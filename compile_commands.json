@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/brettbar/personal/game",
+  "command": "/usr/bin/c++ -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP -I/include -I/home/brettbar/personal/game/_deps/raylib-build/src -I/home/brettbar/personal/game/_deps/raylib-src/src/external/glfw/include -O3 -DNDEBUG -Wall -Wextra -std=c++17 -o CMakeFiles/game.dir/main.cpp.o -c /home/brettbar/personal/game/main.cpp",
+  "file": "/home/brettbar/personal/game/main.cpp"
+}
+]
