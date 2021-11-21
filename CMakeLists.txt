@@ -6,7 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(game)
-add_executable(${PROJECT_NAME} src/main.cpp src/map.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/map.cpp src/actors.cpp)
 
 target_link_libraries(${PROJECT_NAME}  raylib m)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)

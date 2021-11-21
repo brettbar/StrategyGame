@@ -7,7 +7,7 @@ struct Tile {
   Vector2 position;
 };
 
-void CreateMap(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
+void Create(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
   u32 currId = 0;
   Vector2 position = {0.0f, 0.0f};
 
@@ -18,7 +18,7 @@ void CreateMap(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
       tile.id = currId++;
 
       if (y % 2 == 1)
-        tile.position = {position.x + x * 128 - 64, position.y + y * 96};
+        tile.position = {position.x + x * 128 + 64, position.y + y * 96};
       else
         tile.position = {position.x + x * 128, position.y + y * 96};
 
@@ -27,7 +27,7 @@ void CreateMap(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
   }
 }
 
-void DrawMap(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
+void Draw(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
   auto tiles = registry.view<Tile>();
 
   tiles.each([hex, frameRec](Tile tile) {
