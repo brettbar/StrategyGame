@@ -27,15 +27,33 @@ void CreateNew(entt::registry &registry, Vector2 clickPos,
       entity, roman.position, roman.destination, roman.speed, roman.sprite);
 }
 
-void SetDestinations(entt::registry &registry, Camera2D camera) {
-  entt::basic_view villagers = registry.view<Actors::RomanVillager>();
+void UpdateSelection(entt::registry &registry, Vector2 clickPos) {
+  auto view = registry.view<Actors::RomanVillager>();
 
-  villagers.each([camera](Actors::RomanVillager &romanVillager) {
+  registry.clear<Actors::Selected>();
+
+  // use forward iterators and get only the components of interest
+  for (auto entity : view) {
+    Actors::RomanVillager &villager = view.get<Actors::RomanVillager>(entity);
+
+    if (CheckCollisionPointCircle(villager.position, clickPos, 64)) {
+      registry.emplace<Actors::Selected>(entity, true);
+    }
+  }
+}
+
+void SetDestinations(entt::registry &registry, Camera2D camera) {
+  entt::basic_view view =
+      registry.view<Actors::RomanVillager, Actors::Selected>();
+
+  for (auto entity : view) {
+    Actors::RomanVillager &villager = view.get<Actors::RomanVillager>(entity);
+
     Vector2 *tileOrig =
         determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
     if (tileOrig != nullptr)
-      romanVillager.destination = *tileOrig;
-  });
+      villager.destination = *tileOrig;
+  }
 }
 
 void UpdateMovement(entt::registry &registry) {
@@ -76,8 +94,8 @@ Vector2 *determineTilePos(Vector2 inputPos) {
     column = (int)(x / gridWidth);
 
   // Work out the position of the point relative to the box it is in
-  double relY = y - (row * gridHeight);
-  double relX;
+  f32 relY = y - (row * gridHeight);
+  f32 relX;
 
   if (rowIsOdd)
     relX = (x - (column * gridWidth)) - halfWidth;

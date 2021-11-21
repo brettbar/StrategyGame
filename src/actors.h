@@ -20,8 +20,13 @@ struct RomanVillager {
   Texture2D sprite;
 };
 
+struct Selected {
+  bool isSelected;
+};
+
 void Draw(entt::registry&);
 void CreateNew(entt::registry&, Vector2, Texture2D);
+void UpdateSelection(entt::registry&, Vector2);
 void SetDestinations(entt::registry&, Camera2D);
 void UpdateMovement(entt::registry&);
 Vector2* determineTilePos(Vector2);

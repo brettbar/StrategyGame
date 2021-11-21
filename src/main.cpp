@@ -54,13 +54,15 @@ int main(void) {
     Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), camera);
 
     if (IsMouseButtonPressed(0)) {
-      Actors::CreateNew(registry, clickPos, romanVillagerTexture);
+      Actors::UpdateSelection(registry, clickPos);
     }
-
     if (IsMouseButtonPressed(1)) {
       Actors::SetDestinations(registry, camera);
     }
-
+    if (IsKeyPressed(KEY_ENTER)) {
+      Vector2 *spawnPoint = Actors::determineTilePos(clickPos);
+      Actors::CreateNew(registry, *spawnPoint, romanVillagerTexture);
+    }
     Actors::UpdateMovement(registry);
 
     // Draw
