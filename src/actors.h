@@ -4,6 +4,7 @@
 #define ACTORS_H
 
 #include "../include/entt.hpp"
+#include "map.h"
 #include "raylib.h"
 #include "raymath.h"
 
