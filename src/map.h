@@ -12,6 +12,7 @@ using i32 = int;
 using f32 = float;
 
 namespace Map {
+
 struct Tile {
   u32 id;
   Vector2 position;

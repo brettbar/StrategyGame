@@ -3,6 +3,7 @@
 #include "map.h"
 #include "raylib.h"
 #include "raymath.h"
+#include <map>
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
@@ -11,19 +12,54 @@ using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
 
+struct State {
+  entt::registry registry;
+  u32 screenWidth;
+  u32 screenHeight;
+  const u32 mapWidth;
+  const u32 mapHeight;
+  std::map<std::string, Texture2D> textures;
+  Camera2D camera;
+};
+
+void Init(State&);
+void Exit(State&);
+void Update(State&);
+void FixedUpdate();
+void Draw(State&);
+void Input();
+bool GameIsRunning();
+
 void CameraUpdate(Camera2D &);
 void DrawUI();
 
+
 int main(void) {
-  // Initialization
-  //--------------------------------------------------------------------------------------
-  const u32 screenWidth = 1280;
-  const u32 screenHeight = 720;
+  State state = {
+      .screenWidth = 1280,
+      .screenHeight = 720,
+      .mapWidth = 128,
+      .mapHeight = 128,
+      .textures = {},
+      .camera = {0},
+  };
 
-  const u32 mapWidth = 128;
-  const u32 mapHeight = 128;
+  Init(state);
 
-  InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+  // Main game loop
+  while (GameIsRunning()) {
+    Update(state);
+    Draw(state);
+  }
+
+  Exit(state);
+
+  return 0;
+}
+
+void Init(State &state) {
+  InitWindow(state.screenWidth, state.screenHeight,
+             "raylib [core] example - basic window");
 
   Texture2D hex = LoadTexture("assets/textures/hexagon.png");
   Texture2D rawRomanVillTexture =
@@ -37,72 +73,63 @@ int main(void) {
   Texture2D romanVillagerTexture = LoadTextureFromImage(romanVillagerImage);
   UnloadImage(romanVillagerImage);
 
-  Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
+  state.textures.emplace("hex", hex);
+  state.textures.emplace("rawRomanVillTexture", rawRomanVillTexture);
+  state.textures.emplace("romanVillageTexture", romanVillageTexture);
+  state.textures.emplace("romanVillagerTexture", romanVillagerTexture);
 
-  Camera2D camera = {0};
-  camera.zoom = 2.0f;
+  state.camera.zoom = 2.0f;
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
-  entt::registry registry;
 
-  Map::CreateTerrain(registry, mapWidth, mapHeight);
+  Map::CreateTerrain(state.registry, state.mapWidth, state.mapHeight);
 
   SetTargetFPS(144); // Set our game to run at 60 frames-per-second
-  //--------------------------------------------------------------------------------------
+}
 
-  // Main game loop
-  while (!WindowShouldClose()) { // Detect window close button or ESC key
-    // Update
-    CameraUpdate(camera);
+void Update(State &state) {
+    CameraUpdate(state.camera);
 
-    Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), camera);
+    Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
     if (IsMouseButtonPressed(0)) {
-      Actors::UpdateSelection(registry, clickPos);
+      Actors::UpdateSelection(state.registry, clickPos);
     }
     if (IsMouseButtonPressed(1)) {
-      Actors::SetDestinations(registry, camera);
+      Actors::SetDestinations(state.registry, state.camera);
     }
     if (IsKeyPressed(KEY_ENTER)) {
-      Actors::CreateNew(registry, clickPos, romanVillagerTexture);
+      Actors::CreateNew(state.registry, clickPos,
+                        state.textures.at("romanVillagerTexture"));
     }
-    Actors::UpdateMovement(registry);
+    Actors::UpdateMovement(state.registry);
 
     if (IsKeyPressed(KEY_P)) {
-      Map::UpdateProvinces(registry, clickPos);
+      Map::UpdateProvinces(state.registry, clickPos);
     }
+}
 
-    // Draw
-    //----------------------------------------------------------------------------------
+void Draw(State &state) {
     BeginDrawing();
 
     ClearBackground(DARKGRAY);
 
-    BeginMode2D(camera);
+    BeginMode2D(state.camera);
 
-    Map::DrawTerrain(registry, hex, frameRec);
-    Map::DrawProvinces(registry, romanVillageTexture);
-    Actors::Draw(registry);
+    Texture2D &hex = state.textures.at("hex");
+    Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
+    Map::DrawTerrain(state.registry, hex, frameRec);
+
+    Texture2D &romanVillageTexture = state.textures.at("romanVillageTexture");
+    Map::DrawProvinces(state.registry, romanVillageTexture);
+    Actors::Draw(state.registry);
 
     EndMode2D();
 
     DrawUI();
 
     EndDrawing();
-    //----------------------------------------------------------------------------------
-  }
-
-  // De-Initialization
-  //--------------------------------------------------------------------------------------
-  UnloadTexture(hex);
-  UnloadTexture(romanVillageTexture);
-  UnloadTexture(rawRomanVillTexture);
-  UnloadTexture(romanVillagerTexture);
-
-  CloseWindow(); // Close window and OpenGL context
-  //--------------------------------------------------------------------------------------
-
-  return 0;
 }
+
 
 void CameraUpdate(Camera2D &camera) {
   f32 cameraSpeed = 4.0f;
@@ -126,10 +153,20 @@ void CameraUpdate(Camera2D &camera) {
     camera.zoom = 3.0f;
   else if (camera.zoom < 0.1f)
     camera.zoom = 0.1f;
-
 }
 
 void DrawUI() {
   DrawRectangle(10, 10, 90, 20, BLACK);
   DrawFPS(20, 10);
+}
+
+bool GameIsRunning() { return !WindowShouldClose(); }
+
+void Exit(State& state) {
+  UnloadTexture(state.textures.at("hex"));
+  UnloadTexture(state.textures.at("romanVillageTexture"));
+  UnloadTexture(state.textures.at("rawRomanVillTexture"));
+  UnloadTexture(state.textures.at("romanVillagerTexture"));
+
+  CloseWindow(); // Close window and OpenGL context
 }
