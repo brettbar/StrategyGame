@@ -3,7 +3,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "../include/entt.hpp"
+#include "../include/entt/entt.hpp"
 #include "raylib.h"
 #include "raymath.h"
 
@@ -28,7 +28,7 @@ struct IVector2 {
 
 void CreateTerrain(entt::registry &, u32, u32);
 void DrawTerrain(entt::registry &, Texture2D, Rectangle);
-void UpdateProvinces(entt::registry &, Vector2);
+void UpdateProvinces(entt::registry &);
 void DrawProvinces(entt::registry &, Texture2D);
 void DrawBorder(Tile);
 Vector2 *determineTilePos(Vector2);

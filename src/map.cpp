@@ -33,33 +33,33 @@ void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
   });
 }
 
-void UpdateProvinces(entt::registry &registry, Vector2 clickPos) {
+void UpdateProvinces(entt::registry &registry) {
   auto tiles = registry.view<Tile>();
-  Vector2 *target = determineTilePos(clickPos);
-  assert(target != nullptr);
+  // Vector2 *target = determineTilePos(clickPos);
+  // assert(target != nullptr);
 
-  int row = target->y / 96.0;
-  int column;
-
-  if (row % 2 == 1) {
-    column = (target->x - 64.0) / 128.0;
-  } else {
-    column = target->x / 128.0;
-  }
-
-  int targetId = column + row * 128;
-
-  printf("%d\n", targetId);
-
-  tiles.each([targetId](Tile &tile) {
-    if (targetId == (i32)tile.id) {
-      tile.population += 25;
-
-      if (tile.population >= 100) {
-        tile.name = "Roma";
-      }
-    }
+  tiles.each([] (Tile &tile) {
+    if (tile.population > 0)
+      tile.population += 1;
   });
+  // int row = target->y / 96.0;
+  // int column;
+
+  // if (row % 2 == 1) {
+  //   column = (target->x - 64.0) / 128.0;
+  // } else {
+  //   column = target->x / 128.0;
+  // }
+
+  // int targetId = column + row * 128;
+
+  // printf("%d\n", targetId);
+
+  // tiles.each([targetId](Tile &tile) {
+  //   if (targetId == (i32)tile.id) {
+  //     tile.population += 25;
+  //   }
+  // });
 }
 
 void DrawProvinces(entt::registry &registry, Texture2D village) {
@@ -73,7 +73,8 @@ void DrawProvinces(entt::registry &registry, Texture2D village) {
     if (tile.population >= 100) {
       DrawBorder(tile);
       DrawTextureV(village, tile.position, WHITE);
-      DrawText(tile.name.c_str(), tile.position.x + 50.0,
+      if (tile.name != "")
+        DrawText(tile.name.c_str(), tile.position.x + 50.0,
                tile.position.y + 86.0, 14, WHITE);
     }
   });

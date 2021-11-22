@@ -3,7 +3,7 @@
 #ifndef ACTORS_H
 #define ACTORS_H
 
-#include "../include/entt.hpp"
+#include "../include/entt/entt.hpp"
 #include "map.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -26,10 +26,10 @@ struct Selected {
 };
 
 void Draw(entt::registry&);
-void CreateNew(entt::registry&, Vector2, Texture2D);
+void CreateNew(entt::registry&, Vector2, u32, std::map<std::string, Texture2D>);
 void UpdateSelection(entt::registry&, Vector2);
 void SetDestinations(entt::registry&, Camera2D);
-void UpdateMovement(entt::registry&);
+void UpdateMovement(entt::registry&, f32, f32);
 Vector2* determineTilePos(Vector2);
 }; // namespace Units
 

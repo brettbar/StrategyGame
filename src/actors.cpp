@@ -4,6 +4,10 @@ namespace Actors {
 
 void Draw(entt::registry &registry) {
   entt::basic_view villagers = registry.view<Actors::RomanVillager>();
+  registry.sort<Actors::RomanVillager>([](const Actors::RomanVillager &lhs, const Actors::RomanVillager &rhs) {
+    return rhs.position.y > lhs.position.y;
+  });
+
   villagers.each([](Actors::RomanVillager romanVillager) {
     DrawTextureV(
         romanVillager.sprite,
@@ -12,19 +16,38 @@ void Draw(entt::registry &registry) {
   });
 }
 
-void CreateNew(entt::registry &registry, Vector2 clickPos,
-               Texture2D romanVillagerTexture) {
+void CreateNew(entt::registry &registry, Vector2 clickPos, u32 faction,
+               std::map<std::string, Texture2D> textures) {
   entt::entity entity = registry.create();
 
-  Actors::RomanVillager roman = Actors::RomanVillager{
+  Actors::RomanVillager actor = Actors::RomanVillager{
       .position = clickPos,
       .destination = clickPos,
       .speed = 1.0f,
-      .sprite = romanVillagerTexture,
+      // .sprite = textures.at("romanVillagerTexture"),
   };
 
+  switch (faction) {
+  case 0:
+    actor.sprite = textures.at("romanVillagerTexture");
+    break;
+  case 1:
+    actor.sprite = textures.at("greekVillagerTexture");
+    break;
+  case 2:
+    actor.sprite = textures.at("celtVillagerTexture");
+    break;
+  case 3:
+    actor.sprite = textures.at("punicVillagerTexture");
+    break;
+
+  default:
+    actor.sprite = textures.at("romanVillagerTexture");
+    break;
+  }
+
   registry.emplace<Actors::RomanVillager>(
-      entity, roman.position, roman.destination, roman.speed, roman.sprite);
+      entity, actor.position, actor.destination, actor.speed, actor.sprite);
 }
 
 void UpdateSelection(entt::registry &registry, Vector2 clickPos) {
@@ -56,10 +79,10 @@ void SetDestinations(entt::registry &registry, Camera2D camera) {
   }
 }
 
-void UpdateMovement(entt::registry &registry) {
+void UpdateMovement(entt::registry &registry, f32 deltaTime, f32 timeScale) {
   entt::basic_view villagers = registry.view<Actors::RomanVillager>();
 
-  villagers.each([](Actors::RomanVillager &romanVillager) {
+  villagers.each([deltaTime, timeScale](Actors::RomanVillager &romanVillager) {
     if (Vector2Distance(romanVillager.destination, romanVillager.position) >
         0.5f) {
       Vector2 foo = {
@@ -68,11 +91,12 @@ void UpdateMovement(entt::registry &registry) {
       };
 
       Vector2 unitVec = Vector2Normalize(foo);
-      romanVillager.position.x += unitVec.x * romanVillager.speed;
-      romanVillager.position.y += unitVec.y * romanVillager.speed;
+      romanVillager.position.x +=
+          unitVec.x * romanVillager.speed * deltaTime * timeScale;
+      romanVillager.position.y +=
+          unitVec.y * romanVillager.speed * deltaTime * timeScale;
     }
   });
 }
-
 
 }; // namespace Actors
