@@ -1,0 +1,74 @@
+{
+  "Romans": {
+    "name": "Roman Republic",
+    "adjective": "Roman",
+    "primary": "RED",
+    "secondary": "GOLD",
+    "government": "Republic",
+    "society": {
+      "mobility": "Settled",
+      "culture": "Latin",
+      "religion": "Hellenic",
+      "commonNames": [],
+      "settlementNames": []
+    },
+    "uniqueTraits": [],
+    "uniqueMechanics": []
+  },
+  "Greeks": {
+    "name": "Greek Cities",
+    "adjective": "Greek",
+    "primary": "SKYBLUE",
+    "secondary": "GOLD",
+    "government": "Federation",
+    "society": {
+      "mobility": "Settled",
+      "culture": "Greek",
+      "religion": "Hellenic",
+      "commonNames": [],
+      "settlementNames": []
+    }
+  },
+  "Celts": {
+    "name": "Celtic Tribes",
+    "adjective": "Celtic",
+    "primary": "GREEN",
+    "secondary": "GOLD",
+    "government": "Federation",
+    "society": {
+      "mobility": "Tribal",
+      "culture": "Celtic",
+      "religion": "Celtic",
+      "commonNames": [],
+      "settlementNames": []
+    }
+  },
+  "Carthaginians": {
+    "name": "Punic Colonies",
+    "adjective": "Punic",
+    "primary": "WHITE",
+    "secondary": "PURPLE",
+    "government": "Republic",
+    "society": {
+      "mobility": "Settled",
+      "culture": "Punic",
+      "religion": "Canaanite",
+      "commonNames": [],
+      "settlementNames": []
+    }
+  },
+  "Persians": {
+    "name": "Persian Empire",
+    "adjective": "Persian",
+    "primary": "ORANGE",
+    "secondary": "WHITE",
+    "government": "Monarchy",
+    "society": {
+      "mobility": "Settled",
+      "culture": "Persian",
+      "religion": "Persian",
+      "commonNames": [],
+      "settlementNames": []
+    }
+  }
+}

@@ -3,9 +3,9 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "../include/entt/entt.hpp"
-#include "raylib.h"
-#include "raymath.h"
+#include "common.h"
+#include <chrono>
+#include <thread>
 
 using u32 = unsigned int;
 using i32 = int;
@@ -27,10 +27,14 @@ struct IVector2 {
 };
 
 void CreateTerrain(entt::registry &, u32, u32);
-void DrawTerrain(entt::registry &, Texture2D, Rectangle);
 void UpdateProvinces(entt::registry &);
-void DrawProvinces(entt::registry &, Texture2D);
+void SetProvinceOwner(entt::registry &, u32, Vector2);
+
+void DrawTerrain(entt::registry &, Texture2D, Rectangle);
+void DrawProvinces(entt::registry &, bool, Texture2D);
 void DrawBorder(Tile);
+
+i32 determineTileIdFromClick(Vector2);
 Vector2 *determineTilePos(Vector2);
 }; // namespace Map
 

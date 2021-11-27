@@ -20,9 +20,48 @@ void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
       else
         tile.position = {position.x + x * 128, position.y + y * 96};
 
-      registry.emplace<Tile>(entity, tile.id, tile.position);
+      registry.emplace<Tile>(entity, tile.id, tile.position, tile.owner,
+                             tile.population, tile.name);
     }
   }
+}
+
+void UpdateProvinces(entt::registry &registry) {
+  auto tiles = registry.view<Tile>();
+  tiles.each([](Tile &tile) {
+    if (tile.owner > -1 && tile.population >= 0)
+      tile.population += 25;
+  });
+}
+
+void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
+  i32 tileId = determineTileIdFromClick(clickPos);
+  assert(tileId >= 0);
+
+  auto tiles = registry.view<Tile>();
+
+  tiles.each([tileId, owner](Tile &tile) {
+    if (tile.id == (u32)tileId) {
+      tile.owner = owner;
+      switch (tile.owner) {
+      case 0:
+        tile.name = "Tomato Town";
+        break;
+      case 1:
+        tile.name = "Athens";
+        break;
+      case 2:
+        tile.name = "Lugudunon";
+        break;
+      case 3:
+        tile.name = "Carthage";
+        break;
+      case 4:
+        tile.name = "Persepolis";
+        break;
+      }
+    }
+  });
 }
 
 void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
@@ -33,49 +72,31 @@ void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
   });
 }
 
-void UpdateProvinces(entt::registry &registry) {
-  auto tiles = registry.view<Tile>();
-  // Vector2 *target = determineTilePos(clickPos);
-  // assert(target != nullptr);
-
-  tiles.each([] (Tile &tile) {
-    if (tile.population > 0)
-      tile.population += 1;
-  });
-  // int row = target->y / 96.0;
-  // int column;
-
-  // if (row % 2 == 1) {
-  //   column = (target->x - 64.0) / 128.0;
-  // } else {
-  //   column = target->x / 128.0;
-  // }
-
-  // int targetId = column + row * 128;
-
-  // printf("%d\n", targetId);
-
-  // tiles.each([targetId](Tile &tile) {
-  //   if (targetId == (i32)tile.id) {
-  //     tile.population += 25;
-  //   }
-  // });
-}
-
-void DrawProvinces(entt::registry &registry, Texture2D village) {
+void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
   auto tiles = registry.view<Tile>();
 
-  tiles.each([village](Tile &tile) {
-    std::string popText = std::to_string(tile.population);
-    const char *text = popText.c_str();
-    DrawText(text, tile.position.x + 16.0, tile.position.y + 16.0, 14, WHITE);
+  tiles.each([village, debug](Tile &tile) {
+    // std::string idString = std::to_string(tile.id);
+    // const char *idText = idString.c_str();
+    // DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
+    // WHITE);
+
+    // std::string ownerString = std::to_string(tile.owner);
+    // const char *ownertext = ownerString.c_str();
+    // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0, 14,
+    //          BLUE);
+
+    std::string popString = std::to_string(tile.population);
+    const char *text = popString.c_str();
+    if (debug)
+      DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0, 14, RED);
 
     if (tile.population >= 100) {
       DrawBorder(tile);
       DrawTextureV(village, tile.position, WHITE);
       if (tile.name != "")
         DrawText(tile.name.c_str(), tile.position.x + 50.0,
-               tile.position.y + 86.0, 14, WHITE);
+                 tile.position.y + 86.0, 14, WHITE);
     }
   });
 }
@@ -83,6 +104,7 @@ void DrawProvinces(entt::registry &registry, Texture2D village) {
 void DrawBorder(Tile tile) {
   f32 centerX = tile.position.x + 64;
   f32 centerY = tile.position.y + 64;
+  Color color = BLACK;
 
   Vector2 vertices[6] = {
       {centerX, centerY + 64},      {centerX + 64, centerY + 32},
@@ -90,10 +112,45 @@ void DrawBorder(Tile tile) {
       {centerX - 64, centerY - 32}, {centerX - 64, centerY + 32},
   };
 
-  for (u32 i = 0; i < 5; i++) {
-    DrawLineEx(vertices[i], vertices[i + 1], 2, Fade(RED, 0.5f));
+  switch (tile.owner) {
+  case 0:
+    color = RED;
+    break;
+  case 1:
+    color = SKYBLUE;
+    break;
+  case 2:
+    color = GREEN;
+    break;
+  case 3:
+    color = PURPLE;
+    break;
+  case 4:
+    color = ORANGE;
+    break;
   }
-  DrawLineEx(vertices[5], vertices[0], 2, Fade(RED, 0.5f));
+
+  for (u32 i = 0; i < 5; i++) {
+    DrawLineEx(vertices[i], vertices[i + 1], 2, Fade(color, 0.5f));
+  }
+  DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
+}
+
+i32 determineTileIdFromClick(Vector2 clickPos) {
+  Vector2 *target = determineTilePos(clickPos);
+  if (target == nullptr)
+    return -1;
+
+  i32 row = target->y / 96.0;
+  i32 column;
+
+  if (row % 2 == 1) {
+    column = (target->x - 64.0) / 128.0;
+  } else {
+    column = target->x / 128.0;
+  }
+
+  return column + row * 128;
 }
 
 Vector2 *determineTilePos(Vector2 inputPos) {

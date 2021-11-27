@@ -3,14 +3,8 @@
 #ifndef ACTORS_H
 #define ACTORS_H
 
-#include "../include/entt/entt.hpp"
+#include "common.h"
 #include "map.h"
-#include "raylib.h"
-#include "raymath.h"
-
-using u32 = unsigned int;
-using i32 = int;
-using f32 = float;
 
 namespace Actors {
 
@@ -25,11 +19,11 @@ struct Selected {
   bool isSelected;
 };
 
-void Draw(entt::registry&);
+void Draw(entt::registry&, bool);
 void CreateNew(entt::registry&, Vector2, u32, std::map<std::string, Texture2D>);
 void UpdateSelection(entt::registry&, Vector2);
 void SetDestinations(entt::registry&, Camera2D);
-void UpdateMovement(entt::registry&, f32, f32);
+void UpdateMovement(entt::registry&, f32);
 Vector2* determineTilePos(Vector2);
 }; // namespace Units
 

@@ -1,67 +1,59 @@
-#include "../include/entt/entt.hpp"
-#include "../include/raygui/raygui.h"
+#include "common.h"
+
 #include "actors.h"
 #include "map.h"
-#include "raylib.h"
-#include "raymath.h"
-#include <map>
+#include "ui.h"
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
 
-using u32 = unsigned int;
-using i32 = int;
-using f32 = float;
-
-struct State {
-  entt::registry registry;
-  u32 screenWidth;
-  u32 screenHeight;
-  const u32 mapWidth;
-  const u32 mapHeight;
-  f32 timeScale;
-  f32 prevTimeScale;
-  std::map<std::string, Texture2D> textures;
-  Camera2D camera;
-};
-
 void Init(State &);
-void Exit(State &);
 void Input(State &);
-void FixedUpdate(State &, f32);
+void Update(State &);
+void LateUpdate(State &);
 void Draw(State &);
-bool GameIsRunning();
+void Exit(State &);
 
+bool GameIsRunning();
 void CameraUpdate(Camera2D &);
-void DrawUI(State &);
+void ZoomCamera(Camera2D &, f32, Vector2);
 
 int main(void) {
-  State state = {
-      .screenWidth = 1280,
-      .screenHeight = 720,
-      .mapWidth = 128,
-      .mapHeight = 128,
-      .timeScale = 0.0f,
-      .prevTimeScale = 0.0f,
-      .textures = {},
-      .camera = {0},
-  };
+  State state = {.screenWidth = 1920,
+                 .screenHeight = 1080,
+                 .mapWidth = 128,
+                 .mapHeight = 128,
+                 .timeScale = 0.0f,
+                 .prevTimeScale = 0.0f,
+                 .textures = {},
+                 .debug = true};
 
   Init(state);
 
   // Main game loop
+  f32 MS_PER_UPDATE = 1 / 60.0;
+  f32 ONCE_A_SECOND = 1;
+  f32 oncelag = 0.0f;
+
   f32 lag = 0.0f;
-  f32 MS_PER_UPDATE = 1000;
+  f32 dt = 0.0f;
 
   while (GameIsRunning()) {
-    f32 dt = GetFrameTime() * 1000;
+    dt = GetFrameTime();
+
     lag += dt;
+    oncelag += dt;
 
     Input(state);
 
     while (lag >= MS_PER_UPDATE) {
-      FixedUpdate(state, dt);
+      Update(state);
       lag -= MS_PER_UPDATE;
+    }
+
+    while (oncelag >= ONCE_A_SECOND * (1 / state.timeScale)) {
+      LateUpdate(state);
+      oncelag = 0.0f;
     }
 
     Draw(state);
@@ -85,7 +77,8 @@ void Init(State &state) {
       LoadTexture("assets/textures/units/Celt_Villager.png");
   Texture2D punicVillagerTexture =
       LoadTexture("assets/textures/units/Carthaginian_Villager.png");
-
+  Texture2D persianVillagerTexture =
+      LoadTexture("assets/textures/units/Persian_Villager.png");
   Texture2D romanVillageTexture =
       LoadTexture("assets/textures/village_roman.png");
 
@@ -94,8 +87,11 @@ void Init(State &state) {
   state.textures.emplace("greekVillagerTexture", greekVillagerTexture);
   state.textures.emplace("celtVillagerTexture", celtVillagerTexture);
   state.textures.emplace("punicVillagerTexture", punicVillagerTexture);
+  state.textures.emplace("persianVillagerTexture", persianVillagerTexture);
   state.textures.emplace("romanVillageTexture", romanVillageTexture);
 
+  state.camera = {0};
+  state.camera.target = {0, 0};
   state.camera.zoom = 2.0f;
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
@@ -130,6 +126,29 @@ void Input(State &state) {
       state.timeScale = 1.5f;
   }
 
+  if (IsKeyDown(KEY_LEFT_SHIFT)) {
+    if (IsKeyPressed(KEY_ONE)) {
+      Map::SetProvinceOwner(state.registry, 0, clickPos);
+    }
+    if (IsKeyPressed(KEY_TWO)) {
+      Map::SetProvinceOwner(state.registry, 1, clickPos);
+    }
+    if (IsKeyPressed(KEY_THREE)) {
+      Map::SetProvinceOwner(state.registry, 2, clickPos);
+    }
+    if (IsKeyPressed(KEY_FOUR)) {
+      Map::SetProvinceOwner(state.registry, 3, clickPos);
+    }
+    if (IsKeyPressed(KEY_FIVE)) {
+      Map::SetProvinceOwner(state.registry, 4, clickPos);
+    }
+    return;
+  }
+
+  if (IsKeyPressed(KEY_GRAVE)) {
+    state.debug = !state.debug;
+  }
+
   if (IsMouseButtonPressed(0)) {
     Actors::UpdateSelection(state.registry, clickPos);
   }
@@ -148,12 +167,16 @@ void Input(State &state) {
   if (IsKeyPressed(KEY_FOUR)) {
     Actors::CreateNew(state.registry, clickPos, 3, state.textures);
   }
+  if (IsKeyPressed(KEY_FIVE)) {
+    Actors::CreateNew(state.registry, clickPos, 4, state.textures);
+  }
 }
 
-void FixedUpdate(State &state, f32 deltaTime) {
-  Actors::UpdateMovement(state.registry, deltaTime * 100, state.timeScale);
-  Map::UpdateProvinces(state.registry);
+void Update(State &state) {
+  Actors::UpdateMovement(state.registry, state.timeScale);
 }
+
+void LateUpdate(State &state) { Map::UpdateProvinces(state.registry); }
 
 void Draw(State &state) {
   BeginDrawing();
@@ -167,8 +190,8 @@ void Draw(State &state) {
   Map::DrawTerrain(state.registry, hex, frameRec);
 
   Texture2D &romanVillageTexture = state.textures.at("romanVillageTexture");
-  Map::DrawProvinces(state.registry, romanVillageTexture);
-  Actors::Draw(state.registry);
+  Map::DrawProvinces(state.registry, state.debug, romanVillageTexture);
+  Actors::Draw(state.registry, state.debug);
 
   EndMode2D();
 
@@ -179,6 +202,7 @@ void Draw(State &state) {
 
 void CameraUpdate(Camera2D &camera) {
   f32 cameraSpeed = 4.0f;
+  camera.target = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
 
   if (IsKeyDown(KEY_D))
     camera.offset.x -= cameraSpeed;
@@ -194,19 +218,34 @@ void CameraUpdate(Camera2D &camera) {
   if (IsKeyDown(KEY_X))
     camera.zoom += 0.05f;
 
-  camera.zoom += ((f32)GetMouseWheelMove() * 0.05f);
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  // float newZoom = camera.zoom + mouseWheelDelta * 0.05f;
+  // if (newZoom <= 0) {
+  //   newZoom = 0.01f;
+  // }
+
+  // if (GetMouseWheelMove() > 0.0)
+  //   ZoomCamera(camera, (f32)GetMouseWheelMove(), GetMousePosition());
+  // else if (GetMouseWheelMove() < 0.0)
+  //   ZoomCamera(camera, 1/(f32)GetMouseWheelMove(), GetMousePosition());
+  camera.zoom += (mouseWheelDelta * 0.05f);
   if (camera.zoom > 3.0f)
     camera.zoom = 3.0f;
   else if (camera.zoom < 0.1f)
     camera.zoom = 0.1f;
 }
 
-void DrawUI(State &state) {
-  DrawRectangle(10, 10, 90, 20, BLACK);
-  DrawFPS(20, 10);
+void ZoomCamera(Camera2D &camera, f32 zoomStep, Vector2 point) {
+  Vector2 c0 = camera.offset;
+  Vector2 v0 = {(f32)GetScreenWidth() / 2.0f, (f32)GetScreenHeight() / 2.0f};
+  f32 z0 = camera.zoom;
+  f32 z1 = z0 * zoomStep;
 
-  DrawRectangle(1170, 10, 90, 20, BLACK);
-  DrawText(std::to_string(state.timeScale).c_str(), 1170, 10, 20, WHITE);
+  Vector2 c1 = Vector2Add(c0, Vector2Scale(Vector2Add(v0, point), (z0 - z1)));
+
+  camera.zoom = z1;
+  camera.offset = c1;
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }
@@ -217,6 +256,7 @@ void Exit(State &state) {
   UnloadTexture(state.textures.at("greekVillagerTexture"));
   UnloadTexture(state.textures.at("celtVillagerTexture"));
   UnloadTexture(state.textures.at("punicVillagerTexture"));
+  UnloadTexture(state.textures.at("persianVillagerTexture"));
   UnloadTexture(state.textures.at("romanVillagerTexture"));
   UnloadTexture(state.textures.at("romanVillageTexture"));
 
