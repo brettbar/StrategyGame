@@ -1,13 +1,29 @@
-
 #pragma once
 
 #ifndef UI_H 
 #define UI_H
 
-// #define RAYGUI_IMPLEMENTATION
-// #include "../include/raygui/raygui.h"
 #include "common.h"
 
-void DrawUI(State &);
+namespace UI {
+
+struct UI_Element {
+  std::string id;
+  bool debugOnly;
+  Rectangle panel;
+  Vector2 position;
+  std::vector<UI_Element> children;
+  Texture2D texture;
+};
+
+void Init(State &);
+void Input(State &);
+void Update(State &);
+void Draw(State &);
+
+UI_Element createButton(Texture2D, Vector2, Color);
+
+};
+
 
 #endif

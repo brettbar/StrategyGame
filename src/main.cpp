@@ -95,6 +95,8 @@ void Init(State &state) {
   state.camera.zoom = 2.0f;
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
+  
+  UI::Init(state);
   Map::CreateTerrain(state.registry, state.mapWidth, state.mapHeight);
 
   SetTargetFPS(144); // Set our game to run at 60 frames-per-second
@@ -126,6 +128,10 @@ void Input(State &state) {
       state.timeScale = 1.5f;
   }
 
+  if (IsKeyPressed(KEY_TAB)) {
+      Actors::CreateNew(state.registry, clickPos, state.selectedTexture);
+  }
+
   if (IsKeyDown(KEY_LEFT_SHIFT)) {
     if (IsKeyPressed(KEY_ONE)) {
       Map::SetProvinceOwner(state.registry, 0, clickPos);
@@ -150,6 +156,7 @@ void Input(State &state) {
   }
 
   if (IsMouseButtonPressed(0)) {
+    UI::Input(state);
     Actors::UpdateSelection(state.registry, clickPos);
   }
   if (IsMouseButtonPressed(1)) {
@@ -195,7 +202,7 @@ void Draw(State &state) {
 
   EndMode2D();
 
-  DrawUI(state);
+  UI::Draw(state);
 
   EndDrawing();
 }

@@ -8,6 +8,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <map>
+#include <vector>
 
 using u32 = unsigned int;
 using i32 = int;
@@ -24,6 +25,8 @@ struct State {
   std::map<std::string, Texture2D> textures;
   Camera2D camera;
   bool debug;
+  
+  Texture2D selectedTexture;
 };
 
 #endif

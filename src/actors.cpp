@@ -3,18 +3,18 @@
 namespace Actors {
 
 void Draw(entt::registry &registry, bool debug) {
-  entt::basic_view villagers = registry.view<Actors::RomanVillager>();
-  registry.sort<Actors::RomanVillager>([](const Actors::RomanVillager &lhs, const Actors::RomanVillager &rhs) {
+  entt::basic_view villagers = registry.view<Actors::Unit>();
+  registry.sort<Actors::Unit>([](const Actors::Unit &lhs, const Actors::Unit &rhs) {
     return rhs.position.y > lhs.position.y;
   });
 
-  villagers.each([debug](Actors::RomanVillager romanVillager) {
+  villagers.each([debug](Actors::Unit unit) {
     DrawTextureV(
-        romanVillager.sprite,
-        {romanVillager.position.x - 64.0f, romanVillager.position.y - 64.0f},
+        unit.sprite,
+        {unit.position.x - 64.0f, unit.position.y - 64.0f},
         WHITE);
-    if (debug && Vector2Distance(romanVillager.position, romanVillager.destination) > 0.5f) {
-      DrawLineEx(romanVillager.position, romanVillager.destination, 2, MAGENTA);
+    if (debug && Vector2Distance(unit.position, unit.destination) > 0.5f) {
+      DrawLineEx(unit.position, unit.destination, 2, MAGENTA);
     }
   });
 }
@@ -25,7 +25,7 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, u32 faction,
 
   Vector2 *spawn = Map::determineTilePos(clickPos);
 
-  Actors::RomanVillager actor = Actors::RomanVillager{
+  Actors::Unit actor = Actors::Unit{
       .speed = 1.0f,
       // .sprite = textures.at("romanVillagerTexture"),
   };
@@ -59,20 +59,44 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, u32 faction,
     break;
   }
 
-  registry.emplace<Actors::RomanVillager>(
+  registry.emplace<Actors::Unit>(
       entity, actor.position, actor.destination, actor.speed, actor.sprite);
 }
 
+void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
+  entt::entity entity = registry.create();
+
+  Vector2 *spawn = Map::determineTilePos(clickPos);
+
+  Actors::Unit actor = Actors::Unit{
+      .speed = 1.0f,
+      // .sprite = textures.at("romanVillagerTexture"),
+  };
+
+  if (spawn != nullptr)
+    actor.position = *spawn;
+  else
+    actor.position = clickPos;
+
+  actor.destination = actor.position;
+
+  actor.sprite = texture;
+
+  registry.emplace<Actors::Unit>(
+      entity, actor.position, actor.destination, actor.speed, actor.sprite);
+}
+
+
 void UpdateSelection(entt::registry &registry, Vector2 clickPos) {
-  auto view = registry.view<Actors::RomanVillager>();
+  auto view = registry.view<Actors::Unit>();
 
   registry.clear<Actors::Selected>();
 
   // use forward iterators and get only the components of interest
   for (auto entity : view) {
-    Actors::RomanVillager &villager = view.get<Actors::RomanVillager>(entity);
+    Actors::Unit &unit= view.get<Actors::Unit>(entity);
 
-    if (CheckCollisionPointCircle(villager.position, clickPos, 64)) {
+    if (CheckCollisionPointCircle(unit.position, clickPos, 64)) {
       registry.emplace<Actors::Selected>(entity, true);
     }
   }
@@ -80,34 +104,34 @@ void UpdateSelection(entt::registry &registry, Vector2 clickPos) {
 
 void SetDestinations(entt::registry &registry, Camera2D camera) {
   entt::basic_view view =
-      registry.view<Actors::RomanVillager, Actors::Selected>();
+      registry.view<Actors::Unit, Actors::Selected>();
 
   for (auto entity : view) {
-    Actors::RomanVillager &villager = view.get<Actors::RomanVillager>(entity);
+    Actors::Unit &unit= view.get<Actors::Unit>(entity);
 
     Vector2 *tileOrig =
         Map::determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
     if (tileOrig != nullptr)
-      villager.destination = *tileOrig;
+      unit.destination = *tileOrig;
   }
 }
 
 void UpdateMovement(entt::registry &registry, f32 timeScale) {
-  entt::basic_view villagers = registry.view<Actors::RomanVillager>();
+  entt::basic_view units = registry.view<Actors::Unit>();
 
-  villagers.each([timeScale](Actors::RomanVillager &romanVillager) {
-    if (Vector2Distance(romanVillager.destination, romanVillager.position) >
+  units.each([timeScale](Actors::Unit &unit) {
+    if (Vector2Distance(unit.destination, unit.position) >
         0.5f) {
       Vector2 foo = {
-          romanVillager.destination.x - romanVillager.position.x,
-          romanVillager.destination.y - romanVillager.position.y,
+          unit.destination.x - unit.position.x,
+          unit.destination.y - unit.position.y,
       };
 
       Vector2 unitVec = Vector2Normalize(foo);
-      romanVillager.position.x +=
-          unitVec.x * romanVillager.speed * timeScale;
-      romanVillager.position.y +=
-          unitVec.y * romanVillager.speed * timeScale;
+      unit.position.x +=
+          unitVec.x * unit.speed * timeScale;
+      unit.position.y +=
+          unitVec.y * unit.speed * timeScale;
     }
   });
 }

@@ -8,7 +8,7 @@
 
 namespace Actors {
 
-struct RomanVillager {
+struct Unit {
   Vector2 position;
   Vector2 destination;
   f32 speed;
@@ -21,6 +21,7 @@ struct Selected {
 
 void Draw(entt::registry&, bool);
 void CreateNew(entt::registry&, Vector2, u32, std::map<std::string, Texture2D>);
+void CreateNew(entt::registry&, Vector2, Texture2D);
 void UpdateSelection(entt::registry&, Vector2);
 void SetDestinations(entt::registry&, Camera2D);
 void UpdateMovement(entt::registry&, f32);
