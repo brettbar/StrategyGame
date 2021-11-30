@@ -83,7 +83,19 @@ void Draw(State &state) {
 void DrawTopBar(State &state) {
   DrawRectangle(0, 0, (f32)state.screenWidth, 24.0f, BLACK);
   DrawFPS(16, 2);
-  DrawText(std::to_string(state.timeScale).c_str(), state.screenWidth - 128, 2,
+
+  str symbol = "||";
+  if (state.timeScale == 1.5) {
+    symbol = ">>>";
+  } else if (state.timeScale == 1.0) {
+    symbol = ">>";
+  } else if (state.timeScale == 0.5) {
+    symbol = ">";
+  } else {
+    symbol = "||";
+  }
+
+  DrawText(symbol.c_str(), state.screenWidth - 128, 2,
            20, WHITE);
 }
 

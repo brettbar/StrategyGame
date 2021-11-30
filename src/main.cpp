@@ -38,7 +38,7 @@ int main(void) {
                  .mapWidth = 128,
                  .mapHeight = 128,
                  .timeScale = 0.0f,
-                 .prevTimeScale = 0.0f,
+                 .prevTimeScale = 1.0f,
                  .textures = {},
                  .debug = true};
 
@@ -105,10 +105,11 @@ void Init(State &state) {
   state.textures.emplace("romanVillageTexture", romanVillageTexture);
 
   state.camera = Camera2D{
-      .offset = {(f32)GetScreenWidth()/2, (f32)GetScreenHeight()/2},      // Camera offset (displacement from target)
-      .target = {(f32)(state.mapWidth*128)/2, (f32)(state.mapHeight*128)/2}, // Camera target (rotation and zoom origin)
-      .rotation = 0,    // Camera rotation in degrees
-      .zoom = 2.0f,     // Camera zoom (scaling), should be 1.0f by default
+      .offset = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2},
+      .target = {(state.mapWidth * 128.0f) / 2,
+                 (state.mapHeight * 128.0f) / 2},
+      .rotation = 0,
+      .zoom = 2.0f,
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
@@ -124,17 +125,13 @@ void Input(State &state) {
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
   if (IsKeyPressed(KEY_SPACE)) {
-    printf("%f, %f\n", GetMousePosition().x, GetMousePosition().y);
-    Vector2 target = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2};
-    printf("%f %f\n", target.x, target.y);
 
-    Vector2 margaret = GetScreenToWorld2D(target, state.camera);
-    printf("%f %f\n", margaret.x, margaret.y);
+    // 0 0.5 1.0 1.5
 
     if (state.timeScale > 0.0f) {
       state.prevTimeScale = state.timeScale;
-      state.timeScale = 0.0f;
-    } else {
+      state.timeScale = 0.0f; 
+    } else if (state.timeScale == 0.0f) {
       state.timeScale = state.prevTimeScale;
     }
   }
@@ -143,6 +140,11 @@ void Input(State &state) {
     state.timeScale -= 0.5f;
     if (state.timeScale < 0.0f)
       state.timeScale = 0.0f;
+
+    if (state.timeScale == 0.0f && state.prevTimeScale > 0.5f) {
+      state.prevTimeScale -= 0.5f;
+      state.timeScale = state.prevTimeScale;
+    }
   }
 
   if (IsKeyPressed(KEY_EQUAL)) {
@@ -233,9 +235,7 @@ void Draw(State &state) {
   EndDrawing();
 }
 
-void PrintVec2(Vector2 vec) {
-  printf("(%f, %f)\n", vec.x, vec.y);
-}
+void PrintVec2(Vector2 vec) { printf("(%f, %f)\n", vec.x, vec.y); }
 
 void CameraUpdate(Camera2D &camera) {
   f32 cameraSpeed = 4.0f;
@@ -244,7 +244,6 @@ void CameraUpdate(Camera2D &camera) {
   // PrintVec2(target);
 
   // camera.offset = target;
-
 
   if (IsKeyDown(KEY_D))
     camera.target.x += cameraSpeed;
