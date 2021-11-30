@@ -20,7 +20,7 @@ void Draw(entt::registry &registry, bool debug) {
 }
 
 void CreateNew(entt::registry &registry, Vector2 clickPos, u32 faction,
-               std::map<std::string, Texture2D> textures) {
+               std::map<str, Texture2D> textures) {
   entt::entity entity = registry.create();
 
   Vector2 *spawn = Map::determineTilePos(clickPos);

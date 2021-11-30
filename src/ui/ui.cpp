@@ -6,11 +6,14 @@ namespace UI {
 void Init(State &state) {
   auto entity = state.registry.create();
 
+  int currId = 0;
+
   UI_Element drawer = UI_Element();
-  drawer.id = "sprite_list";
+  drawer.id = currId++;
+  drawer.type = "sprite_list";
   drawer.debugOnly = true;
-  drawer.panel = {(f32)state.screenWidth - 256,
-                  ((f32)state.screenHeight / 2) - 512, 256, 1024};
+  drawer.panel = {(f32)state.screenWidth - 192, ((f32)state.screenHeight / 4),
+                  192, (f32)state.screenHeight / 2};
   drawer.children = {
       createButton(state.textures.at("romanVillagerTexture"),
                    {drawer.panel.x, drawer.panel.y}, WHITE),
@@ -46,12 +49,12 @@ void Input(State &state) {
 
   view.each([&state, mousePos](UI_Element &uiElement) {
     if (CheckCollisionPointRec(mousePos, uiElement.panel)) {
-      printf("%s\n", uiElement.id.c_str());
+      printf("%s\n", uiElement.type.c_str());
 
-      if (uiElement.id == "sprite_list" && state.debug) {
+      if (uiElement.type == "sprite_list" && state.debug) {
         for (auto child : uiElement.children) {
           if (CheckCollisionPointRec(mousePos, child.panel)) {
-            printf("%s\n", child.id.c_str());
+            printf("%s\n", child.type.c_str());
             state.selectedTexture = child.texture;
           }
         }
@@ -63,34 +66,41 @@ void Input(State &state) {
 void Update(State &state) {}
 
 void Draw(State &state) {
-  auto view = state.registry.view<UI_Element>();
-
   DrawRectangle(10, 10, 90, 20, BLACK);
   DrawFPS(20, 10);
 
-  DrawRectangle(1170, 10, 90, 20, BLACK);
-  DrawText(std::to_string(state.timeScale).c_str(), 1170, 10, 20, WHITE);
+  DrawRectangle(state.screenWidth - 128, 10, 90, 20, BLACK);
+  DrawText(std::to_string(state.timeScale).c_str(), state.screenWidth - 128, 10,
+           20, WHITE);
 
-  bool debug = state.debug;
-  std::map<std::string, Texture2D> textures = state.textures;
+  DrawTopBar();
 
-  view.each([debug, textures](UI_Element &uiElement) {
-    if (debug) {
-      if (uiElement.id == "sprite_list") {
-        DrawRectangleRounded(uiElement.panel, 0.2f, 1, DARKGRAY);
+  if (state.debug)
+    DrawDebug(state);
+}
 
-        for (auto child : uiElement.children) {
-          DrawTextureEx(child.texture, child.position, 0.0f, 1.0f, WHITE);
-          DrawRectangleLinesEx(child.panel, 2, WHITE);
-        }
+void DrawDebug(State &state) {
+  auto view = state.registry.view<UI_Element>();
+
+  view.each([](UI_Element &uiElement) {
+    if (uiElement.type == "sprite_list") {
+      DrawRectangleRounded(uiElement.panel, 0.2f, 1, DARKGRAY);
+
+      for (auto child : uiElement.children) {
+        DrawTextureEx(child.texture, child.position, 0.0f, 1.0f, WHITE);
+        DrawRectangleLinesEx(child.panel, 2, WHITE);
       }
     }
   });
 }
 
+void DrawTopBar(State &state) {
+  DrawRectangle(0, 0, (f32)state.screenWidth, (f32)state.screenHeight, BLACK);
+}
+
 UI_Element createButton(Texture2D texture, Vector2 position, Color color) {
   UI_Element uiElement = UI_Element();
-  uiElement.id = "texture_button";
+  uiElement.type = "texture_button";
   uiElement.debugOnly = true;
   uiElement.children = {};
   uiElement.position = position;
@@ -98,4 +108,10 @@ UI_Element createButton(Texture2D texture, Vector2 position, Color color) {
   uiElement.panel = {position.x + 32.0f, position.y + 32.0f, 64, 64};
   return uiElement;
 }
+
+void Layout(std::vector<UI_Element> elements) {
+  for (auto element : elements) {
+  }
+}
+
 }; // namespace UI

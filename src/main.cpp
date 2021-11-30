@@ -1,8 +1,18 @@
+/*
+  Authored by Brett Barinaga on 11/29/21.
+  Copyright (c) Brett Barinaga, All rights reserved.
+
+TEMPORARY TODOS HERE
+  @TODO Figure out passing state by ref or val for each function
+  @TODO clean up redunant view captures, maybe one view capture
+    per type per frame, then pass that as ref or val?
+  @TODO a more general clean up of the code
+*/
 #include "common.h"
 
 #include "actors.h"
 #include "map.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
@@ -19,8 +29,8 @@ void CameraUpdate(Camera2D &);
 void ZoomCamera(Camera2D &, f32, Vector2);
 
 int main(void) {
-  State state = {.screenWidth = 1920,
-                 .screenHeight = 1080,
+  State state = {.screenWidth = 1280,
+                 .screenHeight = 720,
                  .mapWidth = 128,
                  .mapHeight = 128,
                  .timeScale = 0.0f,
@@ -95,7 +105,6 @@ void Init(State &state) {
   state.camera.zoom = 2.0f;
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  
   UI::Init(state);
   Map::CreateTerrain(state.registry, state.mapWidth, state.mapHeight);
 
@@ -129,7 +138,7 @@ void Input(State &state) {
   }
 
   if (IsKeyPressed(KEY_TAB)) {
-      Actors::CreateNew(state.registry, clickPos, state.selectedTexture);
+    Actors::CreateNew(state.registry, clickPos, state.selectedTexture);
   }
 
   if (IsKeyDown(KEY_LEFT_SHIFT)) {

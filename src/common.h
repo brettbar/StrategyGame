@@ -13,6 +13,7 @@
 using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
+using str = std::string;
 
 struct State {
   entt::registry registry;
@@ -22,7 +23,7 @@ struct State {
   const u32 mapHeight;
   f32 timeScale;
   f32 prevTimeScale;
-  std::map<std::string, Texture2D> textures;
+  std::map<str, Texture2D> textures;
   Camera2D camera;
   bool debug;
   

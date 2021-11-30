@@ -76,17 +76,17 @@ void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
   auto tiles = registry.view<Tile>();
 
   tiles.each([village, debug](Tile &tile) {
-    // std::string idString = std::to_string(tile.id);
+    // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
     // DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
     // WHITE);
 
-    // std::string ownerString = std::to_string(tile.owner);
+    // str ownerString = std::to_string(tile.owner);
     // const char *ownertext = ownerString.c_str();
     // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0, 14,
     //          BLUE);
 
-    std::string popString = std::to_string(tile.population);
+    str popString = std::to_string(tile.population);
     const char *text = popString.c_str();
     if (debug)
       DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0, 14, RED);

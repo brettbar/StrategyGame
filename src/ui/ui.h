@@ -3,12 +3,13 @@
 #ifndef UI_H 
 #define UI_H
 
-#include "common.h"
+#include "../common.h"
 
 namespace UI {
 
 struct UI_Element {
-  std::string id;
+  u32 id;
+  str type;
   bool debugOnly;
   Rectangle panel;
   Vector2 position;
@@ -20,6 +21,9 @@ void Init(State &);
 void Input(State &);
 void Update(State &);
 void Draw(State &);
+
+void DrawTopBar(State &);
+void DrawDebug(State &);
 
 UI_Element createButton(Texture2D, Vector2, Color);
 

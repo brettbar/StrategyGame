@@ -18,7 +18,7 @@ struct Tile {
   Vector2 position;
   i32 owner;
   u32 population;
-  std::string name;
+  str name;
 };
 
 struct IVector2 {
