@@ -4,6 +4,8 @@
 
 TEMPORARY TODOS HERE
   @TODO Figure out passing state by ref or val for each function
+  @TODO See if excessive State & params can be replaced with only the
+      properties that are actually be used.
   @TODO clean up redunant view captures, maybe one view capture
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
@@ -13,6 +15,8 @@ TEMPORARY TODOS HERE
 #include "actors.h"
 #include "map.h"
 #include "ui/ui.h"
+#include <cstdio>
+#include <raylib.h>
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
@@ -100,9 +104,12 @@ void Init(State &state) {
   state.textures.emplace("persianVillagerTexture", persianVillagerTexture);
   state.textures.emplace("romanVillageTexture", romanVillageTexture);
 
-  state.camera = {0};
-  state.camera.target = {0, 0};
-  state.camera.zoom = 2.0f;
+  state.camera = Camera2D{
+      .offset = {(f32)GetScreenWidth()/2, (f32)GetScreenHeight()/2},      // Camera offset (displacement from target)
+      .target = {(f32)(state.mapWidth*128)/2, (f32)(state.mapHeight*128)/2}, // Camera target (rotation and zoom origin)
+      .rotation = 0,    // Camera rotation in degrees
+      .zoom = 2.0f,     // Camera zoom (scaling), should be 1.0f by default
+  };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   UI::Init(state);
@@ -117,6 +124,13 @@ void Input(State &state) {
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
   if (IsKeyPressed(KEY_SPACE)) {
+    printf("%f, %f\n", GetMousePosition().x, GetMousePosition().y);
+    Vector2 target = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2};
+    printf("%f %f\n", target.x, target.y);
+
+    Vector2 margaret = GetScreenToWorld2D(target, state.camera);
+    printf("%f %f\n", margaret.x, margaret.y);
+
     if (state.timeScale > 0.0f) {
       state.prevTimeScale = state.timeScale;
       state.timeScale = 0.0f;
@@ -190,6 +204,8 @@ void Input(State &state) {
 
 void Update(State &state) {
   Actors::UpdateMovement(state.registry, state.timeScale);
+  state.screenWidth = GetScreenWidth();
+  state.screenHeight = GetScreenHeight();
 }
 
 void LateUpdate(State &state) { Map::UpdateProvinces(state.registry); }
@@ -211,23 +227,33 @@ void Draw(State &state) {
 
   EndMode2D();
 
+  UI::Update(state);
   UI::Draw(state);
 
   EndDrawing();
 }
 
+void PrintVec2(Vector2 vec) {
+  printf("(%f, %f)\n", vec.x, vec.y);
+}
+
 void CameraUpdate(Camera2D &camera) {
   f32 cameraSpeed = 4.0f;
-  camera.target = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
 
   if (IsKeyDown(KEY_D))
-    camera.offset.x -= cameraSpeed;
+    camera.target.x += cameraSpeed;
   if (IsKeyDown(KEY_A))
-    camera.offset.x += cameraSpeed;
+    camera.target.x -= cameraSpeed;
   if (IsKeyDown(KEY_W))
-    camera.offset.y += cameraSpeed;
+    camera.target.y -= cameraSpeed;
   if (IsKeyDown(KEY_S))
-    camera.offset.y -= cameraSpeed;
+    camera.target.y += cameraSpeed;
 
   if (IsKeyDown(KEY_Z))
     camera.zoom -= 0.05f;
@@ -245,6 +271,7 @@ void CameraUpdate(Camera2D &camera) {
   //   ZoomCamera(camera, (f32)GetMouseWheelMove(), GetMousePosition());
   // else if (GetMouseWheelMove() < 0.0)
   //   ZoomCamera(camera, 1/(f32)GetMouseWheelMove(), GetMousePosition());
+
   camera.zoom += (mouseWheelDelta * 0.05f);
   if (camera.zoom > 3.0f)
     camera.zoom = 3.0f;
@@ -252,17 +279,18 @@ void CameraUpdate(Camera2D &camera) {
     camera.zoom = 0.1f;
 }
 
-void ZoomCamera(Camera2D &camera, f32 zoomStep, Vector2 point) {
-  Vector2 c0 = camera.offset;
-  Vector2 v0 = {(f32)GetScreenWidth() / 2.0f, (f32)GetScreenHeight() / 2.0f};
-  f32 z0 = camera.zoom;
-  f32 z1 = z0 * zoomStep;
+// void ZoomCamera(Camera2D &camera, f32 zoomStep, Vector2 point) {
+//   Vector2 c0 = camera.offset;
+//   Vector2 v0 = {(f32)GetScreenWidth() / 2.0f, (f32)GetScreenHeight() / 2.0f};
+//   f32 z0 = camera.zoom;
+//   f32 z1 = z0 * zoomStep;
 
-  Vector2 c1 = Vector2Add(c0, Vector2Scale(Vector2Add(v0, point), (z0 - z1)));
+//   Vector2 c1 = Vector2Add(c0, Vector2Scale(Vector2Add(v0, point), (z0 -
+//   z1)));
 
-  camera.zoom = z1;
-  camera.offset = c1;
-}
+//   camera.zoom = z1;
+//   camera.offset = c1;
+// }
 
 bool GameIsRunning() { return !WindowShouldClose(); }
 

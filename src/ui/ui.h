@@ -1,20 +1,32 @@
 #pragma once
 
-#ifndef UI_H 
+#ifndef UI_H
 #define UI_H
 
 #include "../common.h"
 
 namespace UI {
 
-struct UI_Element {
+enum Shape {
+  Texture,
+  Rect,
+  Rect_Lines,
+  Rect_Rounded,
+};
+
+struct Element {
+  // Required
   u32 id;
-  str type;
+  str name;
+  Shape shape;
   bool debugOnly;
-  Rectangle panel;
   Vector2 position;
-  std::vector<UI_Element> children;
+
+  // Optional
+  Rectangle panel;
+  Color color;
   Texture2D texture;
+  std::vector<Element> children;
 };
 
 void Init(State &);
@@ -23,11 +35,14 @@ void Update(State &);
 void Draw(State &);
 
 void DrawTopBar(State &);
-void DrawDebug(State &);
+void DrawElement(Element);
 
-UI_Element createButton(Texture2D, Vector2, Color);
+Element CreateButton(Texture2D, Vector2, Color);
+Element CreateSideBar(State &);
 
-};
+// Debug Only
+Element CreateDrawer(State &);
 
+}; // namespace UI
 
 #endif
