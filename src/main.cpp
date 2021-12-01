@@ -125,9 +125,6 @@ void Input(State &state) {
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
   if (IsKeyPressed(KEY_SPACE)) {
-
-    // 0 0.5 1.0 1.5
-
     if (state.timeScale > 0.0f) {
       state.prevTimeScale = state.timeScale;
       state.timeScale = 0.0f; 
@@ -235,24 +232,23 @@ void Draw(State &state) {
   EndDrawing();
 }
 
-void PrintVec2(Vector2 vec) { printf("(%f, %f)\n", vec.x, vec.y); }
 
 void CameraUpdate(Camera2D &camera) {
-  f32 cameraSpeed = 4.0f;
-  Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-  Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  f32 cameraSpeed = 5.0f;
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
   // PrintVec2(target);
 
   // camera.offset = target;
 
   if (IsKeyDown(KEY_D))
-    camera.target.x += cameraSpeed;
+    camera.target.x += cameraSpeed * 1/camera.zoom;
   if (IsKeyDown(KEY_A))
-    camera.target.x -= cameraSpeed;
+    camera.target.x -= cameraSpeed * 1/camera.zoom;
   if (IsKeyDown(KEY_W))
-    camera.target.y -= cameraSpeed;
+    camera.target.y -= cameraSpeed * 1/camera.zoom;
   if (IsKeyDown(KEY_S))
-    camera.target.y += cameraSpeed;
+    camera.target.y += cameraSpeed * 1/camera.zoom;
 
   if (IsKeyDown(KEY_Z))
     camera.zoom -= 0.05f;
@@ -261,35 +257,12 @@ void CameraUpdate(Camera2D &camera) {
 
   f32 mouseWheelDelta = GetMouseWheelMove();
 
-  // float newZoom = camera.zoom + mouseWheelDelta * 0.05f;
-  // if (newZoom <= 0) {
-  //   newZoom = 0.01f;
-  // }
-
-  // if (GetMouseWheelMove() > 0.0)
-  //   ZoomCamera(camera, (f32)GetMouseWheelMove(), GetMousePosition());
-  // else if (GetMouseWheelMove() < 0.0)
-  //   ZoomCamera(camera, 1/(f32)GetMouseWheelMove(), GetMousePosition());
-
   camera.zoom += (mouseWheelDelta * 0.05f);
   if (camera.zoom > 3.0f)
     camera.zoom = 3.0f;
   else if (camera.zoom < 0.1f)
     camera.zoom = 0.1f;
 }
-
-// void ZoomCamera(Camera2D &camera, f32 zoomStep, Vector2 point) {
-//   Vector2 c0 = camera.offset;
-//   Vector2 v0 = {(f32)GetScreenWidth() / 2.0f, (f32)GetScreenHeight() / 2.0f};
-//   f32 z0 = camera.zoom;
-//   f32 z1 = z0 * zoomStep;
-
-//   Vector2 c1 = Vector2Add(c0, Vector2Scale(Vector2Add(v0, point), (z0 -
-//   z1)));
-
-//   camera.zoom = z1;
-//   camera.offset = c1;
-// }
 
 bool GameIsRunning() { return !WindowShouldClose(); }
 

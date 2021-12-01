@@ -10,10 +10,10 @@ void Init(State &state) {
   int currId = 0;
 
   Element drawer = CreateDrawer(state);
-  Element sidebar = CreateSideBar(state);
+  // Element sidebar = CreateSideBar(state);
 
   state.registry.emplace<Element>(drawerEntity, drawer);
-  state.registry.emplace<Element>(sidebarEntity, sidebar);
+  // state.registry.emplace<Element>(sidebarEntity, sidebar);
 }
 
 void Input(State &state) {

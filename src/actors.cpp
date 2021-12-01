@@ -121,7 +121,7 @@ void UpdateMovement(entt::registry &registry, f32 timeScale) {
 
   units.each([timeScale](Actors::Unit &unit) {
     if (Vector2Distance(unit.destination, unit.position) >
-        0.5f) {
+        0.7f) {
       Vector2 foo = {
           unit.destination.x - unit.position.x,
           unit.destination.y - unit.position.y,

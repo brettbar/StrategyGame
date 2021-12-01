@@ -30,4 +30,6 @@ struct State {
   Texture2D selectedTexture;
 };
 
+void PrintVec2(Vector2);
+
 #endif
