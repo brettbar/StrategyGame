@@ -33,8 +33,8 @@ void CameraUpdate(Camera2D &);
 void ZoomCamera(Camera2D &, f32, Vector2);
 
 int main(void) {
-  State state = {.screenWidth = 1280,
-                 .screenHeight = 720,
+  State state = {.screenWidth = 1920,
+                 .screenHeight = 1080,
                  .mapWidth = 128,
                  .mapHeight = 128,
                  .timeScale = 0.0f,
