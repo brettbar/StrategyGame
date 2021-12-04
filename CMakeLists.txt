@@ -16,7 +16,6 @@ if (WIN32)
   )
 endif (WIN32)
 
-
 set(SOURCES src/main.cpp src/map.cpp src/actors.cpp src/ui/ui.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 

@@ -1,24 +1,29 @@
 #pragma once
 
-#ifndef MAP_H
-#define MAP_H
+#ifndef MAP_HPP
+#define MAP_HPP
 
-#include "common.h"
+#include "common.hpp"
 #include <chrono>
 #include <thread>
-
-using u32 = unsigned int;
-using i32 = int;
-using f32 = float;
 
 namespace Map {
 
 struct Tile {
   u32 id;
+  Vector2 coord;
   Vector2 position;
   i32 owner;
   u32 population;
   str name;
+
+  std::vector<Vector2> neighborCoords;
+  // Vector2 neighborNE;
+  // Vector2 neighborE;
+  // Vector2 neighborSE;
+  // Vector2 neighborSW;
+  // Vector2 neighborW;
+  // Vector2 neighborNW;
 };
 
 struct IVector2 {
@@ -32,10 +37,12 @@ void SetProvinceOwner(entt::registry &, u32, Vector2);
 
 void DrawTerrain(entt::registry &, Texture2D, Rectangle);
 void DrawProvinces(entt::registry &, bool, Texture2D);
-void DrawBorder(Tile);
+void DrawBorders(entt::registry &);
+void DrawSingleBorder(Tile);
 
 i32 determineTileIdFromClick(Vector2);
 Vector2 *determineTilePos(Vector2);
+
 }; // namespace Map
 
 #endif

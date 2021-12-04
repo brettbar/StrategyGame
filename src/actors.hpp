@@ -1,10 +1,10 @@
 #pragma once
 
-#ifndef ACTORS_H
-#define ACTORS_H
+#ifndef ACTORS_HPP
+#define ACTORS_HPP
 
-#include "common.h"
-#include "map.h"
+#include "common.hpp"
+#include "map.hpp"
 
 namespace Actors {
 

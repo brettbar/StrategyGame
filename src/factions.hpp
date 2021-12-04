@@ -1,8 +1,8 @@
 
 #pragma once
 
-#ifndef MAP_H
-#define MAP_H
+#ifndef FACTIONS_H
+#define FACTIONS_H
 
 // #include "../include/entt.hpp"
 #include "raylib.h"

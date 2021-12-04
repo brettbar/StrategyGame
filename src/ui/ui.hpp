@@ -1,9 +1,9 @@
 #pragma once
 
-#ifndef UI_H
-#define UI_H
+#ifndef UI_HPP
+#define UI_HPP
 
-#include "../common.h"
+#include "../common.hpp"
 
 namespace UI {
 

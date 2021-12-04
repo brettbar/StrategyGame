@@ -10,11 +10,11 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "common.h"
+#include "common.hpp"
 
-#include "actors.h"
-#include "map.h"
-#include "ui/ui.h"
+#include "actors.hpp"
+#include "map.hpp"
+#include "ui/ui.hpp"
 #include <cstdio>
 #include <raylib.h>
 
@@ -106,8 +106,7 @@ void Init(State &state) {
 
   state.camera = Camera2D{
       .offset = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2},
-      .target = {(state.mapWidth * 128.0f) / 2,
-                 (state.mapHeight * 128.0f) / 2},
+      .target = {(state.mapWidth * 128.0f) / 2, (state.mapHeight * 128.0f) / 2},
       .rotation = 0,
       .zoom = 2.0f,
   };
@@ -127,7 +126,7 @@ void Input(State &state) {
   if (IsKeyPressed(KEY_SPACE)) {
     if (state.timeScale > 0.0f) {
       state.prevTimeScale = state.timeScale;
-      state.timeScale = 0.0f; 
+      state.timeScale = 0.0f;
     } else if (state.timeScale == 0.0f) {
       state.timeScale = state.prevTimeScale;
     }
@@ -232,7 +231,6 @@ void Draw(State &state) {
   EndDrawing();
 }
 
-
 void CameraUpdate(Camera2D &camera) {
   f32 cameraSpeed = 5.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
@@ -242,13 +240,13 @@ void CameraUpdate(Camera2D &camera) {
   // camera.offset = target;
 
   if (IsKeyDown(KEY_D))
-    camera.target.x += cameraSpeed * 1/camera.zoom;
+    camera.target.x += cameraSpeed * 1 / camera.zoom;
   if (IsKeyDown(KEY_A))
-    camera.target.x -= cameraSpeed * 1/camera.zoom;
+    camera.target.x -= cameraSpeed * 1 / camera.zoom;
   if (IsKeyDown(KEY_W))
-    camera.target.y -= cameraSpeed * 1/camera.zoom;
+    camera.target.y -= cameraSpeed * 1 / camera.zoom;
   if (IsKeyDown(KEY_S))
-    camera.target.y += cameraSpeed * 1/camera.zoom;
+    camera.target.y += cameraSpeed * 1 / camera.zoom;
 
   if (IsKeyDown(KEY_Z))
     camera.zoom -= 0.05f;
