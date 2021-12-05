@@ -15,6 +15,17 @@ using i32 = int;
 using f32 = float;
 using str = std::string;
 
+struct IVector2 {
+  i32 x;
+  i32 y;
+};
+
+struct UVector2 {
+  u32 x;
+  u32 y;
+};
+
+
 struct State {
   entt::registry registry;
   u32 screenWidth;

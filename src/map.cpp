@@ -4,63 +4,76 @@
 namespace Map {
 
 void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
-  Vector2 position = {0.0f, 0.0f};
+  for (u32 i = 0; i < mapWidth * mapHeight; i++) {
+    entt::entity entity = registry.create();
+    Tile tile = Tile{};
+    // tile.id = x + y * 128;
+    tile.id = i;
+    tile.owner = -1;
+    tile.population = 0;
+    tile.name = "";
 
-  for (u32 y = 0; y < mapHeight; y++) {
-    for (u32 x = 0; x < mapWidth; x++) {
-      entt::entity entity = registry.create();
-      Tile tile = Tile{};
-      tile.id = x + y * 128;
-      tile.owner = -1;
-      tile.population = 0;
-      tile.name = "";
+    u32 x = i % mapWidth;
+    u32 y = i / mapHeight;
 
-      if (y % 2 == 1)
-        tile.position = {position.x + x * 128 + 64, position.y + y * 96};
-      else
-        tile.position = {position.x + x * 128, position.y + y * 96};
+    f32 xPos = x * 128;
+    f32 yPos = y * 96;
 
-      tile.coord = {(f32)x, (f32)y};
+    if (y % 2 == 1)
+      tile.position = {xPos + 64, yPos};
+    else
+      tile.position = {xPos, yPos};
 
-      tile.neighborCoords = {
-          {tile.coord.x + 1, tile.coord.y - 1},
-          {tile.coord.x + 1, tile.coord.y},
-          {tile.coord.x + 1, tile.coord.y + 1},
-          {tile.coord.x, tile.coord.y + 1},
-          {tile.coord.x - 1, tile.coord.y},
-          {tile.coord.x, tile.coord.y - 1},
-      };
+    tile.center = {tile.position.x + 64, tile.position.y + 64};
 
-      // tilemap.tiles[x][y] = tile;
-      registry.emplace<Tile>(entity, tile.id, tile.coord, tile.position,
-                             tile.owner, tile.population, tile.name);
-    }
+    tile.coord = {x, y};
+
+    // tile->neighbors = {
+    //     tilemap.tiles[tile->coord.y - 1][tile->coord.x + 1],
+    //     tilemap.tiles[tile->coord.y][tile->coord.x + 1],
+    //     tilemap.tiles[tile->coord.y + 1][tile->coord.x + 1],
+    //     tilemap.tiles[tile->coord.y + 1][tile->coord.x],
+    //     tilemap.tiles[tile->coord.y][tile->coord.x - 1],
+    //     tilemap.tiles[tile->coord.y - 1][tile->coord.x],
+    // };
+    registry.emplace<Tile>(entity, tile);
   }
-
-  // registry.sort<Tile>(
-  //     [](const Tile &lhs, const Tile &rhs) { return rhs.id > lhs.id; });
 }
 
+u32 index(u32 x, u32 y, u32 mapWidth) { return x + mapWidth * y; };
+
 void UpdateProvinces(entt::registry &registry) {
-  auto tiles = registry.view<Tile>();
-  tiles.each([](Tile &tile) {
+  auto tilesView = registry.view<Tile>();
+
+  for (auto entity : tilesView) {
+    Tile &tile = tilesView.get<Tile>(entity);
     if (tile.owner > -1 && tile.population >= 0)
       tile.population += 25;
-  });
+  }
+}
+
+void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
+  auto tilesView = registry.view<Tile>();
+
+  for (auto entity : tilesView) {
+    Tile &tile = tilesView.get<Tile>(entity);
+    DrawTextureRec(hex, frameRec, tile.position, WHITE);
+  }
 }
 
 void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   i32 tileId = determineTileIdFromClick(clickPos);
   assert(tileId >= 0);
 
-  auto tiles = registry.view<Tile>();
+  auto tilesView = registry.view<Tile>();
 
-  tiles.each([tileId, owner](Tile &tile) {
+  for (auto entity : tilesView) {
+    Tile &tile = tilesView.get<Tile>(entity);
     if (tile.id == (u32)tileId) {
       tile.owner = owner;
       switch (tile.owner) {
       case 0:
-        tile.name = "Tomato Town";
+        tile.name = "Rome";
         break;
       case 1:
         tile.name = "Athens";
@@ -76,43 +89,39 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
         break;
       }
     }
-  });
-}
-
-void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
-  auto tiles = registry.view<Tile>();
-
-  tiles.each([hex, frameRec](Tile tile) {
-    DrawTextureRec(hex, frameRec, tile.position, WHITE);
-  });
+  }
 }
 
 void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
-  auto tiles = registry.view<Tile>();
-
-  tiles.each([village, debug](Tile &tile) {
+  auto tilesView = registry.view<Tile>();
+  for (auto entity : tilesView) {
+    Tile &tile = tilesView.get<Tile>(entity);
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
-    // DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
-    // WHITE);
+    // if (debug)
+    //   DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0,
+    //   14,
+    //            WHITE);
 
     // str ownerString = std::to_string(tile.owner);
     // const char *ownertext = ownerString.c_str();
-    // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0, 14,
+    // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0,
+    // 14,
     //          BLUE);
 
-    // str coordString =
-    //     std::to_string((u32)tile.coord.x) + "," +
-    //     std::to_string((u32)tile.coord.y);
+    // str coordString = std::to_string((u32)tile.coord.x) + "," +
+    //                   std::to_string((u32)tile.coord.y);
     // const char *coordText = coordString.c_str();
     // if (debug)
     //   DrawText(coordText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
-    //   BLUE);
+    //            BLUE);
 
-    str popString = std::to_string(tile.population);
-    const char *text = popString.c_str();
-    if (debug)
-      DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0, 14, RED);
+    // str popString = std::to_string(tile.population);
+    // const char *text = popString.c_str();
+    // if (debug)
+    //   DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0,
+    //   14,
+    //            RED);
 
     if (tile.population >= 100) {
       // DrawSingleBorder(tile);
@@ -120,213 +129,112 @@ void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
       if (tile.name != "")
         DrawText(tile.name.c_str(), tile.position.x + 50.0,
                  tile.position.y + 86.0, 14, WHITE);
-    }
-  });
 
-  DrawBorders(registry);
-}
+      if (tile.owner > -1 && tile.population > 100) {
+        // f32 centerX = tile.position.x + 64;
+        // f32 centerY = tile.position.y + 64;
+        Color color = BLACK;
 
-void DrawBorders(entt::registry &registry) {
-  // registry.sort<Tile>(
-  //     [](const Tile &lhs, const Tile &rhs) { return rhs.id > lhs.id; });
+        switch (tile.owner) {
+        case 0:
+          color = RED;
+          break;
+        case 1:
+          color = SKYBLUE;
+          break;
+        case 2:
+          color = GREEN;
+          break;
+        case 3:
+          color = PURPLE;
+          break;
+        case 4:
+          color = ORANGE;
+          break;
+        }
 
-  auto tiles = registry.view<Tile>();
+        Vector2 vertices[6] = {
+            {tile.center.x, tile.center.y - 64},
+            {tile.center.x + 64, tile.center.y - 32},
+            {tile.center.x + 64, tile.center.y + 32},
+            {tile.center.x, tile.center.y + 64},
+            {tile.center.x - 64, tile.center.y + 32},
+            {tile.center.x - 64, tile.center.y - 32},
+        };
 
-  for (auto entity : tiles) {
-    Tile &tile = tiles.get<Tile>(entity);
+        int topColOffset = 1;
+        int botColOffset = 0;
+        if (tile.coord.y % 2 == 0) {
+          topColOffset = 0;
+          botColOffset = 1;
+        }
 
-    if (tile.owner > -1 && tile.population > 100) {
-      f32 centerX = tile.position.x + 64;
-      f32 centerY = tile.position.y + 64;
-      Color color = BLACK;
+        Tile *neighborNE =
+            FindTileByCoord(registry, tile.coord.x + topColOffset, tile.coord.y - 1);
+        Tile *neighborE =
+            FindTileByCoord(registry, tile.coord.x + 1, tile.coord.y);
+        Tile *neighborSE =
+            FindTileByCoord(registry, tile.coord.x + topColOffset, tile.coord.y + 1);
+        Tile *neighborSW =
+            FindTileByCoord(registry, tile.coord.x - botColOffset, tile.coord.y + 1);
+        Tile *neighborW =
+            FindTileByCoord(registry, tile.coord.x - 1, tile.coord.y);
+        Tile *neighborNW =
+            FindTileByCoord(registry, tile.coord.x - botColOffset, tile.coord.y - 1);
 
-      switch (tile.owner) {
-      case 0:
-        color = RED;
-        break;
-      case 1:
-        color = SKYBLUE;
-        break;
-      case 2:
-        color = GREEN;
-        break;
-      case 3:
-        color = PURPLE;
-        break;
-      case 4:
-        color = ORANGE;
-        break;
+        if (neighborNE != nullptr) {
+          if (neighborNE->owner != tile.owner) {
+            // DrawCircleV(neighborNE->center, 16, BLACK);
+            DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.5f));
+          }
+        }
+        if (neighborE != nullptr) {
+          if (neighborE->owner != tile.owner) {
+            // DrawCircleV(neighborE->center, 16, BLACK);
+            DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.5f));
+          }
+        }
+        if (neighborSE != nullptr) {
+          if (neighborSE->owner != tile.owner) {
+            // DrawCircleV(neighborSE->center, 16, BLACK);
+            DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.5f));
+          }
+        }
+        if (neighborSW != nullptr) {
+          if (neighborSW->owner != tile.owner) {
+            // DrawCircleV(neighborSW->center, 16, BLACK);
+            DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.5f));
+          }
+        }
+        if (neighborW != nullptr) {
+          if (neighborW->owner != tile.owner) {
+            // DrawCircleV(neighborW->center, 16, BLACK);
+            DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.5f));
+          }
+        }
+        if (neighborNW != nullptr) {
+          if (neighborNW->owner != tile.owner) {
+            // DrawCircleV(neighborNW->center, 16, BLACK);
+            DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
+          }
+        }
       }
-
-      Vector2 vertices[6] = {
-          {centerX, centerY + 64},      {centerX + 64, centerY + 32},
-          {centerX + 64, centerY - 32}, {centerX, centerY - 64},
-          {centerX - 64, centerY - 32}, {centerX - 64, centerY + 32},
-      };
-
-      printf("%d\n", tile.id);
-      //   Tile neighborNE = tileMap.tiles[x + 1][y - 1];
-      //   Tile neighborE = tileMap.tiles[x + 1][y];
-      //   Tile neighborSE = tileMap.tiles[x + 1][y + 1];
-      //   Tile neighborSW = tileMap.tiles[x][y + 1];
-      //   Tile neighborW = tileMap.tiles[x - 1][y];
-      //   Tile neighborNW = tileMap.tiles[x][y - 1];
-
-      //   // for (u32 i = 0; i < 5; i++) {
-      //   //   DrawLineEx(vertices[i], vertices[i + 1], 2, Fade(color, 0.5f));
-      //   // }
-
-      //   DrawLineEx(vertices[0], vertices[0 + 1], 2, Fade(color, 0.5f));
-
-      // @TODO
-        // if (tile.neighborCoords[0].x > -1 && tile.neighborCoords.y > -1) {
-        //   // draw NE border
-        //   DrawLineEx(vertices[0], vertices[0 + 1], 2, Fade(color, 0.5f));
-        // }
-        // if (neighborE.owner < 0) {
-        //   // draw E border
-        //   DrawLineEx(vertices[1], vertices[1 + 1], 2, Fade(color, 0.5f));
-        // }
-        // if (neighborSE.owner < 0) {
-        //   // draw SE border
-        //   DrawLineEx(vertices[2], vertices[2 + 1], 2, Fade(color, 0.5f));
-        // }
-        // if (neighborSW.owner < 0) {
-        //   // draw SW border
-        //   DrawLineEx(vertices[3], vertices[3 + 1], 2, Fade(color, 0.5f));
-        // }
-        // if (neighborW.owner < 0) {
-        //   // draw W border
-        //   DrawLineEx(vertices[4], vertices[4 + 1], 2, Fade(color, 0.5f));
-        // }
-        // if (neighborNW.owner < 0) {
-        //   // draw NW border
-        //   DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
-        // }
-      // }
     }
+
+    // DrawBorders(tilemap);
   }
-
-  // void DrawBorders(entt::registry &registry) {
-  //   // registry.sort<Tile>([](const Tile &lhs, const Tile &rhs) {
-  //   //   return rhs.position.y > lhs.position.y;
-  //   // });
-
-  //   auto view = registry.view<TileMap>();
-  //   auto mapEntity = view.front();
-  //   TileMap tileMap = view.get<TileMap>(mapEntity);
-
-  //   for (u32 x = 0; x < tileMap.width; x++) {
-  //     for (u32 y = 0; y < tileMap.height; y++) {
-  //       Tile &tile = tileMap.tiles[x][y];
-
-  //       // printf("%d\n", tile.owner);
-  //       if (tile.owner > -1 && tile.population > 100) {
-  //         printf("%d\n", tile.id);
-  //         f32 centerX = tile.position.x + 64;
-  //         f32 centerY = tile.position.y + 64;
-  //         Color color = BLACK;
-
-  //         switch (tile.owner) {
-  //         case 0:
-  //           color = RED;
-  //           break;
-  //         case 1:
-  //           color = SKYBLUE;
-  //           break;
-  //         case 2:
-  //           color = GREEN;
-  //           break;
-  //         case 3:
-  //           color = PURPLE;
-  //           break;
-  //         case 4:
-  //           color = ORANGE;
-  //           break;
-  //         }
-
-  //         Vector2 vertices[6] = {
-  //             {centerX, centerY + 64},      {centerX + 64, centerY + 32},
-  //             {centerX + 64, centerY - 32}, {centerX, centerY - 64},
-  //             {centerX - 64, centerY - 32}, {centerX - 64, centerY + 32},
-  //         };
-
-  //         Tile neighborNE = tileMap.tiles[x + 1][y - 1];
-  //         Tile neighborE = tileMap.tiles[x + 1][y];
-  //         Tile neighborSE = tileMap.tiles[x + 1][y + 1];
-  //         Tile neighborSW = tileMap.tiles[x][y + 1];
-  //         Tile neighborW = tileMap.tiles[x - 1][y];
-  //         Tile neighborNW = tileMap.tiles[x][y - 1];
-
-  //         // for (u32 i = 0; i < 5; i++) {
-  //         //   DrawLineEx(vertices[i], vertices[i + 1], 2, Fade(color,
-  //         0.5f));
-  //         // }
-
-  //         DrawLineEx(vertices[0], vertices[0 + 1], 2, Fade(color, 0.5f));
-  //         if (neighborNE.owner < 0) {
-  //           // draw NE border
-  //           DrawLineEx(vertices[0], vertices[0 + 1], 2, Fade(color, 0.5f));
-  //         }
-  //         if (neighborE.owner < 0) {
-  //           // draw E border
-  //           DrawLineEx(vertices[1], vertices[1 + 1], 2, Fade(color, 0.5f));
-  //         }
-  //         if (neighborSE.owner < 0) {
-  //           // draw SE border
-  //           DrawLineEx(vertices[2], vertices[2 + 1], 2, Fade(color, 0.5f));
-  //         }
-  //         if (neighborSW.owner < 0) {
-  //           // draw SW border
-  //           DrawLineEx(vertices[3], vertices[3 + 1], 2, Fade(color, 0.5f));
-  //         }
-  //         if (neighborW.owner < 0) {
-  //           // draw W border
-  //           DrawLineEx(vertices[4], vertices[4 + 1], 2, Fade(color, 0.5f));
-  //         }
-  //         if (neighborNW.owner < 0) {
-  //           // draw NW border
-  //           DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 }
 
-void DrawSingleBorder(Tile tile) {
-  f32 centerX = tile.position.x + 64;
-  f32 centerY = tile.position.y + 64;
-  Color color = BLACK;
+Tile *FindTileByCoord(entt::registry &registry, u32 x, u32 y) {
+  auto tilesView = registry.view<Tile>();
 
-  Vector2 vertices[6] = {
-      {centerX, centerY + 64},      {centerX + 64, centerY + 32},
-      {centerX + 64, centerY - 32}, {centerX, centerY - 64},
-      {centerX - 64, centerY - 32}, {centerX - 64, centerY + 32},
-  };
-
-  switch (tile.owner) {
-  case 0:
-    color = RED;
-    break;
-  case 1:
-    color = SKYBLUE;
-    break;
-  case 2:
-    color = GREEN;
-    break;
-  case 3:
-    color = PURPLE;
-    break;
-  case 4:
-    color = ORANGE;
-    break;
+  for (auto entity : tilesView) {
+    Tile &tile = tilesView.get<Tile>(entity);
+    if (tile.coord.x == x && tile.coord.y == y) {
+      return &tile;
+    }
   }
-
-  for (u32 i = 0; i < 5; i++) {
-    DrawLineEx(vertices[i], vertices[i + 1], 2, Fade(color, 0.5f));
-  }
-  DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
+  return nullptr;
 }
 
 i32 determineTileIdFromClick(Vector2 clickPos) {
