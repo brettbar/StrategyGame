@@ -137,110 +137,109 @@ void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
     //   14,
     //            RED);
 
-    if (tile != nullptr)
-      if (tile->population >= 100) {
-        // DrawSingleBorder(tile);
-        DrawTextureV(village, tile->position, WHITE);
-        if (tile->name != "")
-          DrawText(tile->name.c_str(), tile->position.x + 50.0,
-                   tile->position.y + 86.0, 14, WHITE);
+    if (tile->owner > -1 && tile->population >= 100) {
+      // DrawSingleBorder(tile);
+      DrawTextureV(village, tile->position, WHITE);
+      if (tile->name != "")
+        DrawText(tile->name.c_str(), tile->position.x + 50.0,
+                 tile->position.y + 86.0, 14, WHITE);
+    }
 
-        if (tile->owner > -1 && tile->population > 100) {
-          // f32 centerX = tile.position.x + 64;
-          // f32 centerY = tile.position.y + 64;
-          Color color = BLACK;
+    if (tile->owner > -1) {
+      // f32 centerX = tile.position.x + 64;
+      // f32 centerY = tile.position.y + 64;
+      Color color = BLACK;
 
-          switch (tile->owner) {
-          case 0:
-            color = RED;
-            break;
-          case 1:
-            color = SKYBLUE;
-            break;
-          case 2:
-            color = GREEN;
-            break;
-          case 3:
-            color = PURPLE;
-            break;
-          case 4:
-            color = ORANGE;
-            break;
-          }
-
-          Vector2 vertices[6] = {
-              {tile->center.x, tile->center.y - 64},
-              {tile->center.x + 64, tile->center.y - 32},
-              {tile->center.x + 64, tile->center.y + 32},
-              {tile->center.x, tile->center.y + 64},
-              {tile->center.x - 64, tile->center.y + 32},
-              {tile->center.x - 64, tile->center.y - 32},
-          };
-
-          int topColOffset = 1;
-          int botColOffset = 0;
-          if (tile->coord.y % 2 == 0) {
-            topColOffset = 0;
-            botColOffset = 1;
-          }
-
-          Tile *neighborNE = FindTileByCoord(
-              tileMap, tile->coord.x + topColOffset, tile->coord.y - 1);
-          Tile *neighborE =
-              FindTileByCoord(tileMap, tile->coord.x + 1, tile->coord.y);
-          Tile *neighborSE = FindTileByCoord(
-              tileMap, tile->coord.x + topColOffset, tile->coord.y + 1);
-          Tile *neighborSW = FindTileByCoord(
-              tileMap, tile->coord.x - botColOffset, tile->coord.y + 1);
-          Tile *neighborW =
-              FindTileByCoord(tileMap, tile->coord.x - 1, tile->coord.y);
-          Tile *neighborNW = FindTileByCoord(
-              tileMap, tile->coord.x - botColOffset, tile->coord.y - 1);
-
-          if (neighborNE != nullptr) {
-            if (neighborNE->owner != tile->owner) {
-              // DrawCircleV(neighborNE->center, 16, BLACK);
-              DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.5f));
-            }
-          }
-          if (neighborE != nullptr) {
-            if (neighborE->owner != tile->owner) {
-              // DrawCircleV(neighborE->center, 16, BLACK);
-              DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.5f));
-            }
-          }
-          if (neighborSE != nullptr) {
-            if (neighborSE->owner != tile->owner) {
-              // DrawCircleV(neighborSE->center, 16, BLACK);
-              DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.5f));
-            }
-          }
-          if (neighborSW != nullptr) {
-            if (neighborSW->owner != tile->owner) {
-              // DrawCircleV(neighborSW->center, 16, BLACK);
-              DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.5f));
-            }
-          }
-          if (neighborW != nullptr) {
-            if (neighborW->owner != tile->owner) {
-              // DrawCircleV(neighborW->center, 16, BLACK);
-              DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.5f));
-            }
-          }
-          if (neighborNW != nullptr) {
-            if (neighborNW->owner != tile->owner) {
-              // DrawCircleV(neighborNW->center, 16, BLACK);
-              DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
-            }
-          }
-        }
+      switch (tile->owner) {
+      case 0:
+        color = RED;
+        break;
+      case 1:
+        color = SKYBLUE;
+        break;
+      case 2:
+        color = GREEN;
+        break;
+      case 3:
+        color = PURPLE;
+        break;
+      case 4:
+        color = ORANGE;
+        break;
       }
 
-    // DrawBorders(tilemap);
+      Vector2 vertices[6] = {
+          {tile->center.x, tile->center.y - 63},
+          {tile->center.x + 63, tile->center.y - 31},
+          {tile->center.x + 63, tile->center.y + 31},
+          {tile->center.x, tile->center.y + 63},
+          {tile->center.x - 63, tile->center.y + 31},
+          {tile->center.x - 63, tile->center.y - 31},
+      };
+
+      int topColOffset = 1;
+      int botColOffset = 0;
+      if (tile->coord.y % 2 == 0) {
+        topColOffset = 0;
+        botColOffset = 1;
+      }
+
+      Tile *neighborNE = FindTileByCoord(tileMap, tile->coord.x + topColOffset,
+                                         tile->coord.y - 1);
+      Tile *neighborE =
+          FindTileByCoord(tileMap, tile->coord.x + 1, tile->coord.y);
+      Tile *neighborSE = FindTileByCoord(tileMap, tile->coord.x + topColOffset,
+                                         tile->coord.y + 1);
+      Tile *neighborSW = FindTileByCoord(tileMap, tile->coord.x - botColOffset,
+                                         tile->coord.y + 1);
+      Tile *neighborW =
+          FindTileByCoord(tileMap, tile->coord.x - 1, tile->coord.y);
+      Tile *neighborNW = FindTileByCoord(tileMap, tile->coord.x - botColOffset,
+                                         tile->coord.y - 1);
+
+      if (neighborNE != nullptr) {
+        if (neighborNE->owner != tile->owner) {
+          // DrawCircleV(neighborNE->center, 16, BLACK);
+          DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.8f));
+        }
+      }
+      if (neighborE != nullptr) {
+        if (neighborE->owner != tile->owner) {
+          // DrawCircleV(neighborE->center, 16, BLACK);
+          DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.8f));
+        }
+      }
+      if (neighborSE != nullptr) {
+        if (neighborSE->owner != tile->owner) {
+          // DrawCircleV(neighborSE->center, 16, BLACK);
+          DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.8f));
+        }
+      }
+      if (neighborSW != nullptr) {
+        if (neighborSW->owner != tile->owner) {
+          // DrawCircleV(neighborSW->center, 16, BLACK);
+          DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.8f));
+        }
+      }
+      if (neighborW != nullptr) {
+        if (neighborW->owner != tile->owner) {
+          // DrawCircleV(neighborW->center, 16, BLACK);
+          DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.8f));
+        }
+      }
+      if (neighborNW != nullptr) {
+        if (neighborNW->owner != tile->owner) {
+          // DrawCircleV(neighborNW->center, 16, BLACK);
+          DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.8f));
+        }
+      }
+    }
   }
+
+  // DrawBorders(tilemap);
 }
 
-Tile *FindTileByCoord(TileMap& tileMap, u32 x, u32 y) {
+Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y) {
 
   if ((x >= 0 && x <= MAP_WIDTH) && (y >= 0 && y <= MAP_HEIGHT)) {
     return tileMap.tiles[index(x, y)];
@@ -315,4 +314,5 @@ Vector2 *determineTilePos(Vector2 inputPos) {
   }
   return new Vector2{tileOrigX, tileOrigY};
 }
-}; // namespace Map
+}
+; // namespace Map
