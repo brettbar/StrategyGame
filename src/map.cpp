@@ -4,14 +4,18 @@
 namespace Map {
 
 void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
+  entt::entity entity = registry.create();
+  TileMap tileMap = {
+      .tiles = {},
+  };
+
   for (u32 i = 0; i < mapWidth * mapHeight; i++) {
-    entt::entity entity = registry.create();
-    Tile tile = Tile{};
+    Tile *tile = new Tile{};
     // tile.id = x + y * 128;
-    tile.id = i;
-    tile.owner = -1;
-    tile.population = 0;
-    tile.name = "";
+    tile->id = i;
+    tile->owner = -1;
+    tile->population = 0;
+    tile->name = "";
 
     u32 x = i % mapWidth;
     u32 y = i / mapHeight;
@@ -20,13 +24,15 @@ void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
     f32 yPos = y * 96;
 
     if (y % 2 == 1)
-      tile.position = {xPos + 64, yPos};
+      tile->position = {xPos + 64, yPos};
     else
-      tile.position = {xPos, yPos};
+      tile->position = {xPos, yPos};
 
-    tile.center = {tile.position.x + 64, tile.position.y + 64};
+    tile->center = {tile->position.x + 64, tile->position.y + 64};
 
-    tile.coord = {x, y};
+    tile->coord = {x, y};
+
+    tileMap.tiles[index(x, y)] = tile;
 
     // tile->neighbors = {
     //     tilemap.tiles[tile->coord.y - 1][tile->coord.x + 1],
@@ -36,28 +42,32 @@ void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
     //     tilemap.tiles[tile->coord.y][tile->coord.x - 1],
     //     tilemap.tiles[tile->coord.y - 1][tile->coord.x],
     // };
-    registry.emplace<Tile>(entity, tile);
   }
+  registry.emplace<TileMap>(entity, tileMap);
 }
 
-u32 index(u32 x, u32 y, u32 mapWidth) { return x + mapWidth * y; };
+u32 index(u32 x, u32 y) { return x + MAP_WIDTH * y; };
 
 void UpdateProvinces(entt::registry &registry) {
-  auto tilesView = registry.view<Tile>();
+  auto tilesView = registry.view<TileMap>();
+  auto tilesEntity = tilesView.front();
+  TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (auto entity : tilesView) {
-    Tile &tile = tilesView.get<Tile>(entity);
-    if (tile.owner > -1 && tile.population >= 0)
-      tile.population += 25;
+  for (Tile *tile : tileMap.tiles) {
+    if (tile != nullptr)
+      if (tile->owner > -1 && tile->population >= 0)
+        tile->population += 25;
   }
 }
 
 void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
-  auto tilesView = registry.view<Tile>();
+  auto tilesView = registry.view<TileMap>();
+  auto tilesEntity = tilesView.front();
+  TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (auto entity : tilesView) {
-    Tile &tile = tilesView.get<Tile>(entity);
-    DrawTextureRec(hex, frameRec, tile.position, WHITE);
+  for (Tile *tile : tileMap.tiles) {
+    if (tile != nullptr)
+      DrawTextureRec(hex, frameRec, tile->position, WHITE);
   }
 }
 
@@ -65,37 +75,41 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   i32 tileId = determineTileIdFromClick(clickPos);
   assert(tileId >= 0);
 
-  auto tilesView = registry.view<Tile>();
+  auto tilesView = registry.view<TileMap>();
+  auto tilesEntity = tilesView.front();
+  TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (auto entity : tilesView) {
-    Tile &tile = tilesView.get<Tile>(entity);
-    if (tile.id == (u32)tileId) {
-      tile.owner = owner;
-      switch (tile.owner) {
-      case 0:
-        tile.name = "Rome";
-        break;
-      case 1:
-        tile.name = "Athens";
-        break;
-      case 2:
-        tile.name = "Lugudunon";
-        break;
-      case 3:
-        tile.name = "Carthage";
-        break;
-      case 4:
-        tile.name = "Persepolis";
-        break;
+  for (Tile *tile : tileMap.tiles) {
+    if (tile != nullptr)
+      if (tile->id == (u32)tileId) {
+        tile->owner = owner;
+        switch (tile->owner) {
+        case 0:
+          tile->name = "Rome";
+          break;
+        case 1:
+          tile->name = "Athens";
+          break;
+        case 2:
+          tile->name = "Lugudunon";
+          break;
+        case 3:
+          tile->name = "Carthage";
+          break;
+        case 4:
+          tile->name = "Persepolis";
+          break;
+        }
       }
-    }
   }
 }
 
 void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
-  auto tilesView = registry.view<Tile>();
-  for (auto entity : tilesView) {
-    Tile &tile = tilesView.get<Tile>(entity);
+  auto tilesView = registry.view<TileMap>();
+  auto tilesEntity = tilesView.front();
+  TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
+
+  for (Tile *tile : tileMap.tiles) {
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
     // if (debug)
@@ -123,116 +137,113 @@ void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
     //   14,
     //            RED);
 
-    if (tile.population >= 100) {
-      // DrawSingleBorder(tile);
-      DrawTextureV(village, tile.position, WHITE);
-      if (tile.name != "")
-        DrawText(tile.name.c_str(), tile.position.x + 50.0,
-                 tile.position.y + 86.0, 14, WHITE);
+    if (tile != nullptr)
+      if (tile->population >= 100) {
+        // DrawSingleBorder(tile);
+        DrawTextureV(village, tile->position, WHITE);
+        if (tile->name != "")
+          DrawText(tile->name.c_str(), tile->position.x + 50.0,
+                   tile->position.y + 86.0, 14, WHITE);
 
-      if (tile.owner > -1 && tile.population > 100) {
-        // f32 centerX = tile.position.x + 64;
-        // f32 centerY = tile.position.y + 64;
-        Color color = BLACK;
+        if (tile->owner > -1 && tile->population > 100) {
+          // f32 centerX = tile.position.x + 64;
+          // f32 centerY = tile.position.y + 64;
+          Color color = BLACK;
 
-        switch (tile.owner) {
-        case 0:
-          color = RED;
-          break;
-        case 1:
-          color = SKYBLUE;
-          break;
-        case 2:
-          color = GREEN;
-          break;
-        case 3:
-          color = PURPLE;
-          break;
-        case 4:
-          color = ORANGE;
-          break;
-        }
-
-        Vector2 vertices[6] = {
-            {tile.center.x, tile.center.y - 64},
-            {tile.center.x + 64, tile.center.y - 32},
-            {tile.center.x + 64, tile.center.y + 32},
-            {tile.center.x, tile.center.y + 64},
-            {tile.center.x - 64, tile.center.y + 32},
-            {tile.center.x - 64, tile.center.y - 32},
-        };
-
-        int topColOffset = 1;
-        int botColOffset = 0;
-        if (tile.coord.y % 2 == 0) {
-          topColOffset = 0;
-          botColOffset = 1;
-        }
-
-        Tile *neighborNE =
-            FindTileByCoord(registry, tile.coord.x + topColOffset, tile.coord.y - 1);
-        Tile *neighborE =
-            FindTileByCoord(registry, tile.coord.x + 1, tile.coord.y);
-        Tile *neighborSE =
-            FindTileByCoord(registry, tile.coord.x + topColOffset, tile.coord.y + 1);
-        Tile *neighborSW =
-            FindTileByCoord(registry, tile.coord.x - botColOffset, tile.coord.y + 1);
-        Tile *neighborW =
-            FindTileByCoord(registry, tile.coord.x - 1, tile.coord.y);
-        Tile *neighborNW =
-            FindTileByCoord(registry, tile.coord.x - botColOffset, tile.coord.y - 1);
-
-        if (neighborNE != nullptr) {
-          if (neighborNE->owner != tile.owner) {
-            // DrawCircleV(neighborNE->center, 16, BLACK);
-            DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.5f));
+          switch (tile->owner) {
+          case 0:
+            color = RED;
+            break;
+          case 1:
+            color = SKYBLUE;
+            break;
+          case 2:
+            color = GREEN;
+            break;
+          case 3:
+            color = PURPLE;
+            break;
+          case 4:
+            color = ORANGE;
+            break;
           }
-        }
-        if (neighborE != nullptr) {
-          if (neighborE->owner != tile.owner) {
-            // DrawCircleV(neighborE->center, 16, BLACK);
-            DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.5f));
+
+          Vector2 vertices[6] = {
+              {tile->center.x, tile->center.y - 64},
+              {tile->center.x + 64, tile->center.y - 32},
+              {tile->center.x + 64, tile->center.y + 32},
+              {tile->center.x, tile->center.y + 64},
+              {tile->center.x - 64, tile->center.y + 32},
+              {tile->center.x - 64, tile->center.y - 32},
+          };
+
+          int topColOffset = 1;
+          int botColOffset = 0;
+          if (tile->coord.y % 2 == 0) {
+            topColOffset = 0;
+            botColOffset = 1;
           }
-        }
-        if (neighborSE != nullptr) {
-          if (neighborSE->owner != tile.owner) {
-            // DrawCircleV(neighborSE->center, 16, BLACK);
-            DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.5f));
+
+          Tile *neighborNE = FindTileByCoord(
+              tileMap, tile->coord.x + topColOffset, tile->coord.y - 1);
+          Tile *neighborE =
+              FindTileByCoord(tileMap, tile->coord.x + 1, tile->coord.y);
+          Tile *neighborSE = FindTileByCoord(
+              tileMap, tile->coord.x + topColOffset, tile->coord.y + 1);
+          Tile *neighborSW = FindTileByCoord(
+              tileMap, tile->coord.x - botColOffset, tile->coord.y + 1);
+          Tile *neighborW =
+              FindTileByCoord(tileMap, tile->coord.x - 1, tile->coord.y);
+          Tile *neighborNW = FindTileByCoord(
+              tileMap, tile->coord.x - botColOffset, tile->coord.y - 1);
+
+          if (neighborNE != nullptr) {
+            if (neighborNE->owner != tile->owner) {
+              // DrawCircleV(neighborNE->center, 16, BLACK);
+              DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.5f));
+            }
           }
-        }
-        if (neighborSW != nullptr) {
-          if (neighborSW->owner != tile.owner) {
-            // DrawCircleV(neighborSW->center, 16, BLACK);
-            DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.5f));
+          if (neighborE != nullptr) {
+            if (neighborE->owner != tile->owner) {
+              // DrawCircleV(neighborE->center, 16, BLACK);
+              DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.5f));
+            }
           }
-        }
-        if (neighborW != nullptr) {
-          if (neighborW->owner != tile.owner) {
-            // DrawCircleV(neighborW->center, 16, BLACK);
-            DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.5f));
+          if (neighborSE != nullptr) {
+            if (neighborSE->owner != tile->owner) {
+              // DrawCircleV(neighborSE->center, 16, BLACK);
+              DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.5f));
+            }
           }
-        }
-        if (neighborNW != nullptr) {
-          if (neighborNW->owner != tile.owner) {
-            // DrawCircleV(neighborNW->center, 16, BLACK);
-            DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
+          if (neighborSW != nullptr) {
+            if (neighborSW->owner != tile->owner) {
+              // DrawCircleV(neighborSW->center, 16, BLACK);
+              DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.5f));
+            }
+          }
+          if (neighborW != nullptr) {
+            if (neighborW->owner != tile->owner) {
+              // DrawCircleV(neighborW->center, 16, BLACK);
+              DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.5f));
+            }
+          }
+          if (neighborNW != nullptr) {
+            if (neighborNW->owner != tile->owner) {
+              // DrawCircleV(neighborNW->center, 16, BLACK);
+              DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.5f));
+            }
           }
         }
       }
-    }
 
     // DrawBorders(tilemap);
   }
 }
 
-Tile *FindTileByCoord(entt::registry &registry, u32 x, u32 y) {
-  auto tilesView = registry.view<Tile>();
+Tile *FindTileByCoord(TileMap& tileMap, u32 x, u32 y) {
 
-  for (auto entity : tilesView) {
-    Tile &tile = tilesView.get<Tile>(entity);
-    if (tile.coord.x == x && tile.coord.y == y) {
-      return &tile;
-    }
+  if ((x >= 0 && x <= MAP_WIDTH) && (y >= 0 && y <= MAP_HEIGHT)) {
+    return tileMap.tiles[index(x, y)];
   }
   return nullptr;
 }

@@ -31,8 +31,12 @@ struct Tile {
   // Vector2 neighborNW;
 };
 
+struct TileMap {
+  std::array<Tile*, MAP_WIDTH*MAP_HEIGHT> tiles;
+};
 
 void CreateTerrain(entt::registry &, u32, u32);
+u32 index(u32, u32);
 void UpdateProvinces(entt::registry &);
 void SetProvinceOwner(entt::registry &, u32, Vector2);
 
@@ -40,7 +44,7 @@ void DrawTerrain(entt::registry &, Texture2D, Rectangle);
 void DrawProvinces(entt::registry &, bool, Texture2D);
 void DrawSingleBorder(Tile);
 
-Tile* FindTileByCoord(entt::registry &, u32, u32);
+Tile* FindTileByCoord(TileMap &, u32, u32);
 
 i32 determineTileIdFromClick(Vector2);
 Vector2 *determineTilePos(Vector2);
