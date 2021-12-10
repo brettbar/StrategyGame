@@ -41,7 +41,7 @@ void UpdateProvinces(entt::registry &);
 void SetProvinceOwner(entt::registry &, u32, Vector2);
 
 void DrawTerrain(entt::registry &, Texture2D, Rectangle);
-void DrawProvinces(entt::registry &, bool, Texture2D);
+void DrawProvinces(State &);
 void DrawSingleBorder(Tile);
 
 Tile* FindTileByCoord(TileMap &, u32, u32);

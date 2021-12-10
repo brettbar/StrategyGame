@@ -104,12 +104,15 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   }
 }
 
-void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
-  auto tilesView = registry.view<TileMap>();
+void DrawProvinces(State &state) {
+  auto tilesView = state.registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tile : tileMap.tiles) {
+  for (Tile *tilePtr : tileMap.tiles) {
+    if (tilePtr == nullptr)
+      continue;
+    Tile &tile = *tilePtr;
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
     // if (debug)
@@ -137,106 +140,47 @@ void DrawProvinces(entt::registry &registry, bool debug, Texture2D village) {
     //   14,
     //            RED);
 
-    if (tile->owner > -1 && tile->population >= 100) {
-      // DrawSingleBorder(tile);
-      DrawTextureV(village, tile->position, WHITE);
-      if (tile->name != "")
-        DrawText(tile->name.c_str(), tile->position.x + 50.0,
-                 tile->position.y + 86.0, 14, WHITE);
-    }
-
-    if (tile->owner > -1) {
-      // f32 centerX = tile.position.x + 64;
-      // f32 centerY = tile.position.y + 64;
+    if (tile.owner > -1) {
       Color color = BLACK;
 
-      switch (tile->owner) {
+      Rectangle frameRec = {0.0, 0.0, 128, 128.0};
+
+      switch (tile.owner) {
       case 0:
         color = RED;
+        frameRec.x = 0.0f;
         break;
       case 1:
         color = SKYBLUE;
+        frameRec.x = 128.0f;
         break;
       case 2:
         color = GREEN;
+        frameRec.x = 256.0f;
         break;
       case 3:
         color = PURPLE;
+        frameRec.x = 384.0f;
         break;
       case 4:
         color = ORANGE;
+        frameRec.x = 513.0f;
         break;
       }
 
-      Vector2 vertices[6] = {
-          {tile->center.x, tile->center.y - 63},
-          {tile->center.x + 63, tile->center.y - 31},
-          {tile->center.x + 63, tile->center.y + 31},
-          {tile->center.x, tile->center.y + 63},
-          {tile->center.x - 63, tile->center.y + 31},
-          {tile->center.x - 63, tile->center.y - 31},
-      };
+      DrawTextureRec(state.textures.at("factionOverlay"), frameRec,
+                     tile.position, Fade(WHITE, 0.5));
+    }
 
-      int topColOffset = 1;
-      int botColOffset = 0;
-      if (tile->coord.y % 2 == 0) {
-        topColOffset = 0;
-        botColOffset = 1;
-      }
-
-      Tile *neighborNE = FindTileByCoord(tileMap, tile->coord.x + topColOffset,
-                                         tile->coord.y - 1);
-      Tile *neighborE =
-          FindTileByCoord(tileMap, tile->coord.x + 1, tile->coord.y);
-      Tile *neighborSE = FindTileByCoord(tileMap, tile->coord.x + topColOffset,
-                                         tile->coord.y + 1);
-      Tile *neighborSW = FindTileByCoord(tileMap, tile->coord.x - botColOffset,
-                                         tile->coord.y + 1);
-      Tile *neighborW =
-          FindTileByCoord(tileMap, tile->coord.x - 1, tile->coord.y);
-      Tile *neighborNW = FindTileByCoord(tileMap, tile->coord.x - botColOffset,
-                                         tile->coord.y - 1);
-
-      if (neighborNE != nullptr) {
-        if (neighborNE->owner != tile->owner) {
-          // DrawCircleV(neighborNE->center, 16, BLACK);
-          DrawLineEx(vertices[0], vertices[1], 2, Fade(color, 0.8f));
-        }
-      }
-      if (neighborE != nullptr) {
-        if (neighborE->owner != tile->owner) {
-          // DrawCircleV(neighborE->center, 16, BLACK);
-          DrawLineEx(vertices[1], vertices[2], 2, Fade(color, 0.8f));
-        }
-      }
-      if (neighborSE != nullptr) {
-        if (neighborSE->owner != tile->owner) {
-          // DrawCircleV(neighborSE->center, 16, BLACK);
-          DrawLineEx(vertices[2], vertices[3], 2, Fade(color, 0.8f));
-        }
-      }
-      if (neighborSW != nullptr) {
-        if (neighborSW->owner != tile->owner) {
-          // DrawCircleV(neighborSW->center, 16, BLACK);
-          DrawLineEx(vertices[3], vertices[4], 2, Fade(color, 0.8f));
-        }
-      }
-      if (neighborW != nullptr) {
-        if (neighborW->owner != tile->owner) {
-          // DrawCircleV(neighborW->center, 16, BLACK);
-          DrawLineEx(vertices[4], vertices[5], 2, Fade(color, 0.8f));
-        }
-      }
-      if (neighborNW != nullptr) {
-        if (neighborNW->owner != tile->owner) {
-          // DrawCircleV(neighborNW->center, 16, BLACK);
-          DrawLineEx(vertices[5], vertices[0], 2, Fade(color, 0.8f));
-        }
-      }
+    if (tile.population >= 100) {
+      // DrawSingleBorder(tile);
+      DrawTextureV(state.textures.at("romanVillageTexture"), tile.position,
+                   WHITE);
+      if (tile.name != "")
+        DrawText(tile.name.c_str(), tile.position.x + 50.0,
+                 tile.position.y + 86.0, 14, WHITE);
     }
   }
-
-  // DrawBorders(tilemap);
 }
 
 Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y) {
@@ -314,5 +258,4 @@ Vector2 *determineTilePos(Vector2 inputPos) {
   }
   return new Vector2{tileOrigX, tileOrigY};
 }
-}
-; // namespace Map
+}; // namespace Map

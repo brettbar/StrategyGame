@@ -95,8 +95,10 @@ void Init(State &state) {
       LoadTexture("assets/textures/units/Persian_Villager.png");
   Texture2D romanVillageTexture =
       LoadTexture("assets/textures/village_roman.png");
+  Texture2D factionOverlay = LoadTexture("assets/textures/overlays.png");
 
   state.textures.emplace("hex", hex);
+  state.textures.emplace("factionOverlay", factionOverlay);
   state.textures.emplace("romanVillagerTexture", romanVillagerTexture);
   state.textures.emplace("greekVillagerTexture", greekVillagerTexture);
   state.textures.emplace("celtVillagerTexture", celtVillagerTexture);
@@ -219,8 +221,7 @@ void Draw(State &state) {
   Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
   Map::DrawTerrain(state.registry, hex, frameRec);
 
-  Texture2D &romanVillageTexture = state.textures.at("romanVillageTexture");
-  Map::DrawProvinces(state.registry, state.debug, romanVillageTexture);
+  Map::DrawProvinces(state);
   Actors::Draw(state.registry, state.debug);
 
   EndMode2D();
@@ -266,6 +267,7 @@ bool GameIsRunning() { return !WindowShouldClose(); }
 
 void Exit(State &state) {
   UnloadTexture(state.textures.at("hex"));
+  UnloadTexture(state.textures.at("factionOverlay"));
   UnloadTexture(state.textures.at("romanVillagerTexture"));
   UnloadTexture(state.textures.at("greekVillagerTexture"));
   UnloadTexture(state.textures.at("celtVillagerTexture"));
