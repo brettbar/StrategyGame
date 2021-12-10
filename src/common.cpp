@@ -1,4 +1,4 @@
-#include "common.h"
+#include "common.hpp"
 
 
 void PrintVec2(Vector2 vec) { 

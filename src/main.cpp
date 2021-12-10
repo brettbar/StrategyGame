@@ -15,6 +15,7 @@ TEMPORARY TODOS HERE
 #include "actors.hpp"
 #include "map.hpp"
 #include "ui/ui.hpp"
+#include "resource.hpp"
 #include <cstdio>
 #include <raylib.h>
 
