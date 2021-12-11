@@ -14,8 +14,8 @@ TEMPORARY TODOS HERE
 
 #include "actors.hpp"
 #include "map.hpp"
-#include "ui/ui.hpp"
 #include "resource.hpp"
+#include "ui/ui.hpp"
 #include <cstdio>
 #include <raylib.h>
 
@@ -33,16 +33,17 @@ bool GameIsRunning();
 void CameraUpdate(Camera2D &);
 void ZoomCamera(Camera2D &, f32, Vector2);
 
-int main(void) {
-  State state = {.screenWidth = 1920,
-                 .screenHeight = 1080,
-                 .mapWidth = 128,
-                 .mapHeight = 128,
-                 .timeScale = 0.0f,
-                 .prevTimeScale = 1.0f,
-                 .textures = {},
-                 .debug = true};
+State state = {.screenWidth = 1920,
+               .screenHeight = 1080,
+               .mapWidth = 128,
+               .mapHeight = 128,
+               .timeScale = 0.0f,
+               .prevTimeScale = 1.0f,
+               .textures = {},
+               .debug = true};
+TextureCache textureCache = {};
 
+int main(void) {
   Init(state);
 
   // Main game loop
@@ -83,7 +84,10 @@ void Init(State &state) {
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
-  Texture2D hex = LoadTexture("assets/textures/hexagon.png");
+
+  constexpr entt::id_type hs = entt::hashed_string{"hexagon"};
+  textureCache.load<TextureLoader>(hs, LoadTexture("assets/textures/hexagon.png"));
+    
   Texture2D romanVillagerTexture =
       LoadTexture("assets/textures/units/Roman_Villager.png");
   Texture2D greekVillagerTexture =
@@ -98,7 +102,7 @@ void Init(State &state) {
       LoadTexture("assets/textures/village_roman.png");
   Texture2D factionOverlay = LoadTexture("assets/textures/overlays.png");
 
-  state.textures.emplace("hex", hex);
+  // state.textures.emplace("hex", hex);
   state.textures.emplace("factionOverlay", factionOverlay);
   state.textures.emplace("romanVillagerTexture", romanVillagerTexture);
   state.textures.emplace("greekVillagerTexture", greekVillagerTexture);
@@ -218,7 +222,8 @@ void Draw(State &state) {
 
   BeginMode2D(state.camera);
 
-  Texture2D &hex = state.textures.at("hex");
+  // Texture2D &hex = state.textures.at("hex");
+  Texture2D hex = textureCache.handle(entt::hashed_string{"hexagon"})->texture;
   Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
   Map::DrawTerrain(state.registry, hex, frameRec);
 
@@ -267,7 +272,8 @@ void CameraUpdate(Camera2D &camera) {
 bool GameIsRunning() { return !WindowShouldClose(); }
 
 void Exit(State &state) {
-  UnloadTexture(state.textures.at("hex"));
+  // UnloadTexture(state.textures.at("hex"));
+  UnloadTexture(textureCache.handle(entt::hashed_string{"hexagon"})->texture);
   UnloadTexture(state.textures.at("factionOverlay"));
   UnloadTexture(state.textures.at("romanVillagerTexture"));
   UnloadTexture(state.textures.at("greekVillagerTexture"));
