@@ -4,6 +4,7 @@
 #define MAP_HPP
 
 #include "common.hpp"
+#include "resource.hpp"
 #include <array>
 #include <chrono>
 #include <thread>
@@ -41,7 +42,7 @@ void UpdateProvinces(entt::registry &);
 void SetProvinceOwner(entt::registry &, u32, Vector2);
 
 void DrawTerrain(entt::registry &, Texture2D, Rectangle);
-void DrawProvinces(State &);
+void DrawProvinces(State &, TextureCache &);
 void DrawSingleBorder(Tile);
 
 Tile* FindTileByCoord(TileMap &, u32, u32);

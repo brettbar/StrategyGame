@@ -4,6 +4,7 @@
 #define UI_HPP
 
 #include "../common.hpp"
+#include "../resource.hpp"
 
 namespace UI {
 
@@ -29,7 +30,7 @@ struct Element {
   std::vector<Element> children;
 };
 
-void Init(State &);
+void Init(State &, TextureCache &);
 void Input(State &);
 void Update(State &);
 void Draw(State &);
@@ -41,7 +42,7 @@ Element CreateButton(Texture2D, Vector2, Color);
 Element CreateSideBar(State &);
 
 // Debug Only
-Element CreateDrawer(State &);
+Element CreateDrawer(State &, TextureCache &);
 
 }; // namespace UI
 

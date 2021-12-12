@@ -104,7 +104,7 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   }
 }
 
-void DrawProvinces(State &state) {
+void DrawProvinces(State &state, TextureCache &textureCache) {
   auto tilesView = state.registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
@@ -168,14 +168,14 @@ void DrawProvinces(State &state) {
         break;
       }
 
-      DrawTextureRec(state.textures.at("factionOverlay"), frameRec,
+      DrawTextureRec(textureCache.handle(hstr{"factionOverlay"})->texture, frameRec,
                      tile.position, Fade(WHITE, 0.5));
     }
 
     if (tile.population >= 100) {
       // DrawSingleBorder(tile);
-      DrawTextureV(state.textures.at("romanVillageTexture"), tile.position,
-                   WHITE);
+      DrawTextureV(textureCache.handle(hstr{"romanVillageTexture"})->texture,
+                   tile.position, WHITE);
       if (tile.name != "")
         DrawText(tile.name.c_str(), tile.position.x + 50.0,
                  tile.position.y + 86.0, 14, WHITE);

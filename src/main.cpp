@@ -1,6 +1,6 @@
 /*
-  Authored by Brett Barinaga on 11/29/21.
-  Copyright (c) Brett Barinaga, All rights reserved.
+  Authored by Brett Barinaga on 11/29/21. Copyright (c) Brett Barinaga, All
+rights reserved.
 
 TEMPORARY TODOS HERE
   @TODO Figure out passing state by ref or val for each function
@@ -27,7 +27,7 @@ void Input(State &);
 void Update(State &);
 void LateUpdate(State &);
 void Draw(State &);
-void Exit(State &);
+void Exit();
 
 bool GameIsRunning();
 void CameraUpdate(Camera2D &);
@@ -39,8 +39,8 @@ State state = {.screenWidth = 1920,
                .mapHeight = 128,
                .timeScale = 0.0f,
                .prevTimeScale = 1.0f,
-               .textures = {},
                .debug = true};
+
 TextureCache textureCache = {};
 
 int main(void) {
@@ -75,7 +75,7 @@ int main(void) {
     Draw(state);
   }
 
-  Exit(state);
+  Exit();
 
   return 0;
 }
@@ -84,32 +84,21 @@ void Init(State &state) {
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
-
-  constexpr entt::id_type hs = entt::hashed_string{"hexagon"};
-  textureCache.load<TextureLoader>(hs, LoadTexture("assets/textures/hexagon.png"));
-    
-  Texture2D romanVillagerTexture =
-      LoadTexture("assets/textures/units/Roman_Villager.png");
-  Texture2D greekVillagerTexture =
-      LoadTexture("assets/textures/units/Greek_Villager.png");
-  Texture2D celtVillagerTexture =
-      LoadTexture("assets/textures/units/Celt_Villager.png");
-  Texture2D punicVillagerTexture =
-      LoadTexture("assets/textures/units/Carthaginian_Villager.png");
-  Texture2D persianVillagerTexture =
-      LoadTexture("assets/textures/units/Persian_Villager.png");
-  Texture2D romanVillageTexture =
-      LoadTexture("assets/textures/village_roman.png");
-  Texture2D factionOverlay = LoadTexture("assets/textures/overlays.png");
-
-  // state.textures.emplace("hex", hex);
-  state.textures.emplace("factionOverlay", factionOverlay);
-  state.textures.emplace("romanVillagerTexture", romanVillagerTexture);
-  state.textures.emplace("greekVillagerTexture", greekVillagerTexture);
-  state.textures.emplace("celtVillagerTexture", celtVillagerTexture);
-  state.textures.emplace("punicVillagerTexture", punicVillagerTexture);
-  state.textures.emplace("persianVillagerTexture", persianVillagerTexture);
-  state.textures.emplace("romanVillageTexture", romanVillageTexture);
+  LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", textureCache);
+  LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png",
+               textureCache);
+  LoadResource(hstr{"romanVillagerTexture"},
+               "assets/textures/units/Roman_Villager.png", textureCache);
+  LoadResource(hstr{"greekVillagerTexture"},
+               "assets/textures/units/Greek_Villager.png", textureCache);
+  LoadResource(hstr{"celtVillagerTexture"},
+               "assets/textures/units/Celt_Villager.png", textureCache);
+  LoadResource(hstr{"punicVillagerTexture"},
+               "assets/textures/units/Carthaginian_Villager.png", textureCache);
+  LoadResource(hstr{"persianVillagerTexture"},
+               "assets/textures/units/Persian_Villager.png", textureCache);
+  LoadResource(hstr{"romanVillageTexture"}, "assets/textures/village_roman.png",
+               textureCache);
 
   state.camera = Camera2D{
       .offset = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2},
@@ -119,7 +108,7 @@ void Init(State &state) {
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  UI::Init(state);
+  UI::Init(state, textureCache);
   Map::CreateTerrain(state.registry, state.mapWidth, state.mapHeight);
 
   SetTargetFPS(144); // Set our game to run at 60 frames-per-second
@@ -191,19 +180,29 @@ void Input(State &state) {
     Actors::SetDestinations(state.registry, state.camera);
   }
   if (IsKeyPressed(KEY_ONE)) {
-    Actors::CreateNew(state.registry, clickPos, 0, state.textures);
+    Actors::CreateNew(
+        state.registry, clickPos,
+        textureCache.handle(hstr{"romanVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_TWO)) {
-    Actors::CreateNew(state.registry, clickPos, 1, state.textures);
+    Actors::CreateNew(
+        state.registry, clickPos,
+        textureCache.handle(hstr{"greekVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_THREE)) {
-    Actors::CreateNew(state.registry, clickPos, 2, state.textures);
+    Actors::CreateNew(
+        state.registry, clickPos,
+        textureCache.handle(hstr{"celtVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_FOUR)) {
-    Actors::CreateNew(state.registry, clickPos, 3, state.textures);
+    Actors::CreateNew(
+        state.registry, clickPos,
+        textureCache.handle(hstr{"punicVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_FIVE)) {
-    Actors::CreateNew(state.registry, clickPos, 4, state.textures);
+    Actors::CreateNew(
+        state.registry, clickPos,
+        textureCache.handle(hstr{"persianVillagerTexture"})->texture);
   }
 }
 
@@ -222,12 +221,11 @@ void Draw(State &state) {
 
   BeginMode2D(state.camera);
 
-  // Texture2D &hex = state.textures.at("hex");
-  Texture2D hex = textureCache.handle(entt::hashed_string{"hexagon"})->texture;
+  Texture2D hex = textureCache.handle(hstr{"hexagon"})->texture;
   Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
   Map::DrawTerrain(state.registry, hex, frameRec);
 
-  Map::DrawProvinces(state);
+  Map::DrawProvinces(state, textureCache);
   Actors::Draw(state.registry, state.debug);
 
   EndMode2D();
@@ -271,17 +269,17 @@ void CameraUpdate(Camera2D &camera) {
 
 bool GameIsRunning() { return !WindowShouldClose(); }
 
-void Exit(State &state) {
+void Exit() {
   // UnloadTexture(state.textures.at("hex"));
-  UnloadTexture(textureCache.handle(entt::hashed_string{"hexagon"})->texture);
-  UnloadTexture(state.textures.at("factionOverlay"));
-  UnloadTexture(state.textures.at("romanVillagerTexture"));
-  UnloadTexture(state.textures.at("greekVillagerTexture"));
-  UnloadTexture(state.textures.at("celtVillagerTexture"));
-  UnloadTexture(state.textures.at("punicVillagerTexture"));
-  UnloadTexture(state.textures.at("persianVillagerTexture"));
-  UnloadTexture(state.textures.at("romanVillagerTexture"));
-  UnloadTexture(state.textures.at("romanVillageTexture"));
+  UnloadTexture(textureCache.handle(hstr{"hexagon"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"factionOverlay"})->texture);
+  // UnloadTexture(state.textures.at("factionOverlay"));
+  UnloadTexture(textureCache.handle(hstr{"romanVillagerTexture"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"greekVillagerTexture"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"celtVillagerTexture"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"punicVillagerTexture"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"persianVillagerTexture"})->texture);
+  UnloadTexture(textureCache.handle(hstr{"romanVillageTexture"})->texture);
 
   CloseWindow(); // Close window and OpenGL context
 }

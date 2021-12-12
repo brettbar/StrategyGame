@@ -3,13 +3,13 @@
 
 namespace UI {
 
-void Init(State &state) {
+void Init(State &state, TextureCache &cache) {
   auto drawerEntity = state.registry.create();
   auto sidebarEntity = state.registry.create();
 
   int currId = 0;
 
-  Element drawer = CreateDrawer(state);
+  Element drawer = CreateDrawer(state, cache);
   // Element sidebar = CreateSideBar(state);
 
   state.registry.emplace<Element>(drawerEntity, drawer);
@@ -141,7 +141,7 @@ Element CreateSideBar(State &state) {
   return sidebar;
 }
 
-Element CreateDrawer(State &state) {
+Element CreateDrawer(State &state, TextureCache &cache) {
   Element drawer = Element();
   drawer.id = 0;
   drawer.name = "sprite_list";
@@ -150,29 +150,29 @@ Element CreateDrawer(State &state) {
   drawer.panel = {(f32)state.screenWidth - 192, ((f32)state.screenHeight / 4),
                   192, (f32)state.screenHeight / 2};
   drawer.children = {
-      CreateButton(state.textures.at("romanVillagerTexture"),
+      CreateButton(cache.handle(hstr{"romanVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y}, WHITE),
-      CreateButton(state.textures.at("romanVillageTexture"),
+      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y}, WHITE),
 
-      CreateButton(state.textures.at("greekVillagerTexture"),
+      CreateButton(cache.handle(hstr{"greekVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y + 64.0f}, WHITE),
-      CreateButton(state.textures.at("romanVillageTexture"),
+      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y + 64.0f}, WHITE),
 
-      CreateButton(state.textures.at("celtVillagerTexture"),
+      CreateButton(cache.handle(hstr{"celtVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y + 128.0f}, WHITE),
-      CreateButton(state.textures.at("romanVillageTexture"),
+      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y + 128.0f}, WHITE),
 
-      CreateButton(state.textures.at("punicVillagerTexture"),
+      CreateButton(cache.handle(hstr{"punicVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y + 192.0f}, WHITE),
-      CreateButton(state.textures.at("romanVillageTexture"),
+      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y + 192.0f}, WHITE),
 
-      CreateButton(state.textures.at("persianVillagerTexture"),
+      CreateButton(cache.handle(hstr{"persianVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y + 256.0f}, WHITE),
-      CreateButton(state.textures.at("romanVillageTexture"),
+      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y + 256.0f}, WHITE),
   };
   return drawer;
