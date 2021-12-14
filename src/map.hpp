@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef MAP_HPP
-#define MAP_HPP
-
 #include "common.hpp"
 #include "resource.hpp"
 #include <array>
@@ -42,14 +39,8 @@ void UpdateProvinces(entt::registry &);
 void SetProvinceOwner(entt::registry &, u32, Vector2);
 
 void DrawTerrain(entt::registry &, Texture2D, Rectangle);
-void DrawProvinces(State &, TextureCache &);
+void DrawProvinces(entt::registry &, TextureCache &);
 void DrawSingleBorder(Tile);
 
 Tile* FindTileByCoord(TileMap &, u32, u32);
-
-i32 determineTileIdFromClick(Vector2);
-Vector2 *determineTilePos(Vector2);
-
 }; // namespace Map
-
-#endif

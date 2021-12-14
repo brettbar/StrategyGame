@@ -16,7 +16,17 @@ if (WIN32)
   )
 endif (WIN32)
 
-set(SOURCES src/main.cpp src/map.cpp src/actors.cpp src/ui/ui.cpp)
+set(SOURCES 
+  src/main.cpp 
+  src/common.cpp
+  src/ui/ui.cpp 
+  src/map.cpp 
+  # src/components/unit.hpp
+  src/systems/movement.cpp 
+  src/systems/animation.cpp 
+  src/systems/selection.cpp 
+  src/systems/spawn.cpp
+)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 if (WIN32)

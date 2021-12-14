@@ -30,10 +30,10 @@ struct Element {
   std::vector<Element> children;
 };
 
-void Init(State &, TextureCache &);
-void Input(State &);
-void Update(State &);
-void Draw(State &);
+void Init(State &, entt::registry &, TextureCache &);
+void Input(State &, entt::registry &);
+void Update(State &, entt::registry &);
+void Draw(State &, entt::registry &);
 
 void DrawTopBar(State &);
 void DrawElement(Element);

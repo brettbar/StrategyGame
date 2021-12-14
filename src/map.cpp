@@ -29,9 +29,7 @@ void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
       tile->position = {xPos, yPos};
 
     tile->center = {tile->position.x + 64, tile->position.y + 64};
-
     tile->coord = {x, y};
-
     tileMap.tiles[index(x, y)] = tile;
 
     // tile->neighbors = {
@@ -53,10 +51,13 @@ void UpdateProvinces(entt::registry &registry) {
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tile : tileMap.tiles) {
-    if (tile != nullptr)
-      if (tile->owner > -1 && tile->population >= 0)
-        tile->population += 25;
+  for (Tile *tilePtr : tileMap.tiles) {
+    if (tilePtr == nullptr)
+      continue;
+    Tile &tile = *tilePtr;
+
+    if (tile.owner > -1 && tile.population >= 0)
+      tile.population += 25;
   }
 }
 
@@ -65,9 +66,12 @@ void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tile : tileMap.tiles) {
-    if (tile != nullptr)
-      DrawTextureRec(hex, frameRec, tile->position, WHITE);
+  for (Tile *tilePtr : tileMap.tiles) {
+    if (tilePtr == nullptr)
+      continue;
+    Tile &tile = *tilePtr;
+
+    DrawTextureRec(hex, frameRec, tile.position, WHITE);
   }
 }
 
@@ -79,33 +83,36 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tile : tileMap.tiles) {
-    if (tile != nullptr)
-      if (tile->id == (u32)tileId) {
-        tile->owner = owner;
-        switch (tile->owner) {
-        case 0:
-          tile->name = "Rome";
-          break;
-        case 1:
-          tile->name = "Athens";
-          break;
-        case 2:
-          tile->name = "Lugudunon";
-          break;
-        case 3:
-          tile->name = "Carthage";
-          break;
-        case 4:
-          tile->name = "Persepolis";
-          break;
-        }
+  for (Tile *tilePtr : tileMap.tiles) {
+    if (tilePtr == nullptr)
+      continue;
+    Tile &tile = *tilePtr;
+
+    if (tile.id == (u32)tileId) {
+      tile.owner = owner;
+      switch (tile.owner) {
+      case 0:
+        tile.name = "Rome";
+        break;
+      case 1:
+        tile.name = "Athens";
+        break;
+      case 2:
+        tile.name = "Lugudunon";
+        break;
+      case 3:
+        tile.name = "Carthage";
+        break;
+      case 4:
+        tile.name = "Persepolis";
+        break;
       }
+    }
   }
 }
 
-void DrawProvinces(State &state, TextureCache &textureCache) {
-  auto tilesView = state.registry.view<TileMap>();
+void DrawProvinces(entt::registry &reg, TextureCache &cache) {
+  auto tilesView = reg.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
@@ -168,13 +175,13 @@ void DrawProvinces(State &state, TextureCache &textureCache) {
         break;
       }
 
-      DrawTextureRec(textureCache.handle(hstr{"factionOverlay"})->texture, frameRec,
-                     tile.position, Fade(WHITE, 0.5));
+      DrawTextureRec(cache.handle(hstr{"factionOverlay"})->texture,
+                     frameRec, tile.position, Fade(WHITE, 0.5));
     }
 
     if (tile.population >= 100) {
       // DrawSingleBorder(tile);
-      DrawTextureV(textureCache.handle(hstr{"romanVillageTexture"})->texture,
+      DrawTextureV(cache.handle(hstr{"romanVillageTexture"})->texture,
                    tile.position, WHITE);
       if (tile.name != "")
         DrawText(tile.name.c_str(), tile.position.x + 50.0,
@@ -189,73 +196,5 @@ Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y) {
     return tileMap.tiles[index(x, y)];
   }
   return nullptr;
-}
-
-i32 determineTileIdFromClick(Vector2 clickPos) {
-  Vector2 *target = determineTilePos(clickPos);
-  if (target == nullptr)
-    return -1;
-
-  i32 row = target->y / 96.0;
-  i32 column;
-
-  if (row % 2 == 1) {
-    column = (target->x - 64.0) / 128.0;
-  } else {
-    column = target->x / 128.0;
-  }
-
-  return column + row * 128;
-}
-
-Vector2 *determineTilePos(Vector2 inputPos) {
-  i32 x = inputPos.x;
-  i32 y = inputPos.y;
-  i32 gridHeight = 96;
-  i32 gridWidth = 128;
-  i32 halfWidth = gridWidth / 2;
-
-  // Find the row and column of the box that the point falls in.
-  int row = (int)(y / gridHeight);
-  int column;
-
-  bool rowIsOdd = row % 2 == 1;
-
-  // Is the row an odd number?
-  if (rowIsOdd) // Yes: Offset x to match the indent of the row
-    column = (int)((x - halfWidth) / gridWidth);
-  else // No: Calculate normally
-    column = (int)(x / gridWidth);
-
-  // Work out the position of the point relative to the box it is in
-  f32 relY = y - (row * gridHeight);
-  f32 relX;
-
-  if (rowIsOdd)
-    relX = (x - (column * gridWidth)) - halfWidth;
-  else
-    relX = x - (column * gridWidth);
-
-  f32 c = 32.0;
-  f32 m = c / halfWidth;
-
-  // Work out if the point is above either of the hexagon's top edges
-  if (relY < (-m * relX) + c) { // LEFT edge
-    row--;
-    if (!rowIsOdd)
-      column--;
-  } else if (relY < (m * relX) - c) { // RIGHT edge
-    row--;
-    if (rowIsOdd)
-      column++;
-  }
-
-  f32 tileOrigX = (column * 128.0) + 64.0;
-  f32 tileOrigY = (row * 96.0) + 64.0;
-
-  if (row % 2 == 1) {
-    tileOrigX += 64.0;
-  }
-  return new Vector2{tileOrigX, tileOrigY};
 }
 }; // namespace Map

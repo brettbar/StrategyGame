@@ -3,21 +3,21 @@
 
 namespace UI {
 
-void Init(State &state, TextureCache &cache) {
-  auto drawerEntity = state.registry.create();
-  auto sidebarEntity = state.registry.create();
+void Init(State &state, entt::registry &reg, TextureCache &cache) {
+  auto drawerEntity = reg.create();
+  auto sidebarEntity = reg.create();
 
   int currId = 0;
 
   Element drawer = CreateDrawer(state, cache);
   // Element sidebar = CreateSideBar(state);
 
-  state.registry.emplace<Element>(drawerEntity, drawer);
-  // state.registry.emplace<Element>(sidebarEntity, sidebar);
+  reg.emplace<Element>(drawerEntity, drawer);
+  // reg.emplace<Element>(sidebarEntity, sidebar);
 }
 
-void Input(State &state) {
-  auto view = state.registry.view<Element>();
+void Input(State &state, entt::registry &reg) {
+  auto view = reg.view<Element>();
   Vector2 mousePos = GetMousePosition();
 
   view.each([&state, mousePos](Element &uiElement) {
@@ -33,8 +33,8 @@ void Input(State &state) {
   });
 }
 
-void Update(State &state) {
-  auto view = state.registry.view<Element>();
+void Update(State &state, entt::registry &reg) {
+  auto view = reg.view<Element>();
 
   view.each([&state](Element &drawer) {
     if (drawer.name == "sprite_list") {
@@ -59,9 +59,8 @@ void Update(State &state) {
   });
 }
 
-void Draw(State &state) {
-  auto view = state.registry.view<Element>();
-
+void Draw(State &state, entt::registry &reg) {
+  auto view = reg.view<Element>();
 
   view.each([&state](Element &element) {
     if (element.name == "sprite_list") {
@@ -77,7 +76,6 @@ void Draw(State &state) {
     }
   });
   DrawTopBar(state);
-
 }
 
 void DrawTopBar(State &state) {

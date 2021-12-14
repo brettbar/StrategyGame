@@ -1,8 +1,4 @@
-
 #pragma once
-
-#ifndef COMMON_HPP
-#define COMMON_HPP
 
 #include "../include/entt/entt.hpp"
 #include <raylib.h>
@@ -28,14 +24,12 @@ struct UVector2 {
 
 
 struct State {
-  entt::registry registry;
   u32 screenWidth;
   u32 screenHeight;
   const u32 mapWidth;
   const u32 mapHeight;
   f32 timeScale;
   f32 prevTimeScale;
-  // std::map<str, Texture2D> textures;
   Camera2D camera;
   bool debug;
   
@@ -43,5 +37,5 @@ struct State {
 };
 
 void PrintVec2(Vector2);
-
-#endif
+i32 determineTileIdFromClick(Vector2);
+Vector2* determineTilePos(Vector2);

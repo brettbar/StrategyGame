@@ -10,41 +10,40 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "common.hpp"
-
-#include "actors.hpp"
 #include "map.hpp"
 #include "resource.hpp"
 #include "ui/ui.hpp"
-#include <cstdio>
-#include <raylib.h>
+#include "systems/animation.hpp"
+#include "systems/spawn.hpp"
+#include "systems/selection.hpp"
+#include "systems/movement.hpp"
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
 
-void Init(State &);
-void Input(State &);
-void Update(State &);
-void LateUpdate(State &);
-void Draw(State &);
-void Exit();
+void Init(State &, entt::registry &, TextureCache &);
+void Input(State &, entt::registry &, TextureCache &);
+void Update(State &, entt::registry &);
+void LateUpdate(entt::registry &);
+void Draw(State &, entt::registry &, TextureCache &);
+void Exit(TextureCache &);
 
 bool GameIsRunning();
 void CameraUpdate(Camera2D &);
 void ZoomCamera(Camera2D &, f32, Vector2);
 
-State state = {.screenWidth = 1920,
-               .screenHeight = 1080,
-               .mapWidth = 128,
-               .mapHeight = 128,
-               .timeScale = 0.0f,
-               .prevTimeScale = 1.0f,
-               .debug = true};
-
-TextureCache textureCache = {};
-
 int main(void) {
-  Init(state);
+  State state = {.screenWidth = 1920,
+                 .screenHeight = 1080,
+                 .mapWidth = 128,
+                 .mapHeight = 128,
+                 .timeScale = 0.0f,
+                 .prevTimeScale = 1.0f,
+                 .debug = true};
+  entt::registry reg;
+  TextureCache textureCache = {};
+
+  Init(state, reg, textureCache);
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -60,45 +59,47 @@ int main(void) {
     lag += dt;
     oncelag += dt;
 
-    Input(state);
+    Input(state, reg, textureCache);
 
     while (lag >= MS_PER_UPDATE) {
-      Update(state);
+      Update(state, reg);
       lag -= MS_PER_UPDATE;
     }
 
     while (oncelag >= ONCE_A_SECOND * (1 / state.timeScale)) {
-      LateUpdate(state);
+      LateUpdate(reg);
       oncelag = 0.0f;
     }
 
-    Draw(state);
+    Draw(state, reg, textureCache);
   }
 
-  Exit();
+  Exit(textureCache);
 
   return 0;
 }
 
-void Init(State &state) {
+void Init(State &state, entt::registry &reg, TextureCache &cache) {
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
-  LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", textureCache);
-  LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png",
-               textureCache);
+  LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
+  LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png", cache);
+
+  LoadResource(hstr{"template"}, "assets/textures/Template.png", cache);
+
   LoadResource(hstr{"romanVillagerTexture"},
-               "assets/textures/units/Roman_Villager.png", textureCache);
+               "assets/textures/units/Roman_Villager.png", cache);
   LoadResource(hstr{"greekVillagerTexture"},
-               "assets/textures/units/Greek_Villager.png", textureCache);
+               "assets/textures/units/Greek_Villager.png", cache);
   LoadResource(hstr{"celtVillagerTexture"},
-               "assets/textures/units/Celt_Villager.png", textureCache);
+               "assets/textures/units/Celt_Villager.png", cache);
   LoadResource(hstr{"punicVillagerTexture"},
-               "assets/textures/units/Carthaginian_Villager.png", textureCache);
+               "assets/textures/units/Carthaginian_Villager.png", cache);
   LoadResource(hstr{"persianVillagerTexture"},
-               "assets/textures/units/Persian_Villager.png", textureCache);
+               "assets/textures/units/Persian_Villager.png", cache);
   LoadResource(hstr{"romanVillageTexture"}, "assets/textures/village_roman.png",
-               textureCache);
+               cache);
 
   state.camera = Camera2D{
       .offset = {(f32)GetScreenWidth() / 2, (f32)GetScreenHeight() / 2},
@@ -108,13 +109,13 @@ void Init(State &state) {
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  UI::Init(state, textureCache);
-  Map::CreateTerrain(state.registry, state.mapWidth, state.mapHeight);
+  UI::Init(state, reg, cache);
+  Map::CreateTerrain(reg, state.mapWidth, state.mapHeight);
 
   SetTargetFPS(144); // Set our game to run at 60 frames-per-second
 }
 
-void Input(State &state) {
+void Input(State &state, entt::registry &reg, TextureCache &cache) {
   CameraUpdate(state.camera);
 
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
@@ -146,24 +147,24 @@ void Input(State &state) {
   }
 
   if (IsKeyPressed(KEY_TAB)) {
-    Actors::CreateNew(state.registry, clickPos, state.selectedTexture);
+    Spawn::CreateNew(reg, clickPos, state.selectedTexture);
   }
 
   if (IsKeyDown(KEY_LEFT_SHIFT)) {
     if (IsKeyPressed(KEY_ONE)) {
-      Map::SetProvinceOwner(state.registry, 0, clickPos);
+      Map::SetProvinceOwner(reg, 0, clickPos);
     }
     if (IsKeyPressed(KEY_TWO)) {
-      Map::SetProvinceOwner(state.registry, 1, clickPos);
+      Map::SetProvinceOwner(reg, 1, clickPos);
     }
     if (IsKeyPressed(KEY_THREE)) {
-      Map::SetProvinceOwner(state.registry, 2, clickPos);
+      Map::SetProvinceOwner(reg, 2, clickPos);
     }
     if (IsKeyPressed(KEY_FOUR)) {
-      Map::SetProvinceOwner(state.registry, 3, clickPos);
+      Map::SetProvinceOwner(reg, 3, clickPos);
     }
     if (IsKeyPressed(KEY_FIVE)) {
-      Map::SetProvinceOwner(state.registry, 4, clickPos);
+      Map::SetProvinceOwner(reg, 4, clickPos);
     }
     return;
   }
@@ -173,67 +174,82 @@ void Input(State &state) {
   }
 
   if (IsMouseButtonPressed(0)) {
-    UI::Input(state);
-    Actors::UpdateSelection(state.registry, clickPos);
+    UI::Input(state, reg);
+    Selection::UpdateSelection(reg, clickPos);
   }
   if (IsMouseButtonPressed(1)) {
-    Actors::SetDestinations(state.registry, state.camera);
+    Movement::SetDestinations(reg, state.camera);
   }
   if (IsKeyPressed(KEY_ONE)) {
-    Actors::CreateNew(
-        state.registry, clickPos,
-        textureCache.handle(hstr{"romanVillagerTexture"})->texture);
+    Spawn::CreateNew(
+        reg, clickPos,
+        cache.handle(hstr{"romanVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_TWO)) {
-    Actors::CreateNew(
-        state.registry, clickPos,
-        textureCache.handle(hstr{"greekVillagerTexture"})->texture);
+    Spawn::CreateNew(
+        reg, clickPos,
+        cache.handle(hstr{"greekVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_THREE)) {
-    Actors::CreateNew(
-        state.registry, clickPos,
-        textureCache.handle(hstr{"celtVillagerTexture"})->texture);
+    Spawn::CreateNew(
+        reg, clickPos,
+        cache.handle(hstr{"celtVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_FOUR)) {
-    Actors::CreateNew(
-        state.registry, clickPos,
-        textureCache.handle(hstr{"punicVillagerTexture"})->texture);
+    Spawn::CreateNew(
+        reg, clickPos,
+        cache.handle(hstr{"punicVillagerTexture"})->texture);
   }
   if (IsKeyPressed(KEY_FIVE)) {
-    Actors::CreateNew(
-        state.registry, clickPos,
-        textureCache.handle(hstr{"persianVillagerTexture"})->texture);
+    Spawn::CreateNew(
+        reg, clickPos,
+        cache.handle(hstr{"persianVillagerTexture"})->texture);
   }
 }
 
-void Update(State &state) {
-  Actors::UpdateMovement(state.registry, state.timeScale);
+void Update(State &state, entt::registry &reg) {
+  Movement::Update(reg, state.timeScale);
   state.screenWidth = GetScreenWidth();
   state.screenHeight = GetScreenHeight();
 }
 
-void LateUpdate(State &state) { Map::UpdateProvinces(state.registry); }
+void LateUpdate(entt::registry &reg) { Map::UpdateProvinces(reg); }
 
-void Draw(State &state) {
+void Draw(State &state, entt::registry &reg, TextureCache &cache) {
   BeginDrawing();
 
   ClearBackground(DARKGRAY);
 
   BeginMode2D(state.camera);
 
-  Texture2D hex = textureCache.handle(hstr{"hexagon"})->texture;
+  Texture2D hex = cache.handle(hstr{"hexagon"})->texture;
   Rectangle frameRec = {0.0f, 0.0f, (f32)hex.width / 5, (f32)hex.height};
-  Map::DrawTerrain(state.registry, hex, frameRec);
+  Map::DrawTerrain(reg, hex, frameRec);
 
-  Map::DrawProvinces(state, textureCache);
-  Actors::Draw(state.registry, state.debug);
+  Map::DrawProvinces(reg, cache);
+  Animation::UpdateSprites(reg);
+  Animation::Draw(reg, state.debug);
 
   EndMode2D();
 
-  UI::Update(state);
-  UI::Draw(state);
+  UI::Update(state, reg);
+  UI::Draw(state, reg);
 
   EndDrawing();
+}
+
+void Exit(TextureCache &cache) {
+  UnloadTexture(cache.handle(hstr{"hexagon"})->texture);
+  UnloadTexture(cache.handle(hstr{"template"})->texture);
+  UnloadTexture(cache.handle(hstr{"factionOverlay"})->texture);
+  UnloadTexture(cache.handle(hstr{"romanVillagerTexture"})->texture);
+  UnloadTexture(cache.handle(hstr{"greekVillagerTexture"})->texture);
+  UnloadTexture(cache.handle(hstr{"celtVillagerTexture"})->texture);
+  UnloadTexture(cache.handle(hstr{"punicVillagerTexture"})->texture);
+  UnloadTexture(cache.handle(hstr{"persianVillagerTexture"})->texture);
+  UnloadTexture(cache.handle(hstr{"romanVillageTexture"})->texture);
+
+  CloseWindow(); // Close window and OpenGL context
 }
 
 void CameraUpdate(Camera2D &camera) {
@@ -268,18 +284,3 @@ void CameraUpdate(Camera2D &camera) {
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }
-
-void Exit() {
-  // UnloadTexture(state.textures.at("hex"));
-  UnloadTexture(textureCache.handle(hstr{"hexagon"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"factionOverlay"})->texture);
-  // UnloadTexture(state.textures.at("factionOverlay"));
-  UnloadTexture(textureCache.handle(hstr{"romanVillagerTexture"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"greekVillagerTexture"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"celtVillagerTexture"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"punicVillagerTexture"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"persianVillagerTexture"})->texture);
-  UnloadTexture(textureCache.handle(hstr{"romanVillageTexture"})->texture);
-
-  CloseWindow(); // Close window and OpenGL context
-}
