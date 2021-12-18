@@ -2,6 +2,7 @@
 
 #include "../common.hpp"
 #include "../components/unit.hpp"
+#include "../components/animated.hpp"
 
 namespace Spawn {
 

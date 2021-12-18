@@ -7,6 +7,6 @@
 namespace Animation {
 
 void Draw(entt::registry&, bool);
-void UpdateSprites(entt::registry &);
+void UpdateSprites(entt::registry &, f32);
 
 };

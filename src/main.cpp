@@ -183,27 +183,27 @@ void Input(State &state, entt::registry &reg, TextureCache &cache) {
   if (IsKeyPressed(KEY_ONE)) {
     Spawn::CreateNew(
         reg, clickPos,
-        cache.handle(hstr{"romanVillagerTexture"})->texture);
+        cache.handle(hstr{"template"})->texture);
   }
   if (IsKeyPressed(KEY_TWO)) {
     Spawn::CreateNew(
         reg, clickPos,
-        cache.handle(hstr{"greekVillagerTexture"})->texture);
+        cache.handle(hstr{"template"})->texture);
   }
   if (IsKeyPressed(KEY_THREE)) {
     Spawn::CreateNew(
         reg, clickPos,
-        cache.handle(hstr{"celtVillagerTexture"})->texture);
+        cache.handle(hstr{"template"})->texture);
   }
   if (IsKeyPressed(KEY_FOUR)) {
     Spawn::CreateNew(
         reg, clickPos,
-        cache.handle(hstr{"punicVillagerTexture"})->texture);
+        cache.handle(hstr{"template"})->texture);
   }
   if (IsKeyPressed(KEY_FIVE)) {
     Spawn::CreateNew(
         reg, clickPos,
-        cache.handle(hstr{"persianVillagerTexture"})->texture);
+        cache.handle(hstr{"template"})->texture);
   }
 }
 
@@ -211,6 +211,7 @@ void Update(State &state, entt::registry &reg) {
   Movement::Update(reg, state.timeScale);
   state.screenWidth = GetScreenWidth();
   state.screenHeight = GetScreenHeight();
+  Animation::UpdateSprites(reg, state.timeScale);
 }
 
 void LateUpdate(entt::registry &reg) { Map::UpdateProvinces(reg); }
@@ -227,7 +228,6 @@ void Draw(State &state, entt::registry &reg, TextureCache &cache) {
   Map::DrawTerrain(reg, hex, frameRec);
 
   Map::DrawProvinces(reg, cache);
-  Animation::UpdateSprites(reg);
   Animation::Draw(reg, state.debug);
 
   EndMode2D();

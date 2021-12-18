@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../components/unit.hpp"
+#include "../components/animated.hpp"
 
 namespace Movement {
 
