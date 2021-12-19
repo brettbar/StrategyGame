@@ -9,7 +9,6 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
 
   Unit actor = Unit{
       .speed = 1.0f,
-      // .sprite = textures.at("romanVillagerTexture"),
   };
 
   Animations animations = {
@@ -24,8 +23,10 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
     .frameRec = { 0, 0, 128, 128 },
     .state = IDLE_DR,
     .animations = animations,
+    .direction = 0,
     .currFrame = 0,
     .animTime = 0.0f,
+    .moving = false,
   };
 
   if (spawn != nullptr)
@@ -34,8 +35,6 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
     actor.position = clickPos;
 
   actor.destination = actor.position;
-
-  actor.sprite = texture;
 
   registry.emplace<Unit>(entity, actor);
   registry.emplace<Animated>(entity, animated);

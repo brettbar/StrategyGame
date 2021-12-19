@@ -4,15 +4,23 @@ namespace Movement {
 
 void SetDestinations(entt::registry &registry, Camera2D camera) {
   entt::basic_view view =
-      registry.view<Unit, Selected>();
+      registry.view<Unit, Animated, Selected>();
 
   for (auto entity : view) {
     Unit &unit= view.get<Unit>(entity);
+    Animated &anim = view.get<Animated>(entity);
 
     Vector2 *tileOrig =
         determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
-    if (tileOrig != nullptr)
+    if (tileOrig != nullptr) {
       unit.destination = *tileOrig;
+
+      if (unit.destination.x > unit.position.x)
+        anim.direction = IDLE_DR;
+      else if (unit.destination.x < unit.position.x)
+        anim.direction = IDLE_DL;
+
+    }
   }
 }
 
@@ -34,14 +42,14 @@ void Update(entt::registry &registry, f32 timeScale) {
 
       if (unit.destination.x > unit.position.x)
         anim.state = WALK_DR;
-      else
+      else if (unit.destination.x < unit.position.x)
         anim.state = WALK_DL;
 
     } else {
 
-      if (anim.state == WALK_DR)
+      if (anim.direction == 0 )
         anim.state = IDLE_DR;
-      else if (anim.state == WALK_DL)
+      else if (anim.direction == 1)
         anim.state = IDLE_DL;
 
     }

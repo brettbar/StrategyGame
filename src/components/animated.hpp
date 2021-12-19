@@ -21,6 +21,8 @@ struct Animated {
   Rectangle frameRec;
   AnimState state;
   Animations animations;
+  u32 direction;
   u32 currFrame;
   f32 animTime;
+  bool moving;
 };
