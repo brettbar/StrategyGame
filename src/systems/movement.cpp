@@ -45,13 +45,14 @@ void Update(entt::registry &registry, f32 timeScale) {
       else if (unit.destination.x < unit.position.x)
         anim.state = WALK_DL;
 
-    } else {
+      if (Vector2Distance(unit.destination, unit.position) <= 0.7f) {
+        unit.position = unit.destination;
 
-      if (anim.direction == 0 )
-        anim.state = IDLE_DR;
-      else if (anim.direction == 1)
-        anim.state = IDLE_DL;
-
+        if (anim.direction == 0)
+          anim.state = IDLE_DR;
+        else if (anim.direction == 1)
+          anim.state = IDLE_DL;
+      }
     }
   });
 }
