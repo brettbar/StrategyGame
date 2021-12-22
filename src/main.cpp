@@ -10,7 +10,7 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "map.hpp"
+#include "systems/map.hpp"
 #include "resource.hpp"
 #include "systems/animate.hpp"
 #include "systems/movement.hpp"
@@ -48,6 +48,7 @@ int main(void)
   Init(state, reg, textureCache);
 
   // Main game loop
+  //@TODO should this be 1 / 120.0?
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
   f32 oncelag = 0.0f;
@@ -62,6 +63,7 @@ int main(void)
     lag += dt;
     oncelag += dt;
 
+    CameraUpdate(state.camera);
     Input(state, reg, textureCache);
 
     while (lag >= MS_PER_UPDATE)
@@ -107,8 +109,6 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
 
 void Input(State &state, entt::registry &reg, TextureCache &cache)
 {
-  CameraUpdate(state.camera);
-
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
   if (IsKeyPressed(KEY_SPACE))
@@ -232,8 +232,8 @@ void Exit(entt::registry &registry, TextureCache &cache)
   UnloadTexture(cache.handle(hstr{"persianVillagerTexture"})->texture);
   UnloadTexture(cache.handle(hstr{"romanVillageTexture"})->texture);
 
-
   registry.clear<Unit>();
+  registry.clear<Selected>();
   registry.clear<Animated>();
   registry.clear<Map::TileMap>();
 

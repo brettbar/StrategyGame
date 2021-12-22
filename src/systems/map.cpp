@@ -113,20 +113,20 @@ void DrawProvinces(entt::registry &reg, TextureCache &cache)
     // if (debug)
     //   DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0,
     //   14,
-    //            WHITE);
+    // WHITE);
 
     // str ownerString = std::to_string(tile.owner);
     // const char *ownertext = ownerString.c_str();
     // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0,
     // 14,
-    //          BLUE);
+    // BLUE);
 
     // str coordString = std::to_string((u32)tile.coord.x) + "," +
     //                   std::to_string((u32)tile.coord.y);
     // const char *coordText = coordString.c_str();
     // if (debug)
     //   DrawText(coordText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
-    //            BLUE);
+    // BLUE);
 
     // str popString = std::to_string(tile.population);
     // const char *text = popString.c_str();
