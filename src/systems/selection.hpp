@@ -4,9 +4,9 @@
 #include "../components/unit.hpp"
 
 
-namespace Selection {
+namespace Selection
+{
 
-void UpdateSelection(entt::registry&, Vector2);
+void UpdateSelection(entt::registry &, Vector2);
 
 };
-

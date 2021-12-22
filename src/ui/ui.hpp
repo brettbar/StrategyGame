@@ -6,9 +6,11 @@
 #include "../common.hpp"
 #include "../resource.hpp"
 
-namespace UI {
+namespace UI
+{
 
-enum Shape {
+enum Shape
+{
   Texture,
   Rect,
   Rect_Lines,
@@ -44,6 +46,6 @@ Element CreateSideBar(State &);
 // Debug Only
 Element CreateDrawer(State &, TextureCache &);
 
-}; // namespace UI
+};// namespace UI
 
 #endif

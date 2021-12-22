@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../components/unit.hpp"
 #include "../components/animated.hpp"
+#include "../components/unit.hpp"
 
-namespace Movement {
+namespace Movement
+{
 
-void SetDestinations(entt::registry&, Camera2D);
-void Update(entt::registry&, f32);
+void SetDestinations(entt::registry &, Camera2D);
+void Update(entt::registry &, f32);
 
-}; // namespace Units
+};// namespace Movement

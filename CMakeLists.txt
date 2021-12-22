@@ -22,8 +22,8 @@ set(SOURCES
   src/ui/ui.cpp 
   src/map.cpp 
   # src/components/unit.hpp
-  src/systems/movement.cpp 
-  src/systems/animation.cpp 
+  src/systems/movement.cpp
+        src/systems/animate.cpp
   src/systems/selection.cpp 
   src/systems/spawn.cpp
 )

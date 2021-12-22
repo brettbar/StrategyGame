@@ -1,55 +1,53 @@
 #include "movement.hpp"
 
-namespace Movement {
+namespace Movement
+{
 
-void SetDestinations(entt::registry &registry, Camera2D camera) {
-  entt::basic_view view =
-      registry.view<Unit, Animated, Selected>();
+void SetDestinations(entt::registry &registry, Camera2D camera)
+{
+  entt::basic_view view = registry.view<Unit, Animated, Selected>();
 
-  for (auto entity : view) {
-    Unit &unit= view.get<Unit>(entity);
+  for (auto entity: view)
+  {
+    Unit &unit = view.get<Unit>(entity);
     Animated &anim = view.get<Animated>(entity);
 
     Vector2 *tileOrig =
-        determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
-    if (tileOrig != nullptr) {
+      determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
+    if (tileOrig != nullptr)
+    {
       unit.destination = *tileOrig;
 
-      if (unit.destination.x > unit.position.x)
-        anim.direction = IDLE_DR;
+      if (unit.destination.x > unit.position.x) anim.direction = IDLE_DR;
       else if (unit.destination.x < unit.position.x)
         anim.direction = IDLE_DL;
-
     }
   }
 }
 
-void Update(entt::registry &registry, f32 timeScale) {
+void Update(entt::registry &registry, f32 timeScale)
+{
   entt::basic_view units = registry.view<Unit, Animated>();
 
   units.each([timeScale](Unit &unit, Animated &anim) {
-    if (Vector2Distance(unit.destination, unit.position) > 0.7f) {
-      Vector2 foo = {
-          unit.destination.x - unit.position.x,
-          unit.destination.y - unit.position.y,
-      };
+    if (Vector2Distance(unit.destination, unit.position) > 0.7f)
+    {
+      Vector2 unitVec = Vector2Normalize({
+        unit.destination.x - unit.position.x,
+        unit.destination.y - unit.position.y,
+      });
+      unit.position.x += unitVec.x * unit.speed * timeScale;
+      unit.position.y += unitVec.y * unit.speed * timeScale;
 
-      Vector2 unitVec = Vector2Normalize(foo);
-      unit.position.x +=
-          unitVec.x * unit.speed * timeScale;
-      unit.position.y +=
-          unitVec.y * unit.speed * timeScale;
-
-      if (unit.destination.x > unit.position.x)
-        anim.state = WALK_DR;
+      if (unit.destination.x > unit.position.x) anim.state = WALK_DR;
       else if (unit.destination.x < unit.position.x)
         anim.state = WALK_DL;
 
-      if (Vector2Distance(unit.destination, unit.position) <= 0.7f) {
+      if (Vector2Distance(unit.destination, unit.position) <= 0.7f)
+      {
         unit.position = unit.destination;
 
-        if (anim.direction == 0)
-          anim.state = IDLE_DR;
+        if (anim.direction == 0) anim.state = IDLE_DR;
         else if (anim.direction == 1)
           anim.state = IDLE_DL;
       }
@@ -57,4 +55,4 @@ void Update(entt::registry &registry, f32 timeScale) {
   });
 }
 
-}; // namespace Actors
+};// namespace Movement

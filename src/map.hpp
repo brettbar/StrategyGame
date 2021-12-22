@@ -1,12 +1,14 @@
 #pragma once
 
-#include "common.hpp"
-#include "resource.hpp"
 #include <array>
 #include <chrono>
 #include <thread>
 
-namespace Map {
+#include "common.hpp"
+#include "resource.hpp"
+
+namespace Map
+{
 
 const u32 MAP_WIDTH = 128;
 const u32 MAP_HEIGHT = 128;
@@ -19,18 +21,10 @@ struct Tile {
   i32 owner;
   u32 population;
   str name;
-
-  u32 neighborIds[6];
-  // Vector2 neighborNE;
-  // Vector2 neighborE;
-  // Vector2 neighborSE;
-  // Vector2 neighborSW;
-  // Vector2 neighborW;
-  // Vector2 neighborNW;
 };
 
 struct TileMap {
-  std::array<Tile*, MAP_WIDTH*MAP_HEIGHT> tiles;
+  std::array<Tile, MAP_WIDTH * MAP_HEIGHT> tiles;
 };
 
 void CreateTerrain(entt::registry &, u32, u32);
@@ -42,5 +36,5 @@ void DrawTerrain(entt::registry &, Texture2D, Rectangle);
 void DrawProvinces(entt::registry &, TextureCache &);
 void DrawSingleBorder(Tile);
 
-Tile* FindTileByCoord(TileMap &, u32, u32);
-}; // namespace Map
+Tile *FindTileByCoord(TileMap &, u32, u32);
+};// namespace Map

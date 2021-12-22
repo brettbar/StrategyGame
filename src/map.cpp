@@ -1,15 +1,19 @@
 #include "map.hpp"
+
 #include <raylib.h>
 
-namespace Map {
+namespace Map
+{
 
-void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
+void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight)
+{
   entt::entity entity = registry.create();
   TileMap tileMap = {
-      .tiles = {},
+    .tiles = {},
   };
 
-  for (u32 i = 0; i < mapWidth * mapHeight; i++) {
+  for (u32 i = 0; i < mapWidth * mapHeight; i++)
+  {
     Tile *tile = new Tile{};
     // tile.id = x + y * 128;
     tile->id = i;
@@ -23,59 +27,45 @@ void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight) {
     f32 xPos = x * 128;
     f32 yPos = y * 96;
 
-    if (y % 2 == 1)
-      tile->position = {xPos + 64, yPos};
+    if (y % 2 == 1) tile->position = {xPos + 64, yPos};
     else
       tile->position = {xPos, yPos};
 
     tile->center = {tile->position.x + 64, tile->position.y + 64};
     tile->coord = {x, y};
-    tileMap.tiles[index(x, y)] = tile;
-
-    // tile->neighbors = {
-    //     tilemap.tiles[tile->coord.y - 1][tile->coord.x + 1],
-    //     tilemap.tiles[tile->coord.y][tile->coord.x + 1],
-    //     tilemap.tiles[tile->coord.y + 1][tile->coord.x + 1],
-    //     tilemap.tiles[tile->coord.y + 1][tile->coord.x],
-    //     tilemap.tiles[tile->coord.y][tile->coord.x - 1],
-    //     tilemap.tiles[tile->coord.y - 1][tile->coord.x],
-    // };
+    tileMap.tiles[index(x, y)] = *tile;
   }
   registry.emplace<TileMap>(entity, tileMap);
 }
 
 u32 index(u32 x, u32 y) { return x + MAP_WIDTH * y; };
 
-void UpdateProvinces(entt::registry &registry) {
+void UpdateProvinces(entt::registry &registry)
+{
   auto tilesView = registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tilePtr : tileMap.tiles) {
-    if (tilePtr == nullptr)
-      continue;
-    Tile &tile = *tilePtr;
-
-    if (tile.owner > -1 && tile.population >= 0)
-      tile.population += 25;
+  for (Tile &tile: tileMap.tiles)
+  {
+    if (tile.owner > -1 && tile.population >= 0) tile.population += 25;
   }
 }
 
-void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec) {
+void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec)
+{
   auto tilesView = registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tilePtr : tileMap.tiles) {
-    if (tilePtr == nullptr)
-      continue;
-    Tile &tile = *tilePtr;
-
+  for (Tile &tile: tileMap.tiles)
+  {
     DrawTextureRec(hex, frameRec, tile.position, WHITE);
   }
 }
 
-void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
+void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos)
+{
   i32 tileId = determineTileIdFromClick(clickPos);
   assert(tileId >= 0);
 
@@ -83,43 +73,41 @@ void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tilePtr : tileMap.tiles) {
-    if (tilePtr == nullptr)
-      continue;
-    Tile &tile = *tilePtr;
-
-    if (tile.id == (u32)tileId) {
+  for (Tile &tile: tileMap.tiles)
+  {
+    if (tile.id == (u32) tileId)
+    {
       tile.owner = owner;
-      switch (tile.owner) {
-      case 0:
-        tile.name = "Rome";
-        break;
-      case 1:
-        tile.name = "Athens";
-        break;
-      case 2:
-        tile.name = "Lugudunon";
-        break;
-      case 3:
-        tile.name = "Carthage";
-        break;
-      case 4:
-        tile.name = "Persepolis";
-        break;
+      switch (tile.owner)
+      {
+        case 0:
+          tile.name = "Rome";
+          break;
+        case 1:
+          tile.name = "Athens";
+          break;
+        case 2:
+          tile.name = "Lugudunon";
+          break;
+        case 3:
+          tile.name = "Carthage";
+          break;
+        case 4:
+          tile.name = "Persepolis";
+          break;
       }
     }
   }
 }
 
-void DrawProvinces(entt::registry &reg, TextureCache &cache) {
+void DrawProvinces(entt::registry &reg, TextureCache &cache)
+{
   auto tilesView = reg.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-  for (Tile *tilePtr : tileMap.tiles) {
-    if (tilePtr == nullptr)
-      continue;
-    Tile &tile = *tilePtr;
+  for (Tile &tile: tileMap.tiles)
+  {
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
     // if (debug)
@@ -147,39 +135,42 @@ void DrawProvinces(entt::registry &reg, TextureCache &cache) {
     //   14,
     //            RED);
 
-    if (tile.owner > -1) {
+    if (tile.owner > -1)
+    {
       Color color = BLACK;
 
       Rectangle frameRec = {0.0, 0.0, 128, 128.0};
 
-      switch (tile.owner) {
-      case 0:
-        color = RED;
-        frameRec.x = 0.0f;
-        break;
-      case 1:
-        color = SKYBLUE;
-        frameRec.x = 128.0f;
-        break;
-      case 2:
-        color = GREEN;
-        frameRec.x = 256.0f;
-        break;
-      case 3:
-        color = PURPLE;
-        frameRec.x = 384.0f;
-        break;
-      case 4:
-        color = ORANGE;
-        frameRec.x = 513.0f;
-        break;
+      switch (tile.owner)
+      {
+        case 0:
+          color = RED;
+          frameRec.x = 0.0f;
+          break;
+        case 1:
+          color = SKYBLUE;
+          frameRec.x = 128.0f;
+          break;
+        case 2:
+          color = GREEN;
+          frameRec.x = 256.0f;
+          break;
+        case 3:
+          color = PURPLE;
+          frameRec.x = 384.0f;
+          break;
+        case 4:
+          color = ORANGE;
+          frameRec.x = 513.0f;
+          break;
       }
 
-      DrawTextureRec(cache.handle(hstr{"factionOverlay"})->texture,
-                     frameRec, tile.position, Fade(WHITE, 0.5));
+      DrawTextureRec(cache.handle(hstr{"factionOverlay"})->texture, frameRec,
+                     tile.position, Fade(WHITE, 0.5));
     }
 
-    if (tile.population >= 100) {
+    if (tile.population >= 100)
+    {
       // DrawSingleBorder(tile);
       DrawTextureV(cache.handle(hstr{"romanVillageTexture"})->texture,
                    tile.position, WHITE);
@@ -190,11 +181,13 @@ void DrawProvinces(entt::registry &reg, TextureCache &cache) {
   }
 }
 
-Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y) {
+Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y)
+{
 
-  if ((x >= 0 && x <= MAP_WIDTH) && (y >= 0 && y <= MAP_HEIGHT)) {
-    return tileMap.tiles[index(x, y)];
+  if ((x >= 0 && x <= MAP_WIDTH) && (y >= 0 && y <= MAP_HEIGHT))
+  {
+    return &tileMap.tiles[index(x, y)];
   }
   return nullptr;
 }
-}; // namespace Map
+};// namespace Map

@@ -1,26 +1,28 @@
 #include "spawn.hpp"
 
-namespace Spawn {
+namespace Spawn
+{
 
-void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
+void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture)
+{
   entt::entity entity = registry.create();
 
   Vector2 *spawn = determineTilePos(clickPos);
 
   Unit actor = Unit{
-      .speed = 1.0f,
+    .speed = 1.0f,
   };
 
   Animations animations = {
-      { IDLE_DR, 2, 0.2f },
-      { IDLE_DL, 2, 0.2f },
-      { WALK_DL, 8, 0.8f },
-      { WALK_DL, 8, 0.8f },
+    {IDLE_DR, 2, 0.2f},
+    {IDLE_DL, 2, 0.2f},
+    {WALK_DL, 8, 0.8f},
+    {WALK_DL, 8, 0.8f},
   };
 
-  Animated animated = Animated {
+  Animated animated = Animated{
     .sprite = texture,
-    .frameRec = { 0, 0, 128, 128 },
+    .frameRec = {0, 0, 128, 128},
     .state = IDLE_DR,
     .animations = animations,
     .direction = 0,
@@ -29,8 +31,7 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
     .moving = false,
   };
 
-  if (spawn != nullptr)
-    actor.position = *spawn;
+  if (spawn != nullptr) actor.position = *spawn;
   else
     actor.position = clickPos;
 
@@ -41,5 +42,4 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
 }
 
 
-};
-
+};// namespace Spawn

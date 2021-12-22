@@ -1,12 +1,13 @@
 #pragma once
 
 #include "../common.hpp"
-#include "movement.hpp"
 #include "../components/animated.hpp"
+#include "movement.hpp"
 
-namespace Animation {
+namespace Animate
+{
 
-void Draw(entt::registry&, bool);
+void Draw(entt::registry &, bool);
 void UpdateSprites(entt::registry &, f32);
 
-};
+};// namespace Animate
