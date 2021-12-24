@@ -19,8 +19,8 @@ endif (WIN32)
 set(SOURCES 
   src/main.cpp 
   src/common.cpp
-  src/ui/ui.cpp 
-  src/map.cpp 
+  src/ui/ui.cpp
+        src/systems/map.cpp
   # src/components/unit.hpp
   src/systems/movement.cpp 
   src/systems/animation.cpp 

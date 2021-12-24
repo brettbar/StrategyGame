@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common.hpp"
-#include "resource.hpp"
+#include "../common.hpp"
+#include "../resource.hpp"
 #include <array>
 #include <chrono>
 #include <thread>
