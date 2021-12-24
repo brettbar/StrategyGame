@@ -4,8 +4,8 @@
 #include <chrono>
 #include <thread>
 
-#include "../common.hpp"
-#include "../resource.hpp"
+#include "common.hpp"
+#include "resource.hpp"
 
 namespace Map
 {
