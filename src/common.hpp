@@ -1,12 +1,10 @@
 #pragma once
 
+#include "../include/entt/entt.hpp"
 #include <raylib.h>
 #include <raymath.h>
-
 #include <map>
 #include <vector>
-
-#include "../include/entt/entt.hpp"
 
 using u32 = unsigned int;
 using i32 = int;
@@ -34,10 +32,10 @@ struct State {
   f32 prevTimeScale;
   Camera2D camera;
   bool debug;
-
+  
   Texture2D selectedTexture;
 };
 
 void PrintVec2(Vector2);
 i32 determineTileIdFromClick(Vector2);
-Vector2 *determineTilePos(Vector2);
+Vector2* determineTilePos(Vector2);

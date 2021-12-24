@@ -1,21 +1,20 @@
 #pragma once
 #include "../common.hpp"
 
-enum AnimState
-{
+enum AnimState {
   IDLE_DR,
   IDLE_DL,
   WALK_DR,
   WALK_DL,
 };
 
-struct Animation {
+struct Anim {
   AnimState name;
   u32 frameLength;
   f32 speed;
 };
 
-using Animations = std::vector<Animation>;
+using Animations = std::vector<Anim>;
 
 struct Animated {
   Texture2D sprite;
