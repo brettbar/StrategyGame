@@ -1,153 +1,184 @@
 #include "ui.hpp"
 #include <raylib.h>
 
-namespace UI {
+namespace UI
+{
 
-void Init(State &state, entt::registry &reg, TextureCache &cache) {
-  auto drawerEntity = reg.create();
-  auto sidebarEntity = reg.create();
+  void Init(State &state, entt::registry &reg, TextureCache &cache)
+  {
+    auto drawerEntity = reg.create();
+    auto sidebarEntity = reg.create();
 
-  int currId = 0;
+    int currId = 0;
 
-  Element drawer = CreateDrawer(state, cache);
-  // Element sidebar = CreateSideBar(state);
+    Element drawer = CreateDrawer(state, cache);
+    // Element sidebar = CreateSideBar(state);
 
-  reg.emplace<Element>(drawerEntity, drawer);
-  // reg.emplace<Element>(sidebarEntity, sidebar);
-}
+    reg.emplace<Element>(drawerEntity, drawer);
+    // reg.emplace<Element>(sidebarEntity, sidebar);
+  }
 
-void Input(State &state, entt::registry &reg) {
-  auto view = reg.view<Element>();
-  Vector2 mousePos = GetMousePosition();
+  void Input(State &state, entt::registry &reg)
+  {
+    auto view = reg.view<Element>();
+    Vector2 mousePos = GetMousePosition();
 
-  view.each([&state, mousePos](Element &uiElement) {
-    if (CheckCollisionPointRec(mousePos, uiElement.panel)) {
-      if (uiElement.name == "sprite_list" && state.debug) {
-        for (auto child : uiElement.children) {
-          if (CheckCollisionPointRec(mousePos, child.panel)) {
-            state.selectedTexture = child.texture;
+    view.each([&state, mousePos](Element &uiElement) {
+      if (CheckCollisionPointRec(mousePos, uiElement.panel))
+      {
+        if (uiElement.name == "sprite_list" && state.debug)
+        {
+          for (auto child: uiElement.children)
+          {
+            if (CheckCollisionPointRec(mousePos, child.panel))
+            {
+              state.selectedTexture = child.texture;
+            }
           }
         }
       }
-    }
-  });
-}
+    });
+  }
 
-void Update(State &state, entt::registry &reg) {
-  auto view = reg.view<Element>();
+  void Update(State &state, entt::registry &reg)
+  {
+    auto view = reg.view<Element>();
 
-  view.each([&state](Element &drawer) {
-    if (drawer.name == "sprite_list") {
-      drawer.panel = {(f32)state.screenWidth - 192,
-                      ((f32)state.screenHeight / 4), 192,
-                      (f32)state.screenHeight / 2};
+    view.each([&state](Element &drawer) {
+      if (drawer.name == "sprite_list")
+      {
+        drawer.panel = {(f32) state.screenWidth - 192,
+                        ((f32) state.screenHeight / 4), 192,
+                        (f32) state.screenHeight / 2};
 
-      f32 offset = 0;
-      for (u32 i = 0; i < drawer.children.size(); i++) {
-        if (i % 2 == 0) {
-          drawer.children[i].position.x = drawer.panel.x;
-          drawer.children[i].position.y = drawer.panel.y + 64.0 * offset;
-        } else {
-          drawer.children[i].position.x = drawer.panel.x + 64.0;
-          drawer.children[i].position.y = drawer.panel.y + 64.0 * offset++;
+        f32 offset = 0;
+        for (u32 i = 0; i < drawer.children.size(); i++)
+        {
+          if (i % 2 == 0)
+          {
+            drawer.children[i].position.x = drawer.panel.x;
+            drawer.children[i].position.y = drawer.panel.y + 64.0 * offset;
+          }
+          else
+          {
+            drawer.children[i].position.x = drawer.panel.x + 64.0;
+            drawer.children[i].position.y = drawer.panel.y + 64.0 * offset++;
+          }
+          drawer.children[i].panel = {drawer.children[i].position.x + 32.0f,
+                                      drawer.children[i].position.y + 32.0f, 64,
+                                      64};
         }
-        drawer.children[i].panel = {drawer.children[i].position.x + 32.0f,
-                                    drawer.children[i].position.y + 32.0f, 64,
-                                    64};
       }
-    }
-  });
-}
+    });
+  }
 
-void Draw(State &state, entt::registry &reg) {
-  auto view = reg.view<Element>();
+  void Draw(State &state, entt::registry &reg)
+  {
+    auto view = reg.view<Element>();
 
-  view.each([&state](Element &element) {
-    if (element.name == "sprite_list") {
-      if (state.debug)
-        DrawElement(element);
-
-      for (auto child : element.children) {
+    view.each([&state](Element &element) {
+      if (element.name == "sprite_list")
+      {
         if (state.debug)
-          DrawElement(child);
+          DrawElement(element);
+
+        for (auto child: element.children)
+        {
+          if (state.debug)
+            DrawElement(child);
+        }
       }
-    } else {
-      DrawElement(element);
+      else
+      {
+        DrawElement(element);
+      }
+    });
+    DrawTopBar(state);
+  }
+
+  void DrawTopBar(State &state)
+  {
+    DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
+    DrawFPS(16, 2);
+
+    str symbol = "||";
+    if (state.timeScale == 1.5)
+    {
+      symbol = ">>>";
     }
-  });
-  DrawTopBar(state);
-}
+    else if (state.timeScale == 1.0)
+    {
+      symbol = ">>";
+    }
+    else if (state.timeScale == 0.5)
+    {
+      symbol = ">";
+    }
+    else
+    {
+      symbol = "||";
+    }
 
-void DrawTopBar(State &state) {
-  DrawRectangle(0, 0, (f32)state.screenWidth, 24.0f, BLACK);
-  DrawFPS(16, 2);
-
-  str symbol = "||";
-  if (state.timeScale == 1.5) {
-    symbol = ">>>";
-  } else if (state.timeScale == 1.0) {
-    symbol = ">>";
-  } else if (state.timeScale == 0.5) {
-    symbol = ">";
-  } else {
-    symbol = "||";
+    DrawText(symbol.c_str(), state.screenWidth - 128, 2,
+             20, WHITE);
   }
 
-  DrawText(symbol.c_str(), state.screenWidth - 128, 2,
-           20, WHITE);
-}
-
-void DrawElement(Element element) {
-  switch (element.shape) {
-  case Texture:
-    DrawTextureEx(element.texture, element.position, 0.0f, 1.0f, WHITE);
-    break;
-  case Rect:
-    DrawRectangleRec(element.panel, element.color);
-    break;
-  case Rect_Rounded:
-    DrawRectangleRounded(element.panel, 0.2f, 1, DARKGRAY);
-    break;
-  case Rect_Lines:
-    DrawRectangleLinesEx(element.panel, 2, WHITE);
-    break;
+  void DrawElement(Element element)
+  {
+    switch (element.shape)
+    {
+      case Texture:
+        DrawTextureEx(element.texture, element.position, 0.0f, 1.0f, WHITE);
+        break;
+      case Rect:
+        DrawRectangleRec(element.panel, element.color);
+        break;
+      case Rect_Rounded:
+        DrawRectangleRounded(element.panel, 0.2f, 1, DARKGRAY);
+        break;
+      case Rect_Lines:
+        DrawRectangleLinesEx(element.panel, 2, WHITE);
+        break;
+    }
   }
-}
 
-Element CreateButton(Texture2D texture, Vector2 position, Color color) {
-  Element element = Element();
-  element.id = 0;
-  element.name = "sprite_button";
-  element.shape = Texture;
-  element.debugOnly = true;
-  element.position = position;
-  element.texture = texture;
-  element.panel = {position.x + 32.0f, position.y + 32.0f, 64, 64};
-  element.children = {};
-  return element;
-}
+  Element CreateButton(Texture2D texture, Vector2 position, Color color)
+  {
+    Element element = Element();
+    element.id = 0;
+    element.name = "sprite_button";
+    element.shape = Texture;
+    element.debugOnly = true;
+    element.position = position;
+    element.texture = texture;
+    element.panel = {position.x + 32.0f, position.y + 32.0f, 64, 64};
+    element.children = {};
+    return element;
+  }
 
-Element CreateSideBar(State &state) {
-  Element sidebar = Element();
-  sidebar.id = 0;
-  sidebar.name = "side_bar";
-  sidebar.shape = Rect;
-  sidebar.debugOnly = false;
-  sidebar.panel = {0, 0, 100, (f32)state.screenHeight};
-  sidebar.color = DARKGRAY;
-  sidebar.children = {};
-  return sidebar;
-}
+  Element CreateSideBar(State &state)
+  {
+    Element sidebar = Element();
+    sidebar.id = 0;
+    sidebar.name = "side_bar";
+    sidebar.shape = Rect;
+    sidebar.debugOnly = false;
+    sidebar.panel = {0, 0, 100, (f32) state.screenHeight};
+    sidebar.color = DARKGRAY;
+    sidebar.children = {};
+    return sidebar;
+  }
 
-Element CreateDrawer(State &state, TextureCache &cache) {
-  Element drawer = Element();
-  drawer.id = 0;
-  drawer.name = "sprite_list";
-  drawer.shape = Rect_Rounded;
-  drawer.debugOnly = true;
-  drawer.panel = {(f32)state.screenWidth - 192, ((f32)state.screenHeight / 4),
-                  192, (f32)state.screenHeight / 2};
-  drawer.children = {
+  Element CreateDrawer(State &state, TextureCache &cache)
+  {
+    Element drawer = Element();
+    drawer.id = 0;
+    drawer.name = "sprite_list";
+    drawer.shape = Rect_Rounded;
+    drawer.debugOnly = true;
+    drawer.panel = {(f32) state.screenWidth - 192, ((f32) state.screenHeight / 4),
+                    192, (f32) state.screenHeight / 2};
+    drawer.children = {
       CreateButton(cache.handle(hstr{"romanVillagerTexture"})->texture,
                    {drawer.panel.x, drawer.panel.y}, WHITE),
       CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
@@ -172,8 +203,8 @@ Element CreateDrawer(State &state, TextureCache &cache) {
                    {drawer.panel.x, drawer.panel.y + 256.0f}, WHITE),
       CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
                    {drawer.panel.x + 64.0f, drawer.panel.y + 256.0f}, WHITE),
-  };
-  return drawer;
-}
+    };
+    return drawer;
+  }
 
-}; // namespace UI
+};// namespace UI

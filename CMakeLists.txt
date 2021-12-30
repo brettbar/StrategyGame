@@ -26,7 +26,7 @@ set(SOURCES
   src/systems/animation.cpp 
   src/systems/selection.cpp 
   src/systems/spawn.cpp
-)
+        src/systems/terrain.cpp src/systems/terrain.hpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 if (WIN32)
