@@ -95,18 +95,18 @@ namespace Terrain
           break;
       }
 
-      switch (tile->visibility)
-      {
-        case VISIBILE:
-          break;
-        case EXPLORED:
-          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
-          break;
-        case UNEXPLORED:
-          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
-          break;
-        default: break;
-      }
+//      switch (tile->visibility)
+//      {
+//        case VISIBILE:
+//          break;
+//        case EXPLORED:
+//          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
+//          break;
+//        case UNEXPLORED:
+//          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
+//          break;
+//        default: break;
+//      }
     }
   }
 
@@ -267,10 +267,4 @@ namespace Terrain
 
   // i = x + W * y;
   u32 index(u32 x, u32 y) { return x + MAP_WIDTH * y; };
-
-  // i - x = W * y
-  u32 y_coord(u32 x, u32 index) { return (index - x) / MAP_WIDTH; }
-
-  // i - W * y = x
-  u32 x_coord(u32 y, u32 index) { return (index - MAP_WIDTH) * y; }
 };// namespace Terrain

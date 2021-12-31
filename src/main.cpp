@@ -244,7 +244,7 @@ void Update(State &state, entt::registry &reg)
   state.screenWidth = GetScreenWidth();
   state.screenHeight = GetScreenHeight();
   Animation::UpdateSprites(reg, state.timeScale);
-  Terrain::UpdateFOW(reg);
+//  Terrain::UpdateFOW(reg);
 }
 
 void LateUpdate(entt::registry &reg) {
@@ -286,6 +286,7 @@ void Exit(TextureCache &cache)
   UnloadTexture(cache.handle(hstr{"persianVillagerTexture"})->texture);
   UnloadTexture(cache.handle(hstr{"romanVillageTexture"})->texture);
 
+  cache.clear();
   CloseWindow();// Close window and OpenGL context
 }
 
