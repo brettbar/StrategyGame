@@ -48,16 +48,18 @@ namespace Terrain
       else if (tile->noise >= 0.92f)
         tile->biome = HILLS;
       // Tierra
-      else if (tile->noise >= 0.8f)
-        tile->biome = LAND;
-      // Playa
       else if (tile->noise >= 0.76f)
-        tile->biome = BEACH;
+        tile->biome = LAND;
+//      // Playa
+//      else if (tile->noise >= 0.76f)
+//        tile->biome = BEACH;
       // Mar
       else
         tile->biome = WATER;
 
       tile->center = {tile->position.x + 64, tile->position.y + 64};
+      tile->coords = {x, y};
+      tile->visibility = UNEXPLORED;
       tileMap[index(x, y)] = tile;
     }
     registry.emplace<TileMap>(entity, tileMap);
@@ -92,8 +94,67 @@ namespace Terrain
           DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
       }
+
+      switch (tile->visibility)
+      {
+        case VISIBILE:
+          break;
+        case EXPLORED:
+          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
+          break;
+        case UNEXPLORED:
+          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
+          break;
+        default: break;
+      }
     }
   }
+
+  void UpdateFOW(entt::registry &reg)
+  {
+    auto view = reg.view<Unit, Sight>();
+    auto tileView = reg.view<TileMap>();
+    TileMap tiles = tileView.get<TileMap>(tileView.front());
+
+    for (auto &entity: view)
+    {
+      Sight sight = view.get<Sight>(entity);
+      Unit unit = view.get<Unit>(entity);
+
+      i32 closestId = DetermineTileIdFromClick(unit.position);
+      assert(closestId >= 0);
+
+      std::shared_ptr<Tile> closest = tiles[closestId];
+      u32 x = closest->coords.x;
+      u32 y = closest->coords.y;
+
+      std::array<std::shared_ptr<Tile>, 6> neighbors = {
+        tiles[index(x, y-1)],
+        tiles[index(x+1, y)],
+        tiles[index(x, y+1)],
+        tiles[index(x-1, y+1)],
+        tiles[index(x-1, y)],
+        tiles[index(x-1, y-1)],
+      };
+
+      if (y % 2 == 1)
+      {
+        neighbors[0] = tiles[index(x+1, y-1)];
+        neighbors[2] = tiles[index(x+1, y+1)];
+        neighbors[3] = tiles[index(x, y+1)];
+        neighbors[5] = tiles[index(x, y-1)];
+      }
+
+      for (auto &neighbor : neighbors)
+      {
+        if (neighbor != nullptr)
+          neighbor->visibility = VISIBILE;
+      }
+
+      closest->visibility = VISIBILE;
+    }
+  }
+
   // Written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
   NoiseMap GeneratePerlinNoise(float *fSeed, int nOctaves, float fBias)
@@ -204,6 +265,12 @@ namespace Terrain
       }
   }
 
+  // i = x + W * y;
   u32 index(u32 x, u32 y) { return x + MAP_WIDTH * y; };
 
+  // i - x = W * y
+  u32 y_coord(u32 x, u32 index) { return (index - x) / MAP_WIDTH; }
+
+  // i - W * y = x
+  u32 x_coord(u32 y, u32 index) { return (index - MAP_WIDTH) * y; }
 };// namespace Terrain

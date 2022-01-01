@@ -5,7 +5,7 @@ namespace Spawn {
 void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
   entt::entity entity = registry.create();
 
-  Vector2 *spawn = determineTilePos(clickPos);
+  Vector2 *spawn = DetermineTilePos(clickPos);
 
   Unit actor = Unit{
       .speed = 1.0f,
@@ -29,6 +29,10 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
     .moving = false,
   };
 
+  Sight sight = Sight {
+    .range = 1,
+  };
+
   if (spawn != nullptr)
     actor.position = *spawn;
   else
@@ -38,6 +42,7 @@ void CreateNew(entt::registry &registry, Vector2 clickPos, Texture2D texture) {
 
   registry.emplace<Unit>(entity, actor);
   registry.emplace<Animated>(entity, animated);
+  registry.emplace<Sight>(entity, sight);
 }
 
 

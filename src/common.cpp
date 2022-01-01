@@ -4,8 +4,8 @@ void PrintVec2(Vector2 vec) {
   printf("(%f, %f)\n", vec.x, vec.y); 
 }
 
-i32 determineTileIdFromClick(Vector2 clickPos) {
-  Vector2 *target = determineTilePos(clickPos);
+i32 DetermineTileIdFromClick(Vector2 clickPos) {
+  Vector2 *target = DetermineTilePos(clickPos);
   if (target == nullptr)
     return -1;
 
@@ -21,7 +21,7 @@ i32 determineTileIdFromClick(Vector2 clickPos) {
   return column + row * 128;
 }
 
-Vector2 *determineTilePos(Vector2 inputPos) {
+Vector2 *DetermineTilePos(Vector2 inputPos) {
   i32 x = inputPos.x;
   i32 y = inputPos.y;
   i32 gridHeight = 96;

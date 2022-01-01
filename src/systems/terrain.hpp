@@ -4,13 +4,21 @@
 #pragma once
 
 #include "../common.hpp"
-
+#include "../components/sight.hpp"
+#include "../components/unit.hpp"
 #include <chrono>
 
 namespace Terrain
 {
   const u32 MAP_WIDTH = 128;
   const u32 MAP_HEIGHT = 128;
+
+  enum Visibility
+  {
+    UNEXPLORED,
+    EXPLORED,
+    VISIBILE,
+  };
 
   enum Biome
   {
@@ -26,7 +34,9 @@ namespace Terrain
     f32 noise;
     Vector2 position;
     Vector2 center;
+    UVector2 coords;
     Biome biome;
+    Visibility visibility;
   };
 
   using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
@@ -34,9 +44,10 @@ namespace Terrain
                              Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
 
   void CreateTerrain(entt::registry &, u32, u32);
-  void CreateFOW(entt::registry &);
 
   void DrawTerrain(entt::registry &, Texture2D, Rectangle);
+
+  void UpdateFOW(entt::registry &);
 
   NoiseMap GeneratePerlinNoise(float *, int, float);
   void FilterIslands(NoiseMap &);

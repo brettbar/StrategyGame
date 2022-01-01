@@ -26,6 +26,5 @@ namespace Map
   void DrawProvinces(entt::registry &, TextureCache &);
 //  void DrawSingleBorder(Province());
 
-//  Tile *FindTileByCoord(TileMap &, u32, u32);
 
 };// namespace Map

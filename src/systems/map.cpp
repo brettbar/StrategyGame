@@ -41,7 +41,7 @@ namespace Map
 
   void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos)
   {
-        i32 provId = determineTileIdFromClick(clickPos);
+        i32 provId = DetermineTileIdFromClick(clickPos);
         assert(provId >= 0);
 
         auto provincesView = registry.view<Provinces>();

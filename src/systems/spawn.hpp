@@ -3,6 +3,7 @@
 #include "../common.hpp"
 #include "../components/unit.hpp"
 #include "../components/animated.hpp"
+#include "../components/sight.hpp"
 
 namespace Spawn {
 

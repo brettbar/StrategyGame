@@ -11,7 +11,7 @@ void SetDestinations(entt::registry &registry, Camera2D camera) {
     Animated &anim = view.get<Animated>(entity);
 
     Vector2 *tileOrig =
-        determineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
+        DetermineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
     if (tileOrig != nullptr) {
       unit.destination = *tileOrig;
 

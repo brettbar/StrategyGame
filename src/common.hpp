@@ -37,5 +37,5 @@ struct State {
 };
 
 void PrintVec2(Vector2);
-i32 determineTileIdFromClick(Vector2);
-Vector2* determineTilePos(Vector2);
+i32 DetermineTileIdFromClick(Vector2);
+Vector2* DetermineTilePos(Vector2);

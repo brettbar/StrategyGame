@@ -244,6 +244,7 @@ void Update(State &state, entt::registry &reg)
   state.screenWidth = GetScreenWidth();
   state.screenHeight = GetScreenHeight();
   Animation::UpdateSprites(reg, state.timeScale);
+  Terrain::UpdateFOW(reg);
 }
 
 void LateUpdate(entt::registry &reg) {
