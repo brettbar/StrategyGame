@@ -100,6 +100,7 @@ namespace UI
   {
     DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
     DrawFPS(16, 2);
+    DrawText(state.currPlayer->factionName.c_str(), 720, 7, 14, BLUE);
 
     str symbol = "||";
     if (state.timeScale == 1.5)

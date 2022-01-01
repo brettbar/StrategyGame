@@ -10,7 +10,7 @@ void SetDestinations(entt::registry &registry, Camera2D camera) {
     Unit &unit= view.get<Unit>(entity);
     Animated &anim = view.get<Animated>(entity);
 
-    Vector2 *tileOrig =
+    std::unique_ptr<Vector2> tileOrig =
         DetermineTilePos(GetScreenToWorld2D(GetMousePosition(), camera));
     if (tileOrig != nullptr) {
       unit.destination = *tileOrig;

@@ -10,17 +10,25 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
+#include "player.hpp"
 #include "resource.hpp"
+#include "state.hpp"
 #include "systems/animation.hpp"
 #include "systems/map.hpp"
-#include "systems/terrain.hpp"
 #include "systems/movement.hpp"
 #include "systems/selection.hpp"
 #include "systems/spawn.hpp"
+#include "systems/terrain.hpp"
 #include "ui/ui.hpp"
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
+
+void LoadResources(TextureCache &);
+bool GameIsRunning();
+void CameraUpdate(Camera2D &);
+void ZoomCamera(Camera2D &, f32, Vector2);
+
 
 void Init(State &, entt::registry &, TextureCache &);
 void Input(State &, entt::registry &, TextureCache &);
@@ -28,10 +36,6 @@ void Update(State &, entt::registry &);
 void LateUpdate(entt::registry &);
 void Draw(State &, entt::registry &, TextureCache &);
 void Exit(TextureCache &);
-
-bool GameIsRunning();
-void CameraUpdate(Camera2D &);
-void ZoomCamera(Camera2D &, f32, Vector2);
 
 int main(void)
 {
@@ -41,7 +45,8 @@ int main(void)
                  .mapHeight = 128,
                  .timeScale = 0.0f,
                  .prevTimeScale = 1.0f,
-                 .debug = true};
+                 .debug = true,
+                 .currPlayer = std::make_shared<Player>(Player(0, ROMANS, "Roman Republic"))};
   entt::registry reg;
   TextureCache textureCache = {};
 
@@ -90,23 +95,7 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
-  LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
-  LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png", cache);
-
-  LoadResource(hstr{"template"}, "assets/textures/Template.png", cache);
-
-  LoadResource(hstr{"romanVillagerTexture"},
-               "assets/textures/units/Roman_Villager.png", cache);
-  LoadResource(hstr{"greekVillagerTexture"},
-               "assets/textures/units/Greek_Villager.png", cache);
-  LoadResource(hstr{"celtVillagerTexture"},
-               "assets/textures/units/Celt_Villager.png", cache);
-  LoadResource(hstr{"punicVillagerTexture"},
-               "assets/textures/units/Carthaginian_Villager.png", cache);
-  LoadResource(hstr{"persianVillagerTexture"},
-               "assets/textures/units/Persian_Villager.png", cache);
-  LoadResource(hstr{"romanVillageTexture"}, "assets/textures/village_roman.png",
-               cache);
+  LoadResources(cache);
 
   state.camera = Camera2D{
     .offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2},
@@ -164,32 +153,12 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
 
   if (IsKeyPressed(KEY_TAB))
   {
-    Spawn::CreateNew(reg, clickPos, state.selectedTexture);
+    Spawn::CreateNew(reg, cache, clickPos, state.currPlayer);
   }
 
-  if (IsKeyDown(KEY_LEFT_SHIFT))
+  if (IsKeyPressed(KEY_C))
   {
-    if (IsKeyPressed(KEY_ONE))
-    {
-      Map::SetProvinceOwner(reg, 0, clickPos);
-    }
-    if (IsKeyPressed(KEY_TWO))
-    {
-      Map::SetProvinceOwner(reg, 1, clickPos);
-    }
-    if (IsKeyPressed(KEY_THREE))
-    {
-      Map::SetProvinceOwner(reg, 2, clickPos);
-    }
-    if (IsKeyPressed(KEY_FOUR))
-    {
-      Map::SetProvinceOwner(reg, 3, clickPos);
-    }
-    if (IsKeyPressed(KEY_FIVE))
-    {
-      Map::SetProvinceOwner(reg, 4, clickPos);
-    }
-    return;
+    Map::SetProvinceOwner(reg, state.currPlayer->id, clickPos);
   }
 
   if (IsKeyPressed(KEY_GRAVE))
@@ -206,35 +175,49 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
   {
     Movement::SetDestinations(reg, state.camera);
   }
+  if (IsKeyPressed(KEY_TAB))
+  {
+    Spawn::CreateNew(reg, cache, clickPos, state.currPlayer);
+  }
+
   if (IsKeyPressed(KEY_ONE))
   {
-    Spawn::CreateNew(
-      reg, clickPos,
-      cache.handle(hstr{"template"})->texture);
+    state.currPlayer->id = 0;
+    state.currPlayer->faction = ROMANS;
+    state.currPlayer->factionName = "Roman Republic";
+    state.currPlayer->RefreshTextureMap();
   }
+
   if (IsKeyPressed(KEY_TWO))
   {
-    Spawn::CreateNew(
-      reg, clickPos,
-      cache.handle(hstr{"template"})->texture);
+    state.currPlayer->id = 1;
+    state.currPlayer->faction = GREEKS;
+    state.currPlayer->factionName = "Greek Cities";
+    state.currPlayer->RefreshTextureMap();
   }
+
   if (IsKeyPressed(KEY_THREE))
   {
-    Spawn::CreateNew(
-      reg, clickPos,
-      cache.handle(hstr{"template"})->texture);
+    state.currPlayer->id = 2;
+    state.currPlayer->faction = CELTS;
+    state.currPlayer->factionName = "Celtic Tribes";
+    state.currPlayer->RefreshTextureMap();
   }
+
   if (IsKeyPressed(KEY_FOUR))
   {
-    Spawn::CreateNew(
-      reg, clickPos,
-      cache.handle(hstr{"template"})->texture);
+    state.currPlayer->id = 3;
+    state.currPlayer->faction = PUNICS;
+    state.currPlayer->factionName = "Punic Colonies";
+    state.currPlayer->RefreshTextureMap();
   }
+
   if (IsKeyPressed(KEY_FIVE))
   {
-    Spawn::CreateNew(
-      reg, clickPos,
-      cache.handle(hstr{"template"})->texture);
+    state.currPlayer->id = 4;
+    state.currPlayer->faction = PERSIANS;
+    state.currPlayer->factionName = "Persian Empire";
+    state.currPlayer->RefreshTextureMap();
   }
 }
 
@@ -244,10 +227,11 @@ void Update(State &state, entt::registry &reg)
   state.screenWidth = GetScreenWidth();
   state.screenHeight = GetScreenHeight();
   Animation::UpdateSprites(reg, state.timeScale);
-//  Terrain::UpdateFOW(reg);
+  //  Terrain::UpdateFOW(reg);
 }
 
-void LateUpdate(entt::registry &reg) {
+void LateUpdate(entt::registry &reg)
+{
   Map::UpdateProvinces(reg);
 }
 
@@ -320,6 +304,27 @@ void CameraUpdate(Camera2D &camera)
     camera.zoom = 3.0f;
   else if (camera.zoom < 0.1f)
     camera.zoom = 0.1f;
+}
+
+void LoadResources(TextureCache &cache)
+{
+  LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
+  LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png", cache);
+
+  LoadResource(hstr{"template"}, "assets/textures/Template.png", cache);
+
+  LoadResource(hstr{"romanVillagerTexture"},
+               "assets/textures/units/Roman_Villager.png", cache);
+  LoadResource(hstr{"greekVillagerTexture"},
+               "assets/textures/units/Greek_Villager.png", cache);
+  LoadResource(hstr{"celtVillagerTexture"},
+               "assets/textures/units/Celt_Villager.png", cache);
+  LoadResource(hstr{"punicVillagerTexture"},
+               "assets/textures/units/Carthaginian_Villager.png", cache);
+  LoadResource(hstr{"persianVillagerTexture"},
+               "assets/textures/units/Persian_Villager.png", cache);
+  LoadResource(hstr{"romanVillageTexture"}, "assets/textures/village_roman.png",
+               cache);
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }

@@ -9,34 +9,38 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(game)
 
 if (WIN32)
-  add_library(raylib STATIC IMPORTED)
-  set_target_properties(raylib PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
-  )
+    add_library(raylib STATIC IMPORTED)
+    set_target_properties(raylib PROPERTIES
+            IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+            )
 endif (WIN32)
 
-set(SOURCES 
-  src/main.cpp 
-  src/common.cpp
-  src/ui/ui.cpp
+set(SOURCES
+        src/main.cpp
+        src/common.cpp
+        src/ui/ui.cpp
         src/systems/map.cpp
-  # src/components/unit.hpp
-  src/systems/movement.cpp 
-  src/systems/animation.cpp 
-  src/systems/selection.cpp 
-  src/systems/spawn.cpp
-        src/systems/terrain.cpp src/systems/terrain.hpp)
+        # src/components/unit.hpp
+        src/systems/movement.cpp
+        src/systems/animation.cpp
+        src/systems/selection.cpp
+        src/systems/spawn.cpp
+        src/systems/spawn.cpp
+        src/systems/terrain.cpp
+        src/systems/terrain.hpp
+        src/entities/archetypes.hpp
+        )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 if (WIN32)
-  target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm)
+    target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm)
 endif (WIN32)
 
 if (UNIX)
-  target_link_libraries(${PROJECT_NAME}  raylib m)
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_SOURCE_DIRS}/include)
+    target_link_libraries(${PROJECT_NAME} raylib m)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_SOURCE_DIRS}/include)
 endif (UNIX)
 
 

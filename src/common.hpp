@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
+#include "player.hpp"
 #include <raylib.h>
 #include <raymath.h>
 #include <map>
@@ -22,20 +23,6 @@ struct UVector2 {
   u32 y;
 };
 
-
-struct State {
-  u32 screenWidth;
-  u32 screenHeight;
-  const u32 mapWidth;
-  const u32 mapHeight;
-  f32 timeScale;
-  f32 prevTimeScale;
-  Camera2D camera;
-  bool debug;
-  
-  Texture2D selectedTexture;
-};
-
 void PrintVec2(Vector2);
 i32 DetermineTileIdFromClick(Vector2);
-Vector2* DetermineTilePos(Vector2);
+std::unique_ptr<Vector2> DetermineTilePos(Vector2);

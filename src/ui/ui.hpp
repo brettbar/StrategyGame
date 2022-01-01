@@ -4,6 +4,7 @@
 #define UI_HPP
 
 #include "../common.hpp"
+#include "../state.hpp"
 #include "../resource.hpp"
 
 namespace UI {

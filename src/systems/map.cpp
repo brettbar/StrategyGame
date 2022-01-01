@@ -19,8 +19,7 @@ namespace Map
         .owner = -1,
         .population = 0,
         .name = "",
-        .tile = tiles[i]
-      });
+        .tile = tiles[i]});
     }
 
     reg.emplace<Provinces>(entity, provinces);
@@ -41,39 +40,41 @@ namespace Map
 
   void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos)
   {
-        i32 provId = DetermineTileIdFromClick(clickPos);
-        assert(provId >= 0);
+    i32 provId = DetermineTileIdFromClick(clickPos);
+    assert(provId >= 0);
 
-        auto provincesView = registry.view<Provinces>();
-        auto provincesEntity = provincesView.front();
-        Provinces &provinces = provincesView.get<Provinces>(provincesEntity);
+    auto provincesView = registry.view<Provinces>();
+    auto provincesEntity = provincesView.front();
+    Provinces &provinces = provincesView.get<Provinces>(provincesEntity);
 
-        for (std::shared_ptr<Province> prov: provinces)
+    for (std::shared_ptr<Province> prov: provinces)
+    {
+
+      if (prov->id == (u32) provId)
+      {
+        if (prov->tile->biome == Terrain::WATER) continue;
+
+        prov->owner = owner;
+        switch (prov->owner)
         {
-
-          if (prov->id == (u32) provId)
-          {
-            prov->owner = owner;
-            switch (prov->owner)
-            {
-              case 0:
-                prov->name = "Rome";
-                break;
-              case 1:
-                prov->name = "Athens";
-                break;
-              case 2:
-                prov->name = "Lugudunon";
-                break;
-              case 3:
-                prov->name = "Carthage";
-                break;
-              case 4:
-                prov->name = "Persepolis";
-                break;
-            }
-          }
+          case 0:
+            prov->name = "Rome";
+            break;
+          case 1:
+            prov->name = "Athens";
+            break;
+          case 2:
+            prov->name = "Lugudunon";
+            break;
+          case 3:
+            prov->name = "Carthage";
+            break;
+          case 4:
+            prov->name = "Persepolis";
+            break;
         }
+      }
+    }
   }
 
   void DrawProvinces(entt::registry &reg, TextureCache &cache)
