@@ -8,13 +8,18 @@
 
 namespace Map
 {
-
   struct Province {
+    u32 id;
     i32 owner;
     u32 population;
     str name;
+    std::shared_ptr<Terrain::Tile> tile;
   };
 
+  using Provinces =
+    std::array<std::shared_ptr<Province>, Terrain::MAP_WIDTH*Terrain::MAP_HEIGHT>;
+
+  void InitProvinces(entt::registry &);
   void UpdateProvinces(entt::registry &);
   void SetProvinceOwner(entt::registry &, u32, Vector2);
 

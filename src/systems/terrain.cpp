@@ -24,7 +24,7 @@ namespace Terrain
 
     for (u32 i = 0; i < mapWidth * mapHeight; i++)
     {
-      Tile *tile = new Tile{};
+      std::shared_ptr<Tile> tile = std::make_shared<Tile>();
       // tile.id = x + y * 128;
       tile->id = i;
 
@@ -69,32 +69,27 @@ namespace Terrain
     auto tilesEntity = tilesView.front();
     TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
-    for (Tile *tilePtr: tileMap)
+    for (std::shared_ptr<Tile> tile: tileMap)
     {
-      if (tilePtr == nullptr)
-        continue;
-      Tile &tile = *tilePtr;
-
-
-      switch (tile.biome)
+      switch (tile->biome)
       {
         case MTNS:
-          DrawTextureRec(hex, {frameRec.x + 512.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 512.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case HILLS:
-          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case LAND:
-          DrawTextureRec(hex, frameRec, tile.position, WHITE);
+          DrawTextureRec(hex, frameRec, tile->position, WHITE);
           break;
         case BEACH:
-          DrawTextureRec(hex, {frameRec.x + 384.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 384.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case WATER:
-          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         default:
-          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
       }
     }

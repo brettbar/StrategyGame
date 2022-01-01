@@ -35,8 +35,8 @@ void ZoomCamera(Camera2D &, f32, Vector2);
 
 int main(void)
 {
-  State state = {.screenWidth = 1920,
-                 .screenHeight = 1080,
+  State state = {.screenWidth = 1280,
+                 .screenHeight = 720,
                  .mapWidth = 128,
                  .mapHeight = 128,
                  .timeScale = 0.0f,
@@ -86,6 +86,7 @@ int main(void)
 
 void Init(State &state, entt::registry &reg, TextureCache &cache)
 {
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
@@ -117,6 +118,7 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
 
   UI::Init(state, reg, cache);
   Terrain::CreateTerrain(reg, state.mapWidth, state.mapHeight);
+  Map::InitProvinces(reg);
 
   SetTargetFPS(144);// Set our game to run at 60 frames-per-second
 }
@@ -244,7 +246,9 @@ void Update(State &state, entt::registry &reg)
   Animation::UpdateSprites(reg, state.timeScale);
 }
 
-void LateUpdate(entt::registry &reg) { Map::UpdateProvinces(reg); }
+void LateUpdate(entt::registry &reg) {
+  Map::UpdateProvinces(reg);
+}
 
 void Draw(State &state, entt::registry &reg, TextureCache &cache)
 {

@@ -12,8 +12,13 @@ namespace Terrain
   const u32 MAP_WIDTH = 128;
   const u32 MAP_HEIGHT = 128;
 
-  enum Biome {
-    WATER, BEACH, LAND, HILLS, MTNS,
+  enum Biome
+  {
+    WATER,
+    BEACH,
+    LAND,
+    HILLS,
+    MTNS,
   };
 
   struct Tile {
@@ -25,7 +30,8 @@ namespace Terrain
   };
 
   using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
-  using TileMap = std::array<Tile *, Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
+  using TileMap = std::array<std::shared_ptr<Tile>,
+                             Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
 
   void CreateTerrain(entt::registry &, u32, u32);
   void CreateFOW(entt::registry &);
