@@ -1,7 +1,7 @@
-#include "map.hpp"
+#include "provinces.hpp"
 #include <raylib.h>
 
-namespace Map
+namespace Provinces
 {
 
   void InitProvinces(entt::registry &reg)
@@ -168,4 +168,4 @@ namespace Map
   //  }
 
 
-};// namespace Map
+};// namespace Provinces

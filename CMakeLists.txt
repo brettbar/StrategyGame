@@ -20,7 +20,7 @@ set(SOURCES
         src/main.cpp
         src/common.cpp
         src/ui/ui.cpp
-        src/systems/map.cpp
+        src/systems/provinces.cpp
         # src/components/unit.hpp
         src/systems/movement.cpp
         src/systems/animation.cpp

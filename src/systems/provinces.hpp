@@ -6,7 +6,7 @@
 #include <array>
 #include <thread>
 
-namespace Map
+namespace Provinces
 {
   struct Province {
     u32 id;
@@ -27,4 +27,4 @@ namespace Map
 //  void DrawSingleBorder(Province());
 
 
-};// namespace Map
+};// namespace Provinces

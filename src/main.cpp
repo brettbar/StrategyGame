@@ -14,7 +14,7 @@ TEMPORARY TODOS HERE
 #include "resource.hpp"
 #include "state.hpp"
 #include "systems/animation.hpp"
-#include "systems/map.hpp"
+#include "systems/provinces.hpp"
 #include "systems/movement.hpp"
 #include "systems/selection.hpp"
 #include "systems/spawn.hpp"
@@ -108,7 +108,7 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
 
   UI::Init(state, reg, cache);
   Terrain::CreateTerrain(reg);
-  Map::InitProvinces(reg);
+  Provinces::InitProvinces(reg);
 }
 
 void Input(State &state, entt::registry &reg, TextureCache &cache)
@@ -157,7 +157,7 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
 
   if (IsKeyPressed(KEY_C))
   {
-    Map::SetProvinceOwner(reg, state.currPlayer->id, clickPos);
+    Provinces::SetProvinceOwner(reg, state.currPlayer->id, clickPos);
   }
 
   if (IsKeyPressed(KEY_GRAVE))
@@ -227,7 +227,7 @@ void Update(State &state, entt::registry &reg)
 
 void LateUpdate(entt::registry &reg)
 {
-  Map::UpdateProvinces(reg);
+  Provinces::UpdateProvinces(reg);
 }
 
 void Draw(State &state, entt::registry &reg, TextureCache &cache)
@@ -242,7 +242,7 @@ void Draw(State &state, entt::registry &reg, TextureCache &cache)
   Rectangle frameRec = {0.0f, 0.0f, (f32) hex.width / 5, (f32) hex.height};
   Terrain::DrawTerrain(reg, hex, frameRec);
 
-  Map::DrawProvinces(reg, cache);
+  Provinces::DrawProvinces(reg, cache);
   Animation::Draw(reg, state.debug);
 
   EndMode2D();
