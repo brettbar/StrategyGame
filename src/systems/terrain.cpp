@@ -6,7 +6,7 @@
 
 namespace Terrain
 {
-  void CreateTerrain(entt::registry &registry, u32 mapWidth, u32 mapHeight)
+  void CreateTerrain(entt::registry &registry)
   {
     entt::entity entity = registry.create();
     TileMap tileMap = {};
@@ -22,14 +22,14 @@ namespace Terrain
     NoiseMap pNoise = GeneratePerlinNoise(noiseSeed, 7, 1.2f);
     FilterIslands(pNoise);
 
-    for (u32 i = 0; i < mapWidth * mapHeight; i++)
+    for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
     {
       std::shared_ptr<Tile> tile = std::make_shared<Tile>();
       // tile.id = x + y * 128;
       tile->id = i;
 
-      u32 x = i % mapWidth;
-      u32 y = i / mapHeight;
+      u32 x = i % MAP_WIDTH;
+      u32 y = i / MAP_HEIGHT;
 
       f32 xPos = x * 128;
       f32 yPos = y * 96;

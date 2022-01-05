@@ -3,7 +3,6 @@
 
 namespace Spawn
 {
-
   void CreateNew(entt::registry &reg, TextureCache &cache, Vector2 clickPos, std::shared_ptr<Player> currPlayer)
   {
     std::unique_ptr<Vector2> spawn = DetermineTilePos(clickPos);

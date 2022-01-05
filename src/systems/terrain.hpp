@@ -43,7 +43,7 @@ namespace Terrain
   using TileMap = std::array<std::shared_ptr<Tile>,
                              Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
 
-  void CreateTerrain(entt::registry &, u32, u32);
+  void CreateTerrain(entt::registry &);
 
   void DrawTerrain(entt::registry &, Texture2D, Rectangle);
 

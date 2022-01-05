@@ -92,6 +92,7 @@ int main(void)
 void Init(State &state, entt::registry &reg, TextureCache &cache)
 {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+  SetTargetFPS(144);// Set our game to run at 60 frames-per-second
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
@@ -106,10 +107,8 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   UI::Init(state, reg, cache);
-  Terrain::CreateTerrain(reg, state.mapWidth, state.mapHeight);
+  Terrain::CreateTerrain(reg);
   Map::InitProvinces(reg);
-
-  SetTargetFPS(144);// Set our game to run at 60 frames-per-second
 }
 
 void Input(State &state, entt::registry &reg, TextureCache &cache)
@@ -151,7 +150,7 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
       state.timeScale = 1.5f;
   }
 
-  if (IsKeyPressed(KEY_TAB))
+  if (IsKeyPressed(KEY_V))
   {
     Spawn::CreateNew(reg, cache, clickPos, state.currPlayer);
   }
@@ -174,10 +173,6 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
   if (IsMouseButtonPressed(1))
   {
     Movement::SetDestinations(reg, state.camera);
-  }
-  if (IsKeyPressed(KEY_TAB))
-  {
-    Spawn::CreateNew(reg, cache, clickPos, state.currPlayer);
   }
 
   if (IsKeyPressed(KEY_ONE))
