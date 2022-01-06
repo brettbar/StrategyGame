@@ -11,15 +11,7 @@ namespace Terrain
     entt::entity entity = registry.create();
     TileMap tileMap = {};
     float seed;
-    srand(seed);
-    /* srand(time(NULL)); */
-
-    float *noiseSeed = new float[MAP_WIDTH * MAP_HEIGHT];
-
-    for (int i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-      noiseSeed[i] = (float) rand() / (float) RAND_MAX;
-
-    NoiseMap pNoise = GeneratePerlinNoise(noiseSeed, 7, 1.2f);
+    NoiseMap pNoise = GeneratePerlinNoise(seed, 7, 1.2f);
     FilterIslands(pNoise);
 
     for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
@@ -155,10 +147,18 @@ namespace Terrain
     }
   }
 
-  // Written by: OneLoneCoder Javidx9
+  // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  NoiseMap GeneratePerlinNoise(float *fSeed, int nOctaves, float fBias)
+  NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias)
   {
+    srand(seed);
+    /* srand(time(NULL)); */
+
+    float *fSeed = new float[MAP_WIDTH * MAP_HEIGHT];
+
+    for (int i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
+      fSeed[i] = (float) rand() / (float) RAND_MAX;
+
     // final array of perlin noise data
     NoiseMap fOutput;
 
