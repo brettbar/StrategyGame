@@ -4,8 +4,10 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../resource.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
+#include "rlgl.h"
 #include <chrono>
 
 namespace Terrain
@@ -45,12 +47,11 @@ namespace Terrain
 
   void CreateTerrain(entt::registry &);
 
-  void DrawTerrain(entt::registry &, Texture2D, Rectangle);
-
+  void DrawTerrain(entt::registry &, TextureCache &);
   void UpdateFOW(entt::registry &);
 
   NoiseMap GeneratePerlinNoise(float, int, float);
-  void FilterIslands(NoiseMap &);
+  void FilterIslands(NoiseMap &, float);
 
   u32 index(u32, u32);
 

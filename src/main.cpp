@@ -238,9 +238,7 @@ void Draw(State &state, entt::registry &reg, TextureCache &cache)
 
   BeginMode2D(state.camera);
 
-  Texture2D hex = cache.handle(hstr{"hexagon"})->texture;
-  Rectangle frameRec = {0.0f, 0.0f, (f32) hex.width / 5, (f32) hex.height};
-  Terrain::DrawTerrain(reg, hex, frameRec);
+  Terrain::DrawTerrain(reg, cache);
 
   Provinces::DrawProvinces(reg, cache);
   Animation::Draw(reg, state.debug);
@@ -256,6 +254,7 @@ void Draw(State &state, entt::registry &reg, TextureCache &cache)
 void Exit(TextureCache &cache)
 {
   UnloadTexture(cache.handle(hstr{"hexagon"})->texture);
+  UnloadTexture(cache.handle(hstr{"test"})->texture);
   UnloadTexture(cache.handle(hstr{"template"})->texture);
   UnloadTexture(cache.handle(hstr{"factionOverlay"})->texture);
   UnloadTexture(cache.handle(hstr{"romanVillagerTexture"})->texture);
@@ -295,15 +294,16 @@ void CameraUpdate(Camera2D &camera)
   f32 mouseWheelDelta = GetMouseWheelMove();
 
   camera.zoom += (mouseWheelDelta * 0.05f);
-  if (camera.zoom > 3.0f)
-    camera.zoom = 3.0f;
-  else if (camera.zoom < 0.1f)
-    camera.zoom = 0.1f;
+  if (camera.zoom > 8.0f)
+    camera.zoom = 8.0f;
+  else if (camera.zoom < 0.08f)
+    camera.zoom = 0.08f;
 }
 
 void LoadResources(TextureCache &cache)
 {
   LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
+  LoadResource(hstr{"test"}, "assets/textures/hexagons/hexagon5.png", cache);
   LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png", cache);
 
   LoadResource(hstr{"template"}, "assets/textures/Template.png", cache);

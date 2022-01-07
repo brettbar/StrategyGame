@@ -12,7 +12,26 @@ namespace Terrain
     TileMap tileMap = {};
     float seed;
     NoiseMap pNoise = GeneratePerlinNoise(seed, 7, 1.2f);
-    FilterIslands(pNoise);
+
+
+    float min = MAXFLOAT;
+    float max = 0;
+
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
+    {
+      if (pNoise[x] < min)
+        min = pNoise[x];
+      if (pNoise[x] > max)
+        max = pNoise[x];
+    }
+
+    float waterLevel = 0.55;
+    FilterIslands(pNoise, waterLevel);
+
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
+    {
+      pNoise[x] = (pNoise[x] - min) / (max - min);
+    }
 
     for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
     {
@@ -34,17 +53,17 @@ namespace Terrain
       tile->noise = pNoise[index(x, y)];
 
       // Montanas
-      if (tile->noise >= 0.98f)
+      if (tile->noise >= 0.8f)
         tile->biome = MTNS;
       // Colina
-      else if (tile->noise >= 0.92f)
+      else if (tile->noise >= 0.75f)
         tile->biome = HILLS;
       // Tierra
-      else if (tile->noise >= 0.76f)
+      else if (tile->noise >= 0.55f)
         tile->biome = LAND;
-//      // Playa
-//      else if (tile->noise >= 0.76f)
-//        tile->biome = BEACH;
+      //      // Playa
+      //      else if (tile->noise >= 0.76f)
+      //        tile->biome = BEACH;
       // Mar
       else
         tile->biome = WATER;
@@ -57,48 +76,57 @@ namespace Terrain
     registry.emplace<TileMap>(entity, tileMap);
   }
 
-  void DrawTerrain(entt::registry &registry, Texture2D hex, Rectangle frameRec)
+  void DrawTerrain(entt::registry &registry, TextureCache &cache)
   {
     auto tilesView = registry.view<TileMap>();
     auto tilesEntity = tilesView.front();
     TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
+    Texture2D hex = cache.handle(hstr{"hexagon"})->texture;
+    rlEnableSmoothLines();
+    rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
+    rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
+
+    Rectangle frameRec = {1.0f, 1.0f, 128, 128};
+
     for (std::shared_ptr<Tile> tile: tileMap)
     {
+      //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+      //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
       switch (tile->biome)
       {
         case MTNS:
-          DrawTextureRec(hex, {frameRec.x + 512.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 520, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case HILLS:
-          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 260, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case LAND:
           DrawTextureRec(hex, frameRec, tile->position, WHITE);
           break;
         case BEACH:
-          DrawTextureRec(hex, {frameRec.x + 384.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 390, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         case WATER:
-          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 130, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
         default:
-          DrawTextureRec(hex, {frameRec.x + 128.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
+          DrawTextureRec(hex, {frameRec.x + 130, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
       }
 
-//      switch (tile->visibility)
-//      {
-//        case VISIBILE:
-//          break;
-//        case EXPLORED:
-//          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
-//          break;
-//        case UNEXPLORED:
-//          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
-//          break;
-//        default: break;
-//      }
+      //      switch (tile->visibility)
+      //      {
+      //        case VISIBILE:
+      //          break;
+      //        case EXPLORED:
+      //          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
+      //          break;
+      //        case UNEXPLORED:
+      //          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
+      //          break;
+      //        default: break;
+      //      }
     }
   }
 
@@ -121,23 +149,23 @@ namespace Terrain
       u32 y = closest->coords.y;
 
       std::array<std::shared_ptr<Tile>, 6> neighbors = {
-        tiles[index(x, y-1)],
-        tiles[index(x+1, y)],
-        tiles[index(x, y+1)],
-        tiles[index(x-1, y+1)],
-        tiles[index(x-1, y)],
-        tiles[index(x-1, y-1)],
+        tiles[index(x, y - 1)],
+        tiles[index(x + 1, y)],
+        tiles[index(x, y + 1)],
+        tiles[index(x - 1, y + 1)],
+        tiles[index(x - 1, y)],
+        tiles[index(x - 1, y - 1)],
       };
 
       if (y % 2 == 1)
       {
-        neighbors[0] = tiles[index(x+1, y-1)];
-        neighbors[2] = tiles[index(x+1, y+1)];
-        neighbors[3] = tiles[index(x, y+1)];
-        neighbors[5] = tiles[index(x, y-1)];
+        neighbors[0] = tiles[index(x + 1, y - 1)];
+        neighbors[2] = tiles[index(x + 1, y + 1)];
+        neighbors[3] = tiles[index(x, y + 1)];
+        neighbors[5] = tiles[index(x, y - 1)];
       }
 
-      for (auto &neighbor : neighbors)
+      for (auto &neighbor: neighbors)
       {
         if (neighbor != nullptr)
           neighbor->visibility = VISIBILE;
@@ -151,10 +179,12 @@ namespace Terrain
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
   NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias)
   {
-    srand(seed);
-    /* srand(time(NULL)); */
+    //    srand(seed);
+    srand(time(NULL));
 
-    float *fSeed = new float[MAP_WIDTH * MAP_HEIGHT];
+    //    float *fSeed = new float[MAP_WIDTH * MAP_HEIGHT];
+
+    NoiseMap fSeed = {};
 
     for (int i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
       fSeed[i] = (float) rand() / (float) RAND_MAX;
@@ -222,12 +252,12 @@ namespace Terrain
         }
 
         // set the normalized perlin noise to the element in the output array
-        fOutput[y * MAP_WIDTH + x] = (fNoise / fScaleAcc) * 2.0f;
+        fOutput[y * MAP_WIDTH + x] = (fNoise / fScaleAcc);
       }
     return fOutput;
   }
 
-  void FilterIslands(NoiseMap &noiseMap)
+  void FilterIslands(NoiseMap &noiseMap, float waterLevel)
   {
     for (int x = 1; x < MAP_WIDTH - 1; x++)
       for (int y = 1; y < MAP_HEIGHT - 1; y++)
@@ -235,27 +265,27 @@ namespace Terrain
         u32 numWater = 0;
 
         float NE = noiseMap.at(index(x, y - 1));
-        if (NE < 0.76f)
+        if (NE < waterLevel)
           numWater++;
 
         float E = noiseMap.at(index(x + 1, y));
-        if (E < 0.76f)
+        if (E < waterLevel)
           numWater++;
 
         float SE = noiseMap.at(index(x, y + 1));
-        if (SE < 0.76f)
+        if (SE < waterLevel)
           numWater++;
 
         float SW = noiseMap.at(index(x - 1, y + 1));
-        if (SW < 0.76f)
+        if (SW < waterLevel)
           numWater++;
 
         float W = noiseMap.at(index(x - 1, y));
-        if (W < 0.76f)
+        if (W < waterLevel)
           numWater++;
 
         float NW = noiseMap.at(index(x - 1, y - 1));
-        if (NW < 0.76f)
+        if (NW < waterLevel)
           numWater++;
 
         if (numWater >= 5)
