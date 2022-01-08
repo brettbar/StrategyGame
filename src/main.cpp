@@ -14,12 +14,14 @@ TEMPORARY TODOS HERE
 #include "resource.hpp"
 #include "state.hpp"
 #include "systems/animation.hpp"
-#include "systems/provinces.hpp"
 #include "systems/movement.hpp"
+#include "systems/provinces.hpp"
 #include "systems/selection.hpp"
 #include "systems/spawn.hpp"
 #include "systems/terrain.hpp"
 #include "ui/ui.hpp"
+
+
 
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
@@ -92,7 +94,7 @@ int main(void)
 void Init(State &state, entt::registry &reg, TextureCache &cache)
 {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-  SetTargetFPS(144);// Set our game to run at 60 frames-per-second
+  SetTargetFPS(200);// Set our game to run at 60 frames-per-second
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
@@ -106,7 +108,7 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  UI::Init(state, reg, cache);
+  UI::Create(state, reg, cache);
   Terrain::CreateTerrain(reg);
   Provinces::InitProvinces(reg);
 }
@@ -167,7 +169,7 @@ void Input(State &state, entt::registry &reg, TextureCache &cache)
 
   if (IsMouseButtonPressed(0))
   {
-    UI::Input(state, reg);
+    // UI::Input(state, reg);
     Selection::UpdateSelection(reg, clickPos);
   }
   if (IsMouseButtonPressed(1))
@@ -232,22 +234,25 @@ void LateUpdate(entt::registry &reg)
 
 void Draw(State &state, entt::registry &reg, TextureCache &cache)
 {
+  state.camera.offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2},
+
   BeginDrawing();
+  {
+    ClearBackground(DARKGRAY);
 
-  ClearBackground(DARKGRAY);
+    BeginMode2D(state.camera);
+    {
+      Terrain::Draw(state.camera, reg, cache);
+      Provinces::DrawProvinces(reg, cache);
+      Animation::Draw(reg, state.debug);
+    }
+    EndMode2D();
 
-  BeginMode2D(state.camera);
-
-  Terrain::DrawTerrain(reg, cache);
-
-  Provinces::DrawProvinces(reg, cache);
-  Animation::Draw(reg, state.debug);
-
-  EndMode2D();
-
-  UI::Update(state, reg);
-  UI::Draw(state, reg);
-
+    {
+      UI::Update(state, reg);
+      UI::Draw(state, reg);
+    }
+  }
   EndDrawing();
 }
 

@@ -47,11 +47,12 @@ namespace Terrain
 
   void CreateTerrain(entt::registry &);
 
-  void DrawTerrain(entt::registry &, TextureCache &);
+  void Draw(Camera2D &, entt::registry &, TextureCache &);
   void UpdateFOW(entt::registry &);
 
   NoiseMap GeneratePerlinNoise(float, int, float);
   void FilterIslands(NoiseMap &, float);
+  void NormalizeMap(NoiseMap &);
 
   u32 index(u32, u32);
 

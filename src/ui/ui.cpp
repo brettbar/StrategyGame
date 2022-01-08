@@ -4,104 +4,60 @@
 namespace UI
 {
 
-  void Init(State &state, entt::registry &reg, TextureCache &cache)
+  void Create(State &state, entt::registry &reg, TextureCache &cache)
   {
-    auto drawerEntity = reg.create();
-    auto sidebarEntity = reg.create();
+    auto sidebarEntt = reg.create();
 
-    int currId = 0;
+    PanelSolid sidebar = PanelSolid();
+    sidebar.id = 0;
+    sidebar.name = "Sidebar";
+    sidebar.debug = false;
+    sidebar.stateful = true;
+    sidebar.position = {0, 0};
+    sidebar.style = RECT_FILLED;
+    sidebar.color = BLACK;
+    sidebar.layout = {
+      .width = state.screenWidth / 12,
+      .height = state.screenHeight,
+    };
+    sidebar.children = {};
 
-    Element drawer = CreateDrawer(state, cache);
-    // Element sidebar = CreateSideBar(state);
-
-    reg.emplace<Element>(drawerEntity, drawer);
-    // reg.emplace<Element>(sidebarEntity, sidebar);
-  }
-
-  void Input(State &state, entt::registry &reg)
-  {
-    auto view = reg.view<Element>();
-    Vector2 mousePos = GetMousePosition();
-
-    view.each([&state, mousePos](Element &uiElement) {
-      if (CheckCollisionPointRec(mousePos, uiElement.panel))
-      {
-        if (uiElement.name == "sprite_list" && state.debug)
-        {
-          for (auto child: uiElement.children)
-          {
-            if (CheckCollisionPointRec(mousePos, child.panel))
-            {
-              state.selectedTexture = child.texture;
-            }
-          }
-        }
-      }
-    });
+    reg.emplace<PanelSolid>(sidebarEntt, sidebar);
   }
 
   void Update(State &state, entt::registry &reg)
   {
-    auto view = reg.view<Element>();
+    auto elemView = reg.view<PanelSolid>();
+    auto provView = reg.view<Provinces::Provinces>();
 
-    view.each([&state](Element &drawer) {
-      if (drawer.name == "sprite_list")
-      {
-        drawer.panel = {(f32) state.screenWidth - 192,
-                        ((f32) state.screenHeight / 4), 192,
-                        (f32) state.screenHeight / 2};
 
-        f32 offset = 0;
-        for (u32 i = 0; i < drawer.children.size(); i++)
-        {
-          if (i % 2 == 0)
-          {
-            drawer.children[i].position.x = drawer.panel.x;
-            drawer.children[i].position.y = drawer.panel.y + 64.0 * offset;
-          }
-          else
-          {
-            drawer.children[i].position.x = drawer.panel.x + 64.0;
-            drawer.children[i].position.y = drawer.panel.y + 64.0 * offset++;
-          }
-          drawer.children[i].panel = {drawer.children[i].position.x + 32.0f,
-                                      drawer.children[i].position.y + 32.0f, 64,
-                                      64};
-        }
-      }
-    });
+    for (auto &el: elemView)
+    {
+      PanelSolid &sidebar = elemView.get<PanelSolid>(el);
+      sidebar.layout = {
+        .width = state.screenWidth / 12,
+        .height = state.screenHeight,
+      };
+    }
+
+
   }
+
 
   void Draw(State &state, entt::registry &reg)
   {
-    auto view = reg.view<Element>();
+    auto elView = reg.view<PanelSolid>();
 
-    view.each([&state](Element &element) {
-      if (element.name == "sprite_list")
-      {
-        if (state.debug)
-          DrawElement(element);
+    for (auto &el: elView)
+    {
+      PanelSolid element = elView.get<PanelSolid>(el);
+      DrawRectangleV(element.position, {(f32) element.layout.width, (f32) element.layout.height}, element.color);
+    }
 
-        for (auto child: element.children)
-        {
-          if (state.debug)
-            DrawElement(child);
-        }
-      }
-      else
-      {
-        DrawElement(element);
-      }
-    });
-    DrawTopBar(state);
-  }
-
-  void DrawTopBar(State &state)
-  {
     DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
     DrawFPS(16, 2);
     DrawText(state.currPlayer->factionName.c_str(), 720, 7, 14, BLUE);
-
+    
     str symbol = "||";
     if (state.timeScale == 1.5)
     {
@@ -122,90 +78,6 @@ namespace UI
 
     DrawText(symbol.c_str(), state.screenWidth - 128, 2,
              20, WHITE);
-  }
-
-  void DrawElement(Element element)
-  {
-    switch (element.shape)
-    {
-      case Texture:
-        DrawTextureEx(element.texture, element.position, 0.0f, 1.0f, WHITE);
-        break;
-      case Rect:
-        DrawRectangleRec(element.panel, element.color);
-        break;
-      case Rect_Rounded:
-        DrawRectangleRounded(element.panel, 0.2f, 1, DARKGRAY);
-        break;
-      case Rect_Lines:
-        DrawRectangleLinesEx(element.panel, 2, WHITE);
-        break;
-    }
-  }
-
-  Element CreateButton(Texture2D texture, Vector2 position, Color color)
-  {
-    Element element = Element();
-    element.id = 0;
-    element.name = "sprite_button";
-    element.shape = Texture;
-    element.debugOnly = true;
-    element.position = position;
-    element.texture = texture;
-    element.panel = {position.x + 32.0f, position.y + 32.0f, 64, 64};
-    element.children = {};
-    return element;
-  }
-
-  Element CreateSideBar(State &state)
-  {
-    Element sidebar = Element();
-    sidebar.id = 0;
-    sidebar.name = "side_bar";
-    sidebar.shape = Rect;
-    sidebar.debugOnly = false;
-    sidebar.panel = {0, 0, 100, (f32) state.screenHeight};
-    sidebar.color = DARKGRAY;
-    sidebar.children = {};
-    return sidebar;
-  }
-
-  Element CreateDrawer(State &state, TextureCache &cache)
-  {
-    Element drawer = Element();
-    drawer.id = 0;
-    drawer.name = "sprite_list";
-    drawer.shape = Rect_Rounded;
-    drawer.debugOnly = true;
-    drawer.panel = {(f32) state.screenWidth - 192, ((f32) state.screenHeight / 4),
-                    192, (f32) state.screenHeight / 2};
-    drawer.children = {
-      CreateButton(cache.handle(hstr{"romanVillagerTexture"})->texture,
-                   {drawer.panel.x, drawer.panel.y}, WHITE),
-      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
-                   {drawer.panel.x + 64.0f, drawer.panel.y}, WHITE),
-
-      CreateButton(cache.handle(hstr{"greekVillagerTexture"})->texture,
-                   {drawer.panel.x, drawer.panel.y + 64.0f}, WHITE),
-      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
-                   {drawer.panel.x + 64.0f, drawer.panel.y + 64.0f}, WHITE),
-
-      CreateButton(cache.handle(hstr{"celtVillagerTexture"})->texture,
-                   {drawer.panel.x, drawer.panel.y + 128.0f}, WHITE),
-      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
-                   {drawer.panel.x + 64.0f, drawer.panel.y + 128.0f}, WHITE),
-
-      CreateButton(cache.handle(hstr{"punicVillagerTexture"})->texture,
-                   {drawer.panel.x, drawer.panel.y + 192.0f}, WHITE),
-      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
-                   {drawer.panel.x + 64.0f, drawer.panel.y + 192.0f}, WHITE),
-
-      CreateButton(cache.handle(hstr{"persianVillagerTexture"})->texture,
-                   {drawer.panel.x, drawer.panel.y + 256.0f}, WHITE),
-      CreateButton(cache.handle(hstr{"romanVillageTexture"})->texture,
-                   {drawer.panel.x + 64.0f, drawer.panel.y + 256.0f}, WHITE),
-    };
-    return drawer;
   }
 
 };// namespace UI

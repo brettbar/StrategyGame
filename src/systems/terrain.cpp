@@ -3,6 +3,7 @@
 //
 
 #include "terrain.hpp"
+#include <string>
 
 namespace Terrain
 {
@@ -13,25 +14,10 @@ namespace Terrain
     float seed;
     NoiseMap pNoise = GeneratePerlinNoise(seed, 7, 1.2f);
 
-
-    float min = MAXFLOAT;
-    float max = 0;
-
-    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
-    {
-      if (pNoise[x] < min)
-        min = pNoise[x];
-      if (pNoise[x] > max)
-        max = pNoise[x];
-    }
-
-    float waterLevel = 0.55;
+    float waterLevel = 0.59;
     FilterIslands(pNoise, waterLevel);
 
-    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
-    {
-      pNoise[x] = (pNoise[x] - min) / (max - min);
-    }
+    NormalizeMap(pNoise);
 
     for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
     {
@@ -59,7 +45,7 @@ namespace Terrain
       else if (tile->noise >= 0.75f)
         tile->biome = HILLS;
       // Tierra
-      else if (tile->noise >= 0.55f)
+      else if (tile->noise >= waterLevel)
         tile->biome = LAND;
       //      // Playa
       //      else if (tile->noise >= 0.76f)
@@ -76,7 +62,7 @@ namespace Terrain
     registry.emplace<TileMap>(entity, tileMap);
   }
 
-  void DrawTerrain(entt::registry &registry, TextureCache &cache)
+  void Draw(Camera2D &camera, entt::registry &registry, TextureCache &cache)
   {
     auto tilesView = registry.view<TileMap>();
     auto tilesEntity = tilesView.front();
@@ -91,6 +77,14 @@ namespace Terrain
 
     for (std::shared_ptr<Tile> tile: tileMap)
     {
+      f32 padding = 128.0f;
+      if (tile->position.x - padding > camera.target.x + (camera.offset.x / camera.zoom) ||
+          tile->position.x + padding < camera.target.x - (camera.offset.x / camera.zoom) ||
+          tile->position.y - padding > camera.target.y + (camera.offset.y / camera.zoom) ||
+          tile->position.y + padding < camera.target.y - (camera.offset.y / camera.zoom)
+      ) continue;
+
+
       //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
       //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
       switch (tile->biome)
@@ -179,8 +173,8 @@ namespace Terrain
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
   NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias)
   {
-    //    srand(seed);
-    srand(time(NULL));
+        srand(seed);
+//    srand(time(NULL));
 
     //    float *fSeed = new float[MAP_WIDTH * MAP_HEIGHT];
 
@@ -294,6 +288,26 @@ namespace Terrain
         }
       }
   }
+
+  void NormalizeMap(NoiseMap &pNoise)
+  {
+    float min = MAXFLOAT;
+    float max = 0;
+
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
+    {
+      if (pNoise[x] < min)
+        min = pNoise[x];
+      if (pNoise[x] > max)
+        max = pNoise[x];
+    }
+
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
+    {
+      pNoise[x] = (pNoise[x] - min) / (max - min);
+    }
+  }
+
 
   // i = x + W * y;
   u32 index(u32 x, u32 y) { return x + MAP_WIDTH * y; };

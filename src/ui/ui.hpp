@@ -6,44 +6,63 @@
 #include "../common.hpp"
 #include "../state.hpp"
 #include "../resource.hpp"
+#include "../systems/provinces.hpp"
 
 namespace UI {
 
-enum Shape {
-  Texture,
-  Rect,
-  Rect_Lines,
-  Rect_Rounded,
+enum Style {
+  RECT_FILLED,
+  RECT_LINES,
+  RECT_ROUNDED,
+};
+
+enum LayoutStyle {
+  HORIZONTAL,
+  VERTICAL,
+  GRID,
 };
 
 struct Element {
-  // Required
   u32 id;
   str name;
-  Shape shape;
-  bool debugOnly;
+  bool debug;
+  bool stateful;
   Vector2 position;
+};
 
-  // Optional
-  Rectangle panel;
+struct Layout {
+  u32 width;
+  u32 height;
+  LayoutStyle style;
+};
+
+struct PanelSolid : Element {
+  Style style;
   Color color;
-  Texture2D texture;
+  Layout layout;
   std::vector<Element> children;
 };
 
-void Init(State &, entt::registry &, TextureCache &);
-void Input(State &, entt::registry &);
+struct PanelTexture : Element {
+  Texture texture;
+  Layout layout;
+  std::vector<Element> children;
+};
+
+struct TextButton : Element {
+  Style style;
+  Color color;
+  str text;
+};
+
+struct ImageButton : Element {
+  Texture2D texture;
+};
+
+void Create(State &, entt::registry &, TextureCache &);
 void Update(State &, entt::registry &);
 void Draw(State &, entt::registry &);
 
-void DrawTopBar(State &);
-void DrawElement(Element);
-
-Element CreateButton(Texture2D, Vector2, Color);
-Element CreateSideBar(State &);
-
-// Debug Only
-Element CreateDrawer(State &, TextureCache &);
 
 }; // namespace UI
 
