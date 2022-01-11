@@ -10,31 +10,49 @@ namespace Provinces
     Terrain::TileMap tiles = tView.get<Terrain::TileMap>(tView.front());
 
     entt::entity entity = reg.create();
-    Provinces provinces;
+    ProvinceList provinces;
 
     for (u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++)
     {
       provinces[i] = std::make_shared<Province>(Province{
         .id = i,
         .owner = -1,
-        .population = 0,
-        .name = "",
         .tile = tiles[i]});
     }
 
-    reg.emplace<Provinces>(entity, provinces);
+    reg.emplace<ProvinceList>(entity, provinces);
   }
 
   void UpdateProvinces(entt::registry &registry)
   {
-    auto view = registry.view<Provinces>();
-    Provinces &provinces = view.get<Provinces>(view.front());
+    auto view = registry.view<ProvinceList>();
+    ProvinceList &provinces = view.get<ProvinceList>(view.front());
 
     for (std::shared_ptr<Province> prov: provinces)
     {
-      if (prov->owner > -1 && prov->population >= 0)
-        prov->population += 25;
+      if (prov->owner > -1 && prov->settlement != nullptr)
+        UpdateSettlement(*prov->settlement);
     }
+  }
+
+  void UpdateSettlement(Settlement &settlement)
+  {
+    UpdatePopulation(settlement);
+  }
+
+  void UpdatePopulation(Settlement &settlement)
+  {
+    Population &pop = settlement.population;
+    // if growing exponentially
+    // P(t) = P0*e^(kt)
+
+    // dP/dt = r * P ( 1 - P/K )
+    // dP/dt = r * P ( K - P ) / K
+    pop.growthRate = (pop.birthRate - pop.deathRate) / pop.current;
+    f32 dP_over_dt =
+      pop.growthRate * pop.current * (pop.carryingCapacity - pop.current) / pop.carryingCapacity;
+
+    settlement.population.current += (i32) dP_over_dt;
   }
 
 
@@ -43,11 +61,11 @@ namespace Provinces
     i32 provId = DetermineTileIdFromClick(clickPos);
     assert(provId >= 0);
 
-    auto provincesView = registry.view<Provinces>();
+    auto provincesView = registry.view<ProvinceList>();
     auto provincesEntity = provincesView.front();
-    Provinces &provinces = provincesView.get<Provinces>(provincesEntity);
+    ProvinceList &provinces = provincesView.get<ProvinceList>(provincesEntity);
 
-    for (std::shared_ptr<Province> prov: provinces)
+    for (std::shared_ptr<Provinces::Province> prov: provinces)
     {
 
       if (prov->id == (u32) provId)
@@ -55,32 +73,49 @@ namespace Provinces
         if (prov->tile->biome == Terrain::WATER) continue;
 
         prov->owner = owner;
-        switch (prov->owner)
+
+        if (prov->settlement == nullptr)
         {
-          case 0:
-            prov->name = "Rome";
-            break;
-          case 1:
-            prov->name = "Athens";
-            break;
-          case 2:
-            prov->name = "Lugudunon";
-            break;
-          case 3:
-            prov->name = "Carthage";
-            break;
-          case 4:
-            prov->name = "Persepolis";
-            break;
+          prov->settlement = std::make_unique<Settlement>();
+          prov->settlement->id = prov->id;
+          prov->settlement->population = {
+            .current = 200,
+            .birthRate = 40,
+            .deathRate = 10,
+            .growthRate = (40.0f - 10.0f) / 200,
+            .carryingCapacity = 1000,
+          };
+
+          switch (prov->owner)
+          {
+            case 0:
+              prov->settlement->name = "Rome";
+              break;
+            case 1:
+              prov->settlement->name = "Athens";
+              break;
+            case 2:
+              prov->settlement->name = "Lugudunon";
+              break;
+            case 3:
+              prov->settlement->name = "Carthage";
+              break;
+            case 4:
+              prov->settlement->name = "Persepolis";
+              break;
+          }
+        }
+        else
+        {
         }
       }
     }
   }
 
-  void DrawProvinces(entt::registry &reg, TextureCache &cache)
+  void DrawProvinces(Player currPlayer, entt::registry &reg, TextureCache &cache)
   {
-    auto view = reg.view<Provinces>();
-    Provinces &provinces = view.get<Provinces>(view.front());
+    auto view = reg.view<ProvinceList>();
+    ProvinceList &provinces = view.get<ProvinceList>(view.front());
 
     for (std::shared_ptr<Province> prov: provinces)
     {
@@ -145,14 +180,33 @@ namespace Provinces
                        frameRec, prov->tile->position, Fade(WHITE, 0.5));
       }
 
-      if (prov->population >= 100)
+      if (prov->settlement != nullptr)
       {
-        // DrawSingleBorder(tile);
-        DrawTextureV(cache.handle(hstr{"romanVillageTexture"})->texture,
-                     prov->tile->position, WHITE);
-        if (prov->name != "")
-          DrawText(prov->name.c_str(), prov->tile->position.x + 50.0,
-                   prov->tile->position.y + 86.0, 14, WHITE);
+        if (prov->settlement->population.current > 0)
+        {
+          Vector2 provPos = prov->tile->position;
+
+          // DrawRectangleRec({provPos.x + 50,
+          //                   provPos.y + 86, 128, 64},
+          //                  Fade(WHITE, 0.8f));
+          // DrawSingleBorder(tile);
+
+          DrawTextureV(cache.handle(hstr{"romanVillageTexture"})->texture,
+                       provPos, WHITE);
+
+
+          DrawRectangleRec({provPos.x + 64, provPos.y + 96, 32, 14}, BLACK);
+          // std::string popStr = "Pop: " + std::to_string(prov->settlement->population.current);
+
+          // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
+
+
+          // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
+
+          if (prov->settlement->name != "")
+            DrawText(prov->settlement->name.c_str(), provPos.x + 64.0,
+                     provPos.y + 86.0, 14, WHITE);
+        }
       }
     }
   }
@@ -166,6 +220,4 @@ namespace Provinces
   //    }
   //    return nullptr;
   //  }
-
-
 };// namespace Provinces

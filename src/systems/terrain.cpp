@@ -81,8 +81,7 @@ namespace Terrain
       if (tile->position.x - padding > camera.target.x + (camera.offset.x / camera.zoom) ||
           tile->position.x + padding < camera.target.x - (camera.offset.x / camera.zoom) ||
           tile->position.y - padding > camera.target.y + (camera.offset.y / camera.zoom) ||
-          tile->position.y + padding < camera.target.y - (camera.offset.y / camera.zoom)
-      ) continue;
+          tile->position.y + padding < camera.target.y - (camera.offset.y / camera.zoom)) continue;
 
 
       //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
@@ -109,18 +108,19 @@ namespace Terrain
           break;
       }
 
-      //      switch (tile->visibility)
-      //      {
-      //        case VISIBILE:
-      //          break;
-      //        case EXPLORED:
-      //          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
-      //          break;
-      //        case UNEXPLORED:
-      //          DrawTextureRec(hex, {frameRec.x + 256.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
-      //          break;
-      //        default: break;
-      //      }
+      // switch (tile->visibility)
+      // {
+      //   case VISIBILE:
+      //     break;
+      //   case EXPLORED:
+      //     DrawTextureRec(hex, {frameRec.x + 260, frameRec.y, frameRec.width, frameRec.height}, tile->position, Fade(BLACK, 0.5f));
+      //     break;
+      //   case UNEXPLORED:
+      //     DrawTextureRec(hex, {frameRec.x + 260f, frameRec.y, frameRec.width, frameRec.height}, tile->position, BLACK);
+      //     break;
+      //   default:
+      //     break;
+      // }
     }
   }
 
@@ -173,8 +173,8 @@ namespace Terrain
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
   NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias)
   {
-        srand(seed);
-//    srand(time(NULL));
+    srand(seed);
+    //    srand(time(NULL));
 
     //    float *fSeed = new float[MAP_WIDTH * MAP_HEIGHT];
 

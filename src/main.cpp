@@ -243,7 +243,7 @@ void Draw(State &state, entt::registry &reg, TextureCache &cache)
     BeginMode2D(state.camera);
     {
       Terrain::Draw(state.camera, reg, cache);
-      Provinces::DrawProvinces(reg, cache);
+      Provinces::DrawProvinces(*state.currPlayer, reg, cache);
       Animation::Draw(reg, state.debug);
     }
     EndMode2D();
