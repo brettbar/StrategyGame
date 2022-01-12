@@ -69,9 +69,9 @@ namespace Terrain
     TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
 
     Texture2D hex = cache.handle(hstr{"hexagon"})->texture;
-    rlEnableSmoothLines();
-    rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
-    rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
+    // rlEnableSmoothLines();
+    // rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
+    // rlTextureParameters(hex.id, RL_TEXTURE_WRAP_T, RL_TEXTURE_WRAP_CLAMP);
 
     Rectangle frameRec = {1.0f, 1.0f, 128, 128};
 

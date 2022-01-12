@@ -28,7 +28,7 @@ TEMPORARY TODOS HERE
 
 void LoadResources(TextureCache &);
 bool GameIsRunning();
-void CameraUpdate(Camera2D &);
+void CameraUpdate(Camera2D &, f32);
 void ZoomCamera(Camera2D &, f32, Vector2);
 
 
@@ -83,6 +83,9 @@ int main(void)
       oncelag = 0.0f;
     }
 
+    CameraUpdate(state.camera, dt);
+
+
     Draw(state, reg, textureCache);
   }
 
@@ -94,7 +97,7 @@ int main(void)
 void Init(State &state, entt::registry &reg, TextureCache &cache)
 {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-  SetTargetFPS(200);// Set our game to run at 60 frames-per-second
+  SetTargetFPS(144);// Set our game to run at 60 frames-per-second
   InitWindow(state.screenWidth, state.screenHeight,
              "raylib [core] example - basic window");
 
@@ -115,8 +118,6 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
 
 void Input(State &state, entt::registry &reg, TextureCache &cache)
 {
-  CameraUpdate(state.camera);
-
   Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
 
   if (IsKeyPressed(KEY_SPACE))
@@ -234,8 +235,6 @@ void LateUpdate(entt::registry &reg)
 
 void Draw(State &state, entt::registry &reg, TextureCache &cache)
 {
-  state.camera.offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2},
-
   BeginDrawing();
   {
     ClearBackground(DARKGRAY);
@@ -273,9 +272,9 @@ void Exit(TextureCache &cache)
   CloseWindow();// Close window and OpenGL context
 }
 
-void CameraUpdate(Camera2D &camera)
+void CameraUpdate(Camera2D &camera, f32 dt)
 {
-  f32 cameraSpeed = 5.0f;
+  f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
   // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
   // PrintVec2(target);
@@ -283,13 +282,13 @@ void CameraUpdate(Camera2D &camera)
   // camera.offset = target;
 
   if (IsKeyDown(KEY_D))
-    camera.target.x += cameraSpeed * 1 / camera.zoom;
+    camera.target.x += dt * cameraSpeed / camera.zoom;
   if (IsKeyDown(KEY_A))
-    camera.target.x -= cameraSpeed * 1 / camera.zoom;
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
   if (IsKeyDown(KEY_W))
-    camera.target.y -= cameraSpeed * 1 / camera.zoom;
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
   if (IsKeyDown(KEY_S))
-    camera.target.y += cameraSpeed * 1 / camera.zoom;
+    camera.target.y += dt * cameraSpeed / camera.zoom;
 
   if (IsKeyDown(KEY_Z))
     camera.zoom -= 0.05f;
@@ -303,6 +302,8 @@ void CameraUpdate(Camera2D &camera)
     camera.zoom = 8.0f;
   else if (camera.zoom < 0.08f)
     camera.zoom = 0.08f;
+
+  camera.offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2};
 }
 
 void LoadResources(TextureCache &cache)

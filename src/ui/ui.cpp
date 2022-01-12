@@ -6,8 +6,6 @@ namespace UI
 
   void Create(State &state, entt::registry &reg, TextureCache &cache)
   {
-    auto sidebarEntt = reg.create();
-
     PanelSolid sidebar = PanelSolid();
     sidebar.id = 0;
     sidebar.name = "Sidebar";
@@ -22,7 +20,22 @@ namespace UI
     };
     sidebar.children = {};
 
-    reg.emplace<PanelSolid>(sidebarEntt, sidebar);
+    PanelSolid bottom = PanelSolid();
+    bottom.id = 1;
+    bottom.name = "Bottom";
+    bottom.debug = false;
+    bottom.stateful = true;
+    bottom.position = {(f32)state.screenWidth/ 2, (f32)GetScreenHeight() - 256};
+    bottom.style = RECT_FILLED;
+    bottom.color = BLACK;
+    bottom.layout = {
+      .width = 1024,
+      .height = 256,
+    };
+    bottom.children = {};
+
+    reg.emplace<PanelSolid>(reg.create(), sidebar);
+    reg.emplace<PanelSolid>(reg.create(), bottom);
   }
 
   void Update(State &state, entt::registry &reg)
