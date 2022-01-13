@@ -40,16 +40,19 @@ void Exit(TextureCache &);
 
 int main(void)
 {
-  State state = {.screenWidth = 1280,
-                 .screenHeight = 720,
-                 .mapWidth = 128,
-                 .mapHeight = 128,
-                 .timeScale = 0.0f,
-                 .prevTimeScale = 1.0f,
-                 .debug = true,
-                 .month = 1,
-                 .year = 500,
-                 .currPlayer = std::make_shared<Player>(Player(0, ROMANS, "Roman Republic"))};
+  State state = {
+    .screenWidth = 1280,
+    .screenHeight = 720,
+    .mapWidth = 128,
+    .mapHeight = 128,
+    .timeScale = 0.0f,
+    .prevTimeScale = 1.0f,
+    .debug = true,
+    .month = 1,
+    .year = 4,
+    .startYear = 4,
+    .currPlayer = std::make_shared<Player>(Player(0, ROMANS, "Roman Republic"))};
+
   entt::registry reg;
   TextureCache textureCache = {};
 
@@ -132,7 +135,8 @@ void LateUpdate(State &state, entt::registry &reg)
   Provinces::UpdateProvinces(reg);
   if (state.month < 12)
     state.month++;
-  else {
+  else
+  {
     state.year++;
     state.month = 1;
   }

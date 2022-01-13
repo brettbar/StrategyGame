@@ -25,12 +25,13 @@ namespace UI
     bottom.name = "Bottom";
     bottom.debug = false;
     bottom.stateful = true;
-    bottom.position = {(f32) state.screenWidth / 2, (f32) GetScreenHeight() - 256};
     bottom.style = RECT_FILLED;
     bottom.color = BLACK;
+    bottom.position = {
+      (f32) state.screenWidth / 4, (f32) state.screenHeight - state.screenHeight/6};
     bottom.layout = {
-      .width = 1024,
-      .height = 256,
+      .width = state.screenWidth / 2,
+      .height = state.screenHeight / 6,
     };
     bottom.children = {};
 
@@ -45,11 +46,26 @@ namespace UI
 
     for (auto &el: elemView)
     {
-      PanelSolid &sidebar = elemView.get<PanelSolid>(el);
-      sidebar.layout = {
-        .width = state.screenWidth / 12,
-        .height = state.screenHeight,
-      };
+      PanelSolid &panel = elemView.get<PanelSolid>(el);
+      switch (panel.id)
+      {
+        case 0:
+          panel.layout = {
+            .width = state.screenWidth / 12,
+            .height = state.screenHeight,
+          };
+          break;
+        case 1:
+          panel.position = {
+            (f32) state.screenWidth / 4, (f32) state.screenHeight - state.screenHeight/6};
+          panel.layout = {
+            .width = state.screenWidth / 2,
+            .height = state.screenHeight / 6,
+          };
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -76,8 +92,8 @@ namespace UI
 
     DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
     DrawFPS(16, 2);
-    DrawText(state.currPlayer->factionName.c_str(), 720, 7, 14, BLUE);
-    DrawText(FormatDate(state.month, state.year).c_str(), state.screenWidth - 128, 7, 14, GREEN);
+    DrawText(state.currPlayer->factionName.c_str(), GetScreenWidth()/2, 7, 14, BLUE);
+    DrawText(FormatDate(state.month, state.year, state.startYear, state.annoDomini).c_str(), state.screenWidth - 128, 7, 14, GREEN);
 
     str symbol = "||";
     if (state.timeScale == 1.5)
@@ -100,16 +116,23 @@ namespace UI
     DrawText(symbol.c_str(), state.screenWidth - 256, 2, 20, WHITE);
   }
 
-  str FormatDate(u32 month, u32 year)
+  str FormatDate(u32 month, u32 year, u32 startYr, bool annoDomini)
   {
     str months[] = {
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     if (month > 12) month = 12;
     if (month < 1) month = 1;
 
-    return months[month-1] + ", " + std::to_string(year);
+    str yr = "";
+    if (year >= startYr * 2)
+      yr = std::to_string(year - (startYr * 2) + 1) + " AD";
+    else
+      yr = std::to_string(startYr + (startYr - year)) + " BC";
+
+
+
+    return months[month - 1] + ", " + yr;
   }
 
 };// namespace UI

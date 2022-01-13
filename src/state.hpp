@@ -18,6 +18,8 @@ struct State {
 
   u32 month;
   u32 year;
+  u32 startYear;
+  bool annoDomini;
 
 
   std::shared_ptr<Player> currPlayer;
