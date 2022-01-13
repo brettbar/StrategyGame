@@ -25,7 +25,7 @@ namespace UI
     bottom.name = "Bottom";
     bottom.debug = false;
     bottom.stateful = true;
-    bottom.position = {(f32)state.screenWidth/ 2, (f32)GetScreenHeight() - 256};
+    bottom.position = {(f32) state.screenWidth / 2, (f32) GetScreenHeight() - 256};
     bottom.style = RECT_FILLED;
     bottom.color = BLACK;
     bottom.layout = {
@@ -68,15 +68,16 @@ namespace UI
     for (auto &provEntt: provView)
     {
       Provinces::Province &prov = provView.get<Provinces::Province>(provEntt);
-      if ((u32)prov.owner == state.currPlayer->id) {
+      if ((u32) prov.owner == state.currPlayer->id)
+      {
         DrawRectangleV(prov.tile->position, {256, 256}, RED);
       }
-
     }
 
     DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
     DrawFPS(16, 2);
     DrawText(state.currPlayer->factionName.c_str(), 720, 7, 14, BLUE);
+    DrawText(FormatDate(state.month, state.year).c_str(), state.screenWidth - 128, 7, 14, GREEN);
 
     str symbol = "||";
     if (state.timeScale == 1.5)
@@ -96,8 +97,19 @@ namespace UI
       symbol = "||";
     }
 
-    DrawText(symbol.c_str(), state.screenWidth - 128, 2,
-             20, WHITE);
+    DrawText(symbol.c_str(), state.screenWidth - 256, 2, 20, WHITE);
+  }
+
+  str FormatDate(u32 month, u32 year)
+  {
+    str months[] = {
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+
+    if (month > 12) month = 12;
+    if (month < 1) month = 1;
+
+    return months[month-1] + ", " + std::to_string(year);
   }
 
 };// namespace UI

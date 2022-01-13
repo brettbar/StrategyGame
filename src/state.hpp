@@ -16,6 +16,10 @@ struct State {
   Camera2D camera;
   bool debug;
 
+  u32 month;
+  u32 year;
+
+
   std::shared_ptr<Player> currPlayer;
 
   Texture2D selectedTexture;

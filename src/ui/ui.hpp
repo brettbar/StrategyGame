@@ -62,6 +62,7 @@ struct ImageButton : Element {
 void Create(State &, entt::registry &, TextureCache &);
 void Update(State &, entt::registry &);
 void Draw(State &, entt::registry &);
+str FormatDate(u32, u32);
 
 
 }; // namespace UI

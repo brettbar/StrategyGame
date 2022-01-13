@@ -11,12 +11,11 @@ namespace Terrain
   {
     entt::entity entity = registry.create();
     TileMap tileMap = {};
-    float seed;
+    f32 seed = 25;
     NoiseMap pNoise = GeneratePerlinNoise(seed, 7, 1.2f);
 
     float waterLevel = 0.59;
-    FilterIslands(pNoise, waterLevel);
-
+//    FilterIslands(pNoise, waterLevel);
     NormalizeMap(pNoise);
 
     for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
@@ -251,7 +250,7 @@ namespace Terrain
     return fOutput;
   }
 
-  void FilterIslands(NoiseMap &noiseMap, float waterLevel)
+  void FilterIslands(NoiseMap &noiseMap, f32 waterLevel)
   {
     for (int x = 1; x < MAP_WIDTH - 1; x++)
       for (int y = 1; y < MAP_HEIGHT - 1; y++)
@@ -291,7 +290,7 @@ namespace Terrain
 
   void NormalizeMap(NoiseMap &pNoise)
   {
-    float min = MAXFLOAT;
+    float min = std::numeric_limits<float>::max();
     float max = 0;
 
     for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)

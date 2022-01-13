@@ -51,7 +51,7 @@ namespace Terrain
   void UpdateFOW(entt::registry &);
 
   NoiseMap GeneratePerlinNoise(float, int, float);
-  void FilterIslands(NoiseMap &, float);
+  void FilterIslands(NoiseMap &, f32);
   void NormalizeMap(NoiseMap &);
 
   u32 index(u32, u32);

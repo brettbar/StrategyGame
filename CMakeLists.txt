@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME} src/main.cpp
         src/systems/spawn.cpp
         src/systems/terrain.cpp
         src/systems/terrain.hpp
-        src/entities/archetypes.hpp)
+        src/entities/archetypes.hpp src/input.cpp src/input.hpp)
 
 
 if (UNIX)

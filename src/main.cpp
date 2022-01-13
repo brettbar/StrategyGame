@@ -10,6 +10,7 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
+#include "input.hpp"
 #include "player.hpp"
 #include "resource.hpp"
 #include "state.hpp"
@@ -22,7 +23,6 @@ TEMPORARY TODOS HERE
 #include "ui/ui.hpp"
 
 
-
 #define MAX_SPRITES 100
 #define MAX_BATCH_ELEMENTS 8192
 
@@ -33,9 +33,8 @@ void ZoomCamera(Camera2D &, f32, Vector2);
 
 
 void Init(State &, entt::registry &, TextureCache &);
-void Input(State &, entt::registry &, TextureCache &);
 void Update(State &, entt::registry &);
-void LateUpdate(entt::registry &);
+void LateUpdate(State &, entt::registry &);
 void Draw(State &, entt::registry &, TextureCache &);
 void Exit(TextureCache &);
 
@@ -48,6 +47,8 @@ int main(void)
                  .timeScale = 0.0f,
                  .prevTimeScale = 1.0f,
                  .debug = true,
+                 .month = 1,
+                 .year = 500,
                  .currPlayer = std::make_shared<Player>(Player(0, ROMANS, "Roman Republic"))};
   entt::registry reg;
   TextureCache textureCache = {};
@@ -69,7 +70,7 @@ int main(void)
     lag += dt;
     oncelag += dt;
 
-    Input(state, reg, textureCache);
+    Input::Handle(state, reg, textureCache);
 
     while (lag >= MS_PER_UPDATE)
     {
@@ -79,7 +80,7 @@ int main(void)
 
     while (oncelag >= ONCE_A_SECOND * (1 / state.timeScale))
     {
-      LateUpdate(reg);
+      LateUpdate(state, reg);
       oncelag = 0.0f;
     }
 
@@ -116,108 +117,6 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
   Provinces::InitProvinces(reg);
 }
 
-void Input(State &state, entt::registry &reg, TextureCache &cache)
-{
-  Vector2 clickPos = GetScreenToWorld2D(GetMousePosition(), state.camera);
-
-  if (IsKeyPressed(KEY_SPACE))
-  {
-    if (state.timeScale > 0.0f)
-    {
-      state.prevTimeScale = state.timeScale;
-      state.timeScale = 0.0f;
-    }
-    else if (state.timeScale == 0.0f)
-    {
-      state.timeScale = state.prevTimeScale;
-    }
-  }
-
-  if (IsKeyPressed(KEY_MINUS))
-  {
-    state.timeScale -= 0.5f;
-    if (state.timeScale < 0.0f)
-      state.timeScale = 0.0f;
-
-    if (state.timeScale == 0.0f && state.prevTimeScale > 0.5f)
-    {
-      state.prevTimeScale -= 0.5f;
-      state.timeScale = state.prevTimeScale;
-    }
-  }
-
-  if (IsKeyPressed(KEY_EQUAL))
-  {
-    state.timeScale += 0.5f;
-    if (state.timeScale > 1.5f)
-      state.timeScale = 1.5f;
-  }
-
-  if (IsKeyPressed(KEY_V))
-  {
-    Spawn::CreateNew(reg, cache, clickPos, state.currPlayer);
-  }
-
-  if (IsKeyPressed(KEY_C))
-  {
-    Provinces::SetProvinceOwner(reg, state.currPlayer->id, clickPos);
-  }
-
-  if (IsKeyPressed(KEY_GRAVE))
-  {
-    state.debug = !state.debug;
-  }
-
-  if (IsMouseButtonPressed(0))
-  {
-    // UI::Input(state, reg);
-    Selection::UpdateSelection(reg, clickPos);
-  }
-  if (IsMouseButtonPressed(1))
-  {
-    Movement::SetDestinations(reg, state.camera);
-  }
-
-  if (IsKeyPressed(KEY_ONE))
-  {
-    state.currPlayer->id = 0;
-    state.currPlayer->faction = ROMANS;
-    state.currPlayer->factionName = "Roman Republic";
-    state.currPlayer->RefreshTextureMap();
-  }
-
-  if (IsKeyPressed(KEY_TWO))
-  {
-    state.currPlayer->id = 1;
-    state.currPlayer->faction = GREEKS;
-    state.currPlayer->factionName = "Greek Cities";
-    state.currPlayer->RefreshTextureMap();
-  }
-
-  if (IsKeyPressed(KEY_THREE))
-  {
-    state.currPlayer->id = 2;
-    state.currPlayer->faction = CELTS;
-    state.currPlayer->factionName = "Celtic Tribes";
-    state.currPlayer->RefreshTextureMap();
-  }
-
-  if (IsKeyPressed(KEY_FOUR))
-  {
-    state.currPlayer->id = 3;
-    state.currPlayer->faction = PUNICS;
-    state.currPlayer->factionName = "Punic Colonies";
-    state.currPlayer->RefreshTextureMap();
-  }
-
-  if (IsKeyPressed(KEY_FIVE))
-  {
-    state.currPlayer->id = 4;
-    state.currPlayer->faction = PERSIANS;
-    state.currPlayer->factionName = "Persian Empire";
-    state.currPlayer->RefreshTextureMap();
-  }
-}
 
 void Update(State &state, entt::registry &reg)
 {
@@ -228,9 +127,15 @@ void Update(State &state, entt::registry &reg)
   //  Terrain::UpdateFOW(reg);
 }
 
-void LateUpdate(entt::registry &reg)
+void LateUpdate(State &state, entt::registry &reg)
 {
   Provinces::UpdateProvinces(reg);
+  if (state.month < 12)
+    state.month++;
+  else {
+    state.year++;
+    state.month = 1;
+  }
 }
 
 void Draw(State &state, entt::registry &reg, TextureCache &cache)
