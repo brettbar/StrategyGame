@@ -27,11 +27,15 @@ inline void Renderer::Init(State &state)
   //  rlSetMatrixModelview(matView);
   //  rlSetMatrixProjection(matProj);
 
-  int matViewLoc = GetShaderLocation(shader, "matView");
-  int matProjectionLoc = GetShaderLocation(shader, "matProjection");
+  int zoomLoc = GetShaderLocation(shader, "uZoom");
 
-  SetShaderValueMatrix(shader, matProjectionLoc, matProj);
-  SetShaderValueMatrix(shader, matViewLoc, matView);
+  SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
+
+//  int matViewLoc = GetShaderLocation(shader, "matView");
+//  int matProjectionLoc = GetShaderLocation(shader, "matProjection");
+//
+//  SetShaderValueMatrix(shader, matProjectionLoc, matProj);
+//  SetShaderValueMatrix(shader, matViewLoc, matView);
 
   Renderer::shader = shader;
 }
