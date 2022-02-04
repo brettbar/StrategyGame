@@ -107,5 +107,15 @@ namespace Input
       state.currPlayer->factionName = "Persian Empire";
       state.currPlayer->RefreshTextureMap();
     }
+
+    if (IsKeyPressed(KEY_P))
+    {
+      Map::mode = Map::Mode::POLITICAL;
+    }
+
+    if (IsKeyPressed(KEY_T))
+    {
+      Map::mode = Map::Mode::TERRAIN;
+    }
   }
 };// namespace Input

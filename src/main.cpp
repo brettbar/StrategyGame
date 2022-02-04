@@ -12,19 +12,17 @@ TEMPORARY TODOS HERE
 */
 #include "input.hpp"
 #include "player.hpp"
+#include "renderer.hpp"
 #include "resource.hpp"
 #include "state.hpp"
 #include "systems/animation.hpp"
+#include "systems/map/provinces.hpp"
+#include "systems/map/terrain.hpp"
 #include "systems/movement.hpp"
-#include "systems/provinces.hpp"
 #include "systems/selection.hpp"
 #include "systems/spawn.hpp"
-#include "systems/terrain.hpp"
 #include "ui/ui.hpp"
 
-
-#define MAX_SPRITES 100
-#define MAX_BATCH_ELEMENTS 8192
 
 void LoadResources(TextureCache &);
 bool GameIsRunning();
@@ -35,8 +33,14 @@ void ZoomCamera(Camera2D &, f32, Vector2);
 void Init(State &, entt::registry &, TextureCache &);
 void Update(State &, entt::registry &);
 void LateUpdate(State &, entt::registry &);
-void Draw(State &, entt::registry &, TextureCache &);
 void Exit(TextureCache &);
+
+enum GameState
+{
+  MENU,
+  RUNNING,
+  PAUSE
+};
 
 int main(void)
 {
@@ -57,6 +61,8 @@ int main(void)
   TextureCache textureCache = {};
 
   Init(state, reg, textureCache);
+
+  Renderer::Init(state);
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -89,11 +95,12 @@ int main(void)
 
     CameraUpdate(state.camera, dt);
 
-
-    Draw(state, reg, textureCache);
+    Renderer::Draw(state, reg, textureCache);
   }
 
   Exit(textureCache);
+
+  UnloadShader(Renderer::shader);
 
   return 0;
 }
@@ -133,6 +140,9 @@ void Update(State &state, entt::registry &reg)
 void LateUpdate(State &state, entt::registry &reg)
 {
   Provinces::UpdateProvinces(reg);
+
+  state.day++;
+
   if (state.month < 12)
     state.month++;
   else
@@ -140,28 +150,6 @@ void LateUpdate(State &state, entt::registry &reg)
     state.year++;
     state.month = 1;
   }
-}
-
-void Draw(State &state, entt::registry &reg, TextureCache &cache)
-{
-  BeginDrawing();
-  {
-    ClearBackground(DARKGRAY);
-
-    BeginMode2D(state.camera);
-    {
-      Terrain::Draw(state.camera, reg, cache);
-      Provinces::DrawProvinces(*state.currPlayer, reg, cache);
-      Animation::Draw(reg, state.debug);
-    }
-    EndMode2D();
-
-    {
-      UI::Update(state, reg);
-      UI::Draw(state, reg);
-    }
-  }
-  EndDrawing();
 }
 
 void Exit(TextureCache &cache)

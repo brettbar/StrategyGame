@@ -16,6 +16,7 @@ struct State {
   Camera2D camera;
   bool debug;
 
+  u32 day;
   u32 month;
   u32 year;
   u32 startYear;

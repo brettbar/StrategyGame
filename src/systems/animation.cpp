@@ -33,8 +33,8 @@ void UpdateSprites(entt::registry &reg, f32 timeScale) {
   for (auto &entity : view) {
     Animated &anim = view.get<Animated>(entity);
 
-    float animSpeed = 0.2f;
-    anim.animTime += anim.animations[anim.state].speed * timeScale * 0.25;
+    float animSpeed = 0.18f;
+    anim.animTime += anim.animations[anim.state].speed * timeScale * animSpeed;
     anim.currFrame = (int)anim.animTime % anim.animations[anim.state].frameLength;
 
     anim.frameRec.x = (f32)anim.currFrame * 128;

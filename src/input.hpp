@@ -8,7 +8,8 @@
 #include "resource.hpp"
 #include "state.hpp"
 #include "systems/movement.hpp"
-#include "systems/provinces.hpp"
+#include "systems/map/provinces.hpp"
+#include "systems/map/map.hpp"
 #include "systems/spawn.hpp"
 #include "systems/selection.hpp"
 

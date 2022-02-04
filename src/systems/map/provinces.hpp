@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../common.hpp"
-#include "../resource.hpp"
+#include "../../common.hpp"
+#include "../../resource.hpp"
 #include "terrain.hpp"
 #include <array>
 #include <thread>
@@ -84,7 +84,7 @@ namespace Provinces
   void UpdatePopulation(Settlement &);
   void SetProvinceOwner(entt::registry &, u32, Vector2);
 
-  void DrawProvinces(Player, entt::registry &, TextureCache &);
+  void DrawProvinces(entt::registry &, TextureCache &, bool);
   //  void DrawSingleBorder(Province());
 
 

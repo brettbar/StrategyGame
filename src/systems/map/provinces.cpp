@@ -112,7 +112,7 @@ namespace Provinces
     }
   }
 
-  void DrawProvinces(Player currPlayer, entt::registry &reg, TextureCache &cache)
+  void DrawProvinces(entt::registry &reg, TextureCache &cache, bool showOverlays)
   {
     auto view = reg.view<ProvinceList>();
     ProvinceList &provinces = view.get<ProvinceList>(view.front());
@@ -176,7 +176,8 @@ namespace Provinces
             break;
         }
 
-        DrawTextureRec(cache.handle(hstr{"factionOverlay"})->texture,
+        if (showOverlays)
+          DrawTextureRec(cache.handle(hstr{"factionOverlay"})->texture,
                        frameRec, prov->tile->position, Fade(WHITE, 0.5));
       }
 

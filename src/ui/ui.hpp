@@ -6,7 +6,7 @@
 #include "../common.hpp"
 #include "../state.hpp"
 #include "../resource.hpp"
-#include "../systems/provinces.hpp"
+#include "../systems/map/provinces.hpp"
 
 namespace UI {
 

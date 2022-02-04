@@ -3,10 +3,10 @@
 //
 #pragma once
 
-#include "../common.hpp"
-#include "../resource.hpp"
-#include "../components/sight.hpp"
-#include "../components/unit.hpp"
+#include "../../common.hpp"
+#include "../../resource.hpp"
+#include "../../components/sight.hpp"
+#include "../../components/unit.hpp"
 #include "rlgl.h"
 #include <chrono>
 

@@ -2,7 +2,6 @@
 
 #include "../include/entt/entt.hpp"
 #include "common.hpp"
-#include <raylib.h>
 
 struct TextureResource {
   const Texture2D texture;
