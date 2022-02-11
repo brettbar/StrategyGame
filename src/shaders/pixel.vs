@@ -6,7 +6,6 @@ in vec2 vertexTexCoord;
 in vec3 vertexNormal;
 in vec4 vertexColor;
 
-varying vec2 vUv;
 
 // Input uniform values
 uniform mat4 mvp;             // VS: ModelViewProjection matrix
@@ -21,6 +20,7 @@ out vec2 fragTexCoord;
 out vec4 fragColor;
 
 // NOTE: Add here your custom variables
+out vec2 vUv;
 
 void main()
 {

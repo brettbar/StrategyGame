@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef UI_HPP
-#define UI_HPP
-
 #include "../common.hpp"
 #include "../state.hpp"
 #include "../resource.hpp"
@@ -67,4 +64,3 @@ str FormatDate(u32, u32, u32, bool);
 
 }; // namespace UI
 
-#endif

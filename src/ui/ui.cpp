@@ -43,7 +43,6 @@ namespace UI
   {
     auto elemView = reg.view<PanelSolid>();
 
-
     for (auto &el: elemView)
     {
       PanelSolid &panel = elemView.get<PanelSolid>(el);
@@ -69,7 +68,6 @@ namespace UI
     }
   }
 
-
   void Draw(State &state, entt::registry &reg)
   {
     auto elView = reg.view<PanelSolid>();
@@ -93,7 +91,8 @@ namespace UI
     DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
     DrawFPS(16, 2);
     DrawText(state.currPlayer->factionName.c_str(), GetScreenWidth()/2, 7, 14, BLUE);
-    DrawText(FormatDate(state.month, state.year, state.startYear, state.annoDomini).c_str(), state.screenWidth - 128, 7, 14, GREEN);
+    DrawText(FormatDate(state.month, state.year, state.startYear, state.annoDomini).c_str(),
+      state.screenWidth - 128, 7, 14, GREEN);
 
     str symbol = "||";
     if (state.timeScale == 1.5)
@@ -119,7 +118,9 @@ namespace UI
   str FormatDate(u32 month, u32 year, u32 startYr, bool annoDomini)
   {
     str months[] = {
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
 
     if (month > 12) month = 12;
     if (month < 1) month = 1;

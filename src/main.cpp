@@ -205,7 +205,14 @@ void CameraUpdate(Camera2D &camera, f32 dt)
 
 void LoadResources(TextureCache &cache)
 {
+//  Image hexagon = LoadImage("assets/textures/hexagon.png");
+//  ImageResize(&hexagon, 512, 512);
+//  Texture hexTex = LoadTextureFromImage(hexagon);
+//
+//  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
+
   LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
+
   LoadResource(hstr{"test"}, "assets/textures/hexagons/hexagon5.png", cache);
   LoadResource(hstr{"factionOverlay"}, "assets/textures/overlays.png", cache);
 

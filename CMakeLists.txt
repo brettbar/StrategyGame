@@ -9,23 +9,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(game)
 
 add_executable(${PROJECT_NAME} src/main.cpp
-        src/common.cpp
         src/ui/ui.cpp
-        src/systems/map/provinces.cpp
+        src/systems/map/provinces.hpp
         # src/components/unit.hpp
         src/systems/movement.cpp
         src/systems/animation.cpp
         src/systems/selection.cpp
         src/systems/spawn.cpp
         src/systems/spawn.cpp
-        src/systems/map/terrain.cpp
         src/systems/map/terrain.hpp
         src/entities/archetypes.hpp
         src/input.cpp
         src/input.hpp
+        src/common.cpp
         src/components/actor.hpp
         src/systems/actors.cpp
-        src/systems/actors.hpp src/systems/map/map.cpp src/systems/map/map.hpp)
+        src/systems/actors.hpp src/systems/map/map.hpp)
 
 
 if (UNIX)
