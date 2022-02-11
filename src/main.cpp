@@ -35,11 +35,13 @@ void Update(State &, entt::registry &);
 void LateUpdate(State &, entt::registry &);
 void Exit(TextureCache &);
 
+bool DEBUG = false;
+
 enum GameState
 {
   MENU,
   RUNNING,
-  PAUSE
+  PAUSE,
 };
 
 int main(void)
@@ -205,11 +207,11 @@ void CameraUpdate(Camera2D &camera, f32 dt)
 
 void LoadResources(TextureCache &cache)
 {
-//  Image hexagon = LoadImage("assets/textures/hexagon.png");
-//  ImageResize(&hexagon, 512, 512);
-//  Texture hexTex = LoadTextureFromImage(hexagon);
-//
-//  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
+  //  Image hexagon = LoadImage("assets/textures/hexagon.png");
+  //  ImageResize(&hexagon, 512, 512);
+  //  Texture hexTex = LoadTextureFromImage(hexagon);
+  //
+  //  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
 
   LoadResource(hstr{"hexagon"}, "assets/textures/hexagon.png", cache);
 
