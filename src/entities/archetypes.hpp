@@ -5,16 +5,15 @@
 #pragma once
 
 #include "../common.hpp"
-#include "../resource.hpp"
 #include "../components/animated.hpp"
-#include "../components/unit.hpp"
 #include "../components/sight.hpp"
+#include "../components/unit.hpp"
+#include "../resource.hpp"
 
 namespace Archetypes
 {
 
-  struct Actor
-  {
+  struct Actor {
 
     Unit unit;
     Animated animated;
@@ -49,7 +48,6 @@ namespace Archetypes
         .range = 1,
       };
     }
-
   };
 
 
