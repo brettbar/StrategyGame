@@ -1,124 +1,71 @@
+
 #pragma once
 
 #include "../common.hpp"
 #include "../resource.hpp"
 #include "../state.hpp"
-#include "../systems/map/provinces.hpp"
+#include "../world/systems/map/provinces.hpp"
+#include <raylib.h>
 
-namespace UI
-{
-  enum Style
-  {
-    RECT_FILLED,
-    RECT_LINES,
-    RECT_ROUNDED,
+namespace UI {
+  enum ItemType {
+    NONE,
+    PANEL,
+    BUTTON,
   };
 
-  enum LayoutStyle
-  {
-    HORIZONTAL,
-    VERTICAL,
-    GRID,
+  struct Item {
+    i32 id;
+    i32 owner;
+    i32 index;
+    ItemType type;
+    Rectangle dimensions;
+    std::vector<Item> children;
   };
-
-  struct Element {
-    u32 id;
-    str name;
-    bool debug;
-    bool stateful;
-    Vector2 position;
-  };
-
-  struct Layout {
-    u32 width;
-    u32 height;
-    LayoutStyle style;
-  };
-
-  struct PanelSolid : Element {
-    Style style;
-    Color color;
-    Layout layout;
-    std::vector<Element> children;
-  };
-
-  struct PanelTexture : Element {
-    Texture texture;
-    Layout layout;
-    std::vector<Element> children;
-  };
-
-  struct TextButton : Element {
-    Style style;
-    Color color;
-    str text;
-  };
-
-  struct ImageButton : Element {
-    Texture2D texture;
-  };
-
-  inline void Update(State &, entt::registry &);
-  inline void Draw(State &, entt::registry &);
-  inline str FormatDate(u32, u32, u32);
-
-  inline void Create(State &state, entt::registry &reg, TextureCache &cache)
-  {
-    PanelSolid sidebar = PanelSolid();
-    sidebar.id = 0;
-    sidebar.name = "Sidebar";
-    sidebar.debug = false;
-    sidebar.stateful = true;
-    sidebar.position = {0, 0};
-    sidebar.style = RECT_FILLED;
-    sidebar.color = BLACK;
-    sidebar.layout = {
-      .width = state.screenWidth / 12,
-      .height = state.screenHeight,
-    };
-    sidebar.children = {};
-
-    PanelSolid bottom = PanelSolid();
-    bottom.id = 1;
-    bottom.name = "Bottom";
-    bottom.debug = false;
-    bottom.stateful = true;
-    bottom.style = RECT_FILLED;
-    bottom.color = BLACK;
-    bottom.position = {
-      (f32) state.screenWidth / 4, (f32) state.screenHeight - state.screenHeight / 6.0f};
-    bottom.layout = {
-      .width = state.screenWidth / 2,
-      .height = state.screenHeight / 6,
-    };
-    bottom.children = {};
-
-    reg.emplace<PanelSolid>(reg.create(), sidebar);
-    reg.emplace<PanelSolid>(reg.create(), bottom);
+  inline bool operator==(const Item &lhs, const Item &rhs) {
+    return (lhs.id == rhs.id);
   }
 
-  inline void Update(State &state, entt::registry &reg)
-  {
-    auto elemView = reg.view<PanelSolid>();
+  struct Context {
+    i32 hot;
+    i32 active;
+  };
 
-    for (auto &el: elemView)
-    {
-      PanelSolid &panel = elemView.get<PanelSolid>(el);
-      switch (panel.id)
+  inline Item *CreateId(i32, ItemType);
+  inline std::vector<Item> Build();
+
+  inline Context Context = {
+    .hot = -1,
+    .active = -1,
+  };
+
+  inline std::vector<Item> UserInterface();
+
+  inline std::vector<Item> userInterface = UserInterface();
+
+  inline std::vector<Item> UserInterface() {
+    return {
       {
-        case 0:
-          panel.layout = {
-            .width = state.screenWidth / 12,
-            .height = state.screenHeight,
-          };
+        .type = PANEL,
+        .dimensions = {0, 0, 80, (f32) GetScreenHeight()},
+        .children = {
+
+        },
+      },
+    };
+  }
+
+  inline void Draw() {
+    for (Item item: userInterface) {
+      switch (item.type) {
+        case PANEL:
+          item.dimensions.height = (f32) GetScreenHeight();
+          DrawRectangleRec(item.dimensions, BLACK);
           break;
-        case 1:
-          panel.position = {
-            (f32) state.screenWidth / 4, (f32) state.screenHeight - state.screenHeight / 6.0f};
-          panel.layout = {
-            .width = state.screenWidth / 2,
-            .height = state.screenHeight / 6,
-          };
+        case BUTTON:
+          DrawRectangleRec(item.dimensions, BLACK);
+          break;
+        case NONE:
           break;
         default:
           break;
@@ -126,71 +73,30 @@ namespace UI
     }
   }
 
-  inline void Draw(State &state, entt::registry &reg)
-  {
-    auto elView = reg.view<PanelSolid>();
-    auto provView = reg.view<Provinces::Province>();
+  // inline bool DoButton(Item item, bool inside, bool mouseWentUp, bool mouseWentDown) {
+  //   bool result = false;
 
-    for (auto &el: elView)
-    {
-      PanelSolid element = elView.get<PanelSolid>(el);
-      DrawRectangleV(element.position, {(f32) element.layout.width, (f32) element.layout.height}, element.color);
-    }
+  //   if (item == Context.active) {
+  //     if (mouseWentUp) {
+  //       if (id == Context.hot)
+  //         result = true;// do the button action
+  //       Context.active = nullptr;
+  //     }
+  //   } else if (id == Context.hot) {
+  //     if (mouseWentDown)
+  //       Context.active = id;
+  //   }
 
-    for (auto &provEntt: provView)
-    {
-      Provinces::Province &prov = provView.get<Provinces::Province>(provEntt);
-      if ((u32) prov.owner == state.currPlayer->id)
-      {
-        DrawRectangleV(prov.tile->position, {256, 256}, RED);
-      }
-    }
+  //   if (inside)
+  //     Context.hot = id;
 
-    DrawRectangle(0, 0, (f32) state.screenWidth, 24.0f, BLACK);
-    DrawFPS(16, 2);
-    DrawText(state.currPlayer->factionName.c_str(), GetScreenWidth() / 2, 7, 14, BLUE);
-    DrawText(FormatDate(state.month, state.year, state.startYear).c_str(),
-             state.screenWidth - 128, 7, 14, GREEN);
+  //   //draw the button
 
-    str symbol = "||";
-    if (state.timeScale == 1.5)
-    {
-      symbol = ">>>";
-    }
-    else if (state.timeScale == 1.0)
-    {
-      symbol = ">>";
-    }
-    else if (state.timeScale == 0.5)
-    {
-      symbol = ">";
-    }
-    else
-    {
-      symbol = "||";
-    }
+  //   return result;
+  // }
 
-    DrawText(symbol.c_str(), state.screenWidth - 256, 2, 20, WHITE);
-  }
+  // void ::Draw() {
+  //   if (Do...) {}
+  // }
 
-  inline str FormatDate(u32 month, u32 year, u32 startYr)
-  {
-    str months[] = {
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-    if (month > 12) month = 12;
-    if (month < 1) month = 1;
-
-    str yr = "";
-    if (year >= startYr * 2)
-      yr = std::to_string(year - (startYr * 2) + 1) + " AD";
-    else
-      yr = std::to_string(startYr + (startYr - year)) + " BC";
-
-
-    return months[month - 1] + ", " + yr;
-  }
-
-
-};// namespace UI
+}// namespace UI

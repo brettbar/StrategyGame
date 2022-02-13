@@ -5,23 +5,24 @@ rights reserved.
 TEMPORARY TODOS HERE
   @TODO Figure out passing state by ref or val for each function
   @TODO See if excessive State & params can be replaced with only the
-      properties that are actually be used.
-  @TODO clean up redunant view captures, maybe one view capture
+      properties that are actually be used. @TODO clean up redunant view captures, maybe one view capture
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
+#include "editor/editor.hpp"
 #include "input.hpp"
-#include "player.hpp"
-#include "renderer.hpp"
+#include "renderer/renderer.hpp"
 #include "resource.hpp"
 #include "state.hpp"
-#include "systems/animation.hpp"
-#include "systems/map/provinces.hpp"
-#include "systems/map/terrain.hpp"
-#include "systems/movement.hpp"
-#include "systems/selection.hpp"
-#include "systems/spawn.hpp"
 #include "ui/ui.hpp"
+#include "world/player.hpp"
+#include "world/systems/animation.hpp"
+#include "world/systems/map/provinces.hpp"
+#include "world/systems/map/terrain.hpp"
+#include "world/systems/movement.hpp"
+#include "world/systems/selection.hpp"
+#include "world/systems/spawn.hpp"
+#include <raylib.h>
 
 
 void LoadResources(TextureCache &);
@@ -35,25 +36,13 @@ void Update(State &, entt::registry &);
 void LateUpdate(State &, entt::registry &);
 void Exit(TextureCache &);
 
-bool DEBUG = false;
-
-enum GameState
-{
-  MENU,
-  RUNNING,
-  PAUSE,
-};
-
-int main(void)
-{
+int main(void) {
   State state = {
-    .screenWidth = 1280,
-    .screenHeight = 720,
     .mapWidth = 128,
     .mapHeight = 128,
     .timeScale = 0.0f,
     .prevTimeScale = 1.0f,
-    .debug = true,
+    .gameState = GAME,
     .month = 1,
     .year = 4,
     .startYear = 4,
@@ -74,8 +63,7 @@ int main(void)
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-  while (GameIsRunning())
-  {
+  while (GameIsRunning()) {
     dt = GetFrameTime();
 
     lag += dt;
@@ -83,14 +71,12 @@ int main(void)
 
     Input::Handle(state, reg, textureCache);
 
-    while (lag >= MS_PER_UPDATE)
-    {
+    while (lag >= MS_PER_UPDATE) {
       Update(state, reg);
       lag -= MS_PER_UPDATE;
     }
 
-    while (oncelag >= ONCE_A_SECOND * (1 / state.timeScale))
-    {
+    while (oncelag >= ONCE_A_SECOND * (1 / state.timeScale)) {
       LateUpdate(state, reg);
       oncelag = 0.0f;
     }
@@ -107,11 +93,10 @@ int main(void)
   return 0;
 }
 
-void Init(State &state, entt::registry &reg, TextureCache &cache)
-{
+void Init(State &state, entt::registry &reg, TextureCache &cache) {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   SetTargetFPS(144);// Set our game to run at 60 frames-per-second
-  InitWindow(state.screenWidth, state.screenHeight,
+  InitWindow(GetScreenWidth(), GetScreenHeight(),
              "raylib [core] example - basic window");
 
   LoadResources(cache);
@@ -124,38 +109,32 @@ void Init(State &state, entt::registry &reg, TextureCache &cache)
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  UI::Create(state, reg, cache);
+  UI::Build();
   Terrain::CreateTerrain(reg);
   Provinces::InitProvinces(reg);
 }
 
 
-void Update(State &state, entt::registry &reg)
-{
+void Update(State &state, entt::registry &reg) {
   Movement::Update(reg, state.timeScale);
-  state.screenWidth = GetScreenWidth();
-  state.screenHeight = GetScreenHeight();
   Animation::UpdateSprites(reg, state.timeScale);
   //  Terrain::UpdateFOW(reg);
 }
 
-void LateUpdate(State &state, entt::registry &reg)
-{
+void LateUpdate(State &state, entt::registry &reg) {
   Provinces::UpdateProvinces(reg);
 
   state.day++;
 
   if (state.month < 12)
     state.month++;
-  else
-  {
+  else {
     state.year++;
     state.month = 1;
   }
 }
 
-void Exit(TextureCache &cache)
-{
+void Exit(TextureCache &cache) {
   UnloadTexture(cache.handle(hstr{"hexagon"})->texture);
   UnloadTexture(cache.handle(hstr{"test"})->texture);
   UnloadTexture(cache.handle(hstr{"template"})->texture);
@@ -171,8 +150,7 @@ void Exit(TextureCache &cache)
   CloseWindow();// Close window and OpenGL context
 }
 
-void CameraUpdate(Camera2D &camera, f32 dt)
-{
+void CameraUpdate(Camera2D &camera, f32 dt) {
   f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
   // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
@@ -205,8 +183,7 @@ void CameraUpdate(Camera2D &camera, f32 dt)
   camera.offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2};
 }
 
-void LoadResources(TextureCache &cache)
-{
+void LoadResources(TextureCache &cache) {
   //  Image hexagon = LoadImage("assets/textures/hexagon.png");
   //  ImageResize(&hexagon, 512, 512);
   //  Texture hexTex = LoadTextureFromImage(hexagon);

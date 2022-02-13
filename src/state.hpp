@@ -6,22 +6,29 @@
 
 #include "common.hpp"
 
+enum GameState {
+  MENU,
+  EDITOR,
+  GAME,
+};
+
+enum RunState {
+  RUNNING,
+  PAUSE,
+};
+
 struct State {
-  u32 screenWidth;
-  u32 screenHeight;
   const u32 mapWidth;
   const u32 mapHeight;
   f32 timeScale;
   f32 prevTimeScale;
   Camera2D camera;
-  bool debug;
+  GameState gameState;
 
   u32 day;
   u32 month;
   u32 year;
   u32 startYear;
-  bool annoDomini;
-
 
   std::shared_ptr<Player> currPlayer;
 

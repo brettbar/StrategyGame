@@ -17,18 +17,18 @@ AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterCaseLabel: true
-  AfterClass: true
-  AfterControlStatement: Always
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterUnion: true
-  BeforeCatch: true
-  BeforeElse: true
+  AfterCaseLabel: false
+  AfterClass: false 
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
   IndentBraces: false
-  SplitEmptyFunction: true
-  SplitEmptyRecord: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon

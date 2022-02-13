@@ -4,47 +4,44 @@
 
 #pragma once
 
-#include "../common.hpp"
+#include "../../common.hpp"
+#include "../../resource.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
-#include "../resource.hpp"
 
-namespace Archetypes
-{
+namespace Archetypes {
 
   struct Actor {
+    Components::Unit unit;
+    Components::Animated animated;
+    Components::Sight sight;
 
-    Unit unit;
-    Animated animated;
-    Sight sight;
+    Components::Animations animations;
 
-    Animations animations;
-
-    Actor(Texture2D sprite, Vector2 spawn)
-    {
-      unit = Unit{
+    Actor(Texture2D sprite, Vector2 spawn) {
+      unit = Components::Unit{
         .position = spawn,
         .destination = spawn,
         .speed = 1.0f,
       };
       animations = {
-        {IDLE_DR, 2, 0.2f},
-        {IDLE_DL, 2, 0.2f},
-        {WALK_DL, 8, 0.8f},
-        {WALK_DL, 8, 0.8f},
+        {Components::IDLE_DR, 2, 0.2f},
+        {Components::IDLE_DL, 2, 0.2f},
+        {Components::WALK_DL, 8, 0.8f},
+        {Components::WALK_DL, 8, 0.8f},
       };
-      animated = Animated{
+      animated = Components::Animated{
         .sprite = sprite,
         .frameRec = {0, 0, 128, 128},
-        .state = IDLE_DR,
+        .state = Components::IDLE_DR,
         .animations = animations,
         .direction = 0,
         .currFrame = 0,
         .animTime = 0.0f,
         .moving = false,
       };
-      sight = Sight{
+      sight = Components::Sight{
         .range = 1,
       };
     }

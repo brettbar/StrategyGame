@@ -4,26 +4,22 @@
 
 #pragma once
 
-#include "../../common.hpp"
-#include "../../resource.hpp"
-#include "../../state.hpp"
+#include "../../../common.hpp"
+#include "../../../resource.hpp"
+#include "../../../state.hpp"
 #include "provinces.hpp"
 #include "terrain.hpp"
 
-namespace Map
-{
-  enum Mode
-  {
+namespace Map {
+  enum Mode {
     TERRAIN,
     POLITICAL,
   };
 
   inline Mode mode = Mode::TERRAIN;
 
-  inline void Draw(State &state, entt::registry &reg, TextureCache &cache)
-  {
-    switch (mode)
-    {
+  inline void Draw(State &state, entt::registry &reg, TextureCache &cache) {
+    switch (mode) {
       case Mode::TERRAIN:
         Terrain::Draw(state.camera, reg, cache);
         Provinces::DrawProvinces(reg, cache, false);

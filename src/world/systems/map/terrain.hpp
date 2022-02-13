@@ -3,29 +3,26 @@
 //
 #pragma once
 
-#include "../../common.hpp"
+#include "../../../common.hpp"
+#include "../../../resource.hpp"
 #include "../../components/sight.hpp"
 #include "../../components/unit.hpp"
-#include "../../resource.hpp"
 #include "rlgl.h"
 #include "terrain.hpp"
 #include <chrono>
 #include <string>
 
-namespace Terrain
-{
+namespace Terrain {
   const u32 MAP_WIDTH = 128;
   const u32 MAP_HEIGHT = 128;
 
-  enum Visibility
-  {
+  enum Visibility {
     UNEXPLORED,
     EXPLORED,
     VISIBILE,
   };
 
-  enum Biome
-  {
+  enum Biome {
     WATER,
     BEACH,
     LAND,
@@ -55,8 +52,7 @@ namespace Terrain
   inline void FilterIslands(NoiseMap &, f32);
   inline void NormalizeMap(NoiseMap &);
 
-  inline void CreateTerrain(entt::registry &registry)
-  {
+  inline void CreateTerrain(entt::registry &registry) {
     entt::entity entity = registry.create();
     TileMap tileMap = {};
     f32 seed = 25;
@@ -66,8 +62,7 @@ namespace Terrain
     //    FilterIslands(pNoise, waterLevel);
     NormalizeMap(pNoise);
 
-    for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-    {
+    for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++) {
       std::shared_ptr<Tile> tile = std::make_shared<Tile>();
       // tile.id = x + y * 128;
       tile->id = i;
@@ -109,8 +104,7 @@ namespace Terrain
     registry.emplace<TileMap>(entity, tileMap);
   }
 
-  inline void Draw(Camera2D &camera, entt::registry &registry, TextureCache &cache)
-  {
+  inline void Draw(Camera2D &camera, entt::registry &registry, TextureCache &cache) {
     auto tilesView = registry.view<TileMap>();
     auto tilesEntity = tilesView.front();
     TileMap &tileMap = tilesView.get<TileMap>(tilesEntity);
@@ -119,8 +113,7 @@ namespace Terrain
 
     Rectangle frameRec = {1.0f, 1.0f, 128, 128};
 
-    for (std::shared_ptr<Tile> tile: tileMap)
-    {
+    for (std::shared_ptr<Tile> tile: tileMap) {
       f32 padding = 128.0f;
       if (tile->position.x - padding > camera.target.x + (camera.offset.x / camera.zoom) ||
           tile->position.x + padding < camera.target.x - (camera.offset.x / camera.zoom) ||
@@ -130,8 +123,7 @@ namespace Terrain
 
       //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
       //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
-      switch (tile->biome)
-      {
+      switch (tile->biome) {
         case MTNS:
           DrawTextureRec(hex, {frameRec.x + 520, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
           break;
@@ -168,16 +160,14 @@ namespace Terrain
     }
   }
 
-  inline void UpdateFOW(entt::registry &reg)
-  {
-    auto view = reg.view<Unit, Sight>();
+  inline void UpdateFOW(entt::registry &reg) {
+    auto view = reg.view<Components::Unit, Components::Sight>();
     auto tileView = reg.view<TileMap>();
     TileMap tiles = tileView.get<TileMap>(tileView.front());
 
-    for (auto &entity: view)
-    {
-      Sight sight = view.get<Sight>(entity);
-      Unit unit = view.get<Unit>(entity);
+    for (auto &entity: view) {
+      Components::Sight sight = view.get<Components::Sight>(entity);
+      Components::Unit unit = view.get<Components::Unit>(entity);
 
       i32 closestId = DetermineTileIdFromClick(unit.position);
       assert(closestId >= 0);
@@ -195,16 +185,14 @@ namespace Terrain
         tiles[index(x - 1, y - 1)],
       };
 
-      if (y % 2 == 1)
-      {
+      if (y % 2 == 1) {
         neighbors[0] = tiles[index(x + 1, y - 1)];
         neighbors[2] = tiles[index(x + 1, y + 1)];
         neighbors[3] = tiles[index(x, y + 1)];
         neighbors[5] = tiles[index(x, y - 1)];
       }
 
-      for (auto &neighbor: neighbors)
-      {
+      for (auto &neighbor: neighbors) {
         if (neighbor != nullptr)
           neighbor->visibility = VISIBILE;
       }
@@ -215,8 +203,7 @@ namespace Terrain
 
   // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  inline NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias)
-  {
+  inline NoiseMap GeneratePerlinNoise(float seed, int nOctaves, float fBias) {
     srand(seed);
     //    srand(time(NULL));
 
@@ -231,8 +218,7 @@ namespace Terrain
     NoiseMap fOutput;
 
     for (int x = 0; x < MAP_WIDTH; x++)
-      for (int y = 0; y < MAP_HEIGHT; y++)
-      {
+      for (int y = 0; y < MAP_HEIGHT; y++) {
         // used to accumulate the perlin noise for a point, will be normalized in the end
         float fNoise = 0.0f;
         // used to sum all scaling factors, used to normalize our final perlin noise
@@ -240,8 +226,7 @@ namespace Terrain
         // halved for each octave
         float fScale = 1.0f;
 
-        for (int o = 0; o < nOctaves; o++)
-        {
+        for (int o = 0; o < nOctaves; o++) {
           // We need two sample points to linearly interpolate between.
           // The distance between these sample points, is called pitch.
 
@@ -295,11 +280,9 @@ namespace Terrain
     return fOutput;
   }
 
-  inline void FilterIslands(NoiseMap &noiseMap, f32 waterLevel)
-  {
+  inline void FilterIslands(NoiseMap &noiseMap, f32 waterLevel) {
     for (int x = 1; x < MAP_WIDTH - 1; x++)
-      for (int y = 1; y < MAP_HEIGHT - 1; y++)
-      {
+      for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         u32 numWater = 0;
 
         float NE = noiseMap.at(index(x, y - 1));
@@ -326,28 +309,24 @@ namespace Terrain
         if (NW < waterLevel)
           numWater++;
 
-        if (numWater >= 5)
-        {
+        if (numWater >= 5) {
           noiseMap[index(x, y)] = 0.0f;
         }
       }
   }
 
-  inline void NormalizeMap(NoiseMap &pNoise)
-  {
+  inline void NormalizeMap(NoiseMap &pNoise) {
     float min = std::numeric_limits<float>::max();
     float max = 0;
 
-    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
-    {
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++) {
       if (pNoise[x] < min)
         min = pNoise[x];
       if (pNoise[x] > max)
         max = pNoise[x];
     }
 
-    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++)
-    {
+    for (int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++) {
       pNoise[x] = (pNoise[x] - min) / (max - min);
     }
   }

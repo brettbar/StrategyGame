@@ -1,5 +1,5 @@
-#include "../../common.hpp"
-#include "../../resource.hpp"
+#include "../../../common.hpp"
+#include "../../../resource.hpp"
 #include "terrain.hpp"
 #include <array>
 #include <raylib.h>
@@ -7,10 +7,8 @@
 
 #pragma once
 
-namespace Provinces
-{
-  enum Development
-  {
+namespace Provinces {
+  enum Development {
     Village,
     // Civic
     Town,
@@ -83,16 +81,14 @@ namespace Provinces
   inline void UpdateSettlement(Settlement &);
   //  void DrawSingleBorder(Province());
 
-  inline void InitProvinces(entt::registry &reg)
-  {
+  inline void InitProvinces(entt::registry &reg) {
     auto tView = reg.view<Terrain::TileMap>();
     Terrain::TileMap tiles = tView.get<Terrain::TileMap>(tView.front());
 
     entt::entity entity = reg.create();
     ProvinceList provinces;
 
-    for (u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++)
-    {
+    for (u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++) {
       provinces[i] = std::make_shared<Province>(Province{
         .id = i,
         .owner = -1,
@@ -102,25 +98,21 @@ namespace Provinces
     reg.emplace<ProvinceList>(entity, provinces);
   }
 
-  inline void UpdateProvinces(entt::registry &registry)
-  {
+  inline void UpdateProvinces(entt::registry &registry) {
     auto view = registry.view<ProvinceList>();
     ProvinceList &provinces = view.get<ProvinceList>(view.front());
 
-    for (std::shared_ptr<Province> prov: provinces)
-    {
+    for (std::shared_ptr<Province> prov: provinces) {
       if (prov->owner > -1 && prov->settlement != nullptr)
         UpdateSettlement(*prov->settlement);
     }
   }
 
-  inline void UpdateSettlement(Settlement &settlement)
-  {
+  inline void UpdateSettlement(Settlement &settlement) {
     UpdatePopulation(settlement);
   }
 
-  inline void UpdatePopulation(Settlement &settlement)
-  {
+  inline void UpdatePopulation(Settlement &settlement) {
     Population &pop = settlement.population;
     // if growing exponentially
     // P(t) = P0*e^(kt)
@@ -135,8 +127,7 @@ namespace Provinces
   }
 
 
-  inline void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos)
-  {
+  inline void SetProvinceOwner(entt::registry &registry, u32 owner, Vector2 clickPos) {
     i32 provId = DetermineTileIdFromClick(clickPos);
     assert(provId >= 0);
 
@@ -144,17 +135,14 @@ namespace Provinces
     auto provincesEntity = provincesView.front();
     ProvinceList &provinces = provincesView.get<ProvinceList>(provincesEntity);
 
-    for (std::shared_ptr<Provinces::Province> prov: provinces)
-    {
+    for (std::shared_ptr<Provinces::Province> prov: provinces) {
 
-      if (prov->id == (u32) provId)
-      {
+      if (prov->id == (u32) provId) {
         if (prov->tile->biome == Terrain::WATER) continue;
 
         prov->owner = owner;
 
-        if (prov->settlement == nullptr)
-        {
+        if (prov->settlement == nullptr) {
           prov->settlement = std::make_unique<Settlement>();
           prov->settlement->id = prov->id;
           prov->settlement->population = {
@@ -165,8 +153,7 @@ namespace Provinces
             .carryingCapacity = 1000,
           };
 
-          switch (prov->owner)
-          {
+          switch (prov->owner) {
             case 0:
               prov->settlement->name = "Rome";
               break;
@@ -183,21 +170,17 @@ namespace Provinces
               prov->settlement->name = "Persepolis";
               break;
           }
-        }
-        else
-        {
+        } else {
         }
       }
     }
   }
 
-  inline void DrawProvinces(entt::registry &reg, TextureCache &cache, bool showOverlays)
-  {
+  inline void DrawProvinces(entt::registry &reg, TextureCache &cache, bool showOverlays) {
     auto view = reg.view<ProvinceList>();
     ProvinceList &provinces = view.get<ProvinceList>(view.front());
 
-    for (std::shared_ptr<Province> prov: provinces)
-    {
+    for (std::shared_ptr<Province> prov: provinces) {
       // str idString = std::to_string(tile.id);
       // const char *idText = idString.c_str();
       // if (debug)
@@ -225,14 +208,12 @@ namespace Provinces
       //   14,
       //            RED);
 
-      if (prov->owner > -1)
-      {
+      if (prov->owner > -1) {
         Color color = BLACK;
 
         Rectangle frameRec = {0.0, 0.0, 128, 128.0};
 
-        switch (prov->owner)
-        {
+        switch (prov->owner) {
           case 0:
             color = RED;
             frameRec.x = 0.0f;
@@ -260,10 +241,8 @@ namespace Provinces
                          frameRec, prov->tile->position, Fade(WHITE, 0.5));
       }
 
-      if (prov->settlement != nullptr)
-      {
-        if (prov->settlement->population.current > 0)
-        {
+      if (prov->settlement != nullptr) {
+        if (prov->settlement->population.current > 0) {
           Vector2 provPos = prov->tile->position;
 
           // DrawRectangleRec({provPos.x + 50,
