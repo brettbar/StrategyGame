@@ -95,7 +95,6 @@ inline void Renderer::Draw(State &state, entt::registry &reg, TextureCache &cach
     EndShaderMode();
 
     {
-      // UI::Update(state, reg);
       UI::Draw();
     }
 

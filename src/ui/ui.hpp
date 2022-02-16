@@ -61,7 +61,6 @@ namespace UI {
     u32 mouseButton;
   };
 
-
   inline Item *CreateId(i32, ItemType);
 
   inline Context Context = {
@@ -69,28 +68,32 @@ namespace UI {
     .active = -1,
   };
 
-  inline std::vector<Item> userInterface = {
-    {
-      .id = 0,
-      .type = PANEL,
-      .color = BLACK,
-      .dimensions = {0, 0, 80, (f32) GetScreenHeight()},
-      .children = {
-        {
-          .id = 1,
-          .type = BUTTON,
-          .color = WHITE,
-          .dimensions = {0, 0, 60, 60},
-        },
-        {
-          .id = 2,
-          .type = BUTTON,
-          .color = BLUE,
-          .dimensions = {0, 60, 60, 60},
+  inline std::vector<Item> userInterface;
+
+  inline void Init() {
+    userInterface = {
+      {
+        .id = 0,
+        .type = PANEL,
+        .color = BLACK,
+        .dimensions = {0, 0, 80, (f32) GetScreenHeight()},
+        .children = {
+          {
+            .id = 1,
+            .type = BUTTON,
+            .color = WHITE,
+            .dimensions = {0, 0, 60, 60},
+          },
+          {
+            .id = 2,
+            .type = BUTTON,
+            .color = BLUE,
+            .dimensions = {0, 60, 60, 60},
+          },
         },
       },
-    },
-  };
+    };
+  }
 
   inline bool DoButton(Item item, bool inside, bool mouseWentUp, bool mouseWentDown) {
     bool result = false;
@@ -109,20 +112,24 @@ namespace UI {
     if (inside)
       Context.hot = item.id;
 
-    //draw the button
-    //DrawRectangleRec(item.dimensions, item.color);
-
     return result;
   }
 
   inline bool HandleMouseEvent(u32 mouseButton, Vector2 mousePos) {
     for (Item &item: userInterface) {
-
-      if (mouseButton == 0)
-        if (DoButton(item, CheckCollisionPointRec(mousePos, item.dimensions), false, true)) {
-          item.color = RED;
+      for (Item &child: item.children) {
+        if (CheckCollisionPointRec(mousePos, child.dimensions)) {
+          printf("HERE\n");
+          child.color = RED;
           return true;
         }
+      }
+
+      // if (DoButton(item, CheckCollisionPointRec(mousePos, item.dimensions), false, true)) {
+      //   printf("HERE\n");
+      //   item.color = RED;
+      //   return true;
+      // }
     }
     return false;
   }
@@ -130,8 +137,9 @@ namespace UI {
   inline void Draw() {
     for (Item item: userInterface) {
       DrawRectangleRec(item.dimensions, item.color);
+
       for (Item child: item.children) {
-        DrawRectangleRec(item.dimensions, item.color);
+        DrawRectangleRec(child.dimensions, child.color);
       }
     }
   }

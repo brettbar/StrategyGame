@@ -53,6 +53,7 @@ int main(void) {
 
   Init(state, reg, textureCache);
 
+  UI::Init();
   Renderer::Init(state);
 
   // Main game loop
