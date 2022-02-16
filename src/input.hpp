@@ -7,6 +7,7 @@
 #include "common.hpp"
 #include "resource.hpp"
 #include "state.hpp"
+#include "ui/ui.hpp"
 #include "world/systems/map/map.hpp"
 #include "world/systems/map/provinces.hpp"
 #include "world/systems/movement.hpp"
@@ -60,10 +61,12 @@ namespace Input {
 
     if (IsMouseButtonPressed(0)) {
       // UI::Input(state, reg);
-      Selection::UpdateSelection(reg, clickPos);
+      if (!UI::HandleMouseEvent(0, GetMousePosition()))
+        Selection::UpdateSelection(reg, clickPos);
     }
     if (IsMouseButtonPressed(1)) {
-      Movement::SetDestinations(reg, state.camera);
+      if (!UI::HandleMouseEvent(1, GetMousePosition()))
+        Movement::SetDestinations(reg, state.camera);
     }
 
     if (IsKeyPressed(KEY_ONE)) {

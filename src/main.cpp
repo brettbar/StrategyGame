@@ -109,7 +109,7 @@ void Init(State &state, entt::registry &reg, TextureCache &cache) {
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  UI::Build();
+  // UI::Build();
   Terrain::CreateTerrain(reg);
   Provinces::InitProvinces(reg);
 }
