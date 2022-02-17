@@ -1,148 +1,99 @@
 
 #pragma once
 
-#include "../common.hpp"
-#include "../resource.hpp"
-#include "../state.hpp"
-#include "../world/systems/map/provinces.hpp"
+#include "./guilib.hpp"
 #include <raylib.h>
 
-namespace UI {
-  enum ItemType {
-    PANEL,
-    BUTTON,
-  };
+namespace UI
+{
 
-  enum Layout {
-    NONE,
-    HORIZONTAL,
-    VERTICAL
-  };
+inline std::vector<GUI::Item> uiTree;
+inline std::vector<GUI::Item *> uiElements;
 
-  enum Alignment {
-    TL,
-    TC,
-    TR,
-    ML,
-    MC,
-    MR,
-    BL,
-    BC,
-    BR,
-  };
 
-  struct Style {
-    u32 margin;
+inline GUI::Context uiContext = {
+  .hot = nullptr,
+  .active = nullptr,
+};
 
-    Layout layout;
-    Alignment alignment;
-  };
-
-  struct Item {
-    i32 id;
-    i32 owner;
-    i32 index;
-    ItemType type;
-    Color color;
-    Rectangle dimensions;
-    Style style;
-    std::vector<Item> children;
-  };
-  inline bool operator==(const Item &lhs, const Item &rhs) {
-    return (lhs.id == rhs.id);
-  }
-
-  struct Context {
-    i32 hot;
-    i32 active;
-  };
-
-  struct MouseEvent {
-    u32 mouseButton;
-  };
-
-  inline Item *CreateId(i32, ItemType);
-
-  inline Context Context = {
-    .hot = -1,
-    .active = -1,
-  };
-
-  inline std::vector<Item> userInterface;
-
-  inline void Init() {
-    userInterface = {
-      {
-        .id = 0,
-        .type = PANEL,
-        .color = BLACK,
-        .dimensions = {0, 0, 80, (f32) GetScreenHeight()},
-        .children = {
+inline void Init()
+{
+  uiTree = {
+    {
+      .type = GUI::PANEL,
+      .color = BLACK,
+      .dimensions = { 0, 0, 80, (f32) GetScreenHeight() },
+      .children =
+        {
           {
-            .id = 1,
-            .type = BUTTON,
+            .type = GUI::BUTTON,
             .color = WHITE,
-            .dimensions = {0, 0, 60, 60},
+            .dimensions = { 0, 0, 60, 60 },
           },
           {
-            .id = 2,
-            .type = BUTTON,
+            .type = GUI::BUTTON,
             .color = BLUE,
-            .dimensions = {0, 60, 60, 60},
+            .dimensions = { 0, 60, 60, 60 },
           },
         },
-      },
-    };
-  }
+    },
+  };
 
-  inline bool DoButton(Item item, bool inside, bool mouseWentUp, bool mouseWentDown) {
-    bool result = false;
+  uiElements = {};
+  // TODO(optim), I don't need to be storing the children for
+  // each element, space optimization here
+  for ( auto &element: uiTree )
+  {
+    element.index = uiElements.size();
+    uiElements.push_back( &element );
 
-    if (item.id == Context.active) {
-      if (mouseWentUp) {
-        if (item.id == Context.hot)
-          result = true;// do the button action
-        Context.active = -1;
-      }
-    } else if (item.id == Context.hot) {
-      if (mouseWentDown)
-        Context.active = item.id;
-    }
-
-    if (inside)
-      Context.hot = item.id;
-
-    return result;
-  }
-
-  inline bool HandleMouseEvent(u32 mouseButton, Vector2 mousePos) {
-    for (Item &item: userInterface) {
-      for (Item &child: item.children) {
-        if (CheckCollisionPointRec(mousePos, child.dimensions)) {
-          printf("HERE\n");
-          child.color = RED;
-          return true;
-        }
-      }
-
-      // if (DoButton(item, CheckCollisionPointRec(mousePos, item.dimensions), false, true)) {
-      //   printf("HERE\n");
-      //   item.color = RED;
-      //   return true;
-      // }
-    }
-    return false;
-  }
-
-  inline void Draw() {
-    for (Item item: userInterface) {
-      DrawRectangleRec(item.dimensions, item.color);
-
-      for (Item child: item.children) {
-        DrawRectangleRec(child.dimensions, child.color);
-      }
+    for ( auto &child: element.children )
+    {
+      child.index = uiElements.size();
+      uiElements.push_back( &child );
     }
   }
+}
 
+inline bool HandleMouseEvent( u32 mouseButton, Vector2 mousePos ) {}
 
-}// namespace UI
+inline void Update()
+{
+  Vector2 mousePos = GetMousePosition();
+  const bool mouseWentUp = IsMouseButtonReleased( 0 );
+  const bool mouseWentDown = IsMouseButtonPressed( 0 );
+
+  if ( mouseWentDown ) PrintVec2( mousePos );
+
+  for ( GUI::Item *item: uiElements )
+  {
+    if (
+      item->type == GUI::BUTTON &&
+      DoButton(
+        uiContext,
+        item,
+        CheckCollisionPointRec( mousePos, item->dimensions ),
+        mouseWentUp,
+        mouseWentDown ) )
+    {
+      printf( "%d\n", item->index );
+      item->color = RED;
+    }
+  }
+}
+
+inline void Draw()
+{
+  // @TODO(gen) maybe this goes in a fixed update loop instead of draw?
+  // Update();
+
+  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+  DrawFPS( GetScreenWidth() - 100, 2 );
+
+  for ( GUI::Item *item: uiElements )
+  {
+    DrawRectangleRec( item->dimensions, item->color );
+  }
+}
+
+};// namespace UI

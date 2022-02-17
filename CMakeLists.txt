@@ -12,6 +12,7 @@ add_executable(
   ${PROJECT_NAME} src/main.cpp
   include/raygui.h
   src/ui/ui.hpp
+  src/ui/guilib.hpp
   src/renderer/renderer.hpp
   src/editor/editor.hpp
   src/world/player.hpp
