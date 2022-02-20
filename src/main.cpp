@@ -54,7 +54,6 @@ int main( void )
   TextureCache textureCache = {};
 
   Init( state, reg, textureCache );
-
   UI::Init();
   Renderer::Init( state );
 
@@ -78,7 +77,6 @@ int main( void )
     while ( lag >= MS_PER_UPDATE )
     {
       Update( state, reg );
-      UI::Update();
       lag -= MS_PER_UPDATE;
     }
 
@@ -105,8 +103,10 @@ void Init( State &state, entt::registry &reg, TextureCache &cache )
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   InitWindow(
-    GetScreenWidth(),
-    GetScreenHeight(),
+    1920,
+    1080,
+    // GetScreenWidth(),
+    // GetScreenHeight(),
     "raylib [core] example - basic window" );
 
   LoadResources( cache );
@@ -120,7 +120,6 @@ void Init( State &state, entt::registry &reg, TextureCache &cache )
   };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
-  // UI::Build();
   Terrain::CreateTerrain( reg );
   Provinces::InitProvinces( reg );
 }

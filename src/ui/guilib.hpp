@@ -1,14 +1,16 @@
 #pragma once
 
 #include "../common.hpp"
+#include <raylib.h>
 
 namespace GUI
 {
 
-enum ItemType
+enum Type
 {
   PANEL,
-  BUTTON
+  BUTTON,
+  TEXT_BUTTON,
 };
 
 enum Layout
@@ -18,67 +20,78 @@ enum Layout
   VERTICAL
 };
 
-enum Alignment
-{
-  TL,
-  TC,
-  TR,
-  ML,
-  MC,
-  MR,
-  BL,
-  BC,
-  BR
+struct Context {
+  i32 hot;
+  i32 active;
 };
 
-struct Style {
-  u32 margin;
-  Layout layout;
-  Alignment alignment;
-};
 
 struct Item {
-  i32 owner;
-  i32 index;
-  ItemType type;
+  Type type;
   Color color;
   Rectangle dimensions;
-  Style stye;
-  std::vector<Item> children;
-};
-// inline bool operator==( const Item &lhs, const Item &rhs )
-// {
-//   return lhs.id == rhs.id;
-// }
 
-struct Context {
-  Item *hot;
-  Item *active;
+  std::string text;
 };
 
+struct ItemId {
+  i32 index;
+  Item item;
+  bool operator==( const ItemId &rhs ) { return this->index == rhs.index; };
+};
+
+template<typename T>
+struct Panel {
+  i32 index;
+  Type type;
+  Color color;
+  Rectangle dimensions;
+  std::vector<ItemId> children;
+};
+
+
+template<typename T>
 inline bool DoButton(
   Context &context,
-  GUI::Item *item,
+  ItemId &itemId,
   bool inside,
   bool mouseWentUp,
   bool mouseWentDown )
 {
   bool result = false;
 
-  if ( item == context.active )
+  if ( itemId.index == context.active )
   {
     if ( mouseWentUp )
     {
-      if ( item == context.hot ) result = true;// do the button action
-      context.active = nullptr;
+      if ( itemId.index == context.hot ) result = true;// do the button action
+      context.active = -1;
     }
   }
-  else if ( item == context.hot )
+  else if ( itemId.index == context.hot )
   {
-    if ( mouseWentDown ) context.active = item;
+    if ( mouseWentDown ) context.active = itemId.index;
   }
 
-  if ( inside ) context.hot = item;
+  if ( inside )
+  {
+    if ( context.active == -1 ) context.hot = itemId.index;
+  }
+
+
+  switch ( itemId.item.type )
+  {
+    case TEXT_BUTTON:
+      DrawRectangleRec( itemId.item.dimensions, itemId.item.color );
+      DrawText(
+        itemId.item.text.c_str(),
+        itemId.item.dimensions.x,
+        itemId.item.dimensions.y + ( 0.5 * itemId.item.dimensions.height ),
+        20,
+        RED );
+      break;
+  }
+
 
   return result;
 }

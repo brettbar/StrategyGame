@@ -4,96 +4,115 @@
 #include "./guilib.hpp"
 #include <raylib.h>
 
+
 namespace UI
 {
 
-inline std::vector<GUI::Item> uiTree;
-inline std::vector<GUI::Item *> uiElements;
-
+inline std::vector<GUI::Panel> uiTree;
+// inline std::vector<std::shared_ptr<GUI::ItemId>> uiElements;
 
 inline GUI::Context uiContext = {
-  .hot = nullptr,
-  .active = nullptr,
+  .hot = -1,
+  .active = -1,
 };
 
 inline void Init()
 {
   uiTree = {
-    {
+    GUI::Panel{
+      .index = 0,
       .type = GUI::PANEL,
       .color = BLACK,
       .dimensions = { 0, 0, 80, (f32) GetScreenHeight() },
       .children =
         {
-          {
-            .type = GUI::BUTTON,
-            .color = WHITE,
-            .dimensions = { 0, 0, 60, 60 },
+          GUI::ItemId{
+            .index = 1,
+            .item =
+              GUI::Item{
+                .type = GUI::TEXT_BUTTON,
+                .color = WHITE,
+                .dimensions = { 5, 5, 60, 60 },
+                .text = "HELLO",
+              },
           },
-          {
-            .type = GUI::BUTTON,
-            .color = BLUE,
-            .dimensions = { 0, 60, 60, 60 },
+          GUI::ItemId{
+            .index = 2,
+            .item =
+              {
+                .type = GUI::BUTTON,
+                .color = BLUE,
+                .dimensions = { 5, 65, 60, 60 },
+              },
           },
         },
     },
   };
-
-  uiElements = {};
-  // TODO(optim), I don't need to be storing the children for
-  // each element, space optimization here
-  for ( auto &element: uiTree )
-  {
-    element.index = uiElements.size();
-    uiElements.push_back( &element );
-
-    for ( auto &child: element.children )
-    {
-      child.index = uiElements.size();
-      uiElements.push_back( &child );
-    }
-  }
 }
-
-inline bool HandleMouseEvent( u32 mouseButton, Vector2 mousePos ) {}
-
-inline void Update()
-{
-  Vector2 mousePos = GetMousePosition();
-  const bool mouseWentUp = IsMouseButtonReleased( 0 );
-  const bool mouseWentDown = IsMouseButtonPressed( 0 );
-
-  if ( mouseWentDown ) PrintVec2( mousePos );
-
-  for ( GUI::Item *item: uiElements )
-  {
-    if (
-      item->type == GUI::BUTTON &&
-      DoButton(
-        uiContext,
-        item,
-        CheckCollisionPointRec( mousePos, item->dimensions ),
-        mouseWentUp,
-        mouseWentDown ) )
-    {
-      printf( "%d\n", item->index );
-      item->color = RED;
-    }
-  }
-}
+}// namespace UI
 
 inline void Draw()
 {
-  // @TODO(gen) maybe this goes in a fixed update loop instead of draw?
-  // Update();
+  // Vector2 mousePos = GetMousePosition();
+  bool mouseWentUp = IsMouseButtonReleased( 0 );
+  bool mouseWentDown = IsMouseButtonPressed( 0 );
 
-  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-  DrawFPS( GetScreenWidth() - 100, 2 );
+  // if ( mouseWentDown )
+  // {
+  //   printf( "down " );
+  //   PrintVec2( mousePos );
 
-  for ( GUI::Item *item: uiElements )
+  //   printf( "Hot: %d\n", uiContext.hot );
+  //   printf( "Active: %d\n", uiContext.active );
+  // }
+  // if ( mouseWentUp )
+  // {
+  //   printf( "up" );
+  //   PrintVec2( mousePos );
+  // }
+
+  bool overAnyElem = false;
+
+  for ( auto &panel: uiTree )
   {
-    DrawRectangleRec( item->dimensions, item->color );
+    DrawRectangleRec( panel.dimensions, panel.color );
+    for ( auto &child: panel.children )
+    {
+
+      bool inside =
+        CheckCollisionPointRec( GetMousePosition(), child.item.dimensions );
+
+      if ( !overAnyElem ) overAnyElem = inside;
+
+
+      // if ( inside ) std::cout << "Inside rect: " << child.index << "\n";
+
+      if ( DoButton( uiContext, child, inside, mouseWentUp, mouseWentDown ) )
+      {
+        child.item.color = GREEN;
+      }
+    }
+  }
+
+  if ( !overAnyElem )
+  {
+    uiContext.hot = -1;
+    uiContext.active = -1;
   }
 }
 
-};// namespace UI
+// inline void Draw()
+// {
+//   // @TODO(gen) maybe this goes in a fixed update loop instead of draw?
+//   // Update();
+
+//   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+//   DrawFPS( GetScreenWidth() - 100, 2 );
+
+//   for ( std::shared_ptr<GUI::ItemId> id: uiElements )
+//   {
+//     DrawRectangleRec( id->item.dimensions, id->item.color );
+//   }
+// }
+}
+;// namespace UI

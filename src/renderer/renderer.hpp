@@ -8,20 +8,22 @@
 #include "../world/systems/map/provinces.hpp"
 #include "rlgl.h"
 
-namespace Renderer {
-  Shader shader;
-
-  void Init(State &);
-  void Draw(State &, entt::registry &, TextureCache &);
+namespace Renderer
+{
+Shader shader;
+
+void Init( State & );
+void Draw( State &, entt::registry &, TextureCache & );
 };// namespace Renderer
 
-inline void Renderer::Init(State &state) {
+inline void Renderer::Init( State &state )
+{
 
   //  Matrix matProj = MatrixOrtho(0.0, state.screenWidth, state.screenHeight, 0.0, 0.0, 1.0);
   //  Matrix matView = MatrixIdentity();
 
   //  Shader shader = LoadShader("assets/shaders/pixel.vs", "assets/shaders/pixel.fs");
-  Shader shader = LoadShader(0, 0);
+  Shader shader = LoadShader( 0, 0 );
 
   //  rlSetMatrixModelview(matView);
   //  rlSetMatrixProjection(matProj);
@@ -39,10 +41,12 @@ inline void Renderer::Init(State &state) {
 }
 
 
-inline void Renderer::Draw(State &state, entt::registry &reg, TextureCache &cache) {
+inline void
+Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
+{
   BeginDrawing();
   {
-    ClearBackground(DARKGRAY);
+    ClearBackground( DARKGRAY );
 
     //    BeginShaderMode(shader);
     //      BeginMode2D(state.camera);
@@ -85,18 +89,16 @@ inline void Renderer::Draw(State &state, entt::registry &reg, TextureCache &cach
     //    SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
 
 
-    BeginShaderMode(shader);
-    BeginMode2D(state.camera);
+    BeginShaderMode( shader );
+    BeginMode2D( state.camera );
     {
-      Map::Draw(state, reg, cache);
-      Animation::Draw(reg, state.gameState == GameState::EDITOR);
+      Map::Draw( state, reg, cache );
+      Animation::Draw( reg, state.gameState == GameState::EDITOR );
     }
     EndMode2D();
     EndShaderMode();
 
-    {
-      UI::Draw();
-    }
+    UI::Draw();
 
     // if (state.gameState == EDITOR)
     //   Editor::Draw();
