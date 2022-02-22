@@ -40,7 +40,6 @@ struct ItemId {
   bool operator==( const ItemId &rhs ) { return this->index == rhs.index; };
 };
 
-template<typename T>
 struct Panel {
   i32 index;
   Type type;
@@ -50,7 +49,6 @@ struct Panel {
 };
 
 
-template<typename T>
 inline bool DoButton(
   Context &context,
   ItemId &itemId,

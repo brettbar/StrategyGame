@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "../events.hpp"
 #include "./guilib.hpp"
 #include <raylib.h>
 
@@ -33,7 +34,7 @@ inline void Init()
                 .type = GUI::TEXT_BUTTON,
                 .color = WHITE,
                 .dimensions = { 5, 5, 60, 60 },
-                .text = "HELLO",
+                .text = "Spawn",
               },
           },
           GUI::ItemId{
@@ -49,33 +50,19 @@ inline void Init()
     },
   };
 }
-}// namespace UI
+
 
 inline void Draw()
 {
   // Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
-
-  // if ( mouseWentDown )
-  // {
-  //   printf( "down " );
-  //   PrintVec2( mousePos );
-
-  //   printf( "Hot: %d\n", uiContext.hot );
-  //   printf( "Active: %d\n", uiContext.active );
-  // }
-  // if ( mouseWentUp )
-  // {
-  //   printf( "up" );
-  //   PrintVec2( mousePos );
-  // }
-
   bool overAnyElem = false;
 
   for ( auto &panel: uiTree )
   {
     DrawRectangleRec( panel.dimensions, panel.color );
+
     for ( auto &child: panel.children )
     {
 
@@ -90,6 +77,8 @@ inline void Draw()
       if ( DoButton( uiContext, child, inside, mouseWentUp, mouseWentDown ) )
       {
         child.item.color = GREEN;
+        Events::emitter.publish<Events::Event>(
+          Events::PROVINCES_SPAWN_PROVINCE );
       }
     }
   }
@@ -114,5 +103,4 @@ inline void Draw()
 //     DrawRectangleRec( id->item.dimensions, id->item.color );
 //   }
 // }
-}
-;// namespace UI
+};// namespace UI

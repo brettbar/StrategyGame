@@ -58,7 +58,7 @@ inline i32 DetermineTileIdFromClick( Vector2 clickPos )
   return column + row * 128;
 }
 
-inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos )
+inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos )
 {
   i32 x = inputPos.x;
   i32 y = inputPos.y;
@@ -111,7 +111,7 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos )
   return std::make_unique<Vector2>( Vector2{ tileOrigX, tileOrigY } );
 }
 
-inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos )
+inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos )
 {
   i32 x = inputPos.x;
   i32 y = inputPos.y;

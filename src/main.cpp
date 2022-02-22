@@ -10,6 +10,7 @@ TEMPORARY TODOS HERE
   @TODO a more general clean up of the code
 */
 #include "editor/editor.hpp"
+#include "events.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "resource.hpp"
@@ -24,12 +25,10 @@ TEMPORARY TODOS HERE
 #include "world/systems/spawn.hpp"
 #include <raylib.h>
 
-
 void LoadResources( TextureCache & );
 bool GameIsRunning();
 void CameraUpdate( Camera2D &, f32 );
 void ZoomCamera( Camera2D &, f32, Vector2 );
-
 
 void Init( State &, entt::registry &, TextureCache & );
 void Update( State &, entt::registry & );
@@ -43,19 +42,32 @@ int main( void )
     .mapHeight = 128,
     .timeScale = 0.0f,
     .prevTimeScale = 1.0f,
-    .gameState = GAME,
+    .gameState = EDITOR,
     .month = 1,
     .year = 4,
     .startYear = 4,
     .currPlayer =
-      std::make_shared<Player>( Player( 0, ROMANS, "Roman Republic" ) ) };
+      std::make_shared<Player>( Player( 0, ROMANS, "Roman Republic" ) ),
+  };
 
   entt::registry reg;
   TextureCache textureCache = {};
 
+
   Init( state, reg, textureCache );
   UI::Init();
   Renderer::Init( state );
+
+
+  // auto eventConn = UI::eventEmitter.on<UI::Event>(
+  //   [&reg, &state]( const UI::Event &event, UI::EventEmitter &emitter ) {
+  //     switch ( event.type )
+  //     {
+  //       case UI::PROVINCES_SPAWN_PROVINCE:
+  //         Provinces::SpawnProvince( reg, state.currPlayer->id );
+  //         break;
+  //     }
+  //   } );
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -94,6 +106,7 @@ int main( void )
   Exit( textureCache );
 
   UnloadShader( Renderer::shader );
+  // @TODO figure out all deallocs or whatever
 
   return 0;
 }
@@ -134,7 +147,7 @@ void Update( State &state, entt::registry &reg )
 
 void LateUpdate( State &state, entt::registry &reg )
 {
-  Provinces::UpdateProvinces( reg );
+  Provinces::UpdateProvinces( state, reg );
 
   state.day++;
 
