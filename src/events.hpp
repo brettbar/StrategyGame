@@ -10,15 +10,19 @@ namespace Events
 enum EventType
 {
   PROVINCES_SPAWN_PROVINCE,
+  SPAWN_DELETE_SPAWNED,
 };
 
 struct Event {
   EventType type;
 };
 
-struct EventEmitter : entt::emitter<EventEmitter> {
-};
+// struct ProvincesEvent : Event {
+// };
 
-EventEmitter emitter{};
+// struct SpawnEvent : Event {
+// };
+
+inline entt::dispatcher dispatcher{};
 
 };// namespace Events

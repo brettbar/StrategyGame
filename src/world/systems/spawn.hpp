@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common.hpp"
+#include "../../events.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
@@ -11,6 +12,8 @@
 
 namespace Spawn
 {
+
+inline void DeleteSelected( entt::registry & );
 
 Texture2D DetermineTexture( Faction, TextureCache & );
 
@@ -33,4 +36,19 @@ inline void CreateNew(
   reg.emplace<Components::Animated>( entity, actor.animated );
   reg.emplace<Components::Sight>( entity, actor.sight );
 }
+
+inline void DeleteSelected( entt::registry &reg )
+{
+  auto selectedView = reg.view<Components::Selected, Components::Unit>();
+  auto selectedEntity = selectedView.front();
+
+  if ( selectedEntity == entt::null )
+  {
+    printf( "No selected entity, cancelling\n" );
+    return;
+  }
+
+  reg.destroy( selectedEntity );
+}
+
 };// namespace Spawn

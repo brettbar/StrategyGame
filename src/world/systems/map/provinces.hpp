@@ -1,6 +1,7 @@
 #include "../../../common.hpp"
 #include "../../../events.hpp"
 #include "../../../resource.hpp"
+#include "../spawn.hpp"
 #include "terrain.hpp"
 #include <array>
 #include <raylib.h>
@@ -10,7 +11,31 @@
 
 namespace Provinces
 {
+
 inline void SpawnProvince( entt::registry &, u32 );
+
+struct Listener {
+  State *currState;
+  entt::registry *currReg;
+
+  void receive( const Events::Event &event )
+  {
+    switch ( event.type )
+    {
+      case Events::PROVINCES_SPAWN_PROVINCE:
+        printf( "Provinces got an event!\n" );
+        SpawnProvince( *currReg, currState->currPlayer->id );
+        break;
+      case Events::SPAWN_DELETE_SPAWNED:
+        printf( "Spawn got an event!\n" );
+        Spawn::DeleteSelected( *currReg );
+        break;
+    }
+  }
+};
+
+inline Listener listener;
+
 
 enum Development
 {
@@ -87,7 +112,7 @@ inline void UpdateSettlement( Settlement & );
 //  void DrawSingleBorder(Province());
 
 
-inline void InitProvinces( entt::registry &reg )
+inline void InitProvinces( State &state, entt::registry &reg )
 {
   auto tView = reg.view<Terrain::TileMap>();
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
@@ -101,11 +126,22 @@ inline void InitProvinces( entt::registry &reg )
       Province{ .id = i, .owner = -1, .tile = tiles[i] } );
   }
 
+
+  Events::dispatcher.sink<Events::Event>().connect<&Listener::receive>(
+    listener );
+
   reg.emplace<ProvinceList>( entity, provinces );
 }
 
+
 inline void UpdateProvinces( State &state, entt::registry &reg )
 {
+  listener = {
+    .currState = &state,
+    .currReg = &reg,
+  };
+  // Events::dispatcher.update<Events::ProvincesEvent>();
+
   auto view = reg.view<ProvinceList>();
   ProvinceList &provinces = view.get<ProvinceList>( view.front() );
 
@@ -114,18 +150,6 @@ inline void UpdateProvinces( State &state, entt::registry &reg )
     if ( prov->owner > -1 && prov->settlement != nullptr )
       UpdateSettlement( *prov->settlement );
   }
-
-
-  Events::emitter.on<Events::Event>(
-    [&reg,
-     &state]( const Events::Event &event, Events::EventEmitter &emitter ) {
-      switch ( event.type )
-      {
-        case Events::PROVINCES_SPAWN_PROVINCE:
-          SpawnProvince( reg, state.currPlayer->id );
-          break;
-      }
-    } );
 }
 
 inline void UpdateSettlement( Settlement &settlement )
@@ -262,9 +286,6 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
             prov->settlement->name = "Persepolis";
             break;
         }
-      }
-      else
-      {
       }
     }
   }

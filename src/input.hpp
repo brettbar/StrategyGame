@@ -73,12 +73,12 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache )
   {
     // UI::Input(state, reg);
     // if ( !UI::HandleMouseEvent( 0, GetMousePosition() ) )
-    Selection::UpdateSelection( reg, clickPos );
+    if ( !UI::MouseWasOverUI() ) Selection::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) )
   {
     // if ( !UI::HandleMouseEvent( 1, GetMousePosition() ) )
-    Movement::SetDestinations( reg, state.camera );
+    if ( !UI::MouseWasOverUI() ) Movement::SetDestinations( reg, state.camera );
   }
 
   if ( IsKeyPressed( KEY_ONE ) )

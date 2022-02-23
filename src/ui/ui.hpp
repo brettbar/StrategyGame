@@ -51,6 +51,29 @@ inline void Init()
   };
 }
 
+inline bool MouseWasOverUI()
+{
+  bool inside = false;
+
+  for ( auto &panel: uiTree )
+  {
+    inside = CheckCollisionPointRec( GetMousePosition(), panel.dimensions );
+
+    if ( inside ) return true;
+
+    for ( auto &child: panel.children )
+    {
+
+      inside =
+        CheckCollisionPointRec( GetMousePosition(), child.item.dimensions );
+
+      if ( inside ) return true;
+    }
+  }
+
+  return inside;
+}
+
 
 inline void Draw()
 {
@@ -77,8 +100,10 @@ inline void Draw()
       if ( DoButton( uiContext, child, inside, mouseWentUp, mouseWentDown ) )
       {
         child.item.color = GREEN;
-        Events::emitter.publish<Events::Event>(
+        Events::dispatcher.trigger<Events::Event>(
           Events::PROVINCES_SPAWN_PROVINCE );
+        Events::dispatcher.trigger<Events::Event>(
+          Events::SPAWN_DELETE_SPAWNED );
       }
     }
   }
