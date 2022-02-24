@@ -25,6 +25,12 @@ add_executable(
   src/world/systems/spawn.hpp
   src/world/entities/archetypes.hpp
   src/world/components/actor.hpp
+  src/world/components/animated.hpp
+  src/world/components/province.hpp
+  src/world/components/selected.hpp
+  src/world/components/sight.hpp
+  src/world/components/tile.hpp
+  src/world/components/unit.hpp
   src/world/systems/actors.hpp
   src/input.hpp
   src/common.hpp

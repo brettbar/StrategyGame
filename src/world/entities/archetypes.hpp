@@ -10,42 +10,44 @@
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
 
-namespace Archetypes {
+namespace Archetypes
+{
 
-  struct Actor {
-    Components::Unit unit;
-    Components::Animated animated;
-    Components::Sight sight;
+struct Actor {
+  c_Unit::Unit unit;
+  c_Animated::Animated animated;
+  c_Sight::Sight sight;
 
-    Components::Animations animations;
+  c_Animated::Animations animations;
 
-    Actor(Texture2D sprite, Vector2 spawn) {
-      unit = Components::Unit{
-        .position = spawn,
-        .destination = spawn,
-        .speed = 1.0f,
-      };
-      animations = {
-        {Components::IDLE_DR, 2, 0.2f},
-        {Components::IDLE_DL, 2, 0.2f},
-        {Components::WALK_DL, 8, 0.8f},
-        {Components::WALK_DL, 8, 0.8f},
-      };
-      animated = Components::Animated{
-        .sprite = sprite,
-        .frameRec = {0, 0, 128, 128},
-        .state = Components::IDLE_DR,
-        .animations = animations,
-        .direction = 0,
-        .currFrame = 0,
-        .animTime = 0.0f,
-        .moving = false,
-      };
-      sight = Components::Sight{
-        .range = 1,
-      };
-    }
-  };
+  Actor( Texture2D sprite, Vector2 spawn )
+  {
+    unit = c_Unit::Unit{
+      .position = spawn,
+      .destination = spawn,
+      .speed = 1.0f,
+    };
+    animations = {
+      { c_Animated::IDLE_DR, 2, 0.2f },
+      { c_Animated::IDLE_DL, 2, 0.2f },
+      { c_Animated::WALK_DL, 8, 0.8f },
+      { c_Animated::WALK_DL, 8, 0.8f },
+    };
+    animated = c_Animated::Animated{
+      .sprite = sprite,
+      .frameRec = { 0, 0, 128, 128 },
+      .state = c_Animated::IDLE_DR,
+      .animations = animations,
+      .direction = 0,
+      .currFrame = 0,
+      .animTime = 0.0f,
+      .moving = false,
+    };
+    sight = c_Sight::Sight{
+      .range = 1,
+    };
+  }
+};
 
 
 };// namespace Archetypes

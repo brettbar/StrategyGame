@@ -1,16 +1,14 @@
 #pragma once
 
-#include "components.hpp"
+#include "../../common.hpp"
 
-namespace Components
+namespace c_Unit
 {
-  struct Unit {
-    Vector2 position;
-    Vector2 destination;
-    f32 speed;
-  };
 
-  struct Selected {
-    bool isSelected;
-  };
-}// namespace Components
+struct Unit {
+  Vector2 position;
+  Vector2 destination;
+  f32 speed;
+};
+
+}// namespace c_Unit

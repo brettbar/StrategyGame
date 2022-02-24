@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include "components.hpp"
+#include "../../common.hpp"
 
 
-namespace Components
+namespace c_Sight
 {
-  struct Sight {
-    u32 range;
-  };
-}
+struct Sight {
+  u32 range;
+};
+}// namespace c_Sight

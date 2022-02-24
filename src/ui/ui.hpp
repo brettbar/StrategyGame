@@ -48,6 +48,19 @@ inline void Init()
           },
         },
     },
+    GUI::Panel{
+      .index = 3,
+      .type = GUI::PANEL,
+      .color = RED,
+      .dimensions =
+        {
+          (f32) ( GetScreenWidth() / 2.0f ) - 400,
+          (f32) GetScreenHeight() - 200,
+          400,
+          200,
+        },
+      .children = {},
+    },
   };
 }
 

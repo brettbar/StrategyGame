@@ -3,6 +3,7 @@
 #include "../../common.hpp"
 #include "../../events.hpp"
 #include "../components/animated.hpp"
+#include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
 #include "../entities/archetypes.hpp"
@@ -32,14 +33,14 @@ inline void CreateNew(
     cache.handle( currPlayer->textureMap.at( "Villager" ) )->texture;
   Archetypes::Actor actor = Archetypes::Actor( tex, *spawn );
 
-  reg.emplace<Components::Unit>( entity, actor.unit );
-  reg.emplace<Components::Animated>( entity, actor.animated );
-  reg.emplace<Components::Sight>( entity, actor.sight );
+  reg.emplace<c_Unit::Unit>( entity, actor.unit );
+  reg.emplace<c_Animated::Animated>( entity, actor.animated );
+  reg.emplace<c_Sight::Sight>( entity, actor.sight );
 }
 
 inline void DeleteSelected( entt::registry &reg )
 {
-  auto selectedView = reg.view<Components::Selected, Components::Unit>();
+  auto selectedView = reg.view<c_Selected::Selected, c_Unit::Unit>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null )

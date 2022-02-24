@@ -1,6 +1,7 @@
 #include "../../../common.hpp"
 #include "../../../events.hpp"
 #include "../../../resource.hpp"
+#include "../../components/province.hpp"
 #include "../spawn.hpp"
 #include "terrain.hpp"
 #include <array>
@@ -20,6 +21,11 @@ struct Listener {
 
   void receive( const Events::Event &event )
   {
+    if ( currState == nullptr || currReg == nullptr )
+    {
+      return;
+    }
+
     switch ( event.type )
     {
       case Events::PROVINCES_SPAWN_PROVINCE:
@@ -37,78 +43,13 @@ struct Listener {
 inline Listener listener;
 
 
-enum Development
-{
-  Village,
-  // Civic
-  Town,
-  City,
-  Metropolis,
-  // Martial
-  Fort,
-  Fortress,
-  Citadel,
-};
-
-struct Population {
-  u32 current;
-
-  // births per 1000 people
-  // higher when health is higher and degeneracy is lower
-  f32 birthRate;
-  // deaths per 1000 people
-  // higher when health is lower
-  f32 deathRate;
-
-  // birthRate - deathRate
-  f32 growthRate;
-
-  // higher when disease and famine are lower
-  f32 health;
-
-  // higher when the current population is higher
-  f32 foodConsumption;
-
-  // higher when food foodConsumption is lower and external factors
-  f32 foodAvailability;
-
-  // higher when food consumption is higher and foodAvailability is lower
-  f32 famine;
-
-  // higher when density is higher, degeneracy is higher, and external factors
-  f32 disease;
-
-  // higher by external factors
-  f32 degeneracy;
-
-  // d = current / carryingCapacity
-  f32 density;
-
-  // higher when settlment development is higher
-  f32 carryingCapacity;
-};
-
-struct Settlement {
-  u32 id;
-  str name;
-  Development development;
-  Population population;
-};
-
-struct Province {
-  u32 id;
-  i32 owner;
-
-  std::unique_ptr<Settlement> settlement;
-  std::shared_ptr<Terrain::Tile> tile;
-};
-
-using ProvinceList = std::
-  array<std::shared_ptr<Province>, Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
+using ProvinceList = std::array<
+  std::shared_ptr<c_Province::Province>,
+  Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
 
 void DrawProvinces( entt::registry &, TextureCache &, bool );
-inline void UpdatePopulation( Settlement & );
-inline void UpdateSettlement( Settlement & );
+inline void UpdatePopulation( c_Province::Settlement & );
+inline void UpdateSettlement( c_Province::Settlement & );
 //  void DrawSingleBorder(Province());
 
 
@@ -122,8 +63,8 @@ inline void InitProvinces( State &state, entt::registry &reg )
 
   for ( u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++ )
   {
-    provinces[i] = std::make_shared<Province>(
-      Province{ .id = i, .owner = -1, .tile = tiles[i] } );
+    provinces[i] = std::make_shared<c_Province::Province>(
+      c_Province::Province{ .id = i, .owner = -1, .tile = tiles[i] } );
   }
 
 
@@ -145,21 +86,21 @@ inline void UpdateProvinces( State &state, entt::registry &reg )
   auto view = reg.view<ProvinceList>();
   ProvinceList &provinces = view.get<ProvinceList>( view.front() );
 
-  for ( std::shared_ptr<Province> prov: provinces )
+  for ( std::shared_ptr<c_Province::Province> prov: provinces )
   {
     if ( prov->owner > -1 && prov->settlement != nullptr )
       UpdateSettlement( *prov->settlement );
   }
 }
 
-inline void UpdateSettlement( Settlement &settlement )
+inline void UpdateSettlement( c_Province::Settlement &settlement )
 {
   UpdatePopulation( settlement );
 }
 
-inline void UpdatePopulation( Settlement &settlement )
+inline void UpdatePopulation( c_Province::Settlement &settlement )
 {
-  Population &pop = settlement.population;
+  c_Province::Population &pop = settlement.population;
   // if growing exponentially
   // P(t) = P0*e^(kt)
 
@@ -183,18 +124,18 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos )
   auto provincesEntity = provincesView.front();
   ProvinceList &provinces = provincesView.get<ProvinceList>( provincesEntity );
 
-  for ( std::shared_ptr<Provinces::Province> prov: provinces )
+  for ( std::shared_ptr<c_Province::Province> prov: provinces )
   {
 
     if ( prov->id == (u32) provId )
     {
-      if ( prov->tile->biome == Terrain::WATER ) continue;
+      if ( prov->tile->biome == c_Tile::WATER ) continue;
 
       prov->owner = owner;
 
       if ( prov->settlement == nullptr )
       {
-        prov->settlement = std::make_unique<Settlement>();
+        prov->settlement = std::make_unique<c_Province::Settlement>();
         prov->settlement->id = prov->id;
         prov->settlement->population = {
           .current = 200,
@@ -229,7 +170,7 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos )
 
 inline void SpawnProvince( entt::registry &reg, u32 owner )
 {
-  auto selectedView = reg.view<Components::Selected, Components::Unit>();
+  auto selectedView = reg.view<c_Selected::Selected, c_Unit::Unit>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null )
@@ -238,7 +179,7 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
     return;
   }
 
-  Components::Unit &unit = selectedView.get<Components::Unit>( selectedEntity );
+  c_Unit::Unit &unit = selectedView.get<c_Unit::Unit>( selectedEntity );
 
   i32 provId = DetermineTileIdFromClick( unit.position );
   assert( provId >= 0 );
@@ -247,18 +188,18 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
   auto provincesEntity = provincesView.front();
   ProvinceList &provinces = provincesView.get<ProvinceList>( provincesEntity );
 
-  for ( std::shared_ptr<Provinces::Province> prov: provinces )
+  for ( std::shared_ptr<c_Province::Province> prov: provinces )
   {
 
     if ( prov->id == (u32) provId )
     {
-      if ( prov->tile->biome == Terrain::WATER ) continue;
+      if ( prov->tile->biome == c_Tile::WATER ) continue;
 
       prov->owner = owner;
 
       if ( prov->settlement == nullptr )
       {
-        prov->settlement = std::make_unique<Settlement>();
+        prov->settlement = std::make_unique<c_Province::Settlement>();
         prov->settlement->id = prov->id;
         prov->settlement->population = {
           .current = 200,
@@ -298,7 +239,7 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays )
   auto view = reg.view<ProvinceList>();
   ProvinceList &provinces = view.get<ProvinceList>( view.front() );
 
-  for ( std::shared_ptr<Province> prov: provinces )
+  for ( std::shared_ptr<c_Province::Province> prov: provinces )
   {
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
