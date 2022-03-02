@@ -6,6 +6,7 @@
 
 namespace Movement
 {
+
 inline void SetDestinations( entt::registry &registry, Camera2D camera )
 {
   entt::basic_view view =
@@ -54,6 +55,15 @@ inline void Update( entt::registry &registry, f32 timeScale )
         anim.state = c_Animated::WALK_DR;
       else if ( unit.destination.x < unit.position.x )
         anim.state = c_Animated::WALK_DL;
+
+      if ( unit.destination.x == unit.position.x )
+      {
+        if ( anim.state == c_Animated::IDLE_DR )
+          anim.state = c_Animated::WALK_DR;
+        else if ( anim.state == c_Animated::IDLE_DL )
+          anim.state = c_Animated::WALK_DL;
+      }
+
 
       if ( Vector2Distance( unit.destination, unit.position ) <= 0.7f )
       {

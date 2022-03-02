@@ -1,13 +1,14 @@
-#include "../common.hpp"
-#include "../editor/editor.hpp"
-#include "../resource.hpp"
-#include "../state.hpp"
-#include "../ui/ui.hpp"
-#include "../world/systems/animation.hpp"
-#include "../world/systems/map/map.hpp"
-#include "../world/systems/map/provinces.hpp"
-#include "rlgl.h"
-
+#include "../common.hpp"
+#include "../editor/editor.hpp"
+#include "../resource.hpp"
+#include "../state.hpp"
+#include "../ui/ui.hpp"
+#include "../world/systems/animation.hpp"
+#include "../world/systems/map/map.hpp"
+#include "../world/systems/map/provinces.hpp"
+#include "../world/systems/selection.hpp"
+#include "rlgl.h"
+
 namespace Renderer
 {
 Shader shader;
@@ -99,10 +100,10 @@ Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
     EndMode2D();
     EndShaderMode();
 
-    UI::Draw();
-
-    // if (state.gameState == EDITOR)
-    //   Editor::Draw();
+    UI::Draw();
   }
   EndDrawing();
-}
+}
+
+// if (state.gameState == EDITOR)
+//   Editor::Draw();

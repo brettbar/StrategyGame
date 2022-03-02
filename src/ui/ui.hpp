@@ -22,45 +22,77 @@ inline void Init()
   uiTree = {
     GUI::Panel{
       .index = 0,
-      .type = GUI::PANEL,
+      .floating = false,
       .color = BLACK,
-      .dimensions = { 0, 0, 80, (f32) GetScreenHeight() },
+      .position = Vector2{ 0, 0 },
+      .dimensions = Vector2{ 80, (f32) GetScreenHeight() },
+      .update = []() -> Rectangle {
+        return { 0, 0, 80, (f32) GetScreenHeight() };
+      },
       .children =
         {
           GUI::ItemId{
-            .index = 1,
-            .item =
-              GUI::Item{
-                .type = GUI::TEXT_BUTTON,
-                .color = WHITE,
-                .dimensions = { 5, 5, 60, 60 },
-                .text = "Spawn",
-              },
+            1,
+            GUI::Item{
+              .type = GUI::TEXT_BUTTON,
+              .color = WHITE,
+              .offset = { 5, 5 },
+              .dimensions = { 60, 60 },
+              .action =
+                []() {
+                  Events::dispatcher.trigger<Events::Event>(
+                    Events::PROVINCES_SPAWN_PROVINCE );
+
+                  Events::dispatcher.trigger<Events::Event>(
+                    Events::SPAWN_DELETE_SPAWNED );
+                },
+              .text = "Spawn",
+            },
           },
           GUI::ItemId{
-            .index = 2,
-            .item =
-              {
-                .type = GUI::BUTTON,
-                .color = BLUE,
-                .dimensions = { 5, 65, 60, 60 },
-              },
+            2,
+            GUI::Item{
+              .type = GUI::TEXT_BUTTON,
+              .color = BLUE,
+              .offset = { 5, 65 },
+              .dimensions = { 60, 60 },
+            },
           },
         },
     },
+
     GUI::Panel{
       .index = 3,
-      .type = GUI::PANEL,
+      .floating = false,
       .color = RED,
-      .dimensions =
-        {
-          (f32) ( GetScreenWidth() / 2.0f ) - 400,
+      .position =
+        Vector2{
+          (f32) ( GetScreenWidth() / 2.0f ) - 200,
+          (f32) GetScreenHeight() - 200,
+        },
+      .dimensions = Vector2{ 400, 200 },
+      .update = []() -> Rectangle {
+        return {
+          ( GetScreenWidth() / 2.0f ) - 200,
           (f32) GetScreenHeight() - 200,
           400,
-          200,
-        },
+          200 };
+      },
       .children = {},
     },
+
+    GUI::Panel{
+      .index = 4,
+      .floating = true,
+      .color = BLUE,
+      .position = Vector2{ 500, 100 },
+      .dimensions = Vector2{ 200, 400 },
+      .update = []() -> Rectangle {
+        return { 500, 100, 200, 400 };
+      },
+      .children = {},
+    },
+
   };
 }
 
@@ -70,15 +102,20 @@ inline bool MouseWasOverUI()
 
   for ( auto &panel: uiTree )
   {
-    inside = CheckCollisionPointRec( GetMousePosition(), panel.dimensions );
+    inside = CheckCollisionPointRec(
+      GetMousePosition(),
+      GUI::GetAbsoluteRectangle( panel.position, panel.dimensions ) );
 
     if ( inside ) return true;
 
     for ( auto &child: panel.children )
     {
 
-      inside =
-        CheckCollisionPointRec( GetMousePosition(), child.item.dimensions );
+      inside = CheckCollisionPointRec(
+        GetMousePosition(),
+        GUI::GetAbsoluteRectangle(
+          child.item.position,
+          child.item.dimensions ) );
 
       if ( inside ) return true;
     }
@@ -97,13 +134,24 @@ inline void Draw()
 
   for ( auto &panel: uiTree )
   {
-    DrawRectangleRec( panel.dimensions, panel.color );
+    if ( panel.floating )
+    {
+    }
+    else
+    {
+      panel.Update();
+      DrawRectangleV( panel.position, panel.dimensions, panel.color );
+    }
 
     for ( auto &child: panel.children )
     {
+      child.item.Update( panel.position );
 
-      bool inside =
-        CheckCollisionPointRec( GetMousePosition(), child.item.dimensions );
+      bool inside = CheckCollisionPointRec(
+        GetMousePosition(),
+        GUI::GetAbsoluteRectangle(
+          child.item.position,
+          child.item.dimensions ) );
 
       if ( !overAnyElem ) overAnyElem = inside;
 
@@ -112,11 +160,12 @@ inline void Draw()
 
       if ( DoButton( uiContext, child, inside, mouseWentUp, mouseWentDown ) )
       {
-        child.item.color = GREEN;
-        Events::dispatcher.trigger<Events::Event>(
-          Events::PROVINCES_SPAWN_PROVINCE );
-        Events::dispatcher.trigger<Events::Event>(
-          Events::SPAWN_DELETE_SPAWNED );
+        if ( ColorToInt( child.item.color ) == ColorToInt( WHITE ) )
+          child.item.color = GREEN;
+        else if ( ColorToInt( child.item.color ) == ColorToInt( GREEN ) )
+          child.item.color = WHITE;
+
+        child.item.action();
       }
     }
   }
