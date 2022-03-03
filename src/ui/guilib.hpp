@@ -72,24 +72,31 @@ inline bool DoFloatingPanel(
   Context &context,
   Panel &panel,
   bool inside,
+  bool mouseWentUp,
+  bool mouseWentDown,
   bool mouseHeldDown )
 {
   bool result = false;
 
   if ( panel.index == context.active )
   {
-    if ( mouseHeldDown )
+    if ( !mouseWentUp && mouseHeldDown )
     {
       result = true;
+    }
+  }
+  else if ( panel.index == context.hot )
+  {
+    if ( mouseWentDown )
+    {
+      context.active = panel.index;
     }
   }
 
   if ( inside )
   {
     if ( context.active == -1 )
-    {
-      context.active = panel.index;
-    }
+      context.hot = panel.index;
   }
 
   DrawRectangleV( panel.position, panel.dimensions, panel.color );

@@ -148,7 +148,13 @@ inline void Draw()
       if ( !overAnyElem )
         overAnyElem = inside;
 
-      if ( GUI::DoFloatingPanel( uiContext, panel, inside, mouseHeldDown ) )
+      if ( GUI::DoFloatingPanel(
+             uiContext,
+             panel,
+             inside,
+             mouseWentUp,
+             mouseWentDown,
+             mouseHeldDown ) )
       {
         // printf( "DoFloatingPanel: %d\n", panel.index );
         panel.position.x = panel.oldOffset.x + mousePos.x;
