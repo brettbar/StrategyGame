@@ -55,6 +55,8 @@ struct Panel {
   Color color;
   Vector2 position;
   Vector2 dimensions;
+
+  Vector2 oldOffset;
   std::function<Rectangle()> update;
   std::vector<ItemId> children;
 
@@ -68,32 +70,32 @@ struct Panel {
 
 inline bool DoFloatingPanel(
   Context &context,
-  ItemId &itemId,
+  Panel &panel,
   bool inside,
-  bool mouseWentUp,
-  bool mouseWentDown )
+  bool mouseHeldDown )
 {
   bool result = false;
 
-  if ( itemId.index == context.active )
+  if ( panel.index == context.active )
   {
-    if ( mouseWentUp )
+    if ( mouseHeldDown )
     {
-      if ( itemId.index == context.hot ) result = true;// do the button action
-      context.active = -1;
+      result = true;
     }
-  }
-  else if ( itemId.index == context.hot )
-  {
-    if ( mouseWentDown ) context.active = itemId.index;
   }
 
   if ( inside )
   {
-    if ( context.active == -1 ) context.hot = itemId.index;
+    if ( context.active == -1 )
+    {
+      context.active = panel.index;
+    }
   }
-}
 
+  DrawRectangleV( panel.position, panel.dimensions, panel.color );
+
+  return result;
+}
 
 inline bool DoButton(
   Context &context,
@@ -108,18 +110,21 @@ inline bool DoButton(
   {
     if ( mouseWentUp )
     {
-      if ( itemId.index == context.hot ) result = true;// do the button action
+      if ( itemId.index == context.hot )
+        result = true;// do the button action
       context.active = -1;
     }
   }
   else if ( itemId.index == context.hot )
   {
-    if ( mouseWentDown ) context.active = itemId.index;
+    if ( mouseWentDown )
+      context.active = itemId.index;
   }
 
   if ( inside )
   {
-    if ( context.active == -1 ) context.hot = itemId.index;
+    if ( context.active == -1 )
+      context.hot = itemId.index;
   }
 
   switch ( itemId.item.type )
