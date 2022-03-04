@@ -9,6 +9,8 @@
 namespace UI
 {
 
+inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
+
 inline std::vector<GUI::Panel> uiTree;
 // inline std::vector<std::shared_ptr<GUI::ItemId>> uiElements;
 
@@ -156,27 +158,7 @@ inline void Draw()
              mouseWentDown,
              mouseHeldDown ) )
       {
-        // printf( "DoFloatingPanel: %d\n", panel.index );
-        panel.position.x = panel.oldOffset.x + mousePos.x;
-        panel.position.y = panel.oldOffset.y + mousePos.y;
-
-        if ( ( panel.position.x + panel.dimensions.x ) > GetScreenWidth() )
-        {
-          panel.position.x = GetScreenWidth() - panel.dimensions.x;
-        }
-        else if ( ( panel.position.x ) < 0 )
-        {
-          panel.position.x = 0;
-        }
-
-        if ( ( panel.position.y + panel.dimensions.y ) > GetScreenHeight() )
-        {
-          panel.position.y = GetScreenHeight() - panel.dimensions.y;
-        }
-        else if ( ( panel.position.y ) < 0 )
-        {
-          panel.position.y = 0;
-        }
+        HandleFloatingPanel( panel, mousePos );
       }
       else
       {
@@ -231,6 +213,31 @@ inline void Draw()
   {
     uiContext.hot = -1;
     uiContext.active = -1;
+  }
+}
+
+inline void HandleFloatingPanel( GUI::Panel &panel, Vector2 mousePos )
+{
+  // printf( "DoFloatingPanel: %d\n", panel.index );
+  panel.position.x = panel.oldOffset.x + mousePos.x;
+  panel.position.y = panel.oldOffset.y + mousePos.y;
+
+  if ( ( panel.position.x + panel.dimensions.x ) > GetScreenWidth() )
+  {
+    panel.position.x = GetScreenWidth() - panel.dimensions.x;
+  }
+  else if ( ( panel.position.x ) < 0 )
+  {
+    panel.position.x = 0;
+  }
+
+  if ( ( panel.position.y + panel.dimensions.y ) > GetScreenHeight() )
+  {
+    panel.position.y = GetScreenHeight() - panel.dimensions.y;
+  }
+  else if ( ( panel.position.y ) < 0 )
+  {
+    panel.position.y = 0;
   }
 }
 

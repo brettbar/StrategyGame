@@ -9,7 +9,6 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "editor/editor.hpp"
 #include "events.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
@@ -120,7 +119,7 @@ void Init( State &state, entt::registry &reg, TextureCache &cache )
     1080,
     // GetScreenWidth(),
     // GetScreenHeight(),
-    "raylib [core] example - basic window" );
+    "FieldsOfMars" );
 
   LoadResources( cache );
 
@@ -151,7 +150,8 @@ void LateUpdate( State &state, entt::registry &reg )
 
   state.day++;
 
-  if ( state.month < 12 ) state.month++;
+  if ( state.month < 12 )
+    state.month++;
   else
   {
     state.year++;
@@ -185,18 +185,25 @@ void CameraUpdate( Camera2D &camera, f32 dt )
 
   // camera.offset = target;
 
-  if ( IsKeyDown( KEY_D ) ) camera.target.x += dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_A ) ) camera.target.x -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_W ) ) camera.target.y -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_S ) ) camera.target.y += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_D ) )
+    camera.target.x += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    camera.target.y += dt * cameraSpeed / camera.zoom;
 
-  if ( IsKeyDown( KEY_Z ) ) camera.zoom -= 0.05f;
-  if ( IsKeyDown( KEY_X ) ) camera.zoom += 0.05f;
+  if ( IsKeyDown( KEY_Z ) )
+    camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    camera.zoom += 0.05f;
 
   f32 mouseWheelDelta = GetMouseWheelMove();
 
   camera.zoom += ( mouseWheelDelta * 0.05f );
-  if ( camera.zoom > 8.0f ) camera.zoom = 8.0f;
+  if ( camera.zoom > 8.0f )
+    camera.zoom = 8.0f;
   else if ( camera.zoom < 0.08f )
     camera.zoom = 0.08f;
 

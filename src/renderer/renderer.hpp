@@ -1,5 +1,4 @@
 #include "../common.hpp"
-#include "../editor/editor.hpp"
 #include "../resource.hpp"
 #include "../state.hpp"
 #include "../ui/ui.hpp"

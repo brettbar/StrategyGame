@@ -19,24 +19,27 @@ inline void Draw( entt::registry &reg, bool isDebug )
   {
     c_Unit::Unit &unit = unitsView.get<c_Unit::Unit>( entity );
     if ( isDebug )
+    {
       DrawRectangleLinesEx(
         { unit.position.x - 32, unit.position.y - 32, 64, 64 },
         2,
         YELLOW );
+    }
   }
 
   for ( auto entity: provsView )
   {
     c_Province::Province &prov = provsView.get<c_Province::Province>( entity );
     if ( isDebug )
+    {
       DrawRectangleLinesEx(
-        { prov.tile->position.x - 32, prov.tile->position.y - 32, 64, 64 },
+        { prov.tile->position.x - 32, prov.tile->position.y - 64, 64, 64 },
         2,
         YELLOW );
+    }
   }
 }
 
-// TODO provinces can be selected
 inline void UpdateSelection( entt::registry &reg, Vector2 clickPos )
 {
   auto unitsView = reg.view<c_Unit::Unit>();
@@ -49,7 +52,8 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos )
   // use forward iterators and get only the components of interest
   for ( auto entity: unitsView )
   {
-    if ( alreadyFoundOne ) return;
+    if ( alreadyFoundOne )
+      return;
 
     c_Unit::Unit &unit = unitsView.get<c_Unit::Unit>( entity );
 
@@ -62,7 +66,8 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos )
 
   for ( auto entity: provView )
   {
-    if ( alreadyFoundOne ) return;
+    if ( alreadyFoundOne )
+      return;
 
     c_Province::Province &prov = provView.get<c_Province::Province>( entity );
 

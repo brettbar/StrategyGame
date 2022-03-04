@@ -14,7 +14,6 @@ add_executable(
   src/ui/ui.hpp
   src/ui/guilib.hpp
   src/renderer/renderer.hpp
-  src/editor/editor.hpp
   src/world/player.hpp
   src/world/systems/map/map.hpp
   src/world/systems/map/provinces.hpp
