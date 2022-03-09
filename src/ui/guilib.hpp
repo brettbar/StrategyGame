@@ -12,6 +12,7 @@ enum Type
   PANEL,
   BUTTON,
   TEXT_BUTTON,
+  TEXTURE_BUTTON,
 };
 
 enum Layout
@@ -26,15 +27,36 @@ struct Context {
   i32 active;
 };
 
-struct Item {
-  Type type;
+struct Element {
+  i32 index;
+  bool enabled;
   Color color;
   Vector2 position;
-  Vector2 offset;
   Vector2 dimensions;
+
+  // Element( bool e, Color c, Vector2 p, Vector2 d )
+  //     : enabled( e ), color( c ), position( p ), dimensions( d )
+  // {
+  // }
+
+  inline bool operator==( const Element &rhs )
+  {
+    return this->index == rhs.index;
+  };
+};
+
+struct Item : Element {
+  Type type;
+  Vector2 offset;
   std::function<void()> action;
 
   std::string text;
+  Texture2D texture;
+
+  // Item( Element e, Type t, Vector2 o, std::function<void()> a, std::string s )
+  //     : Element( e ), type( t ), offset( o ), action( a ), text( s )
+  // {
+  // }
 
   void Update( Vector2 parentPos )
   {
@@ -43,22 +65,23 @@ struct Item {
   }
 };
 
-struct ItemId {
-  i32 index;
-  Item item;
-  bool operator==( const ItemId &rhs ) { return this->index == rhs.index; };
-};
-
-struct Panel {
-  i32 index;
+struct Panel : Element {
   bool floating;
-  Color color;
-  Vector2 position;
-  Vector2 dimensions;
 
   Vector2 oldOffset;
   std::function<Rectangle()> update;
-  std::vector<ItemId> children;
+  std::vector<Item> children;
+
+
+  // Panel(
+  //   Element e,
+  //   bool f,
+  //   Vector2 o,
+  //   std::function<Rectangle()> u,
+  //   std::vector<Item> c )
+  //     : Element( e ), floating( f ), oldOffset( o ), update( u ), children( c )
+  // {
+  // }
 
   void Update()
   {
@@ -67,6 +90,7 @@ struct Panel {
     this->dimensions = { updated.width, updated.height };
   }
 };
+
 
 inline bool DoFloatingPanel(
   Context &context,
@@ -104,48 +128,48 @@ inline bool DoFloatingPanel(
   return result;
 }
 
-inline bool DoButton(
+inline bool DoItem(
   Context &context,
-  ItemId &itemId,
+  Item &item,
   bool inside,
   bool mouseWentUp,
   bool mouseWentDown )
 {
+  if ( !item.enabled )
+    return false;
+
   bool result = false;
 
-  if ( itemId.index == context.active )
+  if ( item.index == context.active )
   {
     if ( mouseWentUp )
     {
-      if ( itemId.index == context.hot )
+      if ( item.index == context.hot )
         result = true;// do the button action
       context.active = -1;
     }
   }
-  else if ( itemId.index == context.hot )
+  else if ( item.index == context.hot )
   {
     if ( mouseWentDown )
-      context.active = itemId.index;
+      context.active = item.index;
   }
 
   if ( inside )
   {
     if ( context.active == -1 )
-      context.hot = itemId.index;
+      context.hot = item.index;
   }
 
-  switch ( itemId.item.type )
+  switch ( item.type )
   {
     case TEXT_BUTTON:
-      DrawRectangleV(
-        itemId.item.position,
-        itemId.item.dimensions,
-        itemId.item.color );
+      DrawRectangleV( item.position, item.dimensions, item.color );
 
       DrawText(
-        itemId.item.text.c_str(),
-        itemId.item.position.x,
-        itemId.item.position.y + ( 0.5 * itemId.item.dimensions.y ),
+        item.text.c_str(),
+        item.position.x,
+        item.position.y + ( 0.5 * item.dimensions.y ),
         20,
         RED );
       break;
