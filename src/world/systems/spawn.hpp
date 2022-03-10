@@ -13,10 +13,36 @@
 
 namespace Spawn
 {
-
 inline void DeleteSelected( entt::registry & );
-
 Texture2D DetermineTexture( Faction, TextureCache & );
+
+struct SpawnListener : Events::Listener {
+  inline void Receive() override
+  {
+    if ( currState == nullptr || currReg == nullptr )
+    {
+      return;
+    }
+
+    printf( "Spawn got an event!\n" );
+    DeleteSelected( *currReg );
+  }
+
+  inline void Listen()
+  {
+    Events::dispatcher.sink<Events::SpawnEvent>()
+      .connect<&SpawnListener::Receive>( this );
+  }
+};
+
+inline SpawnListener listener;
+
+inline void Init() { listener.Listen(); }
+
+inline void Update( State &state, entt::registry &reg )
+{
+  listener.Update( state, reg );
+}
 
 inline void CreateNew(
   entt::registry &reg,

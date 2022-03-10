@@ -134,6 +134,7 @@ void Init( State &state, entt::registry &reg, TextureCache &cache )
 
   Terrain::CreateTerrain( reg );
   Provinces::InitProvinces( state, reg );
+  Spawn::Init();
 }
 
 
@@ -147,6 +148,7 @@ void Update( State &state, entt::registry &reg )
 void LateUpdate( State &state, entt::registry &reg )
 {
   Provinces::UpdateProvinces( state, reg );
+  Spawn::Update( state, reg );
 
   state.day++;
 

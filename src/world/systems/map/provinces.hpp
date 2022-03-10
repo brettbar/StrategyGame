@@ -25,32 +25,27 @@ inline void DrawProvinces( entt::registry &, TextureCache &, bool );
 inline void UpdatePopulation( c_Province::Settlement & );
 inline void UpdateSettlement( c_Province::Settlement & );
 
-struct Listener {
-  State *currState;
-  entt::registry *currReg;
-
-  void receive( const Events::Event &event )
+struct ProvListener : Events::Listener {
+  inline void Receive() override
   {
-    if ( currState == nullptr || currReg == nullptr )
+    if ( this->currState == nullptr || this->currReg == nullptr )
     {
       return;
     }
 
-    switch ( event.type )
-    {
-      case Events::PROVINCES_SPAWN_PROVINCE:
-        printf( "Provinces got an event!\n" );
-        SpawnProvince( *currReg, currState->currPlayer->id );
-        break;
-      case Events::SPAWN_DELETE_SPAWNED:
-        printf( "Spawn got an event!\n" );
-        Spawn::DeleteSelected( *currReg );
-        break;
-    }
+    printf( "Provinces got an event!\n" );
+    SpawnProvince( *this->currReg, this->currState->currPlayer->id );
+  }
+
+  inline void Listen()
+  {
+    Events::dispatcher.sink<Events::ProvEvent>()
+      .connect<&ProvListener::Receive>( this );
   }
 };
 
-inline Listener listener;
+
+inline ProvListener listener;
 
 inline void InitProvinces( State &state, entt::registry &reg )
 {
@@ -66,17 +61,13 @@ inline void InitProvinces( State &state, entt::registry &reg )
   }
 
 
-  Events::dispatcher.sink<Events::Event>().connect<&Listener::receive>(
-    listener );
+  listener.Listen();
 }
 
 
 inline void UpdateProvinces( State &state, entt::registry &reg )
 {
-  listener = {
-    .currState = &state,
-    .currReg = &reg,
-  };
+  listener.Update( state, reg );
 
   auto view = reg.view<c_Province::Province>();
 

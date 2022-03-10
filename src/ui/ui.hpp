@@ -1,9 +1,9 @@
-
 #pragma once
 
 #include "../common.hpp"
 #include "../events.hpp"
 #include "./guilib.hpp"
+#include "tree.hpp"
 
 
 namespace UI
@@ -11,7 +11,6 @@ namespace UI
 
 inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
 
-inline std::vector<GUI::Panel> uiTree;
 // inline std::vector<std::shared_ptr<GUI::ItemId>> uiElements;
 
 inline GUI::Context uiContext = {
@@ -19,112 +18,12 @@ inline GUI::Context uiContext = {
   .active = -1,
 };
 
+inline std::vector<GUI::Panel> uiTree;
+
 inline void Init()
 {
   // i32 i = -1;
-  uiTree = {
-    GUI::Panel{
-      GUI::Element{
-        .enabled = true,
-        .color = BLACK,
-        .position = Vector2{ 0, 0 },
-        .dimensions = Vector2{ 80, (f32) GetScreenHeight() },
-      },
-      .floating = false,
-      .oldOffset = {},
-      .update = []() -> Rectangle {
-        return { 0, 0, 80, (f32) GetScreenHeight() };
-      },
-      .children =
-        {
-          GUI::Item{
-            GUI::Element{
-              .enabled = true,
-              .color = WHITE,
-              .position = {},
-              .dimensions = { 60, 60 },
-            },
-            .type = GUI::TEXT_BUTTON,
-            .offset = Vector2{ 5, 5 },
-            .action =
-              []() {
-                Events::dispatcher.trigger<Events::Event>(
-                  Events::PROVINCES_SPAWN_PROVINCE );
-
-                Events::dispatcher.trigger<Events::Event>(
-                  Events::SPAWN_DELETE_SPAWNED );
-              },
-            .text = "Spawn",
-          },
-        },
-    },
-
-    GUI::Panel{
-      GUI::Element{
-        .enabled = true,
-        .color = RED,
-        .position =
-          Vector2{
-            (f32) ( GetScreenWidth() / 2.0f ) - 200,
-            (f32) GetScreenHeight() - 200,
-          },
-        .dimensions = Vector2{ 400, 200 },
-      },
-      .floating = false,
-      .oldOffset = {},
-      .update = []() -> Rectangle {
-        return {
-          ( GetScreenWidth() / 2.0f ) - 200,
-          (f32) GetScreenHeight() - 200,
-          400,
-          200 };
-      },
-      .children =
-        {
-          GUI::Item{
-            GUI::Element{
-              .enabled = false,
-              .color = WHITE,
-              .position = {},
-              .dimensions = { 128, 128 },
-            },
-            .type = GUI::TEXTURE_BUTTON,
-            .offset = Vector2{ 10, 10 },
-            .action = {},
-            .text = "",
-          },
-        },
-    },
-
-    GUI::Panel{
-      GUI::Element{
-        .enabled = true,
-        .color = BLUE,
-        .position = Vector2{ 500, 100 },
-        .dimensions = Vector2{ 200, 400 },
-      },
-      .floating = true,
-      .oldOffset = {},
-      .update = []() -> Rectangle {
-        return { 500, 100, 200, 400 };
-      },
-      .children = {},
-    },
-  };
-
-  i32 currId = -1;
-
-  for ( GUI::Panel &panel: uiTree )
-  {
-    currId++;
-    panel.index = currId;
-
-    for ( GUI::Item &child: panel.children )
-    {
-      currId++;
-      child.index = currId;
-    }
-  }
+  uiTree = InitTree();
 }
 
 inline bool MouseWasOverUI()

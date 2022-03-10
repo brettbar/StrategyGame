@@ -10,7 +10,6 @@ namespace GUI
 enum Type
 {
   PANEL,
-  BUTTON,
   TEXT_BUTTON,
   TEXTURE_BUTTON,
 };
@@ -34,11 +33,6 @@ struct Element {
   Vector2 position;
   Vector2 dimensions;
 
-  // Element( bool e, Color c, Vector2 p, Vector2 d )
-  //     : enabled( e ), color( c ), position( p ), dimensions( d )
-  // {
-  // }
-
   inline bool operator==( const Element &rhs )
   {
     return this->index == rhs.index;
@@ -50,19 +44,21 @@ struct Item : Element {
   Vector2 offset;
   std::function<void()> action;
 
-  std::string text;
-  Texture2D texture;
-
-  // Item( Element e, Type t, Vector2 o, std::function<void()> a, std::string s )
-  //     : Element( e ), type( t ), offset( o ), action( a ), text( s )
-  // {
-  // }
-
-  void Update( Vector2 parentPos )
+  inline void Update( Vector2 parentPos )
   {
     this->position.x = this->offset.x + parentPos.x;
     this->position.y = this->offset.y + parentPos.y;
   }
+
+  inline virtual void Draw();
+};
+
+struct TextButton : Item {
+  std::string text;
+};
+
+struct TextureButton : Item {
+  Texture2D texture;
 };
 
 struct Panel : Element {
@@ -71,7 +67,6 @@ struct Panel : Element {
   Vector2 oldOffset;
   std::function<Rectangle()> update;
   std::vector<Item> children;
-
 
   // Panel(
   //   Element e,
@@ -181,6 +176,7 @@ inline bool DoItem(
 
   return result;
 }
+
 
 inline Rectangle GetAbsoluteRectangle( Vector2 pos, Vector2 dimensions )
 {
