@@ -10,7 +10,6 @@ project(game)
 
 add_executable(
   ${PROJECT_NAME} src/main.cpp
-  include/raygui.h
   src/ui/ui.hpp
   src/ui/guilib.hpp
   src/renderer/renderer.hpp
@@ -37,10 +36,21 @@ add_executable(
 
 
 if(UNIX)
-  target_link_libraries(${PROJECT_NAME} raylib m)
+  target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/libraylib.so.400 m)
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
   target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/entt/)
 endif(UNIX)
+
+
+# if(UNIX)
+#   add_library(raylib STATIC IMPORTED)
+#   set_target_properties(
+#     raylib PROPERTIES
+#     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+#     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+#   )
+#   target_link_libraries(${PROJECT_NAME} raylib )
+# endif(UNIX)
 
 
 if(WIN32)

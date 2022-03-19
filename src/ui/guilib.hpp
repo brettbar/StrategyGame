@@ -37,12 +37,18 @@ struct Element {
   {
     return this->index == rhs.index;
   };
+
+
+  inline void Update(){};
+  inline void Update( Vector2 ){};
 };
+
 
 struct Item : Element {
   Type type;
   Vector2 offset;
   std::function<void()> action;
+
 
   inline void Update( Vector2 parentPos )
   {
@@ -50,11 +56,21 @@ struct Item : Element {
     this->position.y = this->offset.y + parentPos.y;
   }
 
-  inline virtual void Draw();
+  inline void Draw(){};
 };
 
 struct TextButton : Item {
   std::string text;
+
+  inline void Draw()
+  {
+    DrawText(
+      this->text.c_str(),
+      this->position.x,
+      this->position.y + ( 0.5 * this->dimensions.y ),
+      20,
+      RED );
+  }
 };
 
 struct TextureButton : Item {
@@ -63,20 +79,9 @@ struct TextureButton : Item {
 
 struct Panel : Element {
   bool floating;
-
   Vector2 oldOffset;
   std::function<Rectangle()> update;
-  std::vector<Item> children;
-
-  // Panel(
-  //   Element e,
-  //   bool f,
-  //   Vector2 o,
-  //   std::function<Rectangle()> u,
-  //   std::vector<Item> c )
-  //     : Element( e ), floating( f ), oldOffset( o ), update( u ), children( c )
-  // {
-  // }
+  std::vector<GUI::Item> children;
 
   void Update()
   {
@@ -85,7 +90,6 @@ struct Panel : Element {
     this->dimensions = { updated.width, updated.height };
   }
 };
-
 
 inline bool DoFloatingPanel(
   Context &context,
@@ -161,12 +165,7 @@ inline bool DoItem(
     case TEXT_BUTTON:
       DrawRectangleV( item.position, item.dimensions, item.color );
 
-      DrawText(
-        item.text.c_str(),
-        item.position.x,
-        item.position.y + ( 0.5 * item.dimensions.y ),
-        20,
-        RED );
+      item.Draw();
       break;
 
     default:
