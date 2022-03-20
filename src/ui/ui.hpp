@@ -3,7 +3,7 @@
 #include "../common.hpp"
 #include "../events.hpp"
 #include "./guilib.hpp"
-#include "tree.hpp"
+#include "content.hpp"
 
 
 namespace UI
@@ -11,26 +11,24 @@ namespace UI
 
 inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
 
-// inline std::vector<std::shared_ptr<GUI::ItemId>> uiElements;
-
-inline GUI::Context uiContext = {
+inline GUI::Context context = {
   .hot = -1,
   .active = -1,
 };
 
-inline std::vector<GUI::Panel> uiTree;
+inline std::vector<GUI::Panel> content;
 
 inline void Init()
 {
   // i32 i = -1;
-  uiTree = InitTree();
+  content = InitUI();
 }
 
 inline bool MouseWasOverUI()
 {
   bool inside = false;
 
-  for ( auto &panel: uiTree )
+  for ( GUI::Panel &panel: content )
   {
     inside = CheckCollisionPointRec(
       GetMousePosition(),
@@ -39,12 +37,13 @@ inline bool MouseWasOverUI()
     if ( inside )
       return true;
 
-    for ( auto &child: panel.children )
+    for ( GUI::Item *child: panel.children )
     {
+      GUI::Item item = *child;
 
       inside = CheckCollisionPointRec(
         GetMousePosition(),
-        GUI::GetAbsoluteRectangle( child.position, child.dimensions ) );
+        GUI::GetAbsoluteRectangle( item.position, item.dimensions ) );
 
       if ( inside )
         return true;
@@ -63,7 +62,7 @@ inline void Draw()
   bool mouseHeldDown = IsMouseButtonDown( 0 );
   bool overAnyElem = false;
 
-  for ( GUI::Panel &panel: uiTree )
+  for ( GUI::Panel &panel: content )
   {
     if ( panel.floating )
     {
@@ -75,7 +74,7 @@ inline void Draw()
         overAnyElem = inside;
 
       if ( GUI::DoFloatingPanel(
-             uiContext,
+             context,
              panel,
              inside,
              mouseWentUp,
@@ -98,26 +97,23 @@ inline void Draw()
       DrawRectangleV( panel.position, panel.dimensions, panel.color );
     }
 
-    for ( GUI::Item &child: panel.children )
+    for ( GUI::Item *child: panel.children )
     {
-      child.Update( panel.position );
+      GUI::Item item = *child;
+
+      item.Update( panel.position );
 
       bool inside = CheckCollisionPointRec(
         GetMousePosition(),
-        GUI::GetAbsoluteRectangle( child.position, child.dimensions ) );
+        GUI::GetAbsoluteRectangle( item.position, item.dimensions ) );
 
       if ( !overAnyElem )
         overAnyElem = inside;
 
 
-      if ( DoItem( uiContext, child, inside, mouseWentUp, mouseWentDown ) )
+      if ( DoItem( context, child, inside, mouseWentUp, mouseWentDown ) )
       {
-        if ( ColorToInt( child.color ) == ColorToInt( WHITE ) )
-          child.color = GREEN;
-        else if ( ColorToInt( child.color ) == ColorToInt( GREEN ) )
-          child.color = WHITE;
-
-        child.action();
+        item.action();
       }
     }
 
@@ -125,16 +121,16 @@ inline void Draw()
     DrawFPS( GetScreenWidth() - 100, 2 );
 
     DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-    std::string foo = "hot: " + std::to_string( uiContext.hot ) + " " +
-                      "active: " + std::to_string( uiContext.active );
+    std::string foo = "hot: " + std::to_string( context.hot ) + " " +
+                      "active: " + std::to_string( context.active );
 
     DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
   }
 
   if ( !overAnyElem )
   {
-    uiContext.hot = -1;
-    uiContext.active = -1;
+    context.hot = -1;
+    context.active = -1;
   }
 }
 

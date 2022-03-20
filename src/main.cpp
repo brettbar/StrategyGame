@@ -58,16 +58,6 @@ int main( void )
   Renderer::Init( state );
 
 
-  // auto eventConn = UI::eventEmitter.on<UI::Event>(
-  //   [&reg, &state]( const UI::Event &event, UI::EventEmitter &emitter ) {
-  //     switch ( event.type )
-  //     {
-  //       case UI::PROVINCES_SPAWN_PROVINCE:
-  //         Provinces::SpawnProvince( reg, state.currPlayer->id );
-  //         break;
-  //     }
-  //   } );
-
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
@@ -103,9 +93,6 @@ int main( void )
   }
 
   Exit( textureCache );
-
-  UnloadShader( Renderer::shader );
-  // @TODO figure out all deallocs or whatever
 
   return 0;
 }
@@ -163,6 +150,10 @@ void LateUpdate( State &state, entt::registry &reg )
 
 void Exit( TextureCache &cache )
 {
+  // @TODO figure out all deallocs or whatever
+
+  UnloadShader( Renderer::shader );
+
   UnloadTexture( cache.handle( hstr{ "hexagon" } )->texture );
   UnloadTexture( cache.handle( hstr{ "test" } )->texture );
   UnloadTexture( cache.handle( hstr{ "template" } )->texture );

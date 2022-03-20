@@ -10,6 +10,8 @@ namespace GUI
 enum Type
 {
   PANEL,
+  TEXT_LABEL,
+  TEXTURE_LABEL,
   TEXT_BUTTON,
   TEXTURE_BUTTON,
 };
@@ -33,43 +35,44 @@ struct Element {
   Vector2 position;
   Vector2 dimensions;
 
-  inline bool operator==( const Element &rhs )
-  {
-    return this->index == rhs.index;
-  };
+  inline bool operator==( const Element &rhs ) { return index == rhs.index; };
 
 
   inline void Update(){};
   inline void Update( Vector2 ){};
 };
 
-
 struct Item : Element {
   Type type;
   Vector2 offset;
   std::function<void()> action;
 
-
   inline void Update( Vector2 parentPos )
   {
-    this->position.x = this->offset.x + parentPos.x;
-    this->position.y = this->offset.y + parentPos.y;
+    position.x = offset.x + parentPos.x;
+    position.y = offset.y + parentPos.y;
   }
 
-  inline void Draw(){};
+  inline virtual void Draw(){};
 };
 
-struct TextButton : Item {
+struct TextLabel : Item {
   std::string text;
+  i32 fontSize;
+  Color textColor;
+};
 
-  inline void Draw()
+struct TextButton : TextLabel {
+  inline void Draw() override
   {
+    DrawRectangleV( position, dimensions, color );
+
     DrawText(
-      this->text.c_str(),
-      this->position.x,
-      this->position.y + ( 0.5 * this->dimensions.y ),
-      20,
-      RED );
+      text.c_str(),
+      position.x,
+      position.y + ( 0.5 * dimensions.y ),
+      fontSize,
+      textColor );
   }
 };
 
@@ -81,13 +84,13 @@ struct Panel : Element {
   bool floating;
   Vector2 oldOffset;
   std::function<Rectangle()> update;
-  std::vector<GUI::Item> children;
+  std::vector<GUI::Item *> children;
 
   void Update()
   {
-    Rectangle updated = this->update();
-    this->position = { updated.x, updated.y };
-    this->dimensions = { updated.width, updated.height };
+    Rectangle updated = update();
+    position = { updated.x, updated.y };
+    dimensions = { updated.width, updated.height };
   }
 };
 
@@ -104,16 +107,12 @@ inline bool DoFloatingPanel(
   if ( panel.index == context.active )
   {
     if ( !mouseWentUp && mouseHeldDown )
-    {
       result = true;
-    }
   }
   else if ( panel.index == context.hot )
   {
     if ( mouseWentDown )
-    {
       context.active = panel.index;
-    }
   }
 
   if ( inside )
@@ -129,11 +128,13 @@ inline bool DoFloatingPanel(
 
 inline bool DoItem(
   Context &context,
-  Item &item,
+  Item *itemPtr,
   bool inside,
   bool mouseWentUp,
   bool mouseWentDown )
 {
+  Item item = *itemPtr;
+
   if ( !item.enabled )
     return false;
 
@@ -162,16 +163,31 @@ inline bool DoItem(
 
   switch ( item.type )
   {
+    case PANEL:
+    {
+    }
+    break;
+    case TEXT_LABEL:
+    {
+      TextLabel *label = dynamic_cast<TextLabel *>( itemPtr );
+      label->Draw();
+    }
+    break;
+    case TEXTURE_LABEL:
+    {
+    }
+    break;
+    case TEXTURE_BUTTON:
+    {
+    }
+    break;
     case TEXT_BUTTON:
-      DrawRectangleV( item.position, item.dimensions, item.color );
-
-      item.Draw();
-      break;
-
-    default:
-      break;
+    {
+      TextButton *button = dynamic_cast<TextButton *>( itemPtr );
+      button->Draw();
+    }
+    break;
   }
-
 
   return result;
 }
