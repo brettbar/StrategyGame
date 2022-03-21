@@ -29,7 +29,7 @@ class Player {
   Faction faction;
   std::map<str, hstr> textureMap;
 
-  Player(u32 id, Faction faction, str factionName) {
+  Player( u32 id, Faction faction, str factionName ) {
     this->id = id;
     this->faction = faction;
     this->factionName = factionName;
@@ -38,26 +38,21 @@ class Player {
   ~Player() {}
 
   void RefreshTextureMap() {
-    switch (faction) {
+    switch ( faction ) {
       case ROMANS:
-        this->textureMap = {
-          {"Villager", hstr{"romanVillagerTexture"}}};
+        this->textureMap = { { "Villager", hstr{ "romanVillagerTexture" } } };
         break;
       case GREEKS:
-        this->textureMap = {
-          {"Villager", hstr{"greekVillagerTexture"}}};
+        this->textureMap = { { "Villager", hstr{ "greekVillagerTexture" } } };
         break;
       case CELTS:
-        this->textureMap = {
-          {"Villager", hstr{"celtVillagerTexture"}}};
+        this->textureMap = { { "Villager", hstr{ "celtVillagerTexture" } } };
         break;
       case PUNICS:
-        this->textureMap = {
-          {"Villager", hstr{"punicVillagerTexture"}}};
+        this->textureMap = { { "Villager", hstr{ "punicVillagerTexture" } } };
         break;
       case PERSIANS:
-        this->textureMap = {
-          {"Villager", hstr{"persianVillagerTexture"}}};
+        this->textureMap = { { "Villager", hstr{ "persianVillagerTexture" } } };
         break;
       default:
         break;

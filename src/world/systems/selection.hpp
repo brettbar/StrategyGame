@@ -7,19 +7,15 @@
 #include <raylib.h>
 
 
-namespace Selection
-{
+namespace Selection {
 
-inline void Draw( entt::registry &reg, bool isDebug )
-{
+inline void Draw( entt::registry &reg, bool isDebug ) {
   auto unitsView = reg.view<c_Selected::Selected, c_Unit::Unit>();
   auto provsView = reg.view<c_Selected::Selected, c_Province::Province>();
 
-  for ( auto entity: unitsView )
-  {
+  for ( auto entity: unitsView ) {
     c_Unit::Unit &unit = unitsView.get<c_Unit::Unit>( entity );
-    if ( isDebug )
-    {
+    if ( isDebug ) {
       DrawRectangleLinesEx(
         { unit.position.x - 32, unit.position.y - 32, 64, 64 },
         2,
@@ -27,11 +23,9 @@ inline void Draw( entt::registry &reg, bool isDebug )
     }
   }
 
-  for ( auto entity: provsView )
-  {
+  for ( auto entity: provsView ) {
     c_Province::Province &prov = provsView.get<c_Province::Province>( entity );
-    if ( isDebug )
-    {
+    if ( isDebug ) {
       DrawRectangleLinesEx(
         { prov.tile->position.x - 32, prov.tile->position.y - 64, 64, 64 },
         2,
@@ -40,8 +34,7 @@ inline void Draw( entt::registry &reg, bool isDebug )
   }
 }
 
-inline void UpdateSelection( entt::registry &reg, Vector2 clickPos )
-{
+inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
   auto unitsView = reg.view<c_Unit::Unit>();
   auto provView = reg.view<c_Province::Province>();
 
@@ -50,29 +43,25 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos )
   bool alreadyFoundOne = false;
 
   // use forward iterators and get only the components of interest
-  for ( auto entity: unitsView )
-  {
+  for ( auto entity: unitsView ) {
     if ( alreadyFoundOne )
       return;
 
     c_Unit::Unit &unit = unitsView.get<c_Unit::Unit>( entity );
 
-    if ( CheckCollisionPointCircle( unit.position, clickPos, 64 ) )
-    {
+    if ( CheckCollisionPointCircle( unit.position, clickPos, 64 ) ) {
       reg.emplace<c_Selected::Selected>( entity, true );
       alreadyFoundOne = true;
     }
   }
 
-  for ( auto entity: provView )
-  {
+  for ( auto entity: provView ) {
     if ( alreadyFoundOne )
       return;
 
     c_Province::Province &prov = provView.get<c_Province::Province>( entity );
 
-    if ( CheckCollisionPointCircle( prov.tile->position, clickPos, 64 ) )
-    {
+    if ( CheckCollisionPointCircle( prov.tile->position, clickPos, 64 ) ) {
       reg.emplace<c_Selected::Selected>( entity, true );
       alreadyFoundOne = true;
     }

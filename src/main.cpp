@@ -34,8 +34,7 @@ void Update( State &, entt::registry & );
 void LateUpdate( State &, entt::registry & );
 void Exit( TextureCache & );
 
-int main( void )
-{
+int main( void ) {
   State state = {
     .mapWidth = 128,
     .mapHeight = 128,
@@ -66,8 +65,7 @@ int main( void )
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-  while ( GameIsRunning() )
-  {
+  while ( GameIsRunning() ) {
     dt = GetFrameTime();
 
     lag += dt;
@@ -75,14 +73,12 @@ int main( void )
 
     Input::Handle( state, reg, textureCache );
 
-    while ( lag >= MS_PER_UPDATE )
-    {
+    while ( lag >= MS_PER_UPDATE ) {
       Update( state, reg );
       lag -= MS_PER_UPDATE;
     }
 
-    while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) )
-    {
+    while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
       LateUpdate( state, reg );
       oncelag = 0.0f;
     }
@@ -97,8 +93,7 @@ int main( void )
   return 0;
 }
 
-void Init( State &state, entt::registry &reg, TextureCache &cache )
-{
+void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   InitWindow(
@@ -125,15 +120,13 @@ void Init( State &state, entt::registry &reg, TextureCache &cache )
 }
 
 
-void Update( State &state, entt::registry &reg )
-{
+void Update( State &state, entt::registry &reg ) {
   Movement::Update( reg, state.timeScale );
   Animation::UpdateSprites( reg, state.timeScale );
   //  Terrain::UpdateFOW(reg);
 }
 
-void LateUpdate( State &state, entt::registry &reg )
-{
+void LateUpdate( State &state, entt::registry &reg ) {
   Provinces::UpdateProvinces( state, reg );
   Spawn::Update( state, reg );
 
@@ -141,15 +134,13 @@ void LateUpdate( State &state, entt::registry &reg )
 
   if ( state.month < 12 )
     state.month++;
-  else
-  {
+  else {
     state.year++;
     state.month = 1;
   }
 }
 
-void Exit( TextureCache &cache )
-{
+void Exit( TextureCache &cache ) {
   // @TODO figure out all deallocs or whatever
 
   UnloadShader( Renderer::shader );
@@ -169,8 +160,7 @@ void Exit( TextureCache &cache )
   CloseWindow();// Close window and OpenGL context
 }
 
-void CameraUpdate( Camera2D &camera, f32 dt )
-{
+void CameraUpdate( Camera2D &camera, f32 dt ) {
   f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
   // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
@@ -203,8 +193,7 @@ void CameraUpdate( Camera2D &camera, f32 dt )
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
-void LoadResources( TextureCache &cache )
-{
+void LoadResources( TextureCache &cache ) {
   //  Image hexagon = LoadImage("assets/textures/hexagon.png");
   //  ImageResize(&hexagon, 512, 512);
   //  Texture hexTex = LoadTextureFromImage(hexagon);

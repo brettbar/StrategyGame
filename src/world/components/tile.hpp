@@ -2,18 +2,15 @@
 
 #include "../../common.hpp"
 
-namespace c_Tile
-{
+namespace c_Tile {
 
-enum Visibility
-{
+enum Visibility {
   UNEXPLORED,
   EXPLORED,
   VISIBILE,
 };
 
-enum Biome
-{
+enum Biome {
   WATER,
   BEACH,
   LAND,

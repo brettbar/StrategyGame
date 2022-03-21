@@ -3,11 +3,9 @@
 #include "../../common.hpp"
 #include "tile.hpp"
 
-namespace c_Province
-{
+namespace c_Province {
 
-enum Development
-{
+enum Development {
   Village,
   // Civic
   Town,

@@ -11,16 +11,13 @@
 #include "../../resource.hpp"
 #include "../player.hpp"
 
-namespace Spawn
-{
+namespace Spawn {
 inline void DeleteSelected( entt::registry & );
 Texture2D DetermineTexture( Faction, TextureCache & );
 
 struct SpawnListener : Events::Listener {
-  inline void Receive() override
-  {
-    if ( currState == nullptr || currReg == nullptr )
-    {
+  inline void Receive() override {
+    if ( currState == nullptr || currReg == nullptr ) {
       return;
     }
 
@@ -28,8 +25,7 @@ struct SpawnListener : Events::Listener {
     DeleteSelected( *currReg );
   }
 
-  inline void Listen()
-  {
+  inline void Listen() {
     Events::dispatcher.sink<Events::SpawnEvent>()
       .connect<&SpawnListener::Receive>( this );
   }
@@ -39,8 +35,7 @@ inline SpawnListener listener;
 
 inline void Init() { listener.Listen(); }
 
-inline void Update( State &state, entt::registry &reg )
-{
+inline void Update( State &state, entt::registry &reg ) {
   listener.Update( state, reg );
 }
 
@@ -48,8 +43,7 @@ inline void CreateNew(
   entt::registry &reg,
   TextureCache &cache,
   Vector2 clickPos,
-  std::shared_ptr<Player> currPlayer )
-{
+  std::shared_ptr<Player> currPlayer ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 
@@ -64,13 +58,11 @@ inline void CreateNew(
   reg.emplace<c_Sight::Sight>( entity, actor.sight );
 }
 
-inline void DeleteSelected( entt::registry &reg )
-{
+inline void DeleteSelected( entt::registry &reg ) {
   auto selectedView = reg.view<c_Selected::Selected, c_Unit::Unit>();
   auto selectedEntity = selectedView.front();
 
-  if ( selectedEntity == entt::null )
-  {
+  if ( selectedEntity == entt::null ) {
     printf( "No selected entity, cancelling\n" );
     return;
   }

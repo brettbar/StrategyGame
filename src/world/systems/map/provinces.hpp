@@ -10,8 +10,7 @@
 
 #pragma once
 
-namespace Provinces
-{
+namespace Provinces {
 
 // TODO This shit needs to get fixed
 // Shouldnt be using a separate array of pointers,
@@ -26,10 +25,8 @@ inline void UpdatePopulation( c_Province::Settlement & );
 inline void UpdateSettlement( c_Province::Settlement & );
 
 struct ProvListener : Events::Listener {
-  inline void Receive() override
-  {
-    if ( this->currState == nullptr || this->currReg == nullptr )
-    {
+  inline void Receive() override {
+    if ( this->currState == nullptr || this->currReg == nullptr ) {
       return;
     }
 
@@ -37,8 +34,7 @@ struct ProvListener : Events::Listener {
     SpawnProvince( *this->currReg, this->currState->currPlayer->id );
   }
 
-  inline void Listen()
-  {
+  inline void Listen() {
     Events::dispatcher.sink<Events::ProvEvent>()
       .connect<&ProvListener::Receive>( this );
   }
@@ -47,14 +43,12 @@ struct ProvListener : Events::Listener {
 
 inline ProvListener listener;
 
-inline void InitProvinces( State &state, entt::registry &reg )
-{
+inline void InitProvinces( State &state, entt::registry &reg ) {
   auto tView = reg.view<Terrain::TileMap>();
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
 
 
-  for ( u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++ )
-  {
+  for ( u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++ ) {
     entt::entity provEnt = reg.create();
 
     reg.emplace<c_Province::Province>( provEnt, i, -1, nullptr, tiles[i] );
@@ -65,14 +59,12 @@ inline void InitProvinces( State &state, entt::registry &reg )
 }
 
 
-inline void UpdateProvinces( State &state, entt::registry &reg )
-{
+inline void UpdateProvinces( State &state, entt::registry &reg ) {
   listener.Update( state, reg );
 
   auto view = reg.view<c_Province::Province>();
 
-  for ( auto &ent: view )
-  {
+  for ( auto &ent: view ) {
     c_Province::Province &prov = view.get<c_Province::Province>( ent );
 
     if ( prov.owner > -1 && prov.settlement != nullptr )
@@ -80,13 +72,11 @@ inline void UpdateProvinces( State &state, entt::registry &reg )
   }
 }
 
-inline void UpdateSettlement( c_Province::Settlement &settlement )
-{
+inline void UpdateSettlement( c_Province::Settlement &settlement ) {
   UpdatePopulation( settlement );
 }
 
-inline void UpdatePopulation( c_Province::Settlement &settlement )
-{
+inline void UpdatePopulation( c_Province::Settlement &settlement ) {
   c_Province::Population &pop = settlement.population;
   // if growing exponentially
   // P(t) = P0*e^(kt)
@@ -102,26 +92,22 @@ inline void UpdatePopulation( c_Province::Settlement &settlement )
 }
 
 inline void
-SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos )
-{
+SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   i32 provId = DetermineTileIdFromClick( clickPos );
   assert( provId >= 0 );
 
   auto provinces = registry.view<c_Province::Province>();
 
-  for ( auto ent: provinces )
-  {
+  for ( auto ent: provinces ) {
     c_Province::Province &prov = provinces.get<c_Province::Province>( ent );
 
-    if ( prov.id == (u32) provId )
-    {
+    if ( prov.id == (u32) provId ) {
       if ( prov.tile->biome == c_Tile::WATER )
         continue;
 
       prov.owner = owner;
 
-      if ( prov.settlement == nullptr )
-      {
+      if ( prov.settlement == nullptr ) {
         prov.settlement = std::make_unique<c_Province::Settlement>();
         prov.settlement->id = prov.id;
         prov.settlement->population = {
@@ -132,8 +118,7 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos )
           .carryingCapacity = 1000,
         };
 
-        switch ( prov.owner )
-        {
+        switch ( prov.owner ) {
           case 0:
             prov.settlement->name = "Rome";
             break;
@@ -155,13 +140,11 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos )
   }
 }
 
-inline void SpawnProvince( entt::registry &reg, u32 owner )
-{
+inline void SpawnProvince( entt::registry &reg, u32 owner ) {
   auto selectedView = reg.view<c_Selected::Selected, c_Unit::Unit>();
   auto selectedEntity = selectedView.front();
 
-  if ( selectedEntity == entt::null )
-  {
+  if ( selectedEntity == entt::null ) {
     printf( "No selected entity, cancelling\n" );
     return;
   }
@@ -173,19 +156,16 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
 
   auto provinces = reg.view<c_Province::Province>();
 
-  for ( auto ent: provinces )
-  {
+  for ( auto ent: provinces ) {
     c_Province::Province &prov = provinces.get<c_Province::Province>( ent );
 
-    if ( prov.id == (u32) provId )
-    {
+    if ( prov.id == (u32) provId ) {
       if ( prov.tile->biome == c_Tile::WATER )
         continue;
 
       prov.owner = owner;
 
-      if ( prov.settlement == nullptr )
-      {
+      if ( prov.settlement == nullptr ) {
         prov.settlement = std::make_unique<c_Province::Settlement>();
         prov.settlement->id = prov.id;
         prov.settlement->population = {
@@ -196,8 +176,7 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
           .carryingCapacity = 1000,
         };
 
-        switch ( prov.owner )
-        {
+        switch ( prov.owner ) {
           case 0:
             prov.settlement->name = "Rome";
             break;
@@ -221,12 +200,10 @@ inline void SpawnProvince( entt::registry &reg, u32 owner )
 
 
 inline void
-DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays )
-{
+DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
   auto provinces = reg.view<c_Province::Province>();
 
-  for ( auto ent: provinces )
-  {
+  for ( auto ent: provinces ) {
     c_Province::Province &prov = provinces.get<c_Province::Province>( ent );
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
@@ -255,14 +232,12 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays )
     //   14,
     //            RED);
 
-    if ( prov.owner > -1 )
-    {
+    if ( prov.owner > -1 ) {
       Color color = BLACK;
 
       Rectangle frameRec = { 0.0, 0.0, 128, 128.0 };
 
-      switch ( prov.owner )
-      {
+      switch ( prov.owner ) {
         case 0:
           color = RED;
           frameRec.x = 0.0f;
@@ -293,10 +268,8 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays )
           Fade( WHITE, 0.5 ) );
     }
 
-    if ( prov.settlement != nullptr )
-    {
-      if ( prov.settlement->population.current > 0 )
-      {
+    if ( prov.settlement != nullptr ) {
+      if ( prov.settlement->population.current > 0 ) {
         Vector2 provPos = prov.tile->position;
 
         // DrawRectangleRec({provPos.x + 50,

@@ -8,18 +8,16 @@ struct TextureResource {
 };
 
 struct TextureLoader : entt::resource_loader<TextureLoader, TextureResource> {
-  std::shared_ptr<TextureResource> load(Texture2D texture) const
-  {
+  std::shared_ptr<TextureResource> load( Texture2D texture ) const {
     // ...
-    return std::shared_ptr<TextureResource>(new TextureResource{texture});
+    return std::shared_ptr<TextureResource>( new TextureResource{ texture } );
   }
 };
 
 using TextureCache = entt::resource_cache<TextureResource>;
 
-inline void LoadResource(hstr id, str path, TextureCache &cache)
-{
-  Texture2D tex = LoadTexture(path.c_str());
+inline void LoadResource( hstr id, str path, TextureCache &cache ) {
+  Texture2D tex = LoadTexture( path.c_str() );
   //  SetTextureFilter(tex, TEXTURE_WRAP_REPEAT);
-  cache.load<TextureLoader>(id, tex);
+  cache.load<TextureLoader>( id, tex );
 }

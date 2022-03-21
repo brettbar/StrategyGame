@@ -10,8 +10,7 @@
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
 
-namespace Archetypes
-{
+namespace Archetypes {
 
 struct Actor {
   c_Unit::Unit unit;
@@ -20,8 +19,7 @@ struct Actor {
 
   c_Animated::Animations animations;
 
-  Actor( Texture2D sprite, Vector2 spawn )
-  {
+  Actor( Texture2D sprite, Vector2 spawn ) {
     unit = c_Unit::Unit{
       .position = spawn,
       .destination = spawn,

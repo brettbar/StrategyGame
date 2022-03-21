@@ -2,8 +2,7 @@
 
 #include "../../common.hpp"
 
-namespace c_Unit
-{
+namespace c_Unit {
 
 struct Unit {
   Vector2 position;

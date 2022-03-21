@@ -2,10 +2,8 @@
 
 #include "../../common.hpp"
 
-namespace c_Animated
-{
-enum AnimState
-{
+namespace c_Animated {
+enum AnimState {
   IDLE_DR,
   IDLE_DL,
   WALK_DR,

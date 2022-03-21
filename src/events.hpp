@@ -5,8 +5,7 @@
 // #include "world/systems/spawn.hpp"
 
 
-namespace Events
-{
+namespace Events {
 
 // enum EventType
 // {
@@ -16,33 +15,27 @@ namespace Events
 
 inline entt::dispatcher dispatcher{};
 
-struct Event {
-};
-struct ProvEvent : Event {
-};
-struct SpawnEvent : Event {
-};
+struct Event {};
+struct ProvEvent : Event {};
+struct SpawnEvent : Event {};
 
 
 struct Listener {
   State *currState;
   entt::registry *currReg;
 
-  Listener()
-  {
+  Listener() {
     currState = nullptr;
     currReg = nullptr;
   }
   ~Listener() {}
 
-  Listener( State &state, entt::registry &reg )
-  {
+  Listener( State &state, entt::registry &reg ) {
     this->currState = &state;
     this->currReg = &reg;
   }
 
-  inline void Update( State &state, entt::registry &reg )
-  {
+  inline void Update( State &state, entt::registry &reg ) {
     this->currState = &state, this->currReg = &reg;
   }
 

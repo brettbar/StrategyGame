@@ -6,8 +6,7 @@
 #include "content.hpp"
 
 
-namespace UI
-{
+namespace UI {
 
 inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
 
@@ -18,32 +17,25 @@ inline GUI::Context context = {
 
 inline std::vector<GUI::Panel> content;
 
-inline void Init()
-{
-  // i32 i = -1;
-  content = InitUI();
-}
+inline void Init() { content = InitUI(); }
 
-inline bool MouseWasOverUI()
-{
+inline bool MouseWasOverUI() {
   bool inside = false;
 
-  for ( GUI::Panel &panel: content )
-  {
+  for ( GUI::Panel &panel: content ) {
     inside = CheckCollisionPointRec(
       GetMousePosition(),
-      GUI::GetAbsoluteRectangle( panel.position, panel.dimensions ) );
+      GUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
 
     if ( inside )
       return true;
 
-    for ( GUI::Item *child: panel.children )
-    {
+    for ( GUI::Item *child: panel.children ) {
       GUI::Item item = *child;
 
       inside = CheckCollisionPointRec(
         GetMousePosition(),
-        GUI::GetAbsoluteRectangle( item.position, item.dimensions ) );
+        GUI::GetAbsoluteRectangle( item.pos, item.dmns ) );
 
       if ( inside )
         return true;
@@ -54,21 +46,18 @@ inline bool MouseWasOverUI()
 }
 
 
-inline void Draw()
-{
+inline void Draw() {
   Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
   bool mouseHeldDown = IsMouseButtonDown( 0 );
   bool overAnyElem = false;
 
-  for ( GUI::Panel &panel: content )
-  {
-    if ( panel.floating )
-    {
+  for ( GUI::Panel &panel: content ) {
+    if ( panel.floating ) {
       bool inside = CheckCollisionPointRec(
         GetMousePosition(),
-        GUI::GetAbsoluteRectangle( panel.position, panel.dimensions ) );
+        GUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
 
       if ( !overAnyElem )
         overAnyElem = inside;
@@ -79,41 +68,49 @@ inline void Draw()
              inside,
              mouseWentUp,
              mouseWentDown,
-             mouseHeldDown ) )
-      {
+             mouseHeldDown ) ) {
         HandleFloatingPanel( panel, mousePos );
-      }
-      else
-      {
+      } else {
         panel.oldOffset = {
-          panel.position.x - mousePos.x,
-          panel.position.y - mousePos.y,
+          panel.pos.x - mousePos.x,
+          panel.pos.y - mousePos.y,
         };
       }
-    }
-    else
-    {
+    } else {
       panel.Update();
-      DrawRectangleV( panel.position, panel.dimensions, panel.color );
+      DrawRectangleV( panel.pos, panel.dmns, panel.color );
     }
 
-    for ( GUI::Item *child: panel.children )
-    {
+    for ( GUI::Item *child: panel.children ) {
       GUI::Item item = *child;
 
-      item.Update( panel.position );
+      item.Update( panel.pos );
 
       bool inside = CheckCollisionPointRec(
         GetMousePosition(),
-        GUI::GetAbsoluteRectangle( item.position, item.dimensions ) );
+        GUI::GetAbsoluteRectangle( item.pos, item.dmns ) );
 
       if ( !overAnyElem )
         overAnyElem = inside;
 
 
-      if ( DoItem( context, child, inside, mouseWentUp, mouseWentDown ) )
-      {
-        item.action();
+      if ( DoItem( context, child, inside, mouseWentUp, mouseWentDown ) ) {
+        switch ( child->type ) {
+          case GUI::PANEL: {
+          } break;
+          case GUI::TEXT_LABEL: {
+          } break;
+          case GUI::TEXTURE_LABEL: {
+          } break;
+          case GUI::TEXTURE_BUTTON: {
+            GUI::TextButton *button = dynamic_cast<GUI::TextButton *>( child );
+            button->action();
+          } break;
+          case GUI::TEXT_BUTTON: {
+            GUI::TextButton *button = dynamic_cast<GUI::TextButton *>( child );
+            button->action();
+          } break;
+        }
       }
     }
 
@@ -127,35 +124,27 @@ inline void Draw()
     DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
   }
 
-  if ( !overAnyElem )
-  {
+  if ( !overAnyElem ) {
     context.hot = -1;
     context.active = -1;
   }
 }
 
-inline void HandleFloatingPanel( GUI::Panel &panel, Vector2 mousePos )
-{
+inline void HandleFloatingPanel( GUI::Panel &panel, Vector2 mousePos ) {
   // printf( "DoFloatingPanel: %d\n", panel.index );
-  panel.position.x = panel.oldOffset.x + mousePos.x;
-  panel.position.y = panel.oldOffset.y + mousePos.y;
+  panel.pos.x = panel.oldOffset.x + mousePos.x;
+  panel.pos.y = panel.oldOffset.y + mousePos.y;
 
-  if ( ( panel.position.x + panel.dimensions.x ) > GetScreenWidth() )
-  {
-    panel.position.x = GetScreenWidth() - panel.dimensions.x;
-  }
-  else if ( ( panel.position.x ) < 0 )
-  {
-    panel.position.x = 0;
+  if ( ( panel.pos.x + panel.dmns.x ) > GetScreenWidth() ) {
+    panel.pos.x = GetScreenWidth() - panel.dmns.x;
+  } else if ( ( panel.pos.x ) < 0 ) {
+    panel.pos.x = 0;
   }
 
-  if ( ( panel.position.y + panel.dimensions.y ) > GetScreenHeight() )
-  {
-    panel.position.y = GetScreenHeight() - panel.dimensions.y;
-  }
-  else if ( ( panel.position.y ) < 0 )
-  {
-    panel.position.y = 0;
+  if ( ( panel.pos.y + panel.dmns.y ) > GetScreenHeight() ) {
+    panel.pos.y = GetScreenHeight() - panel.dmns.y;
+  } else if ( ( panel.pos.y ) < 0 ) {
+    panel.pos.y = 0;
   }
 }
 

@@ -6,13 +6,8 @@
 
 #include "../../common.hpp"
 
-namespace c_Actor
-{
-enum ActorType
-{
-  SETTLER,
-  ARMY
-};
+namespace c_Actor {
+enum ActorType { SETTLER, ARMY };
 
 struct Actor {
   ActorType type;

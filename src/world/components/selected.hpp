@@ -2,8 +2,7 @@
 
 #include "../../common.hpp"
 
-namespace c_Selected
-{
+namespace c_Selected {
 
 struct Selected {
   bool isSelected;
