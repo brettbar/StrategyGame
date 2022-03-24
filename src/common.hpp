@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "world/player.hpp"
+#include "world/player_system.hpp"
 #include <map>
 #include <raylib.h>
 #include <raymath.h>
@@ -39,7 +39,8 @@ inline void PrintRect( Rectangle rect ) {
 
 inline i32 DetermineTileIdFromClick( Vector2 clickPos ) {
   std::unique_ptr<Vector2> target = DetermineTilePos( clickPos );
-  if ( target == nullptr )
+  if ( target == nullptr )
+
     return -1;
 
   i32 row = target->y / 96.0;
@@ -77,7 +78,8 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   f32 relY = y - ( row * gridHeight );
   f32 relX;
 
-  if ( rowIsOdd )
+  if ( rowIsOdd )
+
     relX = ( x - ( column * gridWidth ) ) - halfWidth;
   else
     relX = x - ( column * gridWidth );
@@ -88,11 +90,13 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   // Work out if the point is above either of the hexagon's top edges
   if ( relY < ( -m * relX ) + c ) {// LEFT edge
     row--;
-    if ( !rowIsOdd )
+    if ( !rowIsOdd )
+
       column--;
   } else if ( relY < ( m * relX ) - c ) {// RIGHT edge
     row--;
-    if ( rowIsOdd )
+    if ( rowIsOdd )
+
       column++;
   }
 
@@ -128,7 +132,8 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   f32 relY = y - ( row * gridHeight );
   f32 relX;
 
-  if ( rowIsOdd )
+  if ( rowIsOdd )
+
     relX = ( x - ( column * gridWidth ) ) - halfWidth;
   else
     relX = x - ( column * gridWidth );
@@ -139,11 +144,13 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   // Work out if the point is above either of the hexagon's top edges
   if ( relY < ( -m * relX ) + c ) {// LEFT edge
     row--;
-    if ( !rowIsOdd )
+    if ( !rowIsOdd )
+
       column--;
   } else if ( relY < ( m * relX ) - c ) {// RIGHT edge
     row--;
-    if ( rowIsOdd )
+    if ( rowIsOdd )
+
       column++;
   }
 

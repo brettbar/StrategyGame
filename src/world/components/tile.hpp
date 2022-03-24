@@ -2,7 +2,7 @@
 
 #include "../../common.hpp"
 
-namespace c_Tile {
+namespace Tile {
 
 enum Visibility {
   UNEXPLORED,
@@ -18,7 +18,7 @@ enum Biome {
   MTNS,
 };
 
-struct Tile {
+struct Component {
   u32 id;
   f32 noise;
   Vector2 position;
@@ -29,4 +29,4 @@ struct Tile {
 };
 
 
-};// namespace c_Tile
+};// namespace Tile

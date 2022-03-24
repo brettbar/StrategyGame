@@ -2,12 +2,12 @@
 
 #include "../../common.hpp"
 
-namespace c_Unit {
+namespace Unit {
 
-struct Unit {
+struct Component {
   Vector2 position;
   Vector2 destination;
   f32 speed;
 };
 
-}// namespace c_Unit
+}// namespace Unit

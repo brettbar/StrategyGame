@@ -8,8 +8,10 @@
 #include "../../common.hpp"
 
 
-namespace c_Sight {
-struct Sight {
+namespace Sight {
+
+struct Component {
   u32 range;
 };
-}// namespace c_Sight
+
+}// namespace Component

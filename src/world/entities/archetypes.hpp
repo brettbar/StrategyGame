@@ -13,35 +13,35 @@
 namespace Archetypes {
 
 struct Actor {
-  c_Unit::Unit unit;
-  c_Animated::Animated animated;
-  c_Sight::Sight sight;
+  Unit::Component unit;
+  Animated::Component animated;
+  Sight::Component sight;
 
-  c_Animated::Animations animations;
+  Animated::Animations animations;
 
   Actor( Texture2D sprite, Vector2 spawn ) {
-    unit = c_Unit::Unit{
+    unit = Unit::Component{
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,
     };
     animations = {
-      { c_Animated::IDLE_DR, 2, 0.2f },
-      { c_Animated::IDLE_DL, 2, 0.2f },
-      { c_Animated::WALK_DL, 8, 0.8f },
-      { c_Animated::WALK_DL, 8, 0.8f },
+      { Animated::IDLE_DR, 2, 0.2f },
+      { Animated::IDLE_DL, 2, 0.2f },
+      { Animated::WALK_DL, 8, 0.8f },
+      { Animated::WALK_DL, 8, 0.8f },
     };
-    animated = c_Animated::Animated{
+    animated = Animated::Component{
       .sprite = sprite,
       .frameRec = { 0, 0, 128, 128 },
-      .state = c_Animated::IDLE_DR,
+      .state = Animated::IDLE_DR,
       .animations = animations,
       .direction = 0,
       .currFrame = 0,
       .animTime = 0.0f,
       .moving = false,
     };
-    sight = c_Sight::Sight{
+    sight = Sight::Component{
       .range = 1,
     };
   }

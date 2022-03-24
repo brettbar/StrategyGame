@@ -9,19 +9,19 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "events.hpp"
+#include "world/systems/event_system.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "resource.hpp"
 #include "state.hpp"
 #include "ui/ui.hpp"
-#include "world/player.hpp"
-#include "world/systems/animation.hpp"
-#include "world/systems/map/provinces.hpp"
-#include "world/systems/map/terrain.hpp"
-#include "world/systems/movement.hpp"
-#include "world/systems/selection.hpp"
-#include "world/systems/spawn.hpp"
+#include "world/player_system.hpp"
+#include "world/systems/animation_system.hpp"
+#include "world/systems/map/province_system.hpp"
+#include "world/systems/map/terrain_system.hpp"
+#include "world/systems/movement_system.hpp"
+#include "world/systems/selection_system.hpp"
+#include "world/systems/spawn_system.hpp"
 #include <raylib.h>
 
 void LoadResources( TextureCache & );
@@ -45,17 +45,14 @@ int main( void ) {
     .year = 4,
     .startYear = 4,
     .currPlayer =
-      std::make_shared<Player>( Player( 0, ROMANS, "Roman Republic" ) ),
+      std::make_shared<PlayerSystem>(
+      PlayerSystem( 0, ROMANS, "Roman Republic" ) ),
   };
 
   entt::registry reg;
   TextureCache textureCache = {};
 
-
   Init( state, reg, textureCache );
-  UI::Init();
-  Renderer::Init( state );
-
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -115,20 +112,22 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   Terrain::CreateTerrain( reg );
-  Provinces::InitProvinces( state, reg );
-  Spawn::Init();
+  ProvinceSystem::InitProvinces( state, reg );
+  SpawnSystem::Init();
+  UI::Init();
+  Renderer::Init( state );
 }
 
-
 void Update( State &state, entt::registry &reg ) {
-  Movement::Update( reg, state.timeScale );
-  Animation::UpdateSprites( reg, state.timeScale );
+  MovementSystem::Update( reg, state.timeScale );
+  AnimationSystem::UpdateSprites( reg, state.timeScale );
   //  Terrain::UpdateFOW(reg);
+  UI::Update( state, reg );
 }
 
 void LateUpdate( State &state, entt::registry &reg ) {
-  Provinces::UpdateProvinces( state, reg );
-  Spawn::Update( state, reg );
+  ProvinceSystem::UpdateProvinces( state, reg );
+  SpawnSystem::Update( state, reg );
 
   state.day++;
 

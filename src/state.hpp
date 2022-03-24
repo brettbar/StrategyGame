@@ -30,7 +30,7 @@ struct State {
   u32 year;
   u32 startYear;
 
-  std::shared_ptr<Player> currPlayer;
+  std::shared_ptr<PlayerSystem> currPlayer;
 
   Texture2D selectedTexture;
 };

@@ -6,10 +6,10 @@
 
 #include "../../common.hpp"
 
-namespace c_Actor {
+namespace Actor {
 enum ActorType { SETTLER, ARMY };
 
-struct Actor {
+struct Component {
   ActorType type;
 };
 };// namespace c_Actor

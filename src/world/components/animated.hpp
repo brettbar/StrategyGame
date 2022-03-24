@@ -2,7 +2,7 @@
 
 #include "../../common.hpp"
 
-namespace c_Animated {
+namespace Animated {
 enum AnimState {
   IDLE_DR,
   IDLE_DL,
@@ -18,7 +18,7 @@ struct Anim {
 
 using Animations = std::vector<Anim>;
 
-struct Animated {
+struct Component {
   Texture2D sprite;
   Rectangle frameRec;
   AnimState state;

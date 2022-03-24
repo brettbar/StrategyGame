@@ -8,11 +8,11 @@
 #include "resource.hpp"
 #include "state.hpp"
 #include "ui/ui.hpp"
-#include "world/systems/map/map.hpp"
-#include "world/systems/map/provinces.hpp"
-#include "world/systems/movement.hpp"
-#include "world/systems/selection.hpp"
-#include "world/systems/spawn.hpp"
+#include "world/systems/map/map_system.hpp"
+#include "world/systems/map/province_system.hpp"
+#include "world/systems/movement_system.hpp"
+#include "world/systems/selection_system.hpp"
+#include "world/systems/spawn_system.hpp"
 
 namespace Input {
 inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
@@ -45,11 +45,11 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    Spawn::CreateNew( reg, cache, clickPos, state.currPlayer );
+    SpawnSystem::CreateNew( reg, cache, clickPos, state.currPlayer );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    Provinces::SetProvinceOwner( reg, state.currPlayer->id, clickPos );
+    ProvinceSystem::SetProvinceOwner( reg, state.currPlayer->id, clickPos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
@@ -63,12 +63,12 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
     // UI::Input(state, reg);
     // if ( !UI::HandleMouseEvent( 0, GetMousePosition() ) )
     if ( !UI::MouseWasOverUI() )
-      Selection::UpdateSelection( reg, clickPos );
+      SelectionSystem::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
     // if ( !UI::HandleMouseEvent( 1, GetMousePosition() ) )
     if ( !UI::MouseWasOverUI() )
-      Movement::SetDestinations( reg, state.camera );
+      MovementSystem::SetDestinations( reg, state.camera );
   }
 
   if ( IsKeyPressed( KEY_ONE ) ) {
@@ -107,11 +107,11 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_P ) ) {
-    Map::mode = Map::Mode::POLITICAL;
+    MapSystem::mode = MapSystem::Mode::POLITICAL;
   }
 
   if ( IsKeyPressed( KEY_T ) ) {
-    Map::mode = Map::Mode::TERRAIN;
+    MapSystem::mode = MapSystem::Mode::TERRAIN;
   }
 }
 };// namespace Input

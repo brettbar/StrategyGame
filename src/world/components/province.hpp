@@ -3,7 +3,7 @@
 #include "../../common.hpp"
 #include "tile.hpp"
 
-namespace c_Province {
+namespace Province {
 
 enum Development {
   Village,
@@ -55,6 +55,7 @@ struct Population {
   f32 carryingCapacity;
 };
 
+// TODO move to its own file
 struct Settlement {
   u32 id;
   str name;
@@ -62,12 +63,12 @@ struct Settlement {
   Population population;
 };
 
-struct Province {
+struct Component {
   u32 id;
   i32 owner;
 
   std::unique_ptr<Settlement> settlement;
-  std::shared_ptr<c_Tile::Tile> tile;
+  std::shared_ptr<Tile::Component> tile;
 };
 
 }// namespace c_Province

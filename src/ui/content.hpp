@@ -1,7 +1,30 @@
 #pragma once
 
-#include "../events.hpp"
+#include "../world/systems/event_system.hpp"
+#include "../world/components/event.hpp"
 #include "guilib.hpp"
+
+
+// inline std::vector<GUI::Panel> InitFloating() {
+
+// GUI::Panel floatingPanel = GUI::Panel();
+
+// floatingPanel.enabled = true;
+
+// floatingPanel.color = BLUE;
+
+// floatingPanel.position = Vector2{ 500, 100 };
+
+// floatingPanel.dimensions = Vector2{ 200, 400 };
+
+// floatingPanel.floating = true;
+
+// floatingPanel.oldOffset = {};
+
+// floatingPanel.update = []() -> Rectangle { return { 500, 100, 200, 400 }; };
+
+// floatingPanel.children = {};
+// }
 
 inline std::vector<GUI::Panel> InitUI() {
   GUI::Panel leftPanel = GUI::Panel();
@@ -28,7 +51,7 @@ inline std::vector<GUI::Panel> InitUI() {
   };
   spawnButton->dmns = Vector2{ 60, 60 };
 
-  spawnButton->text = "Spawn";
+  spawnButton->text = "SpawnSystem";
   spawnButton->fontSize = 20;
   spawnButton->textColor = RED;
 
@@ -38,8 +61,8 @@ inline std::vector<GUI::Panel> InitUI() {
     else if ( ColorToInt( spawnButton->color ) == ColorToInt( GREEN ) )
       spawnButton->color = WHITE;
 
-    Events::dispatcher.trigger<Events::ProvEvent>();
-    Events::dispatcher.trigger<Events::SpawnEvent>();
+    EventSystem::dispatcher.trigger<Event::ProvEvent>();
+    EventSystem::dispatcher.trigger<Event::SpawnEvent>();
   };
 
   GUI::Panel contextPanel = GUI::Panel();
@@ -86,24 +109,12 @@ inline std::vector<GUI::Panel> InitUI() {
   // fooButton->offset = Vector2{ 10, 10 };
   // fooButton->action = std::function<void()>{};
 
-
-  // GUI::Panel floatingPanel = GUI::Panel();
-  // floatingPanel.enabled = true;
-  // floatingPanel.color = BLUE;
-  // floatingPanel.position = Vector2{ 500, 100 };
-  // floatingPanel.dimensions = Vector2{ 200, 400 };
-  // floatingPanel.floating = true;
-  // floatingPanel.oldOffset = {};
-  // floatingPanel.update = []() -> Rectangle { return { 500, 100, 200, 400 }; };
-  // floatingPanel.children = {};
-
   leftPanel.children = { spawnButton };
   contextPanel.children = { contextLabel };
 
   std::vector<GUI::Panel> ui = {
     leftPanel,
     contextPanel,
-    // floatingPanel,
   };
 
   i32 currId = -1;

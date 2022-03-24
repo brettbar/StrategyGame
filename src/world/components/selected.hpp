@@ -2,9 +2,9 @@
 
 #include "../../common.hpp"
 
-namespace c_Selected {
+namespace Selected {
 
-struct Selected {
+struct Component {
   bool isSelected;
 };
 

@@ -1,22 +1,38 @@
-#include "../common.hpp"
-#include "../resource.hpp"
-#include "../state.hpp"
-#include "../ui/ui.hpp"
-#include "../world/systems/animation.hpp"
-#include "../world/systems/map/map.hpp"
-#include "../world/systems/map/provinces.hpp"
-#include "../world/systems/selection.hpp"
-#include "rlgl.h"
-
-namespace Renderer
-{
-Shader shader;
-
-void Init( State & );
+#include "../common.hpp"
+
+#include "../resource.hpp"
+
+#include "../state.hpp"
+
+#include "../ui/ui.hpp"
+
+#include "../world/systems/animation_system.hpp"
+
+#include "../world/systems/map/map_system.hpp"
+
+#include "../world/systems/map/province_system.hpp"
+
+#include "../world/systems/selection_system.hpp"
+
+#include "rlgl.h"
+
+
+
+namespace Renderer
+
+{
+
+Shader shader;
+
+
+
+void Init( State & );
+
 void Draw( State &, entt::registry &, TextureCache & );
 };// namespace Renderer
 
-inline void Renderer::Init( State &state )
+inline void Renderer::Init( State &state )
+
 {
 
   //  Matrix matProj = MatrixOrtho(0.0, state.screenWidth, state.screenHeight, 0.0, 0.0, 1.0);
@@ -42,7 +58,8 @@ inline void Renderer::Init( State &state )
 
 
 inline void
-Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
+Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
+
 {
   BeginDrawing();
   {
@@ -92,17 +109,21 @@ Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
     BeginShaderMode( shader );
     BeginMode2D( state.camera );
     {
-      Map::Draw( state, reg, cache );
-      Animation::Draw( reg, state.gameState == GameState::EDITOR );
-      Selection::Draw( reg, state.gameState == GameState::EDITOR );
+      MapSystem::Draw( state, reg, cache );
+      AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+      SelectionSystem::Draw( reg, state.gameState == GameState::EDITOR );
     }
     EndMode2D();
     EndShaderMode();
 
-    UI::Draw();
+    UI::Draw();
+
   }
   EndDrawing();
-}
-
-// if (state.gameState == EDITOR)
+}
+
+
+
+// if (state.gameState == EDITOR)
+
 //   Editor::Draw();
