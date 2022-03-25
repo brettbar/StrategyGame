@@ -28,19 +28,19 @@ struct Element {
   Vector2 pos;
   Vector2 dmns;
 
-  inline bool operator==( const Element &rhs ) { return index == rhs.index; };
+  bool operator==( const Element &rhs ) { return index == rhs.index; };
 };
 
 struct Item : Element {
   Type type;
   Vector2 offset;
 
-  inline void Update( Vector2 parentPos ) {
+  void Update( Vector2 parentPos ) {
     pos.x = offset.x + parentPos.x;
     pos.y = offset.y + parentPos.y;
   }
 
-  inline virtual void Draw(){};
+  virtual void Draw(){};
 };
 
 struct TextLabel : Item {
@@ -48,7 +48,9 @@ struct TextLabel : Item {
   i32 fontSize;
   Color textColor;
 
-  inline void Draw() override {
+  void Update( std::string new_name ) { text = new_name; }
+
+  void Draw() override {
     DrawRectangleV( pos, dmns, color );
 
     DrawText(
@@ -72,14 +74,14 @@ struct TextureButton : Item {
 struct Panel : Element {
   bool floating;
   Vector2 oldOffset;
-  std::function<Rectangle()> update;
+  std::function<void()> update;
   std::vector<GUI::Item *> children;
 
-  void Update() {
-    Rectangle updated = update();
-    pos = { updated.x, updated.y };
-    dmns = { updated.width, updated.height };
-  }
+  // void Update() {
+  //   Rectangle updated = update();
+  //   pos = { updated.x, updated.y };
+  //   dmns = { updated.width, updated.height };
+  // }
 };
 
 inline bool DoFloatingPanel(

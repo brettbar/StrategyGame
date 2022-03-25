@@ -29,7 +29,7 @@ inline void Draw( entt::registry &reg, bool isDebug ) {
     Province::Component &prov = provsView.get<Province::Component>( entity );
     if ( isDebug ) {
       DrawRectangleLinesEx(
-        { prov.tile->position.x - 32, prov.tile->position.y - 64, 64, 64 },
+        { prov.tile->position.x + 32, prov.tile->position.y + 32, 64, 64 },
         2,
         YELLOW );
     }
@@ -67,7 +67,10 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
 
     Province::Component &prov = provView.get<Province::Component>( entity );
 
-    if ( CheckCollisionPointCircle( prov.tile->position, clickPos, 64 ) ) {
+    if ( CheckCollisionPointCircle(
+           Vector2{ prov.tile->position.x + 32, prov.tile->position.y + 32 },
+           clickPos,
+           64 ) ) {
       if ( prov.settlement == nullptr )
         continue;
 

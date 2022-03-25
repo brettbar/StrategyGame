@@ -4,11 +4,11 @@
 #include "../world/components/event.hpp"
 #include "../world/systems/event_system.hpp"
 #include "./guilib.hpp"
-#include "content.hpp"
 
 
 namespace UI {
 inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
+
 
 struct UIListener : EventSystem::Listener {
   inline void Receive( const Event::SelectionEvent &e ) {
@@ -33,6 +33,112 @@ inline std::vector<GUI::Panel> content;
 inline std::vector<GUI::Panel> floating;
 
 inline UIListener listener;
+
+inline std::vector<GUI::Panel> InitUI() {
+  GUI::Panel leftPanel = GUI::Panel();
+  leftPanel.enabled = true;
+  leftPanel.color = BLACK;
+  leftPanel.pos = Vector2{ 0, 0 };
+  leftPanel.dmns = Vector2{ 80, (f32) GetScreenHeight() };
+  leftPanel.floating = false;
+  leftPanel.oldOffset = {};
+  leftPanel.update = [&leftPanel]() {
+    leftPanel.pos = { 0, 0 };
+    leftPanel.dmns = { 80, (f32) GetScreenHeight() };
+  };
+
+  GUI::TextButton *spawnButton = new GUI::TextButton();
+  spawnButton->enabled = true;
+  spawnButton->color = WHITE;
+
+  spawnButton->type = GUI::TEXT_BUTTON;
+  spawnButton->offset = Vector2{ 5, 5 };
+
+  spawnButton->pos = {
+    leftPanel.pos.x + spawnButton->offset.x,
+    leftPanel.pos.y + spawnButton->offset.y,
+  };
+  spawnButton->dmns = Vector2{ 60, 60 };
+
+  spawnButton->text = "SpawnSystem";
+  spawnButton->fontSize = 20;
+  spawnButton->textColor = RED;
+
+  spawnButton->action = [spawnButton]() {
+    if ( ColorToInt( spawnButton->color ) == ColorToInt( WHITE ) )
+      spawnButton->color = GREEN;
+    else if ( ColorToInt( spawnButton->color ) == ColorToInt( GREEN ) )
+      spawnButton->color = WHITE;
+
+    EventSystem::dispatcher.trigger<Event::ProvEvent>();
+    EventSystem::dispatcher.trigger<Event::SpawnEvent>();
+  };
+
+  // GUI::Panel contextPanel = GUI::Panel();
+  // contextPanel.enabled = true;
+  // contextPanel.color = RED;
+  // contextPanel.pos = Vector2{
+  //   (f32) ( GetScreenWidth() / 2.0f ) - 200,
+  //   (f32) GetScreenHeight() - 200,
+  // };
+  // contextPanel.dmns = Vector2{ 400, 200 };
+  // contextPanel.floating = false;
+  // contextPanel.oldOffset = Vector2{};
+  // contextPanel.update = [contextPanel]() {
+  //   contextPanel.pos = Vector2{
+  //     ( GetScreenWidth() / 2.0f ) - 200,
+  //     (f32) GetScreenHeight() - 200 };
+  //   contextPanel.dmns = Vector2{ 400, 200 };
+  // };
+
+  // GUI::TextLabel *contextLabel = new GUI::TextLabel();
+  // contextLabel->type = GUI::TEXT_LABEL;
+  // contextLabel->offset = Vector2{ 5, 5 };
+
+  // contextLabel->enabled = true;
+  // contextLabel->color = BLACK;
+  // contextLabel->pos = {
+  //   contextPanel.pos.x + contextLabel->offset.x,
+  //   contextPanel.pos.y + contextLabel->offset.y,
+  // };
+  // contextLabel->dmns = { 200, 100 };
+  // contextLabel->text = "Poplili";
+  // contextLabel->fontSize = 20;
+  // contextLabel->textColor = WHITE;
+
+
+  // GUI::TextureButton *fooButton = new GUI::TextureButton();
+  // fooButton->enabled = false;
+  // fooButton->color = WHITE;
+  // fooButton->dimensions = Vector2{ 128, 128 };
+
+  // fooButton->type = GUI::TEXTURE_BUTTON;
+  // fooButton->offset = Vector2{ 10, 10 };
+  // fooButton->action = std::function<void()>{};
+
+  leftPanel.children = { spawnButton };
+  // contextPanel.children = { contextLabel };
+
+  std::vector<GUI::Panel> ui = {
+    leftPanel,
+    // contextPanel,
+  };
+
+  i32 currId = -1;
+
+  for ( GUI::Panel &panel: ui ) {
+    currId++;
+    panel.index = currId;
+
+    for ( GUI::Item *child: panel.children ) {
+      currId++;
+      child->index = currId;
+    }
+  }
+
+  return ui;
+}
+
 
 inline void Init() {
   content = InitUI();
@@ -78,7 +184,7 @@ inline void Draw() {
   //  }
 
   for ( GUI::Panel &panel: content ) {
-    panel.Update();
+    panel.update();
     DrawRectangleV( panel.pos, panel.dmns, panel.color );
 
     for ( GUI::Item *child: panel.children ) {
@@ -102,12 +208,14 @@ inline void Draw() {
           case GUI::TEXTURE_LABEL: {
           } break;
           case GUI::TEXTURE_BUTTON: {
-            GUI::TextButton *button = dynamic_cast<GUI::TextButton *>( child );
-            button->action();
+            // GUI::TextButton *button = dynamic_cast<GUI::TextButton *>( child );
+            // button->action();
           } break;
           case GUI::TEXT_BUTTON: {
             GUI::TextButton *button = dynamic_cast<GUI::TextButton *>( child );
             button->action();
+
+
           } break;
         }
       }
