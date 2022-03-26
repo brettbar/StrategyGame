@@ -31,19 +31,34 @@ struct Element {
   Vector2 pos;
   Vector2 dmns;
   Vector2 offset;
-  std::function<Rectangle()> resize;
 
   void Update( Vector2 parentPos ) {
     pos.x = offset.x + parentPos.x;
     pos.y = offset.y + parentPos.y;
   }
+};
+
+struct DynamicElement {
+  Element elem;
+
+  std::function<Vector2()> move;
+  std::function<Vector2()> resize;
+
+  void Move() {
+    Vector2 updated = move();
+    elem.pos = updated;
+  }
 
   void Resize() {
-    Rectangle updated = resize();
-    this->pos = { updated.x, updated.y };
-    this->dmns = { updated.width, updated.height };
+    Vector2 updated = resize();
+    elem.dmns = updated;
   }
+
+  // void Move() {
+  //   elem.pos = { updated.x, updated.y };
+  // };
 };
+
 
 struct TextLabel {
   Element elem;
@@ -69,12 +84,17 @@ struct TextButton {
 };
 
 struct Panel {
-  Element elem;
-  bool floating;
-  Vector2 oldOffset;
+  DynamicElement dyn;
   std::vector<entt::entity> children;
 
-  void Draw() { DrawRectangleV( elem.pos, elem.dmns, elem.color ); }
+  Panel( DynamicElement dynamicElement ) : dyn( dynamicElement ) {}
+
+  void Draw() { DrawRectangleV( dyn.elem.pos, dyn.elem.dmns, dyn.elem.color ); }
+};
+
+struct FloatingPanel {
+  Panel panel;
+  Vector2 oldOffset;
 };
 
 inline bool DoItem(
@@ -111,7 +131,10 @@ inline bool DoItem(
   switch ( elem.type ) {
     case PANEL: {
       auto &panel = uiReg.get<Panel>( entity );
-      panel.elem.Resize();
+      panel.dyn.elem.Update( { 0, 0 } );
+
+      panel.dyn.Move();
+      panel.dyn.Resize();
       panel.Draw();
     } break;
     case TEXT_LABEL: {
@@ -124,7 +147,6 @@ inline bool DoItem(
     } break;
     case TEXT_BUTTON: {
       auto &button = uiReg.get<TextButton>( entity );
-
       button.label.Draw();
     } break;
   }

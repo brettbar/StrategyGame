@@ -30,74 +30,120 @@ inline GUI::Context context = {
 
 inline UIListener listener;
 
-inline void createLeftPanel() {
-  entt::entity entity = GUI::uiReg.create();
-
-  GUI::Panel panel = GUI::Panel();
-  panel.elem = { .type = GUI::PANEL };
-  panel.elem = {
-    .enabled = true,
-    .color = BLACK,
-    .pos = Vector2{ 0, 0 },
-    .dmns = Vector2{ 80, (f32) GetScreenHeight() },
-    .offset = Vector2{ 0, 0 },
-    .resize = []() -> Rectangle {
-      return { 0, 0, 80, (f32) GetScreenHeight() };
+inline GUI::Panel createLeftPanel() {
+  GUI::DynamicElement dyn = {
+    .elem =
+      {
+        .type = GUI::PANEL,
+        .enabled = true,
+        .color = BLACK,
+        .pos = Vector2{ 0, 0 },
+        .dmns = Vector2{ 80, (f32) GetScreenHeight() },
+        .offset = Vector2{ 0, 0 },
+      },
+    .move = []() -> Vector2 {
+      return { 0, 0 };
+    },
+    .resize = []() -> Vector2 {
+      return { 80, (f32) GetScreenHeight() };
     },
   };
-  panel.floating = false;
-  panel.oldOffset = {};
 
-  GUI::uiReg.emplace<GUI::Element>( entity, panel.elem );
-  GUI::uiReg.emplace<GUI::Panel>( entity, panel );
+  return GUI::Panel( dyn );
+}
+
+inline GUI::TextButton createSpawnButton( GUI::Panel parent ) {
+  GUI::TextButton spawnButton = GUI::TextButton();
+  spawnButton.label = {
+    .text = "SpawnSystem",
+    .fontSize = 20,
+    .textColor = RED,
+  };
+
+  Vector2 offset = { 5, 5 };
+
+  spawnButton.label.elem = {
+    .type = GUI::TEXT_BUTTON,
+    .enabled = true,
+    .color = WHITE,
+    .pos =
+      {
+        parent.dyn.elem.pos.x + offset.x,
+        parent.dyn.elem.pos.y + offset.y,
+      },
+    .dmns = Vector2{ 60, 60 },
+    .offset = offset,
+  };
+
+  spawnButton.action = [&spawnButton]() {
+    if ( ColorToInt( spawnButton.label.elem.color ) == ColorToInt( WHITE ) )
+      spawnButton.label.elem.color = GREEN;
+    else if (
+      ColorToInt( spawnButton.label.elem.color ) == ColorToInt( GREEN ) )
+      spawnButton.label.elem.color = WHITE;
+
+    EventSystem::dispatcher.trigger<Event::ProvEvent>();
+    EventSystem::dispatcher.trigger<Event::SpawnEvent>();
+  };
+
+  return spawnButton;
+}
+
+inline GUI::Panel createContextPanel() {
+  Vector2 offset = {
+    (f32) ( GetScreenWidth() / 2.0f ) - 200,
+    (f32) GetScreenHeight() - 200,
+  };
+
+  GUI::DynamicElement dny = {
+    .elem =
+      {
+        .type = GUI::PANEL,
+        .enabled = true,
+        .color = RED,
+        .pos =
+          {
+            offset.x,
+            offset.y,
+          },
+        .dmns = Vector2{ 400, 200 },
+        .offset = offset,
+      },
+    .move = []() -> Vector2 {
+      return {
+        (f32) ( GetScreenWidth() / 2.0f ) - 200,
+        (f32) GetScreenHeight() - 200,
+      };
+    },
+    .resize = []() -> Vector2 {
+      return { 400, 200 };
+    },
+  };
+
+  return GUI::Panel( dny );
 }
 
 inline void InitUI() {
 
-  createLeftPanel();
-  // GUI::TextButton *spawnButton = new GUI::TextButton();
-  // spawnButton->enabled = true;
-  // spawnButton->color = WHITE;
+  entt::entity leftPanelEntt = GUI::uiReg.create();
+  GUI::Panel leftPanel = createLeftPanel();
 
-  // spawnButton->type = GUI::TEXT_BUTTON;
-  // spawnButton->offset = Vector2{ 5, 5 };
+  entt::entity spawnButtonEntt = GUI::uiReg.create();
+  GUI::TextButton spawnButton = createSpawnButton( leftPanel );
 
-  // spawnButton->pos = {
-  //   leftPanel.pos.x + spawnButton->offset.x,
-  //   leftPanel.pos.y + spawnButton->offset.y,
-  // };
-  // spawnButton->dmns = Vector2{ 60, 60 };
+  entt::entity contextPanelEntt = GUI::uiReg.create();
+  GUI::Panel contextPanel = createContextPanel();
 
-  // spawnButton->text = "SpawnSystem";
-  // spawnButton->fontSize = 20;
-  // spawnButton->textColor = RED;
+  // Emplace in reverse declared order, to have them drawn in proper order
+  GUI::uiReg.emplace<GUI::Element>( contextPanelEntt, contextPanel.dyn.elem );
+  GUI::uiReg.emplace<GUI::Panel>( contextPanelEntt, contextPanel );
 
-  // spawnButton->action = [spawnButton]() {
-  //   if ( ColorToInt( spawnButton->color ) == ColorToInt( WHITE ) )
-  //     spawnButton->color = GREEN;
-  //   else if ( ColorToInt( spawnButton->color ) == ColorToInt( GREEN ) )
-  //     spawnButton->color = WHITE;
+  GUI::uiReg.emplace<GUI::Element>( spawnButtonEntt, spawnButton.label.elem );
+  GUI::uiReg.emplace<GUI::TextButton>( spawnButtonEntt, spawnButton );
 
-  //   EventSystem::dispatcher.trigger<Event::ProvEvent>();
-  //   EventSystem::dispatcher.trigger<Event::SpawnEvent>();
-  // };
+  GUI::uiReg.emplace<GUI::Element>( leftPanelEntt, leftPanel.dyn.elem );
+  GUI::uiReg.emplace<GUI::Panel>( leftPanelEntt, leftPanel );
 
-  // GUI::Panel contextPanel = GUI::Panel();
-  // contextPanel.enabled = true;
-  // contextPanel.color = RED;
-  // contextPanel.pos = Vector2{
-  //   (f32) ( GetScreenWidth() / 2.0f ) - 200,
-  //   (f32) GetScreenHeight() - 200,
-  // };
-  // contextPanel.dmns = Vector2{ 400, 200 };
-  // contextPanel.floating = false;
-  // contextPanel.oldOffset = Vector2{};
-  // contextPanel.update = [contextPanel]() {
-  //   contextPanel.pos = Vector2{
-  //     ( GetScreenWidth() / 2.0f ) - 200,
-  //     (f32) GetScreenHeight() - 200 };
-  //   contextPanel.dmns = Vector2{ 400, 200 };
-  // };
 
   // GUI::TextLabel *contextLabel = new GUI::TextLabel();
   // contextLabel->type = GUI::TEXT_LABEL;
@@ -223,5 +269,4 @@ inline void Draw() {
 //     panel.pos.y = 0;
 //   }
 // }
-
 };// namespace UI
