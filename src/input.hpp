@@ -7,6 +7,7 @@
 #include "common.hpp"
 #include "resource.hpp"
 #include "state.hpp"
+#include "ui/guilib.hpp"
 #include "ui/ui.hpp"
 #include "world/systems/map/map_system.hpp"
 #include "world/systems/map/province_system.hpp"
@@ -62,12 +63,12 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   if ( IsMouseButtonPressed( 0 ) ) {
     // UI::Input(state, reg);
     // if ( !UI::HandleMouseEvent( 0, GetMousePosition() ) )
-    if ( !UI::MouseWasOverUI() )
+    if ( !GUI::MouseWasOverUI() )
       SelectionSystem::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
     // if ( !UI::HandleMouseEvent( 1, GetMousePosition() ) )
-    if ( !UI::MouseWasOverUI() )
+    if ( !GUI::MouseWasOverUI() )
       MovementSystem::SetDestinations( reg, state.camera );
   }
 

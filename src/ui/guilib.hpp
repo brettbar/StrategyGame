@@ -16,153 +16,168 @@ enum Type {
 
 enum Layout { NONE, HORIZONTAL, VERTICAL };
 
+inline entt::registry uiReg;
+
 struct Context {
-  i32 hot;
-  i32 active;
+  entt::entity hot;
+  entt::entity active;
 };
 
+
 struct Element {
-  i32 index;
+  Type type;
   bool enabled;
   Color color;
   Vector2 pos;
   Vector2 dmns;
-
-  bool operator==( const Element &rhs ) { return index == rhs.index; };
-};
-
-struct Item : Element {
-  Type type;
   Vector2 offset;
+  std::function<Rectangle()> resize;
 
   void Update( Vector2 parentPos ) {
     pos.x = offset.x + parentPos.x;
     pos.y = offset.y + parentPos.y;
   }
 
-  virtual void Draw(){};
+  void Resize() {
+    Rectangle updated = resize();
+    this->pos = { updated.x, updated.y };
+    this->dmns = { updated.width, updated.height };
+  }
 };
 
-struct TextLabel : Item {
+struct TextLabel {
+  Element elem;
   std::string text;
   i32 fontSize;
   Color textColor;
 
-  void Update( std::string new_name ) { text = new_name; }
-
-  void Draw() override {
-    DrawRectangleV( pos, dmns, color );
+  void Draw() {
+    DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
     DrawText(
       text.c_str(),
-      pos.x,
-      pos.y + ( 0.5 * dmns.y ),
+      elem.pos.x,
+      elem.pos.y + ( 0.5 * elem.dmns.y ),
       fontSize,
       textColor );
   }
 };
 
-struct TextButton : TextLabel {
+struct TextButton {
+  TextLabel label;
   std::function<void()> action;
 };
 
-struct TextureButton : Item {
-  Texture2D texture;
-  std::function<void()> action;
-};
-
-struct Panel : Element {
+struct Panel {
+  Element elem;
   bool floating;
   Vector2 oldOffset;
-  std::function<void()> update;
-  std::vector<GUI::Item *> children;
+  std::vector<entt::entity> children;
 
-  // void Update() {
-  //   Rectangle updated = update();
-  //   pos = { updated.x, updated.y };
-  //   dmns = { updated.width, updated.height };
-  // }
+  void Draw() { DrawRectangleV( elem.pos, elem.dmns, elem.color ); }
 };
-
-inline bool DoFloatingPanel(
-  Context &context,
-  Panel &panel,
-  bool inside,
-  bool mouseWentUp,
-  bool mouseWentDown,
-  bool mouseHeldDown ) {
-  bool result = false;
-
-  if ( panel.index == context.active ) {
-    if ( !mouseWentUp && mouseHeldDown )
-      result = true;
-  } else if ( panel.index == context.hot ) {
-    if ( mouseWentDown )
-      context.active = panel.index;
-  }
-
-  if ( inside ) {
-    if ( context.active == -1 )
-      context.hot = panel.index;
-  }
-
-  DrawRectangleV( panel.pos, panel.dmns, panel.color );
-
-  return result;
-}
 
 inline bool DoItem(
   Context &context,
-  Item *itemPtr,
+  entt::entity entity,
+  bool enabled,
   bool inside,
   bool mouseWentUp,
   bool mouseWentDown ) {
-  Item item = *itemPtr;
 
-  if ( !item.enabled )
+  if ( !enabled )
     return false;
 
   bool result = false;
 
-  if ( item.index == context.active ) {
+  if ( entity == context.active ) {
     if ( mouseWentUp ) {
-      if ( item.index == context.hot )
+      if ( entity == context.hot )
         result = true;// do the button action
-      context.active = -1;
+      context.active = entt::null;
     }
-  } else if ( item.index == context.hot ) {
+  } else if ( entity == context.hot ) {
     if ( mouseWentDown )
-      context.active = item.index;
+      context.active = entity;
   }
 
   if ( inside ) {
-    if ( context.active == -1 )
-      context.hot = item.index;
+    if ( context.active == entt::null )
+      context.hot = entity;
   }
 
-  switch ( item.type ) {
+  auto &elem = uiReg.get<Element>( entity );
+
+  switch ( elem.type ) {
     case PANEL: {
+      auto &panel = uiReg.get<Panel>( entity );
+      panel.elem.Resize();
+      panel.Draw();
     } break;
     case TEXT_LABEL: {
-      TextLabel *label = dynamic_cast<TextLabel *>( itemPtr );
-      label->Draw();
+      auto &label = uiReg.get<TextLabel>( entity );
+      label.Draw();
     } break;
     case TEXTURE_LABEL: {
     } break;
     case TEXTURE_BUTTON: {
     } break;
     case TEXT_BUTTON: {
-      TextButton *button = dynamic_cast<TextButton *>( itemPtr );
-      button->Draw();
+      auto &button = uiReg.get<TextButton>( entity );
+
+      button.label.Draw();
     } break;
   }
 
   return result;
 }
 
-
 inline Rectangle GetAbsoluteRectangle( Vector2 pos, Vector2 dimensions ) {
   return { pos.x, pos.y, dimensions.x, dimensions.y };
 }
+
+inline bool MouseWasOverUI() {
+  bool inside = false;
+
+  for ( auto &entity: GUI::uiReg.view<GUI::Element>() ) {
+    GUI::Element elem = GUI::uiReg.get<GUI::Element>( entity );
+    inside = CheckCollisionPointRec(
+      GetMousePosition(),
+      GUI::GetAbsoluteRectangle( elem.pos, elem.dmns ) );
+
+    if ( inside )
+      return true;
+  }
+
+  return inside;
+}
+
+
+// inline bool DoFloatingPanel(
+//   Context &context,
+//   Panel &panel,
+//   bool inside,
+//   bool mouseWentUp,
+//   bool mouseWentDown,
+//   bool mouseHeldDown ) {
+//   bool result = false;
+
+//   if ( panel.elem == context.active ) {
+//     if ( !mouseWentUp && mouseHeldDown )
+//       result = true;
+//   } else if ( panel.elem == context.hot ) {
+//     if ( mouseWentDown )
+//       context.active = panel.elem.entity;
+//   }
+
+//   if ( inside ) {
+//     if ( context.active == entt::null )
+//       context.hot = panel.elem.entity;
+//   }
+
+//   DrawRectangleV( panel.elem.pos, panel.elem.dmns, panel.elem.color );
+
+//   return result;
+// }
 
 };// namespace GUI
