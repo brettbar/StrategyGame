@@ -1,29 +1,19 @@
 #include "../common.hpp"
-
 #include "../resource.hpp"
-
 #include "../state.hpp"
-
-#include "../ui/ui.hpp"
-
 #include "../world/systems/animation_system.hpp"
-
 #include "../world/systems/map/map_system.hpp"
-
 #include "../world/systems/map/province_system.hpp"
-
 #include "../world/systems/selection_system.hpp"
+#include "../world/systems/ui_system.hpp"
 
 #include "rlgl.h"
-
 
 
 namespace Renderer
 
 {
-
 Shader shader;
-
 
 
 void Init( State & );
@@ -117,11 +107,9 @@ Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
     EndShaderMode();
 
     UI::Draw();
-
   }
   EndDrawing();
 }
-
 
 
 // if (state.gameState == EDITOR)

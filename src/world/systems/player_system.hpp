@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../common.hpp"
+#include "../../common.hpp"
 
 using u32 = unsigned int;
 using i32 = int;

@@ -1,15 +1,16 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "event_system.hpp"
 #include "../components/animated.hpp"
+#include "../components/event.hpp"
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
 #include "../entities/archetypes.hpp"
+#include "event_system.hpp"
 
 #include "../../resource.hpp"
-#include "../player_system.hpp"
+#include "player_system.hpp"
 
 namespace SpawnSystem {
 inline void DeleteSelected( entt::registry & );

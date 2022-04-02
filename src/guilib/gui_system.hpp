@@ -23,7 +23,6 @@ struct Context {
   entt::entity active;
 };
 
-
 struct Element {
   Type type;
   bool enabled;
@@ -32,22 +31,23 @@ struct Element {
   Vector2 dmns;
   Vector2 offset;
 
-  void Update( Vector2 parentPos ) {
-    pos.x = offset.x + parentPos.x;
-    pos.y = offset.y + parentPos.y;
+  std::function<Vector2()> move;
+
+  // void Update( Vector2 parentPos ) {
+  //   pos.x = offset.x + parentPos.x;
+  //   pos.y = offset.y + parentPos.y;
+  // }
+
+  void Move() {
+    Vector2 updated = move();
+    pos = updated;
   }
 };
 
 struct DynamicElement {
   Element elem;
 
-  std::function<Vector2()> move;
   std::function<Vector2()> resize;
-
-  void Move() {
-    Vector2 updated = move();
-    elem.pos = updated;
-  }
 
   void Resize() {
     Vector2 updated = resize();
@@ -100,20 +100,16 @@ struct FloatingPanel {
 inline bool DoItem(
   Context &context,
   entt::entity entity,
-  bool enabled,
   bool inside,
   bool mouseWentUp,
   bool mouseWentDown ) {
-
-  if ( !enabled )
-    return false;
-
   bool result = false;
 
   if ( entity == context.active ) {
     if ( mouseWentUp ) {
       if ( entity == context.hot )
         result = true;// do the button action
+
       context.active = entt::null;
     }
   } else if ( entity == context.hot ) {
@@ -126,14 +122,12 @@ inline bool DoItem(
       context.hot = entity;
   }
 
-  auto &elem = uiReg.get<Element>( entity );
-
-  switch ( elem.type ) {
+  switch ( uiReg.get<Element>( entity ).type ) {
     case PANEL: {
       auto &panel = uiReg.get<Panel>( entity );
-      panel.dyn.elem.Update( { 0, 0 } );
+      // panel.dyn.elem.Update( { 0, 0 } );
 
-      panel.dyn.Move();
+      panel.dyn.elem.Move();
       panel.dyn.Resize();
       panel.Draw();
     } break;
@@ -147,6 +141,7 @@ inline bool DoItem(
     } break;
     case TEXT_BUTTON: {
       auto &button = uiReg.get<TextButton>( entity );
+      button.label.elem.Move();
       button.label.Draw();
     } break;
   }

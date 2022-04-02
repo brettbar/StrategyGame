@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../common.hpp"
-#include "../world/components/event.hpp"
-#include "../world/systems/event_system.hpp"
-#include "./guilib.hpp"
+#include "../../common.hpp"
+#include "../../guilib/gui_system.hpp"
+#include "../components/event.hpp"
+#include "event_system.hpp"
 
 namespace UI {
 
@@ -40,10 +40,10 @@ inline GUI::Panel createLeftPanel() {
         .pos = Vector2{ 0, 0 },
         .dmns = Vector2{ 80, (f32) GetScreenHeight() },
         .offset = Vector2{ 0, 0 },
+        .move = []() -> Vector2 {
+          return { 0, 0 };
+        },
       },
-    .move = []() -> Vector2 {
-      return { 0, 0 };
-    },
     .resize = []() -> Vector2 {
       return { 80, (f32) GetScreenHeight() };
     },
@@ -52,7 +52,7 @@ inline GUI::Panel createLeftPanel() {
   return GUI::Panel( dyn );
 }
 
-inline GUI::TextButton createSpawnButton( GUI::Panel parent ) {
+inline GUI::TextButton createSpawnButton( GUI::Panel &parent ) {
   GUI::TextButton spawnButton = GUI::TextButton();
   spawnButton.label = {
     .text = "SpawnSystem",
@@ -73,9 +73,17 @@ inline GUI::TextButton createSpawnButton( GUI::Panel parent ) {
       },
     .dmns = Vector2{ 60, 60 },
     .offset = offset,
+    .move = [parent, offset]() -> Vector2 {
+      return {
+        parent.dyn.elem.pos.x + offset.x,
+        parent.dyn.elem.pos.y + offset.y,
+      };
+    },
   };
 
   spawnButton.action = [&spawnButton]() {
+    printf( "Spawn Button Action!\n" );
+
     if ( ColorToInt( spawnButton.label.elem.color ) == ColorToInt( WHITE ) )
       spawnButton.label.elem.color = GREEN;
     else if (
@@ -108,13 +116,13 @@ inline GUI::Panel createContextPanel() {
           },
         .dmns = Vector2{ 400, 200 },
         .offset = offset,
+        .move = []() -> Vector2 {
+          return {
+            (f32) ( GetScreenWidth() / 2.0f ) - 200,
+            (f32) GetScreenHeight() - 200,
+          };
+        },
       },
-    .move = []() -> Vector2 {
-      return {
-        (f32) ( GetScreenWidth() / 2.0f ) - 200,
-        (f32) GetScreenHeight() - 200,
-      };
-    },
     .resize = []() -> Vector2 {
       return { 400, 200 };
     },
@@ -128,21 +136,22 @@ inline void InitUI() {
   entt::entity leftPanelEntt = GUI::uiReg.create();
   GUI::Panel leftPanel = createLeftPanel();
 
-  entt::entity spawnButtonEntt = GUI::uiReg.create();
-  GUI::TextButton spawnButton = createSpawnButton( leftPanel );
-
   entt::entity contextPanelEntt = GUI::uiReg.create();
   GUI::Panel contextPanel = createContextPanel();
 
+  entt::entity spawnButtonEntt = GUI::uiReg.create();
+  GUI::TextButton spawnButton = createSpawnButton( contextPanel );
+
+
   // Emplace in reverse declared order, to have them drawn in proper order
+  GUI::uiReg.emplace<GUI::Element>( leftPanelEntt, leftPanel.dyn.elem );
+  GUI::uiReg.emplace<GUI::Panel>( leftPanelEntt, leftPanel );
+
   GUI::uiReg.emplace<GUI::Element>( contextPanelEntt, contextPanel.dyn.elem );
   GUI::uiReg.emplace<GUI::Panel>( contextPanelEntt, contextPanel );
 
   GUI::uiReg.emplace<GUI::Element>( spawnButtonEntt, spawnButton.label.elem );
   GUI::uiReg.emplace<GUI::TextButton>( spawnButtonEntt, spawnButton );
-
-  GUI::uiReg.emplace<GUI::Element>( leftPanelEntt, leftPanel.dyn.elem );
-  GUI::uiReg.emplace<GUI::Panel>( leftPanelEntt, leftPanel );
 
 
   // GUI::TextLabel *contextLabel = new GUI::TextLabel();
@@ -189,8 +198,15 @@ inline void Draw() {
   bool mouseHeldDown = IsMouseButtonDown( 0 );
   bool overAnyElem = false;
 
-  for ( auto &entity: GUI::uiReg.view<GUI::Element>() ) {
+  auto view = GUI::uiReg.view<GUI::Element>();
+
+  for ( auto it = view.rbegin(); it != view.rend(); ++it ) {
+    entt::entity entity = *it;
+
     GUI::Element elem = GUI::uiReg.get<GUI::Element>( entity );
+
+    if ( !elem.enabled )
+      continue;
 
     bool inside = CheckCollisionPointRec(
       GetMousePosition(),
@@ -199,57 +215,54 @@ inline void Draw() {
     if ( !overAnyElem )
       overAnyElem = inside;
 
-    if ( GUI::DoItem(
-           context,
-           entity,
-           elem.enabled,
-           inside,
-           mouseWentUp,
-           mouseWentDown ) ) {
+    if ( GUI::DoItem( context, entity, inside, mouseWentUp, mouseWentDown ) ) {
+      switch ( GUI::uiReg.get<GUI::Element>( entity ).type ) {
+        case GUI::PANEL: {
+          auto &panel = GUI::uiReg.get<GUI::Panel>( entity );
+        } break;
+        case GUI::TEXT_LABEL: {
+          auto &label = GUI::uiReg.get<GUI::TextLabel>( entity );
+          label.Draw();
+        } break;
+        case GUI::TEXTURE_LABEL: {
+        } break;
+        case GUI::TEXTURE_BUTTON: {
+        } break;
+        case GUI::TEXT_BUTTON: {
+          auto &button = GUI::uiReg.get<GUI::TextButton>( entity );
+          button.action();
+        } break;
+      }
     }
   }
 
+
+  std::string hot_str = std::to_string( (std::uint32_t) context.hot );
+  std::string active_str = std::to_string( (std::uint32_t) context.active );
 
   if ( !overAnyElem ) {
     context.hot = entt::null;
     context.active = entt::null;
   }
 
-  //  for ( GUI::Panel &panel: floating ) {
-  //    if ( !panel.floating )
-  //      return;
-  //
-  //    bool inside = CheckCollisionPointRec(
-  //      GetMousePosition(),
-  //      GUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
-  //
-  //    if ( !overAnyElem )
-  //      overAnyElem = inside;
-  //
-  //    if ( GUI::DoFloatingPanel(
-  //           context,
-  //           panel,
-  //           inside,
-  //           mouseWentUp,
-  //           mouseWentDown,
-  //           mouseHeldDown ) ) {
-  //      HandleFloatingPanel( panel, mousePos );
-  //    } else {
-  //      panel.oldOffset = {
-  //        panel.pos.x - mousePos.x,
-  //        panel.pos.y - mousePos.y,
-  //      };
-  //    }
-  //  }
+  if ( context.hot == entt::null ) {
+    hot_str = "-1";
+  }
+
+  if ( context.active == entt::null ) {
+    active_str = "-1";
+  }
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
 
   DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  // std::string foo = "hot: " + std::to_string( context.hot ) + " " +
-  //                   "active: " + std::to_string( context.active );
+  std::string foo = "hot: " + hot_str;
+  DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
 
-  // DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
+  DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
+  std::string bar = "active: " + active_str;
+  DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 }
 
 // inline void HandleFloatingPanel( GUI::Panel &panel, Vector2 mousePos ) {
@@ -269,4 +282,31 @@ inline void Draw() {
 //     panel.pos.y = 0;
 //   }
 // }
+//  for ( GUI::Panel &panel: floating ) {
+//    if ( !panel.floating )
+//      return;
+//
+//    bool inside = CheckCollisionPointRec(
+//      GetMousePosition(),
+//      GUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
+//
+//    if ( !overAnyElem )
+//      overAnyElem = inside;
+//
+//    if ( GUI::DoFloatingPanel(
+//           context,
+//           panel,
+//           inside,
+//           mouseWentUp,
+//           mouseWentDown,
+//           mouseHeldDown ) ) {
+//      HandleFloatingPanel( panel, mousePos );
+//    } else {
+//      panel.oldOffset = {
+//        panel.pos.x - mousePos.x,
+//        panel.pos.y - mousePos.y,
+//      };
+//    }
+//  }
+
 };// namespace UI

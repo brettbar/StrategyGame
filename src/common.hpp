@@ -1,12 +1,13 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "world/player_system.hpp"
+#include "world/systems/player_system.hpp"
 #include <map>
 #include <raylib.h>
 #include <raymath.h>
 #include <vector>
 
+using ECS = entt::registry;
 using u32 = unsigned int;
 using i32 = int;
 using f32 = float;

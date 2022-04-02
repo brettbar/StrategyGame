@@ -26,29 +26,29 @@ endif()
 
 add_executable(
   ${PROJECT_NAME} src/main.cpp
-  src/ui/ui.hpp
-  src/ui/guilib.hpp
+  src/guilib/gui_system.hpp
   src/renderer/renderer.hpp
-        src/world/player_system.hpp
-        src/world/systems/map/map_system.hpp
-        src/world/systems/map/province_system.hpp
-        src/world/systems/map/terrain_system.hpp
-        src/world/systems/movement_system.hpp
-        src/world/systems/animation_system.hpp
-        src/world/systems/selection_system.hpp
-        src/world/systems/spawn_system.hpp
-        src/world/entities/archetypes.hpp
-        src/world/components/actor.hpp
-        src/world/components/animated.hpp
-        src/world/components/province.hpp
-        src/world/components/selected.hpp
-        src/world/components/sight.hpp
-        src/world/components/tile.hpp
-        src/world/components/unit.hpp
-        src/world/systems/actor_system.hpp
-        src/input.hpp
-        src/common.hpp
-        src/world/components/event.hpp)
+  src/world/systems/player_system.hpp
+  src/world/systems/ui_system.hpp
+  src/world/systems/map/map_system.hpp
+  src/world/systems/map/province_system.hpp
+  src/world/systems/map/terrain_system.hpp
+  src/world/systems/movement_system.hpp
+  src/world/systems/animation_system.hpp
+  src/world/systems/selection_system.hpp
+  src/world/systems/spawn_system.hpp
+  src/world/entities/archetypes.hpp
+  src/world/components/actor.hpp
+  src/world/components/animated.hpp
+  src/world/components/province.hpp
+  src/world/components/selected.hpp
+  src/world/components/sight.hpp
+  src/world/components/tile.hpp
+  src/world/components/unit.hpp
+  src/world/systems/actor_system.hpp
+  src/input.hpp
+  src/common.hpp
+  src/world/components/event.hpp)
 
 
 if(UNIX)

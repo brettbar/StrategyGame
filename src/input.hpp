@@ -5,15 +5,15 @@
 #pragma once
 
 #include "common.hpp"
+#include "guilib/gui_system.hpp"
 #include "resource.hpp"
 #include "state.hpp"
-#include "ui/guilib.hpp"
-#include "ui/ui.hpp"
 #include "world/systems/map/map_system.hpp"
 #include "world/systems/map/province_system.hpp"
 #include "world/systems/movement_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/spawn_system.hpp"
+#include "world/systems/ui_system.hpp"
 
 namespace Input {
 inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {

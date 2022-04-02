@@ -9,19 +9,19 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
-#include "world/systems/event_system.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "resource.hpp"
 #include "state.hpp"
-#include "ui/ui.hpp"
-#include "world/player_system.hpp"
 #include "world/systems/animation_system.hpp"
+#include "world/systems/event_system.hpp"
 #include "world/systems/map/province_system.hpp"
 #include "world/systems/map/terrain_system.hpp"
 #include "world/systems/movement_system.hpp"
+#include "world/systems/player_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/spawn_system.hpp"
+#include "world/systems/ui_system.hpp"
 #include <raylib.h>
 
 void LoadResources( TextureCache & );
@@ -44,8 +44,7 @@ int main( void ) {
     .month = 1,
     .year = 4,
     .startYear = 4,
-    .currPlayer =
-      std::make_shared<PlayerSystem>(
+    .currPlayer = std::make_shared<PlayerSystem>(
       PlayerSystem( 0, ROMANS, "Roman Republic" ) ),
   };
 
