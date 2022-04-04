@@ -6,7 +6,7 @@
 
 namespace GUI {
 
-enum Type {
+enum class Type {
   PANEL,
   TEXT_LABEL,
   TEXTURE_LABEL,
@@ -14,7 +14,22 @@ enum Type {
   TEXTURE_BUTTON,
 };
 
-enum Layout { NONE, HORIZONTAL, VERTICAL };
+enum class VertAlign {
+  CENTER,
+  TOP,
+  BOTTOM,
+};
+
+enum class HorizAlign {
+  CENTER,
+  LEFT,
+  RIGHT,
+};
+
+enum class Dimension {
+  FIXED,
+  FILL
+};
 
 inline entt::registry uiReg;
 
@@ -24,58 +39,30 @@ struct Context {
 };
 
 struct Element {
-  Type type;
   bool enabled;
   Color color;
   Vector2 pos;
   Vector2 dmns;
   Vector2 offset;
 
-  std::function<Vector2()> move;
-
-  // void Update( Vector2 parentPos ) {
-  //   pos.x = offset.x + parentPos.x;
-  //   pos.y = offset.y + parentPos.y;
-  // }
-
-  void Move() {
-    Vector2 updated = move();
-    pos = updated;
-  }
+  HorizAlign horiz_align;
+  VertAlign vert_align;
+  Dimension horiz_dimension;
+  Dimension vert_dimension;
 };
 
-struct DynamicElement {
+struct Panel {
   Element elem;
 
-  std::function<Vector2()> resize;
-
-  void Resize() {
-    Vector2 updated = resize();
-    elem.dmns = updated;
-  }
-
-  // void Move() {
-  //   elem.pos = { updated.x, updated.y };
-  // };
+  std::function<Vector2()> move;
+  std::vector<entt::entity> children;
 };
-
 
 struct TextLabel {
   Element elem;
   std::string text;
   i32 fontSize;
   Color textColor;
-
-  void Draw() {
-    DrawRectangleV( elem.pos, elem.dmns, elem.color );
-
-    DrawText(
-      text.c_str(),
-      elem.pos.x,
-      elem.pos.y + ( 0.5 * elem.dmns.y ),
-      fontSize,
-      textColor );
-  }
 };
 
 struct TextButton {
@@ -83,19 +70,55 @@ struct TextButton {
   std::function<void()> action;
 };
 
-struct Panel {
-  DynamicElement dyn;
-  std::vector<entt::entity> children;
+//struct FloatingPanel {
+//  Panel panel;
+//  Vector2 oldOffset;
+//};
 
-  Panel( DynamicElement dynamicElement ) : dyn( dynamicElement ) {}
+inline void Layout( f32 screenWidth, f32 screenHeight ) {
+  auto panel_view = GUI::uiReg.view<GUI::Panel>();
 
-  void Draw() { DrawRectangleV( dyn.elem.pos, dyn.elem.dmns, dyn.elem.color ); }
-};
+  for (auto &panel_entity: panel_view) {
+    GUI::Panel &panel = GUI::uiReg.get<GUI::Panel>(panel_entity);
 
-struct FloatingPanel {
-  Panel panel;
-  Vector2 oldOffset;
-};
+    // 1. Position Panel
+    switch ( panel.elem.horiz_align ) {
+      case GUI::HorizAlign::LEFT:
+        panel.elem.pos.x = 0;
+        break;
+      case GUI::HorizAlign::CENTER:
+        panel.elem.pos.x = screenWidth / 2;
+        break;
+      case GUI::HorizAlign::RIGHT:
+        panel.elem.pos.x = screenWidth;
+        break;
+    }
+
+    switch ( panel.elem.vert_align ) {
+      case GUI::VertAlign::TOP:
+        panel.elem.pos.y = 0;
+        break;
+      case GUI::VertAlign::CENTER:
+        panel.elem.pos.y = screenHeight / 2;
+        break;
+      case GUI::VertAlign::BOTTOM:
+        panel.elem.pos.y = screenHeight;
+        break;
+    }
+
+    // 2. Resize Panel
+    if (panel.elem.horiz_dimension == GUI::Dimension::FILL)
+      panel.elem.dmns.x = screenWidth;
+
+    if (panel.elem.vert_dimension == GUI::Dimension::FILL)
+      panel.elem.dmns.y = screenHeight;
+
+    // 3. Layout Items
+    for (auto &item_entity: panel.children) {
+
+    }
+  }
+}
 
 inline bool DoItem(
   Context &context,
@@ -122,30 +145,6 @@ inline bool DoItem(
       context.hot = entity;
   }
 
-  switch ( uiReg.get<Element>( entity ).type ) {
-    case PANEL: {
-      auto &panel = uiReg.get<Panel>( entity );
-      // panel.dyn.elem.Update( { 0, 0 } );
-
-      panel.dyn.elem.Move();
-      panel.dyn.Resize();
-      panel.Draw();
-    } break;
-    case TEXT_LABEL: {
-      auto &label = uiReg.get<TextLabel>( entity );
-      label.Draw();
-    } break;
-    case TEXTURE_LABEL: {
-    } break;
-    case TEXTURE_BUTTON: {
-    } break;
-    case TEXT_BUTTON: {
-      auto &button = uiReg.get<TextButton>( entity );
-      button.label.elem.Move();
-      button.label.Draw();
-    } break;
-  }
-
   return result;
 }
 
@@ -158,6 +157,7 @@ inline bool MouseWasOverUI() {
 
   for ( auto &entity: GUI::uiReg.view<GUI::Element>() ) {
     GUI::Element elem = GUI::uiReg.get<GUI::Element>( entity );
+
     inside = CheckCollisionPointRec(
       GetMousePosition(),
       GUI::GetAbsoluteRectangle( elem.pos, elem.dmns ) );

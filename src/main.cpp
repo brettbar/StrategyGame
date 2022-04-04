@@ -93,8 +93,8 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   InitWindow(
-    1920,
-    1080,
+    1270,
+    720,
     // GetScreenWidth(),
     // GetScreenHeight(),
     "FieldsOfMars" );
