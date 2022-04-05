@@ -21,7 +21,7 @@ TEMPORARY TODOS HERE
 #include "world/systems/player_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/spawn_system.hpp"
-#include "world/systems/ui_system.hpp"
+#include "world/systems/ui/ui_system.hpp"
 #include <raylib.h>
 
 void LoadResources( TextureCache & );

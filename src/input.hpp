@@ -13,7 +13,7 @@
 #include "world/systems/movement_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/spawn_system.hpp"
-#include "world/systems/ui_system.hpp"
+#include "world/systems/ui/ui_system.hpp"
 
 namespace Input {
 inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {

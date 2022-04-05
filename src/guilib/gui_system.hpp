@@ -26,12 +26,9 @@ enum class HorizAlign {
   RIGHT,
 };
 
-enum class Dimension {
-  FIXED,
-  FILL
-};
+enum class Dimension { FIXED, FILL };
 
-inline entt::registry uiReg;
+inline entt::registry gui_reg;
 
 struct Context {
   entt::entity hot;
@@ -39,11 +36,13 @@ struct Context {
 };
 
 struct Element {
+  Type type;
   bool enabled;
   Color color;
   Vector2 pos;
   Vector2 dmns;
-  Vector2 offset;
+
+  Vector2 margins;
 
   HorizAlign horiz_align;
   VertAlign vert_align;
@@ -52,14 +51,10 @@ struct Element {
 };
 
 struct Panel {
-  Element elem;
-
-  std::function<Vector2()> move;
   std::vector<entt::entity> children;
 };
 
 struct TextLabel {
-  Element elem;
   std::string text;
   i32 fontSize;
   Color textColor;
@@ -74,48 +69,68 @@ struct TextButton {
 //  Panel panel;
 //  Vector2 oldOffset;
 //};
+inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
-inline void Layout( f32 screenWidth, f32 screenHeight ) {
-  auto panel_view = GUI::uiReg.view<GUI::Panel>();
 
-  for (auto &panel_entity: panel_view) {
-    GUI::Panel &panel = GUI::uiReg.get<GUI::Panel>(panel_entity);
+inline void AlignElement( GUI::Element &elem, Rectangle parent ) {
+  switch ( elem.horiz_align ) {
+    case GUI::HorizAlign::LEFT:
+      elem.pos.x = parent.x;
+      break;
+    case GUI::HorizAlign::CENTER:
+      elem.pos.x = ( parent.width / 2 ) - ( elem.dmns.x / 2 );
+      break;
+    case GUI::HorizAlign::RIGHT:
+      elem.pos.x = parent.width - elem.dmns.x;
+      break;
+  }
+  elem.pos.x += elem.margins.x;
 
-    // 1. Position Panel
-    switch ( panel.elem.horiz_align ) {
-      case GUI::HorizAlign::LEFT:
-        panel.elem.pos.x = 0;
-        break;
-      case GUI::HorizAlign::CENTER:
-        panel.elem.pos.x = screenWidth / 2;
-        break;
-      case GUI::HorizAlign::RIGHT:
-        panel.elem.pos.x = screenWidth;
-        break;
-    }
+  switch ( elem.vert_align ) {
+    case GUI::VertAlign::TOP:
+      elem.pos.y = parent.y;
+      break;
+    case GUI::VertAlign::CENTER:
+      elem.pos.y = ( parent.height / 2 ) - ( elem.dmns.y / 2 );
+      break;
+    case GUI::VertAlign::BOTTOM:
+      elem.pos.y = parent.height - elem.dmns.y;
+      break;
+  }
+  elem.pos.y += elem.margins.y;
+}
 
-    switch ( panel.elem.vert_align ) {
-      case GUI::VertAlign::TOP:
-        panel.elem.pos.y = 0;
-        break;
-      case GUI::VertAlign::CENTER:
-        panel.elem.pos.y = screenHeight / 2;
-        break;
-      case GUI::VertAlign::BOTTOM:
-        panel.elem.pos.y = screenHeight;
-        break;
-    }
+inline void ResizeElement( GUI::Element &elem, f32 width, f32 height ) {
+  if ( elem.horiz_dimension == GUI::Dimension::FILL )
+    elem.dmns.x = width;
+
+  if ( elem.vert_dimension == GUI::Dimension::FILL )
+    elem.dmns.y = height;
+}
+
+
+inline void Layout( f32 screen_width, f32 screen_height ) {
+  auto panel_view = GUI::gui_reg.view<GUI::Panel>();
+
+  for ( auto &panel_entity: panel_view ) {
+    GUI::Panel &panel = GUI::gui_reg.get<GUI::Panel>( panel_entity );
+    GUI::Element &panel_elem = GUI::gui_reg.get<GUI::Element>( panel_entity );
+
+    // 1. Align Panel
+    AlignElement( panel_elem, { 0, 0, screen_width, screen_height } );
 
     // 2. Resize Panel
-    if (panel.elem.horiz_dimension == GUI::Dimension::FILL)
-      panel.elem.dmns.x = screenWidth;
-
-    if (panel.elem.vert_dimension == GUI::Dimension::FILL)
-      panel.elem.dmns.y = screenHeight;
+    ResizeElement( panel_elem, screen_width, screen_height );
 
     // 3. Layout Items
-    for (auto &item_entity: panel.children) {
+    for ( auto &item_entity: panel.children ) {
+      GUI::Element &child = GUI::gui_reg.get<GUI::Element>( item_entity );
 
+      AlignElement(
+        child,
+        RectangleFromVectors( panel_elem.pos, panel_elem.dmns ) );
+
+      ResizeElement( child, panel_elem.dmns.x, panel_elem.dmns.y );
     }
   }
 }
@@ -148,19 +163,19 @@ inline bool DoItem(
   return result;
 }
 
-inline Rectangle GetAbsoluteRectangle( Vector2 pos, Vector2 dimensions ) {
+inline Rectangle RectangleFromVectors( Vector2 pos, Vector2 dimensions ) {
   return { pos.x, pos.y, dimensions.x, dimensions.y };
 }
 
 inline bool MouseWasOverUI() {
   bool inside = false;
 
-  for ( auto &entity: GUI::uiReg.view<GUI::Element>() ) {
-    GUI::Element elem = GUI::uiReg.get<GUI::Element>( entity );
+  for ( auto &entity: GUI::gui_reg.view<GUI::Element>() ) {
+    GUI::Element elem = GUI::gui_reg.get<GUI::Element>( entity );
 
     inside = CheckCollisionPointRec(
       GetMousePosition(),
-      GUI::GetAbsoluteRectangle( elem.pos, elem.dmns ) );
+      GUI::RectangleFromVectors( elem.pos, elem.dmns ) );
 
     if ( inside )
       return true;
