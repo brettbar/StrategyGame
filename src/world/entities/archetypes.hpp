@@ -12,14 +12,14 @@
 
 namespace Archetypes {
 
-struct Actor {
+struct Character {
   Unit::Component unit;
   Animated::Component animated;
   Sight::Component sight;
 
   Animated::Animations animations;
 
-  Actor( Texture2D sprite, Vector2 spawn ) {
+  Character( Texture2D sprite, Vector2 spawn ) {
     unit = Unit::Component{
       .position = spawn,
       .destination = spawn,

@@ -54,10 +54,6 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
     if ( CheckCollisionPointCircle( unit.position, clickPos, 64 ) ) {
       reg.emplace<Selected::Component>( entity, true );
       alreadyFoundOne = true;
-
-      printf( "selected an actor\n" );
-      EventSystem::dispatcher.trigger<Event::SelectionEvent>(
-        { .name = "Tulius Cicero" } );
     }
   }
 
@@ -77,10 +73,6 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
 
       reg.emplace<Selected::Component>( entity, true );
       alreadyFoundOne = true;
-
-      printf( "selected a province\n" );
-      EventSystem::dispatcher.trigger<Event::SelectionEvent>(
-        { .name = prov.settlement->name } );
     }
   }
 }

@@ -7,9 +7,12 @@
 #include "../../common.hpp"
 
 namespace Actor {
-enum ActorType { SETTLER, ARMY };
+
+enum class Type { SETTLER, ARMY };
 
 struct Component {
-  ActorType type;
+  const char *name;
+  Type type;
 };
-};// namespace c_Actor
+
+};// namespace Actor

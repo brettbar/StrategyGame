@@ -65,12 +65,12 @@ struct TextButton {
   std::function<void()> action;
 };
 
-//struct FloatingPanel {
-//  Panel panel;
-//  Vector2 oldOffset;
-//};
-inline Rectangle RectangleFromVectors( Vector2, Vector2 );
+struct FloatingPanel {
+  Panel panel;
+  Vector2 oldOffset;
+};
 
+inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
 inline void AlignElement( GUI::Element &elem, Rectangle parent ) {
   switch ( elem.horiz_align ) {

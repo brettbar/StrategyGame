@@ -113,7 +113,7 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( state, reg );
   SpawnSystem::Init();
-  UI::Init();
+  UI::Init( reg );
   Renderer::Init( state );
 }
 

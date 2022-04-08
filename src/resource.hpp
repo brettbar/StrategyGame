@@ -16,8 +16,8 @@ struct TextureLoader : entt::resource_loader<TextureLoader, TextureResource> {
 
 using TextureCache = entt::resource_cache<TextureResource>;
 
-inline void LoadResource( hstr id, str path, TextureCache &cache ) {
-  Texture2D tex = LoadTexture( path.c_str() );
+inline void LoadResource( hstr id, const char *path, TextureCache &cache ) {
+  Texture2D tex = LoadTexture( path );
   //  SetTextureFilter(tex, TEXTURE_WRAP_REPEAT);
   cache.load<TextureLoader>( id, tex );
 }

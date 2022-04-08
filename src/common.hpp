@@ -11,7 +11,7 @@ using ECS = entt::registry;
 using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
-using str = std::string;
+// using str = std::string;
 using hstr = entt::hashed_string;
 
 struct IVector2 {

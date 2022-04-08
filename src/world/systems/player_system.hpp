@@ -9,7 +9,7 @@
 using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
-using str = std::string;
+// using str = std::string;
 using hstr = entt::hashed_string;
 
 enum Faction {
@@ -25,11 +25,11 @@ enum Faction {
 class PlayerSystem {
   public:
   u32 id;
-  str factionName;
+  const char *factionName;
   Faction faction;
-  std::map<str, hstr> textureMap;
+  std::map<const char *, hstr> textureMap;
 
-  PlayerSystem( u32 id, Faction faction, str factionName ) {
+  PlayerSystem( u32 id, Faction faction, const char *factionName ) {
     this->id = id;
     this->faction = faction;
     this->factionName = factionName;

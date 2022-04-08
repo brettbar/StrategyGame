@@ -1,7 +1,7 @@
 #include "../../../common.hpp"
-#include "../event_system.hpp"
 #include "../../../resource.hpp"
 #include "../../components/province.hpp"
+#include "../event_system.hpp"
 #include "../spawn_system.hpp"
 #include "terrain_system.hpp"
 #include <array>
@@ -291,9 +291,10 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
 
         // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
 
-        if ( prov.settlement->name != "" )
+        // NOTE: I changed this from "" to nullptr
+        if ( prov.settlement->name != nullptr )
           DrawText(
-            prov.settlement->name.c_str(),
+            prov.settlement->name,
             provPos.x + 64.0,
             provPos.y + 86.0,
             14,

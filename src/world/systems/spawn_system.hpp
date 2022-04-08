@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common.hpp"
+#include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
@@ -51,11 +52,15 @@ inline void CreateNew(
 
   Texture tex =
     cache.handle( currPlayer->textureMap.at( "Villager" ) )->texture;
-  Archetypes::Actor actor = Archetypes::Actor( tex, *spawn );
+  Archetypes::Character character = Archetypes::Character( tex, *spawn );
 
-  reg.emplace<Unit::Component>( entity, actor.unit );
-  reg.emplace<Animated::Component>( entity, actor.animated );
-  reg.emplace<Sight::Component>( entity, actor.sight );
+  reg.emplace<Actor::Component>(
+    entity,
+    "Marcus Priscus",
+    Actor::Type::SETTLER );
+  reg.emplace<Unit::Component>( entity, character.unit );
+  reg.emplace<Animated::Component>( entity, character.animated );
+  reg.emplace<Sight::Component>( entity, character.sight );
 }
 
 inline void DeleteSelected( entt::registry &reg ) {

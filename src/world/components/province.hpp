@@ -58,7 +58,7 @@ struct Population {
 // TODO move to its own file
 struct Settlement {
   u32 id;
-  str name;
+  const char *name;
   Development development;
   Population population;
 };
@@ -71,4 +71,4 @@ struct Component {
   std::shared_ptr<Tile::Component> tile;
 };
 
-}// namespace c_Province
+}// namespace Province
