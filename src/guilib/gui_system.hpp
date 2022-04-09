@@ -26,6 +26,21 @@ enum class HorizAlign {
   RIGHT,
 };
 
+enum class FlexDirection {
+  FLEX_ROW,
+  FLEX_COLUMN,
+};
+
+enum class JustifyContent {
+  AUTO,
+  FLEX_START,
+  FLEX_END,
+  CENTER,
+  SPACE_BETWEEN,
+  SPACE_AROUND,
+  SPACE_EVENLY
+};
+
 enum class Dimension { FIXED, FILL };
 
 inline entt::registry gui_reg;
@@ -41,6 +56,7 @@ struct Element {
   Color color;
   Vector2 pos;
   Vector2 dmns;
+  Vector2 offset;
 
   Vector2 margins;
 
@@ -51,6 +67,8 @@ struct Element {
 };
 
 struct Panel {
+  HorizAlign children_horiz_align;
+  VertAlign children_vert_align;
   std::vector<entt::entity> children;
 };
 
@@ -72,8 +90,13 @@ struct FloatingPanel {
 
 inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
-inline void AlignElement( GUI::Element &elem, Rectangle parent ) {
-  switch ( elem.horiz_align ) {
+inline void AlignElement(
+  Element &elem,
+  Rectangle parent,
+  HorizAlign horiz_align,
+  VertAlign vert_align ) {
+
+  switch ( horiz_align ) {
     case GUI::HorizAlign::LEFT:
       elem.pos.x = parent.x;
       break;
@@ -86,7 +109,7 @@ inline void AlignElement( GUI::Element &elem, Rectangle parent ) {
   }
   elem.pos.x += elem.margins.x;
 
-  switch ( elem.vert_align ) {
+  switch ( vert_align ) {
     case GUI::VertAlign::TOP:
       elem.pos.y = parent.y;
       break;
@@ -110,14 +133,17 @@ inline void ResizeElement( GUI::Element &elem, f32 width, f32 height ) {
 
 
 inline void Layout( f32 screen_width, f32 screen_height ) {
-  auto panel_view = GUI::gui_reg.view<GUI::Panel>();
 
-  for ( auto &panel_entity: panel_view ) {
+  for ( auto &panel_entity: GUI::gui_reg.view<GUI::Panel>() ) {
     GUI::Panel &panel = GUI::gui_reg.get<GUI::Panel>( panel_entity );
     GUI::Element &panel_elem = GUI::gui_reg.get<GUI::Element>( panel_entity );
 
     // 1. Align Panel
-    AlignElement( panel_elem, { 0, 0, screen_width, screen_height } );
+    AlignElement(
+      panel_elem,
+      { 0, 0, screen_width, screen_height },
+      panel.children_horiz_align,
+      panel.children_vert_align );
 
     // 2. Resize Panel
     ResizeElement( panel_elem, screen_width, screen_height );
@@ -128,7 +154,9 @@ inline void Layout( f32 screen_width, f32 screen_height ) {
 
       AlignElement(
         child,
-        RectangleFromVectors( panel_elem.pos, panel_elem.dmns ) );
+        RectangleFromVectors( panel_elem.pos, panel_elem.dmns ),
+        panel.children_horiz_align,
+        panel.children_vert_align );
 
       ResizeElement( child, panel_elem.dmns.x, panel_elem.dmns.y );
     }

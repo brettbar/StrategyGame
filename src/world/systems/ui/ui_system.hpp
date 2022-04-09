@@ -19,11 +19,6 @@ inline GUI::Context context = {
   .active = entt::null,
 };
 
-inline void InitUI() {
-  createLeftPanel();
-  createContextPanel();
-}
-
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
@@ -45,7 +40,8 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
 }
 
 inline void Init( entt::registry &reg ) {
-  InitUI();
+  createLeftPanel();
+  createContextPanel();
   reg.on_construct<Selected::Component>().connect<&SelectListener>();
 }
 

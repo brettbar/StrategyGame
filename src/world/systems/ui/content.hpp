@@ -3,12 +3,12 @@
 #include "../../components/event.hpp"
 #include "../event_system.hpp"
 
-inline void createLeftPanel();
-inline void createContextPanel();
+inline entt::entity createLeftPanel();
+inline entt::entity createContextPanel();
 inline entt::entity createSpawnButton( Vector2 );
 inline entt::entity createContextLabel( Vector2 );
 
-inline void createLeftPanel() {
+inline entt::entity createLeftPanel() {
   entt::entity entity = GUI::gui_reg.create();
 
   GUI::Element elem = {
@@ -18,13 +18,13 @@ inline void createLeftPanel() {
     .pos = Vector2{ 0, 0 },
     .dmns = Vector2{ 80, (f32) GetScreenHeight() },
     .margins = Vector2{ 0, 0 },
-    .horiz_align = GUI::HorizAlign::LEFT,
-    .vert_align = GUI::VertAlign::TOP,
     .horiz_dimension = GUI::Dimension::FIXED,
     .vert_dimension = GUI::Dimension::FILL,
   };
 
   GUI::Panel panel = {
+    .children_horiz_align = GUI::HorizAlign::LEFT,
+    .children_vert_align = GUI::VertAlign::TOP,
     .children =
       {
         createSpawnButton( elem.pos ),
@@ -33,6 +33,8 @@ inline void createLeftPanel() {
 
   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
   GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+
+  return entity;
 }
 
 inline entt::entity createSpawnButton( Vector2 parent ) {
@@ -58,8 +60,6 @@ inline entt::entity createSpawnButton( Vector2 parent ) {
       },
     .dmns = Vector2{ 60, 60 },
     .margins = margins,
-    .horiz_align = GUI::HorizAlign::CENTER,
-    .vert_align = GUI::VertAlign::TOP,
     .horiz_dimension = GUI::Dimension::FIXED,
     .vert_dimension = GUI::Dimension::FIXED,
   };
@@ -82,7 +82,7 @@ inline entt::entity createSpawnButton( Vector2 parent ) {
   return entity;
 }
 
-inline void createContextPanel() {
+inline entt::entity createContextPanel() {
   entt::entity entity = GUI::gui_reg.create();
 
   GUI::Element elem = {
@@ -94,22 +94,25 @@ inline void createContextPanel() {
         (f32) ( GetScreenWidth() / 2.0f ) - 400,
         (f32) GetScreenHeight() - 200,
       },
-    .dmns = Vector2{ 800, 200 },
-    .horiz_align = GUI::HorizAlign::CENTER,
-    .vert_align = GUI::VertAlign::BOTTOM,
+    .dmns = Vector2{ 1000, 300 },
     .horiz_dimension = GUI::Dimension::FIXED,
     .vert_dimension = GUI::Dimension::FIXED,
   };
 
   GUI::Panel panel = {
+    .children_horiz_align = GUI::HorizAlign::CENTER,
+    .children_vert_align = GUI::VertAlign::CENTER,
     .children =
       {
+        createContextLabel( elem.pos ),
         createContextLabel( elem.pos ),
       },
   };
 
   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
   GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+
+  return entity;
 }
 
 inline entt::entity createContextLabel( Vector2 parent ) {
@@ -128,8 +131,6 @@ inline entt::entity createContextLabel( Vector2 parent ) {
       },
     .dmns = { 200, 100 },
     .margins = margins,
-    .horiz_align = GUI::HorizAlign::LEFT,
-    .vert_align = GUI::VertAlign::TOP,
     .horiz_dimension = GUI::Dimension::FIXED,
     .vert_dimension = GUI::Dimension::FIXED,
   };
@@ -145,32 +146,32 @@ inline entt::entity createContextLabel( Vector2 parent ) {
   return entity;
 }
 
-inline void createFloatingPanel() {
-  entt::entity entity = GUI::gui_reg.create();
+// inline void createFloatingPanel() {
+//   entt::entity entity = GUI::gui_reg.create();
 
-  GUI::Element elem = {
-    .type = GUI::Type::PANEL,
-    .enabled = true,
-    .color = RED,
-    .pos =
-      {
-        (f32) ( GetScreenWidth() / 2.0f ) - 400,
-        (f32) GetScreenHeight() - 200,
-      },
-    .dmns = Vector2{ 800, 200 },
-    .horiz_align = GUI::HorizAlign::CENTER,
-    .vert_align = GUI::VertAlign::BOTTOM,
-    .horiz_dimension = GUI::Dimension::FIXED,
-    .vert_dimension = GUI::Dimension::FIXED,
-  };
+//   GUI::Element elem = {
+//     .type = GUI::Type::PANEL,
+//     .enabled = true,
+//     .color = RED,
+//     .pos =
+//       {
+//         (f32) ( GetScreenWidth() / 2.0f ) - 400,
+//         (f32) GetScreenHeight() - 200,
+//       },
+//     .dmns = Vector2{ 800, 200 },
+//     .horiz_dimension = GUI::Dimension::FIXED,
+//     .vert_dimension = GUI::Dimension::FIXED,
+//   };
 
-  GUI::Panel panel = {
-    .children =
-      {
-        createContextLabel( elem.pos ),
-      },
-  };
+//   GUI::Panel panel = {
+//     .children_horiz_align = GUI::HorizAlign::CENTER,
+//     .children_vert_align = GUI::VertAlign::CENTER,
+//     .children =
+//       {
+//         createContextLabel( elem.pos ),
+//       },
+//   };
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
-}
+//   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
+//   GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+// }
