@@ -12,10 +12,12 @@ inline entt::entity createContextLabel( Vector2 );
 inline GUI::Panel createRootPanel() {
   return {
     .align_axis = GUI::AlignAxis::FLEX_ROW,
-    .align_main = GUI::Alignment::FLEX_END,
+    .align_main = GUI::Alignment::SPACE_BETWEEN,
     .align_cross = GUI::Alignment::FLEX_START,
     .children =
       {
+        createLeftPanel(),
+        createContextPanel(),
         createLeftPanel(),
         createContextPanel(),
       },
@@ -33,7 +35,7 @@ inline entt::entity createLeftPanel() {
     // .dmns = Vector2{ 80, (f32) GetScreenHeight() },
     // .margins = Vector2{ 0, 0 },
     .pos{ 0, 0 },
-    .dmns = Vector2{ 300, 300 },
+    .dmns = Vector2{ 400, 300 },
     .align_self = GUI::AlignSelf::AUTO,
     .horiz_dimension = GUI::Dimension::FIXED,
     .vert_dimension = GUI::Dimension::FILL,

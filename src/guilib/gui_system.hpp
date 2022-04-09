@@ -154,8 +154,9 @@ inline void MainAlignChildren(
         elem.pos.x = parent.x + ( i * elem.dmns.x );
       }
     } break;
+
     case Alignment::FLEX_END: {
-      u32 currentOffset = 0;
+      f32 current_offset = 0;
 
       for ( std::vector<entt::entity>::reverse_iterator rit = children.rbegin();
             rit != children.rend();
@@ -163,16 +164,64 @@ inline void MainAlignChildren(
         entt::entity &entity = *rit;
         Element &elem = gui_reg.get<Element>( entity );
 
-        currentOffset += ( elem.dmns.x );
+        current_offset += ( elem.dmns.x );
 
-        elem.pos.x = parent.width - currentOffset;
+        elem.pos.x = parent.width - current_offset;
       }
     } break;
-    // case Alignment::CENTER:
-    //   elem.pos.x = ( parent.width / 2 ) - ( elem.dmns.x / 2 );
-    //   break;
-    // case Alignment::SPACE_BETWEEN:
-    //   break;
+
+    case Alignment::CENTER: {
+      f32 total_width = 0;
+
+      for ( u32 i = 0; i < children.size(); i++ ) {
+        entt::entity &entity = children[i];
+        Element &elem = gui_reg.get<Element>( entity );
+        total_width += elem.dmns.x;
+      }
+
+      f32 x_pos = ( parent.width / 2 ) - ( total_width / 2 );
+
+      f32 end_of_last = x_pos;
+
+      for ( u32 i = 0; i < children.size(); i++ ) {
+        entt::entity &entity = children[i];
+        Element &elem = gui_reg.get<Element>( entity );
+
+        elem.pos.x = end_of_last;
+        end_of_last = elem.pos.x + elem.dmns.x;
+      }
+    } break;
+
+    case Alignment::SPACE_BETWEEN: {
+
+      f32 total_width = 0;
+
+      for ( u32 i = 0; i < children.size(); i++ ) {
+        entt::entity &entity = children[i];
+        Element &elem = gui_reg.get<Element>( entity );
+        total_width += elem.dmns.x;
+      }
+
+      f32 total_gap_width = parent.width - total_width;
+      u32 num_gaps = children.size() - 1;
+
+      f32 gap_width = total_gap_width / num_gaps;
+
+      f32 end_of_last = parent.x;
+      for ( u32 i = 0; i < children.size(); i++ ) {
+        entt::entity &entity = children[i];
+        Element &elem = gui_reg.get<Element>( entity );
+
+        if ( i % 2 == 0 ) {
+          elem.pos.x = end_of_last;
+          end_of_last = elem.pos.x + elem.dmns.x;
+        } else {
+          elem.pos.x = end_of_last + gap_width;
+          end_of_last = elem.pos.x + elem.dmns.x + gap_width;
+        }
+      }
+
+    } break;
     // case Alignment::SPACE_AROUND:
     //   break;
     // case Alignment::SPACE_EVENLY:
