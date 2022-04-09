@@ -2,6 +2,7 @@
 
 #include "../common.hpp"
 #include <functional>
+#include <iterator>
 #include <raylib.h>
 
 namespace GUI {
@@ -14,31 +15,39 @@ enum class Type {
   TEXTURE_BUTTON,
 };
 
-enum class VertAlign {
-  CENTER,
-  TOP,
-  BOTTOM,
-};
+// enum class VertAlign {
+//   CENTER,
+//   TOP,
+//   BOTTOM,
+// };
 
-enum class HorizAlign {
-  CENTER,
-  LEFT,
-  RIGHT,
-};
+// enum class HorizAlign {
+//   CENTER,
+//   LEFT,
+//   RIGHT,
+// };
 
-enum class FlexDirection {
-  FLEX_ROW,
+enum class AlignAxis {
+  FLEX_ROW,// Default
   FLEX_COLUMN,
 };
 
-enum class JustifyContent {
-  AUTO,
+enum class AlignSelf {
+  AUTO,// Default
   FLEX_START,
+  FLEX_END,
+  CENTER,
+  STRETCH,
+};
+
+enum class Alignment {
+  FLEX_START,// Default
   FLEX_END,
   CENTER,
   SPACE_BETWEEN,
   SPACE_AROUND,
-  SPACE_EVENLY
+  SPACE_EVENLY,
+  STRETCH
 };
 
 enum class Dimension { FIXED, FILL };
@@ -60,15 +69,15 @@ struct Element {
 
   Vector2 margins;
 
-  HorizAlign horiz_align;
-  VertAlign vert_align;
+  AlignSelf align_self;
   Dimension horiz_dimension;
   Dimension vert_dimension;
 };
 
 struct Panel {
-  HorizAlign children_horiz_align;
-  VertAlign children_vert_align;
+  AlignAxis align_axis;
+  Alignment align_main;
+  Alignment align_cross;
   std::vector<entt::entity> children;
 };
 
@@ -90,77 +99,187 @@ struct FloatingPanel {
 
 inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
-inline void AlignElement(
-  Element &elem,
-  Rectangle parent,
-  HorizAlign horiz_align,
-  VertAlign vert_align ) {
+// inline void AlignElement(
+//   Element &elem,
+//   Rectangle parent,
+//   HorizAlign horiz_align,
+//   VertAlign vert_align ) {
 
-  switch ( horiz_align ) {
-    case GUI::HorizAlign::LEFT:
-      elem.pos.x = parent.x;
-      break;
-    case GUI::HorizAlign::CENTER:
-      elem.pos.x = ( parent.width / 2 ) - ( elem.dmns.x / 2 );
-      break;
-    case GUI::HorizAlign::RIGHT:
-      elem.pos.x = parent.width - elem.dmns.x;
-      break;
-  }
-  elem.pos.x += elem.margins.x;
+//   switch ( horiz_align ) {
+//     case GUI::HorizAlign::LEFT:
+//       elem.pos.x = parent.x;
+//       break;
+//     case GUI::HorizAlign::CENTER:
+//       elem.pos.x = ( parent.width / 2 ) - ( elem.dmns.x / 2 );
+//       break;
+//     case GUI::HorizAlign::RIGHT:
+//       elem.pos.x = parent.width - elem.dmns.x;
+//       break;
+//   }
+//   elem.pos.x += elem.margins.x;
 
-  switch ( vert_align ) {
-    case GUI::VertAlign::TOP:
-      elem.pos.y = parent.y;
-      break;
-    case GUI::VertAlign::CENTER:
-      elem.pos.y = ( parent.height / 2 ) - ( elem.dmns.y / 2 );
-      break;
-    case GUI::VertAlign::BOTTOM:
-      elem.pos.y = parent.height - elem.dmns.y;
-      break;
-  }
-  elem.pos.y += elem.margins.y;
-}
+//   switch ( vert_align ) {
+//     case GUI::VertAlign::TOP:
+//       elem.pos.y = parent.y;
+//       break;
+//     case GUI::VertAlign::CENTER:
+//       elem.pos.y = ( parent.height / 2 ) - ( elem.dmns.y / 2 );
+//       break;
+//     case GUI::VertAlign::BOTTOM:
+//       elem.pos.y = parent.height - elem.dmns.y;
+//       break;
+//   }
+//   elem.pos.y += elem.margins.y;
+// }
 
-inline void ResizeElement( GUI::Element &elem, f32 width, f32 height ) {
-  if ( elem.horiz_dimension == GUI::Dimension::FILL )
+inline void ResizeElement( Element &elem, f32 width, f32 height ) {
+  if ( elem.horiz_dimension == Dimension::FILL )
     elem.dmns.x = width;
 
-  if ( elem.vert_dimension == GUI::Dimension::FILL )
+  if ( elem.vert_dimension == Dimension::FILL )
     elem.dmns.y = height;
 }
 
+inline void MainAlignChildren(
+  Rectangle parent,
+  Alignment main_align,
+  std::vector<entt::entity> children ) {
 
-inline void Layout( f32 screen_width, f32 screen_height ) {
+  switch ( main_align ) {
+    case Alignment::FLEX_START: {
 
-  for ( auto &panel_entity: GUI::gui_reg.view<GUI::Panel>() ) {
-    GUI::Panel &panel = GUI::gui_reg.get<GUI::Panel>( panel_entity );
-    GUI::Element &panel_elem = GUI::gui_reg.get<GUI::Element>( panel_entity );
+      for ( u32 i = 0; i < children.size(); i++ ) {
+        entt::entity &entity = children[i];
+        Element &elem = gui_reg.get<Element>( entity );
+        elem.pos.x = parent.x + ( i * elem.dmns.x );
+      }
+    } break;
+    case Alignment::FLEX_END: {
+      u32 currentOffset = 0;
 
-    // 1. Align Panel
-    AlignElement(
-      panel_elem,
-      { 0, 0, screen_width, screen_height },
-      panel.children_horiz_align,
-      panel.children_vert_align );
+      for ( std::vector<entt::entity>::reverse_iterator rit = children.rbegin();
+            rit != children.rend();
+            ++rit ) {
+        entt::entity &entity = *rit;
+        Element &elem = gui_reg.get<Element>( entity );
 
-    // 2. Resize Panel
-    ResizeElement( panel_elem, screen_width, screen_height );
+        currentOffset += ( elem.dmns.x );
 
-    // 3. Layout Items
-    for ( auto &item_entity: panel.children ) {
-      GUI::Element &child = GUI::gui_reg.get<GUI::Element>( item_entity );
+        elem.pos.x = parent.width - currentOffset;
+      }
+    } break;
+    // case Alignment::CENTER:
+    //   elem.pos.x = ( parent.width / 2 ) - ( elem.dmns.x / 2 );
+    //   break;
+    // case Alignment::SPACE_BETWEEN:
+    //   break;
+    // case Alignment::SPACE_AROUND:
+    //   break;
+    // case Alignment::SPACE_EVENLY:
+    //   break;
+    // case Alignment::STRETCH:
+    //   break;
+    default:
+      // Flex Start
+      break;
+  }
+}
 
-      AlignElement(
-        child,
-        RectangleFromVectors( panel_elem.pos, panel_elem.dmns ),
-        panel.children_horiz_align,
-        panel.children_vert_align );
+inline void CrossAlignChildren(
+  Rectangle parent,
+  Alignment cross_align,
+  std::vector<entt::entity> children ) {
+  for ( u32 i = 0; i < children.size(); i++ ) {
+    entt::entity &entity = children[i];
+    Element &elem = gui_reg.get<Element>( entity );
 
-      ResizeElement( child, panel_elem.dmns.x, panel_elem.dmns.y );
+    switch ( elem.align_self ) {
+      case AlignSelf::AUTO:
+        break;
+      case AlignSelf::FLEX_START:
+        elem.pos.y = parent.y;
+        return;
+      case AlignSelf::FLEX_END:
+        elem.pos.y = parent.height - elem.dmns.y;
+        return;
+      case AlignSelf::CENTER:
+        elem.pos.y = ( parent.height / 2 ) - ( elem.dmns.y / 2 );
+        return;
+      case AlignSelf::STRETCH:
+        break;
+      default:
+        // AUTO
+        break;
+    }
+
+    switch ( cross_align ) {
+      case Alignment::FLEX_START:
+        elem.pos.y = parent.y;
+        break;
+      case Alignment::FLEX_END:
+        elem.pos.y = parent.height - elem.dmns.y;
+        break;
+      case Alignment::CENTER:
+        elem.pos.y = ( parent.height / 2 ) - ( elem.dmns.y / 2 );
+        break;
+      case Alignment::SPACE_BETWEEN:
+        break;
+      case Alignment::SPACE_AROUND:
+        break;
+      case Alignment::SPACE_EVENLY:
+        break;
+      case Alignment::STRETCH:
+        break;
+      default:
+        // Flex Start
+        break;
     }
   }
+}
+
+
+inline void Layout( Panel root, f32 screen_width, f32 screen_height ) {
+
+  if ( root.align_axis == AlignAxis::FLEX_ROW ) {
+    MainAlignChildren(
+      { 0, 0, screen_width, screen_height },
+      root.align_main,
+      root.children );
+
+    CrossAlignChildren(
+      { 0, 0, screen_width, screen_height },
+      root.align_cross,
+      root.children );
+  } else {
+  }
+
+  // for ( auto &panel_entity: GUI::gui_reg.view<GUI::Panel>() ) {
+  //   GUI::Panel &panel = GUI::gui_reg.get<GUI::Panel>( panel_entity );
+  //   GUI::Element &panel_elem = GUI::gui_reg.get<GUI::Element>( panel_entity );
+
+  //   // 1. Align Panel
+  //   AlignElement(
+  //     panel_elem,
+  //     { 0, 0, screen_width, screen_height },
+  //     panel.children_horiz_align,
+  //     panel.children_vert_align );
+
+  //   // 2. Resize Panel
+  //   ResizeElement( panel_elem, screen_width, screen_height );
+
+  //   // 3. Layout Items
+  //   for ( auto &item_entity: panel.children ) {
+  //     GUI::Element &child = GUI::gui_reg.get<GUI::Element>( item_entity );
+
+  //     AlignElement(
+  //       child,
+  //       RectangleFromVectors( panel_elem.pos, panel_elem.dmns ),
+  //       panel.children_horiz_align,
+  //       panel.children_vert_align );
+
+  //     ResizeElement( child, panel_elem.dmns.x, panel_elem.dmns.y );
+  //   }
+  // }
 }
 
 inline bool DoItem(

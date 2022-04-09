@@ -19,6 +19,8 @@ inline GUI::Context context = {
   .active = entt::null,
 };
 
+inline GUI::Panel root = createRootPanel();
+
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
@@ -40,8 +42,6 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
 }
 
 inline void Init( entt::registry &reg ) {
-  createLeftPanel();
-  createContextPanel();
   reg.on_construct<Selected::Component>().connect<&SelectListener>();
 }
 
@@ -62,7 +62,7 @@ inline void Draw() {
   auto items_view =
     GUI::gui_reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
 
-  GUI::Layout( screen_width, screen_height );
+  GUI::Layout( root, screen_width, screen_height );
 
   for ( auto entity: items_view ) {
     GUI::Element &elem = GUI::gui_reg.get<GUI::Element>( entity );
