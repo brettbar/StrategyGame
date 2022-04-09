@@ -6,20 +6,20 @@
 inline GUI::Panel createRootPanel();
 inline entt::entity createLeftPanel();
 inline entt::entity createContextPanel();
-inline entt::entity createSpawnButton( Vector2 );
-inline entt::entity createContextLabel( Vector2 );
+inline entt::entity createMiniMapPanel();
+inline entt::entity createSpawnButton();
+inline entt::entity createContextLabel();
 
 inline GUI::Panel createRootPanel() {
   return {
     .align_axis = GUI::AlignAxis::FLEX_ROW,
     .align_main = GUI::Alignment::SPACE_BETWEEN,
-    .align_cross = GUI::Alignment::FLEX_START,
+    .align_cross = GUI::Alignment::FLEX_END,
     .children =
       {
         createLeftPanel(),
         createContextPanel(),
-        createLeftPanel(),
-        createContextPanel(),
+        createMiniMapPanel(),
       },
   };
 }
@@ -31,23 +31,19 @@ inline entt::entity createLeftPanel() {
     .type = GUI::Type::PANEL,
     .enabled = true,
     .color = BLACK,
-    // .pos = Vector2{ 0, 0 },
-    // .dmns = Vector2{ 80, (f32) GetScreenHeight() },
-    // .margins = Vector2{ 0, 0 },
-    .pos{ 0, 0 },
-    .dmns = Vector2{ 400, 300 },
-    .align_self = GUI::AlignSelf::AUTO,
-    .horiz_dimension = GUI::Dimension::FIXED,
-    .vert_dimension = GUI::Dimension::FILL,
+    .dmns = Vector2{ 80, 0 },
+    .align_self = GUI::AlignSelf::STRETCH,
   };
 
   GUI::Panel panel = {
-    .align_axis = GUI::AlignAxis::FLEX_ROW,
+    .align_axis = GUI::AlignAxis::FLEX_COLUMN,
     .align_main = GUI::Alignment::FLEX_START,
-    .align_cross = GUI::Alignment::FLEX_START,
+    .align_cross = GUI::Alignment::CENTER,
     .children =
       {
-        // createSpawnButton( elem.pos ),
+        createSpawnButton(),
+        createSpawnButton(),
+        createSpawnButton(),
       },
   };
 
@@ -64,16 +60,8 @@ inline entt::entity createContextPanel() {
     .type = GUI::Type::PANEL,
     .enabled = true,
     .color = RED,
-    // .pos =
-    //   {
-    //     (f32) ( GetScreenWidth() / 2.0f ) - 400,
-    //     (f32) GetScreenHeight() - 200,
-    //   },
-    .pos{ 0, 0 },
-    .dmns = Vector2{ 300, 300 },
+    .dmns = Vector2{ 1000, 300 },
     .align_self = GUI::AlignSelf::AUTO,
-    .horiz_dimension = GUI::Dimension::FIXED,
-    .vert_dimension = GUI::Dimension::FIXED,
   };
 
   GUI::Panel panel = {
@@ -82,8 +70,8 @@ inline entt::entity createContextPanel() {
     .align_cross = GUI::Alignment::FLEX_START,
     .children =
       {
-        // createContextLabel( elem.pos ),
-        // createContextLabel( elem.pos ),
+        createContextLabel(),
+        createContextLabel(),
       },
   };
 
@@ -93,7 +81,31 @@ inline entt::entity createContextPanel() {
   return entity;
 }
 
-inline entt::entity createSpawnButton( Vector2 parent ) {
+inline entt::entity createMiniMapPanel() {
+  entt::entity entity = GUI::gui_reg.create();
+
+  GUI::Element elem = {
+    .type = GUI::Type::PANEL,
+    .enabled = true,
+    .color = BLUE,
+    .dmns = Vector2{ 300, 300 },
+    .align_self = GUI::AlignSelf::AUTO,
+  };
+
+  GUI::Panel panel = {
+    .align_axis = GUI::AlignAxis::FLEX_ROW,
+    .align_main = GUI::Alignment::FLEX_START,
+    .align_cross = GUI::Alignment::FLEX_START,
+    .children = {},
+  };
+
+  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
+  GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+
+  return entity;
+}
+
+inline entt::entity createSpawnButton() {
   entt::entity entity = GUI::gui_reg.create();
 
   GUI::TextButton spawnButton = GUI::TextButton();
@@ -103,21 +115,19 @@ inline entt::entity createSpawnButton( Vector2 parent ) {
     .textColor = RED,
   };
 
-  Vector2 margins = { 0, 5 };
+  GUI::Margins margins = {
+    .top = 5,
+    .right = 0,
+    .bottom = 5,
+    .left = 0,
+  };
 
   GUI::Element elem = {
     .type = GUI::Type::TEXT_BUTTON,
     .enabled = true,
     .color = WHITE,
-    .pos =
-      {
-        parent.x + margins.x,
-        parent.y + margins.y,
-      },
     .dmns = Vector2{ 60, 60 },
     .margins = margins,
-    .horiz_dimension = GUI::Dimension::FIXED,
-    .vert_dimension = GUI::Dimension::FIXED,
   };
 
   spawnButton.action = []() {
@@ -138,24 +148,24 @@ inline entt::entity createSpawnButton( Vector2 parent ) {
   return entity;
 }
 
-inline entt::entity createContextLabel( Vector2 parent ) {
+inline entt::entity createContextLabel() {
   entt::entity entity = GUI::gui_reg.create();
 
-  Vector2 margins = { 5, 5 };
+  GUI::Margins margins = {
+    .top = 5,
+    .right = 5,
+    .bottom = 5,
+    .left = 5,
+  };
 
   GUI::Element elem = {
     .type = GUI::Type::TEXT_LABEL,
     .enabled = true,
     .color = BLACK,
-    .pos =
-      {
-        parent.x + margins.x,
-        parent.y + margins.y,
-      },
     .dmns = { 200, 100 },
     .margins = margins,
-    .horiz_dimension = GUI::Dimension::FIXED,
-    .vert_dimension = GUI::Dimension::FIXED,
+    // .horiz_dimension = GUI::Dimension::FIXED,
+    // .vert_dimension = GUI::Dimension::FIXED,
   };
 
   GUI::TextLabel label = GUI::TextLabel();
