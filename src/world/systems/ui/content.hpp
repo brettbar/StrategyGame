@@ -9,6 +9,7 @@ inline entt::entity createContextPanel();
 inline entt::entity createMiniMapPanel();
 inline entt::entity createSpawnButton();
 inline entt::entity createContextLabel();
+inline entt::entity createContextTexture();
 
 inline GUI::Panel createRootPanel() {
   return {
@@ -71,7 +72,7 @@ inline entt::entity createContextPanel() {
     .children =
       {
         createContextLabel(),
-        createContextLabel(),
+        createContextTexture(),
       },
   };
 
@@ -152,9 +153,9 @@ inline entt::entity createContextLabel() {
   entt::entity entity = GUI::gui_reg.create();
 
   GUI::Margins margins = {
-    .top = 5,
+    .top = 0,
     .right = 5,
-    .bottom = 5,
+    .bottom = 0,
     .left = 5,
   };
 
@@ -164,8 +165,6 @@ inline entt::entity createContextLabel() {
     .color = BLACK,
     .dmns = { 200, 100 },
     .margins = margins,
-    // .horiz_dimension = GUI::Dimension::FIXED,
-    // .vert_dimension = GUI::Dimension::FIXED,
   };
 
   GUI::TextLabel label = GUI::TextLabel();
@@ -175,6 +174,32 @@ inline entt::entity createContextLabel() {
 
   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
   GUI::gui_reg.emplace<GUI::TextLabel>( entity, label );
+
+  return entity;
+}
+
+inline entt::entity createContextTexture() {
+  entt::entity entity = GUI::gui_reg.create();
+
+  GUI::Margins margins = {
+    .top = 0,
+    .right = 5,
+    .bottom = 0,
+    .left = 5,
+  };
+
+  GUI::Element elem = {
+    .type = GUI::Type::TEXTURE_LABEL,
+    .enabled = true,
+    .color = BLACK,
+    .dmns = { 200, 200 },
+    .margins = margins,
+  };
+
+  GUI::TextureLabel label = {};
+
+  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
+  GUI::gui_reg.emplace<GUI::TextureLabel>( entity, label );
 
   return entity;
 }

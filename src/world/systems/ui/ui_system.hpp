@@ -27,15 +27,23 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
     auto &province = reg.get<Province::Component>( entity );
     printf( "Settlement: %s \n", province.settlement->name );
 
+    // TODO handle this better
     entt::entity text_label_entt = GUI::gui_reg.view<GUI::TextLabel>().front();
     GUI::gui_reg.get<GUI::TextLabel>( text_label_entt ).text =
       province.settlement->name;
+
+    // TODO handle this better
+    entt::entity texture_label_entt =
+      GUI::gui_reg.view<GUI::TextureLabel>().front();
+    // GUI::gui_reg.get<GUI::TextureLabel>( texture_label_entt ).texture =
+    //   province.settlement->name;
 
   } else if ( reg.all_of<Actor::Component>( entity ) ) {
 
     auto actor = reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
+    // TODO handle this better
     entt::entity text_label_entt = GUI::gui_reg.view<GUI::TextLabel>().front();
     GUI::gui_reg.get<GUI::TextLabel>( text_label_entt ).text = actor.name;
   }
@@ -101,7 +109,7 @@ inline void Draw() {
 
     switch ( elem.type ) {
       case GUI::Type::PANEL: {
-        auto &panel = GUI::gui_reg.get<GUI::Panel>( entity );
+        // auto &panel = GUI::gui_reg.get<GUI::Panel>( entity );
 
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
@@ -112,7 +120,7 @@ inline void Draw() {
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
         DrawText(
-          label.text.c_str(),
+          label.text,
           elem.pos.x,
           elem.pos.y + ( 0.5 * elem.dmns.y ),
           label.fontSize,
@@ -124,11 +132,16 @@ inline void Draw() {
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
         DrawText(
-          button.label.text.c_str(),
+          button.label.text,
           elem.pos.x,
           elem.pos.y + ( 0.5 * elem.dmns.y ),
           button.label.fontSize,
           button.label.textColor );
+      } break;
+
+      case GUI::Type::TEXTURE_LABEL: {
+        auto &label = GUI::gui_reg.get<GUI::TextureLabel>( entity );
+        DrawTexture( label.texture, elem.pos.x, elem.pos.y, elem.color );
       } break;
 
       default:

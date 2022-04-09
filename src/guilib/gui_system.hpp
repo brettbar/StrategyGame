@@ -72,7 +72,7 @@ struct Panel {
 };
 
 struct TextLabel {
-  std::string text;
+  const char *text;
   i32 fontSize;
   Color textColor;
 };
@@ -82,10 +82,14 @@ struct TextButton {
   std::function<void()> action;
 };
 
-struct FloatingPanel {
-  Panel panel;
-  Vector2 oldOffset;
+struct TextureLabel {
+  Texture2D texture;
 };
+
+// struct FloatingPanel {
+//   Panel panel;
+//   Vector2 oldOffset;
+// };
 
 inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
