@@ -2,31 +2,35 @@
 #include "../../../guilib/gui_system.hpp"
 #include "../../components/event.hpp"
 #include "../event_system.hpp"
+#include <map>
 
-inline GUI::Panel createRootPanel();
-inline entt::entity createLeftPanel();
-inline entt::entity createContextPanel();
-inline entt::entity createMiniMapPanel();
-inline entt::entity createSpawnButton();
-inline entt::entity createContextLabel();
-inline entt::entity createContextTexture();
+inline std::map<const char *, entt::entity> ui_lookup;
 
-inline GUI::Panel createRootPanel() {
+inline GUI::Panel CreateRootPanel();
+inline entt::entity CreateLeftPanel();
+inline entt::entity CreateContextPanel();
+inline entt::entity CreateMiniMapPanel();
+inline entt::entity CreateSpawnButton();
+inline entt::entity CreateContextLabel( const char * );
+inline entt::entity CreateSettlementStats();
+
+
+inline GUI::Panel CreateRootPanel() {
   return {
     .align_axis = GUI::AlignAxis::FLEX_ROW,
     .align_main = GUI::Alignment::SPACE_BETWEEN,
     .align_cross = GUI::Alignment::FLEX_END,
     .children =
       {
-        createLeftPanel(),
-        createContextPanel(),
-        createMiniMapPanel(),
+        CreateLeftPanel(),
+        CreateContextPanel(),
+        CreateMiniMapPanel(),
       },
   };
 }
 
-inline entt::entity createLeftPanel() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateLeftPanel() {
+  entt::entity entity = GUI::reg.create();
 
   GUI::Element elem = {
     .type = GUI::Type::PANEL,
@@ -42,20 +46,22 @@ inline entt::entity createLeftPanel() {
     .align_cross = GUI::Alignment::CENTER,
     .children =
       {
-        createSpawnButton(),
-        createSpawnButton(),
-        createSpawnButton(),
+        CreateSpawnButton(),
+        CreateSpawnButton(),
+        CreateSpawnButton(),
       },
   };
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::Panel>( entity, panel );
+
+  ui_lookup.insert_or_assign( "left_panel", entity );
 
   return entity;
 }
 
-inline entt::entity createContextPanel() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateContextPanel() {
+  entt::entity entity = GUI::reg.create();
 
   GUI::Element elem = {
     .type = GUI::Type::PANEL,
@@ -71,19 +77,21 @@ inline entt::entity createContextPanel() {
     .align_cross = GUI::Alignment::FLEX_START,
     .children =
       {
-        createContextLabel(),
-        createContextTexture(),
+        CreateContextLabel( "" ),
+        CreateSettlementStats(),
       },
   };
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::Panel>( entity, panel );
+
+  ui_lookup.insert_or_assign( "context_panel", entity );
 
   return entity;
 }
 
-inline entt::entity createMiniMapPanel() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateMiniMapPanel() {
+  entt::entity entity = GUI::reg.create();
 
   GUI::Element elem = {
     .type = GUI::Type::PANEL,
@@ -100,20 +108,22 @@ inline entt::entity createMiniMapPanel() {
     .children = {},
   };
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::Panel>( entity, panel );
+
+  ui_lookup.insert_or_assign( "minimap_panel", entity );
 
   return entity;
 }
 
-inline entt::entity createSpawnButton() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateSpawnButton() {
+  entt::entity entity = GUI::reg.create();
 
-  GUI::TextButton spawnButton = GUI::TextButton();
-  spawnButton.label = {
+  GUI::TextButton spawn_button = GUI::TextButton();
+  spawn_button.label = {
     .text = "SpawnSystem",
-    .fontSize = 20,
-    .textColor = RED,
+    .font_size = 20,
+    .text_color = RED,
   };
 
   GUI::Margins margins = {
@@ -131,7 +141,7 @@ inline entt::entity createSpawnButton() {
     .margins = margins,
   };
 
-  spawnButton.action = []() {
+  spawn_button.action = []() {
     printf( "Spawn Button Action!\n" );
 
     // if ( ColorToInt( elem.color ) == ColorToInt( WHITE ) )
@@ -143,14 +153,16 @@ inline entt::entity createSpawnButton() {
     EventSystem::dispatcher.trigger<Event::SpawnEvent>();
   };
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::TextButton>( entity, spawnButton );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::TextButton>( entity, spawn_button );
+
+  ui_lookup.insert_or_assign( "spawn_button", entity );
 
   return entity;
 }
 
-inline entt::entity createContextLabel() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateContextLabel( const char *text ) {
+  entt::entity entity = GUI::reg.create();
 
   GUI::Margins margins = {
     .top = 0,
@@ -168,18 +180,19 @@ inline entt::entity createContextLabel() {
   };
 
   GUI::TextLabel label = GUI::TextLabel();
-  label.text = "Poplili";
-  label.fontSize = 20;
-  label.textColor = WHITE;
+  label.text = text;
+  label.font_size = 20;
+  label.text_color = WHITE;
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::TextLabel>( entity, label );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::TextLabel>( entity, label );
 
+  ui_lookup.insert_or_assign( "context_label", entity );
   return entity;
 }
 
-inline entt::entity createContextTexture() {
-  entt::entity entity = GUI::gui_reg.create();
+inline entt::entity CreateSettlementStats() {
+  entt::entity entity = GUI::reg.create();
 
   GUI::Margins margins = {
     .top = 0,
@@ -189,18 +202,22 @@ inline entt::entity createContextTexture() {
   };
 
   GUI::Element elem = {
-    .type = GUI::Type::TEXTURE_LABEL,
-    .enabled = true,
+    .type = GUI::Type::TEXT_LABEL,
+    .enabled = false,
     .color = BLACK,
-    .dmns = { 200, 200 },
+    .dmns = { 300, 200 },
     .margins = margins,
   };
 
-  GUI::TextureLabel label = {};
+  GUI::TextLabel label = GUI::TextLabel();
+  label.text = "";
+  label.font_size = 14;
+  label.text_color = WHITE;
 
-  GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-  GUI::gui_reg.emplace<GUI::TextureLabel>( entity, label );
+  GUI::reg.emplace<GUI::Element>( entity, elem );
+  GUI::reg.emplace<GUI::TextLabel>( entity, label );
 
+  ui_lookup.insert_or_assign( "settlement_stats", entity );
   return entity;
 }
 

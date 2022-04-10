@@ -38,7 +38,7 @@ enum class Alignment {
   STRETCH
 };
 
-inline entt::registry gui_reg;
+inline entt::registry reg;
 
 struct Context {
   entt::entity hot;
@@ -72,9 +72,11 @@ struct Panel {
 };
 
 struct TextLabel {
-  const char *text;
-  i32 fontSize;
-  Color textColor;
+  // const char *text;
+  std::string text;
+  i32 font_size;
+  Color text_color;
+  // Alignment text_align;
 };
 
 struct TextButton {
@@ -103,7 +105,7 @@ inline void MainRowAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         elem.pos.x = end_of_last + elem.margins.left;
         end_of_last = elem.pos.x + elem.dmns.x + elem.margins.right;
@@ -117,7 +119,7 @@ inline void MainRowAlignChildren(
             rit != children.rend();
             ++rit ) {
         entt::entity &entity = *rit;
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         current_offset += ( elem.dmns.x );
 
@@ -130,7 +132,7 @@ inline void MainRowAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
         total_width += elem.dmns.x;
       }
 
@@ -140,7 +142,7 @@ inline void MainRowAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         elem.pos.x = end_of_last;
         end_of_last = elem.pos.x + elem.dmns.x;
@@ -152,7 +154,7 @@ inline void MainRowAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
         total_width += elem.dmns.x;
       }
 
@@ -164,7 +166,7 @@ inline void MainRowAlignChildren(
       f32 end_of_last = parent.x;
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         if ( i % 2 == 0 ) {
           elem.pos.x = end_of_last;
@@ -195,7 +197,7 @@ inline void CrossRowAlignChildren(
 
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    Element &elem = gui_reg.get<Element>( entity );
+    Element &elem = reg.get<Element>( entity );
 
     switch ( elem.align_self ) {
       case AlignSelf::AUTO:
@@ -254,7 +256,7 @@ inline void MainColumnAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         elem.pos.y = end_of_last + elem.margins.top;
         end_of_last = elem.pos.y + elem.dmns.y + elem.margins.bottom;
@@ -268,7 +270,7 @@ inline void MainColumnAlignChildren(
             rit != children.rend();
             ++rit ) {
         entt::entity &entity = *rit;
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         current_offset += ( elem.dmns.y );
 
@@ -281,7 +283,7 @@ inline void MainColumnAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
         total_height += elem.dmns.y;
       }
 
@@ -291,7 +293,7 @@ inline void MainColumnAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         elem.pos.y = end_of_last;
         end_of_last = elem.pos.y + elem.dmns.y;
@@ -303,7 +305,7 @@ inline void MainColumnAlignChildren(
 
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
         total_height += elem.dmns.y;
       }
 
@@ -315,7 +317,7 @@ inline void MainColumnAlignChildren(
       f32 end_of_last = parent.y;
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
-        Element &elem = gui_reg.get<Element>( entity );
+        Element &elem = reg.get<Element>( entity );
 
         if ( i % 2 == 0 ) {
           elem.pos.y = end_of_last;
@@ -346,7 +348,7 @@ inline void CrossColumnAlignChildren(
 
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    Element &elem = gui_reg.get<Element>( entity );
+    Element &elem = reg.get<Element>( entity );
 
     switch ( elem.align_self ) {
       case AlignSelf::AUTO:
@@ -418,9 +420,9 @@ inline void Layout( Panel root, f32 screen_width, f32 screen_height ) {
       root.children );
   }
 
-  for ( auto &panel_entity: GUI::gui_reg.view<GUI::Panel>() ) {
-    GUI::Panel &panel = GUI::gui_reg.get<GUI::Panel>( panel_entity );
-    GUI::Element &panel_elem = GUI::gui_reg.get<GUI::Element>( panel_entity );
+  for ( auto &panel_entity: GUI::reg.view<GUI::Panel>() ) {
+    GUI::Panel &panel = GUI::reg.get<GUI::Panel>( panel_entity );
+    GUI::Element &panel_elem = GUI::reg.get<GUI::Element>( panel_entity );
     if ( panel.align_axis == AlignAxis::FLEX_ROW ) {
       MainRowAlignChildren(
         RectangleFromVectors( panel_elem.pos, panel_elem.dmns ),
@@ -481,8 +483,8 @@ inline Rectangle RectangleFromVectors( Vector2 pos, Vector2 dimensions ) {
 inline bool MouseWasOverUI() {
   bool inside = false;
 
-  for ( auto &entity: GUI::gui_reg.view<GUI::Element>() ) {
-    GUI::Element elem = GUI::gui_reg.get<GUI::Element>( entity );
+  for ( auto &entity: GUI::reg.view<GUI::Element>() ) {
+    GUI::Element elem = GUI::reg.get<GUI::Element>( entity );
 
     inside = CheckCollisionPointRec(
       GetMousePosition(),

@@ -45,7 +45,7 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
   bool alreadyFoundOne = false;
 
   // use forward iterators and get only the components of interest
-  for ( auto entity: unitsView ) {
+  for ( auto &entity: unitsView ) {
     if ( alreadyFoundOne )
       return;
 
@@ -57,7 +57,7 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
     }
   }
 
-  for ( auto entity: provView ) {
+  for ( auto &entity: provView ) {
     if ( alreadyFoundOne )
       return;
 

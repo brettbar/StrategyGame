@@ -19,33 +19,22 @@ inline GUI::Context context = {
   .active = entt::null,
 };
 
-inline GUI::Panel root = createRootPanel();
+inline GUI::Panel root = CreateRootPanel();
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
-    auto &province = reg.get<Province::Component>( entity );
-    printf( "Settlement: %s \n", province.settlement->name );
+    auto stats = ui_lookup.at( "settlement_stats" );
+    GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
 
-    // TODO handle this better
-    entt::entity text_label_entt = GUI::gui_reg.view<GUI::TextLabel>().front();
-    GUI::gui_reg.get<GUI::TextLabel>( text_label_entt ).text =
-      province.settlement->name;
-
-    // TODO handle this better
-    entt::entity texture_label_entt =
-      GUI::gui_reg.view<GUI::TextureLabel>().front();
-    // GUI::gui_reg.get<GUI::TextureLabel>( texture_label_entt ).texture =
-    //   province.settlement->name;
+    elem.enabled = true;
 
   } else if ( reg.all_of<Actor::Component>( entity ) ) {
+    // auto actor = reg.get<Actor::Component>( entity );
+    // printf( "Actor: %s \n", actor.name );
 
-    auto actor = reg.get<Actor::Component>( entity );
-    printf( "Actor: %s \n", actor.name );
-
-    // TODO handle this better
-    entt::entity text_label_entt = GUI::gui_reg.view<GUI::TextLabel>().front();
-    GUI::gui_reg.get<GUI::TextLabel>( text_label_entt ).text = actor.name;
+    // entt::entity context_label = ui_lookup.at( "context_label" );
+    // GUI::gui_reg.get<GUI::TextLabel>( context_label ).text = actor.name;
   }
 }
 
@@ -53,7 +42,47 @@ inline void Init( entt::registry &reg ) {
   reg.on_construct<Selected::Component>().connect<&SelectListener>();
 }
 
-inline void Update( State &state, entt::registry &reg ) {}
+inline void Update( entt::registry &reg ) {
+  entt::entity stats = ui_lookup.at( "settlement_stats" );
+  GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
+
+  if ( elem.enabled ) {
+    auto prov_entity =
+      reg.view<Selected::Component, Province::Component>().front();
+
+    if ( prov_entity == entt::null )
+      return;
+
+
+    auto &province = reg.get<Province::Component>( prov_entity );
+    // printf( "Settlement: %s \n", province.settlement->name );
+
+    entt::entity context_label = ui_lookup.at( "context_label" );
+    GUI::reg.get<GUI::TextLabel>( context_label ).text =
+      province.settlement->name;
+
+    entt::entity settlement_stats = ui_lookup.at( "settlement_stats" );
+    // printf(
+    //   "current population %d\n",
+    //   province.settlement->population.current );
+
+    std::string text = "";
+    text +=
+      "Pop: " + std::to_string( province.settlement->population.current ) +
+      "\n";
+    text +=
+      "BR: " + std::to_string( province.settlement->population.birthRate ) +
+      "\n";
+    text +=
+      "DR: " + std::to_string( province.settlement->population.deathRate ) +
+      "\n";
+    text +=
+      "GR: " + std::to_string( province.settlement->population.growthRate ) +
+      "\n";
+
+    GUI::reg.get<GUI::TextLabel>( settlement_stats ).text = text;
+  }
+}
 
 inline void Draw() {
   Vector2 mousePos = GetMousePosition();
@@ -66,14 +95,13 @@ inline void Draw() {
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
-  auto all_view = GUI::gui_reg.view<GUI::Element>();
-  auto items_view =
-    GUI::gui_reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
+  auto all_view = GUI::reg.view<GUI::Element>();
+  auto items_view = GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
 
   GUI::Layout( root, screen_width, screen_height );
 
-  for ( auto entity: items_view ) {
-    GUI::Element &elem = GUI::gui_reg.get<GUI::Element>( entity );
+  for ( auto &entity: items_view ) {
+    GUI::Element &elem = GUI::reg.get<GUI::Element>( entity );
 
     if ( !elem.enabled )
       continue;
@@ -89,7 +117,7 @@ inline void Draw() {
     if ( GUI::DoItem( context, entity, inside, mouseWentUp, mouseWentDown ) ) {
       switch ( elem.type ) {
         case GUI::Type::TEXT_BUTTON: {
-          auto &button = GUI::gui_reg.get<GUI::TextButton>( entity );
+          auto &button = GUI::reg.get<GUI::TextButton>( entity );
           button.action();
         } break;
         case GUI::Type::TEXTURE_BUTTON: {
@@ -103,9 +131,9 @@ inline void Draw() {
 
   // 6. Draw Everything
   for ( auto &entity: all_view ) {
-    GUI::Element &elem = GUI::gui_reg.get<GUI::Element>( entity );
+    GUI::Element &elem = GUI::reg.get<GUI::Element>( entity );
     if ( !elem.enabled )
-      return;
+      continue;
 
     switch ( elem.type ) {
       case GUI::Type::PANEL: {
@@ -116,31 +144,31 @@ inline void Draw() {
       } break;
 
       case GUI::Type::TEXT_LABEL: {
-        auto &label = GUI::gui_reg.get<GUI::TextLabel>( entity );
+        auto &label = GUI::reg.get<GUI::TextLabel>( entity );
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
         DrawText(
-          label.text,
+          label.text.c_str(),
           elem.pos.x,
-          elem.pos.y + ( 0.5 * elem.dmns.y ),
-          label.fontSize,
-          label.textColor );
+          elem.pos.y + ( 0.25 * elem.dmns.y ),
+          label.font_size,
+          label.text_color );
       } break;
 
       case GUI::Type::TEXT_BUTTON: {
-        auto &button = GUI::gui_reg.get<GUI::TextButton>( entity );
+        auto &button = GUI::reg.get<GUI::TextButton>( entity );
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
         DrawText(
-          button.label.text,
+          button.label.text.c_str(),
           elem.pos.x,
           elem.pos.y + ( 0.5 * elem.dmns.y ),
-          button.label.fontSize,
-          button.label.textColor );
+          button.label.font_size,
+          button.label.text_color );
       } break;
 
       case GUI::Type::TEXTURE_LABEL: {
-        auto &label = GUI::gui_reg.get<GUI::TextureLabel>( entity );
+        auto &label = GUI::reg.get<GUI::TextureLabel>( entity );
         DrawTexture( label.texture, elem.pos.x, elem.pos.y, elem.color );
       } break;
 

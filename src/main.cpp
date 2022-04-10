@@ -121,7 +121,7 @@ void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
   AnimationSystem::UpdateSprites( reg, state.timeScale );
   //  Terrain::UpdateFOW(reg);
-  UI::Update( state, reg );
+  UI::Update( reg );
 }
 
 void LateUpdate( State &state, entt::registry &reg ) {
