@@ -50,7 +50,7 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    ProvinceSystem::SetProvinceOwner( reg, state.currPlayer->id, clickPos );
+    ProvinceSystem::SpawnProvince( reg, state.currPlayer->id, clickPos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {

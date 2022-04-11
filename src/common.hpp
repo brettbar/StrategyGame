@@ -29,6 +29,10 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 
 inline void PrintVec2( Vector2 vec ) { printf( "(%f, %f)\n", vec.x, vec.y ); }
 
+inline u32 RollN (u32 n) {
+  return rand() % n + 1;
+}
+
 inline void PrintRect( Rectangle rect ) {
   printf(
     "(x:%f, y:%f, w:%f, h:%f)\n",

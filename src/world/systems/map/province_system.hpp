@@ -7,6 +7,9 @@
 #include <array>
 #include <raylib.h>
 #include <thread>
+// TODO REMOVE
+#include <iostream>
+#include <string>
 
 #pragma once
 
@@ -19,11 +22,17 @@ namespace ProvinceSystem {
 //   std::shared_ptr<c_Province::Province>,
 //   Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
 
-inline void SpawnProvince( entt::registry &, u32 );
+inline void SetProvinceOwner( entt::registry &reg, u32 owner );
 inline void DrawProvinces( entt::registry &, TextureCache &, bool );
-inline void UpdatePopulation( Province::Settlement & );
+inline bool UpdatePopulation( Province::Settlement & );
 inline void UpdateSettlement( Province::Settlement & );
+inline void UpdateSprawl( Province::Settlement &);
 
+inline std::map<std::string, Image> building_map;
+
+
+// TODO figure out if this really needs to be here
+// Should be able to make it like the listener in ui_system.
 struct ProvListener : EventSystem::Listener {
   inline void Receive() override {
     if ( this->currState == nullptr || this->currReg == nullptr ) {
@@ -31,7 +40,7 @@ struct ProvListener : EventSystem::Listener {
     }
 
     printf( "ProvinceSystem got an event!\n" );
-    SpawnProvince( *this->currReg, this->currState->currPlayer->id );
+    SetProvinceOwner( *this->currReg, this->currState->currPlayer->id );
   }
 
   inline void Listen() {
@@ -43,7 +52,7 @@ struct ProvListener : EventSystem::Listener {
 
 inline ProvListener listener;
 
-inline void InitProvinces( State &state, entt::registry &reg ) {
+inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
   auto tView = reg.view<Terrain::TileMap>();
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
 
@@ -53,6 +62,27 @@ inline void InitProvinces( State &state, entt::registry &reg ) {
 
     reg.emplace<Province::Component>( provEnt, i, -1, nullptr, tiles[i] );
   }
+
+  Image buildings = LoadImageFromTexture(cache.handle(hstr{"buildings"})->texture);
+  Image roman_m1 = ImageFromImage(buildings, {0, 0, 16, 16});
+  Image roman_m2 = ImageFromImage(buildings, {0, 16, 16, 16});
+  Image roman_m3 = ImageFromImage(buildings, {0, 32, 16, 16});
+  Image roman_m4 = ImageFromImage(buildings, {0, 48, 16, 16});
+
+  Image roman_s1 = ImageFromImage(buildings, {16, 0, 16, 16});
+  Image roman_s2 = ImageFromImage(buildings, {32, 0, 16, 16});
+  Image roman_s3 = ImageFromImage(buildings, {48, 0, 16, 16});
+  Image roman_s4 = ImageFromImage(buildings, {64, 0, 16, 16});
+
+  building_map.insert_or_assign("roman_m1", (roman_m1));
+  building_map.insert_or_assign("roman_m2", (roman_m2));
+  building_map.insert_or_assign("roman_m3", (roman_m3));
+  building_map.insert_or_assign("roman_m4", (roman_m4));
+
+  building_map.insert_or_assign("roman_s1", (roman_s1));
+  building_map.insert_or_assign("roman_s2", (roman_s2));
+  building_map.insert_or_assign("roman_s3", (roman_s3));
+  building_map.insert_or_assign("roman_s4", (roman_s4));
 
 
   listener.Listen();
@@ -73,11 +103,17 @@ inline void UpdateProvinces( State &state, entt::registry &reg ) {
 }
 
 inline void UpdateSettlement( Province::Settlement &settlement ) {
-  UpdatePopulation( settlement );
+  bool needs_sprawl_update = UpdatePopulation( settlement );
+
+  if (needs_sprawl_update)
+    UpdateSprawl( settlement );
 }
 
-inline void UpdatePopulation( Province::Settlement &settlement ) {
+inline bool UpdatePopulation( Province::Settlement &settlement ) {
   Province::Population &pop = settlement.population;
+
+  f32 before = settlement.population.current;
+
   // if growing exponentially
   // P(t) = P0*e^(kt)
 
@@ -89,10 +125,50 @@ inline void UpdatePopulation( Province::Settlement &settlement ) {
                    pop.carryingCapacity;
 
   settlement.population.current += (i32) dP_over_dt;
+
+
+  // Find total number of digits - 1
+  int digits = (int)log10(before);
+
+  // Find first digit
+  before = (int)(before / pow(10, digits));
+
+  digits = (int)log10(settlement.population.current);
+  int after = (int)(settlement.population.current / pow(10, digits));
+
+  if (before < after) {
+    return true;
+  }
+
+  return false;
+}
+
+inline void UpdateSprawl( Province::Settlement &settlement ) {
+  if ( settlement.population.current > 300 && settlement.population.current < 400) {
+    printf("Sprawl increase at %d\n", settlement.population.current);
+    Image base = GenImageColor(128, 128, ColorAlpha(WHITE, 0.0));
+    Image image = LoadImageFromTexture(settlement.texture);
+    ImageDraw(
+      &base,
+      image,
+      {0, 0, 16, 16,},
+      {16, 16, 16, 16},
+      WHITE);
+
+    ImageDraw(
+      &base,
+      building_map.at("roman_s3"),
+      {0, 0, 16, 16},
+      {16, 0, 16, 16},
+      WHITE);
+
+    settlement.texture = LoadTextureFromImage(base);
+  }
+
 }
 
 inline void
-SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos ) {
+SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   i32 provId = DetermineTileIdFromClick( clickPos );
   assert( provId >= 0 );
 
@@ -118,10 +194,21 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos ) {
           .carryingCapacity = 1000,
         };
 
+
         switch ( prov.owner ) {
-          case 0:
+          case 0: {
             prov.settlement->name = "Rome";
-            break;
+            u32 choice = RollN(4);
+            printf("choice %d\n", choice);
+
+            std::string foo = "roman_s" + std::to_string(choice);
+            std::cout << "std::string " << foo << "\n";
+
+            const char *bar = foo.c_str();
+            printf("c_str %s", bar);
+
+            prov.settlement->texture = LoadTextureFromImage(building_map.at(bar));
+          } break;
           case 1:
             prov.settlement->name = "Athens";
             break;
@@ -140,7 +227,7 @@ SetProvinceOwner( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   }
 }
 
-inline void SpawnProvince( entt::registry &reg, u32 owner ) {
+inline void SetProvinceOwner( entt::registry &reg, u32 owner ) {
   auto selectedView = reg.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();
 
@@ -151,51 +238,7 @@ inline void SpawnProvince( entt::registry &reg, u32 owner ) {
 
   Unit::Component &unit = selectedView.get<Unit::Component>( selectedEntity );
 
-  i32 provId = DetermineTileIdFromClick( unit.position );
-  assert( provId >= 0 );
-
-  auto provinces = reg.view<Province::Component>();
-
-  for ( auto ent: provinces ) {
-    Province::Component &prov = provinces.get<Province::Component>( ent );
-
-    if ( prov.id == (u32) provId ) {
-      if ( prov.tile->biome == Tile::WATER )
-        continue;
-
-      prov.owner = owner;
-
-      if ( prov.settlement == nullptr ) {
-        prov.settlement = std::make_unique<Province::Settlement>();
-        prov.settlement->id = prov.id;
-        prov.settlement->population = {
-          .current = 200,
-          .birthRate = 40,
-          .deathRate = 10,
-          .growthRate = ( 40.0f - 10.0f ) / 200,
-          .carryingCapacity = 1000,
-        };
-
-        switch ( prov.owner ) {
-          case 0:
-            prov.settlement->name = "Rome";
-            break;
-          case 1:
-            prov.settlement->name = "Athens";
-            break;
-          case 2:
-            prov.settlement->name = "Lugudunon";
-            break;
-          case 3:
-            prov.settlement->name = "Carthage";
-            break;
-          case 4:
-            prov.settlement->name = "Persepolis";
-            break;
-        }
-      }
-    }
-  }
+  SpawnProvince( reg, owner, unit.position );
 }
 
 
@@ -270,7 +313,10 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
 
     if ( prov.settlement != nullptr ) {
       if ( prov.settlement->population.current > 0 ) {
-        Vector2 provPos = prov.tile->position;
+        Vector2 settlement_pos = {
+          prov.tile->position.x + 48,
+          prov.tile->position.y + 48,
+        };
 
         // DrawRectangleRec({provPos.x + 50,
         //                   provPos.y + 86, 128, 64},
@@ -278,12 +324,19 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
         // DrawSingleBorder(tile);
 
         DrawTextureV(
-          cache.handle( hstr{ "romanVillageTexture" } )->texture,
-          provPos,
+//          cache.handle( hstr{ "romanVillageTexture" } )->texture,
+          prov.settlement->texture,
+          settlement_pos,
           WHITE );
 
 
-        DrawRectangleRec( { provPos.x + 64, provPos.y + 96, 32, 14 }, BLACK );
+        DrawRectangleRec(
+          {
+            settlement_pos.x + 16,
+            settlement_pos.y + 32,
+            32, 14,
+          }, BLACK );
+
         // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
 
         // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
@@ -295,8 +348,8 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
         if ( prov.settlement->name != nullptr )
           DrawText(
             prov.settlement->name,
-            provPos.x + 64.0,
-            provPos.y + 86.0,
+            settlement_pos.x + 16.0,
+            settlement_pos.y + 32.0,
             14,
             WHITE );
       }

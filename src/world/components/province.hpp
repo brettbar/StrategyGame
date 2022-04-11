@@ -61,6 +61,7 @@ struct Settlement {
   const char *name;
   Development development;
   Population population;
+  Texture texture;
 };
 
 struct Component {

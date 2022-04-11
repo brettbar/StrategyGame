@@ -92,12 +92,27 @@ int main( void ) {
 void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
-  InitWindow(
-    1920,
-    1080,
-    // GetScreenWidth(),
-    // GetScreenHeight(),
-    "FieldsOfMars" );
+  const f32 monitor_w = GetMonitorWidth(0);
+
+
+  if (monitor_w <= 1920) {
+    InitWindow(
+      1280,
+      720,
+      // GetScreenWidth(),
+      // GetScreenHeight(),
+      "FieldsOfMars" );
+  } else {
+    InitWindow(
+      1920,
+      1080,
+      // GetScreenWidth(),
+      // GetScreenHeight(),
+      "FieldsOfMars" );
+  }
+
+
+
 
   LoadResources( cache );
 
@@ -111,7 +126,7 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   Terrain::CreateTerrain( reg );
-  ProvinceSystem::InitProvinces( state, reg );
+  ProvinceSystem::InitProvinces( reg, cache );
   SpawnSystem::Init();
   UI::Init( reg );
   Renderer::Init( state );
@@ -234,6 +249,11 @@ void LoadResources( TextureCache &cache ) {
   LoadResource(
     hstr{ "romanVillageTexture" },
     "assets/textures/village_roman.png",
+    cache );
+
+  LoadResource(
+    hstr{"buildings"},
+    "assets/textures/buildings.png",
     cache );
 }
 
