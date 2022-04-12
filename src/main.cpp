@@ -92,10 +92,10 @@ int main( void ) {
 void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
-  const f32 monitor_w = GetMonitorWidth(0);
+  const f32 monitor_w = GetMonitorWidth( 0 );
 
 
-  if (monitor_w <= 1920) {
+  if ( monitor_w <= 1920 ) {
     InitWindow(
       1280,
       720,
@@ -110,8 +110,6 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
       // GetScreenHeight(),
       "FieldsOfMars" );
   }
-
-
 
 
   LoadResources( cache );
@@ -206,12 +204,35 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
+inline Texture2D InitTileOutline() {
+  Image base = GenImageColor( 129, 129, ColorAlpha( WHITE, 0.0 ) );
+
+  // N -> NE
+  ImageDrawLineV( &base, { 0, 32 }, { 64, 0 }, YELLOW );
+  // NE -> SE
+  ImageDrawLineV( &base, { 128, 32 }, { 128, 96 }, YELLOW );
+  // SE -> S
+  ImageDrawLineV( &base, { 64, 0 }, { 128, 32 }, YELLOW );
+  // S -> SW
+  ImageDrawLineV( &base, { 128, 96 }, { 64, 128 }, YELLOW );
+  // SW -> NW
+  ImageDrawLineV( &base, { 64, 128 }, { 0, 96 }, YELLOW );
+  // NW -> N
+  ImageDrawLineV( &base, { 0, 96 }, { 0, 32 }, YELLOW );
+
+  Texture2D texture = LoadTextureFromImage( base );
+
+  return texture;
+}
+
 void LoadResources( TextureCache &cache ) {
   //  Image hexagon = LoadImage("assets/textures/hexagon.png");
   //  ImageResize(&hexagon, 512, 512);
   //  Texture hexTex = LoadTextureFromImage(hexagon);
   //
   //  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
+
+  cache.load<TextureLoader>( hstr{ "tile_outline" }, InitTileOutline() );
 
   LoadResource( hstr{ "hexagon" }, "assets/textures/hexagon.png", cache );
 
@@ -251,10 +272,7 @@ void LoadResources( TextureCache &cache ) {
     "assets/textures/village_roman.png",
     cache );
 
-  LoadResource(
-    hstr{"buildings"},
-    "assets/textures/buildings.png",
-    cache );
+  LoadResource( hstr{ "buildings" }, "assets/textures/buildings.png", cache );
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }

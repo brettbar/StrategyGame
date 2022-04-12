@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common.hpp"
+#include "../../resource.hpp"
 #include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
@@ -11,7 +12,8 @@
 
 namespace SelectionSystem {
 
-inline void Draw( entt::registry &reg, bool isDebug ) {
+
+inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
   auto unitsView = reg.view<Selected::Component, Unit::Component>();
   auto provsView = reg.view<Selected::Component, Province::Component>();
 
@@ -28,13 +30,19 @@ inline void Draw( entt::registry &reg, bool isDebug ) {
   for ( auto entity: provsView ) {
     Province::Component &prov = provsView.get<Province::Component>( entity );
     if ( isDebug ) {
-      DrawRectangleLinesEx(
-        { prov.tile->position.x + 32, prov.tile->position.y + 32, 64, 64 },
-        2,
-        YELLOW );
+      DrawTexture(
+        cache.handle( hstr{ "tile_outline" } )->texture,
+        prov.tile->position.x,
+        prov.tile->position.y,
+        WHITE );
+      // DrawRectangleLinesEx(
+      //   { prov.tile->position.x + 32, prov.tile->position.y + 32, 64, 64 },
+      //   2,
+      //   YELLOW );
     }
   }
 }
+
 
 inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
   auto unitsView = reg.view<Unit::Component>();

@@ -101,7 +101,7 @@ Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
     {
       MapSystem::Draw( state, reg, cache );
       AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-      SelectionSystem::Draw( reg, state.gameState == GameState::EDITOR );
+      SelectionSystem::Draw( reg, cache, state.gameState == GameState::EDITOR );
     }
     EndMode2D();
     EndShaderMode();

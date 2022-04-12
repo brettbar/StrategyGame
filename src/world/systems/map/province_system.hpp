@@ -15,18 +15,11 @@
 
 namespace ProvinceSystem {
 
-// TODO This shit needs to get fixed
-// Shouldnt be using a separate array of pointers,
-// It should be in the ECS somehow
-// using ProvinceList = std::array<
-//   std::shared_ptr<c_Province::Province>,
-//   Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
-
 inline void SetProvinceOwner( entt::registry &reg, u32 owner );
 inline void DrawProvinces( entt::registry &, TextureCache &, bool );
 inline bool UpdatePopulation( Province::Settlement & );
 inline void UpdateSettlement( Province::Settlement & );
-inline void UpdateSprawl( Province::Settlement &);
+inline void UpdateSprawl( Province::Settlement & );
 
 inline std::map<std::string, Image> building_map;
 
@@ -63,26 +56,27 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
     reg.emplace<Province::Component>( provEnt, i, -1, nullptr, tiles[i] );
   }
 
-  Image buildings = LoadImageFromTexture(cache.handle(hstr{"buildings"})->texture);
-  Image roman_m1 = ImageFromImage(buildings, {0, 0, 16, 16});
-  Image roman_m2 = ImageFromImage(buildings, {0, 16, 16, 16});
-  Image roman_m3 = ImageFromImage(buildings, {0, 32, 16, 16});
-  Image roman_m4 = ImageFromImage(buildings, {0, 48, 16, 16});
+  Image buildings =
+    LoadImageFromTexture( cache.handle( hstr{ "buildings" } )->texture );
+  Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
+  Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );
+  Image roman_m3 = ImageFromImage( buildings, { 0, 32, 16, 16 } );
+  Image roman_m4 = ImageFromImage( buildings, { 0, 48, 16, 16 } );
 
-  Image roman_s1 = ImageFromImage(buildings, {16, 0, 16, 16});
-  Image roman_s2 = ImageFromImage(buildings, {32, 0, 16, 16});
-  Image roman_s3 = ImageFromImage(buildings, {48, 0, 16, 16});
-  Image roman_s4 = ImageFromImage(buildings, {64, 0, 16, 16});
+  Image roman_s1 = ImageFromImage( buildings, { 16, 0, 16, 16 } );
+  Image roman_s2 = ImageFromImage( buildings, { 32, 0, 16, 16 } );
+  Image roman_s3 = ImageFromImage( buildings, { 48, 0, 16, 16 } );
+  Image roman_s4 = ImageFromImage( buildings, { 64, 0, 16, 16 } );
 
-  building_map.insert_or_assign("roman_m1", (roman_m1));
-  building_map.insert_or_assign("roman_m2", (roman_m2));
-  building_map.insert_or_assign("roman_m3", (roman_m3));
-  building_map.insert_or_assign("roman_m4", (roman_m4));
+  building_map.insert_or_assign( "roman_m1", ( roman_m1 ) );
+  building_map.insert_or_assign( "roman_m2", ( roman_m2 ) );
+  building_map.insert_or_assign( "roman_m3", ( roman_m3 ) );
+  building_map.insert_or_assign( "roman_m4", ( roman_m4 ) );
 
-  building_map.insert_or_assign("roman_s1", (roman_s1));
-  building_map.insert_or_assign("roman_s2", (roman_s2));
-  building_map.insert_or_assign("roman_s3", (roman_s3));
-  building_map.insert_or_assign("roman_s4", (roman_s4));
+  building_map.insert_or_assign( "roman_s1", ( roman_s1 ) );
+  building_map.insert_or_assign( "roman_s2", ( roman_s2 ) );
+  building_map.insert_or_assign( "roman_s3", ( roman_s3 ) );
+  building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
 
 
   listener.Listen();
@@ -105,14 +99,14 @@ inline void UpdateProvinces( State &state, entt::registry &reg ) {
 inline void UpdateSettlement( Province::Settlement &settlement ) {
   bool needs_sprawl_update = UpdatePopulation( settlement );
 
-  if (needs_sprawl_update)
+  if ( needs_sprawl_update )
     UpdateSprawl( settlement );
 }
 
 inline bool UpdatePopulation( Province::Settlement &settlement ) {
   Province::Population &pop = settlement.population;
 
-  f32 before = settlement.population.current;
+  int before = settlement.population.current / 100;
 
   // if growing exponentially
   // P(t) = P0*e^(kt)
@@ -127,16 +121,17 @@ inline bool UpdatePopulation( Province::Settlement &settlement ) {
   settlement.population.current += (i32) dP_over_dt;
 
 
-  // Find total number of digits - 1
-  int digits = (int)log10(before);
+  // // Find total number of digits - 1
+  // int digits = (int) log10( before );
 
-  // Find first digit
-  before = (int)(before / pow(10, digits));
+  // // Find first digit
+  // before = (int) ( before / pow( 10, digits ) );
 
-  digits = (int)log10(settlement.population.current);
-  int after = (int)(settlement.population.current / pow(10, digits));
+  // digits = (int) log10( settlement.population.current );
+  // int after = (int) ( settlement.population.current / pow( 10, digits ) );
+  int after = settlement.population.current / 100;
 
-  if (before < after) {
+  if ( before < after ) {
     return true;
   }
 
@@ -144,27 +139,25 @@ inline bool UpdatePopulation( Province::Settlement &settlement ) {
 }
 
 inline void UpdateSprawl( Province::Settlement &settlement ) {
-  if ( settlement.population.current > 300 && settlement.population.current < 400) {
-    printf("Sprawl increase at %d\n", settlement.population.current);
-    Image base = GenImageColor(128, 128, ColorAlpha(WHITE, 0.0));
-    Image image = LoadImageFromTexture(settlement.texture);
+  printf( "Sprawl increase at %d\n", settlement.population.current );
+
+  // Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+
+  Image base = LoadImageFromTexture( settlement.texture );
+
+
+  // ImageDraw( &base, image, { 0, 0, 16, 16 }, { 0, 0, 16, 16 }, WHITE );
+
+  for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
     ImageDraw(
       &base,
-      image,
-      {0, 0, 16, 16,},
-      {16, 16, 16, 16},
-      WHITE);
-
-    ImageDraw(
-      &base,
-      building_map.at("roman_s3"),
-      {0, 0, 16, 16},
-      {16, 0, 16, 16},
-      WHITE);
-
-    settlement.texture = LoadTextureFromImage(base);
+      building_map.at( "roman_s3" ),
+      { 0, 0, 16, 16 },
+      { ( i * 8.0f ), 0, 16, 16 },
+      WHITE );
   }
 
+  settlement.texture = LoadTextureFromImage( base );
 }
 
 inline void
@@ -198,16 +191,23 @@ SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
         switch ( prov.owner ) {
           case 0: {
             prov.settlement->name = "Rome";
-            u32 choice = RollN(4);
-            printf("choice %d\n", choice);
+            u32 choice = RollN( 4 );
+            printf( "choice %d\n", choice );
 
-            std::string foo = "roman_s" + std::to_string(choice);
+            std::string foo = "roman_s" + std::to_string( choice );
             std::cout << "std::string " << foo << "\n";
 
             const char *bar = foo.c_str();
-            printf("c_str %s", bar);
+            printf( "c_str %s", bar );
 
-            prov.settlement->texture = LoadTextureFromImage(building_map.at(bar));
+            Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+            ImageDraw(
+              &base,
+              building_map.at( bar ),
+              { 0, 0, 16, 16 },
+              { 0, 0, 16, 16 },
+              WHITE );
+            prov.settlement->texture = LoadTextureFromImage( base );
           } break;
           case 1:
             prov.settlement->name = "Athens";
@@ -323,19 +323,9 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
         //                  Fade(WHITE, 0.8f));
         // DrawSingleBorder(tile);
 
-        DrawTextureV(
-//          cache.handle( hstr{ "romanVillageTexture" } )->texture,
-          prov.settlement->texture,
-          settlement_pos,
-          WHITE );
+        // Draw Settlement
+        DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
 
-
-        DrawRectangleRec(
-          {
-            settlement_pos.x + 16,
-            settlement_pos.y + 32,
-            32, 14,
-          }, BLACK );
 
         // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
 
@@ -345,13 +335,30 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
         // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
 
         // NOTE: I changed this from "" to nullptr
-        if ( prov.settlement->name != nullptr )
+        if ( prov.settlement->name != nullptr ) {
+          DrawRectangleRec(
+            {
+              settlement_pos.x + 16,
+              settlement_pos.y + 32,
+              64,
+              14,
+            },
+            BLACK );
+
           DrawText(
             prov.settlement->name,
             settlement_pos.x + 16.0,
             settlement_pos.y + 32.0,
             14,
             WHITE );
+
+          DrawText(
+            std::to_string( prov.settlement->population.current ).c_str(),
+            settlement_pos.x + 54.0,
+            settlement_pos.y + 32.0,
+            14,
+            WHITE );
+        }
       }
     }
   }

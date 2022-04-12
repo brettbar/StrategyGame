@@ -30,16 +30,23 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
     elem.enabled = true;
 
   } else if ( reg.all_of<Actor::Component>( entity ) ) {
-    // auto actor = reg.get<Actor::Component>( entity );
-    // printf( "Actor: %s \n", actor.name );
+    auto actor = reg.get<Actor::Component>( entity );
+    printf( "Actor: %s \n", actor.name );
 
-    // entt::entity context_label = ui_lookup.at( "context_label" );
-    // GUI::gui_reg.get<GUI::TextLabel>( context_label ).text = actor.name;
+    entt::entity context_label = ui_lookup.at( "context_label" );
+    GUI::reg.get<GUI::TextLabel>( context_label ).text = actor.name;
   }
+}
+
+inline void DeSelectListener() {
+  auto stats = ui_lookup.at( "settlement_stats" );
+  GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
+  elem.enabled = false;
 }
 
 inline void Init( entt::registry &reg ) {
   reg.on_construct<Selected::Component>().connect<&SelectListener>();
+  reg.on_destroy<Selected::Component>().connect<&DeSelectListener>();
 }
 
 inline void Update( entt::registry &reg ) {
@@ -249,7 +256,6 @@ inline void Draw() {
 //      };
 //    }
 //  }
-
 };// namespace UI
 
 //    for ( auto it = items_view.rbegin(); it != items_view.rend(); ++it ) {
