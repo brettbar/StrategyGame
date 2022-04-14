@@ -1,110 +1,89 @@
 #include "../common.hpp"
-#include "../resource.hpp"
 #include "../state.hpp"
 #include "../world/systems/animation_system.hpp"
 #include "../world/systems/map/map_system.hpp"
 #include "../world/systems/map/province_system.hpp"
 #include "../world/systems/selection_system.hpp"
 #include "../world/systems/ui/ui_system.hpp"
+#include "textures.hpp"
+#include <raylib.h>
 
-#include "rlgl.h"
+namespace Renderer {
 
+inline Shader shader;
 
-namespace Renderer
+inline void Init( State &state, TextureCache &cache ) {
 
-{
-Shader shader;
-
-
-void Init( State & );
-
-void Draw( State &, entt::registry &, TextureCache & );
-};// namespace Renderer
-
-inline void Renderer::Init( State &state )
-
-{
-
-  //  Matrix matProj = MatrixOrtho(0.0, state.screenWidth, state.screenHeight, 0.0, 0.0, 1.0);
-  //  Matrix matView = MatrixIdentity();
-
-  //  Shader shader = LoadShader("assets/shaders/pixel.vs", "assets/shaders/pixel.fs");
-  Shader shader = LoadShader( 0, 0 );
-
-  //  rlSetMatrixModelview(matView);
-  //  rlSetMatrixProjection(matProj);
+  Shader shader;
 
 
-  //  int zoomLoc = GetShaderLocation(shader, "uZoom");
-  //  SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
+  shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
+  // shader = LoadShader( 0, 0 );
 
-  //  int matViewLoc = GetShaderLocation(shader, "matView");
-  //  int matProjectionLoc = GetShaderLocation(shader, "matProjection");
-  //
-  //  SetShaderValueMatrix(shader, matProjectionLoc, matProj);
-  //  SetShaderValueMatrix(shader, matViewLoc, matView);
+  state.camera = Camera2D{
+    .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
+    .target =
+      { ( state.mapWidth * 128.0f ) / 2, ( state.mapHeight * 128.0f ) / 2 },
+    .rotation = 0,
+    .zoom = 2.0f,
+  };
+
   Renderer::shader = shader;
 }
 
 
-inline void
-Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
-
-{
+inline void Draw( State &state, entt::registry &reg, TextureCache &cache ) {
   BeginDrawing();
   {
     ClearBackground( DARKGRAY );
 
-    //    BeginShaderMode(shader);
-    //      BeginMode2D(state.camera);
-    //        Texture2D hex = cache.handle(hstr{"hexagon"})->texture;
-    //        Rectangle frameRec = {1.0f, 1.0f, 128, 128};
-    //        for (int i = 0; i < 10; i++)
-    //        {
-    //          for (int j = 0; j < 10; j++)
-    //          {
-    //            DrawTextureRec(hex, frameRec, {i * 128.0f, j * 128.0f}, WHITE);
-    //          }
-    //        }
-    //      EndMode2D();
-    //    EndShaderMode();
 
-    //      glHint(GL_GENERATE_MIPMAP_HINT, GL_DONT_CARE);   // Hint for mipmaps generation algorythm: GL_FASTEST, GL_NICEST, GL_DONT_CARE
-    //      glGenerateMipmap(GL_TEXTURE_2D);    // Generate mipmaps automatically
-    //
-    //      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);   // Activate Trilinear filtering for mipmaps
-    //
-    //      *mipmaps = 1 + (int)floor(log(MAX(width, height))/log(2));
-    //      TRACELOG(RL_LOG_INFO, "TEXTURE: [ID %i] Mipmaps generated automatically, total: %i", id, *mipmaps);
+    // float current_zoom = state.camera.zoom;
+    // // printf( "current_zoom %f\n", current_zoom );
 
-    //    int hid = cache.handle(hstr{"hexagon"})->texture.id;
-    //    int vid = cache.handle(hstr{"romanVillagerTexture"})->texture.id;
+    // int zoomLoc = GetShaderLocation( shader, "uZoom" );
+    // SetShaderValue( shader, zoomLoc, &current_zoom, SHADER_UNIFORM_FLOAT );
 
-    //    int *mipmap = new int[128];
-    //    rlGenTextureMipmaps(id, 128, 128, PIXELFORMAT_UNCOMPRESSED_R32G32B32A32, mipmap);
-    //    rlTextureParameters(id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
-    //    rlTextureParameters(id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_LINEAR);
-
-    //    rlTextureParameters(hid, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
-    //    rlTextureParameters(hid, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
-    //
-    //    rlTextureParameters(vid, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
-    //    rlTextureParameters(vid, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
-
-    //    int zoomLoc = GetShaderLocation(shader, "uZoom");
-    //    SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
+    // int resLoc = GetShaderLocation( shader, "iResolution" );
+    // Vector3 res = { (f32) GetScreenWidth(), (f32) GetScreenHeight(), 0 };
+    // SetShaderValue( shader, resLoc, &res, SHADER_UNIFORM_VEC3 );
+    // printf( "res_loc %i\n", resLoc );
 
 
-    BeginShaderMode( shader );
     BeginMode2D( state.camera );
     {
+      // BeginShaderMode( shader );
+
+      // float tex_width = 128.0f;
+      // float tex_height = 128.0f;
+      // int wt_loc = GetShaderLocation( shader, "wt" );
+      // int ht_loc = GetShaderLocation( shader, "ht" );
+      // int proj_mat_loc = GetShaderLocation( shader, "matProjection" );
+
+
+      // rlSetMatrixModelview( matView );
+      // rlSetMatrixProjection( matProj );
+      // Matrix matView = MatrixIdentity();
+
+      // Matrix proj_mat = GetCameraMatrix2D( state.camera );
+
+      // rlSetMatrixProjection( proj_mat );
+      // SetShaderValue( shader, wt_loc, &tex_width, SHADER_UNIFORM_FLOAT );
+      // SetShaderValue( shader, ht_loc, &tex_height, SHADER_UNIFORM_FLOAT );
       MapSystem::Draw( state, reg, cache );
+
+      // EndShaderMode();
+
+      // tex_width = 1024.0f;
+      // tex_height = 1792.0f;
+      // SetShaderValue( shader, wt_loc, &tex_width, SHADER_UNIFORM_FLOAT );
+      // SetShaderValue( shader, ht_loc, &tex_height, SHADER_UNIFORM_FLOAT );
       AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+
+
       SelectionSystem::Draw( reg, cache, state.gameState == GameState::EDITOR );
     }
     EndMode2D();
-    EndShaderMode();
 
     UI::Draw();
   }
@@ -112,6 +91,50 @@ Renderer::Draw( State &state, entt::registry &reg, TextureCache &cache )
 }
 
 
-// if (state.gameState == EDITOR)
+};// namespace Renderer
 
-//   Editor::Draw();
+
+//  glHint(GL_GENERATE_MIPMAP_HINT, GL_DONT_CARE);   // Hint for mipmaps generation algorythm: GL_FASTEST, GL_NICEST, GL_DONT_CARE
+//  glGenerateMipmap(GL_TEXTURE_2D);    // Generate mipmaps automatically
+//
+//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);   // Activate Trilinear filtering for mipmaps
+//
+//  *mipmaps = 1 + (int)floor(log(MAX(width, height))/log(2));
+//  TRACELOG(RL_LOG_INFO, "TEXTURE: [ID %i] Mipmaps generated automatically, total: %i", id, *mipmaps);
+
+//  int hid = cache.handle(hstr{"hexagon"})->texture.id;
+//  int vid = cache.handle(hstr{"romanVillagerTexture"})->texture.id;
+
+//  int *mipmap = new int[128];
+//  rlGenTextureMipmaps(id, 128, 128, PIXELFORMAT_UNCOMPRESSED_R32G32B32A32, mipmap);
+//  rlTextureParameters(id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+//  rlTextureParameters(id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_LINEAR);
+
+//  rlTextureParameters(hid, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+//  rlTextureParameters(hid, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
+//
+//  rlTextureParameters(vid, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+//  rlTextureParameters(vid, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
+
+//  int zoomLoc = GetShaderLocation(shader, "uZoom");
+//  SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
+
+// Matrix matProj =
+//   MatrixOrtho( 0.0, GetScreenWidth(), GetScreenHeight(), 0.0, 0.0, 1.0 );
+// Matrix matView = MatrixIdentity();
+
+// rlSetMatrixModelview( matView );
+// rlSetMatrixProjection( matProj );
+
+// Shader shader = LoadShader( 0, 0 );
+
+
+//  int zoomLoc = GetShaderLocation(shader, "uZoom");
+//  SetShaderValue(shader, zoomLoc, &state.camera.zoom, SHADER_UNIFORM_FLOAT);
+
+//  int matViewLoc = GetShaderLocation(shader, "matView");
+//  int matProjectionLoc = GetShaderLocation(shader, "matProjection");
+//
+//  SetShaderValueMatrix(shader, matProjectionLoc, matProj);
+//  SetShaderValueMatrix(shader, matViewLoc, matView);

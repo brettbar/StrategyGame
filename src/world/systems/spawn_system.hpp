@@ -10,7 +10,6 @@
 #include "../entities/archetypes.hpp"
 #include "event_system.hpp"
 
-#include "../../resource.hpp"
 #include "player_system.hpp"
 
 namespace SpawnSystem {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../../resource.hpp"
+#include "../../renderer/textures.hpp"
 #include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"

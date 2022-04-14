@@ -11,7 +11,7 @@ TEMPORARY TODOS HERE
 */
 #include "input.hpp"
 #include "renderer/renderer.hpp"
-#include "resource.hpp"
+#include "renderer/textures.hpp"
 #include "state.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/event_system.hpp"
@@ -114,20 +114,20 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
 
   LoadResources( cache );
 
-  state.camera = Camera2D{
-    .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
-    .target =
-      { ( state.mapWidth * 128.0f ) / 2, ( state.mapHeight * 128.0f ) / 2 },
-    .rotation = 0,
-    .zoom = 2.0f,
-  };
+  // state.camera = Camera2D{
+  //   .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
+  //   .target =
+  //     { ( state.mapWidth * 128.0f ) / 2, ( state.mapHeight * 128.0f ) / 2 },
+  //   .rotation = 0,
+  //   .zoom = 2.0f,
+  // };
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, cache );
   SpawnSystem::Init();
   UI::Init( reg );
-  Renderer::Init( state );
+  Renderer::Init( state, cache );
 }
 
 void Update( State &state, entt::registry &reg ) {
@@ -231,48 +231,72 @@ void LoadResources( TextureCache &cache ) {
   //  Texture hexTex = LoadTextureFromImage(hexagon);
   //
   //  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
+  // LoadResource( hstr{ "hexagon" }, "assets/textures/hexagon.png", cache );
 
   cache.load<TextureLoader>( hstr{ "tile_outline" }, InitTileOutline() );
 
-  LoadResource( hstr{ "hexagon" }, "assets/textures/hexagon.png", cache );
+  // Hexes
+  Image hexes = LoadImage( "assets/textures/hexagon.png" );
 
-  LoadResource(
-    hstr{ "test" },
-    "assets/textures/hexagons/hexagon5.png",
-    cache );
+  Image land_hex = ImageCopy( hexes );
+  ImageCrop( &land_hex, { 0, 0, 130, 130 } );
+  LoadResource( hstr{ "land_tile" }, land_hex, cache );
+
+  Image water_hex = ImageCopy( hexes );
+  ImageCrop( &water_hex, { 130, 0, 130, 130 } );
+  LoadResource( hstr{ "water_tile" }, water_hex, cache );
+
+  Image hills_hex = ImageCopy( hexes );
+  ImageCrop( &hills_hex, { 260, 0, 130, 130 } );
+  LoadResource( hstr{ "hills_tile" }, hills_hex, cache );
+
+  Image sand_hex = ImageCopy( hexes );
+  ImageCrop( &sand_hex, { 390, 0, 130, 130 } );
+  LoadResource( hstr{ "sand_tile" }, sand_hex, cache );
+
+  Image snow_hex = ImageCopy( hexes );
+  ImageCrop( &snow_hex, { 520, 0, 130, 130 } );
+  LoadResource( hstr{ "snow_tile" }, snow_hex, cache );
+
   LoadResource(
     hstr{ "factionOverlay" },
-    "assets/textures/overlays.png",
+    LoadImage( "assets/textures/overlays.png" ),
     cache );
 
-  LoadResource( hstr{ "template" }, "assets/textures/Template.png", cache );
+  LoadResource(
+    hstr{ "template" },
+    LoadImage( "assets/textures/Template.png" ),
+    cache );
 
   LoadResource(
     hstr{ "romanVillagerTexture" },
-    "assets/textures/units/Roman_Villager.png",
+    LoadImage( "assets/textures/units/Roman_Villager.png" ),
     cache );
   LoadResource(
     hstr{ "greekVillagerTexture" },
-    "assets/textures/units/Greek_Villager.png",
+    LoadImage( "assets/textures/units/Greek_Villager.png" ),
     cache );
   LoadResource(
     hstr{ "celtVillagerTexture" },
-    "assets/textures/units/Celt_Villager.png",
+    LoadImage( "assets/textures/units/Celt_Villager.png" ),
     cache );
   LoadResource(
     hstr{ "punicVillagerTexture" },
-    "assets/textures/units/Carthaginian_Villager.png",
+    LoadImage( "assets/textures/units/Carthaginian_Villager.png" ),
     cache );
   LoadResource(
     hstr{ "persianVillagerTexture" },
-    "assets/textures/units/Persian_Villager.png",
+    LoadImage( "assets/textures/units/Persian_Villager.png" ),
     cache );
   LoadResource(
     hstr{ "romanVillageTexture" },
-    "assets/textures/village_roman.png",
+    LoadImage( "assets/textures/village_roman.png" ),
     cache );
 
-  LoadResource( hstr{ "buildings" }, "assets/textures/buildings.png", cache );
+  LoadResource(
+    hstr{ "buildings" },
+    LoadImage( "assets/textures/buildings.png" ),
+    cache );
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }

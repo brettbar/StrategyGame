@@ -6,7 +6,7 @@
 
 #include "common.hpp"
 #include "guilib/gui_system.hpp"
-#include "resource.hpp"
+#include "renderer/textures.hpp"
 #include "state.hpp"
 #include "world/systems/map/map_system.hpp"
 #include "world/systems/map/province_system.hpp"

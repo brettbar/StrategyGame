@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../../resource.hpp"
+#include "../../renderer/textures.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"

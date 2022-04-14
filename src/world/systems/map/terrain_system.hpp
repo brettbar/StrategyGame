@@ -4,7 +4,7 @@
 #pragma once
 
 #include "../../../common.hpp"
-#include "../../../resource.hpp"
+#include "../../../renderer/textures.hpp"
 #include "../../components/sight.hpp"
 #include "../../components/tile.hpp"
 #include "../../components/unit.hpp"
@@ -88,7 +88,11 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>( tilesEntity );
 
-  Texture2D hex = cache.handle( hstr{ "hexagon" } )->texture;
+  Texture2D land_tile = cache.handle( hstr{ "land_tile" } )->texture;
+  Texture2D water_tile = cache.handle( hstr{ "water_tile" } )->texture;
+  Texture2D hills_tile = cache.handle( hstr{ "hills_tile" } )->texture;
+  Texture2D sand_tile = cache.handle( hstr{ "sand_tile" } )->texture;
+  Texture2D snow_tile = cache.handle( hstr{ "snow_tile" } )->texture;
 
   Rectangle frameRec = { 1.0f, 1.0f, 128, 128 };
 
@@ -110,42 +114,22 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
     //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
     switch ( tile->biome ) {
       case Tile::MTNS:
-        DrawTextureRec(
-          hex,
-          { frameRec.x + 520, frameRec.y, frameRec.width, frameRec.height },
-          tile->position,
-          WHITE );
+        DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::HILLS:
-        DrawTextureRec(
-          hex,
-          { frameRec.x + 260, frameRec.y, frameRec.width, frameRec.height },
-          tile->position,
-          WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::LAND:
-        DrawTextureRec( hex, frameRec, tile->position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::BEACH:
-        DrawTextureRec(
-          hex,
-          { frameRec.x + 390, frameRec.y, frameRec.width, frameRec.height },
-          tile->position,
-          WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::WATER:
-        DrawTextureRec(
-          hex,
-          { frameRec.x + 130, frameRec.y, frameRec.width, frameRec.height },
-          tile->position,
-          WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
       default:
-        DrawTextureRec(
-          hex,
-          { frameRec.x + 130, frameRec.y, frameRec.width, frameRec.height },
-          tile->position,
-          WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
     }
 

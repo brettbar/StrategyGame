@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../../../common.hpp"
-#include "../../../resource.hpp"
+#include "../../../renderer/textures.hpp"
 #include "../../../state.hpp"
 #include "province_system.hpp"
 #include "terrain_system.hpp"

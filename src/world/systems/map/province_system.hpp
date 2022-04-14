@@ -1,5 +1,5 @@
 #include "../../../common.hpp"
-#include "../../../resource.hpp"
+#include "../../../renderer/textures.hpp"
 #include "../../components/province.hpp"
 #include "../event_system.hpp"
 #include "../spawn_system.hpp"
