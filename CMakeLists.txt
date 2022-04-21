@@ -50,9 +50,14 @@ add_executable(
   src/common.hpp
   src/world/components/event.hpp)
 
+add_executable(
+  server net/server/server.cpp
+)
+
 
 if(UNIX)
-  target_link_libraries(${PROJECT_NAME} raylib)
+  target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
+  target_link_libraries(server GameNetworkingSockets)
   # target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/libraylib.so.400 m)
   # target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
   # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/entt/)

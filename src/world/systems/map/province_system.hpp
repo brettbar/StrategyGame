@@ -99,8 +99,30 @@ inline void UpdateProvinces( State &state, entt::registry &reg ) {
 inline void UpdateSettlement( Province::Settlement &settlement ) {
   bool needs_sprawl_update = UpdatePopulation( settlement );
 
-  if ( needs_sprawl_update )
-    UpdateSprawl( settlement );
+
+  // Update Sprawl
+  if ( !needs_sprawl_update )
+    return;
+
+  printf( "Sprawl increase at %d\n", settlement.population.current );
+
+  // Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+
+  Image base = LoadImageFromTexture( settlement.texture );
+
+
+  // ImageDraw( &base, image, { 0, 0, 16, 16 }, { 0, 0, 16, 16 }, WHITE );
+
+  for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
+    ImageDraw(
+      &base,
+      building_map.at( "roman_s3" ),
+      { 0, 0, 16, 16 },
+      { ( i * 8.0f ), 0, 16, 16 },
+      WHITE );
+  }
+
+  settlement.texture = LoadTextureFromImage( base );
 }
 
 inline bool UpdatePopulation( Province::Settlement &settlement ) {
@@ -138,28 +160,6 @@ inline bool UpdatePopulation( Province::Settlement &settlement ) {
   return false;
 }
 
-inline void UpdateSprawl( Province::Settlement &settlement ) {
-  printf( "Sprawl increase at %d\n", settlement.population.current );
-
-  // Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-
-  Image base = LoadImageFromTexture( settlement.texture );
-
-
-  // ImageDraw( &base, image, { 0, 0, 16, 16 }, { 0, 0, 16, 16 }, WHITE );
-
-  for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
-    ImageDraw(
-      &base,
-      building_map.at( "roman_s3" ),
-      { 0, 0, 16, 16 },
-      { ( i * 8.0f ), 0, 16, 16 },
-      WHITE );
-  }
-
-  settlement.texture = LoadTextureFromImage( base );
-}
-
 inline void
 SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   i32 provId = DetermineTileIdFromClick( clickPos );
@@ -170,59 +170,56 @@ SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if ( prov.id == (u32) provId ) {
-      if ( prov.tile->biome == Tile::WATER )
-        continue;
+    if (
+      prov.id != (u32) provId || prov.tile->biome == Tile::WATER ||
+      prov.settlement != nullptr )
+      continue;
 
-      prov.owner = owner;
+    prov.owner = owner;
 
-      if ( prov.settlement == nullptr ) {
-        prov.settlement = std::make_unique<Province::Settlement>();
-        prov.settlement->id = prov.id;
-        prov.settlement->population = {
-          .current = 200,
-          .birthRate = 40,
-          .deathRate = 10,
-          .growthRate = ( 40.0f - 10.0f ) / 200,
-          .carryingCapacity = 1000,
-        };
+    prov.settlement = std::make_unique<Province::Settlement>();
+    prov.settlement->id = prov.id;
+    prov.settlement->population = {
+      .current = 200,
+      .birthRate = 40,
+      .deathRate = 10,
+      .growthRate = ( 40.0f - 10.0f ) / 200,
+      .carryingCapacity = 1000,
+    };
 
+    switch ( prov.owner ) {
+      case 0: {
+        prov.settlement->name = "Rome";
+        u32 choice = RollN( 4 );
+        printf( "choice %d\n", choice );
 
-        switch ( prov.owner ) {
-          case 0: {
-            prov.settlement->name = "Rome";
-            u32 choice = RollN( 4 );
-            printf( "choice %d\n", choice );
+        std::string foo = "roman_s" + std::to_string( choice );
+        std::cout << "std::string " << foo << "\n";
 
-            std::string foo = "roman_s" + std::to_string( choice );
-            std::cout << "std::string " << foo << "\n";
+        const char *bar = foo.c_str();
+        printf( "c_str %s", bar );
 
-            const char *bar = foo.c_str();
-            printf( "c_str %s", bar );
-
-            Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-            ImageDraw(
-              &base,
-              building_map.at( bar ),
-              { 0, 0, 16, 16 },
-              { 0, 0, 16, 16 },
-              WHITE );
-            prov.settlement->texture = LoadTextureFromImage( base );
-          } break;
-          case 1:
-            prov.settlement->name = "Athens";
-            break;
-          case 2:
-            prov.settlement->name = "Lugudunon";
-            break;
-          case 3:
-            prov.settlement->name = "Carthage";
-            break;
-          case 4:
-            prov.settlement->name = "Persepolis";
-            break;
-        }
-      }
+        Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+        ImageDraw(
+          &base,
+          building_map.at( bar ),
+          { 0, 0, 16, 16 },
+          { 0, 0, 16, 16 },
+          WHITE );
+        prov.settlement->texture = LoadTextureFromImage( base );
+      } break;
+      case 1:
+        prov.settlement->name = "Athens";
+        break;
+      case 2:
+        prov.settlement->name = "Lugudunon";
+        break;
+      case 3:
+        prov.settlement->name = "Carthage";
+        break;
+      case 4:
+        prov.settlement->name = "Persepolis";
+        break;
     }
   }
 }
@@ -275,92 +272,93 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
     //   14,
     //            RED);
 
-    if ( prov.owner > -1 ) {
-      Color color = BLACK;
+    if (
+      prov.owner <= -1 || prov.settlement == nullptr ||
+      prov.settlement->population.current <= 0 )
+      continue;
 
-      Rectangle frameRec = { 0.0, 0.0, 128, 128.0 };
+    Color color = BLACK;
 
-      switch ( prov.owner ) {
-        case 0:
-          color = RED;
-          frameRec.x = 0.0f;
-          break;
-        case 1:
-          color = SKYBLUE;
-          frameRec.x = 128.0f;
-          break;
-        case 2:
-          color = GREEN;
-          frameRec.x = 256.0f;
-          break;
-        case 3:
-          color = PURPLE;
-          frameRec.x = 384.0f;
-          break;
-        case 4:
-          color = ORANGE;
-          frameRec.x = 513.0f;
-          break;
-      }
+    Rectangle frameRec = { 0.0, 0.0, 128, 128.0 };
 
-      if ( showOverlays )
-        DrawTextureRec(
-          cache.handle( hstr{ "factionOverlay" } )->texture,
-          frameRec,
-          prov.tile->position,
-          Fade( WHITE, 0.5 ) );
+    switch ( prov.owner ) {
+      case 0:
+        color = RED;
+        frameRec.x = 0.0f;
+        break;
+      case 1:
+        color = SKYBLUE;
+        frameRec.x = 128.0f;
+        break;
+      case 2:
+        color = GREEN;
+        frameRec.x = 256.0f;
+        break;
+      case 3:
+        color = PURPLE;
+        frameRec.x = 384.0f;
+        break;
+      case 4:
+        color = ORANGE;
+        frameRec.x = 513.0f;
+        break;
     }
 
-    if ( prov.settlement != nullptr ) {
-      if ( prov.settlement->population.current > 0 ) {
-        Vector2 settlement_pos = {
-          prov.tile->position.x + 48,
-          prov.tile->position.y + 48,
-        };
-
-        // DrawRectangleRec({provPos.x + 50,
-        //                   provPos.y + 86, 128, 64},
-        //                  Fade(WHITE, 0.8f));
-        // DrawSingleBorder(tile);
-
-        // Draw Settlement
-        DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
+    if ( showOverlays )
+      DrawTextureRec(
+        cache.handle( hstr{ "factionOverlay" } )->texture,
+        frameRec,
+        prov.tile->position,
+        Fade( WHITE, 0.5 ) );
 
 
-        // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
+    Vector2 settlement_pos = {
+      prov.tile->position.x + 48,
+      prov.tile->position.y + 48,
+    };
 
-        // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
+    // DrawRectangleRec({provPos.x + 50,
+    //                   provPos.y + 86, 128, 64},
+    //                  Fade(WHITE, 0.8f));
+    // DrawSingleBorder(tile);
+
+    // Draw Settlement
+    DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
 
 
-        // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
+    // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
 
-        // NOTE: I changed this from "" to nullptr
-        if ( prov.settlement->name != nullptr ) {
-          DrawRectangleRec(
-            {
-              settlement_pos.x + 16,
-              settlement_pos.y + 32,
-              64,
-              14,
-            },
-            BLACK );
+    // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
 
-          DrawText(
-            prov.settlement->name,
-            settlement_pos.x + 16.0,
-            settlement_pos.y + 32.0,
-            14,
-            WHITE );
 
-          DrawText(
-            std::to_string( prov.settlement->population.current ).c_str(),
-            settlement_pos.x + 54.0,
-            settlement_pos.y + 32.0,
-            14,
-            WHITE );
-        }
-      }
-    }
+    // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
+
+    // NOTE: I changed this from "" to nullptr
+    if ( prov.settlement->name == nullptr )
+      continue;
+
+    DrawRectangleRec(
+      {
+        settlement_pos.x + 16,
+        settlement_pos.y + 32,
+        64,
+        14,
+      },
+      BLACK );
+
+    DrawText(
+      prov.settlement->name,
+      settlement_pos.x + 16.0,
+      settlement_pos.y + 32.0,
+      14,
+      WHITE );
+
+    DrawText(
+      std::to_string( prov.settlement->population.current ).c_str(),
+      settlement_pos.x + 54.0,
+      settlement_pos.y + 32.0,
+      14,
+      WHITE );
   }
 }
 
