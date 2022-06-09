@@ -82,8 +82,11 @@ inline void CreateTerrain( entt::registry &registry ) {
   registry.emplace<TileMap>( entity, tileMap );
 }
 
-inline void
-Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
+inline void Draw(
+  Shader &shader,
+  Camera2D &camera,
+  entt::registry &registry,
+  TextureCache &cache ) {
   auto tilesView = registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>( tilesEntity );
@@ -114,22 +117,58 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
     //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
     switch ( tile->biome ) {
       case Tile::MTNS:
-        DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          snow_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
       case Tile::HILLS:
-        DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          hills_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
       case Tile::LAND:
-        DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          land_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
       case Tile::BEACH:
-        DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          sand_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
       case Tile::WATER:
-        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          water_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
       default:
-        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawPerfectTexture(
+          shader,
+          water_tile,
+          frameRec,
+          tile->position,
+          WHITE );
         break;
     }
 

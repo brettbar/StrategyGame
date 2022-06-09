@@ -18,14 +18,15 @@ enum Mode {
 
 inline Mode mode = Mode::TERRAIN;
 
-inline void Draw( State &state, entt::registry &reg, TextureCache &cache ) {
+inline void
+Draw( Shader &shader, State &state, entt::registry &reg, TextureCache &cache ) {
   switch ( mode ) {
     case Mode::TERRAIN:
-      Terrain::Draw( state.camera, reg, cache );
+      Terrain::Draw( shader, state.camera, reg, cache );
       ProvinceSystem::DrawProvinces( reg, cache, false );
       break;
     case Mode::POLITICAL:
-      Terrain::Draw( state.camera, reg, cache );
+      Terrain::Draw( shader, state.camera, reg, cache );
       ProvinceSystem::DrawProvinces( reg, cache, true );
       break;
   }

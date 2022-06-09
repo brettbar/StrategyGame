@@ -10,7 +10,7 @@ namespace AnimationSystem {
 // void Draw(entt::registry &, bool);
 // void UpdateSprites(entt::registry &, f32);
 
-inline void Draw( entt::registry &registry, bool debug ) {
+inline void Draw( Shader &shader, entt::registry &registry, bool debug ) {
   entt::basic_view villagers =
     registry.view<Unit::Component, Animated::Component>();
 
@@ -19,17 +19,24 @@ inline void Draw( entt::registry &registry, bool debug ) {
       return rhs.position.y > lhs.position.y;
     } );
 
-  villagers.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
+  villagers.each( [&shader,
+                   debug]( Unit::Component &unit, Animated::Component &anim ) {
     //    DrawTextureV(
     //        unit.sprite,
     //        {unit.position.x - 64.0f, unit.position.y - 64.0f},
     //        WHITE);
 
-    DrawTextureRec(
+    DrawPerfectTexture(
+      shader,
       anim.sprite,
       anim.frameRec,
       { unit.position.x - 64.0f, unit.position.y - 64.0f },
       WHITE );
+    // DrawTextureRec(
+    //   anim.sprite,
+    //   anim.frameRec,
+    //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+    //   WHITE );
 
     if ( debug && Vector2Distance( unit.position, unit.destination ) > 0.5f ) {
       DrawLineEx( unit.position, unit.destination, 2, MAGENTA );

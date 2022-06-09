@@ -28,6 +28,7 @@ inline void Init( State &state, TextureCache &cache ) {
     .zoom = 2.0f,
   };
 
+
   Renderer::shader = shader;
 }
 
@@ -50,6 +51,7 @@ inline void Draw( State &state, entt::registry &reg, TextureCache &cache ) {
     // printf( "res_loc %i\n", resLoc );
 
 
+    // BeginShaderMode( shader );
     BeginMode2D( state.camera );
     {
       // BeginShaderMode( shader );
@@ -70,7 +72,7 @@ inline void Draw( State &state, entt::registry &reg, TextureCache &cache ) {
       // rlSetMatrixProjection( proj_mat );
       // SetShaderValue( shader, wt_loc, &tex_width, SHADER_UNIFORM_FLOAT );
       // SetShaderValue( shader, ht_loc, &tex_height, SHADER_UNIFORM_FLOAT );
-      MapSystem::Draw( state, reg, cache );
+      MapSystem::Draw( Renderer::shader, state, reg, cache );
 
       // EndShaderMode();
 
@@ -78,12 +80,16 @@ inline void Draw( State &state, entt::registry &reg, TextureCache &cache ) {
       // tex_height = 1792.0f;
       // SetShaderValue( shader, wt_loc, &tex_width, SHADER_UNIFORM_FLOAT );
       // SetShaderValue( shader, ht_loc, &tex_height, SHADER_UNIFORM_FLOAT );
-      AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+      AnimationSystem::Draw(
+        Renderer::shader,
+        reg,
+        state.gameState == GameState::EDITOR );
 
 
       SelectionSystem::Draw( reg, cache, state.gameState == GameState::EDITOR );
     }
     EndMode2D();
+    // EndShaderMode();
 
     UI::Draw();
   }

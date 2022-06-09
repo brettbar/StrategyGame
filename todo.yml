@@ -1,0 +1,62 @@
+current:
+- Floating window is lost when window is resized smaller
+- Replace as many std and c++ constructs with base c 
+  (like std::string -> const char*)
+
+
+backlog:
+  provinces:
+
+  art:
+    dynamic sprite generator:
+      sprite_map: 
+        - Every unique unit has a single sprite map
+        - Every possible face of the sprite laid out, 
+          like a 3D model's texture map
+      animation_maps:
+        - Every single unique 'unit type' ('male human', 'female human', 
+          'cavalry', 'elephant') has its own animations_map
+        - Contains drawings for each frame of an animation, with every pixel
+          in the animation having a slightly different rgb value
+      color_map:
+        - The color_map mirrors exactly the shape of the sprite map, but with
+          different colored pixels
+        - The position of the color_map's pixels is where in the sprite_map 
+          to look for the final color
+        - The color of the color_map's pixels maps to the colors of the 
+          animations_map's pixels
+
+      pseudocode:         
+        struct Pixel {
+          Vector2 pos
+          Vector3 color  
+        }
+
+        type Image = Pixel[] 
+
+        func gen_animations(
+          Image animations_map,
+          Image color_map,
+          Image sprite_map,
+        ) Image {
+          Image final_anims = animations_map
+          
+          for i, anim_pixel in final_anims {
+             
+            for j, color_pixel in color_map {
+            }
+
+          }
+
+
+
+          return final_anims
+        }
+
+
+          
+
+
+
+complete:
+

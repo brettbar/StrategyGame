@@ -59,7 +59,8 @@ add_executable(
 # )
 
 if(UNIX)
-  target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
+  target_link_libraries(${PROJECT_NAME} raylib)
+  # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
   # target_link_libraries(server GameNetworkingSockets)
   # target_link_libraries(client GameNetworkingSockets)
 

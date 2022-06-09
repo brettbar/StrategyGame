@@ -29,9 +29,7 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 
 inline void PrintVec2( Vector2 vec ) { printf( "(%f, %f)\n", vec.x, vec.y ); }
 
-inline u32 RollN (u32 n) {
-  return rand() % n + 1;
-}
+inline u32 RollN( u32 n ) { return rand() % n + 1; }
 
 inline void PrintRect( Rectangle rect ) {
   printf(
@@ -167,4 +165,26 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   //  if (row % 2 == 1) {
   //    tileOrigX += 64.0;
   //  }
+}
+
+inline void DrawPerfectTexture(
+  Shader &shader,
+  Texture2D texture,
+  Rectangle rect,
+  Vector2 position,
+  Color tint ) {
+  int wt_loc = GetShaderLocation( shader, "wt" );
+  int ht_loc = GetShaderLocation( shader, "ht" );
+
+  float wt = (float) texture.width;
+  SetShaderValue( shader, wt_loc, &wt, SHADER_UNIFORM_FLOAT );
+
+  float ht = (float) texture.height;
+  SetShaderValue( shader, ht_loc, &ht, SHADER_UNIFORM_FLOAT );
+
+  SetTextureFilter( texture, TEXTURE_FILTER_BILINEAR );
+
+  BeginShaderMode( shader );
+  DrawTextureRec( texture, rect, position, tint );
+  EndShaderMode();
 }
