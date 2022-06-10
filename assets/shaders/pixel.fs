@@ -11,19 +11,12 @@ uniform vec4 colDiffuse;
 // Output fragment color
 out vec4 finalColor;
 
-// I added
-uniform float wt;
-uniform float ht;
 
 // NOTE: Add here your custom variables
 
 void main()
 {
-  // float u = fragTexCoord.x;
-  // float v = fragTexCoord.y;
-
   vec2 uv = fragTexCoord;
-  // vec2 size = vec2(wt, ht);
 	vec2 size = vec2(textureSize(texture0, 0));
   vec2 pixel = vec2(1.0) / size;
   uv -= pixel * vec2(0.5);
@@ -35,10 +28,6 @@ void main()
 
   vec4 texelColor = textureLod(texture0, uv + (clamp(delta_pixel / ddxy, 0.0, 1.0) - delta_pixel) * pixel, min(mip.x, mip.y));
   finalColor = texelColor*colDiffuse;
-
-  // Texel color fetching from texture sampler
-  // vec4 texelColor = texture(texture0, vec2(u, v));
-  // finalColor = texelColor*colDiffuse;
 }
 
 // vec4 texturePointSmooth(sampler2D tex, vec2 uv) {

@@ -168,7 +168,7 @@ inline entt::entity CreateContextLabel( const char *text ) {
     .top = 0,
     .right = 5,
     .bottom = 0,
-    .left = 5,
+    .left = 0,
   };
 
   GUI::Element elem = {
@@ -211,7 +211,7 @@ inline entt::entity CreateSettlementStats() {
 
   GUI::TextLabel label = GUI::TextLabel();
   label.text = "";
-  label.font_size = 14;
+  label.font_size = 16;
   label.text_color = WHITE;
 
   GUI::reg.emplace<GUI::Element>( entity, elem );

@@ -27,10 +27,10 @@ and the color of Reference.
 # ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
 
 # Linux
-# ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator/"
+ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator/"
 
 # WSL
-ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"
+# ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"
 
 def main():
     gen_color_maps() 
@@ -71,7 +71,6 @@ def gen_final_anims(sprite_folder):
         'RightEquip': Image.open(ASSET_PATH + 'ColorAnims/RightEquip.png').convert('RGBA'),
         'RightArm': Image.open(ASSET_PATH + 'ColorAnims/RightArm.png').convert('RGBA'),
     }
-
 
     # Entire Animation Spritesheet
     final_anims = Image.open(ASSET_PATH + 'Test.png').convert('RGBA')

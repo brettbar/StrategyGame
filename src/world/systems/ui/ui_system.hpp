@@ -7,8 +7,10 @@
 #include "../../components/province.hpp"
 #include "../../components/selected.hpp"
 #include "../event_system.hpp"
+#include "../../../renderer/fonts.hpp"
 
 #include "content.hpp"
+#include <raylib.h>
 
 namespace UI {
 
@@ -91,7 +93,7 @@ inline void Update( entt::registry &reg ) {
   }
 }
 
-inline void Draw() {
+inline void Draw(FontCache &font_cache ) {
   Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -154,12 +156,17 @@ inline void Draw() {
         auto &label = GUI::reg.get<GUI::TextLabel>( entity );
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
-        DrawText(
-          label.text.c_str(),
+        DrawTextEx(font_cache.handle(hstr{"font_romulus"})->font, label.text.c_str(), { 
           elem.pos.x,
-          elem.pos.y + ( 0.25 * elem.dmns.y ),
-          label.font_size,
-          label.text_color );
+          elem.pos.y + ( 0.25f * elem.dmns.y ),
+       }, label.font_size, 2.0f, label.text_color );
+
+        // DrawText(
+        //   label.text.c_str(),
+        //   elem.pos.x,
+        //   elem.pos.y + ( 0.25 * elem.dmns.y ),
+        //   label.font_size,
+        //   label.text_color );
       } break;
 
       case GUI::Type::TEXT_BUTTON: {
@@ -203,13 +210,14 @@ inline void Draw() {
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
 
-  DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  std::string foo = "hot: " + hot_str;
-  DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
+  // TODO make this a part of debug
+  // DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
+  // std::string foo = "hot: " + hot_str;
+  // DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
 
-  DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
-  std::string bar = "active: " + active_str;
-  DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
+  // DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
+  // std::string bar = "active: " + active_str;
+  // DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 }
 
 

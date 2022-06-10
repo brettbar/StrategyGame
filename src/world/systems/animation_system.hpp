@@ -10,7 +10,7 @@ namespace AnimationSystem {
 // void Draw(entt::registry &, bool);
 // void UpdateSprites(entt::registry &, f32);
 
-inline void Draw( Shader &shader, entt::registry &registry, bool debug ) {
+inline void Draw( entt::registry &registry, bool debug ) {
   entt::basic_view villagers =
     registry.view<Unit::Component, Animated::Component>();
 
@@ -19,15 +19,13 @@ inline void Draw( Shader &shader, entt::registry &registry, bool debug ) {
       return rhs.position.y > lhs.position.y;
     } );
 
-  villagers.each( [&shader,
-                   debug]( Unit::Component &unit, Animated::Component &anim ) {
+  villagers.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
     //    DrawTextureV(
     //        unit.sprite,
     //        {unit.position.x - 64.0f, unit.position.y - 64.0f},
     //        WHITE);
 
     DrawPerfectTexture(
-      shader,
       anim.sprite,
       anim.frameRec,
       { unit.position.x - 64.0f, unit.position.y - 64.0f },

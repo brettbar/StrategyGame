@@ -83,7 +83,6 @@ inline void CreateTerrain( entt::registry &registry ) {
 }
 
 inline void Draw(
-  Shader &shader,
   Camera2D &camera,
   entt::registry &registry,
   TextureCache &cache ) {
@@ -97,7 +96,7 @@ inline void Draw(
   Texture2D sand_tile = cache.handle( hstr{ "sand_tile" } )->texture;
   Texture2D snow_tile = cache.handle( hstr{ "snow_tile" } )->texture;
 
-  Rectangle frameRec = { 1.0f, 1.0f, 128, 128 };
+  Rectangle frameRec = { 0.0f, 0.0f, 128, 128 };
 
   for ( std::shared_ptr<Tile::Component> tile: tileMap ) {
     f32 padding = 128.0f;
@@ -118,8 +117,7 @@ inline void Draw(
     switch ( tile->biome ) {
       case Tile::MTNS:
         // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           snow_tile,
           frameRec,
           tile->position,
@@ -127,8 +125,7 @@ inline void Draw(
         break;
       case Tile::HILLS:
         // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           hills_tile,
           frameRec,
           tile->position,
@@ -136,8 +133,7 @@ inline void Draw(
         break;
       case Tile::LAND:
         // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           land_tile,
           frameRec,
           tile->position,
@@ -145,8 +141,7 @@ inline void Draw(
         break;
       case Tile::BEACH:
         // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           sand_tile,
           frameRec,
           tile->position,
@@ -154,8 +149,7 @@ inline void Draw(
         break;
       case Tile::WATER:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           water_tile,
           frameRec,
           tile->position,
@@ -163,8 +157,7 @@ inline void Draw(
         break;
       default:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture(
-          shader,
+      DrawPerfectTexture(
           water_tile,
           frameRec,
           tile->position,

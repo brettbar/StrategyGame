@@ -12,6 +12,7 @@ TEMPORARY TODOS HERE
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
+#include "renderer/fonts.hpp"
 #include "state.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/event_system.hpp"
@@ -24,15 +25,16 @@ TEMPORARY TODOS HERE
 #include "world/systems/ui/ui_system.hpp"
 #include <raylib.h>
 
-void LoadResources( TextureCache & );
+void LoadResources( TextureCache &, FontCache & );
 bool GameIsRunning();
 void CameraUpdate( Camera2D &, f32 );
 void ZoomCamera( Camera2D &, f32, Vector2 );
 
-void Init( State &, entt::registry &, TextureCache & );
+void Init( State &, entt::registry &, TextureCache &, FontCache & );
 void Update( State &, entt::registry & );
 void LateUpdate( State &, entt::registry & );
 void Exit( TextureCache & );
+
 
 int main( void ) {
   State state = {
@@ -49,9 +51,11 @@ int main( void ) {
   };
 
   entt::registry reg;
-  TextureCache textureCache = {};
 
-  Init( state, reg, textureCache );
+  FontCache font_cache = {};
+  TextureCache texture_cache = {};
+
+  Init( state, reg, texture_cache, font_cache );
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -67,7 +71,7 @@ int main( void ) {
     lag += dt;
     oncelag += dt;
 
-    Input::Handle( state, reg, textureCache );
+    Input::Handle( state, reg, texture_cache );
 
     while ( lag >= MS_PER_UPDATE ) {
       Update( state, reg );
@@ -81,15 +85,19 @@ int main( void ) {
 
     CameraUpdate( state.camera, dt );
 
-    Renderer::Draw( state, reg, textureCache );
+    Renderer::Draw( state, reg, texture_cache, font_cache);
   }
 
-  Exit( textureCache );
+  Exit( texture_cache );
 
   return 0;
 }
 
-void Init( State &state, entt::registry &reg, TextureCache &cache ) {
+void Init(
+  State &state,
+  entt::registry &reg,
+  TextureCache &texture_cache,
+  FontCache &font_cache ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   const f32 monitor_w = GetMonitorWidth( 0 );
@@ -111,8 +119,7 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
       "FieldsOfMars" );
   }
 
-
-  LoadResources( cache );
+  LoadResources( texture_cache, font_cache );
 
   // state.camera = Camera2D{
   //   .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
@@ -124,10 +131,10 @@ void Init( State &state, entt::registry &reg, TextureCache &cache ) {
   // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
 
   Terrain::CreateTerrain( reg );
-  ProvinceSystem::InitProvinces( reg, cache );
+  ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
   UI::Init( reg );
-  Renderer::Init( state, cache );
+  Renderer::Init( state, texture_cache );
 }
 
 void Update( State &state, entt::registry &reg ) {
@@ -225,78 +232,60 @@ inline Texture2D InitTileOutline() {
   return texture;
 }
 
-void LoadResources( TextureCache &cache ) {
-  //  Image hexagon = LoadImage("assets/textures/hexagon.png");
-  //  ImageResize(&hexagon, 512, 512);
-  //  Texture hexTex = LoadTextureFromImage(hexagon);
-  //
-  //  cache.load<TextureLoader>(hstr{"hexagon"}, hexTex);
-  // LoadResource( hstr{ "hexagon" }, "assets/textures/hexagon.png", cache );
+void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
+  texture_cache.load<TextureLoader>(
+    hstr{ "tile_outline" },
+    InitTileOutline() );
 
-  cache.load<TextureLoader>( hstr{ "tile_outline" }, InitTileOutline() );
+  font_cache.load<FontLoader>(
+    hstr{ "font_romulus" },
+    LoadFont( "assets/fonts/romulus.png" ) );
 
-  // Hexes
-  Image hexes = LoadImage( "assets/textures/hexagon.png" );
-
-  Image land_hex = ImageCopy( hexes );
-  ImageCrop( &land_hex, { 0, 0, 130, 130 } );
-  LoadResource( hstr{ "land_tile" }, land_hex, cache );
-
-  Image water_hex = ImageCopy( hexes );
-  ImageCrop( &water_hex, { 130, 0, 130, 130 } );
-  LoadResource( hstr{ "water_tile" }, water_hex, cache );
-
-  Image hills_hex = ImageCopy( hexes );
-  ImageCrop( &hills_hex, { 260, 0, 130, 130 } );
-  LoadResource( hstr{ "hills_tile" }, hills_hex, cache );
-
-  Image sand_hex = ImageCopy( hexes );
-  ImageCrop( &sand_hex, { 390, 0, 130, 130 } );
-  LoadResource( hstr{ "sand_tile" }, sand_hex, cache );
-
-  Image snow_hex = ImageCopy( hexes );
-  ImageCrop( &snow_hex, { 520, 0, 130, 130 } );
-  LoadResource( hstr{ "snow_tile" }, snow_hex, cache );
+  LoadResource( hstr{ "land_tile" }, LoadImage( "assets/textures/hexagons/Earth.png" ), texture_cache );
+  LoadResource( hstr{ "water_tile" }, LoadImage( "assets/textures/hexagons/Water.png" ), texture_cache );
+  LoadResource( hstr{ "hills_tile" }, LoadImage( "assets/textures/hexagons/Mud.png" ), texture_cache );
+  LoadResource( hstr{ "sand_tile" }, LoadImage( "assets/textures/hexagons/Sand.png" ), texture_cache );
+  LoadResource( hstr{ "snow_tile" }, LoadImage( "assets/textures/hexagons/Snow.png" ), texture_cache );
 
   LoadResource(
     hstr{ "factionOverlay" },
     LoadImage( "assets/textures/overlays.png" ),
-    cache );
+    texture_cache );
 
   LoadResource(
     hstr{ "template" },
     LoadImage( "assets/textures/Template.png" ),
-    cache );
+    texture_cache );
 
   LoadResource(
     hstr{ "romanVillagerTexture" },
     LoadImage( "assets/textures/units/Roman_Villager.png" ),
-    cache );
+    texture_cache );
   LoadResource(
     hstr{ "greekVillagerTexture" },
     LoadImage( "assets/textures/units/Greek_Villager.png" ),
-    cache );
+    texture_cache );
   LoadResource(
     hstr{ "celtVillagerTexture" },
     LoadImage( "assets/textures/units/Celt_Villager.png" ),
-    cache );
+    texture_cache );
   LoadResource(
     hstr{ "punicVillagerTexture" },
     LoadImage( "assets/textures/units/Carthaginian_Villager.png" ),
-    cache );
+    texture_cache );
   LoadResource(
     hstr{ "persianVillagerTexture" },
     LoadImage( "assets/textures/units/Persian_Villager.png" ),
-    cache );
+    texture_cache );
   LoadResource(
     hstr{ "romanVillageTexture" },
     LoadImage( "assets/textures/village_roman.png" ),
-    cache );
+    texture_cache );
 
   LoadResource(
     hstr{ "buildings" },
     LoadImage( "assets/textures/buildings.png" ),
-    cache );
+    texture_cache );
 }
 
 bool GameIsRunning() { return !WindowShouldClose(); }

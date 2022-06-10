@@ -1,8 +1,7 @@
-#include "../common.hpp"
-
-#include "rlgl.h"
-
 #pragma once
+
+#include "../common.hpp"
+#include "rlgl.h"
 
 struct TextureResource {
   const Texture2D texture;
