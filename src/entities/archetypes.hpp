@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "../../common.hpp"
-#include "../../renderer/textures.hpp"
+#include "../common.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
+#include "../renderer/textures.hpp"
 
 namespace Archetypes {
 

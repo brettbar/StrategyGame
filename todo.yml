@@ -9,15 +9,12 @@
 
 
 
-
-
-
-
-
 current:
   - cleanup renderer
 
+
 backlog:
+  - serialization and reading
 
 
 

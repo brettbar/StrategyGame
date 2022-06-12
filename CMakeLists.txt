@@ -28,27 +28,27 @@ add_executable(
   ${PROJECT_NAME} src/main.cpp
   src/guilib/gui_system.hpp
   src/renderer/renderer.hpp
-  src/world/systems/player_system.hpp
-  src/world/systems/ui/ui_system.hpp
-  src/world/systems/map/map_system.hpp
-  src/world/systems/map/province_system.hpp
-  src/world/systems/map/terrain_system.hpp
-  src/world/systems/movement_system.hpp
-  src/world/systems/animation_system.hpp
-  src/world/systems/selection_system.hpp
-  src/world/systems/spawn_system.hpp
-  src/world/entities/archetypes.hpp
-  src/world/components/actor.hpp
-  src/world/components/animated.hpp
-  src/world/components/province.hpp
-  src/world/components/selected.hpp
-  src/world/components/sight.hpp
-  src/world/components/tile.hpp
-  src/world/components/unit.hpp
-  src/world/systems/actor_system.hpp
+        src/systems/player_system.hpp
+        src/systems/ui/ui_system.hpp
+        src/systems/map/map_system.hpp
+        src/systems/map/province_system.hpp
+        src/systems/map/terrain_system.hpp
+        src/systems/movement_system.hpp
+        src/systems/animation_system.hpp
+        src/systems/selection_system.hpp
+        src/systems/spawn_system.hpp
+        src/entities/archetypes.hpp
+        src/components/actor.hpp
+        src/components/animated.hpp
+        src/components/province.hpp
+        src/components/selected.hpp
+        src/components/sight.hpp
+        src/components/tile.hpp
+        src/components/unit.hpp
+        src/systems/actor_system.hpp
   src/input.hpp
   src/common.hpp
-  src/world/components/event.hpp)
+        src/components/event.hpp)
 
 # add_executable(
 #   server net/server/server.cpp

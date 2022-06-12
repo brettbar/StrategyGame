@@ -13,28 +13,32 @@ TEMPORARY TODOS HERE
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
 #include "renderer/fonts.hpp"
+#include "save.hpp"
 #include "state.hpp"
-#include "world/systems/animation_system.hpp"
-#include "world/systems/event_system.hpp"
-#include "world/systems/map/province_system.hpp"
-#include "world/systems/map/terrain_system.hpp"
-#include "world/systems/movement_system.hpp"
-#include "world/systems/player_system.hpp"
-#include "world/systems/selection_system.hpp"
-#include "world/systems/spawn_system.hpp"
-#include "world/systems/ui/ui_system.hpp"
+#include "systems/animation_system.hpp"
+#include "systems/event_system.hpp"
+#include "systems/map/province_system.hpp"
+#include "systems/map/terrain_system.hpp"
+#include "systems/movement_system.hpp"
+#include "systems/player_system.hpp"
+#include "systems/selection_system.hpp"
+#include "systems/spawn_system.hpp"
+#include "systems/ui/ui_system.hpp"
 #include <raylib.h>
+#include "filesystem"
+
+namespace fs = std::filesystem;
 
 void LoadResources( TextureCache &, FontCache & );
-bool GameIsRunning();
+bool WindowIsOpen();
 void CameraUpdate( Camera2D &, f32 );
 void ZoomCamera( Camera2D &, f32, Vector2 );
 
 void Init( State &, entt::registry &, TextureCache &, FontCache & );
+void StartGame( entt::registry &, State &, TextureCache & );
 void Update( State &, entt::registry & );
 void LateUpdate( State &, entt::registry & );
 void Exit( TextureCache & );
-
 
 int main( void ) {
   State state = {
@@ -50,92 +54,105 @@ int main( void ) {
       PlayerSystem( 0, ROMANS, "Roman Republic" ) ),
   };
 
+  fs::path f{ "output.json" };
+
   entt::registry reg;
+  reg.clear();
+
+  if ( fs::exists( f ) ) {
+    printf( "Found existing file!\n" );
+    reg = Save::Load();
+  }
 
   FontCache font_cache = {};
   TextureCache texture_cache = {};
 
-  Init( state, reg, texture_cache, font_cache );
+
+  // Initialization
+  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
+  SetExitKey( KEY_DELETE );
+  InitWindow(
+    1920,
+    1080,
+    // GetScreenWidth(),
+    // GetScreenHeight(),
+    "FieldsOfMars" );
+
+  LoadResources( texture_cache, font_cache );
+
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
   f32 oncelag = 0.0f;
-
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-  while ( GameIsRunning() ) {
-    dt = GetFrameTime();
 
-    lag += dt;
-    oncelag += dt;
+  StartGame(reg, state, texture_cache);
 
-    Input::Handle( state, reg, texture_cache );
+  while ( WindowIsOpen() ) {
+    
+    switch (Global::program_mode) {
+      case ProgramMode::MAIN_MENU:
+        Input::CheckMenuToggle();
+        BeginDrawing();
+          ClearBackground( Fade(BLACK, 0.5) );
 
-    while ( lag >= MS_PER_UPDATE ) {
-      Update( state, reg );
-      lag -= MS_PER_UPDATE;
+          DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        EndDrawing();
+      break;
+      case ProgramMode::GAME:
+        // Update Time
+        dt = GetFrameTime();
+        lag += dt;
+        oncelag += dt;
+
+        // Check for Input
+        Input::CheckMenuToggle();
+        Input::Handle( state, reg, texture_cache );
+
+        // Update once per frame
+        while ( lag >= MS_PER_UPDATE ) {
+          Update( state, reg );
+          lag -= MS_PER_UPDATE;
+        }
+
+        // Update once per second
+        while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
+          LateUpdate( state, reg );
+          oncelag = 0.0f;
+        }
+
+        // Update Camera
+        CameraUpdate( state.camera, dt );
+
+        // Draw everything to screen
+        Renderer::Draw( state, reg, texture_cache, font_cache );
+      break;
     }
 
-    while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-      LateUpdate( state, reg );
-      oncelag = 0.0f;
-    }
-
-    CameraUpdate( state.camera, dt );
-
-    Renderer::Draw( state, reg, texture_cache, font_cache);
   }
 
+  // Perform clean up and teardown
   Exit( texture_cache );
 
   return 0;
 }
 
-void Init(
-  State &state,
-  entt::registry &reg,
-  TextureCache &texture_cache,
-  FontCache &font_cache ) {
-  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
-  SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
-  const f32 monitor_w = GetMonitorWidth( 0 );
+void StartMenu() {
 
+}
 
-  if ( monitor_w <= 1920 ) {
-    InitWindow(
-      1280,
-      720,
-      // GetScreenWidth(),
-      // GetScreenHeight(),
-      "FieldsOfMars" );
-  } else {
-    InitWindow(
-      1920,
-      1080,
-      // GetScreenWidth(),
-      // GetScreenHeight(),
-      "FieldsOfMars" );
-  }
-
-  LoadResources( texture_cache, font_cache );
-
-  // state.camera = Camera2D{
-  //   .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
-  //   .target =
-  //     { ( state.mapWidth * 128.0f ) / 2, ( state.mapHeight * 128.0f ) / 2 },
-  //   .rotation = 0,
-  //   .zoom = 2.0f,
-  // };
-  // SetCameraMoveControls(KEY_W, KEY_D, KEY_A, KEY_S, 0, 0);
-
+void StartGame(entt::registry &reg, State &state, TextureCache &texture_cache) {
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
   UI::Init( reg );
-  Renderer::Init( state, texture_cache );
+  Renderer::Init( state );
 }
+
 
 void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
@@ -241,11 +258,26 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
     hstr{ "font_romulus" },
     LoadFont( "assets/fonts/romulus.png" ) );
 
-  LoadResource( hstr{ "land_tile" }, LoadImage( "assets/textures/hexagons/Earth.png" ), texture_cache );
-  LoadResource( hstr{ "water_tile" }, LoadImage( "assets/textures/hexagons/Water.png" ), texture_cache );
-  LoadResource( hstr{ "hills_tile" }, LoadImage( "assets/textures/hexagons/Mud.png" ), texture_cache );
-  LoadResource( hstr{ "sand_tile" }, LoadImage( "assets/textures/hexagons/Sand.png" ), texture_cache );
-  LoadResource( hstr{ "snow_tile" }, LoadImage( "assets/textures/hexagons/Snow.png" ), texture_cache );
+  LoadResource(
+    hstr{ "land_tile" },
+    LoadImage( "assets/textures/hexagons/Earth.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "water_tile" },
+    LoadImage( "assets/textures/hexagons/Water.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "hills_tile" },
+    LoadImage( "assets/textures/hexagons/Mud.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "sand_tile" },
+    LoadImage( "assets/textures/hexagons/Sand.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "snow_tile" },
+    LoadImage( "assets/textures/hexagons/Snow.png" ),
+    texture_cache );
 
   LoadResource(
     hstr{ "factionOverlay" },
@@ -288,4 +320,4 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
     texture_cache );
 }
 
-bool GameIsRunning() { return !WindowShouldClose(); }
+bool WindowIsOpen() { return !WindowShouldClose(); }

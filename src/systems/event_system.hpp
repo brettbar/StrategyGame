@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../common.hpp"
-#include "../../state.hpp"
+#include "../common.hpp"
+#include "../state.hpp"
 // #include "world/systems/spawn.hpp"
 
 

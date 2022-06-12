@@ -3,11 +3,11 @@
 //
 #pragma once
 
-#include "../../../common.hpp"
-#include "../../../renderer/textures.hpp"
+#include "../../common.hpp"
 #include "../../components/sight.hpp"
 #include "../../components/tile.hpp"
 #include "../../components/unit.hpp"
+#include "../../renderer/textures.hpp"
 #include "rlgl.h"
 #include "terrain_system.hpp"
 #include <chrono>

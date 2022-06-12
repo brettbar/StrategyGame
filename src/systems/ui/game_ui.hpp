@@ -1,9 +1,11 @@
-#include "../../../common.hpp"
-#include "../../../guilib/gui_system.hpp"
-#include "../../components/event.hpp"
-#include "../event_system.hpp"
 #include <map>
 
+#include "../../common.hpp"
+#include "../../components/event.hpp"
+#include "../../guilib/gui_system.hpp"
+#include "../event_system.hpp"
+
+namespace GAME_UI {
 inline std::map<const char *, entt::entity> ui_lookup;
 
 inline GUI::Panel CreateRootPanel();
@@ -13,7 +15,6 @@ inline entt::entity CreateMiniMapPanel();
 inline entt::entity CreateSpawnButton();
 inline entt::entity CreateContextLabel( const char * );
 inline entt::entity CreateSettlementStats();
-
 
 inline GUI::Panel CreateRootPanel() {
   return {
@@ -250,3 +251,5 @@ inline entt::entity CreateSettlementStats() {
 //   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
 //   GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
 // }
+
+};

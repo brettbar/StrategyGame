@@ -1,16 +1,18 @@
 #pragma once
 
-#include "../../../common.hpp"
-#include "../../../guilib/gui_system.hpp"
+#include <raylib.h>
+
+#include "../../common.hpp"
 #include "../../components/actor.hpp"
 #include "../../components/event.hpp"
 #include "../../components/province.hpp"
 #include "../../components/selected.hpp"
+#include "../../guilib/gui_system.hpp"
+#include "../../renderer/fonts.hpp"
 #include "../event_system.hpp"
-#include "../../../renderer/fonts.hpp"
 
-#include "content.hpp"
-#include <raylib.h>
+#include "game_ui.hpp"
+#include "main_menu_ui.hpp"
 
 namespace UI {
 
@@ -20,13 +22,14 @@ inline GUI::Context context = {
   .hot = entt::null,
   .active = entt::null,
 };
+inline GUI::Panel curr_content = GAME_UI::CreateRootPanel();
+inline std::map<const char *, entt::entity> curr_lookup = GAME_UI::ui_lookup;
 
-inline GUI::Panel root = CreateRootPanel();
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
-    auto stats = ui_lookup.at( "settlement_stats" );
+    auto stats = curr_lookup.at( "settlement_stats" );
     GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
 
     elem.enabled = true;
@@ -35,13 +38,13 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
     auto actor = reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
-    entt::entity context_label = ui_lookup.at( "context_label" );
+    entt::entity context_label = curr_lookup.at( "context_label" );
     GUI::reg.get<GUI::TextLabel>( context_label ).text = actor.name;
   }
 }
 
 inline void DeSelectListener() {
-  auto stats = ui_lookup.at( "settlement_stats" );
+  auto stats = curr_lookup.at( "settlement_stats" );
   GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
   elem.enabled = false;
 }
@@ -52,7 +55,7 @@ inline void Init( entt::registry &reg ) {
 }
 
 inline void Update( entt::registry &reg ) {
-  entt::entity stats = ui_lookup.at( "settlement_stats" );
+  entt::entity stats = curr_lookup.at( "settlement_stats" );
   GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
 
   if ( elem.enabled ) {
@@ -66,11 +69,11 @@ inline void Update( entt::registry &reg ) {
     auto &province = reg.get<Province::Component>( prov_entity );
     // printf( "Settlement: %s \n", province.settlement->name );
 
-    entt::entity context_label = ui_lookup.at( "context_label" );
+    entt::entity context_label = curr_lookup.at( "context_label" );
     GUI::reg.get<GUI::TextLabel>( context_label ).text =
       province.settlement->name;
 
-    entt::entity settlement_stats = ui_lookup.at( "settlement_stats" );
+    entt::entity settlement_stats = curr_lookup.at( "settlement_stats" );
     // printf(
     //   "current population %d\n",
     //   province.settlement->population.current );
@@ -93,7 +96,7 @@ inline void Update( entt::registry &reg ) {
   }
 }
 
-inline void Draw(FontCache &font_cache ) {
+inline void Draw( FontCache &font_cache ) {
   Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -107,7 +110,7 @@ inline void Draw(FontCache &font_cache ) {
   auto all_view = GUI::reg.view<GUI::Element>();
   auto items_view = GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
 
-  GUI::Layout( root, screen_width, screen_height );
+  GUI::Layout( curr_content, screen_width, screen_height );
 
   for ( auto &entity: items_view ) {
     GUI::Element &elem = GUI::reg.get<GUI::Element>( entity );

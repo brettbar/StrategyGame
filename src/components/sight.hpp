@@ -5,13 +5,19 @@
 
 #pragma once
 
-#include "../../common.hpp"
+#include "../common.hpp"
 
 
 namespace Sight {
 
 struct Component {
   u32 range;
+
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar ( range );
+  }
 };
 
 }// namespace Component

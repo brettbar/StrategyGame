@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../common.hpp"
-#include "../../renderer/textures.hpp"
+#include "../common.hpp"
 #include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
+#include "../renderer/textures.hpp"
 #include "event_system.hpp"
 #include <raylib.h>
 

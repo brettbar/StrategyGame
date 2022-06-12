@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "world/systems/player_system.hpp"
+#include "systems/player_system.hpp"
 #include <map>
 #include <raylib.h>
 #include <raymath.h>

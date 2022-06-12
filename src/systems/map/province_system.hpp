@@ -1,6 +1,6 @@
-#include "../../../common.hpp"
-#include "../../../renderer/textures.hpp"
+#include "../../common.hpp"
 #include "../../components/province.hpp"
+#include "../../renderer/textures.hpp"
 #include "../event_system.hpp"
 #include "../spawn_system.hpp"
 #include "terrain_system.hpp"
@@ -304,12 +304,12 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
         break;
     }
 
-    if ( showOverlays )
-      DrawTextureRec(
-        cache.handle( hstr{ "factionOverlay" } )->texture,
-        frameRec,
-        prov.tile->position,
-        Fade( WHITE, 0.5 ) );
+    // if ( showOverlays )
+    //   DrawTextureRec(
+    //     cache.handle( hstr{ "factionOverlay" } )->texture,
+    //     frameRec,
+    //     prov.tile->position,
+    //     Fade( WHITE, 0.5 ) );
 
 
     Vector2 settlement_pos = {
@@ -326,40 +326,7 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
     DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
 
 
-    // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
-
-    // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
-
-
-    // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
-
-    // NOTE: I changed this from "" to nullptr
-    if ( prov.settlement->name == nullptr )
-      continue;
-
-    DrawRectangleRec(
-      {
-        settlement_pos.x + 16,
-        settlement_pos.y + 32,
-        64,
-        14,
-      },
-      BLACK );
-
-    DrawText(
-      prov.settlement->name,
-      settlement_pos.x + 16.0,
-      settlement_pos.y + 32.0,
-      14,
-      WHITE );
-
-    DrawText(
-      std::to_string( prov.settlement->population.current ).c_str(),
-      settlement_pos.x + 54.0,
-      settlement_pos.y + 32.0,
-      14,
-      WHITE );
-  }
+ }
 }
 
 

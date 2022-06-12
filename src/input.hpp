@@ -5,18 +5,45 @@
 #pragma once
 
 #include "common.hpp"
+#include "global.hpp"
 #include "guilib/gui_system.hpp"
 #include "renderer/textures.hpp"
 #include "state.hpp"
-#include "world/systems/map/map_system.hpp"
-#include "world/systems/movement_system.hpp"
-#include "world/systems/selection_system.hpp"
-#include "world/systems/spawn_system.hpp"
-#include "world/systems/ui/ui_system.hpp"
+#include "components/sight.hpp"
+#include "components/unit.hpp"
+#include "systems/map/map_system.hpp"
+#include "systems/movement_system.hpp"
+#include "systems/selection_system.hpp"
+#include "systems/spawn_system.hpp"
+#include "systems/ui/ui_system.hpp"
+#include "save.hpp"
+#include <raylib.h>
 
 namespace Input {
+
+inline void CheckMenuToggle() {
+  if ( IsKeyPressed( KEY_F11 ) ) {
+    if ( Global::program_mode == ProgramMode::GAME ) {
+      Global::program_mode = ProgramMode::MAIN_MENU;
+    } else {
+      Global::program_mode = ProgramMode::GAME;
+    }
+  }
+}
+
 inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   Vector2 clickPos = GetScreenToWorld2D( GetMousePosition(), state.camera );
+
+
+  if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
+    if ( IsKeyPressed( KEY_S ) ) {
+      Save::Save( reg );
+    }
+
+    if ( IsKeyPressed( KEY_L ) ) {
+      Save::Load();
+    }
+  }
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
     if ( state.timeScale > 0.0f ) {
