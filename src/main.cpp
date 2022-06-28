@@ -23,11 +23,13 @@ TEMPORARY TODOS HERE
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
-#include "systems/ui/ui_system.hpp"
+#include "systems/ui/game_ui_system.hpp"
 #include <raylib.h>
 #include "filesystem"
 
 namespace fs = std::filesystem;
+
+inline GUI::Panel main_menu = MAIN_MENU_UI::CreateRootPanel();
 
 void LoadResources( TextureCache &, FontCache & );
 bool WindowIsOpen();
@@ -90,19 +92,63 @@ int main( void ) {
   f32 dt = 0.0f;
 
 
-  StartGame(reg, state, texture_cache);
+
+  StartGame( reg, state, texture_cache );
 
   while ( WindowIsOpen() ) {
-    
-    switch (Global::program_mode) {
+    switch ( Global::program_mode ) {
       case ProgramMode::MAIN_MENU:
         Input::CheckMenuToggle();
-        BeginDrawing();
-          ClearBackground( Fade(BLACK, 0.5) );
 
-          DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          DrawText(
+            "Congrats! You created your first window!",
+            190,
+            200,
+            20,
+            LIGHTGRAY );
+          UI::Draw( 
+            MAIN_MENU_UI::curr_content,
+            GUI::reg.view<GUI::Element, MAIN_MENU_UI::UiFlag>(), 
+            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
+            font_cache 
+          );
+        }
         EndDrawing();
-      break;
+        break;
+
+      case ProgramMode::MODAL_MENU:
+        Input::CheckMenuToggle();
+
+        BeginDrawing();
+        {
+          Renderer::Draw( state, reg, texture_cache, font_cache );
+          UI::Draw( 
+            GAME_UI::curr_content,
+            GUI::reg.view<GUI::Element, GAME_UI::UiFlag>(), 
+            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
+            font_cache 
+          );
+
+          DrawRectangle(
+            0,
+            0,
+            GetScreenWidth(),
+            GetScreenHeight(),
+            Fade( BLACK, 0.33f ) );
+
+          DrawText(
+            "Congrats! You created your first window!",
+            190,
+            200,
+            20,
+            LIGHTGRAY );
+        }
+        EndDrawing();
+        break;
+
       case ProgramMode::GAME:
         // Update Time
         dt = GetFrameTime();
@@ -112,6 +158,7 @@ int main( void ) {
         // Check for Input
         Input::CheckMenuToggle();
         Input::Handle( state, reg, texture_cache );
+
 
         // Update once per frame
         while ( lag >= MS_PER_UPDATE ) {
@@ -129,10 +176,19 @@ int main( void ) {
         CameraUpdate( state.camera, dt );
 
         // Draw everything to screen
-        Renderer::Draw( state, reg, texture_cache, font_cache );
-      break;
+        BeginDrawing();
+        { 
+          Renderer::Draw( state, reg, texture_cache, font_cache ); 
+          UI::Draw( 
+            GAME_UI::curr_content,
+            GUI::reg.view<GUI::Element, GAME_UI::UiFlag>(), 
+            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
+            font_cache
+         );
+        }
+        EndDrawing();
+        break;
     }
-
   }
 
   // Perform clean up and teardown
@@ -141,11 +197,12 @@ int main( void ) {
   return 0;
 }
 
-void StartMenu() {
+void StartMenu() {}
 
-}
-
-void StartGame(entt::registry &reg, State &state, TextureCache &texture_cache) {
+void StartGame(
+  entt::registry &reg,
+  State &state,
+  TextureCache &texture_cache ) {
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();

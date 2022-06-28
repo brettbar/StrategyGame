@@ -4,11 +4,13 @@
 #include "../../guilib/gui_system.hpp"
 
 namespace MAIN_MENU_UI {
-
-inline std::map<const char *, entt::entity> ui_lookup;
+struct UiFlag{};
 
 inline GUI::Panel CreateRootPanel();
-inline entt::entity CreateMenuButton(const char*);
+inline entt::entity CreateMenuButton( const char* );
+
+inline std::map<const char *, entt::entity> ui_lookup;
+inline GUI::Panel curr_content = CreateRootPanel();
 
 inline GUI::Panel CreateRootPanel() {
   return {
@@ -24,7 +26,7 @@ inline GUI::Panel CreateRootPanel() {
   };
 }
 
-inline entt::entity CreateMenuButton(const char * label) {
+inline entt::entity CreateMenuButton( const char * label ) {
   entt::entity entity = GUI::reg.create();
 
   GUI::TextButton menu_button = GUI::TextButton();
@@ -50,6 +52,7 @@ inline entt::entity CreateMenuButton(const char * label) {
   };
 
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::TextButton>( entity, menu_button );
 

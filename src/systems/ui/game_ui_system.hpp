@@ -16,15 +16,14 @@
 
 namespace UI {
 
-inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
-
 inline GUI::Context context = {
   .hot = entt::null,
   .active = entt::null,
 };
-inline GUI::Panel curr_content = GAME_UI::CreateRootPanel();
+
 inline std::map<const char *, entt::entity> curr_lookup = GAME_UI::ui_lookup;
 
+inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
@@ -96,7 +95,13 @@ inline void Update( entt::registry &reg ) {
   }
 }
 
-inline void Draw( FontCache &font_cache ) {
+template<typename Flag>
+inline void Draw( 
+  GUI::Panel &curr_content,
+  entt::basic_view<entt::entity, entt::get_t<GUI::Element, Flag>, entt::exclude_t<>> all_view,  
+  entt::basic_view<entt::entity, entt::get_t<GUI::Element>, entt::exclude_t<GUI::Panel>> items_view,  
+  FontCache &font_cache 
+) {
   Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -107,8 +112,8 @@ inline void Draw( FontCache &font_cache ) {
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
-  auto all_view = GUI::reg.view<GUI::Element>();
-  auto items_view = GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
+  // auto all_view = GUI::reg.view<GUI::Element>();
+  // auto items_view = GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
 
   GUI::Layout( curr_content, screen_width, screen_height );
 

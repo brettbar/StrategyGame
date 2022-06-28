@@ -6,7 +6,7 @@
 #include "../event_system.hpp"
 
 namespace GAME_UI {
-inline std::map<const char *, entt::entity> ui_lookup;
+struct UiFlag{};
 
 inline GUI::Panel CreateRootPanel();
 inline entt::entity CreateLeftPanel();
@@ -15,6 +15,9 @@ inline entt::entity CreateMiniMapPanel();
 inline entt::entity CreateSpawnButton();
 inline entt::entity CreateContextLabel( const char * );
 inline entt::entity CreateSettlementStats();
+
+inline std::map<const char *, entt::entity> ui_lookup;
+inline GUI::Panel curr_content = CreateRootPanel();
 
 inline GUI::Panel CreateRootPanel() {
   return {
@@ -53,6 +56,7 @@ inline entt::entity CreateLeftPanel() {
       },
   };
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::Panel>( entity, panel );
 
@@ -83,6 +87,7 @@ inline entt::entity CreateContextPanel() {
       },
   };
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::Panel>( entity, panel );
 
@@ -109,6 +114,7 @@ inline entt::entity CreateMiniMapPanel() {
     .children = {},
   };
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::Panel>( entity, panel );
 
@@ -154,6 +160,7 @@ inline entt::entity CreateSpawnButton() {
     EventSystem::dispatcher.trigger<Event::SpawnEvent>();
   };
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::TextButton>( entity, spawn_button );
 
@@ -185,6 +192,7 @@ inline entt::entity CreateContextLabel( const char *text ) {
   label.font_size = 20;
   label.text_color = WHITE;
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::TextLabel>( entity, label );
 
@@ -215,6 +223,7 @@ inline entt::entity CreateSettlementStats() {
   label.font_size = 16;
   label.text_color = WHITE;
 
+  GUI::reg.emplace<UiFlag>( entity, UiFlag());
   GUI::reg.emplace<GUI::Element>( entity, elem );
   GUI::reg.emplace<GUI::TextLabel>( entity, label );
 

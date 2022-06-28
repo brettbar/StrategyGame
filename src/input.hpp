@@ -15,7 +15,7 @@
 #include "systems/movement_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
-#include "systems/ui/ui_system.hpp"
+#include "systems/ui/game_ui_system.hpp"
 #include "save.hpp"
 #include <raylib.h>
 
@@ -24,8 +24,10 @@ namespace Input {
 inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_F11 ) ) {
     if ( Global::program_mode == ProgramMode::GAME ) {
+      Global::program_mode = ProgramMode::MODAL_MENU;
+    } else if ( Global::program_mode == ProgramMode::MODAL_MENU ) {
       Global::program_mode = ProgramMode::MAIN_MENU;
-    } else {
+    } else if ( Global::program_mode == ProgramMode::MAIN_MENU) {
       Global::program_mode = ProgramMode::GAME;
     }
   }

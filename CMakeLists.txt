@@ -29,7 +29,7 @@ add_executable(
   src/guilib/gui_system.hpp
   src/renderer/renderer.hpp
         src/systems/player_system.hpp
-        src/systems/ui/ui_system.hpp
+        src/systems/ui/game_ui_system.hpp
         src/systems/map/map_system.hpp
         src/systems/map/province_system.hpp
         src/systems/map/terrain_system.hpp

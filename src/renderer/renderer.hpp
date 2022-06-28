@@ -3,7 +3,7 @@
 #include "../systems/animation_system.hpp"
 #include "../systems/map/map_system.hpp"
 #include "../systems/selection_system.hpp"
-#include "../systems/ui/ui_system.hpp"
+#include "../systems/ui/game_ui_system.hpp"
 #include "../systems/ui/overlay_system.hpp"
 #include "fonts.hpp"
 #include "textures.hpp"
@@ -15,7 +15,8 @@ inline Shader shader;
 
 inline void Init( State &state ) {
 
-  Renderer::shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
+  Renderer::shader =
+    LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
 
   state.camera = Camera2D{
     .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
@@ -27,20 +28,25 @@ inline void Init( State &state ) {
 }
 
 
-inline void Draw( State &state, entt::registry &reg, TextureCache &texture_cache, FontCache &font_cache) {
-  BeginDrawing();
+inline void Draw(
+  State &state,
+  entt::registry &reg,
+  TextureCache &texture_cache,
+  FontCache &font_cache ) {
+  ClearBackground( DARKGRAY );
+
+  BeginMode2D( state.camera );
+
+  BeginShaderMode( shader );
   {
-    ClearBackground( DARKGRAY );
-
-    BeginMode2D( state.camera );
-
-    BeginShaderMode( shader );
     Terrain::Draw( state.camera, reg, texture_cache );
-    EndShaderMode();
+  }
+  EndShaderMode();
 
-    OverlaySystem::Draw(reg, texture_cache, font_cache);
+  OverlaySystem::Draw( reg, texture_cache, font_cache );
 
-    BeginShaderMode( shader );
+  BeginShaderMode( shader );
+  {
     switch ( MapSystem::mode ) {
       case MapSystem::Mode::TERRAIN:
         ProvinceSystem::DrawProvinces( reg, texture_cache, false );
@@ -50,25 +56,18 @@ inline void Draw( State &state, entt::registry &reg, TextureCache &texture_cache
         break;
     }
 
-    AnimationSystem::Draw(
-      reg,
-      state.gameState == GameState::EDITOR );
-
-    EndShaderMode();
-
-
-
-
-    SelectionSystem::Draw( reg, texture_cache, state.gameState == GameState::EDITOR );
-
-    EndMode2D();
-
-    UI::Draw(font_cache);
+    AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
   }
-  EndDrawing();
+  EndShaderMode();
+
+
+  SelectionSystem::Draw(
+    reg,
+    texture_cache,
+    state.gameState == GameState::EDITOR );
+
+  EndMode2D();
 }
-
-
 
 
 };// namespace Renderer
