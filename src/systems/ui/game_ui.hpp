@@ -2,13 +2,14 @@
 
 #include "../../common.hpp"
 #include "../../components/event.hpp"
-#include "../../guilib/gui_system.hpp"
 #include "../event_system.hpp"
+#include "ui_system.hpp"
 
 namespace GAME_UI {
+
 struct UiFlag{};
 
-inline GUI::Panel CreateRootPanel();
+inline UI::Panel CreateRootPanel();
 inline entt::entity CreateLeftPanel();
 inline entt::entity CreateContextPanel();
 inline entt::entity CreateMiniMapPanel();
@@ -17,13 +18,13 @@ inline entt::entity CreateContextLabel( const char * );
 inline entt::entity CreateSettlementStats();
 
 inline std::map<const char *, entt::entity> ui_lookup;
-inline GUI::Panel curr_content = CreateRootPanel();
+inline UI::Panel curr_content = CreateRootPanel();
 
-inline GUI::Panel CreateRootPanel() {
+inline UI::Panel CreateRootPanel() {
   return {
-    .align_axis = GUI::AlignAxis::FLEX_ROW,
-    .align_main = GUI::Alignment::SPACE_BETWEEN,
-    .align_cross = GUI::Alignment::FLEX_END,
+    .align_axis = UI::AlignAxis::FLEX_ROW,
+    .align_main = UI::Alignment::SPACE_BETWEEN,
+    .align_cross = UI::Alignment::FLEX_END,
     .children =
       {
         CreateLeftPanel(),
@@ -34,20 +35,20 @@ inline GUI::Panel CreateRootPanel() {
 }
 
 inline entt::entity CreateLeftPanel() {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::Element elem = {
-    .type = GUI::Type::PANEL,
+  UI::Element elem = {
+    .type = UI::Type::PANEL,
     .enabled = true,
     .color = BLACK,
     .dmns = Vector2{ 80, 0 },
-    .align_self = GUI::AlignSelf::STRETCH,
+    .align_self = UI::AlignSelf::STRETCH,
   };
 
-  GUI::Panel panel = {
-    .align_axis = GUI::AlignAxis::FLEX_COLUMN,
-    .align_main = GUI::Alignment::FLEX_START,
-    .align_cross = GUI::Alignment::CENTER,
+  UI::Panel panel = {
+    .align_axis = UI::AlignAxis::FLEX_COLUMN,
+    .align_main = UI::Alignment::FLEX_START,
+    .align_cross = UI::Alignment::CENTER,
     .children =
       {
         CreateSpawnButton(),
@@ -56,9 +57,9 @@ inline entt::entity CreateLeftPanel() {
       },
   };
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::Panel>( entity, panel );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::Panel>( entity, panel );
 
   ui_lookup.insert_or_assign( "left_panel", entity );
 
@@ -66,20 +67,20 @@ inline entt::entity CreateLeftPanel() {
 }
 
 inline entt::entity CreateContextPanel() {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::Element elem = {
-    .type = GUI::Type::PANEL,
+  UI::Element elem = {
+    .type = UI::Type::PANEL,
     .enabled = true,
     .color = RED,
     .dmns = Vector2{ 1000, 300 },
-    .align_self = GUI::AlignSelf::AUTO,
+    .align_self = UI::AlignSelf::AUTO,
   };
 
-  GUI::Panel panel = {
-    .align_axis = GUI::AlignAxis::FLEX_ROW,
-    .align_main = GUI::Alignment::FLEX_START,
-    .align_cross = GUI::Alignment::FLEX_START,
+  UI::Panel panel = {
+    .align_axis = UI::AlignAxis::FLEX_ROW,
+    .align_main = UI::Alignment::FLEX_START,
+    .align_cross = UI::Alignment::FLEX_START,
     .children =
       {
         CreateContextLabel( "" ),
@@ -87,9 +88,9 @@ inline entt::entity CreateContextPanel() {
       },
   };
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::Panel>( entity, panel );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::Panel>( entity, panel );
 
   ui_lookup.insert_or_assign( "context_panel", entity );
 
@@ -97,26 +98,26 @@ inline entt::entity CreateContextPanel() {
 }
 
 inline entt::entity CreateMiniMapPanel() {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::Element elem = {
-    .type = GUI::Type::PANEL,
+  UI::Element elem = {
+    .type = UI::Type::PANEL,
     .enabled = true,
     .color = BLUE,
     .dmns = Vector2{ 300, 300 },
-    .align_self = GUI::AlignSelf::AUTO,
+    .align_self = UI::AlignSelf::AUTO,
   };
 
-  GUI::Panel panel = {
-    .align_axis = GUI::AlignAxis::FLEX_ROW,
-    .align_main = GUI::Alignment::FLEX_START,
-    .align_cross = GUI::Alignment::FLEX_START,
+  UI::Panel panel = {
+    .align_axis = UI::AlignAxis::FLEX_ROW,
+    .align_main = UI::Alignment::FLEX_START,
+    .align_cross = UI::Alignment::FLEX_START,
     .children = {},
   };
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::Panel>( entity, panel );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::Panel>( entity, panel );
 
   ui_lookup.insert_or_assign( "minimap_panel", entity );
 
@@ -124,24 +125,24 @@ inline entt::entity CreateMiniMapPanel() {
 }
 
 inline entt::entity CreateSpawnButton() {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::TextButton spawn_button = GUI::TextButton();
+  UI::TextButton spawn_button = UI::TextButton();
   spawn_button.label = {
     .text = "SpawnSystem",
     .font_size = 20,
     .text_color = RED,
   };
 
-  GUI::Margins margins = {
+  UI::Margins margins = {
     .top = 5,
     .right = 0,
     .bottom = 5,
     .left = 0,
   };
 
-  GUI::Element elem = {
-    .type = GUI::Type::TEXT_BUTTON,
+  UI::Element elem = {
+    .type = UI::Type::TEXT_BUTTON,
     .enabled = true,
     .color = WHITE,
     .dmns = Vector2{ 60, 60 },
@@ -160,9 +161,9 @@ inline entt::entity CreateSpawnButton() {
     EventSystem::dispatcher.trigger<Event::SpawnEvent>();
   };
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::TextButton>( entity, spawn_button );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::TextButton>( entity, spawn_button );
 
   ui_lookup.insert_or_assign( "spawn_button", entity );
 
@@ -170,72 +171,72 @@ inline entt::entity CreateSpawnButton() {
 }
 
 inline entt::entity CreateContextLabel( const char *text ) {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::Margins margins = {
+  UI::Margins margins = {
     .top = 0,
     .right = 5,
     .bottom = 0,
     .left = 0,
   };
 
-  GUI::Element elem = {
-    .type = GUI::Type::TEXT_LABEL,
+  UI::Element elem = {
+    .type = UI::Type::TEXT_LABEL,
     .enabled = true,
     .color = BLACK,
     .dmns = { 200, 100 },
     .margins = margins,
   };
 
-  GUI::TextLabel label = GUI::TextLabel();
+  UI::TextLabel label = UI::TextLabel();
   label.text = text;
   label.font_size = 20;
   label.text_color = WHITE;
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::TextLabel>( entity, label );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::TextLabel>( entity, label );
 
   ui_lookup.insert_or_assign( "context_label", entity );
   return entity;
 }
 
 inline entt::entity CreateSettlementStats() {
-  entt::entity entity = GUI::reg.create();
+  entt::entity entity = UI::reg.create();
 
-  GUI::Margins margins = {
+  UI::Margins margins = {
     .top = 0,
     .right = 5,
     .bottom = 0,
     .left = 5,
   };
 
-  GUI::Element elem = {
-    .type = GUI::Type::TEXT_LABEL,
+  UI::Element elem = {
+    .type = UI::Type::TEXT_LABEL,
     .enabled = false,
     .color = BLACK,
     .dmns = { 300, 200 },
     .margins = margins,
   };
 
-  GUI::TextLabel label = GUI::TextLabel();
+  UI::TextLabel label = UI::TextLabel();
   label.text = "";
   label.font_size = 16;
   label.text_color = WHITE;
 
-  GUI::reg.emplace<UiFlag>( entity, UiFlag());
-  GUI::reg.emplace<GUI::Element>( entity, elem );
-  GUI::reg.emplace<GUI::TextLabel>( entity, label );
+  UI::reg.emplace<UiFlag>( entity, UiFlag());
+  UI::reg.emplace<UI::Element>( entity, elem );
+  UI::reg.emplace<UI::TextLabel>( entity, label );
 
   ui_lookup.insert_or_assign( "settlement_stats", entity );
   return entity;
 }
 
 // inline void createFloatingPanel() {
-//   entt::entity entity = GUI::gui_reg.create();
+//   entt::entity entity = UI::gui_reg.create();
 
-//   GUI::Element elem = {
-//     .type = GUI::Type::PANEL,
+//   UI::Element elem = {
+//     .type = UI::Type::PANEL,
 //     .enabled = true,
 //     .color = RED,
 //     .pos =
@@ -244,21 +245,21 @@ inline entt::entity CreateSettlementStats() {
 //         (f32) GetScreenHeight() - 200,
 //       },
 //     .dmns = Vector2{ 800, 200 },
-//     .horiz_dimension = GUI::Dimension::FIXED,
-//     .vert_dimension = GUI::Dimension::FIXED,
+//     .horiz_dimension = UI::Dimension::FIXED,
+//     .vert_dimension = UI::Dimension::FIXED,
 //   };
 
-//   GUI::Panel panel = {
-//     .children_horiz_align = GUI::HorizAlign::CENTER,
-//     .children_vert_align = GUI::VertAlign::CENTER,
+//   UI::Panel panel = {
+//     .children_horiz_align = UI::HorizAlign::CENTER,
+//     .children_vert_align = UI::VertAlign::CENTER,
 //     .children =
 //       {
 //         createContextLabel( elem.pos ),
 //       },
 //   };
 
-//   GUI::gui_reg.emplace<GUI::Element>( entity, elem );
-//   GUI::gui_reg.emplace<GUI::Panel>( entity, panel );
+//   UI::gui_reg.emplace<UI::Element>( entity, elem );
+//   UI::gui_reg.emplace<UI::Panel>( entity, panel );
 // }
 
 };

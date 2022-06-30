@@ -2,25 +2,17 @@
 #include "../../global.hpp"
 #include "ui_system.hpp"
 
-#include <map>
-#include <raylib.h>
-
-namespace MAIN_MENU_UI {
+namespace MODAL_MENU_UI {
 
 struct UiFlag{};
-
-struct ClickEvent {
-  std::string type;
-};
-struct Emitter: entt::emitter<Emitter> {};
 
 inline UI::Panel CreateRootPanel();
 inline entt::entity CreateMenuButton( std::string );
 
+struct Emitter: entt::emitter<Emitter>{};
 inline std::map<const char *, entt::entity> ui_lookup;
 inline UI::Panel curr_content = CreateRootPanel();
 inline Emitter emitter{};
-
 
 inline UI::Panel CreateRootPanel() {
   return {
@@ -28,13 +20,15 @@ inline UI::Panel CreateRootPanel() {
     .align_main = UI::Alignment:: CENTER,
     .align_cross = UI::Alignment::CENTER,
     .children = {
-      CreateMenuButton("New game"),
+      CreateMenuButton("Save game"),
       CreateMenuButton("Load game"),
       CreateMenuButton("Settings"),
-      CreateMenuButton("Exit"),
+      CreateMenuButton("Save & Quit"),
+      CreateMenuButton("Quit Without Saving"),
     }
   };
 }
+
 
 inline entt::entity CreateMenuButton( std::string label ) {
   entt::entity entity = UI::reg.create();
@@ -61,22 +55,25 @@ inline entt::entity CreateMenuButton( std::string label ) {
     .margins = margins,
   };
 
-  if ( label == "New game" ) {
+  if ( label == "Save game" ) {
     menu_button.action = []() {
-      Global::program_mode = ProgramMode::GAME;
+      printf("save game\n");
     };
   } else if ( label == "Load game" ) {
     menu_button.action = []() {
-      Global::program_mode = ProgramMode::GAME;
-      emitter.publish<ClickEvent>("load_game");
+      printf("load game\n");
     };
   } else if ( label == "Settings" ) {
     menu_button.action = []() {
-
+      printf("settings\n");
     };
-  } else if ( label == "Exit" ) {
+  } else if ( label == "Save & Quit" ) {
     menu_button.action = []() {
-      printf("Exiting...\n");
+      printf("save & quit\n");
+    };
+  } else if ( label == "Quit Without Saving" ) {
+    menu_button.action = []() {
+      printf("quit without saving\n");
       CloseWindow();
     };
   }

@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../common.hpp"
+#include "../../renderer/fonts.hpp"
 #include <functional>
 #include <iterator>
 #include <raylib.h>
 
-namespace GUI {
+namespace UI {
 
 enum class Type {
   PANEL,
@@ -93,7 +94,192 @@ struct TextureLabel {
 //   Vector2 oldOffset;
 // };
 
+inline void Layout( Panel , f32 , f32 );
 inline Rectangle RectangleFromVectors( Vector2, Vector2 );
+
+inline Context context = {
+  .hot = entt::null,
+  .active = entt::null,
+};
+
+template<typename Flag>
+inline void Draw( 
+  Panel &curr_content,
+  entt::basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<>> all_view,  
+  entt::basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<Panel>> items_view,  
+  FontCache &font_cache 
+) {
+  Vector2 mousePos = GetMousePosition();
+  bool mouseWentUp = IsMouseButtonReleased( 0 );
+  bool mouseWentDown = IsMouseButtonPressed( 0 );
+  bool mouseHeldDown = IsMouseButtonDown( 0 );
+  bool overAnyElem = false;
+
+  // 0. Get screen dims for current frame
+  const f32 screen_width = GetScreenWidth();
+  const f32 screen_height = GetScreenHeight();
+
+  // auto all_view = reg.view<Element>();
+  // auto items_view = reg.view<Element>( entt::exclude<Panel> );
+
+  Layout( curr_content, screen_width, screen_height );
+
+  for ( auto &entity: items_view ) {
+    Element &elem = reg.get<Element>( entity );
+
+    if ( !elem.enabled )
+      continue;
+
+    bool inside = CheckCollisionPointRec(
+      GetMousePosition(),
+      RectangleFromVectors( { elem.pos.x, elem.pos.y }, elem.dmns ) );
+
+    if ( !overAnyElem )
+      overAnyElem = inside;
+
+
+    if ( DoItem( context, entity, inside, mouseWentUp, mouseWentDown ) ) {
+      switch ( elem.type ) {
+        case Type::TEXT_BUTTON: {
+          auto &button = reg.get<TextButton>( entity );
+          button.action();
+        } break;
+        case Type::TEXTURE_BUTTON: {
+        } break;
+        default:
+          break;
+      }
+    }
+  }
+
+
+  // 6. Draw Everything
+  for ( auto &entity: all_view ) {
+    Element &elem = reg.get<Element>( entity );
+    if ( !elem.enabled )
+      continue;
+
+    switch ( elem.type ) {
+      case Type::PANEL: {
+        // auto &panel = gui_reg.get<Panel>( entity );
+
+        DrawRectangleV( elem.pos, elem.dmns, elem.color );
+
+      } break;
+
+      case Type::TEXT_LABEL: {
+        auto &label = reg.get<TextLabel>( entity );
+        DrawRectangleV( elem.pos, elem.dmns, elem.color );
+
+        DrawTextEx(
+          font_cache.handle(hstr{"font_romulus"})->font, 
+          label.text.c_str(), { 
+            elem.pos.x,
+            elem.pos.y + ( 0.25f * elem.dmns.y ),
+          }, 
+          label.font_size, 2.0f, 
+          label.text_color 
+        );
+
+        // DrawText(
+        //   label.text.c_str(),
+        //   elem.pos.x,
+        //   elem.pos.y + ( 0.25 * elem.dmns.y ),
+        //   label.font_size,
+        //   label.text_color );
+      } break;
+
+      case Type::TEXT_BUTTON: {
+        auto &button = reg.get<TextButton>( entity );
+        DrawRectangleV( elem.pos, elem.dmns, elem.color );
+
+        DrawTextEx(
+          font_cache.handle(
+            hstr{"font_romulus"})->font, 
+            button.label.text.c_str(), { 
+              elem.pos.x,
+              elem.pos.y + ( 0.5f * elem.dmns.y ),
+            },
+            button.label.font_size, 
+            2.0f, 
+            button.label.text_color 
+        );
+
+      } break;
+
+      case Type::TEXTURE_LABEL: {
+        auto &label = reg.get<TextureLabel>( entity );
+        DrawTexture( label.texture, elem.pos.x, elem.pos.y, elem.color );
+      } break;
+
+      default:
+        break;
+    }
+  }
+
+  std::string hot_str = std::to_string( (std::uint32_t) context.hot );
+  std::string active_str = std::to_string( (std::uint32_t) context.active );
+
+  if ( !overAnyElem ) {
+    context.hot = entt::null;
+    context.active = entt::null;
+  }
+
+  if ( context.hot == entt::null ) {
+    hot_str = "-1";
+  }
+
+  if ( context.active == entt::null ) {
+    active_str = "-1";
+  }
+
+  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+  DrawFPS( GetScreenWidth() - 100, 2 );
+
+  // TODO make this a part of debug
+  DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
+  std::string foo = "hot: " + hot_str;
+  DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
+
+  DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
+  std::string bar = "active: " + active_str;
+  DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 inline void MainRowAlignChildren(
   Rectangle parent,
@@ -295,7 +481,7 @@ inline void MainColumnAlignChildren(
         entt::entity &entity = children[i];
         Element &elem = reg.get<Element>( entity );
 
-        elem.pos.y = end_of_last;
+        elem.pos.y = end_of_last + elem.margins.top;
         end_of_last = elem.pos.y + elem.dmns.y;
       }
     } break;
@@ -420,9 +606,9 @@ inline void Layout( Panel root, f32 screen_width, f32 screen_height ) {
       root.children );
   }
 
-  for ( auto &panel_entity: GUI::reg.view<GUI::Panel>() ) {
-    GUI::Panel &panel = GUI::reg.get<GUI::Panel>( panel_entity );
-    GUI::Element &panel_elem = GUI::reg.get<GUI::Element>( panel_entity );
+  for ( auto &panel_entity: reg.view<Panel>() ) {
+    Panel &panel = reg.get<Panel>( panel_entity );
+    Element &panel_elem = reg.get<Element>( panel_entity );
     if ( panel.align_axis == AlignAxis::FLEX_ROW ) {
       MainRowAlignChildren(
         RectangleFromVectors( panel_elem.pos, panel_elem.dmns ),
@@ -483,12 +669,12 @@ inline Rectangle RectangleFromVectors( Vector2 pos, Vector2 dimensions ) {
 inline bool MouseWasOverUI() {
   bool inside = false;
 
-  for ( auto &entity: GUI::reg.view<GUI::Element>() ) {
-    GUI::Element elem = GUI::reg.get<GUI::Element>( entity );
+  for ( auto &entity: reg.view<Element>() ) {
+    Element elem = reg.get<Element>( entity );
 
     inside = CheckCollisionPointRec(
       GetMousePosition(),
-      GUI::RectangleFromVectors( elem.pos, elem.dmns ) );
+      RectangleFromVectors( elem.pos, elem.dmns ) );
 
     if ( inside )
       return true;

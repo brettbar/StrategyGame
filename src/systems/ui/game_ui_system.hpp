@@ -1,35 +1,30 @@
 #pragma once
 
-#include <raylib.h>
-
 #include "../../common.hpp"
 #include "../../components/actor.hpp"
 #include "../../components/event.hpp"
 #include "../../components/province.hpp"
 #include "../../components/selected.hpp"
-#include "../../guilib/gui_system.hpp"
 #include "../../renderer/fonts.hpp"
 #include "../event_system.hpp"
 
+#include "ui_system.hpp"
 #include "game_ui.hpp"
 #include "main_menu_ui.hpp"
 
-namespace UI {
+namespace GAME_UI {
 
-inline GUI::Context context = {
-  .hot = entt::null,
-  .active = entt::null,
-};
-
-inline std::map<const char *, entt::entity> curr_lookup = GAME_UI::ui_lookup;
-
-inline void HandleFloatingPanel( GUI::Panel &, Vector2 );
+inline void SelectListener( entt::registry &, entt::entity );
+inline void DeSelectListener();
+inline void Init( entt::registry &);
+inline void Update( entt::registry & );
+// inline void HandleFloatingPanel( UI::Panel &, Vector2 );
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
-    auto stats = curr_lookup.at( "settlement_stats" );
-    GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
+    auto stats = ui_lookup.at( "settlement_stats" );
+    UI::Element &elem = UI::reg.get<UI::Element>( stats );
 
     elem.enabled = true;
 
@@ -37,14 +32,14 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
     auto actor = reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
-    entt::entity context_label = curr_lookup.at( "context_label" );
-    GUI::reg.get<GUI::TextLabel>( context_label ).text = actor.name;
+    entt::entity context_label = ui_lookup.at( "context_label" );
+    UI::reg.get<UI::TextLabel>( context_label ).text = actor.name;
   }
 }
 
 inline void DeSelectListener() {
-  auto stats = curr_lookup.at( "settlement_stats" );
-  GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
+  auto stats = ui_lookup.at( "settlement_stats" );
+  UI::Element &elem = UI::reg.get<UI::Element>( stats );
   elem.enabled = false;
 }
 
@@ -54,8 +49,8 @@ inline void Init( entt::registry &reg ) {
 }
 
 inline void Update( entt::registry &reg ) {
-  entt::entity stats = curr_lookup.at( "settlement_stats" );
-  GUI::Element &elem = GUI::reg.get<GUI::Element>( stats );
+  entt::entity stats = ui_lookup.at( "settlement_stats" );
+  UI::Element &elem = UI::reg.get<UI::Element>( stats );
 
   if ( elem.enabled ) {
     auto prov_entity =
@@ -68,11 +63,11 @@ inline void Update( entt::registry &reg ) {
     auto &province = reg.get<Province::Component>( prov_entity );
     // printf( "Settlement: %s \n", province.settlement->name );
 
-    entt::entity context_label = curr_lookup.at( "context_label" );
-    GUI::reg.get<GUI::TextLabel>( context_label ).text =
+    entt::entity context_label = ui_lookup.at( "context_label" );
+    UI::reg.get<UI::TextLabel>( context_label ).text =
       province.settlement->name;
 
-    entt::entity settlement_stats = curr_lookup.at( "settlement_stats" );
+    entt::entity settlement_stats = ui_lookup.at( "settlement_stats" );
     // printf(
     //   "current population %d\n",
     //   province.settlement->population.current );
@@ -91,145 +86,13 @@ inline void Update( entt::registry &reg ) {
       "GR: " + std::to_string( province.settlement->population.growthRate ) +
       "\n";
 
-    GUI::reg.get<GUI::TextLabel>( settlement_stats ).text = text;
+    UI::reg.get<UI::TextLabel>( settlement_stats ).text = text;
   }
 }
 
-template<typename Flag>
-inline void Draw( 
-  GUI::Panel &curr_content,
-  entt::basic_view<entt::entity, entt::get_t<GUI::Element, Flag>, entt::exclude_t<>> all_view,  
-  entt::basic_view<entt::entity, entt::get_t<GUI::Element>, entt::exclude_t<GUI::Panel>> items_view,  
-  FontCache &font_cache 
-) {
-  Vector2 mousePos = GetMousePosition();
-  bool mouseWentUp = IsMouseButtonReleased( 0 );
-  bool mouseWentDown = IsMouseButtonPressed( 0 );
-  bool mouseHeldDown = IsMouseButtonDown( 0 );
-  bool overAnyElem = false;
-
-  // 0. Get screen dims for current frame
-  const f32 screen_width = GetScreenWidth();
-  const f32 screen_height = GetScreenHeight();
-
-  // auto all_view = GUI::reg.view<GUI::Element>();
-  // auto items_view = GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> );
-
-  GUI::Layout( curr_content, screen_width, screen_height );
-
-  for ( auto &entity: items_view ) {
-    GUI::Element &elem = GUI::reg.get<GUI::Element>( entity );
-
-    if ( !elem.enabled )
-      continue;
-
-    bool inside = CheckCollisionPointRec(
-      GetMousePosition(),
-      GUI::RectangleFromVectors( { elem.pos.x, elem.pos.y }, elem.dmns ) );
-
-    if ( !overAnyElem )
-      overAnyElem = inside;
 
 
-    if ( GUI::DoItem( context, entity, inside, mouseWentUp, mouseWentDown ) ) {
-      switch ( elem.type ) {
-        case GUI::Type::TEXT_BUTTON: {
-          auto &button = GUI::reg.get<GUI::TextButton>( entity );
-          button.action();
-        } break;
-        case GUI::Type::TEXTURE_BUTTON: {
-        } break;
-        default:
-          break;
-      }
-    }
-  }
-
-
-  // 6. Draw Everything
-  for ( auto &entity: all_view ) {
-    GUI::Element &elem = GUI::reg.get<GUI::Element>( entity );
-    if ( !elem.enabled )
-      continue;
-
-    switch ( elem.type ) {
-      case GUI::Type::PANEL: {
-        // auto &panel = GUI::gui_reg.get<GUI::Panel>( entity );
-
-        DrawRectangleV( elem.pos, elem.dmns, elem.color );
-
-      } break;
-
-      case GUI::Type::TEXT_LABEL: {
-        auto &label = GUI::reg.get<GUI::TextLabel>( entity );
-        DrawRectangleV( elem.pos, elem.dmns, elem.color );
-
-        DrawTextEx(font_cache.handle(hstr{"font_romulus"})->font, label.text.c_str(), { 
-          elem.pos.x,
-          elem.pos.y + ( 0.25f * elem.dmns.y ),
-       }, label.font_size, 2.0f, label.text_color );
-
-        // DrawText(
-        //   label.text.c_str(),
-        //   elem.pos.x,
-        //   elem.pos.y + ( 0.25 * elem.dmns.y ),
-        //   label.font_size,
-        //   label.text_color );
-      } break;
-
-      case GUI::Type::TEXT_BUTTON: {
-        auto &button = GUI::reg.get<GUI::TextButton>( entity );
-        DrawRectangleV( elem.pos, elem.dmns, elem.color );
-
-        DrawText(
-          button.label.text.c_str(),
-          elem.pos.x,
-          elem.pos.y + ( 0.5 * elem.dmns.y ),
-          button.label.font_size,
-          button.label.text_color );
-      } break;
-
-      case GUI::Type::TEXTURE_LABEL: {
-        auto &label = GUI::reg.get<GUI::TextureLabel>( entity );
-        DrawTexture( label.texture, elem.pos.x, elem.pos.y, elem.color );
-      } break;
-
-      default:
-        break;
-    }
-  }
-
-  std::string hot_str = std::to_string( (std::uint32_t) context.hot );
-  std::string active_str = std::to_string( (std::uint32_t) context.active );
-
-  if ( !overAnyElem ) {
-    context.hot = entt::null;
-    context.active = entt::null;
-  }
-
-  if ( context.hot == entt::null ) {
-    hot_str = "-1";
-  }
-
-  if ( context.active == entt::null ) {
-    active_str = "-1";
-  }
-
-  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-  DrawFPS( GetScreenWidth() - 100, 2 );
-
-  // TODO make this a part of debug
-  // DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  // std::string foo = "hot: " + hot_str;
-  // DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
-
-  // DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
-  // std::string bar = "active: " + active_str;
-  // DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
-}
-
-
-// inline void HandleFloatingPanel( GUI::Panel &panel, Vector2 mousePos ) {
+// inline void HandleFloatingPanel( UI::Panel &panel, Vector2 mousePos ) {
 //   // printf( "DoFloatingPanel: %d\n", panel.index );
 //   panel.pos.x = panel.oldOffset.x + mousePos.x;
 //   panel.pos.y = panel.oldOffset.y + mousePos.y;
@@ -246,18 +109,18 @@ inline void Draw(
 //     panel.pos.y = 0;
 //   }
 // }
-//  for ( GUI::Panel &panel: floating ) {
+//  for ( UI::Panel &panel: floating ) {
 //    if ( !panel.floating )
 //      return;
 //
 //    bool inside = CheckCollisionPointRec(
 //      GetMousePosition(),
-//      GUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
+//      UI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
 //
 //    if ( !overAnyElem )
 //      overAnyElem = inside;
 //
-//    if ( GUI::DoFloatingPanel(
+//    if ( UI::DoFloatingPanel(
 //           context,
 //           panel,
 //           inside,

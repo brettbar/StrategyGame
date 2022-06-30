@@ -6,7 +6,6 @@
 
 #include "common.hpp"
 #include "global.hpp"
-#include "guilib/gui_system.hpp"
 #include "renderer/textures.hpp"
 #include "state.hpp"
 #include "components/sight.hpp"
@@ -26,8 +25,6 @@ inline void CheckMenuToggle() {
     if ( Global::program_mode == ProgramMode::GAME ) {
       Global::program_mode = ProgramMode::MODAL_MENU;
     } else if ( Global::program_mode == ProgramMode::MODAL_MENU ) {
-      Global::program_mode = ProgramMode::MAIN_MENU;
-    } else if ( Global::program_mode == ProgramMode::MAIN_MENU) {
       Global::program_mode = ProgramMode::GAME;
     }
   }
@@ -91,12 +88,12 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   if ( IsMouseButtonPressed( 0 ) ) {
     // UI::Input(state, reg);
     // if ( !UI::HandleMouseEvent( 0, GetMousePosition() ) )
-    if ( !GUI::MouseWasOverUI() )
+    if ( !UI::MouseWasOverUI() )
       SelectionSystem::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
     // if ( !UI::HandleMouseEvent( 1, GetMousePosition() ) )
-    if ( !GUI::MouseWasOverUI() )
+    if ( !UI::MouseWasOverUI() )
       MovementSystem::SetDestinations( reg, state.camera );
   }
 

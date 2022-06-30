@@ -23,18 +23,19 @@ TEMPORARY TODOS HERE
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
+#include "systems/ui/ui_system.hpp"
+#include "systems/ui/modal_menu.hpp"
 #include "systems/ui/game_ui_system.hpp"
+
 #include <raylib.h>
 #include "filesystem"
 
 namespace fs = std::filesystem;
 
-inline GUI::Panel main_menu = MAIN_MENU_UI::CreateRootPanel();
-
 void LoadResources( TextureCache &, FontCache & );
-bool WindowIsOpen();
 void CameraUpdate( Camera2D &, f32 );
 void ZoomCamera( Camera2D &, f32, Vector2 );
+
 
 void Init( State &, entt::registry &, TextureCache &, FontCache & );
 void StartGame( entt::registry &, State &, TextureCache & );
@@ -56,19 +57,24 @@ int main( void ) {
       PlayerSystem( 0, ROMANS, "Roman Republic" ) ),
   };
 
-  fs::path f{ "output.json" };
 
   entt::registry reg;
   reg.clear();
 
-  if ( fs::exists( f ) ) {
-    printf( "Found existing file!\n" );
-    reg = Save::Load();
-  }
-
   FontCache font_cache = {};
   TextureCache texture_cache = {};
 
+  bool game_started = false;
+
+
+  MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
+    [&reg](const MAIN_MENU_UI::ClickEvent &event, MAIN_MENU_UI::Emitter &emitter) {
+      fs::path f{ "output.json" };
+      if ( fs::exists( f ) ) {
+        printf( "Found existing file!\n" );
+        reg = Save::Load();
+      }
+    });
 
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
@@ -92,10 +98,7 @@ int main( void ) {
   f32 dt = 0.0f;
 
 
-
-  StartGame( reg, state, texture_cache );
-
-  while ( WindowIsOpen() ) {
+  while ( !WindowShouldClose() ) {
     switch ( Global::program_mode ) {
       case ProgramMode::MAIN_MENU:
         Input::CheckMenuToggle();
@@ -103,16 +106,11 @@ int main( void ) {
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          DrawText(
-            "Congrats! You created your first window!",
-            190,
-            200,
-            20,
-            LIGHTGRAY );
+
           UI::Draw( 
             MAIN_MENU_UI::curr_content,
-            GUI::reg.view<GUI::Element, MAIN_MENU_UI::UiFlag>(), 
-            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
+            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(), 
+            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>( entt::exclude<UI::Panel> ), 
             font_cache 
           );
         }
@@ -125,12 +123,12 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, reg, texture_cache, font_cache );
-          UI::Draw( 
-            GAME_UI::curr_content,
-            GUI::reg.view<GUI::Element, GAME_UI::UiFlag>(), 
-            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
-            font_cache 
-          );
+          // UI::Draw( 
+          //   GAME_UI::curr_content,
+          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>(), 
+          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ), 
+          //   font_cache 
+          // );
 
           DrawRectangle(
             0,
@@ -139,17 +137,22 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
 
-          DrawText(
-            "Congrats! You created your first window!",
-            190,
-            200,
-            20,
-            LIGHTGRAY );
+          UI::Draw( 
+            MODAL_MENU_UI::curr_content,
+            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(), 
+            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>( entt::exclude<UI::Panel> ), 
+            font_cache 
+          );
         }
         EndDrawing();
         break;
 
       case ProgramMode::GAME:
+        if (!game_started)  {
+          StartGame( reg, state, texture_cache );
+          game_started = true;
+        }
+
         // Update Time
         dt = GetFrameTime();
         lag += dt;
@@ -181,8 +184,8 @@ int main( void ) {
           Renderer::Draw( state, reg, texture_cache, font_cache ); 
           UI::Draw( 
             GAME_UI::curr_content,
-            GUI::reg.view<GUI::Element, GAME_UI::UiFlag>(), 
-            GUI::reg.view<GUI::Element>( entt::exclude<GUI::Panel> ), 
+            UI::reg.view<UI::Element, GAME_UI::UiFlag>(), 
+            UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ), 
             font_cache
          );
         }
@@ -197,8 +200,6 @@ int main( void ) {
   return 0;
 }
 
-void StartMenu() {}
-
 void StartGame(
   entt::registry &reg,
   State &state,
@@ -206,8 +207,12 @@ void StartGame(
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
-  UI::Init( reg );
+  GAME_UI::Init( reg );
   Renderer::Init( state );
+}
+
+void LoadGame() {
+
 }
 
 
@@ -215,7 +220,7 @@ void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
   AnimationSystem::UpdateSprites( reg, state.timeScale );
   //  Terrain::UpdateFOW(reg);
-  UI::Update( reg );
+  GAME_UI::Update( reg );
 }
 
 void LateUpdate( State &state, entt::registry &reg ) {
@@ -377,4 +382,3 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
     texture_cache );
 }
 
-bool WindowIsOpen() { return !WindowShouldClose(); }
