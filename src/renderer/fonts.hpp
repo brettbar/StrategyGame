@@ -6,10 +6,13 @@ struct FontResource {
   const Font font;
 };
 
-using FontCache = entt::resource_cache<FontResource>;
-struct FontLoader : entt::resource_loader<FontLoader, FontResource> {
-  std::shared_ptr<FontResource> load( Font font ) const {
+struct FontLoader final : entt::resource_loader<FontResource> {
+  std::shared_ptr<FontResource> operator()( Font font ) {
     // ...
     return std::shared_ptr<FontResource>( new FontResource{ font } );
+
+    // return std::make_shared<FontResource>( new FontResource{ font } );
   }
 };
+
+using FontCache = entt::resource_cache<FontResource, FontLoader>;

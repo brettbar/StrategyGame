@@ -82,19 +82,17 @@ inline void CreateTerrain( entt::registry &registry ) {
   registry.emplace<TileMap>( entity, tileMap );
 }
 
-inline void Draw(
-  Camera2D &camera,
-  entt::registry &registry,
-  TextureCache &cache ) {
+inline void
+Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
   auto tilesView = registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>( tilesEntity );
 
-  Texture2D land_tile = cache.handle( hstr{ "land_tile" } )->texture;
-  Texture2D water_tile = cache.handle( hstr{ "water_tile" } )->texture;
-  Texture2D hills_tile = cache.handle( hstr{ "hills_tile" } )->texture;
-  Texture2D sand_tile = cache.handle( hstr{ "sand_tile" } )->texture;
-  Texture2D snow_tile = cache.handle( hstr{ "snow_tile" } )->texture;
+  Texture2D land_tile = cache[hstr{ "land_tile" }]->texture;
+  Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
+  Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
+  Texture2D sand_tile = cache[hstr{ "sand_tile" }]->texture;
+  Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
 
   Rectangle frameRec = { 0.0f, 0.0f, 128, 128 };
 
@@ -117,51 +115,27 @@ inline void Draw(
     switch ( tile->biome ) {
       case Tile::MTNS:
         // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          snow_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( snow_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::HILLS:
         // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          hills_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( hills_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::LAND:
         // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          land_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( land_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::BEACH:
         // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          sand_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( sand_tile, frameRec, tile->position, WHITE );
         break;
       case Tile::WATER:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          water_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
         break;
       default:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-      DrawPerfectTexture(
-          water_tile,
-          frameRec,
-          tile->position,
-          WHITE );
+        DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
         break;
     }
 

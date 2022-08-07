@@ -176,5 +176,3 @@ inline static void DrawPerfectTexture(
 
   DrawTextureRec( texture, rect, position, tint );
 }
-
-

@@ -94,7 +94,7 @@ struct TextureLabel {
 //   Vector2 oldOffset;
 // };
 
-inline void Layout( Panel , f32 , f32 );
+inline void Layout( Panel, f32, f32 );
 inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
 inline Context context = {
@@ -103,12 +103,14 @@ inline Context context = {
 };
 
 template<typename Flag>
-inline void Draw( 
+inline void Draw(
   Panel &curr_content,
-  entt::basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<>> all_view,  
-  entt::basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<Panel>> items_view,  
-  FontCache &font_cache 
-) {
+  entt::basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<>>
+    all_view,
+  entt::
+    basic_view<entt::entity, entt::get_t<Element, Flag>, entt::exclude_t<Panel>>
+      items_view,
+  FontCache &font_cache ) {
   Vector2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -121,6 +123,8 @@ inline void Draw(
 
   // auto all_view = reg.view<Element>();
   // auto items_view = reg.view<Element>( entt::exclude<Panel> );
+
+  auto font = font_cache[hstr{ "font_romulus" }]->font;
 
   Layout( curr_content, screen_width, screen_height );
 
@@ -171,15 +175,18 @@ inline void Draw(
         auto &label = reg.get<TextLabel>( entity );
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
+
         DrawTextEx(
-          font_cache.handle(hstr{"font_romulus"})->font, 
-          label.text.c_str(), { 
+          // font_cache.handle( hstr{ "font_romulus" } )->font,
+          font,
+          label.text.c_str(),
+          {
             elem.pos.x,
             elem.pos.y + ( 0.25f * elem.dmns.y ),
-          }, 
-          label.font_size, 2.0f, 
-          label.text_color 
-        );
+          },
+          label.font_size,
+          2.0f,
+          label.text_color );
 
         // DrawText(
         //   label.text.c_str(),
@@ -194,16 +201,15 @@ inline void Draw(
         DrawRectangleV( elem.pos, elem.dmns, elem.color );
 
         DrawTextEx(
-          font_cache.handle(
-            hstr{"font_romulus"})->font, 
-            button.label.text.c_str(), { 
-              elem.pos.x,
-              elem.pos.y + ( 0.5f * elem.dmns.y ),
-            },
-            button.label.font_size, 
-            2.0f, 
-            button.label.text_color 
-        );
+          font,
+          button.label.text.c_str(),
+          {
+            elem.pos.x,
+            elem.pos.y + ( 0.5f * elem.dmns.y ),
+          },
+          button.label.font_size,
+          2.0f,
+          button.label.text_color );
 
       } break;
 
@@ -245,40 +251,6 @@ inline void Draw(
   std::string bar = "active: " + active_str;
   DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 inline void MainRowAlignChildren(
@@ -711,4 +683,4 @@ inline bool MouseWasOverUI() {
 //   return result;
 // }
 
-};// namespace GUI
+};// namespace UI

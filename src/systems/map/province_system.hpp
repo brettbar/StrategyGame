@@ -56,8 +56,7 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
     reg.emplace<Province::Component>( provEnt, i, -1, nullptr, tiles[i] );
   }
 
-  Image buildings =
-    LoadImageFromTexture( cache.handle( hstr{ "buildings" } )->texture );
+  Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );
   Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
   Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );
   Image roman_m3 = ImageFromImage( buildings, { 0, 32, 16, 16 } );
@@ -324,9 +323,7 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
 
     // Draw Settlement
     DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
-
-
- }
+  }
 }
 
 

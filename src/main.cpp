@@ -68,13 +68,15 @@ int main( void ) {
 
 
   MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
-    [&reg](const MAIN_MENU_UI::ClickEvent &event, MAIN_MENU_UI::Emitter &emitter) {
+    [&reg](
+      const MAIN_MENU_UI::ClickEvent &event,
+      MAIN_MENU_UI::Emitter &emitter ) {
       fs::path f{ "output.json" };
       if ( fs::exists( f ) ) {
         printf( "Found existing file!\n" );
         reg = Save::Load();
       }
-    });
+    } );
 
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
@@ -107,12 +109,12 @@ int main( void ) {
         {
           ClearBackground( BLACK );
 
-          UI::Draw( 
+          UI::Draw(
             MAIN_MENU_UI::curr_content,
-            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(), 
-            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>( entt::exclude<UI::Panel> ), 
-            font_cache 
-          );
+            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(),
+            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(
+              entt::exclude<UI::Panel> ),
+            font_cache );
         }
         EndDrawing();
         break;
@@ -123,11 +125,11 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, reg, texture_cache, font_cache );
-          // UI::Draw( 
+          // UI::Draw(
           //   GAME_UI::curr_content,
-          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>(), 
-          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ), 
-          //   font_cache 
+          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>(),
+          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ),
+          //   font_cache
           // );
 
           DrawRectangle(
@@ -137,18 +139,18 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
 
-          UI::Draw( 
+          UI::Draw(
             MODAL_MENU_UI::curr_content,
-            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(), 
-            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>( entt::exclude<UI::Panel> ), 
-            font_cache 
-          );
+            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(),
+            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(
+              entt::exclude<UI::Panel> ),
+            font_cache );
         }
         EndDrawing();
         break;
 
       case ProgramMode::GAME:
-        if (!game_started)  {
+        if ( !game_started ) {
           StartGame( reg, state, texture_cache );
           game_started = true;
         }
@@ -180,14 +182,14 @@ int main( void ) {
 
         // Draw everything to screen
         BeginDrawing();
-        { 
-          Renderer::Draw( state, reg, texture_cache, font_cache ); 
-          UI::Draw( 
+        {
+          Renderer::Draw( state, reg, texture_cache, font_cache );
+          UI::Draw(
             GAME_UI::curr_content,
-            UI::reg.view<UI::Element, GAME_UI::UiFlag>(), 
-            UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ), 
-            font_cache
-         );
+            UI::reg.view<UI::Element, GAME_UI::UiFlag>(),
+            UI::reg.view<UI::Element, GAME_UI::UiFlag>(
+              entt::exclude<UI::Panel> ),
+            font_cache );
         }
         EndDrawing();
         break;
@@ -211,9 +213,7 @@ void StartGame(
   Renderer::Init( state );
 }
 
-void LoadGame() {
-
-}
+void LoadGame() {}
 
 
 void Update( State &state, entt::registry &reg ) {
@@ -242,16 +242,16 @@ void Exit( TextureCache &cache ) {
 
   UnloadShader( Renderer::shader );
 
-  UnloadTexture( cache.handle( hstr{ "hexagon" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "test" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "template" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "factionOverlay" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "romanVillagerTexture" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "greekVillagerTexture" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "celtVillagerTexture" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "punicVillagerTexture" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "persianVillagerTexture" } )->texture );
-  UnloadTexture( cache.handle( hstr{ "romanVillageTexture" } )->texture );
+  UnloadTexture( cache[hstr{ "hexagon" }]->texture );
+  UnloadTexture( cache[hstr{ "test" }]->texture );
+  UnloadTexture( cache[hstr{ "template" }]->texture );
+  UnloadTexture( cache[hstr{ "factionOverlay" }]->texture );
+  UnloadTexture( cache[hstr{ "romanVillagerTexture" }]->texture );
+  UnloadTexture( cache[hstr{ "greekVillagerTexture" }]->texture );
+  UnloadTexture( cache[hstr{ "celtVillagerTexture" }]->texture );
+  UnloadTexture( cache[hstr{ "punicVillagerTexture" }]->texture );
+  UnloadTexture( cache[hstr{ "persianVillagerTexture" }]->texture );
+  UnloadTexture( cache[hstr{ "romanVillageTexture" }]->texture );
 
   cache.clear();
   CloseWindow();// Close window and OpenGL context
@@ -290,7 +290,7 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
-inline Texture2D InitTileOutline() {
+inline Image InitTileOutline() {
   Image base = GenImageColor( 129, 129, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
@@ -306,17 +306,17 @@ inline Texture2D InitTileOutline() {
   // NW -> N
   ImageDrawLineV( &base, { 0, 96 }, { 0, 32 }, YELLOW );
 
-  Texture2D texture = LoadTextureFromImage( base );
-
-  return texture;
+  return base;
 }
 
 void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
-  texture_cache.load<TextureLoader>(
-    hstr{ "tile_outline" },
-    InitTileOutline() );
+  // texture_cache.load<TextureLoader>(
+  //   hstr{ "tile_outline" },
+  //   InitTileOutline() );
 
-  font_cache.load<FontLoader>(
+  LoadResource( hstr{ "tile_outline" }, InitTileOutline(), texture_cache );
+
+  font_cache.load(
     hstr{ "font_romulus" },
     LoadFont( "assets/fonts/romulus.png" ) );
 

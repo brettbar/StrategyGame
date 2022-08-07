@@ -49,8 +49,10 @@ inline void CreateNew(
 
   entt::entity entity = reg.create();
 
-  Texture tex =
-    cache.handle( currPlayer->textureMap.at( "Villager" ) )->texture;
+  entt::resource_cache<TextureResource> temp{};
+
+  Texture2D tex = cache[currPlayer->textureMap.at( "Villager" )]->texture;
+
   Archetypes::Character character = Archetypes::Character( tex, *spawn );
 
   reg.emplace<Actor::Component>(

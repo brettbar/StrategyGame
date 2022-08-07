@@ -7,14 +7,14 @@ struct TextureResource {
   const Texture2D texture;
 };
 
-struct TextureLoader : entt::resource_loader<TextureLoader, TextureResource> {
-  std::shared_ptr<TextureResource> load( Texture2D texture ) const {
+struct TextureLoader final : entt::resource_loader<TextureResource> {
+  std::shared_ptr<TextureResource> operator()( Texture2D texture ) const {
     // ...
     return std::shared_ptr<TextureResource>( new TextureResource{ texture } );
   }
 };
 
-using TextureCache = entt::resource_cache<TextureResource>;
+using TextureCache = entt::resource_cache<TextureResource, TextureLoader>;
 
 inline void LoadResource( hstr id, Image image, TextureCache &cache ) {
   Texture2D tex = LoadTextureFromImage( image );
@@ -56,5 +56,5 @@ inline void LoadResource( hstr id, Image image, TextureCache &cache ) {
   //   tex.id,
   //   *mipmap );
 
-  cache.load<TextureLoader>( id, tex );
+  cache.load( id, tex );
 }

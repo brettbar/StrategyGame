@@ -31,7 +31,7 @@ inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
     Province::Component &prov = provsView.get<Province::Component>( entity );
     if ( isDebug ) {
       DrawTexture(
-        cache.handle( hstr{ "tile_outline" } )->texture,
+        cache[hstr{ "tile_outline" }]->texture,
         prov.tile->position.x,
         prov.tile->position.y,
         WHITE );
