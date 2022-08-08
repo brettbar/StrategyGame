@@ -6,23 +6,28 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+
 project(game)
 
-find_package(raylib 4.0.0 QUIET) # QUIET or REQUIRED
-if (NOT raylib_FOUND) # If there's none, fetch and build raylib
-  include(FetchContent)
-  FetchContent_Declare(
-    raylib
-    URL https://github.com/raysan5/raylib/archive/refs/tags/4.0.0.tar.gz
-  )
-  FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
-    set(FETCHCONTENT_QUIET NO)
-    FetchContent_Populate(raylib)
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
-    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-  endif()
-endif()
+# find_package(raylib 4.0.0 REQUIRED) # QUIET or REQUIRED
+# find_package(raylib 4.0.0 QUIET) # QUIET or REQUIRED
+# if (NOT raylib_FOUND) # If there's none, fetch and build raylib
+#     set(CUSTOMIZE_BUILD ON)
+#     set(SUPPORT_FILEFORMAT_BMP ON)
+#   include(FetchContent)
+#   FetchContent_Declare(
+#     raylib
+#     URL https://github.com/raysan5/raylib/archive/refs/tags/4.0.0.tar.gz
+#   )
+#   FetchContent_GetProperties(raylib)
+#   if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+#     set(FETCHCONTENT_QUIET NO)
+#     FetchContent_Populate(raylib)
+#     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
+#     add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+#   endif()
+# endif()
 
 add_executable(
   ${PROJECT_NAME} src/main.cpp
@@ -60,6 +65,12 @@ add_executable(
 # )
 
 if(UNIX)
+  add_library(raylib SHARED IMPORTED)
+  set_target_properties(raylib PROPERTIES
+    IMPORTED_LOCATION_NOCONFIG "/usr/local/lib/libraylib.a"
+    IMPORTED_SONAME_NOCONFIG "libraylib.so.400"
+  )
+
   target_link_libraries(${PROJECT_NAME} raylib)
   # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
   # target_link_libraries(server GameNetworkingSockets)

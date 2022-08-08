@@ -5,6 +5,7 @@
 #include <map>
 #include <raylib.h>
 #include <raymath.h>
+#include <rlgl.h>
 #include <vector>
 
 using ECS = entt::registry;
@@ -168,11 +169,14 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
 }
 
 inline static void DrawPerfectTexture(
-  Texture2D texture,
+  Texture2D &texture,
   Rectangle rect,
   Vector2 position,
   Color tint ) {
   SetTextureFilter( texture, TEXTURE_FILTER_BILINEAR );
+
+  // SetTextureWrap( texture, TEXTURE_WRAP_MIRROR_REPEAT );
+  // SetTextureFilter( texture, TEXTURE_FILTER_POINT );
 
   DrawTextureRec( texture, rect, position, tint );
 }

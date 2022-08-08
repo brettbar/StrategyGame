@@ -17,6 +17,10 @@ namespace Terrain {
 const u32 MAP_WIDTH = 128;
 const u32 MAP_HEIGHT = 128;
 
+const f32 TILE_WIDTH = 64;
+const f32 TILE_HEIGHT = 64;
+
+
 using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
 using TileMap = std::array<
   std::shared_ptr<Tile::Component>,
@@ -41,6 +45,7 @@ inline void CreateTerrain( entt::registry &registry ) {
   NormalizeMap( pNoise );
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+    // for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
     std::shared_ptr<Tile::Component> tile = std::make_shared<Tile::Component>();
     // tile.id = x + y * 128;
     tile->id = i;
@@ -48,11 +53,11 @@ inline void CreateTerrain( entt::registry &registry ) {
     u32 x = i % MAP_WIDTH;
     u32 y = i / MAP_HEIGHT;
 
-    f32 xPos = x * 128;
-    f32 yPos = y * 96;
+    f32 xPos = x * TILE_WIDTH;
+    f32 yPos = y * TILE_HEIGHT * 0.75;
 
     if ( y % 2 == 1 )
-      tile->position = { xPos + 64, yPos };
+      tile->position = { xPos + ( TILE_WIDTH / 2 ), yPos };
     else
       tile->position = { xPos, yPos };
 
@@ -74,13 +79,16 @@ inline void CreateTerrain( entt::registry &registry ) {
     else
       tile->biome = Tile::WATER;
 
-    tile->center = { tile->position.x + 64, tile->position.y + 64 };
+    tile->center = {
+      tile->position.x + ( TILE_WIDTH / 2 ),
+      tile->position.y + ( TILE_HEIGHT / 2 ) };
     tile->coords = { x, y };
     tile->visibility = Tile::UNEXPLORED;
     tileMap[index( x, y )] = tile;
   }
   registry.emplace<TileMap>( entity, tileMap );
 }
+
 
 inline void
 Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
@@ -94,20 +102,21 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
   Texture2D sand_tile = cache[hstr{ "sand_tile" }]->texture;
   Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
 
-  Rectangle frameRec = { 0.0f, 0.0f, 128, 128 };
+  Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
   for ( std::shared_ptr<Tile::Component> tile: tileMap ) {
-    f32 padding = 128.0f;
+
     if (
-      tile->position.x - padding >
+      tile->position.x - TILE_WIDTH >
         camera.target.x + ( camera.offset.x / camera.zoom ) ||
-      tile->position.x + padding <
+      tile->position.x + TILE_WIDTH <
         camera.target.x - ( camera.offset.x / camera.zoom ) ||
-      tile->position.y - padding >
+      tile->position.y - TILE_WIDTH >
         camera.target.y + ( camera.offset.y / camera.zoom ) ||
-      tile->position.y + padding <
-        camera.target.y - ( camera.offset.y / camera.zoom ) )
+      tile->position.y + TILE_WIDTH <
+        camera.target.y - ( camera.offset.y / camera.zoom ) ) {
       continue;
+    }
 
 
     //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);

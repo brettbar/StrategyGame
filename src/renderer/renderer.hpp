@@ -7,6 +7,7 @@
 #include "../systems/ui/overlay_system.hpp"
 #include "fonts.hpp"
 #include "textures.hpp"
+
 #include <raylib.h>
 
 namespace Renderer {
@@ -17,11 +18,12 @@ inline void Init( State &state ) {
 
   Renderer::shader =
     LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
+  // LoadShader( 0, 0 );
 
   state.camera = Camera2D{
     .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
     .target =
-      { ( state.mapWidth * 128.0f ) / 2, ( state.mapHeight * 128.0f ) / 2 },
+      { ( state.mapWidth * 64.0f ) / 2, ( state.mapHeight * 64.0f ) / 2 },
     .rotation = 0,
     .zoom = 2.0f,
   };
@@ -37,28 +39,35 @@ inline void Draw(
 
   BeginMode2D( state.camera );
 
-  BeginShaderMode( shader );
+  BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
   {
-    Terrain::Draw( state.camera, reg, texture_cache );
-  }
-  EndShaderMode();
 
-  OverlaySystem::Draw( reg, texture_cache, font_cache );
-
-  BeginShaderMode( shader );
-  {
-    switch ( MapSystem::mode ) {
-      case MapSystem::Mode::TERRAIN:
-        ProvinceSystem::DrawProvinces( reg, texture_cache, false );
-        break;
-      case MapSystem::Mode::POLITICAL:
-        ProvinceSystem::DrawProvinces( reg, texture_cache, true );
-        break;
+    BeginShaderMode( shader );
+    {
+      // Draw Terrain
+      Terrain::Draw( state.camera, reg, texture_cache );
     }
+    EndShaderMode();
 
-    AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+    // Overlay shouldn't be ran through shader?
+    OverlaySystem::Draw( reg, texture_cache, font_cache );
+
+    BeginShaderMode( shader );
+    {
+      switch ( MapSystem::mode ) {
+        case MapSystem::Mode::TERRAIN:
+          ProvinceSystem::DrawProvinces( reg, texture_cache, false );
+          break;
+        case MapSystem::Mode::POLITICAL:
+          ProvinceSystem::DrawProvinces( reg, texture_cache, true );
+          break;
+      }
+
+      AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+    }
+    EndShaderMode();
   }
-  EndShaderMode();
+  EndBlendMode();
 
 
   SelectionSystem::Draw(

@@ -215,7 +215,6 @@ void StartGame(
 
 void LoadGame() {}
 
-
 void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
   AnimationSystem::UpdateSprites( reg, state.timeScale );
@@ -322,23 +321,23 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
 
   LoadResource(
     hstr{ "land_tile" },
-    LoadImage( "assets/textures/hexagons/Earth.png" ),
+    LoadImage( "assets/textures/hexagons/Grass.bmp" ),
     texture_cache );
   LoadResource(
     hstr{ "water_tile" },
-    LoadImage( "assets/textures/hexagons/Water.png" ),
+    LoadImage( "assets/textures/hexagons/Ocean.bmp" ),
     texture_cache );
   LoadResource(
     hstr{ "hills_tile" },
-    LoadImage( "assets/textures/hexagons/Mud.png" ),
+    LoadImage( "assets/textures/hexagons/Hills.bmp" ),
     texture_cache );
   LoadResource(
     hstr{ "sand_tile" },
-    LoadImage( "assets/textures/hexagons/Sand.png" ),
+    LoadImage( "assets/textures/hexagons/Sand.bmp" ),
     texture_cache );
   LoadResource(
     hstr{ "snow_tile" },
-    LoadImage( "assets/textures/hexagons/Snow.png" ),
+    LoadImage( "assets/textures/hexagons/Snow.bmp" ),
     texture_cache );
 
   LoadResource(
