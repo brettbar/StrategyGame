@@ -4,6 +4,7 @@
 #include "../components/animated.hpp"
 #include "../components/unit.hpp"
 #include "movement_system.hpp"
+#include <raylib.h>
 
 namespace AnimationSystem {
 
@@ -25,11 +26,44 @@ inline void Draw( entt::registry &registry, bool debug ) {
     //        {unit.position.x - 64.0f, unit.position.y - 64.0f},
     //        WHITE);
 
+
+    // float outline_size = 2.0f;
+    // float outline_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+    // float texture_size[2] = { (f32) anim.sprite.width, (f32) anim.sprite.height };
+
+    // i32 outline_size_loc = GetShaderLocation( outline_shader, "outlineSize" );
+    // i32 outline_color_loc = GetShaderLocation( outline_shader, "outlineColor" );
+    // i32 texture_size_loc = GetShaderLocation( outline_shader, "textureSize" );
+
+    // SetShaderValue(
+    //   outline_shader,
+    //   outline_size_loc,
+    //   &outline_size,
+    //   SHADER_UNIFORM_FLOAT );
+    // SetShaderValue(
+    //   outline_shader,
+    //   outline_color_loc,
+    //   outline_color,
+    //   SHADER_UNIFORM_VEC4 );
+    // SetShaderValue(
+    //   outline_shader,
+    //   texture_size_loc,
+    //   texture_size,
+    //   SHADER_UNIFORM_VEC2 );
+
     DrawPerfectTexture(
       anim.sprite,
       anim.frameRec,
       { unit.position.x - 64.0f, unit.position.y - 64.0f },
       WHITE );
+
+    // DrawPerfectTexture(
+    //   anim.sprite,
+    //   anim.frameRec,
+    //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+    //   WHITE );
+
+
     // DrawTextureRec(
     //   anim.sprite,
     //   anim.frameRec,

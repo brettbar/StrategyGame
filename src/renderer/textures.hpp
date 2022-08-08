@@ -20,7 +20,5 @@ using TextureCache = entt::resource_cache<TextureResource, TextureLoader>;
 inline void LoadResource( hstr id, Image image, TextureCache &cache ) {
   ImageAlphaPremultiply( &image );
   Texture2D tex = LoadTextureFromImage( image );
-
-
   cache.load( id, tex );
 }

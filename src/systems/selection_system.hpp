@@ -17,15 +17,16 @@ inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
   auto unitsView = reg.view<Selected::Component, Unit::Component>();
   auto provsView = reg.view<Selected::Component, Province::Component>();
 
-  for ( auto entity: unitsView ) {
-    Unit::Component &unit = unitsView.get<Unit::Component>( entity );
-    if ( isDebug ) {
-      DrawRectangleLinesEx(
-        { unit.position.x - 32, unit.position.y - 32, 64, 64 },
-        2,
-        YELLOW );
-    }
-  }
+  // for ( auto entity: unitsView ) {
+  //   Unit::Component &unit = unitsView.get<Unit::Component>( entity );
+  //   if ( isDebug ) {
+
+  //     // DrawRectangleLinesEx(
+  //     //   { unit.position.x - 32, unit.position.y - 32, 64, 64 },
+  //     //   2,
+  //     //   YELLOW );
+  //   }
+  // }
 
   for ( auto entity: provsView ) {
     Province::Component &prov = provsView.get<Province::Component>( entity );
@@ -59,8 +60,16 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
 
     Unit::Component &unit = unitsView.get<Unit::Component>( entity );
 
-    if ( CheckCollisionPointCircle( unit.position, clickPos, 64 ) ) {
+    if ( CheckCollisionPointCircle( unit.position, clickPos, 32 ) ) {
       reg.emplace<Selected::Component>( entity, true );
+
+
+      for ( auto &entity: unitsView ) {
+        Unit::Component &unit = unitsView.get<Unit::Component>( entity );
+        unit.selected = false;
+      }
+
+      unit.selected = true;
       alreadyFoundOne = true;
     }
   }

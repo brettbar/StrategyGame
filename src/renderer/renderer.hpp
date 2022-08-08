@@ -13,12 +13,33 @@
 namespace Renderer {
 
 inline Shader shader;
+inline Shader outline_shader;
+
+inline void TempDraw( entt::registry &registry, bool debug );
 
 inline void Init( State &state ) {
 
-  Renderer::shader =
-    LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
+  shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
   // LoadShader( 0, 0 );
+  outline_shader = LoadShader( 0, "assets/shaders/outline.fs" );
+
+  i32 outline_size_loc = GetShaderLocation( outline_shader, "outlineSize" );
+  i32 outline_color_loc = GetShaderLocation( outline_shader, "outlineColor" );
+
+  float outline_size = 4.0f;
+  float outline_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+  SetShaderValue(
+    outline_shader,
+    outline_size_loc,
+    &outline_size,
+    SHADER_UNIFORM_FLOAT );
+  SetShaderValue(
+    outline_shader,
+    outline_color_loc,
+    outline_color,
+    SHADER_UNIFORM_VEC4 );
+
 
   state.camera = Camera2D{
     .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
@@ -62,20 +83,75 @@ inline void Draw(
           ProvinceSystem::DrawProvinces( reg, texture_cache, true );
           break;
       }
-
-      AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
     }
+    // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
     EndShaderMode();
+
+    TempDraw( reg, state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
 
-  SelectionSystem::Draw(
-    reg,
-    texture_cache,
-    state.gameState == GameState::EDITOR );
+  // SelectionSystem::Draw(
+  //   reg,
+  //   texture_cache,
+  //   state.gameState == GameState::EDITOR );
 
   EndMode2D();
+}
+
+inline void TempDraw( entt::registry &registry, bool debug ) {
+  entt::basic_view villagers =
+    registry.view<Unit::Component, Animated::Component>();
+
+  registry.sort<Unit::Component>(
+    []( const Unit::Component &lhs, const Unit::Component &rhs ) {
+      return rhs.position.y > lhs.position.y;
+    } );
+
+  villagers.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
+    //    DrawTextureV(
+    //        unit.sprite,
+    //        {unit.position.x - 64.0f, unit.position.y - 64.0f},
+    //        WHITE);
+
+
+    if ( unit.selected ) {
+
+      BeginShaderMode( outline_shader );
+      DrawPerfectTexture(
+        anim.sprite,
+        anim.frameRec,
+        { unit.position.x - 64.0f, unit.position.y - 64.0f },
+        WHITE );
+      EndShaderMode();
+    } else {
+      BeginShaderMode( shader );
+      DrawPerfectTexture(
+        anim.sprite,
+        anim.frameRec,
+        { unit.position.x - 64.0f, unit.position.y - 64.0f },
+        WHITE );
+      EndShaderMode();
+    }
+
+    // DrawPerfectTexture(
+    //   anim.sprite,
+    //   anim.frameRec,
+    //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+    //   WHITE );
+
+
+    // DrawTextureRec(
+    //   anim.sprite,
+    //   anim.frameRec,
+    //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+    //   WHITE );
+
+    if ( debug && Vector2Distance( unit.position, unit.destination ) > 0.5f ) {
+      DrawLineEx( unit.position, unit.destination, 2, MAGENTA );
+    }
+  } );
 }
 
 
