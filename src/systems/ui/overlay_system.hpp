@@ -20,13 +20,45 @@ inline void Draw(
     if (
       prov.owner > -1 && prov.settlement != nullptr &&
       prov.settlement->population.current > 0 ) {
-      Rectangle frameRec = { 0.0, 0.0, 128, 128.0 };
+      Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
-      DrawTextureRec(
-        texture_cache[hstr{ "factionOverlay" }]->texture,
-        frameRec,
-        prov.tile->position,
-        Fade( WHITE, 0.5 ) );
+      switch ( prov.owner ) {
+        case 0:
+          DrawTextureRec(
+            texture_cache[hstr{ "redOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case 1:
+          DrawTextureRec(
+            texture_cache[hstr{ "blueOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case 2:
+          DrawTextureRec(
+            texture_cache[hstr{ "greenOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case 3:
+          DrawTextureRec(
+            texture_cache[hstr{ "purpleOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case 4:
+          DrawTextureRec(
+            texture_cache[hstr{ "orangeOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+      }
 
       // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
 

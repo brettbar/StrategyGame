@@ -50,7 +50,7 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
 
 
-  for ( u32 i = 0; i < Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT; i++ ) {
+  for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
     entt::entity provEnt = reg.create();
 
     reg.emplace<Province::Component>( provEnt, i, -1, nullptr, tiles[i] );
@@ -278,7 +278,7 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
 
     Color color = BLACK;
 
-    Rectangle frameRec = { 0.0, 0.0, 128, 128.0 };
+    Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
     switch ( prov.owner ) {
       case 0:

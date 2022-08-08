@@ -241,16 +241,9 @@ void Exit( TextureCache &cache ) {
 
   UnloadShader( Renderer::shader );
 
-  UnloadTexture( cache[hstr{ "hexagon" }]->texture );
-  UnloadTexture( cache[hstr{ "test" }]->texture );
-  UnloadTexture( cache[hstr{ "template" }]->texture );
-  UnloadTexture( cache[hstr{ "factionOverlay" }]->texture );
-  UnloadTexture( cache[hstr{ "romanVillagerTexture" }]->texture );
-  UnloadTexture( cache[hstr{ "greekVillagerTexture" }]->texture );
-  UnloadTexture( cache[hstr{ "celtVillagerTexture" }]->texture );
-  UnloadTexture( cache[hstr{ "punicVillagerTexture" }]->texture );
-  UnloadTexture( cache[hstr{ "persianVillagerTexture" }]->texture );
-  UnloadTexture( cache[hstr{ "romanVillageTexture" }]->texture );
+  for ( auto resource: cache ) {
+    UnloadTexture( resource.second->texture );
+  }
 
   cache.clear();
   CloseWindow();// Close window and OpenGL context
@@ -341,8 +334,24 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
     texture_cache );
 
   LoadResource(
-    hstr{ "factionOverlay" },
-    LoadImage( "assets/textures/overlays.png" ),
+    hstr{ "redOverlay" },
+    LoadImage( "assets/textures/overlays/Red.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "blueOverlay" },
+    LoadImage( "assets/textures/overlays/Blue.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "greenOverlay" },
+    LoadImage( "assets/textures/overlays/Green.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "purpleOverlay" },
+    LoadImage( "assets/textures/overlays/Purple.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "orangeOverlay" },
+    LoadImage( "assets/textures/overlays/Orange.png" ),
     texture_cache );
 
   LoadResource(

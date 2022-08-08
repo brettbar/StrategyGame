@@ -25,6 +25,12 @@ struct UVector2 {
   u32 y;
 };
 
+const f32 TILE_WIDTH = 64;
+const f32 TILE_HEIGHT = 64;
+const u32 MAP_WIDTH = 128;
+const u32 MAP_HEIGHT = 128;
+
+
 inline i32 DetermineTileIdFromClick( Vector2 );
 inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 
@@ -47,23 +53,23 @@ inline i32 DetermineTileIdFromClick( Vector2 clickPos ) {
 
     return -1;
 
-  i32 row = target->y / 96.0;
+  i32 row = target->y / 48.0;
   i32 column;
 
   if ( row % 2 == 1 ) {
-    column = ( target->x - 64.0 ) / 128.0;
+    column = ( target->x - 32.0 ) / 64.0;
   } else {
-    column = target->x / 128.0;
+    column = target->x / 64.0;
   }
 
-  return column + row * 128;
+  return column + row * MAP_WIDTH;
 }
 
 inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   i32 x = inputPos.x;
   i32 y = inputPos.y;
-  i32 gridHeight = 96;
-  i32 gridWidth = 128;
+  i32 gridHeight = 48;
+  i32 gridWidth = 64;
   i32 halfWidth = gridWidth / 2;
 
   // Find the row and column of the box that the point falls in.
@@ -88,7 +94,7 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   else
     relX = x - ( column * gridWidth );
 
-  f32 c = 32.0;
+  f32 c = 16.0;
   f32 m = c / halfWidth;
 
   // Work out if the point is above either of the hexagon's top edges
@@ -104,11 +110,11 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
       column++;
   }
 
-  f32 tileOrigX = ( column * 128.0 ) + 64.0;
-  f32 tileOrigY = ( row * 96.0 ) + 64.0;
+  f32 tileOrigX = ( column * 64.0 ) + 32.0;
+  f32 tileOrigY = ( row * 48.0 ) + 32.0;
 
   if ( row % 2 == 1 ) {
-    tileOrigX += 64.0;
+    tileOrigX += 32.0;
   }
   return std::make_unique<Vector2>( Vector2{ tileOrigX, tileOrigY } );
 }
@@ -116,8 +122,8 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
 inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   i32 x = inputPos.x;
   i32 y = inputPos.y;
-  i32 gridHeight = 96;
-  i32 gridWidth = 128;
+  i32 gridHeight = 48;
+  i32 gridWidth = 64;
   i32 halfWidth = gridWidth / 2;
 
   // Find the row and column of the box that the point falls in.
@@ -142,7 +148,7 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   else
     relX = x - ( column * gridWidth );
 
-  f32 c = 32.0;
+  f32 c = 16.0;
   f32 m = c / halfWidth;
 
   // Work out if the point is above either of the hexagon's top edges

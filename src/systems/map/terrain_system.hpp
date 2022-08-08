@@ -14,17 +14,10 @@
 #include <string>
 
 namespace Terrain {
-const u32 MAP_WIDTH = 128;
-const u32 MAP_HEIGHT = 128;
-
-const f32 TILE_WIDTH = 64;
-const f32 TILE_HEIGHT = 64;
-
 
 using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
-using TileMap = std::array<
-  std::shared_ptr<Tile::Component>,
-  Terrain::MAP_WIDTH * Terrain::MAP_HEIGHT>;
+using TileMap =
+  std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
 inline void CreateTerrain( entt::registry & );
 inline void Draw( Camera2D &, entt::registry &, TextureCache & );
@@ -54,7 +47,7 @@ inline void CreateTerrain( entt::registry &registry ) {
     u32 y = i / MAP_HEIGHT;
 
     f32 xPos = x * TILE_WIDTH;
-    f32 yPos = y * TILE_HEIGHT * 0.75;
+    f32 yPos = y * ( TILE_HEIGHT * 0.75 );
 
     if ( y % 2 == 1 )
       tile->position = { xPos + ( TILE_WIDTH / 2 ), yPos };
