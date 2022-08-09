@@ -53,7 +53,15 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
     entt::entity provEnt = reg.create();
 
-    reg.emplace<Province::Component>( provEnt, i, -1, nullptr, tiles[i] );
+    Province::Settlement settlement = {
+      i,
+      "",
+      Province::Development::Uninhabited,
+      {},
+      LoadTextureFromImage( GenImageColor( 32, 32, WHITE ) ),
+    };
+
+    reg.emplace<Province::Component>( provEnt, i, -1, settlement, tiles[i] );
   }
 
   Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );
@@ -90,8 +98,8 @@ inline void UpdateProvinces( State &state, entt::registry &reg ) {
   for ( auto &ent: view ) {
     Province::Component &prov = view.get<Province::Component>( ent );
 
-    if ( prov.owner > -1 && prov.settlement != nullptr )
-      UpdateSettlement( *prov.settlement );
+    if ( prov.owner > -1 )
+      UpdateSettlement( prov.settlement );
   }
 }
 
@@ -160,7 +168,7 @@ inline bool UpdatePopulation( Province::Settlement &settlement ) {
 }
 
 inline void
-SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
+AssignProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   i32 provId = DetermineTileIdFromClick( clickPos );
   assert( provId >= 0 );
 
@@ -169,16 +177,14 @@ SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if (
-      prov.id != (u32) provId || prov.tile->biome == Tile::WATER ||
-      prov.settlement != nullptr )
+    if ( prov.id != (u32) provId || prov.tile->biome == Tile::WATER )
       continue;
 
     prov.owner = owner;
 
-    prov.settlement = std::make_unique<Province::Settlement>();
-    prov.settlement->id = prov.id;
-    prov.settlement->population = {
+    prov.settlement = Province::Settlement();
+    prov.settlement.id = prov.id;
+    prov.settlement.population = {
       .current = 200,
       .birthRate = 40,
       .deathRate = 10,
@@ -188,7 +194,7 @@ SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
 
     switch ( prov.owner ) {
       case 0: {
-        prov.settlement->name = "Rome";
+        prov.settlement.name = "Rome";
         u32 choice = RollN( 4 );
         printf( "choice %d\n", choice );
 
@@ -199,25 +205,26 @@ SpawnProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
         printf( "c_str %s", bar );
 
         Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+        ImageAlphaPremultiply( &base );
         ImageDraw(
           &base,
           building_map.at( bar ),
           { 0, 0, 16, 16 },
           { 0, 0, 16, 16 },
           WHITE );
-        prov.settlement->texture = LoadTextureFromImage( base );
+        prov.settlement.texture = LoadTextureFromImage( base );
       } break;
       case 1:
-        prov.settlement->name = "Athens";
+        prov.settlement.name = "Athens";
         break;
       case 2:
-        prov.settlement->name = "Lugudunon";
+        prov.settlement.name = "Lugudunon";
         break;
       case 3:
-        prov.settlement->name = "Carthage";
+        prov.settlement.name = "Carthage";
         break;
       case 4:
-        prov.settlement->name = "Persepolis";
+        prov.settlement.name = "Persepolis";
         break;
     }
   }
@@ -234,7 +241,7 @@ inline void SetProvinceOwner( entt::registry &reg, u32 owner ) {
 
   Unit::Component &unit = selectedView.get<Unit::Component>( selectedEntity );
 
-  SpawnProvince( reg, owner, unit.position );
+  AssignProvince( reg, owner, unit.position );
 }
 
 
@@ -271,49 +278,13 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
     //   14,
     //            RED);
 
-    if (
-      prov.owner <= -1 || prov.settlement == nullptr ||
-      prov.settlement->population.current <= 0 )
+    if ( prov.owner <= -1 || prov.settlement.population.current <= 0 )
       continue;
-
-    Color color = BLACK;
-
-    Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
-
-    switch ( prov.owner ) {
-      case 0:
-        color = RED;
-        frameRec.x = 0.0f;
-        break;
-      case 1:
-        color = SKYBLUE;
-        frameRec.x = 128.0f;
-        break;
-      case 2:
-        color = GREEN;
-        frameRec.x = 256.0f;
-        break;
-      case 3:
-        color = PURPLE;
-        frameRec.x = 384.0f;
-        break;
-      case 4:
-        color = ORANGE;
-        frameRec.x = 513.0f;
-        break;
-    }
-
-    // if ( showOverlays )
-    //   DrawTextureRec(
-    //     cache.handle( hstr{ "factionOverlay" } )->texture,
-    //     frameRec,
-    //     prov.tile->position,
-    //     Fade( WHITE, 0.5 ) );
 
 
     Vector2 settlement_pos = {
-      prov.tile->position.x + 48,
-      prov.tile->position.y + 48,
+      prov.tile->position.x + 24,
+      prov.tile->position.y + 24,
     };
 
     // DrawRectangleRec({provPos.x + 50,
@@ -322,7 +293,7 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
     // DrawSingleBorder(tile);
 
     // Draw Settlement
-    DrawTextureV( prov.settlement->texture, settlement_pos, WHITE );
+    DrawTextureV( prov.settlement.texture, settlement_pos, WHITE );
   }
 }
 

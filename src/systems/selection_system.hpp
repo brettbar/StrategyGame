@@ -51,6 +51,11 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
 
   reg.clear<Selected::Component>();
 
+  for ( auto &entity: unitsView ) {
+    Unit::Component &unit = unitsView.get<Unit::Component>( entity );
+    unit.selected = false;
+  }
+
   bool alreadyFoundOne = false;
 
   // use forward iterators and get only the components of interest
@@ -64,15 +69,12 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
       reg.emplace<Selected::Component>( entity, true );
 
 
-      for ( auto &entity: unitsView ) {
-        Unit::Component &unit = unitsView.get<Unit::Component>( entity );
-        unit.selected = false;
-      }
-
       unit.selected = true;
       alreadyFoundOne = true;
     }
   }
+
+  u32 tile = DetermineTileIdFromClick( clickPos );
 
   for ( auto &entity: provView ) {
     if ( alreadyFoundOne )
@@ -80,17 +82,22 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
 
     Province::Component &prov = provView.get<Province::Component>( entity );
 
-    if ( CheckCollisionPointCircle(
-           Vector2{ prov.tile->position.x + 32, prov.tile->position.y + 32 },
-           clickPos,
-           64 ) ) {
-      if ( prov.settlement == nullptr )
-        continue;
-
-
+    if ( tile == prov.tile->id ) {
       reg.emplace<Selected::Component>( entity, true );
+
       alreadyFoundOne = true;
     }
+
+    // if ( CheckCollisionPointCircle(
+    //        Vector2{ prov.tile->position.x + 32, prov.tile->position.y + 32 },
+    //        clickPos,
+    //        64 ) ) {
+
+
+    //   reg.emplace<Selected::Component>( entity, true );
+
+    //   alreadyFoundOne = true;
+    // }
   }
 }
 

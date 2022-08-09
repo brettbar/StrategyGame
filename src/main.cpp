@@ -9,6 +9,8 @@ TEMPORARY TODOS HERE
     per type per frame, then pass that as ref or val?
   @TODO a more general clean up of the code
 */
+#include <raylib.h>
+
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
@@ -23,11 +25,10 @@ TEMPORARY TODOS HERE
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
-#include "systems/ui/ui_system.hpp"
+#include "systems/ui/irongui/irongui.hpp"
 #include "systems/ui/modal_menu.hpp"
 #include "systems/ui/game_ui_system.hpp"
 
-#include <raylib.h>
 #include "filesystem"
 
 namespace fs = std::filesystem;
@@ -109,11 +110,11 @@ int main( void ) {
         {
           ClearBackground( BLACK );
 
-          UI::Draw(
+          IRONGUI::Draw(
             MAIN_MENU_UI::curr_content,
-            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(),
-            UI::reg.view<UI::Element, MAIN_MENU_UI::UiFlag>(
-              entt::exclude<UI::Panel> ),
+            IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(),
+            IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(
+              entt::exclude<IRONGUI::Panel> ),
             font_cache );
         }
         EndDrawing();
@@ -125,10 +126,10 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, reg, texture_cache, font_cache );
-          // UI::Draw(
+          // IRONGUI::Draw(
           //   GAME_UI::curr_content,
-          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>(),
-          //   UI::reg.view<UI::Element, GAME_UI::UiFlag>( entt::exclude<UI::Panel> ),
+          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
+          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>( entt::exclude<IRONGUI::Panel> ),
           //   font_cache
           // );
 
@@ -139,11 +140,11 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
 
-          UI::Draw(
+          IRONGUI::Draw(
             MODAL_MENU_UI::curr_content,
-            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(),
-            UI::reg.view<UI::Element, MODAL_MENU_UI::UiFlag>(
-              entt::exclude<UI::Panel> ),
+            IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(),
+            IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(
+              entt::exclude<IRONGUI::Panel> ),
             font_cache );
         }
         EndDrawing();
@@ -184,11 +185,11 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, reg, texture_cache, font_cache );
-          UI::Draw(
+          IRONGUI::Draw(
             GAME_UI::curr_content,
-            UI::reg.view<UI::Element, GAME_UI::UiFlag>(),
-            UI::reg.view<UI::Element, GAME_UI::UiFlag>(
-              entt::exclude<UI::Panel> ),
+            IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
+            IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
+              entt::exclude<IRONGUI::Panel> ),
             font_cache );
         }
         EndDrawing();
@@ -283,20 +284,20 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
 }
 
 inline Image InitTileOutline() {
-  Image base = GenImageColor( 129, 129, ColorAlpha( WHITE, 0.0 ) );
+  Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
-  ImageDrawLineV( &base, { 0, 32 }, { 64, 0 }, YELLOW );
+  ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
   // NE -> SE
-  ImageDrawLineV( &base, { 128, 32 }, { 128, 96 }, YELLOW );
+  ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
   // SE -> S
-  ImageDrawLineV( &base, { 64, 0 }, { 128, 32 }, YELLOW );
+  ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
   // S -> SW
-  ImageDrawLineV( &base, { 128, 96 }, { 64, 128 }, YELLOW );
+  ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
   // SW -> NW
-  ImageDrawLineV( &base, { 64, 128 }, { 0, 96 }, YELLOW );
+  ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
   // NW -> N
-  ImageDrawLineV( &base, { 0, 96 }, { 0, 32 }, YELLOW );
+  ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
 
   return base;
 }

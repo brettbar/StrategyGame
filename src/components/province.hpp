@@ -6,6 +6,7 @@
 namespace Province {
 
 enum Development {
+  Uninhabited,
   Village,
   // Civic
   Town,
@@ -68,7 +69,7 @@ struct Component {
   u32 id;
   i32 owner;
 
-  std::unique_ptr<Settlement> settlement;
+  Settlement settlement;
   std::shared_ptr<Tile::Component> tile;
 };
 

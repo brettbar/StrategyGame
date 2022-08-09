@@ -33,7 +33,7 @@ add_executable(
   ${PROJECT_NAME} src/main.cpp
   src/renderer/renderer.hpp
   src/systems/player_system.hpp
-  src/systems/ui/ui_system.hpp
+  src/systems/ui/irongui/irongui.hpp
   src/systems/ui/modal_menu.hpp
   src/systems/ui/game_ui_system.hpp
   src/systems/map/map_system.hpp

@@ -8,7 +8,7 @@
 #include "../../renderer/fonts.hpp"
 #include "../event_system.hpp"
 
-#include "ui_system.hpp"
+#include "irongui/irongui.hpp"
 #include "game_ui.hpp"
 #include "main_menu_ui.hpp"
 
@@ -16,15 +16,15 @@ namespace GAME_UI {
 
 inline void SelectListener( entt::registry &, entt::entity );
 inline void DeSelectListener();
-inline void Init( entt::registry &);
+inline void Init( entt::registry & );
 inline void Update( entt::registry & );
-// inline void HandleFloatingPanel( UI::Panel &, Vector2 );
+// inline void HandleFloatingPanel( IRONGUI::Panel &, Vector2 );
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {
 
     auto stats = ui_lookup.at( "settlement_stats" );
-    UI::Element &elem = UI::reg.get<UI::Element>( stats );
+    IRONGUI::Element &elem = IRONGUI::reg.get<IRONGUI::Element>( stats );
 
     elem.enabled = true;
 
@@ -33,13 +33,13 @@ inline void SelectListener( entt::registry &reg, entt::entity entity ) {
     printf( "Actor: %s \n", actor.name );
 
     entt::entity context_label = ui_lookup.at( "context_label" );
-    UI::reg.get<UI::TextLabel>( context_label ).text = actor.name;
+    IRONGUI::reg.get<IRONGUI::TextLabel>( context_label ).text = actor.name;
   }
 }
 
 inline void DeSelectListener() {
   auto stats = ui_lookup.at( "settlement_stats" );
-  UI::Element &elem = UI::reg.get<UI::Element>( stats );
+  IRONGUI::Element &elem = IRONGUI::reg.get<IRONGUI::Element>( stats );
   elem.enabled = false;
 }
 
@@ -50,7 +50,7 @@ inline void Init( entt::registry &reg ) {
 
 inline void Update( entt::registry &reg ) {
   entt::entity stats = ui_lookup.at( "settlement_stats" );
-  UI::Element &elem = UI::reg.get<UI::Element>( stats );
+  IRONGUI::Element &elem = IRONGUI::reg.get<IRONGUI::Element>( stats );
 
   if ( elem.enabled ) {
     auto prov_entity =
@@ -64,8 +64,8 @@ inline void Update( entt::registry &reg ) {
     // printf( "Settlement: %s \n", province.settlement->name );
 
     entt::entity context_label = ui_lookup.at( "context_label" );
-    UI::reg.get<UI::TextLabel>( context_label ).text =
-      province.settlement->name;
+    IRONGUI::reg.get<IRONGUI::TextLabel>( context_label ).text =
+      province.settlement.name;
 
     entt::entity settlement_stats = ui_lookup.at( "settlement_stats" );
     // printf(
@@ -74,25 +74,23 @@ inline void Update( entt::registry &reg ) {
 
     std::string text = "";
     text +=
-      "Pop: " + std::to_string( province.settlement->population.current ) +
+      "Pop: " + std::to_string( province.settlement.population.current ) + "\n";
+    text +=
+      "BR: " + std::to_string( province.settlement.population.birthRate ) +
       "\n";
     text +=
-      "BR: " + std::to_string( province.settlement->population.birthRate ) +
+      "DR: " + std::to_string( province.settlement.population.deathRate ) +
       "\n";
     text +=
-      "DR: " + std::to_string( province.settlement->population.deathRate ) +
-      "\n";
-    text +=
-      "GR: " + std::to_string( province.settlement->population.growthRate ) +
+      "GR: " + std::to_string( province.settlement.population.growthRate ) +
       "\n";
 
-    UI::reg.get<UI::TextLabel>( settlement_stats ).text = text;
+    IRONGUI::reg.get<IRONGUI::TextLabel>( settlement_stats ).text = text;
   }
 }
 
 
-
-// inline void HandleFloatingPanel( UI::Panel &panel, Vector2 mousePos ) {
+// inline void HandleFloatingPanel( IRONGUI::Panel &panel, Vector2 mousePos ) {
 //   // printf( "DoFloatingPanel: %d\n", panel.index );
 //   panel.pos.x = panel.oldOffset.x + mousePos.x;
 //   panel.pos.y = panel.oldOffset.y + mousePos.y;
@@ -109,18 +107,18 @@ inline void Update( entt::registry &reg ) {
 //     panel.pos.y = 0;
 //   }
 // }
-//  for ( UI::Panel &panel: floating ) {
+//  for ( IRONGUI::Panel &panel: floating ) {
 //    if ( !panel.floating )
 //      return;
 //
 //    bool inside = CheckCollisionPointRec(
 //      GetMousePosition(),
-//      UI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
+//      IRONGUI::GetAbsoluteRectangle( panel.pos, panel.dmns ) );
 //
 //    if ( !overAnyElem )
 //      overAnyElem = inside;
 //
-//    if ( UI::DoFloatingPanel(
+//    if ( IRONGUI::DoFloatingPanel(
 //           context,
 //           panel,
 //           inside,
@@ -135,6 +133,6 @@ inline void Update( entt::registry &reg ) {
 //      };
 //    }
 //  }
-};// namespace UI
+};// namespace GAME_UI
 
 //    for ( auto it = items_view.rbegin(); it != items_view.rend(); ++it ) {

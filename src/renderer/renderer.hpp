@@ -27,7 +27,7 @@ inline void Init( State &state ) {
   i32 outline_color_loc = GetShaderLocation( outline_shader, "outlineColor" );
 
   float outline_size = 4.0f;
-  float outline_color[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+  float outline_color[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
   SetShaderValue(
     outline_shader,
@@ -84,18 +84,18 @@ inline void Draw(
           break;
       }
     }
-    // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
     EndShaderMode();
 
+    // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
     TempDraw( reg, state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
 
-  // SelectionSystem::Draw(
-  //   reg,
-  //   texture_cache,
-  //   state.gameState == GameState::EDITOR );
+  SelectionSystem::Draw(
+    reg,
+    texture_cache,
+    state.gameState == GameState::EDITOR );
 
   EndMode2D();
 }

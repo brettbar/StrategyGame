@@ -21,7 +21,7 @@
 namespace Input {
 
 inline void CheckMenuToggle() {
-  if ( IsKeyPressed( KEY_F11 ) ) {
+  if ( IsKeyPressed( KEY_CAPS_LOCK ) ) {
     if ( Global::program_mode == ProgramMode::GAME ) {
       Global::program_mode = ProgramMode::MODAL_MENU;
     } else if ( Global::program_mode == ProgramMode::MODAL_MENU ) {
@@ -75,7 +75,7 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    ProvinceSystem::SpawnProvince( reg, state.currPlayer->id, clickPos );
+    ProvinceSystem::AssignProvince( reg, state.currPlayer->id, clickPos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
@@ -86,14 +86,14 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsMouseButtonPressed( 0 ) ) {
-    // UI::Input(state, reg);
-    // if ( !UI::HandleMouseEvent( 0, GetMousePosition() ) )
-    if ( !UI::MouseWasOverUI() )
+    // IRONGUI::Input(state, reg);
+    // if ( !IRONGUI::HandleMouseEvent( 0, GetMousePosition() ) )
+    if ( !IRONGUI::MouseIsOverUI() )
       SelectionSystem::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
-    // if ( !UI::HandleMouseEvent( 1, GetMousePosition() ) )
-    if ( !UI::MouseWasOverUI() )
+    // if ( !IRONGUI::HandleMouseEvent( 1, GetMousePosition() ) )
+    if ( !IRONGUI::MouseIsOverUI() )
       MovementSystem::SetDestinations( reg, state.camera );
   }
 
