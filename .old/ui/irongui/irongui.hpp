@@ -61,12 +61,9 @@ inline void Draw(
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
-  // auto all_view = reg.view<Element>();
-  // auto items_view = reg.view<Element>( entt::exclude<Panel> );
-
   auto font = font_cache[hstr{ "font_romulus" }]->font;
 
-  Layout( reg, curr_content, screen_width, screen_height );
+  // Layout( reg, curr_content, screen_width, screen_height );
 
   for ( auto &entity: items_view ) {
     Element &elem = reg.get<Element>( entity );

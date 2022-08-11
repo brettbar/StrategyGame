@@ -29,7 +29,7 @@ inline IRONGUI::Panel CreateRootPanel() {
     .children =
       {
         CreateLeftPanel(),
-        // CreateTopPanel(),
+        CreateTopPanel(),
         CreateContextPanel(),
         CreateMiniMapPanel(),
       },
@@ -44,20 +44,11 @@ inline entt::entity CreateTopPanel() {
     .enabled = true,
     .color = GREEN,
     .pos = Vector2{ 0, 0 },
-    .dmns = Vector2{ (f32) GetScreenWidth(), 20 },
+    .dmns = Vector2{ 1000, 40 },
+    .align_self = IRONGUI::SelfAlign::START,
   };
 
-  IRONGUI::Panel panel = {
-    .pos_absolute = true,
-    .children_align_axis = IRONGUI::AlignAxis::ROW,
-    .children_main_align = IRONGUI::Alignment::START,
-    .children_cross_align = IRONGUI::Alignment::START,
-    .children =
-      {
-        CreateContextLabel( "" ),
-        CreateSettlementStats(),
-      },
-  };
+  IRONGUI::Panel panel = {};
 
   IRONGUI::reg.emplace<UiFlag>( entity, UiFlag() );
   IRONGUI::reg.emplace<IRONGUI::Element>( entity, elem );
@@ -267,34 +258,34 @@ inline entt::entity CreateSettlementStats() {
   return entity;
 }
 
-// inline void createFloatingPanel() {
-//   entt::entity entity = IRONGUI::gui_reg.create();
+inline void createFloatingPanel() {
+  entt::entity entity = IRONGUI::gui_reg.create();
 
-//   IRONGUI::Element elem = {
-//     .type = IRONGUI::Type::PANEL,
-//     .enabled = true,
-//     .color = RED,
-//     .pos =
-//       {
-//         (f32) ( GetScreenWidth() / 2.0f ) - 400,
-//         (f32) GetScreenHeight() - 200,
-//       },
-//     .dmns = Vector2{ 800, 200 },
-//     .horiz_dimension = IRONGUI::Dimension::FIXED,
-//     .vert_dimension = IRONGUI::Dimension::FIXED,
-//   };
+  IRONGUI::Element elem = {
+    .type = IRONGUI::Type::PANEL,
+    .enabled = true,
+    .color = RED,
+    .pos =
+      {
+        (f32) ( GetScreenWidth() / 2.0f ) - 400,
+        (f32) GetScreenHeight() - 200,
+      },
+    .dmns = Vector2{ 800, 200 },
+    .horiz_dimension = IRONGUI::Dimension::FIXED,
+    .vert_dimension = IRONGUI::Dimension::FIXED,
+  };
 
-//   IRONGUI::Panel panel = {
-//     .children_horiz_align = IRONGUI::HorizAlign::CENTER,
-//     .children_vert_align = IRONGUI::VertAlign::CENTER,
-//     .children =
-//       {
-//         createContextLabel( elem.pos ),
-//       },
-//   };
+  IRONGUI::Panel panel = {
+    .children_horiz_align = IRONGUI::HorizAlign::CENTER,
+    .children_vert_align = IRONGUI::VertAlign::CENTER,
+    .children =
+      {
+        createContextLabel( elem.pos ),
+      },
+  };
 
-//   IRONGUI::gui_reg.emplace<IRONGUI::Element>( entity, elem );
-//   IRONGUI::gui_reg.emplace<IRONGUI::Panel>( entity, panel );
-// }
+  IRONGUI::gui_reg.emplace<IRONGUI::Element>( entity, elem );
+  IRONGUI::gui_reg.emplace<IRONGUI::Panel>( entity, panel );
+}
 
 };// namespace GAME_UI

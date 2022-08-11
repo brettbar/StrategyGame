@@ -29,6 +29,7 @@ inline Rectangle RectangleFromVectors( Vector2, Vector2 );
 
 inline void
 Layout( entt::registry &reg, Panel root, f32 screen_width, f32 screen_height ) {
+  // First layout the root's child panels
   if ( root.children_align_axis == AlignAxis::ROW ) {
     MainRowAlignChildren(
       reg,
@@ -55,9 +56,11 @@ Layout( entt::registry &reg, Panel root, f32 screen_width, f32 screen_height ) {
       root.children );
   }
 
+  // Then layout the children of the panels
   for ( auto &panel_entity: reg.view<Panel>() ) {
     Panel &panel = reg.get<Panel>( panel_entity );
     Element &panel_elem = reg.get<Element>( panel_entity );
+
     if ( panel.children_align_axis == AlignAxis::ROW ) {
       MainRowAlignChildren(
         reg,
@@ -93,6 +96,7 @@ inline void MainRowAlignChildren(
   Rectangle parent,
   Alignment main_align,
   std::vector<entt::entity> children ) {
+
   switch ( main_align ) {
     case Alignment::START: {
       f32 end_of_last = parent.x;
@@ -100,13 +104,6 @@ inline void MainRowAlignChildren(
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
         Element &elem = reg.get<Element>( entity );
-
-
-        // if ( elem.type == IRONGUI::Type::PANEL ) {
-        //   if ( reg.get<Panel>( entity ).pos_absolute ) {
-        //     continue;
-        //   }
-        // }
 
         elem.pos.x = end_of_last + elem.margins.left;
         end_of_last = elem.pos.x + elem.dmns.x + elem.margins.right;
@@ -156,6 +153,7 @@ inline void MainRowAlignChildren(
       for ( u32 i = 0; i < children.size(); i++ ) {
         entt::entity &entity = children[i];
         Element &elem = reg.get<Element>( entity );
+
         total_width += elem.dmns.x;
       }
 

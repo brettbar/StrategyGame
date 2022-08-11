@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../common.hpp"
-#include "../../renderer/fonts.hpp"
-#include "../../renderer/textures.hpp"
-#include "../map/province_system.hpp"
+#include "../common.hpp"
+#include "../renderer/fonts.hpp"
+#include "../renderer/textures.hpp"
+#include "map/province_system.hpp"
 #include <raylib.h>
 
 namespace OverlaySystem {

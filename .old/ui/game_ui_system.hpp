@@ -18,7 +18,7 @@ inline void SelectListener( entt::registry &, entt::entity );
 inline void DeSelectListener();
 inline void Init( entt::registry & );
 inline void Update( entt::registry & );
-// inline void HandleFloatingPanel( IRONGUI::Panel &, Vector2 );
+inline void HandleFloatingPanel( IRONGUI::Panel &, Vector2 );
 
 inline void SelectListener( entt::registry &reg, entt::entity entity ) {
   if ( reg.all_of<Province::Component>( entity ) ) {

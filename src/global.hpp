@@ -13,5 +13,5 @@ enum class GameMode {
 };
 
 namespace Global {
-inline ProgramMode program_mode = ProgramMode::MAIN_MENU;
+inline ProgramMode program_mode = ProgramMode::GAME;
 };

@@ -12,9 +12,9 @@ TEMPORARY TODOS HERE
 #include <raylib.h>
 
 #include "input.hpp"
+#include "renderer/fonts.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
-#include "renderer/fonts.hpp"
 #include "save.hpp"
 #include "state.hpp"
 #include "systems/animation_system.hpp"
@@ -25,9 +25,7 @@ TEMPORARY TODOS HERE
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
-#include "systems/ui/irongui/irongui.hpp"
-#include "systems/ui/modal_menu.hpp"
-#include "systems/ui/game_ui_system.hpp"
+#include "ui/ui_system.hpp"
 
 #include "filesystem"
 
@@ -35,7 +33,6 @@ namespace fs = std::filesystem;
 
 void LoadResources( TextureCache &, FontCache & );
 void CameraUpdate( Camera2D &, f32 );
-void ZoomCamera( Camera2D &, f32, Vector2 );
 
 
 void Init( State &, entt::registry &, TextureCache &, FontCache & );
@@ -68,16 +65,16 @@ int main( void ) {
   bool game_started = false;
 
 
-  MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
-    [&reg](
-      const MAIN_MENU_UI::ClickEvent &event,
-      MAIN_MENU_UI::Emitter &emitter ) {
-      fs::path f{ "output.json" };
-      if ( fs::exists( f ) ) {
-        printf( "Found existing file!\n" );
-        reg = Save::Load();
-      }
-    } );
+  // MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
+  //   [&reg](
+  //     const MAIN_MENU_UI::ClickEvent &event,
+  //     MAIN_MENU_UI::Emitter &emitter ) {
+  //     fs::path f{ "output.json" };
+  //     if ( fs::exists( f ) ) {
+  //       printf( "Found existing file!\n" );
+  //       reg = Save::Load();
+  //     }
+  //   } );
 
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
@@ -110,12 +107,12 @@ int main( void ) {
         {
           ClearBackground( BLACK );
 
-          IRONGUI::Draw(
-            MAIN_MENU_UI::curr_content,
-            IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(),
-            IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(
-              entt::exclude<IRONGUI::Panel> ),
-            font_cache );
+          // IRONGUI::Draw(
+          //   MAIN_MENU_UI::curr_content,
+          //   IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(),
+          //   IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(
+          //     entt::exclude<IRONGUI::Panel> ),
+          //   font_cache );
         }
         EndDrawing();
         break;
@@ -140,12 +137,12 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
 
-          IRONGUI::Draw(
-            MODAL_MENU_UI::curr_content,
-            IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(),
-            IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(
-              entt::exclude<IRONGUI::Panel> ),
-            font_cache );
+          // IRONGUI::Draw(
+          //   MODAL_MENU_UI::curr_content,
+          //   IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(),
+          //   IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(
+          //     entt::exclude<IRONGUI::Panel> ),
+          //   font_cache );
         }
         EndDrawing();
         break;
@@ -185,12 +182,13 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, reg, texture_cache, font_cache );
-          IRONGUI::Draw(
-            GAME_UI::curr_content,
-            IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
-            IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
-              entt::exclude<IRONGUI::Panel> ),
-            font_cache );
+          // IRONGUI::Draw(
+          //   GAME_UI::curr_content,
+          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
+          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
+          //     entt::exclude<IRONGUI::Panel> ),
+          //   font_cache );
+          UI::Draw( texture_cache, font_cache );
         }
         EndDrawing();
         break;
@@ -210,7 +208,8 @@ void StartGame(
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
-  GAME_UI::Init( reg );
+  // GAME_UI::Init( reg );
+  UI::Init();
   Renderer::Init( state );
 }
 
@@ -220,7 +219,7 @@ void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
   AnimationSystem::UpdateSprites( reg, state.timeScale );
   //  Terrain::UpdateFOW(reg);
-  GAME_UI::Update( reg );
+  // GAME_UI::Update( reg );
 }
 
 void LateUpdate( State &state, entt::registry &reg ) {
@@ -274,7 +273,7 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
 
   f32 mouseWheelDelta = GetMouseWheelMove();
 
-  camera.zoom += ( mouseWheelDelta * 0.05f );
+  camera.zoom += ( mouseWheelDelta * 0.2f );
   if ( camera.zoom > 8.0f )
     camera.zoom = 8.0f;
   else if ( camera.zoom < 0.08f )
@@ -312,6 +311,10 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
   font_cache.load(
     hstr{ "font_romulus" },
     LoadFont( "assets/fonts/romulus.png" ) );
+
+  font_cache.load(
+    hstr{ "font_default" },
+    LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" ) );
 
   LoadResource(
     hstr{ "land_tile" },
@@ -389,5 +392,39 @@ void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
     hstr{ "buildings" },
     LoadImage( "assets/textures/buildings.png" ),
     texture_cache );
-}
 
+
+  LoadResource(
+    hstr{ "context_panel" },
+    LoadImage( "assets/textures/UI/UI_test.png" ),
+    texture_cache );
+
+  LoadResource(
+    hstr{ "context_tab_overview" },
+    LoadImage( "assets/textures/UI/Overview.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_population" },
+    LoadImage( "assets/textures/UI/Population.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_culture" },
+    LoadImage( "assets/textures/UI/Culture.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_religion" },
+    LoadImage( "assets/textures/UI/Religion.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_resources" },
+    LoadImage( "assets/textures/UI/Resources.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_construction" },
+    LoadImage( "assets/textures/UI/Construction.png" ),
+    texture_cache );
+  LoadResource(
+    hstr{ "context_tab_garrison" },
+    LoadImage( "assets/textures/UI/Garrison.png" ),
+    texture_cache );
+}

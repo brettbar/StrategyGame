@@ -5,17 +5,17 @@
 #pragma once
 
 #include "common.hpp"
-#include "global.hpp"
-#include "renderer/textures.hpp"
-#include "state.hpp"
 #include "components/sight.hpp"
 #include "components/unit.hpp"
+#include "global.hpp"
+#include "renderer/textures.hpp"
+#include "save.hpp"
+#include "state.hpp"
 #include "systems/map/map_system.hpp"
 #include "systems/movement_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
-#include "systems/ui/game_ui_system.hpp"
-#include "save.hpp"
+#include "ui/ui_system.hpp"
 #include <raylib.h>
 
 namespace Input {
@@ -87,13 +87,11 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
 
   if ( IsMouseButtonPressed( 0 ) ) {
     // IRONGUI::Input(state, reg);
-    // if ( !IRONGUI::HandleMouseEvent( 0, GetMousePosition() ) )
-    if ( !IRONGUI::MouseIsOverUI() )
+    if ( !UI::MouseIsOverUI() )
       SelectionSystem::UpdateSelection( reg, clickPos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
-    // if ( !IRONGUI::HandleMouseEvent( 1, GetMousePosition() ) )
-    if ( !IRONGUI::MouseIsOverUI() )
+    if ( !UI::MouseIsOverUI() )
       MovementSystem::SetDestinations( reg, state.camera );
   }
 

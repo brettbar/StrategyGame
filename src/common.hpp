@@ -14,6 +14,8 @@ using i32 = int;
 using f32 = float;
 // using str = std::string;
 using hstr = entt::hashed_string;
+using vec2 = Vector2;
+using rect = Rectangle;
 
 struct IVector2 {
   i32 x;
