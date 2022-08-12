@@ -12,13 +12,15 @@ inline entt::entity CreateContextPanel( entt::registry &reg ) {
 
   Element elem = {
     .type = Type::PANEL,
-    // .dimensions_type = Dimensions::FIXED,
-    .width = 540,
-    .height = 203,
-    .background = WHITE,
   };
 
   Panel context_panel = {
+    .transform =
+      {
+        .width = 540,
+        .height = 203,
+      },
+    .background = Fade( BLACK, 0.5 ),
     .children_axis = Axis::ROW,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
@@ -47,13 +49,15 @@ inline entt::entity CreateTabGroup( entt::registry &reg ) {
 
   Element elem = {
     .type = Type::PANEL,
-    // .dimensions_type = Dimensions::FIX_WIDTH_STRETCH_HEIGHT,
-    .width = 45,
-    .height = 203,
-    .background = GREEN,
   };
 
   Panel tab_grp = {
+    .transform =
+      {
+        .width = 45,
+        .height = 203,
+      },
+    .background = GREEN,
     .children_axis = Axis::COLUMN,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
@@ -81,13 +85,15 @@ inline entt::entity CreateTabButton( entt::registry &reg, hstr key ) {
 
   Element elem = {
     .type = Type::TEXTURE_BUTTON,
-    .width = 45,
-    .height = 29,
-    .background = WHITE,
   };
 
   TextureButton button = {
     {
+      .transform =
+        {
+          .width = 45,
+          .height = 29,
+        },
       .texture_key = key,
     },
     []() {
@@ -108,14 +114,15 @@ inline entt::entity CreateTabContent( entt::registry &reg ) {
   Element elem = {
     .type = Type::TEXT_BUTTON,
     // .dimensions_type = Dimensions::STRETCH,
-    .background = BLACK,
   };
 
   TextButton button = {
     {
+      {},
       .text = "CONTENT",
       .font_size = 32,
       .text_color = WHITE,
+      .background = BLACK,
     },
     []() {
 
