@@ -10,16 +10,38 @@ inline void
 Row_HorizStart( entt::registry &, f32, f32, std::vector<entt::entity> );
 
 inline void
-Row_HorizSpaceOut( entt::registry &, f32, f32, std::vector<entt::entity> );
+Row_HorizSpaceOut( entt::registry &, f32, f32, f32, std::vector<entt::entity> );
 
 inline void
 Row_VertStart( entt::registry &, f32, f32, std::vector<entt::entity> );
 
 inline void
-Row_VertSpaceOut( entt::registry &, f32, f32, std::vector<entt::entity> );
+Row_VertSpaceOut( entt::registry &, f32, f32, f32, std::vector<entt::entity> );
 
 
 inline void Row_Align( entt::registry &reg, Panel &panel ) {
+
+  f32 total_height = 0;
+  f32 total_width = 0;
+  f32 tallest_child = 0;
+
+  for ( u32 i = 0; i < panel.children.size(); i++ ) {
+    entt::entity &entity = panel.children[i];
+    Rectangle &elem = GetTransform( reg, entity );
+
+    total_width += elem.width;
+    total_height += elem.height;
+
+    if ( elem.height > tallest_child )
+      tallest_child = elem.height;
+  }
+
+
+  // if ( !panel.self_transformed ) {
+  //   panel.transform.width = total_width;
+  //   panel.transform.height = tallest_child;
+  // }
+
   switch ( panel.children_horiz_align ) {
     case Align::START:
       Row_HorizStart(
@@ -31,6 +53,7 @@ inline void Row_Align( entt::registry &reg, Panel &panel ) {
     case Align::SPACE_OUT:
       Row_HorizSpaceOut(
         reg,
+        total_width,
         panel.transform.x,
         panel.transform.width,
         panel.children );
@@ -48,6 +71,7 @@ inline void Row_Align( entt::registry &reg, Panel &panel ) {
     case Align::SPACE_OUT:
       Row_VertSpaceOut(
         reg,
+        total_height,
         panel.transform.y,
         panel.transform.height,
         panel.children );
@@ -65,7 +89,7 @@ inline void Row_HorizStart(
 
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    Rectangle &elem = GetTransform( reg, entity );
 
     elem.x = end_of_last;
 
@@ -75,18 +99,10 @@ inline void Row_HorizStart(
 
 inline void Row_HorizSpaceOut(
   entt::registry &reg,
+  f32 total_width,
   f32 parent_x,
   f32 parent_width,
   std::vector<entt::entity> children ) {
-  f32 total_width = 0;
-
-  for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
-
-    total_width += elem.width;
-  }
-
   f32 total_gap_width = parent_width - total_width;
   u32 num_gaps = children.size() - 1;
 
@@ -95,7 +111,7 @@ inline void Row_HorizSpaceOut(
   f32 end_of_last = parent_x;
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    Rectangle &elem = GetTransform( reg, entity );
 
     if ( i % 2 == 0 ) {
       elem.x = end_of_last;
@@ -116,7 +132,7 @@ inline void Row_VertStart(
 
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    Rectangle &elem = GetTransform( reg, entity );
 
     // elem.y = end_of_last + elem.margins.top;
     elem.y = end_of_last;
@@ -134,16 +150,17 @@ inline void Row_VertStart(
 
 inline void Row_VertSpaceOut(
   entt::registry &reg,
+  f32 total_height,
   f32 parent_y,
   f32 parent_height,
   std::vector<entt::entity> children ) {
-  f32 total_height = 0;
+  // f32 total_height = 0;
 
-  for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
-    total_height += elem.height;
-  }
+  // for ( u32 i = 0; i < children.size(); i++ ) {
+  //   entt::entity &entity = children[i];
+  //   Rectangle &elem = GetTransform( reg, entity );
+  //   total_height += elem.height;
+  // }
 
   f32 total_gap_height = parent_height - total_height;
   u32 num_gaps = children.size() - 1;
@@ -153,7 +170,7 @@ inline void Row_VertSpaceOut(
   f32 end_of_last = parent_y;
   for ( u32 i = 0; i < children.size(); i++ ) {
     entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    Rectangle &elem = GetTransform( reg, entity );
 
     if ( i % 2 == 0 ) {
       elem.y = end_of_last;

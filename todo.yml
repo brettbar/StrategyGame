@@ -1,16 +1,6 @@
-
-
-
-
-
-
-
-
-
-
-
 current:
-  - cleanup renderer
+  - 
+
 
 
 backlog:
@@ -20,4 +10,5 @@ backlog:
 
 complete:
   - textures are bleeding over with new shader setup
+  - cleanup renderer
 

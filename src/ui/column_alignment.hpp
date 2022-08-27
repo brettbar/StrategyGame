@@ -15,10 +15,36 @@ inline void
 Col_VertStart( entt::registry &, f32, f32, std::vector<entt::entity> );
 
 inline void
-Col_VertSpaceOut( entt::registry &, f32, f32, std::vector<entt::entity> );
+Col_VertSpaceOut( entt::registry &, f32, f32, f32, std::vector<entt::entity> );
 
 
 inline void Col_Align( entt::registry &reg, Panel &panel ) {
+  f32 total_height = 0;
+  f32 widest_child = 0;
+
+  for ( u32 i = 0; i < panel.children.size(); i++ ) {
+    entt::entity &entity = panel.children[i];
+    rect &elem = GetTransform( reg, entity );
+
+    // if (
+    //   elem.dimensions_type == Dimensions::FIX_WIDTH_STRETCH_HEIGHT ||
+    //   elem.dimensions_type == Dimensions::STRETCH ) {
+    //   elem.height = parent_height / children.size();
+    // }
+
+    total_height += elem.height;
+
+    if ( elem.width > widest_child )
+      widest_child = elem.width;
+  }
+
+
+  // if ( !panel.self_transformed ) {
+  //   panel.transform.height = total_height;
+  //   panel.transform.width = widest_child;
+  // }
+
+
   switch ( panel.children_horiz_align ) {
     case Align::START:
       Col_HorizStart(
@@ -47,6 +73,7 @@ inline void Col_Align( entt::registry &reg, Panel &panel ) {
     case Align::SPACE_OUT:
       Col_VertSpaceOut(
         reg,
+        total_height,
         panel.transform.y,
         panel.transform.height,
         panel.children );
@@ -108,24 +135,10 @@ inline void Col_VertStart(
 
 inline void Col_VertSpaceOut(
   entt::registry &reg,
+  f32 total_height,
   f32 parent_y,
   f32 parent_height,
   std::vector<entt::entity> children ) {
-  f32 total_height = 0;
-
-  for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
-
-    // if (
-    //   elem.dimensions_type == Dimensions::FIX_WIDTH_STRETCH_HEIGHT ||
-    //   elem.dimensions_type == Dimensions::STRETCH ) {
-    //   elem.height = parent_height / children.size();
-    // }
-
-    total_height += elem.height;
-  }
-
   f32 total_gap_height = parent_height - total_height;
   u32 num_gaps = children.size() - 1;
 

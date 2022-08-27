@@ -5,12 +5,17 @@
 
 namespace UI {
 
+inline std::map<std::string, entt::entity> ui_lookup;
+
+inline f32 SCALE = 2.0f;
+
 struct Context {
   entt::entity hot;
   entt::entity active;
 };
 
 enum class Type {
+  BASE_PANEL,
   PANEL,
   TEXT_LABEL,
   TEXTURE_LABEL,
@@ -33,6 +38,8 @@ enum class Align {
 
 struct Element {
   Type type;
+  std::string id;
+  bool enabled;
 };
 
 struct Panel {
@@ -42,16 +49,13 @@ struct Panel {
   Align children_horiz_align;
   Align children_vert_align;
   std::vector<entt::entity> children;
-
-  bool self_positioned = false;
-  std::function<vec2()> update;
-  inline void Update() {
-    vec2 new_pos = this->update();
-    this->transform.x = new_pos.x;
-    this->transform.y = new_pos.y;
-  }
 };
 
+
+struct BasePanel : Panel {
+  vec2 original_size;
+  std::function<void( BasePanel & )> update;
+};
 
 struct TextLabel {
   Rectangle transform;
@@ -67,7 +71,7 @@ struct TextButton : TextLabel {
 
 struct TextureLabel {
   Rectangle transform;
-  hstr texture_key;
+  Texture2D texture;
 };
 
 struct TextureButton : TextureLabel {
@@ -78,6 +82,9 @@ inline Rectangle &GetTransform( entt::registry &reg, entt::entity entity ) {
   Element &elem = reg.get<Element>( entity );
 
   switch ( elem.type ) {
+    case Type::BASE_PANEL: {
+      return reg.get<BasePanel>( entity ).transform;
+    }
     case Type::PANEL: {
       return reg.get<Panel>( entity ).transform;
     }

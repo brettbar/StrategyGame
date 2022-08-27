@@ -209,7 +209,7 @@ void StartGame(
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
   // GAME_UI::Init( reg );
-  UI::Init();
+  UI::Init( texture_cache );
   Renderer::Init( state );
 }
 
