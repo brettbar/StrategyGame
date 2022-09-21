@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "map/province_system.hpp"
@@ -8,10 +9,7 @@
 
 namespace OverlaySystem {
 
-inline void Draw(
-  entt::registry &reg,
-  TextureCache &texture_cache,
-  FontCache &font_cache ) {
+inline void Draw( entt::registry &reg, TextureCache &texture_cache ) {
   auto provinces = reg.view<Province::Component>();
 
   for ( auto ent: provinces ) {
@@ -84,7 +82,7 @@ inline void Draw(
         BLACK );
 
       DrawTextEx(
-        font_cache[hstr{ "font_romulus" }]->font,
+        Global::font_cache[hstr{ "font_romulus" }]->font,
         prov.settlement.name,
         {
           settlement_pos.x + 16.0f,

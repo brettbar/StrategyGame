@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui_components.hpp"
+#include "../../src/ui/ui_components.hpp"
 
 namespace UI {
 inline void Col_Align( entt::registry &, Panel & );
@@ -18,13 +18,16 @@ inline void
 Col_VertSpaceOut( entt::registry &, f32, f32, f32, std::vector<entt::entity> );
 
 
-inline void Col_Align( entt::registry &reg, Panel &panel ) {
+inline void Col_Align( entt::registry &reg, entt::entity panel_entity ) {
+  Element &panel_elem = reg.get<Element>( panel_entity );
+  Panel &panel = reg.get<Panel>( panel_entity );
+
   f32 total_height = 0;
   f32 widest_child = 0;
 
   for ( u32 i = 0; i < panel.children.size(); i++ ) {
-    entt::entity &entity = panel.children[i];
-    rect &elem = GetTransform( reg, entity );
+    entt::entity &child = panel.children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     // if (
     //   elem.dimensions_type == Dimensions::FIX_WIDTH_STRETCH_HEIGHT ||
@@ -40,8 +43,8 @@ inline void Col_Align( entt::registry &reg, Panel &panel ) {
 
 
   // if ( !panel.self_transformed ) {
-  //   panel.transform.height = total_height;
-  //   panel.transform.width = widest_child;
+  //   panel_elem.transform.height = total_height;
+  //   panel_elem.transform.width = widest_child;
   // }
 
 
@@ -49,15 +52,15 @@ inline void Col_Align( entt::registry &reg, Panel &panel ) {
     case Align::START:
       Col_HorizStart(
         reg,
-        panel.transform.x,
-        panel.transform.width,
+        panel_elem.transform.x,
+        panel_elem.transform.width,
         panel.children );
       break;
     case Align::SPACE_OUT:
       Col_HorizSpaceOut(
         reg,
-        panel.transform.x,
-        panel.transform.width,
+        panel_elem.transform.x,
+        panel_elem.transform.width,
         panel.children );
       break;
   }
@@ -66,16 +69,16 @@ inline void Col_Align( entt::registry &reg, Panel &panel ) {
     case Align::START:
       Col_VertStart(
         reg,
-        panel.transform.y,
-        panel.transform.height,
+        panel_elem.transform.y,
+        panel_elem.transform.height,
         panel.children );
       break;
     case Align::SPACE_OUT:
       Col_VertSpaceOut(
         reg,
         total_height,
-        panel.transform.y,
-        panel.transform.height,
+        panel_elem.transform.y,
+        panel_elem.transform.height,
         panel.children );
       break;
   }
@@ -88,8 +91,8 @@ inline void Col_HorizStart(
   std::vector<entt::entity> children ) {
   //
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     // if (
     //   elem.dimensions_type == Dimensions::FIX_HEIGHT_STRETCH_WIDTH ||
@@ -115,11 +118,11 @@ inline void Col_VertStart(
   f32 end_of_last = parent_y;
 
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    Element &elem = ui_reg.get<Element>( child );
 
     // elem.y = end_of_last + elem.margins.top;
-    elem.y = end_of_last;
+    elem.transform.y = end_of_last + elem.margins.top;
     // end_of_last = elem.y + elem.dmns.y + elem.margins.bottom;
 
 
@@ -128,7 +131,8 @@ inline void Col_VertStart(
     // }
 
 
-    end_of_last = elem.y + elem.height;
+    end_of_last =
+      elem.transform.y + elem.transform.height + elem.margins.bottom;
   }
 }
 
@@ -146,8 +150,8 @@ inline void Col_VertSpaceOut(
 
   f32 end_of_last = parent_y;
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    rect &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     if ( i % 2 == 0 ) {
       elem.y = end_of_last;

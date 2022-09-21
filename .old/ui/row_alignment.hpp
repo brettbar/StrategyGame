@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui_components.hpp"
+#include "../../src/ui/ui_components.hpp"
 
 namespace UI {
 
@@ -19,15 +19,17 @@ inline void
 Row_VertSpaceOut( entt::registry &, f32, f32, f32, std::vector<entt::entity> );
 
 
-inline void Row_Align( entt::registry &reg, Panel &panel ) {
+inline void Row_Align( entt::registry &reg, entt::entity panel_entity ) {
+  Element &panel_elem = reg.get<Element>( panel_entity );
+  Panel &panel = reg.get<Panel>( panel_entity );
 
   f32 total_height = 0;
   f32 total_width = 0;
   f32 tallest_child = 0;
 
   for ( u32 i = 0; i < panel.children.size(); i++ ) {
-    entt::entity &entity = panel.children[i];
-    Rectangle &elem = GetTransform( reg, entity );
+    entt::entity &child = panel.children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     total_width += elem.width;
     total_height += elem.height;
@@ -46,16 +48,16 @@ inline void Row_Align( entt::registry &reg, Panel &panel ) {
     case Align::START:
       Row_HorizStart(
         reg,
-        panel.transform.x,
-        panel.transform.width,
+        panel_elem.transform.x,
+        panel_elem.transform.width,
         panel.children );
       break;
     case Align::SPACE_OUT:
       Row_HorizSpaceOut(
         reg,
         total_width,
-        panel.transform.x,
-        panel.transform.width,
+        panel_elem.transform.x,
+        panel_elem.transform.width,
         panel.children );
       break;
   }
@@ -64,16 +66,16 @@ inline void Row_Align( entt::registry &reg, Panel &panel ) {
     case Align::START:
       Row_VertStart(
         reg,
-        panel.transform.y,
-        panel.transform.height,
+        panel_elem.transform.y,
+        panel_elem.transform.height,
         panel.children );
       break;
     case Align::SPACE_OUT:
       Row_VertSpaceOut(
         reg,
         total_height,
-        panel.transform.y,
-        panel.transform.height,
+        panel_elem.transform.y,
+        panel_elem.transform.height,
         panel.children );
       break;
   }
@@ -88,8 +90,8 @@ inline void Row_HorizStart(
   f32 end_of_last = parent_x;
 
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    Rectangle &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     elem.x = end_of_last;
 
@@ -110,8 +112,8 @@ inline void Row_HorizSpaceOut(
 
   f32 end_of_last = parent_x;
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    Rectangle &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     if ( i % 2 == 0 ) {
       elem.x = end_of_last;
@@ -131,8 +133,8 @@ inline void Row_VertStart(
   f32 end_of_last = parent_y;
 
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    Rectangle &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     // elem.y = end_of_last + elem.margins.top;
     elem.y = end_of_last;
@@ -169,8 +171,8 @@ inline void Row_VertSpaceOut(
 
   f32 end_of_last = parent_y;
   for ( u32 i = 0; i < children.size(); i++ ) {
-    entt::entity &entity = children[i];
-    Rectangle &elem = GetTransform( reg, entity );
+    entt::entity &child = children[i];
+    rect &elem = ui_reg.get<Element>( child ).transform;
 
     if ( i % 2 == 0 ) {
       elem.y = end_of_last;

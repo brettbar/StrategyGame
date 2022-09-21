@@ -1,36 +1,35 @@
 #include "../../renderer/textures.hpp"
 #include "../ui_components.hpp"
+#include "context_content.hpp"
 
 namespace UI {
 
-inline entt::entity CreateContextPanel( entt::registry &, TextureCache & );
-inline entt::entity CreateTabGroup( entt::registry &, TextureCache & );
-inline entt::entity CreateTabButton( entt::registry &reg, Texture2D );
-inline entt::entity CreateTabContent( entt::registry & );
+inline entt::entity ContextPanel( TextureCache & );
+inline entt::entity ContextTabGroup( TextureCache & );
+inline entt::entity ContextTabButton( Texture2D );
 
-inline entt::entity
-CreateContextPanel( entt::registry &reg, TextureCache &texture_cache ) {
-  entt::entity entity = reg.create();
-
+inline entt::entity ContextPanel( TextureCache &texture_cache ) {
   Element elem = {
-    .type = Type::BASE_PANEL,
     .id = "context_panel",
+    .type = Type::BASE_PANEL,
+    .enabled = false,
+    .transform =
+      {
+        .width = 540,
+        .height = 203,
+      },
   };
 
-  BasePanel context_panel = {
+  BasePanel panel = {
     {
-      .transform =
-        {
-          .width = 540,
-          .height = 203,
-        },
       .background = Fade( BLACK, 0.5 ),
       .children_axis = Axis::ROW,
       .children_horiz_align = Align::START,
       .children_vert_align = Align::START,
       .children =
         {
-          CreateTabGroup( reg, texture_cache ),
+          ContextTabGroup( texture_cache ),
+          ContextContent(),
         },
     },
     .original_size =
@@ -38,9 +37,10 @@ CreateContextPanel( entt::registry &reg, TextureCache &texture_cache ) {
         .x = 540,
         .y = 203,
       },
+    // TODO cludgy, clean up
     .update =
-      []( BasePanel &panel ) {
-        panel.transform = {
+      []( Element &elem, BasePanel &panel ) {
+        elem.transform = {
           ( (f32) GetScreenWidth() / 2 ) -
             ( panel.original_size.x * SCALE / 2.0f ),
           (f32) GetScreenHeight() - panel.original_size.y * SCALE,
@@ -50,21 +50,14 @@ CreateContextPanel( entt::registry &reg, TextureCache &texture_cache ) {
       },
   };
 
-  reg.emplace<Element>( entity, elem );
-  reg.emplace<BasePanel>( entity, context_panel );
 
-  ui_lookup.insert_or_assign( elem.id, entity );
-
-  return entity;
+  return CreateElement( panel, elem );
 }
 
-inline entt::entity
-CreateTabGroup( entt::registry &reg, TextureCache &texture_cache ) {
-  entt::entity entity = reg.create();
-
+inline entt::entity ContextTabGroup( TextureCache &texture_cache ) {
   Element elem = {
-    .type = Type::PANEL,
     .id = "context_tab_group",
+    .type = Type::PANEL,
   };
 
   Panel tab_grp = {
@@ -74,100 +67,40 @@ CreateTabGroup( entt::registry &reg, TextureCache &texture_cache ) {
     .children_vert_align = Align::START,
     .children =
       {
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_overview" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_population" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_resources" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_culture" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_religion" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_construction" }]->texture ),
-        CreateTabButton(
-          reg,
+        ContextTabButton(
           texture_cache[hstr{ "context_tab_garrison" }]->texture ),
       },
   };
 
-  reg.emplace<Element>( entity, elem );
-  reg.emplace<Panel>( entity, tab_grp );
-
-  ui_lookup.insert_or_assign( elem.id, entity );
-
-  return entity;
+  return CreateElement( tab_grp, elem );
 }
 
-
-inline entt::entity CreateTabButton( entt::registry &reg, Texture2D texture ) {
-  entt::entity entity = reg.create();
-
+inline entt::entity ContextTabButton( Texture2D texture ) {
   Element elem = {
-    .type = Type::TEXTURE_BUTTON,
     .id = "context_tab_button",
+    .type = Type::TEXTURE_BUTTON,
   };
 
   TextureButton button = {
-    {
-      .transform =
-        {
-          .width = (f32) texture.width,
-          .height = (f32) texture.height,
-        },
-      .texture = texture,
-    },
+    { .texture = texture },
     []() {
 
     },
   };
 
-  reg.emplace<Element>( entity, elem );
-  reg.emplace<TextureButton>( entity, button );
-
-  ui_lookup.insert_or_assign( elem.id, entity );
-
-  return entity;
+  return CreateElement( button, elem );
 }
 
-
-inline entt::entity CreateTabContent( entt::registry &reg ) {
-  entt::entity entity = reg.create();
-
-  Element elem = {
-    .type = Type::TEXT_BUTTON,
-    .id = "context_tab_content",
-  };
-
-  TextButton button = {
-    {
-      .transform =
-        {
-          .width = 100,
-          .height = 50,
-        },
-      .text = "CONTENT",
-      .font_size = 32,
-      .text_color = WHITE,
-      .background = BLACK,
-    },
-    []() {
-
-    },
-  };
-
-  reg.emplace<Element>( entity, elem );
-  reg.emplace<TextButton>( entity, button );
-
-  ui_lookup.insert_or_assign( elem.id, entity );
-
-  return entity;
-}
 };// namespace UI

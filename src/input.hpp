@@ -22,16 +22,16 @@ namespace Input {
 
 inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_CAPS_LOCK ) ) {
-    if ( Global::program_mode == ProgramMode::GAME ) {
-      Global::program_mode = ProgramMode::MODAL_MENU;
-    } else if ( Global::program_mode == ProgramMode::MODAL_MENU ) {
-      Global::program_mode = ProgramMode::GAME;
+    if ( Global::program_mode == Global::ProgramMode::GAME ) {
+      Global::program_mode = Global::ProgramMode::MODAL_MENU;
+    } else if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
+      Global::program_mode = Global::ProgramMode::GAME;
     }
   }
 }
 
 inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
-  Vector2 clickPos = GetScreenToWorld2D( GetMousePosition(), state.camera );
+  Vector2 click_pos = GetScreenToWorld2D( GetMousePosition(), state.camera );
 
 
   if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
@@ -71,11 +71,11 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    SpawnSystem::CreateNew( reg, cache, clickPos, state.currPlayer );
+    SpawnSystem::CreateNew( reg, cache, click_pos, state.currPlayer );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    ProvinceSystem::AssignProvince( reg, state.currPlayer->id, clickPos );
+    ProvinceSystem::AssignProvince( reg, state.currPlayer->id, click_pos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
@@ -88,11 +88,13 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   if ( IsMouseButtonPressed( 0 ) ) {
     // IRONGUI::Input(state, reg);
     if ( !UI::MouseIsOverUI() )
-      SelectionSystem::UpdateSelection( reg, clickPos );
+      SelectionSystem::UpdateSelection( reg, click_pos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !UI::MouseIsOverUI() )
+    if ( !UI::MouseIsOverUI() ) {
       MovementSystem::SetDestinations( reg, state.camera );
+      SelectionSystem::ClearSelection( reg, reg.view<Province::Component>() );
+    }
   }
 
   if ( IsKeyPressed( KEY_ONE ) ) {

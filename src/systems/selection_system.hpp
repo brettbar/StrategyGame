@@ -12,6 +12,13 @@
 
 namespace SelectionSystem {
 
+inline entt::entity selected_entity = entt::null;
+
+template<typename T>
+inline void ClearSelection( entt::registry &, view<T> );
+inline void CheckSelectUnits( entt::registry &, view<Unit::Component>, vec2 );
+inline void
+CheckSelectProvince( entt::registry &, view<Province::Component>, vec2 );
 
 inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
   auto unitsView = reg.view<Selected::Component, Unit::Component>();
@@ -44,48 +51,67 @@ inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
   }
 }
 
+inline void UpdateSelection( entt::registry &reg, Vector2 click_pos ) {
+  view<Unit::Component> units_view = reg.view<Unit::Component>();
+  view<Province::Component> prov_view = reg.view<Province::Component>();
 
-inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
-  auto unitsView = reg.view<Unit::Component>();
-  auto provView = reg.view<Province::Component>();
+  ClearSelection( reg, units_view );
+  ClearSelection( reg, prov_view );
 
-  reg.clear<Selected::Component>();
+  CheckSelectUnits( reg, units_view, click_pos );
+  CheckSelectProvince( reg, prov_view, click_pos );
+}
 
-  for ( auto &entity: unitsView ) {
-    Unit::Component &unit = unitsView.get<Unit::Component>( entity );
-    unit.selected = false;
+template<typename T>
+inline void ClearSelection( entt::registry &reg, view<T> component_view ) {
+  // reg.clear<Selected::Component>();
+  selected_entity = entt::null;
+
+  for ( entt::entity entity: component_view ) {
+    T &component = reg.get<T>( entity );
+    component.selected = false;
+
+    reg.remove<Selected::Component>( entity );
   }
+}
 
-  bool alreadyFoundOne = false;
-
+inline void CheckSelectUnits(
+  entt::registry &reg,
+  view<Unit::Component> units_view,
+  vec2 click_pos ) {
   // use forward iterators and get only the components of interest
-  for ( auto &entity: unitsView ) {
-    if ( alreadyFoundOne )
+  for ( auto &entity: units_view ) {
+    if ( selected_entity != entt::null )
       return;
 
-    Unit::Component &unit = unitsView.get<Unit::Component>( entity );
+    Unit::Component &unit = units_view.get<Unit::Component>( entity );
 
-    if ( CheckCollisionPointCircle( unit.position, clickPos, 32 ) ) {
+    if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) ) {
       reg.emplace<Selected::Component>( entity, true );
 
 
       unit.selected = true;
-      alreadyFoundOne = true;
+      selected_entity = entity;
     }
   }
+}
 
-  u32 tile = DetermineTileIdFromClick( clickPos );
+inline void CheckSelectProvince(
+  entt::registry &reg,
+  view<Province::Component> prov_view,
+  vec2 click_pos ) {
+  u32 tile = DetermineTileIdFromClick( click_pos );
 
-  for ( auto &entity: provView ) {
-    if ( alreadyFoundOne )
+  for ( auto &entity: prov_view ) {
+    if ( selected_entity != entt::null )
       return;
 
-    Province::Component &prov = provView.get<Province::Component>( entity );
+    Province::Component &prov = prov_view.get<Province::Component>( entity );
 
     if ( tile == prov.tile->id ) {
       reg.emplace<Selected::Component>( entity, true );
 
-      alreadyFoundOne = true;
+      selected_entity = entity;
     }
 
     // if ( CheckCollisionPointCircle(
@@ -100,5 +126,6 @@ inline void UpdateSelection( entt::registry &reg, Vector2 clickPos ) {
     // }
   }
 }
+
 
 };// namespace SelectionSystem

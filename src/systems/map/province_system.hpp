@@ -61,7 +61,13 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
       LoadTextureFromImage( GenImageColor( 32, 32, WHITE ) ),
     };
 
-    reg.emplace<Province::Component>( provEnt, i, -1, settlement, tiles[i] );
+    reg.emplace<Province::Component>(
+      provEnt,
+      i,
+      -1,
+      false,
+      settlement,
+      tiles[i] );
   }
 
   Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );

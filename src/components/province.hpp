@@ -68,6 +68,7 @@ struct Settlement {
 struct Component {
   u32 id;
   i32 owner;
+  bool selected = false;
 
   Settlement settlement;
   std::shared_ptr<Tile::Component> tile;

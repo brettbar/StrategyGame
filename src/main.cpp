@@ -29,13 +29,12 @@ TEMPORARY TODOS HERE
 
 #include "filesystem"
 
-namespace fs = std::filesystem;
+// namespace fs = std::filesystem;
 
-void LoadResources( TextureCache &, FontCache & );
+void LoadResources( TextureCache & );
 void CameraUpdate( Camera2D &, f32 );
 
-
-void Init( State &, entt::registry &, TextureCache &, FontCache & );
+void Init( State &, entt::registry &, TextureCache & );
 void StartGame( entt::registry &, State &, TextureCache & );
 void Update( State &, entt::registry & );
 void LateUpdate( State &, entt::registry & );
@@ -59,7 +58,7 @@ int main( void ) {
   entt::registry reg;
   reg.clear();
 
-  FontCache font_cache = {};
+  // TODO move this to globals
   TextureCache texture_cache = {};
 
   bool game_started = false;
@@ -87,7 +86,7 @@ int main( void ) {
     // GetScreenHeight(),
     "FieldsOfMars" );
 
-  LoadResources( texture_cache, font_cache );
+  LoadResources( texture_cache );
 
 
   // Main game loop
@@ -97,10 +96,9 @@ int main( void ) {
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-
   while ( !WindowShouldClose() ) {
     switch ( Global::program_mode ) {
-      case ProgramMode::MAIN_MENU:
+      case Global::ProgramMode::MAIN_MENU:
         Input::CheckMenuToggle();
 
         BeginDrawing();
@@ -117,12 +115,12 @@ int main( void ) {
         EndDrawing();
         break;
 
-      case ProgramMode::MODAL_MENU:
+      case Global::ProgramMode::MODAL_MENU:
         Input::CheckMenuToggle();
 
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, texture_cache, font_cache );
+          Renderer::Draw( state, reg, texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -147,7 +145,7 @@ int main( void ) {
         EndDrawing();
         break;
 
-      case ProgramMode::GAME:
+      case Global::ProgramMode::GAME:
         if ( !game_started ) {
           StartGame( reg, state, texture_cache );
           game_started = true;
@@ -181,14 +179,14 @@ int main( void ) {
         // Draw everything to screen
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, texture_cache, font_cache );
+          Renderer::Draw( state, reg, texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
           //     entt::exclude<IRONGUI::Panel> ),
           //   font_cache );
-          UI::Draw( texture_cache, font_cache );
+          UI::Draw( texture_cache );
         }
         EndDrawing();
         break;
@@ -209,7 +207,7 @@ void StartGame(
   ProvinceSystem::InitProvinces( reg, texture_cache );
   SpawnSystem::Init();
   // GAME_UI::Init( reg );
-  UI::Init( texture_cache );
+  UI::Init( reg, texture_cache );
   Renderer::Init( state );
 }
 
@@ -218,6 +216,7 @@ void LoadGame() {}
 void Update( State &state, entt::registry &reg ) {
   MovementSystem::Update( reg, state.timeScale );
   AnimationSystem::UpdateSprites( reg, state.timeScale );
+  UI::Update( reg );
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
 }
@@ -301,18 +300,18 @@ inline Image InitTileOutline() {
   return base;
 }
 
-void LoadResources( TextureCache &texture_cache, FontCache &font_cache ) {
+void LoadResources( TextureCache &texture_cache ) {
   // texture_cache.load<TextureLoader>(
   //   hstr{ "tile_outline" },
   //   InitTileOutline() );
 
   LoadResource( hstr{ "tile_outline" }, InitTileOutline(), texture_cache );
 
-  font_cache.load(
+  Global::font_cache.load(
     hstr{ "font_romulus" },
     LoadFont( "assets/fonts/romulus.png" ) );
 
-  font_cache.load(
+  Global::font_cache.load(
     hstr{ "font_default" },
     LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" ) );
 

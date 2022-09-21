@@ -51,11 +51,8 @@ inline void Init( State &state ) {
 }
 
 
-inline void Draw(
-  State &state,
-  entt::registry &reg,
-  TextureCache &texture_cache,
-  FontCache &font_cache ) {
+inline void
+Draw( State &state, entt::registry &reg, TextureCache &texture_cache ) {
   ClearBackground( DARKGRAY );
 
   BeginMode2D( state.camera );
@@ -71,7 +68,7 @@ inline void Draw(
     EndShaderMode();
 
     // Overlay shouldn't be ran through shader?
-    OverlaySystem::Draw( reg, texture_cache, font_cache );
+    OverlaySystem::Draw( reg, texture_cache );
 
     BeginShaderMode( shader );
     {
