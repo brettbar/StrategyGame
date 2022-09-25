@@ -7,7 +7,7 @@
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
-#include "../entities/archetypes.hpp"
+#include "../archetypes/archetypes.hpp"
 #include "event_system.hpp"
 
 #include "player_system.hpp"

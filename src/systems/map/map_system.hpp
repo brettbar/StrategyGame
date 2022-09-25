@@ -11,7 +11,7 @@
 #include "terrain_system.hpp"
 
 namespace MapSystem {
-enum Mode {
+enum class Mode {
   TERRAIN,
   POLITICAL,
 };

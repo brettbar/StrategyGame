@@ -46,23 +46,20 @@ int main( void ) {
     .mapHeight = 128,
     .timeScale = 0.0f,
     .prevTimeScale = 1.0f,
-    .gameState = EDITOR,
+    .gameState = GameState::EDITOR,
     .month = 1,
     .year = 4,
     .startYear = 4,
     .currPlayer = std::make_shared<PlayerSystem>(
-      PlayerSystem( 0, ROMANS, "Roman Republic" ) ),
+      PlayerSystem( 0, Faction::ROMANS, "Roman Republic" ) ),
   };
 
 
   entt::registry reg;
   reg.clear();
 
-  // TODO move this to globals
-  TextureCache texture_cache = {};
 
   bool game_started = false;
-
 
   // MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
   //   [&reg](
@@ -86,7 +83,7 @@ int main( void ) {
     // GetScreenHeight(),
     "FieldsOfMars" );
 
-  LoadResources( texture_cache );
+  LoadResources( Global::texture_cache );
 
 
   // Main game loop
@@ -120,7 +117,7 @@ int main( void ) {
 
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, texture_cache );
+          Renderer::Draw( state, reg, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -147,7 +144,7 @@ int main( void ) {
 
       case Global::ProgramMode::GAME:
         if ( !game_started ) {
-          StartGame( reg, state, texture_cache );
+          StartGame( reg, state, Global::texture_cache );
           game_started = true;
         }
 
@@ -158,7 +155,7 @@ int main( void ) {
 
         // Check for Input
         Input::CheckMenuToggle();
-        Input::Handle( state, reg, texture_cache );
+        Input::Handle( state, reg, Global::texture_cache );
 
 
         // Update once per frame
@@ -179,14 +176,14 @@ int main( void ) {
         // Draw everything to screen
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, texture_cache );
+          Renderer::Draw( state, reg, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
           //     entt::exclude<IRONGUI::Panel> ),
           //   font_cache );
-          UI::Draw( texture_cache );
+          UI::Draw( Global::texture_cache );
         }
         EndDrawing();
         break;
@@ -194,7 +191,7 @@ int main( void ) {
   }
 
   // Perform clean up and teardown
-  Exit( texture_cache );
+  Exit( Global::texture_cache );
 
   return 0;
 }

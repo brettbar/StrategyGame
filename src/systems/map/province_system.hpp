@@ -95,7 +95,6 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
   listener.Listen();
 }
 
-
 inline void UpdateProvinces( State &state, entt::registry &reg ) {
   listener.Update( state, reg );
 
@@ -183,7 +182,7 @@ AssignProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if ( prov.id != (u32) provId || prov.tile->biome == Tile::WATER )
+    if ( prov.id != (u32) provId || prov.tile->biome == Tile::Biome::WATER )
       continue;
 
     prov.owner = owner;

@@ -5,7 +5,7 @@
 
 #include <string>
 namespace Event {
-// enum EventType
+// enum class EventType
 // {
 //   PROVINCES_SPAWN_PROVINCE,
 //   SPAWN_DELETE_SPAWNED,

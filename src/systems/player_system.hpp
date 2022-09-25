@@ -12,7 +12,7 @@ using f32 = float;
 // using str = std::string;
 using hstr = entt::hashed_string;
 
-enum Faction {
+enum class Faction {
   ROMANS,
   GREEKS,
   CELTS,
@@ -39,19 +39,19 @@ class PlayerSystem {
 
   void RefreshTextureMap() {
     switch ( faction ) {
-      case ROMANS:
+      case Faction::ROMANS:
         this->textureMap = { { "Villager", hstr{ "romanVillagerTexture" } } };
         break;
-      case GREEKS:
+      case Faction::GREEKS:
         this->textureMap = { { "Villager", hstr{ "greekVillagerTexture" } } };
         break;
-      case CELTS:
+      case Faction::CELTS:
         this->textureMap = { { "Villager", hstr{ "celtVillagerTexture" } } };
         break;
-      case PUNICS:
+      case Faction::PUNICS:
         this->textureMap = { { "Villager", hstr{ "punicVillagerTexture" } } };
         break;
-      case PERSIANS:
+      case Faction::PERSIANS:
         this->textureMap = { { "Villager", hstr{ "persianVillagerTexture" } } };
         break;
       default:

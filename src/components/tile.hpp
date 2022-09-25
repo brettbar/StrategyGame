@@ -4,13 +4,13 @@
 
 namespace Tile {
 
-enum Visibility {
+enum class Visibility {
   UNEXPLORED,
   EXPLORED,
   VISIBILE,
 };
 
-enum Biome {
+enum class Biome {
   WATER,
   BEACH,
   LAND,

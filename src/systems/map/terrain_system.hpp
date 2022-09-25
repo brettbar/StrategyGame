@@ -58,25 +58,25 @@ inline void CreateTerrain( entt::registry &registry ) {
 
     // Montanas
     if ( tile->noise >= 0.8f )
-      tile->biome = Tile::MTNS;
+      tile->biome = Tile::Biome::MTNS;
     // Colina
     else if ( tile->noise >= 0.75f )
-      tile->biome = Tile::HILLS;
+      tile->biome = Tile::Biome::HILLS;
     // Tierra
     else if ( tile->noise >= waterLevel )
-      tile->biome = Tile::LAND;
+      tile->biome = Tile::Biome::LAND;
     //      // Playa
     //      else if (tile->noise >= 0.76f)
     //        tile->biome = BEACH;
     // Mar
     else
-      tile->biome = Tile::WATER;
+      tile->biome = Tile::Biome::WATER;
 
     tile->center = {
       tile->position.x + ( TILE_WIDTH / 2 ),
       tile->position.y + ( TILE_HEIGHT / 2 ) };
     tile->coords = { x, y };
-    tile->visibility = Tile::UNEXPLORED;
+    tile->visibility = Tile::Visibility::UNEXPLORED;
     tileMap[index( x, y )] = tile;
   }
   registry.emplace<TileMap>( entity, tileMap );
@@ -115,23 +115,23 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
     //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
     //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
     switch ( tile->biome ) {
-      case Tile::MTNS:
+      case Tile::Biome::MTNS:
         // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( snow_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::HILLS:
+      case Tile::Biome::HILLS:
         // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( hills_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::LAND:
+      case Tile::Biome::LAND:
         // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( land_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::BEACH:
+      case Tile::Biome::BEACH:
         // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( sand_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::WATER:
+      case Tile::Biome::WATER:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
         break;
@@ -191,10 +191,10 @@ inline void UpdateFOW( entt::registry &reg ) {
 
     for ( auto &neighbor: neighbors ) {
       if ( neighbor != nullptr )
-        neighbor->visibility = Tile::VISIBILE;
+        neighbor->visibility = Tile::Visibility::VISIBILE;
     }
 
-    closest->visibility = Tile::VISIBILE;
+    closest->visibility = Tile::Visibility::VISIBILE;
   }
 }
 

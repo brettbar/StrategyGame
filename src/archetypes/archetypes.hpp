@@ -26,15 +26,15 @@ struct Character {
       .speed = 1.0f,
     };
     animations = {
-      { Animated::IDLE_DR, 2, 0.2f },
-      { Animated::IDLE_DL, 2, 0.2f },
-      { Animated::WALK_DL, 8, 0.8f },
-      { Animated::WALK_DL, 8, 0.8f },
+      { Animated::AnimState::IDLE_DR, 2, 0.2f },
+      { Animated::AnimState::IDLE_DL, 2, 0.2f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
     };
     animated = Animated::Component{
       .sprite = sprite,
       .frameRec = { 0, 0, 128, 128 },
-      .state = Animated::IDLE_DR,
+      .state = Animated::AnimState::IDLE_DR,
       .animations = animations,
       .direction = 0,
       .currFrame = 0,

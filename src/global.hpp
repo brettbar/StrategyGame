@@ -22,4 +22,6 @@ inline ProgramMode program_mode = ProgramMode::GAME;
 
 inline FontCache font_cache = {};
 
+inline TextureCache texture_cache = {};
+
 };// namespace Global

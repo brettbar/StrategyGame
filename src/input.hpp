@@ -99,35 +99,35 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
 
   if ( IsKeyPressed( KEY_ONE ) ) {
     state.currPlayer->id = 0;
-    state.currPlayer->faction = ROMANS;
+    state.currPlayer->faction = Faction::ROMANS;
     state.currPlayer->factionName = "Roman Republic";
     state.currPlayer->RefreshTextureMap();
   }
 
   if ( IsKeyPressed( KEY_TWO ) ) {
     state.currPlayer->id = 1;
-    state.currPlayer->faction = GREEKS;
+    state.currPlayer->faction = Faction::GREEKS;
     state.currPlayer->factionName = "Greek Cities";
     state.currPlayer->RefreshTextureMap();
   }
 
   if ( IsKeyPressed( KEY_THREE ) ) {
     state.currPlayer->id = 2;
-    state.currPlayer->faction = CELTS;
+    state.currPlayer->faction = Faction::CELTS;
     state.currPlayer->factionName = "Celtic Tribes";
     state.currPlayer->RefreshTextureMap();
   }
 
   if ( IsKeyPressed( KEY_FOUR ) ) {
     state.currPlayer->id = 3;
-    state.currPlayer->faction = PUNICS;
+    state.currPlayer->faction = Faction::PUNICS;
     state.currPlayer->factionName = "Punic Colonies";
     state.currPlayer->RefreshTextureMap();
   }
 
   if ( IsKeyPressed( KEY_FIVE ) ) {
     state.currPlayer->id = 4;
-    state.currPlayer->faction = PERSIANS;
+    state.currPlayer->faction = Faction::PERSIANS;
     state.currPlayer->factionName = "Persian Empire";
     state.currPlayer->RefreshTextureMap();
   }

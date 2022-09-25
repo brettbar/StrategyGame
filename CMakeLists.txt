@@ -5,6 +5,34 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
+
+set(SOURCE_FILES 
+  src/main.cpp
+  src/renderer/renderer.hpp
+  src/systems/player_system.hpp
+  # src/systems/ui/irongui/irongui.hpp
+  # src/systems/ui/modal_menu.hpp
+  # src/systems/ui/game_ui_system.hpp
+  src/systems/map/map_system.hpp
+  src/systems/map/province_system.hpp
+  src/systems/map/terrain_system.hpp
+  src/systems/movement_system.hpp
+  src/systems/animation_system.hpp
+  src/systems/selection_system.hpp
+  src/systems/spawn_system.hpp
+  src/archetypes/archetypes.hpp
+  src/components/actor.hpp
+  src/components/animated.hpp
+  src/components/province.hpp
+  src/components/selected.hpp
+  src/components/sight.hpp
+  src/components/tile.hpp
+  src/components/unit.hpp
+  src/systems/actor_system.hpp
+  src/input.hpp
+  src/common.hpp
+  src/components/event.hpp)
 
 
 
@@ -46,34 +74,12 @@ find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
 
 
 
-  add_executable(
-          ${PROJECT_NAME} src/main.cpp
-          src/renderer/renderer.hpp
-          src/systems/player_system.hpp
-          # src/systems/ui/irongui/irongui.hpp
-          # src/systems/ui/modal_menu.hpp
-          # src/systems/ui/game_ui_system.hpp
-          src/systems/map/map_system.hpp
-          src/systems/map/province_system.hpp
-          src/systems/map/terrain_system.hpp
-          src/systems/movement_system.hpp
-          src/systems/animation_system.hpp
-          src/systems/selection_system.hpp
-          src/systems/spawn_system.hpp
-          src/entities/archetypes.hpp
-          src/components/actor.hpp
-          src/components/animated.hpp
-          src/components/province.hpp
-          src/components/selected.hpp
-          src/components/sight.hpp
-          src/components/tile.hpp
-          src/components/unit.hpp
-          src/systems/actor_system.hpp
-          src/input.hpp
-          src/common.hpp
-          src/components/event.hpp)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-  target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+# For compiler errors/warnings
+# target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
 
 

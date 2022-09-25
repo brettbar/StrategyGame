@@ -24,6 +24,7 @@ struct Population {
   // births per 1000 people
   // higher when health is higher and degeneracy is lower
   f32 birthRate;
+
   // deaths per 1000 people
   // higher when health is lower
   f32 deathRate;

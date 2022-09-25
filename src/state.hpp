@@ -6,13 +6,13 @@
 
 #include "common.hpp"
 
-enum GameState {
+enum class GameState {
   MENU,
   EDITOR,
   GAME,
 };
 
-enum RunState {
+enum class RunState {
   RUNNING,
   PAUSE,
 };

@@ -6,6 +6,7 @@
 
 namespace Animated {
 
+// TODO should this be an enum class?
 enum AnimState {
   IDLE_DR,
   IDLE_DL,
@@ -39,21 +40,28 @@ struct Component {
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( 
-       sprite.id, sprite.width, sprite.height, sprite.mipmaps, sprite.format, 
-       frameRec.x, frameRec.y, frameRec.width, frameRec.height,
-       state,
-       animations ,
-       direction,
-       currFrame,
-       animTime,
-       moving);
+    ar(
+      sprite.id,
+      sprite.width,
+      sprite.height,
+      sprite.mipmaps,
+      sprite.format,
+      frameRec.x,
+      frameRec.y,
+      frameRec.width,
+      frameRec.height,
+      state,
+      animations,
+      direction,
+      currFrame,
+      animTime,
+      moving );
   }
 
   template<class Archive>
   void serialize( Archive &ar, Animations &anims ) {
-    ar( CEREAL_NVP(anims) );
+    ar( CEREAL_NVP( anims ) );
   }
 };
 
-}// namespace c_Animated
+}// namespace Animated
