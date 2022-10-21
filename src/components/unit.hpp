@@ -9,6 +9,7 @@ struct Component {
   Vector2 destination;
   f32 speed;
   bool selected;
+  bool moving = false;
 
   template<class Archive>
   void serialize( Archive &ar ) {

@@ -8,8 +8,8 @@
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
+#include "../events.hpp"
 #include "../global.hpp"
-#include "event_system.hpp"
 
 #include "player_system.hpp"
 #include "selection_system.hpp"
@@ -19,26 +19,30 @@ inline void CreateNew( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
 inline void DeleteSelected();
 Texture2D DetermineTexture( Faction, TextureCache & );
 
-struct SpawnListener : EventSystem::Listener {
-  inline void Receive() override {
-    if ( currState == nullptr )
-      return;
+// struct SpawnListener : Events::Listener {
+//   inline void Receive() override {
+//     if ( currState == nullptr )
+//       return;
 
-    printf( "SpawnSystem got an event!\n" );
-    DeleteSelected();
-  }
+//     printf( "SpawnSystem got an event!\n" );
+//     DeleteSelected();
+//   }
 
-  inline void Listen() {
-    EventSystem::dispatcher.sink<Event::SpawnEvent>()
-      .connect<&SpawnListener::Receive>( this );
-  }
-};
+//   inline void Listen() {
+//     Events::dispatcher.sink<Event::SpawnEvent>()
+//       .connect<&SpawnListener::Receive>( this );
+//   }
+// };
 
-inline SpawnListener listener;
+// inline SpawnListener listener;
 
-inline void Init() { listener.Listen(); }
+inline void Init() {
+  // listener.Listen();
+}
 
-inline void Update( State &state ) { listener.Update( state ); }
+inline void Update( State &state ) {
+  // listener.Update( state );
+}
 
 inline void CreateNew(
   TextureCache &cache,

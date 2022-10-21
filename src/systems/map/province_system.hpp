@@ -1,8 +1,8 @@
 #include "../../common.hpp"
 #include "../../components/province.hpp"
 #include "../../components/settlement.hpp"
+#include "../../events.hpp"
 #include "../../renderer/textures.hpp"
-#include "../event_system.hpp"
 #include "../spawn_system.hpp"
 #include "terrain_system.hpp"
 #include <array>
@@ -21,26 +21,26 @@ inline void DrawProvinces( TextureCache &, bool );
 
 // TODO figure out if this really needs to be here
 // Should be able to make it like the listener in ui_system.
-struct ProvListener : EventSystem::Listener {
-  inline void Receive() override {
-    if ( this->currState == nullptr ) {
-      return;
-    }
+// struct ProvListener : Events::Listener {
+//   inline void Receive() override {
+//     if ( this->currState == nullptr ) {
+//       return;
+//     }
 
-    printf( "ProvinceSystem got an event!\n" );
-    SetProvinceOwner( this->currState->currPlayer->id );
-  }
+//     printf( "ProvinceSystem got an event!\n" );
+//     SetProvinceOwner( this->currState->currPlayer->id );
+//   }
 
-  inline void Listen() {
-    EventSystem::dispatcher.sink<Event::ProvEvent>()
-      .connect<&ProvListener::Receive>( this );
-  }
-};
+//   inline void Listen() {
+//     Events::dispatcher.sink<Event::ProvEvent>().connect<&ProvListener::Receive>(
+//       this );
+//   }
+// };
 
 
-inline ProvListener listener;
+// inline ProvListener listener;
 
-inline void InitProvinces( TextureCache &cache ) {
+inline void Init( TextureCache &cache ) {
   auto tView = Global::registry.view<Terrain::TileMap>();
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
 
@@ -51,11 +51,11 @@ inline void InitProvinces( TextureCache &cache ) {
       .emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
   }
 
-  listener.Listen();
+  // listener.Listen();
 }
 
-inline void UpdateProvinces( State &state, entt::registry &reg ) {
-  listener.Update( state );
+inline void Update( State &state ) {
+  // listener.Update( state );
 
   // auto view = reg.view<Province::Component>();
 

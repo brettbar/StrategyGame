@@ -8,9 +8,6 @@
 
 namespace AnimationSystem {
 
-// void Draw(entt::registry &, bool);
-// void UpdateSprites(entt::registry &, f32);
-
 inline void Draw( bool debug ) {
   entt::basic_view villagers =
     Global::registry.view<Unit::Component, Animated::Component>();
@@ -76,7 +73,7 @@ inline void Draw( bool debug ) {
   } );
 }
 
-inline void UpdateSprites( f32 timeScale ) {
+inline void Update( f32 timeScale ) {
   auto view = Global::registry.view<Animated::Component, Unit::Component>();
 
   for ( auto &entity: view ) {

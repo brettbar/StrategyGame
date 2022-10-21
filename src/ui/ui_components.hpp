@@ -73,7 +73,7 @@ struct TextLabel {
 };
 
 struct TextButton : TextLabel {
-  bool clickable = false;
+  bool clickable;
   std::function<void()> action;
   std::function<bool()> check_clickable;
 
@@ -82,10 +82,7 @@ struct TextButton : TextLabel {
       action();
   }
 
-  void Update() {
-    if ( !clickable )
-      clickable = check_clickable();
-  }
+  void Update() { clickable = check_clickable(); }
 };
 
 struct TextureLabel {
@@ -93,7 +90,7 @@ struct TextureLabel {
 };
 
 struct TextureButton : TextureLabel {
-  bool clickable = false;
+  bool clickable;
   std::function<void()> action;
   std::function<bool()> check_clickable;
 
@@ -102,10 +99,7 @@ struct TextureButton : TextureLabel {
       action();
   }
 
-  void Update() {
-    if ( !clickable )
-      clickable = check_clickable();
-  }
+  void Update() { clickable = check_clickable(); }
 };
 
 template<typename T>

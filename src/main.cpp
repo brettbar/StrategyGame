@@ -11,6 +11,7 @@ TEMPORARY TODOS HERE
 */
 #include <raylib.h>
 
+#include "events.hpp"
 #include "input.hpp"
 #include "renderer/fonts.hpp"
 #include "renderer/renderer.hpp"
@@ -18,7 +19,6 @@ TEMPORARY TODOS HERE
 #include "save.hpp"
 #include "state.hpp"
 #include "systems/animation_system.hpp"
-#include "systems/event_system.hpp"
 #include "systems/map/province_system.hpp"
 #include "systems/map/terrain_system.hpp"
 #include "systems/movement_system.hpp"
@@ -35,10 +35,13 @@ TEMPORARY TODOS HERE
 void LoadResources( TextureCache & );
 void CameraUpdate( Camera2D &, f32 );
 
-void Init( State &, TextureCache & );
 void StartGame( State &, TextureCache & );
-void Update( State & );
-void LateUpdate( State & );
+void UpdateOnFrame( State & );
+void Update60TPS( State & );
+void Update1TPS( State & );
+
+void Draw( State & );
+
 void Exit( TextureCache & );
 
 int main( void ) {
@@ -74,15 +77,9 @@ int main( void ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   SetExitKey( KEY_DELETE );
-  InitWindow(
-    1920,
-    1080,
-    // GetScreenWidth(),
-    // GetScreenHeight(),
-    "FieldsOfMars" );
+  InitWindow( 1920, 1080, "FieldsOfMars" );
 
   LoadResources( Global::texture_cache );
-
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -155,35 +152,29 @@ int main( void ) {
         Input::CheckMenuToggle();
         Input::Handle( state, Global::texture_cache );
 
-
-        // Update once per frame TODO: is this really once per frame? Looks like 60 times a second to me
+        // Update 60 times a second
         while ( lag >= MS_PER_UPDATE ) {
-          Update( state );
+          Update60TPS( state );
           lag -= MS_PER_UPDATE;
         }
 
         // Update once per second
         while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-          LateUpdate( state );
+          Update1TPS( state );
           oncelag = 0.0f;
         }
+
+        // Update once per frame
+        UpdateOnFrame( state );
 
         // Update Camera
         CameraUpdate( state.camera, dt );
 
         // Draw everything to screen
         BeginDrawing();
-        {
-          Renderer::Draw( state, Global::texture_cache );
-          // IRONGUI::Draw(
-          //   GAME_UI::curr_content,
-          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
-          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
-          //     entt::exclude<IRONGUI::Panel> ),
-          //   font_cache );
-          UI::Draw( Global::texture_cache );
-        }
+        { Draw( state ); }
         EndDrawing();
+
         break;
     }
   }
@@ -195,27 +186,29 @@ int main( void ) {
 }
 
 void StartGame( State &state, TextureCache &texture_cache ) {
-  Terrain::CreateTerrain();
-  ProvinceSystem::InitProvinces( texture_cache );
-  SettlementSystem::InitSettlements( texture_cache );
+  Terrain::Init();
+  ProvinceSystem::Init( texture_cache );
+  SettlementSystem::Init( texture_cache );
   SpawnSystem::Init();
-  // GAME_UI::Init( Global::registry );
   UI::Init( texture_cache );
   Renderer::Init( state );
 }
 
 void LoadGame() {}
 
-void Update( State &state ) {
+void UpdateOnFrame( State &state ) {}
+
+// TODO: look at all of these and see if any belong
+// in UpdateOnFrame
+void Update60TPS( State &state ) {
   MovementSystem::Update( state.timeScale );
-  AnimationSystem::UpdateSprites( state.timeScale );
-  UI::Update( Global::registry );
+  AnimationSystem::Update( state.timeScale );
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
 }
 
-void LateUpdate( State &state ) {
-  ProvinceSystem::UpdateProvinces( state, Global::registry );
+void Update1TPS( State &state ) {
+  ProvinceSystem::Update( state );
   SpawnSystem::Update( state );
 
   state.day++;
@@ -226,6 +219,17 @@ void LateUpdate( State &state ) {
     state.year++;
     state.month = 1;
   }
+}
+
+void Draw( State &state ) {
+  Renderer::Draw( state, Global::texture_cache );
+  // IRONGUI::Draw(
+  //   GAME_UI::curr_content,
+  //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
+  //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
+  //     entt::exclude<IRONGUI::Panel> ),
+  //   font_cache );
+  UI::Draw( Global::texture_cache );
 }
 
 void Exit( TextureCache &cache ) {
@@ -294,10 +298,6 @@ inline Image InitTileOutline() {
 }
 
 void LoadResources( TextureCache &texture_cache ) {
-  // texture_cache.load<TextureLoader>(
-  //   hstr{ "tile_outline" },
-  //   InitTileOutline() );
-
   LoadResource( hstr{ "tile_outline" }, InitTileOutline(), texture_cache );
 
   Global::font_cache.load(
@@ -384,7 +384,6 @@ void LoadResources( TextureCache &texture_cache ) {
     hstr{ "buildings" },
     LoadImage( "assets/textures/buildings.png" ),
     texture_cache );
-
 
   LoadResource(
     hstr{ "context_panel" },

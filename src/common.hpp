@@ -1,3 +1,5 @@
+// TODO, this file should be stripped down and converted to a utils file
+
 #pragma once
 
 #include "../include/entt/entt.hpp"
@@ -182,6 +184,7 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   //  }
 }
 
+// TODO this probably needs to get moved to the renderer
 inline static void DrawPerfectTexture(
   Texture2D &texture,
   Rectangle rect,
@@ -193,4 +196,11 @@ inline static void DrawPerfectTexture(
   // SetTextureFilter( texture, TEXTURE_FILTER_POINT );
 
   DrawTextureRec( texture, rect, position, tint );
+}
+
+inline static std::string EntityIdToString( entt::entity entity ) {
+  if ( entity == entt::null )
+    return "-1";
+  else
+    return std::to_string( (std::uint32_t) entity );
 }

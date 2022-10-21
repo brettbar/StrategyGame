@@ -5,10 +5,10 @@
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
 #include "../components/settlement.hpp"
+#include "../events.hpp"
 #include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
-#include "../systems/event_system.hpp"
 #include "../systems/selection_system.hpp"
 #include "ui_components.hpp"
 #include "widgets/actor_context_panel.hpp"
@@ -20,35 +20,29 @@
 #include <raymath.h>
 
 namespace UI {
+
 inline Context context;
 
 inline void Init( TextureCache & );
-inline void Update();
 inline void Draw();
 inline void LayoutPanel( Panel &, entt::entity );
 inline void ResizeElement( entt::entity, Element & );
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void DrawElement( TextureCache &, entt::entity, Element & );
-inline void SelectListener( entt::registry &, entt::entity );
-inline void DeSelectListener();
+inline void ListenForSelect( entt::registry &, entt::entity );
+inline void ListenForDeselect();
 inline void ToggleElement( entt::entity, bool );
 
-inline std::string ActiveId();
-inline std::string HotId();
-
 inline void Init( TextureCache &texture_cache ) {
-
   OverviewBanner();
   SettlementContextPanel( texture_cache );
   ActorContextPanel( texture_cache );
 
   Global::registry.on_construct<Selected::Component>()
-    .connect<&SelectListener>();
+    .connect<&ListenForSelect>();
   Global::registry.on_destroy<Selected::Component>()
-    .connect<&DeSelectListener>();
+    .connect<&ListenForDeselect>();
 }
-
-inline void Update( entt::registry &game_reg ) {}
 
 inline void Draw( TextureCache &texture_cache ) {
   vec2 mousePos = GetMousePosition();
@@ -111,6 +105,17 @@ inline void Draw( TextureCache &texture_cache ) {
     bool interactive =
       ( elem.type == Type::TEXT_BUTTON || elem.type == Type::TEXTURE_BUTTON );
 
+    switch ( elem.type ) {
+      case Type::TEXT_BUTTON: {
+        TextButton &button = ui_reg.get<TextButton>( entity );
+        button.Update();
+      } break;
+      case Type::TEXTURE_BUTTON: {
+        TextureButton &button = ui_reg.get<TextureButton>( entity );
+        button.Update();
+      } break;
+    }
+
     // Check for interactions
     if ( DoInteraction(
            entity,
@@ -121,12 +126,12 @@ inline void Draw( TextureCache &texture_cache ) {
 
       switch ( elem.type ) {
         case Type::TEXT_BUTTON: {
-          TextButton button = ui_reg.get<TextButton>( entity );
+          TextButton &button = ui_reg.get<TextButton>( entity );
           button.Update();
           button.Action();
         } break;
         case Type::TEXTURE_BUTTON: {
-          TextureButton button = ui_reg.get<TextureButton>( entity );
+          TextureButton &button = ui_reg.get<TextureButton>( entity );
           button.Update();
           button.Action();
         } break;
@@ -147,13 +152,17 @@ inline void Draw( TextureCache &texture_cache ) {
 
   // TODO make this a part of debug
   DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  std::string foo = "hot: " + HotId();
+  std::string foo = "hot: " + EntityIdToString( context.hot );
   DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
-  std::string bar = "active: " + ActiveId();
+  std::string bar = "active: " + EntityIdToString( context.active );
   DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 
+  DrawRectangle( GetScreenWidth() - 200, 202, 200, 24.0f, BLACK );
+  std::string selected_ent =
+    "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+  DrawText( selected_ent.c_str(), GetScreenWidth() - 200, 202, 24.0f, GREEN );
 
   // DrawTexturePro(texture_cache[hstr{"context_panel"}]->texture, {747, 448}, {}, {0, 0}, 0, WHITE);
 }
@@ -382,7 +391,7 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
   }
 }
 
-inline void SelectListener( entt::registry &game_reg, entt::entity entity ) {
+inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
 
@@ -401,7 +410,7 @@ inline void SelectListener( entt::registry &game_reg, entt::entity entity ) {
   }
 }
 
-inline void DeSelectListener() {
+inline void ListenForDeselect() {
   printf( "DeSelectListener?\n" );
   auto context_panel = ui_lookup.at( "settlement_context_panel" );
   // TODO not deselecting properly?
@@ -426,20 +435,6 @@ inline void ToggleElement( entt::entity entity, bool on ) {
       ToggleElement( child, on );
     }
   }
-}
-
-inline std::string ActiveId() {
-  if ( context.active == entt::null )
-    return "-1";
-  else
-    return std::to_string( (std::uint32_t) context.active );
-}
-
-inline std::string HotId() {
-  if ( context.hot == entt::null )
-    return "-1";
-  else
-    return std::to_string( (std::uint32_t) context.hot );
 }
 
 inline bool MouseIsOverUI() {

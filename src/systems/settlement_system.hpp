@@ -10,7 +10,7 @@ inline void UpdateSprawl( Settlement::Component & );
 
 inline std::map<std::string, Image> building_map;
 
-inline void InitSettlements( TextureCache &cache ) {
+inline void Init( TextureCache &cache ) {
   Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );
   Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
   Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );

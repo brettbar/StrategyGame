@@ -47,21 +47,29 @@ inline void Update( f32 timeScale ) {
       unit.position.x += unitVec.x * unit.speed * timeScale;
       unit.position.y += unitVec.y * unit.speed * timeScale;
 
-      if ( unit.destination.x > unit.position.x )
+      // TODO maybe these 2 ifs could be consolidated
+      if ( unit.destination.x > unit.position.x ) {
         anim.state = Animated::WALK_DR;
-      else if ( unit.destination.x < unit.position.x )
+        unit.moving = true;
+      } else if ( unit.destination.x < unit.position.x ) {
         anim.state = Animated::WALK_DL;
-
+        unit.moving = true;
+      }
       if ( unit.destination.x == unit.position.x ) {
-        if ( anim.state == Animated::IDLE_DR )
+        if ( anim.state == Animated::IDLE_DR ) {
           anim.state = Animated::WALK_DR;
-        else if ( anim.state == Animated::IDLE_DL )
+          unit.moving = true;
+        } else if ( anim.state == Animated::IDLE_DL ) {
+
           anim.state = Animated::WALK_DL;
+          unit.moving = true;
+        }
       }
 
 
       if ( Vector2Distance( unit.destination, unit.position ) <= 0.7f ) {
         unit.position = unit.destination;
+        unit.moving = false;
 
         if ( anim.direction == 0 )
           anim.state = Animated::IDLE_DR;
@@ -70,6 +78,13 @@ inline void Update( f32 timeScale ) {
       }
     }
   }
+}
+
+inline bool UnitIsMoving( entt::entity entity ) {
+  if ( Global::registry.all_of<Unit::Component>( entity ) ) {
+    return Global::registry.get<Unit::Component>( entity ).moving;
+  }
+  return false;
 }
 
 };// namespace MovementSystem

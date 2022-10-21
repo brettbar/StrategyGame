@@ -20,7 +20,7 @@ using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
 using TileMap =
   std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
-inline void CreateTerrain();
+inline void Init();
 inline void Draw( Camera2D &, TextureCache & );
 inline void UpdateFOW();
 inline u32 index( u32, u32 );
@@ -28,7 +28,7 @@ inline NoiseMap GeneratePerlinNoise( float, int, float );
 inline void FilterIslands( NoiseMap &, f32 );
 inline void NormalizeMap( NoiseMap & );
 
-inline void CreateTerrain() {
+inline void Init() {
   entt::entity entity = Global::registry.create();
   TileMap tileMap = {};
   f32 seed = 25;

@@ -33,7 +33,6 @@ inline void CheckMenuToggle() {
 inline void Handle( State &state, TextureCache &cache ) {
   Vector2 click_pos = GetScreenToWorld2D( GetMousePosition(), state.camera );
 
-
   if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
     if ( IsKeyPressed( KEY_S ) ) {
       Save::Save( Global::registry );
@@ -86,16 +85,12 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
 
   if ( IsMouseButtonPressed( 0 ) ) {
-    // IRONGUI::Input(state, reg);
     if ( !UI::MouseIsOverUI() )
       SelectionSystem::UpdateSelection( click_pos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !UI::MouseIsOverUI() ) {
+    if ( !UI::MouseIsOverUI() )
       MovementSystem::SetDestinations( state.camera );
-      SelectionSystem::ClearSelection(
-        Global::registry.view<Province::Component>() );
-    }
   }
 
   if ( IsKeyPressed( KEY_ONE ) ) {
