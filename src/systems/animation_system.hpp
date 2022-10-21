@@ -11,11 +11,11 @@ namespace AnimationSystem {
 // void Draw(entt::registry &, bool);
 // void UpdateSprites(entt::registry &, f32);
 
-inline void Draw( entt::registry &registry, bool debug ) {
+inline void Draw( bool debug ) {
   entt::basic_view villagers =
-    registry.view<Unit::Component, Animated::Component>();
+    Global::registry.view<Unit::Component, Animated::Component>();
 
-  registry.sort<Unit::Component>(
+  Global::registry.sort<Unit::Component>(
     []( const Unit::Component &lhs, const Unit::Component &rhs ) {
       return rhs.position.y > lhs.position.y;
     } );
@@ -76,8 +76,8 @@ inline void Draw( entt::registry &registry, bool debug ) {
   } );
 }
 
-inline void UpdateSprites( entt::registry &reg, f32 timeScale ) {
-  auto view = reg.view<Animated::Component, Unit::Component>();
+inline void UpdateSprites( f32 timeScale ) {
+  auto view = Global::registry.view<Animated::Component, Unit::Component>();
 
   for ( auto &entity: view ) {
     Animated::Component &anim = view.get<Animated::Component>( entity );

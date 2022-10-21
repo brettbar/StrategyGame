@@ -10,9 +10,9 @@
 
 namespace OverlaySystem {
 
-inline void Draw( entt::registry &reg, TextureCache &texture_cache ) {
-  auto provinces = reg.view<Province::Component>();
-  auto settlements = reg.view<Settlement::Component>();
+inline void Draw( TextureCache &texture_cache ) {
+  auto provinces = Global::registry.view<Province::Component>();
+  auto settlements = Global::registry.view<Settlement::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
@@ -63,7 +63,8 @@ inline void Draw( entt::registry &reg, TextureCache &texture_cache ) {
   for ( auto entity: settlements ) {
     Settlement::Component &settlement =
       settlements.get<Settlement::Component>( entity );
-    Province::Component &prov = reg.get<Province::Component>( entity );
+    Province::Component &prov =
+      Global::registry.get<Province::Component>( entity );
 
     std::string popStr =
       "Pop: " + std::to_string( settlement.population.current );

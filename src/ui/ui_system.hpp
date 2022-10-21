@@ -1,8 +1,6 @@
 #pragma once
 
 
-#include "../../.old/ui/column_alignment.hpp"
-#include "../../.old/ui/row_alignment.hpp"
 #include "../components/actor.hpp"
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
@@ -24,7 +22,7 @@
 namespace UI {
 inline Context context;
 
-inline void Init( entt::registry &, TextureCache & );
+inline void Init( TextureCache & );
 inline void Update();
 inline void Draw();
 inline void LayoutPanel( Panel &, entt::entity );
@@ -38,14 +36,16 @@ inline void ToggleElement( entt::entity, bool );
 inline std::string ActiveId();
 inline std::string HotId();
 
-inline void Init( entt::registry &game_reg, TextureCache &texture_cache ) {
+inline void Init( TextureCache &texture_cache ) {
 
   OverviewBanner();
   SettlementContextPanel( texture_cache );
   ActorContextPanel( texture_cache );
 
-  game_reg.on_construct<Selected::Component>().connect<&SelectListener>();
-  game_reg.on_destroy<Selected::Component>().connect<&DeSelectListener>();
+  Global::registry.on_construct<Selected::Component>()
+    .connect<&SelectListener>();
+  Global::registry.on_destroy<Selected::Component>()
+    .connect<&DeSelectListener>();
 }
 
 inline void Update( entt::registry &game_reg ) {}

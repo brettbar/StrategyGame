@@ -67,7 +67,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     EndShaderMode();
 
     // Overlay shouldn't be ran through shader?
-    OverlaySystem::Draw( Global::registry, texture_cache );
+    OverlaySystem::Draw( texture_cache );
 
     BeginShaderMode( shader );
     {

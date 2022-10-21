@@ -200,7 +200,7 @@ void StartGame( State &state, TextureCache &texture_cache ) {
   SettlementSystem::InitSettlements( texture_cache );
   SpawnSystem::Init();
   // GAME_UI::Init( Global::registry );
-  UI::Init( Global::registry, texture_cache );
+  UI::Init( texture_cache );
   Renderer::Init( state );
 }
 
@@ -208,7 +208,7 @@ void LoadGame() {}
 
 void Update( State &state ) {
   MovementSystem::Update( state.timeScale );
-  AnimationSystem::UpdateSprites( Global::registry, state.timeScale );
+  AnimationSystem::UpdateSprites( state.timeScale );
   UI::Update( Global::registry );
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
