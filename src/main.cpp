@@ -24,6 +24,7 @@ TEMPORARY TODOS HERE
 #include "systems/movement_system.hpp"
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
+#include "systems/settlement_system.hpp"
 #include "systems/spawn_system.hpp"
 #include "ui/ui_system.hpp"
 
@@ -54,10 +55,8 @@ int main( void ) {
       PlayerSystem( 0, Faction::ROMANS, "Roman Republic" ) ),
   };
 
-
   entt::registry reg;
   reg.clear();
-
 
   bool game_started = false;
 
@@ -153,7 +152,7 @@ int main( void ) {
         lag += dt;
         oncelag += dt;
 
-        // Check for Input
+        // Check for Inpu
         Input::CheckMenuToggle();
         Input::Handle( state, reg, Global::texture_cache );
 
@@ -202,6 +201,7 @@ void StartGame(
   TextureCache &texture_cache ) {
   Terrain::CreateTerrain( reg );
   ProvinceSystem::InitProvinces( reg, texture_cache );
+  SettlementSystem::InitSettlements( reg, texture_cache );
   SpawnSystem::Init();
   // GAME_UI::Init( reg );
   UI::Init( reg, texture_cache );

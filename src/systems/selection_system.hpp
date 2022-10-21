@@ -15,10 +15,10 @@ namespace SelectionSystem {
 inline entt::entity selected_entity = entt::null;
 
 template<typename T>
-inline void ClearSelection( entt::registry &, view<T> );
-inline void CheckSelectUnits( entt::registry &, view<Unit::Component>, vec2 );
+inline void ClearSelection( entt::registry &, View<T> );
+inline void CheckSelectUnits( entt::registry &, View<Unit::Component>, vec2 );
 inline void
-CheckSelectProvince( entt::registry &, view<Province::Component>, vec2 );
+CheckSelectProvince( entt::registry &, View<Province::Component>, vec2 );
 
 inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
   auto unitsView = reg.view<Selected::Component, Unit::Component>();
@@ -52,8 +52,8 @@ inline void Draw( entt::registry &reg, TextureCache &cache, bool isDebug ) {
 }
 
 inline void UpdateSelection( entt::registry &reg, Vector2 click_pos ) {
-  view<Unit::Component> units_view = reg.view<Unit::Component>();
-  view<Province::Component> prov_view = reg.view<Province::Component>();
+  View<Unit::Component> units_view = reg.view<Unit::Component>();
+  View<Province::Component> prov_view = reg.view<Province::Component>();
 
   ClearSelection( reg, units_view );
   ClearSelection( reg, prov_view );
@@ -63,7 +63,7 @@ inline void UpdateSelection( entt::registry &reg, Vector2 click_pos ) {
 }
 
 template<typename T>
-inline void ClearSelection( entt::registry &reg, view<T> component_view ) {
+inline void ClearSelection( entt::registry &reg, View<T> component_view ) {
   // reg.clear<Selected::Component>();
   selected_entity = entt::null;
 
@@ -77,7 +77,7 @@ inline void ClearSelection( entt::registry &reg, view<T> component_view ) {
 
 inline void CheckSelectUnits(
   entt::registry &reg,
-  view<Unit::Component> units_view,
+  View<Unit::Component> units_view,
   vec2 click_pos ) {
   // use forward iterators and get only the components of interest
   for ( auto &entity: units_view ) {
@@ -98,7 +98,7 @@ inline void CheckSelectUnits(
 
 inline void CheckSelectProvince(
   entt::registry &reg,
-  view<Province::Component> prov_view,
+  View<Province::Component> prov_view,
   vec2 click_pos ) {
   u32 tile = DetermineTileIdFromClick( click_pos );
 

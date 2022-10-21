@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../components/settlement.hpp"
 #include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
@@ -11,11 +12,12 @@ namespace OverlaySystem {
 
 inline void Draw( entt::registry &reg, TextureCache &texture_cache ) {
   auto provinces = reg.view<Province::Component>();
+  auto settlements = reg.view<Settlement::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if ( prov.owner > -1 && prov.settlement.population.current > 0 ) {
+    if ( prov.owner > -1 ) {
       Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
       switch ( prov.owner ) {
@@ -55,50 +57,57 @@ inline void Draw( entt::registry &reg, TextureCache &texture_cache ) {
             Fade( WHITE, 0.5 ) );
           break;
       }
-
-      // std::string popStr = "Pop: " + std::to_string(prov.settlement.population.current);
-
-      // DrawText(popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK);
-
-
-      // DrawRectangleRec({provPos.x + 50, provPos.y + 86, 128, 14}, BLACK);
-
-      // NOTE: I changed this from "" to nullptr
-      if ( prov.settlement.name == "" )
-        continue;
-
-      Vector2 settlement_pos = {
-        prov.tile->position.x + 24,
-        prov.tile->position.y + 24,
-      };
-
-      DrawRectangleRec(
-        {
-          settlement_pos.x + 8,
-          settlement_pos.y + 16,
-          32,
-          7,
-        },
-        BLACK );
-
-      DrawTextEx(
-        Global::font_cache[hstr{ "font_romulus" }]->font,
-        prov.settlement.name,
-        {
-          settlement_pos.x + 16.0f,
-          settlement_pos.y + 32.0f,
-        },
-        14,
-        2,
-        WHITE );
-
-      // DrawText(
-      //   std::to_string( prov.settlement->population.current ).c_str(),
-      //   settlement_pos.x + 54.0,
-      //   settlement_pos.y + 32.0,
-      //   14,
-      //   WHITE );
     }
+  }
+
+  for ( auto entity: settlements ) {
+    Settlement::Component &settlement =
+      settlements.get<Settlement::Component>( entity );
+    Province::Component &prov = reg.get<Province::Component>( entity );
+
+    std::string popStr =
+      "Pop: " + std::to_string( settlement.population.current );
+
+    // DrawText( popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK );
+
+
+    // DrawRectangleRec( { provPos.x + 50, provPos.y + 86, 128, 14 }, BLACK );
+
+    // NOTE: I changed this from "" to nullptr
+    if ( settlement.name == "" )
+      continue;
+
+    Vector2 settlement_pos = {
+      prov.tile->position.x + 24,
+      prov.tile->position.y + 24,
+    };
+
+    DrawRectangleRec(
+      {
+        settlement_pos.x + 8,
+        settlement_pos.y + 16,
+        32,
+        7,
+      },
+      BLACK );
+
+    DrawTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      settlement.name,
+      {
+        settlement_pos.x + 16.0f,
+        settlement_pos.y + 32.0f,
+      },
+      14,
+      2,
+      WHITE );
+
+    DrawText(
+      std::to_string( settlement.population.current ).c_str(),
+      settlement_pos.x + 54.0,
+      settlement_pos.y + 32.0,
+      14,
+      WHITE );
   }
 }
 

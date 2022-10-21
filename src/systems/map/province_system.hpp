@@ -1,5 +1,6 @@
 #include "../../common.hpp"
 #include "../../components/province.hpp"
+#include "../../components/settlement.hpp"
 #include "../../renderer/textures.hpp"
 #include "../event_system.hpp"
 #include "../spawn_system.hpp"
@@ -17,12 +18,6 @@ namespace ProvinceSystem {
 
 inline void SetProvinceOwner( entt::registry &reg, u32 owner );
 inline void DrawProvinces( entt::registry &, TextureCache &, bool );
-inline bool UpdatePopulation( Province::Settlement & );
-inline void UpdateSettlement( Province::Settlement & );
-inline void UpdateSprawl( Province::Settlement & );
-
-inline std::map<std::string, Image> building_map;
-
 
 // TODO figure out if this really needs to be here
 // Should be able to make it like the listener in ui_system.
@@ -52,45 +47,8 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
     entt::entity provEnt = reg.create();
-
-    Province::Settlement settlement = {
-      i,
-      "",
-      Province::Development::Uninhabited,
-      {},
-      LoadTextureFromImage( GenImageColor( 32, 32, WHITE ) ),
-    };
-
-    reg.emplace<Province::Component>(
-      provEnt,
-      i,
-      -1,
-      false,
-      settlement,
-      tiles[i] );
+    reg.emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
   }
-
-  Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );
-  Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
-  Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );
-  Image roman_m3 = ImageFromImage( buildings, { 0, 32, 16, 16 } );
-  Image roman_m4 = ImageFromImage( buildings, { 0, 48, 16, 16 } );
-
-  Image roman_s1 = ImageFromImage( buildings, { 16, 0, 16, 16 } );
-  Image roman_s2 = ImageFromImage( buildings, { 32, 0, 16, 16 } );
-  Image roman_s3 = ImageFromImage( buildings, { 48, 0, 16, 16 } );
-  Image roman_s4 = ImageFromImage( buildings, { 64, 0, 16, 16 } );
-
-  building_map.insert_or_assign( "roman_m1", ( roman_m1 ) );
-  building_map.insert_or_assign( "roman_m2", ( roman_m2 ) );
-  building_map.insert_or_assign( "roman_m3", ( roman_m3 ) );
-  building_map.insert_or_assign( "roman_m4", ( roman_m4 ) );
-
-  building_map.insert_or_assign( "roman_s1", ( roman_s1 ) );
-  building_map.insert_or_assign( "roman_s2", ( roman_s2 ) );
-  building_map.insert_or_assign( "roman_s3", ( roman_s3 ) );
-  building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
-
 
   listener.Listen();
 }
@@ -98,78 +56,17 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
 inline void UpdateProvinces( State &state, entt::registry &reg ) {
   listener.Update( state, reg );
 
-  auto view = reg.view<Province::Component>();
+  // auto view = reg.view<Province::Component>();
 
-  for ( auto &ent: view ) {
-    Province::Component &prov = view.get<Province::Component>( ent );
+  // for ( auto &ent: view ) {
+  //   Province::Component &prov = view.get<Province::Component>( ent );
 
-    if ( prov.owner > -1 )
-      UpdateSettlement( prov.settlement );
-  }
-}
+  //   if ( prov.owner > -1 ) {
+  //     Settlement::Component &settlement = reg.get<Settlement::Component>( ent );
 
-inline void UpdateSettlement( Province::Settlement &settlement ) {
-  bool needs_sprawl_update = UpdatePopulation( settlement );
-
-
-  // Update Sprawl
-  if ( !needs_sprawl_update )
-    return;
-
-  printf( "Sprawl increase at %d\n", settlement.population.current );
-
-  // Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-
-  Image base = LoadImageFromTexture( settlement.texture );
-
-
-  // ImageDraw( &base, image, { 0, 0, 16, 16 }, { 0, 0, 16, 16 }, WHITE );
-
-  for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
-    ImageDraw(
-      &base,
-      building_map.at( "roman_s3" ),
-      { 0, 0, 16, 16 },
-      { ( i * 8.0f ), 0, 16, 16 },
-      WHITE );
-  }
-
-  settlement.texture = LoadTextureFromImage( base );
-}
-
-inline bool UpdatePopulation( Province::Settlement &settlement ) {
-  Province::Population &pop = settlement.population;
-
-  int before = settlement.population.current / 100;
-
-  // if growing exponentially
-  // P(t) = P0*e^(kt)
-
-  // dP/dt = r * P ( 1 - P/K )
-  // dP/dt = r * P ( K - P ) / K
-  pop.growthRate = ( pop.birthRate - pop.deathRate ) / pop.current;
-  f32 dP_over_dt = pop.growthRate * pop.current *
-                   ( pop.carryingCapacity - pop.current ) /
-                   pop.carryingCapacity;
-
-  settlement.population.current += (i32) dP_over_dt;
-
-
-  // // Find total number of digits - 1
-  // int digits = (int) log10( before );
-
-  // // Find first digit
-  // before = (int) ( before / pow( 10, digits ) );
-
-  // digits = (int) log10( settlement.population.current );
-  // int after = (int) ( settlement.population.current / pow( 10, digits ) );
-  int after = settlement.population.current / 100;
-
-  if ( before < after ) {
-    return true;
-  }
-
-  return false;
+  //     UpdateSettlement( settlement );
+  //   }
+  // }
 }
 
 inline void
@@ -186,52 +83,55 @@ AssignProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
       continue;
 
     prov.owner = owner;
+    // Settlement::Component settlement = {
+    //   .id = prov.id,
+    //   .population =
+    //     {
+    //       .current = 200,
+    //       .birthRate = 40,
+    //       .deathRate = 10,
+    //       .growthRate = ( 40.0f - 10.0f ) / 200,
+    //       .carryingCapacity = 1000,
+    //     },
+    // };
 
-    prov.settlement = Province::Settlement();
-    prov.settlement.id = prov.id;
-    prov.settlement.population = {
-      .current = 200,
-      .birthRate = 40,
-      .deathRate = 10,
-      .growthRate = ( 40.0f - 10.0f ) / 200,
-      .carryingCapacity = 1000,
-    };
+    // switch ( prov.owner ) {
+    //   case 0: {
+    //     settlement.name = "Rome";
+    //     u32 choice = RollN( 4 );
+    //     printf( "choice %d\n", choice );
 
-    switch ( prov.owner ) {
-      case 0: {
-        prov.settlement.name = "Rome";
-        u32 choice = RollN( 4 );
-        printf( "choice %d\n", choice );
+    //     std::string foo = "roman_s" + std::to_string( choice );
+    //     std::cout << "std::string " << foo << "\n";
 
-        std::string foo = "roman_s" + std::to_string( choice );
-        std::cout << "std::string " << foo << "\n";
+    //     const char *bar = foo.c_str();
+    //     printf( "c_str %s", bar );
 
-        const char *bar = foo.c_str();
-        printf( "c_str %s", bar );
+    //     Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+    //     ImageAlphaPremultiply( &base );
+    //     ImageDraw(
+    //       &base,
+    //       building_map.at( bar ),
+    //       { 0, 0, 16, 16 },
+    //       { 0, 0, 16, 16 },
+    //       WHITE );
+    //     settlement.texture = LoadTextureFromImage( base );
+    //   } break;
+    //   case 1:
+    //     settlement.name = "Athens";
+    //     break;
+    //   case 2:
+    //     settlement.name = "Lugudunon";
+    //     break;
+    //   case 3:
+    //     settlement.name = "Carthage";
+    //     break;
+    //   case 4:
+    //     settlement.name = "Persepolis";
+    //     break;
+    // }
 
-        Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-        ImageAlphaPremultiply( &base );
-        ImageDraw(
-          &base,
-          building_map.at( bar ),
-          { 0, 0, 16, 16 },
-          { 0, 0, 16, 16 },
-          WHITE );
-        prov.settlement.texture = LoadTextureFromImage( base );
-      } break;
-      case 1:
-        prov.settlement.name = "Athens";
-        break;
-      case 2:
-        prov.settlement.name = "Lugudunon";
-        break;
-      case 3:
-        prov.settlement.name = "Carthage";
-        break;
-      case 4:
-        prov.settlement.name = "Persepolis";
-        break;
-    }
+    // registry.emplace<Settlement::Component>( ent, settlement );
   }
 }
 
@@ -253,9 +153,13 @@ inline void SetProvinceOwner( entt::registry &reg, u32 owner ) {
 inline void
 DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
   auto provinces = reg.view<Province::Component>();
+  auto settlements = reg.view<Settlement::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
+    // Settlement::Component &settlement =
+    //   settlements.get<Settlement::Component>( ent );
+
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
     // if (debug)
@@ -283,22 +187,22 @@ DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
     //   14,
     //            RED);
 
-    if ( prov.owner <= -1 || prov.settlement.population.current <= 0 )
-      continue;
+    // if ( prov.owner <= -1 || settlement.population.current <= 0 )
+    //   continue;
 
 
-    Vector2 settlement_pos = {
-      prov.tile->position.x + 24,
-      prov.tile->position.y + 24,
-    };
+    // Vector2 settlement_pos = {
+    //   prov.tile->position.x + 24,
+    //   prov.tile->position.y + 24,
+    // };
 
-    // DrawRectangleRec({provPos.x + 50,
-    //                   provPos.y + 86, 128, 64},
-    //                  Fade(WHITE, 0.8f));
-    // DrawSingleBorder(tile);
+    // // DrawRectangleRec({provPos.x + 50,
+    // //                   provPos.y + 86, 128, 64},
+    // //                  Fade(WHITE, 0.8f));
+    // // DrawSingleBorder(tile);
 
-    // Draw Settlement
-    DrawTextureV( prov.settlement.texture, settlement_pos, WHITE );
+    // // Draw Settlement
+    // DrawTextureV( settlement.texture, settlement_pos, WHITE );
   }
 }
 

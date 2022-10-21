@@ -11,19 +11,20 @@ enum class Gathering {
   FishingDock,//  Wharf, Staith, Jetties, Quay?
   Mine,
   SheepRanch,
+  FlaxFarm,
 };
 
 enum class Refining {
   SawMill,
   Mill,
   Ovens,// TODO think of better name for a building that can make bread or ceramics
-  Clothier,
-  Tailor,
+  Weaver,
   Tanner,
   Smelter,
 };
 
 enum class Production {
+  Tailor,
 
 };
 

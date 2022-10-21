@@ -5,17 +5,19 @@
 #include "../../.old/ui/row_alignment.hpp"
 #include "../components/actor.hpp"
 #include "../components/event.hpp"
-#include "../components/province.hpp"
 #include "../components/selected.hpp"
+#include "../components/settlement.hpp"
 #include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "../systems/event_system.hpp"
 #include "../systems/selection_system.hpp"
 #include "ui_components.hpp"
-#include "widgets/context_panel.hpp"
+#include "widgets/actor_context_panel.hpp"
 #include "widgets/overview_banner.hpp"
+#include "widgets/settlement_context_panel.hpp"
 
+#include <iostream>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -27,41 +29,46 @@ inline void Update();
 inline void Draw();
 inline void LayoutPanel( Panel &, entt::entity );
 inline void ResizeElement( entt::entity, Element & );
-inline bool DoInteraction( entt::entity, bool, bool, bool );
+inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void DrawElement( TextureCache &, entt::entity, Element & );
 inline void SelectListener( entt::registry &, entt::entity );
 inline void DeSelectListener();
 inline void ToggleElement( entt::entity, bool );
 
+inline std::string ActiveId();
+inline std::string HotId();
+
 inline void Init( entt::registry &game_reg, TextureCache &texture_cache ) {
 
   OverviewBanner();
-  ContextPanel( texture_cache );
+  SettlementContextPanel( texture_cache );
+  ActorContextPanel( texture_cache );
 
   game_reg.on_construct<Selected::Component>().connect<&SelectListener>();
   game_reg.on_destroy<Selected::Component>().connect<&DeSelectListener>();
 }
 
 inline void Update( entt::registry &game_reg ) {
-  if ( SelectionSystem::selected_entity == entt::null )
-    return;
+  // if ( SelectionSystem::selected_entity == entt::null )
+  //   return;
 
-  if ( game_reg.all_of<Province::Component>(
-         SelectionSystem::selected_entity ) ) {
+  // if ( game_reg.all_of<Province::Component>(
+  //        SelectionSystem::selected_entity ) ) {
 
-    entt::entity province_context = ui_lookup["province_context"];
-    Element &elem = ui_reg.get<Element>( province_context );
-    if ( !elem.enabled )
-      return;
+  //   entt::entity settlement_context = ui_lookup["settlement_context"];
+  //   Element &elem = ui_reg.get<Element>( settlement_context );
+  //   if ( !elem.enabled )
+  //     return;
 
-    Province::Component &prov =
-      game_reg.get<Province::Component>( SelectionSystem::selected_entity );
+  //   // Settlement::Component &settlement =
+  //   //   game_reg.get<Settlement::Component>( SelectionSystem::selected_entity );
 
-    ui_reg.get<TextLabel>( ui_lookup["province_name"] ).text =
-      prov.settlement.name;
-    ui_reg.get<TextLabel>( ui_lookup["province_population"] ).text =
-      std::to_string( prov.settlement.population.current );
-  }
+  //   // ui_reg.get<TextLabel>( ui_lookup["province_name"] ).text = settlement.name;
+  //   // ui_reg.get<TextLabel>( ui_lookup["province_population"] ).text =
+  //   //   std::to_string( settlement.population.current );
+  //   // ui_reg.get<TextLabel>( ui_lookup["province_development"] ).text =
+  //   //   Settlement::development[settlement.development];
+  // }
 }
 
 inline void Draw( TextureCache &texture_cache ) {
@@ -69,7 +76,7 @@ inline void Draw( TextureCache &texture_cache ) {
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
   bool mouseHeldDown = IsMouseButtonDown( 0 );
-  bool overAnyElem = false;
+  bool over_any_elem = false;
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
@@ -83,7 +90,6 @@ inline void Draw( TextureCache &texture_cache ) {
   } else if ( screen_width >= 3840 ) {
     SCALE = 4.0;
   }
-
 
   for ( auto &ent: base_panels ) {
     Element &elem = ui_reg.get<Element>( ent );
@@ -109,6 +115,7 @@ inline void Draw( TextureCache &texture_cache ) {
     }
   }
 
+
   // Check for interactions and Draw everything
   for ( auto &entity: ui_elements ) {
     Element &elem = ui_reg.get<Element>( entity );
@@ -116,45 +123,55 @@ inline void Draw( TextureCache &texture_cache ) {
     if ( !elem.enabled )
       continue;
 
+
     bool inside = CheckCollisionPointRec( GetMousePosition(), elem.transform );
 
-    if ( !overAnyElem )
-      overAnyElem = inside;
+    if ( !over_any_elem )
+      over_any_elem = inside;
 
+    bool interactive =
+      ( elem.type == Type::TEXT_BUTTON || elem.type == Type::TEXTURE_BUTTON );
 
     // Check for interactions
-    if ( DoInteraction( entity, inside, mouseWentUp, mouseWentDown ) ) {
+    if ( DoInteraction(
+           entity,
+           inside,
+           interactive,
+           mouseWentUp,
+           mouseWentDown ) ) {
+      printf( "Interaction found! %d\n", elem.type );
+
+      switch ( elem.type ) {
+        case Type::TEXT_BUTTON: {
+          TextButton button = ui_reg.get<TextButton>( entity );
+          button.action();
+        } break;
+        case Type::TEXTURE_BUTTON: {
+          TextureButton button = ui_reg.get<TextureButton>( entity );
+          button.action();
+        } break;
+      }
     }
 
     // DRAW
     DrawElement( texture_cache, entity, elem );
   }
 
-
-  std::string hot_str = std::to_string( (std::uint32_t) context.hot );
-  std::string active_str = std::to_string( (std::uint32_t) context.active );
-
-  if ( !overAnyElem ) {
+  if ( !over_any_elem ) {
     context.hot = entt::null;
     context.active = entt::null;
   }
-
-  if ( context.hot == entt::null )
-    hot_str = "-1";
-
-  if ( context.active == entt::null )
-    active_str = "-1";
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
 
   // TODO make this a part of debug
   DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  std::string foo = "hot: " + hot_str;
+  std::string foo = "hot: " + HotId();
   DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
-  std::string bar = "active: " + active_str;
+  std::string bar = "active: " + ActiveId();
   DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 
 
@@ -261,6 +278,16 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
       elem.transform.height = text_dims.y;
     } break;
     case Type::TEXT_BUTTON: {
+      TextButton &button = ui_reg.get<TextButton>( entity );
+
+      const vec2 text_dims = MeasureTextEx(
+        Global::font_cache[hstr{ "font_romulus" }]->font,
+        button.text.c_str(),
+        button.font_size,
+        2.0f );
+
+      elem.transform.width = text_dims.x;
+      elem.transform.height = text_dims.y;
     } break;
     case Type::TEXTURE_BUTTON: {
       Texture2D texture = ui_reg.get<TextureButton>( entity ).texture;
@@ -273,9 +300,11 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
 inline bool DoInteraction(
   entt::entity entity,
   bool inside,
+  bool interactive,
   bool mouseWentUp,
   bool mouseWentDown ) {
   bool result = false;
+  // std::cout << "hot " << HotId() << " active " << ActiveId() << '\n';
 
   if ( entity == context.active ) {
     if ( mouseWentUp ) {
@@ -285,13 +314,17 @@ inline bool DoInteraction(
       context.active = entt::null;
     }
   } else if ( entity == context.hot ) {
+    // if ( mouseWentDown && interactive ) // TODO might want to readd this
     if ( mouseWentDown )
       context.active = entity;
   }
 
   if ( inside ) {
-    if ( context.active == entt::null )
+    if ( context.active == entt::null ) {
       context.hot = entity;
+      if ( mouseWentDown && interactive )
+        context.active = entity;
+    }
   }
 
   return result;
@@ -367,7 +400,7 @@ inline void SelectListener( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
 
-    auto context_panel = ui_lookup.at( "context_panel" );
+    auto context_panel = ui_lookup.at( "settlement_context_panel" );
     ToggleElement( context_panel, true );
     // Element &elem = ui_reg.get<Element>( context_panel );
     // elem.enabled = true;
@@ -375,6 +408,8 @@ inline void SelectListener( entt::registry &game_reg, entt::entity entity ) {
     auto actor = game_reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
+    auto context_panel = ui_lookup.at( "actor_context_panel" );
+    ToggleElement( context_panel, true );
     // entt::entity context_label = ui_lookup.at( "context_label" );
     // ui_reg.get<TextLabel>( context_label ).text = actor.name;
   }
@@ -382,7 +417,7 @@ inline void SelectListener( entt::registry &game_reg, entt::entity entity ) {
 
 inline void DeSelectListener() {
   printf( "DeSelectListener?\n" );
-  auto context_panel = ui_lookup.at( "context_panel" );
+  auto context_panel = ui_lookup.at( "settlement_context_panel" );
   // TODO not deselecting properly?
   ToggleElement( context_panel, false );
 }
@@ -405,6 +440,20 @@ inline void ToggleElement( entt::entity entity, bool on ) {
       ToggleElement( child, on );
     }
   }
+}
+
+inline std::string ActiveId() {
+  if ( context.active == entt::null )
+    return "-1";
+  else
+    return std::to_string( (std::uint32_t) context.active );
+}
+
+inline std::string HotId() {
+  if ( context.hot == entt::null )
+    return "-1";
+  else
+    return std::to_string( (std::uint32_t) context.hot );
 }
 
 inline bool MouseIsOverUI() {

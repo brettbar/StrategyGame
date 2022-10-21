@@ -6,12 +6,6 @@
 
 namespace Resource {
 
-enum class Level {
-  RAW,
-  REFINED,
-  PRODUCT,
-};
-
 enum class RawMaterial {
   // Raw Materials
   Timber,
@@ -29,8 +23,8 @@ enum class RawMaterial {
   CopperOre,
 };
 
-enum class RefinedMaterial {
-  // Refined Materials
+enum class ProcessedMaterial {
+  // Processed Materials
   Lumber,
   Flour,
   Pottery,
@@ -54,16 +48,20 @@ enum class Product {
   Bows,
 };
 
-struct RefinedRecipe {
-  Buildings::Refining produced_in;
-  std::vector<RawMaterial> raw_mats_needed;
-};
+// struct RefinedRecipe {
+//   Buildings::Refining produced_in;
+//   std::vector<RawMaterial> raw_mats_needed;
+// };
 
-struct ProductRecipe {
-  Buildings::Production produced_in;
-  std::vector<RawMaterial> raw_mats_needed;
-  std::vector<RefinedMaterial> refined_mats_needed;
-};
+// struct ProductRecipe {
+//   Buildings::Production produced_in;
+//   std::vector<RawMaterial> raw_mats_needed;
+//   std::vector<RefinedMaterial> refined_mats_needed;
+// };
+
+/*
+  Map<RawMaterial, Building[]> raw_recipes
+*/
 
 
 // inline std::map<RawMaterial, Buildings::Gathering> RAW_MAT_SOURCES = {
@@ -76,8 +74,8 @@ struct ProductRecipe {
 //   { RawMaterial::Fish, Buildings::Gathering::FishingDock },
 //   { RawMaterial::Clay, Buildings::Gathering::Mine },
 //   { RawMaterial::Wool, Buildings::Gathering::SheepRanch },
-//   { RawMaterial::Flax,  },
-//   { RawMaterial::Hide, {} },
+//   { RawMaterial::Flax, Buildings::Gathering::FlaxFarm },
+//   { RawMaterial::Hide, Buildings::Gathering::CowFarm },
 //   { RawMaterial::SilverOre, {} },
 //   { RawMaterial::GoldOre, {} },
 //   { RawMaterial::IronOre, {} },

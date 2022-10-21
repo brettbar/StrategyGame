@@ -73,6 +73,7 @@ struct TextLabel {
 };
 
 struct TextButton : TextLabel {
+  bool clickable = false;
   std::function<void()> action;
 };
 
@@ -81,8 +82,11 @@ struct TextureLabel {
 };
 
 struct TextureButton : TextureLabel {
+  bool clickable = false;
   std::function<void()> action;
 };
+
+struct Interactive {};
 
 template<typename T>
 inline entt::entity CreateElement( T component, Element elem ) {
