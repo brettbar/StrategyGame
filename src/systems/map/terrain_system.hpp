@@ -7,6 +7,7 @@
 #include "../../components/sight.hpp"
 #include "../../components/tile.hpp"
 #include "../../components/unit.hpp"
+#include "../../global.hpp"
 #include "../../renderer/textures.hpp"
 #include "rlgl.h"
 #include "terrain_system.hpp"
@@ -19,16 +20,16 @@ using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
 using TileMap =
   std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
-inline void CreateTerrain( entt::registry & );
-inline void Draw( Camera2D &, entt::registry &, TextureCache & );
-inline void UpdateFOW( entt::registry & );
+inline void CreateTerrain();
+inline void Draw( Camera2D &, TextureCache & );
+inline void UpdateFOW();
 inline u32 index( u32, u32 );
 inline NoiseMap GeneratePerlinNoise( float, int, float );
 inline void FilterIslands( NoiseMap &, f32 );
 inline void NormalizeMap( NoiseMap & );
 
-inline void CreateTerrain( entt::registry &registry ) {
-  entt::entity entity = registry.create();
+inline void CreateTerrain() {
+  entt::entity entity = Global::registry.create();
   TileMap tileMap = {};
   f32 seed = 25;
   NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
@@ -79,13 +80,12 @@ inline void CreateTerrain( entt::registry &registry ) {
     tile->visibility = Tile::Visibility::UNEXPLORED;
     tileMap[index( x, y )] = tile;
   }
-  registry.emplace<TileMap>( entity, tileMap );
+  Global::registry.emplace<TileMap>( entity, tileMap );
 }
 
 
-inline void
-Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
-  auto tilesView = registry.view<TileMap>();
+inline void Draw( Camera2D &camera, TextureCache &cache ) {
+  auto tilesView = Global::registry.view<TileMap>();
   auto tilesEntity = tilesView.front();
   TileMap &tileMap = tilesView.get<TileMap>( tilesEntity );
 
@@ -157,9 +157,9 @@ Draw( Camera2D &camera, entt::registry &registry, TextureCache &cache ) {
   }
 }
 
-inline void UpdateFOW( entt::registry &reg ) {
-  auto view = reg.view<Unit::Component, Sight::Component>();
-  auto tileView = reg.view<TileMap>();
+inline void UpdateFOW() {
+  auto view = Global::registry.view<Unit::Component, Sight::Component>();
+  auto tileView = Global::registry.view<TileMap>();
   TileMap tiles = tileView.get<TileMap>( tileView.front() );
 
   for ( auto &entity: view ) {

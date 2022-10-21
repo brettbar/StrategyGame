@@ -15,7 +15,7 @@ namespace Renderer {
 inline Shader shader;
 inline Shader outline_shader;
 
-inline void TempDraw( entt::registry &registry, bool debug );
+inline void TempDraw( bool debug );
 
 inline void Init( State &state ) {
 
@@ -51,8 +51,7 @@ inline void Init( State &state ) {
 }
 
 
-inline void
-Draw( State &state, entt::registry &reg, TextureCache &texture_cache ) {
+inline void Draw( State &state, TextureCache &texture_cache ) {
   ClearBackground( DARKGRAY );
 
   BeginMode2D( state.camera );
@@ -63,45 +62,42 @@ Draw( State &state, entt::registry &reg, TextureCache &texture_cache ) {
     BeginShaderMode( shader );
     {
       // Draw Terrain
-      Terrain::Draw( state.camera, reg, texture_cache );
+      Terrain::Draw( state.camera, texture_cache );
     }
     EndShaderMode();
 
     // Overlay shouldn't be ran through shader?
-    OverlaySystem::Draw( reg, texture_cache );
+    OverlaySystem::Draw( Global::registry, texture_cache );
 
     BeginShaderMode( shader );
     {
       switch ( MapSystem::mode ) {
         case MapSystem::Mode::TERRAIN:
-          ProvinceSystem::DrawProvinces( reg, texture_cache, false );
+          ProvinceSystem::DrawProvinces( texture_cache, false );
           break;
         case MapSystem::Mode::POLITICAL:
-          ProvinceSystem::DrawProvinces( reg, texture_cache, true );
+          ProvinceSystem::DrawProvinces( texture_cache, true );
           break;
       }
     }
     EndShaderMode();
 
     // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-    TempDraw( reg, state.gameState == GameState::EDITOR );
+    TempDraw( state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
 
-  SelectionSystem::Draw(
-    reg,
-    texture_cache,
-    state.gameState == GameState::EDITOR );
+  SelectionSystem::Draw( texture_cache, state.gameState == GameState::EDITOR );
 
   EndMode2D();
 }
 
-inline void TempDraw( entt::registry &registry, bool debug ) {
+inline void TempDraw( bool debug ) {
   entt::basic_view villagers =
-    registry.view<Unit::Component, Animated::Component>();
+    Global::registry.view<Unit::Component, Animated::Component>();
 
-  registry.sort<Unit::Component>(
+  Global::registry.sort<Unit::Component>(
     []( const Unit::Component &lhs, const Unit::Component &rhs ) {
       return rhs.position.y > lhs.position.y;
     } );

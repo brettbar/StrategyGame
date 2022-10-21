@@ -30,13 +30,13 @@ inline void CheckMenuToggle() {
   }
 }
 
-inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
+inline void Handle( State &state, TextureCache &cache ) {
   Vector2 click_pos = GetScreenToWorld2D( GetMousePosition(), state.camera );
 
 
   if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
     if ( IsKeyPressed( KEY_S ) ) {
-      Save::Save( reg );
+      Save::Save( Global::registry );
     }
 
     if ( IsKeyPressed( KEY_L ) ) {
@@ -75,7 +75,7 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    ProvinceSystem::AssignProvince( reg, state.currPlayer->id, click_pos );
+    ProvinceSystem::AssignProvince( state.currPlayer->id, click_pos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
@@ -88,12 +88,13 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   if ( IsMouseButtonPressed( 0 ) ) {
     // IRONGUI::Input(state, reg);
     if ( !UI::MouseIsOverUI() )
-      SelectionSystem::UpdateSelection( reg, click_pos );
+      SelectionSystem::UpdateSelection( click_pos );
   }
   if ( IsMouseButtonPressed( 1 ) ) {
     if ( !UI::MouseIsOverUI() ) {
-      MovementSystem::SetDestinations( reg, state.camera );
-      SelectionSystem::ClearSelection( reg, reg.view<Province::Component>() );
+      MovementSystem::SetDestinations( state.camera );
+      SelectionSystem::ClearSelection(
+        Global::registry.view<Province::Component>() );
     }
   }
 

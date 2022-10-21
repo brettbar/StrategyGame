@@ -17,7 +17,7 @@
 namespace ProvinceSystem {
 
 inline void SetProvinceOwner( u32 owner );
-inline void DrawProvinces( entt::registry &, TextureCache &, bool );
+inline void DrawProvinces( TextureCache &, bool );
 
 // TODO figure out if this really needs to be here
 // Should be able to make it like the listener in ui_system.
@@ -40,14 +40,15 @@ struct ProvListener : EventSystem::Listener {
 
 inline ProvListener listener;
 
-inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
-  auto tView = reg.view<Terrain::TileMap>();
+inline void InitProvinces( TextureCache &cache ) {
+  auto tView = Global::registry.view<Terrain::TileMap>();
   Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
 
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    entt::entity provEnt = reg.create();
-    reg.emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
+    entt::entity provEnt = Global::registry.create();
+    Global::registry
+      .emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
   }
 
   listener.Listen();
@@ -69,12 +70,11 @@ inline void UpdateProvinces( State &state, entt::registry &reg ) {
   // }
 }
 
-inline void
-AssignProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
+inline void AssignProvince( u32 owner, Vector2 clickPos ) {
   i32 provId = DetermineTileIdFromClick( clickPos );
   assert( provId >= 0 );
 
-  auto provinces = registry.view<Province::Component>();
+  auto provinces = Global::registry.view<Province::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
@@ -147,14 +147,13 @@ inline void SetProvinceOwner( u32 owner ) {
 
   Unit::Component &unit = selectedView.get<Unit::Component>( selectedEntity );
 
-  AssignProvince( Global::registry, owner, unit.position );
+  AssignProvince( owner, unit.position );
 }
 
 
-inline void
-DrawProvinces( entt::registry &reg, TextureCache &cache, bool showOverlays ) {
-  auto provinces = reg.view<Province::Component>();
-  auto settlements = reg.view<Settlement::Component>();
+inline void DrawProvinces( TextureCache &cache, bool showOverlays ) {
+  auto provinces = Global::registry.view<Province::Component>();
+  auto settlements = Global::registry.view<Settlement::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );

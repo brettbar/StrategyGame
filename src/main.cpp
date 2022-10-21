@@ -35,10 +35,10 @@ TEMPORARY TODOS HERE
 void LoadResources( TextureCache & );
 void CameraUpdate( Camera2D &, f32 );
 
-void Init( State &, entt::registry &, TextureCache & );
-void StartGame( entt::registry &, State &, TextureCache & );
-void Update( State &, entt::registry & );
-void LateUpdate( State &, entt::registry & );
+void Init( State &, TextureCache & );
+void StartGame( State &, TextureCache & );
+void Update( State & );
+void LateUpdate( State & );
 void Exit( TextureCache & );
 
 int main( void ) {
@@ -115,7 +115,7 @@ int main( void ) {
 
         BeginDrawing();
         {
-          Renderer::Draw( state, Global::registry, Global::texture_cache );
+          Renderer::Draw( state, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -142,7 +142,7 @@ int main( void ) {
 
       case Global::ProgramMode::GAME:
         if ( !game_started ) {
-          StartGame( Global::registry, state, Global::texture_cache );
+          StartGame( state, Global::texture_cache );
           game_started = true;
         }
 
@@ -153,18 +153,18 @@ int main( void ) {
 
         // Check for Inpu
         Input::CheckMenuToggle();
-        Input::Handle( state, Global::registry, Global::texture_cache );
+        Input::Handle( state, Global::texture_cache );
 
 
         // Update once per frame TODO: is this really once per frame? Looks like 60 times a second to me
         while ( lag >= MS_PER_UPDATE ) {
-          Update( state, Global::registry );
+          Update( state );
           lag -= MS_PER_UPDATE;
         }
 
         // Update once per second
         while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-          LateUpdate( state, Global::registry );
+          LateUpdate( state );
           oncelag = 0.0f;
         }
 
@@ -174,7 +174,7 @@ int main( void ) {
         // Draw everything to screen
         BeginDrawing();
         {
-          Renderer::Draw( state, Global::registry, Global::texture_cache );
+          Renderer::Draw( state, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -194,31 +194,28 @@ int main( void ) {
   return 0;
 }
 
-void StartGame(
-  entt::registry &reg,
-  State &state,
-  TextureCache &texture_cache ) {
-  Terrain::CreateTerrain( reg );
-  ProvinceSystem::InitProvinces( reg, texture_cache );
-  SettlementSystem::InitSettlements( reg, texture_cache );
+void StartGame( State &state, TextureCache &texture_cache ) {
+  Terrain::CreateTerrain();
+  ProvinceSystem::InitProvinces( texture_cache );
+  SettlementSystem::InitSettlements( texture_cache );
   SpawnSystem::Init();
-  // GAME_UI::Init( reg );
-  UI::Init( reg, texture_cache );
+  // GAME_UI::Init( Global::registry );
+  UI::Init( Global::registry, texture_cache );
   Renderer::Init( state );
 }
 
 void LoadGame() {}
 
-void Update( State &state, entt::registry &reg ) {
-  MovementSystem::Update( reg, state.timeScale );
-  AnimationSystem::UpdateSprites( reg, state.timeScale );
-  UI::Update( reg );
+void Update( State &state ) {
+  MovementSystem::Update( state.timeScale );
+  AnimationSystem::UpdateSprites( Global::registry, state.timeScale );
+  UI::Update( Global::registry );
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
 }
 
-void LateUpdate( State &state, entt::registry &reg ) {
-  ProvinceSystem::UpdateProvinces( state, reg );
+void LateUpdate( State &state ) {
+  ProvinceSystem::UpdateProvinces( state, Global::registry );
   SpawnSystem::Update( state );
 
   state.day++;

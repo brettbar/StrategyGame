@@ -3,12 +3,14 @@
 #include "../components/animated.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
+#include "../global.hpp"
 
 namespace MovementSystem {
 
-inline void SetDestinations( entt::registry &registry, Camera2D camera ) {
+inline void SetDestinations( Camera2D camera ) {
   entt::basic_view view =
-    registry.view<Unit::Component, Animated::Component, Selected::Component>();
+    Global::registry
+      .view<Unit::Component, Animated::Component, Selected::Component>();
 
   for ( auto entity: view ) {
     Unit::Component &unit = view.get<Unit::Component>( entity );
@@ -28,8 +30,9 @@ inline void SetDestinations( entt::registry &registry, Camera2D camera ) {
   }
 }
 
-inline void Update( entt::registry &registry, f32 timeScale ) {
-  entt::basic_view units = registry.view<Unit::Component, Animated::Component>();
+inline void Update( f32 timeScale ) {
+  entt::basic_view units =
+    Global::registry.view<Unit::Component, Animated::Component>();
 
   for ( auto &entity: units ) {
     Unit::Component &unit = units.get<Unit::Component>( entity );
