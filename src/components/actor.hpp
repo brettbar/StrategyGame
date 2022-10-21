@@ -8,7 +8,7 @@
 
 namespace Actor {
 
-enum class Type { SETTLER, ARMY };
+enum class Type { Colonist, Army };
 
 struct Component {
   const char *name;

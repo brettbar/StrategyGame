@@ -55,8 +55,7 @@ int main( void ) {
       PlayerSystem( 0, Faction::ROMANS, "Roman Republic" ) ),
   };
 
-  entt::registry reg;
-  reg.clear();
+  Global::registry.clear();
 
   bool game_started = false;
 
@@ -116,7 +115,7 @@ int main( void ) {
 
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, Global::texture_cache );
+          Renderer::Draw( state, Global::registry, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -143,7 +142,7 @@ int main( void ) {
 
       case Global::ProgramMode::GAME:
         if ( !game_started ) {
-          StartGame( reg, state, Global::texture_cache );
+          StartGame( Global::registry, state, Global::texture_cache );
           game_started = true;
         }
 
@@ -154,18 +153,18 @@ int main( void ) {
 
         // Check for Inpu
         Input::CheckMenuToggle();
-        Input::Handle( state, reg, Global::texture_cache );
+        Input::Handle( state, Global::registry, Global::texture_cache );
 
 
-        // Update once per frame
+        // Update once per frame TODO: is this really once per frame? Looks like 60 times a second to me
         while ( lag >= MS_PER_UPDATE ) {
-          Update( state, reg );
+          Update( state, Global::registry );
           lag -= MS_PER_UPDATE;
         }
 
         // Update once per second
         while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-          LateUpdate( state, reg );
+          LateUpdate( state, Global::registry );
           oncelag = 0.0f;
         }
 
@@ -175,7 +174,7 @@ int main( void ) {
         // Draw everything to screen
         BeginDrawing();
         {
-          Renderer::Draw( state, reg, Global::texture_cache );
+          Renderer::Draw( state, Global::registry, Global::texture_cache );
           // IRONGUI::Draw(
           //   GAME_UI::curr_content,
           //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
@@ -220,7 +219,7 @@ void Update( State &state, entt::registry &reg ) {
 
 void LateUpdate( State &state, entt::registry &reg ) {
   ProvinceSystem::UpdateProvinces( state, reg );
-  SpawnSystem::Update( state, reg );
+  SpawnSystem::Update( state );
 
   state.day++;
 

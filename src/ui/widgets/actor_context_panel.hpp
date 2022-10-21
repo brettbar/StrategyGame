@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../renderer/textures.hpp"
+#include "../../systems/actor_system.hpp"
 #include "../ui_components.hpp"
 
 
@@ -88,10 +89,18 @@ inline entt::entity ActorSpawnSettlementButton( TextureCache &texture_cache ) {
       .text = "Spawn Settlement",
       .font_size = 14,
       .text_color = WHITE,
-      .background = BLACK,
+      .background = RED,
     },
-    .clickable = true,
-    .action = []() { printf( "Spawn Settlement clicked!!\n" ); } };
+    .clickable = false,
+    .action = []() { printf( "Spawn Settlement clicked!!\n" ); },
+    .check_clickable = []() -> bool {
+      return ActorSystem::ColonistSelected();
+      // A settlement can be placed when
+      // 1. A colonist is selected
+      // 2. The colonist is in a province owned by their faction
+      // 3. The province does not already contain a settlement
+    },
+  };
 
 
   return CreateElement( button, elem );

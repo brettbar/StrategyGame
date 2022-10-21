@@ -11,22 +11,13 @@ inline entt::dispatcher dispatcher{};
 
 struct Listener {
   State *currState;
-  entt::registry *currReg;
 
-  Listener() {
-    currState = nullptr;
-    currReg = nullptr;
-  }
+  Listener() { currState = nullptr; }
   ~Listener() {}
 
-  Listener( State &state, entt::registry &reg ) {
-    this->currState = &state;
-    this->currReg = &reg;
-  }
+  Listener( State &state ) { this->currState = &state; }
 
-  inline void Update( State &state, entt::registry &reg ) {
-    this->currState = &state, this->currReg = &reg;
-  }
+  inline void Update( State &state ) { this->currState = &state; }
 
   inline virtual void Receive() {}
 };

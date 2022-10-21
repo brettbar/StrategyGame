@@ -24,4 +24,6 @@ inline FontCache font_cache = {};
 
 inline TextureCache texture_cache = {};
 
+inline entt::registry registry;
+
 };// namespace Global

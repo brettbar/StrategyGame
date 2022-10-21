@@ -48,28 +48,7 @@ inline void Init( entt::registry &game_reg, TextureCache &texture_cache ) {
   game_reg.on_destroy<Selected::Component>().connect<&DeSelectListener>();
 }
 
-inline void Update( entt::registry &game_reg ) {
-  // if ( SelectionSystem::selected_entity == entt::null )
-  //   return;
-
-  // if ( game_reg.all_of<Province::Component>(
-  //        SelectionSystem::selected_entity ) ) {
-
-  //   entt::entity settlement_context = ui_lookup["settlement_context"];
-  //   Element &elem = ui_reg.get<Element>( settlement_context );
-  //   if ( !elem.enabled )
-  //     return;
-
-  //   // Settlement::Component &settlement =
-  //   //   game_reg.get<Settlement::Component>( SelectionSystem::selected_entity );
-
-  //   // ui_reg.get<TextLabel>( ui_lookup["province_name"] ).text = settlement.name;
-  //   // ui_reg.get<TextLabel>( ui_lookup["province_population"] ).text =
-  //   //   std::to_string( settlement.population.current );
-  //   // ui_reg.get<TextLabel>( ui_lookup["province_development"] ).text =
-  //   //   Settlement::development[settlement.development];
-  // }
-}
+inline void Update( entt::registry &game_reg ) {}
 
 inline void Draw( TextureCache &texture_cache ) {
   vec2 mousePos = GetMousePosition();
@@ -139,16 +118,17 @@ inline void Draw( TextureCache &texture_cache ) {
            interactive,
            mouseWentUp,
            mouseWentDown ) ) {
-      printf( "Interaction found! %d\n", elem.type );
 
       switch ( elem.type ) {
         case Type::TEXT_BUTTON: {
           TextButton button = ui_reg.get<TextButton>( entity );
-          button.action();
+          button.Update();
+          button.Action();
         } break;
         case Type::TEXTURE_BUTTON: {
           TextureButton button = ui_reg.get<TextureButton>( entity );
-          button.action();
+          button.Update();
+          button.Action();
         } break;
       }
     }
@@ -377,10 +357,16 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
 
     case Type::TEXT_BUTTON: {
       auto &button = ui_reg.get<TextButton>( entity );
+      Color background = button.background;
+
+      if ( !button.clickable ) {
+        background = Fade( BLACK, 0.5 );
+      }
+
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
-        button.background );
+        background );
 
       DrawTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,

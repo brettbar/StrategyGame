@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../archetypes/archetypes.hpp"
 #include "../common.hpp"
 #include "../components/actor.hpp"
 #include "../components/animated.hpp"
@@ -7,22 +8,24 @@
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
-#include "../archetypes/archetypes.hpp"
+#include "../global.hpp"
 #include "event_system.hpp"
 
 #include "player_system.hpp"
+#include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void DeleteSelected( entt::registry & );
+inline void CreateNew( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
+inline void DeleteSelected();
 Texture2D DetermineTexture( Faction, TextureCache & );
 
 struct SpawnListener : EventSystem::Listener {
   inline void Receive() override {
-    if ( currState == nullptr || currReg == nullptr )
+    if ( currState == nullptr )
       return;
 
     printf( "SpawnSystem got an event!\n" );
-    DeleteSelected( *currReg );
+    DeleteSelected();
   }
 
   inline void Listen() {
@@ -35,19 +38,16 @@ inline SpawnListener listener;
 
 inline void Init() { listener.Listen(); }
 
-inline void Update( State &state, entt::registry &reg ) {
-  listener.Update( state, reg );
-}
+inline void Update( State &state ) { listener.Update( state ); }
 
 inline void CreateNew(
-  entt::registry &reg,
   TextureCache &cache,
   Vector2 clickPos,
   std::shared_ptr<PlayerSystem> currPlayer ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 
-  entt::entity entity = reg.create();
+  entt::entity entity = Global::registry.create();
 
   entt::resource_cache<TextureResource> temp{};
 
@@ -55,17 +55,18 @@ inline void CreateNew(
 
   Archetypes::Character character = Archetypes::Character( tex, *spawn );
 
-  reg.emplace<Actor::Component>(
+  Global::registry.emplace<Actor::Component>(
     entity,
     "Marcus Priscus",
-    Actor::Type::SETTLER );
-  reg.emplace<Unit::Component>( entity, character.unit );
-  reg.emplace<Animated::Component>( entity, character.animated );
-  reg.emplace<Sight::Component>( entity, character.sight );
+    Actor::Type::Colonist );
+  Global::registry.emplace<Unit::Component>( entity, character.unit );
+  Global::registry.emplace<Animated::Component>( entity, character.animated );
+  Global::registry.emplace<Sight::Component>( entity, character.sight );
 }
 
-inline void DeleteSelected( entt::registry &reg ) {
-  auto selectedView = reg.view<Selected::Component, Unit::Component>();
+inline void DeleteSelected() {
+  auto selectedView =
+    Global::registry.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null ) {
@@ -73,7 +74,7 @@ inline void DeleteSelected( entt::registry &reg ) {
     return;
   }
 
-  reg.destroy( selectedEntity );
+  Global::registry.destroy( selectedEntity );
 }
 
 };// namespace SpawnSystem

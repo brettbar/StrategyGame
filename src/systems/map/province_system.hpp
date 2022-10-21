@@ -16,19 +16,19 @@
 
 namespace ProvinceSystem {
 
-inline void SetProvinceOwner( entt::registry &reg, u32 owner );
+inline void SetProvinceOwner( u32 owner );
 inline void DrawProvinces( entt::registry &, TextureCache &, bool );
 
 // TODO figure out if this really needs to be here
 // Should be able to make it like the listener in ui_system.
 struct ProvListener : EventSystem::Listener {
   inline void Receive() override {
-    if ( this->currState == nullptr || this->currReg == nullptr ) {
+    if ( this->currState == nullptr ) {
       return;
     }
 
     printf( "ProvinceSystem got an event!\n" );
-    SetProvinceOwner( *this->currReg, this->currState->currPlayer->id );
+    SetProvinceOwner( this->currState->currPlayer->id );
   }
 
   inline void Listen() {
@@ -54,7 +54,7 @@ inline void InitProvinces( entt::registry &reg, TextureCache &cache ) {
 }
 
 inline void UpdateProvinces( State &state, entt::registry &reg ) {
-  listener.Update( state, reg );
+  listener.Update( state );
 
   // auto view = reg.view<Province::Component>();
 
@@ -135,8 +135,9 @@ AssignProvince( entt::registry &registry, u32 owner, Vector2 clickPos ) {
   }
 }
 
-inline void SetProvinceOwner( entt::registry &reg, u32 owner ) {
-  auto selectedView = reg.view<Selected::Component, Unit::Component>();
+inline void SetProvinceOwner( u32 owner ) {
+  auto selectedView =
+    Global::registry.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null ) {
@@ -146,7 +147,7 @@ inline void SetProvinceOwner( entt::registry &reg, u32 owner ) {
 
   Unit::Component &unit = selectedView.get<Unit::Component>( selectedEntity );
 
-  AssignProvince( reg, owner, unit.position );
+  AssignProvince( Global::registry, owner, unit.position );
 }
 
 

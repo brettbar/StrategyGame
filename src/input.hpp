@@ -71,7 +71,7 @@ inline void Handle( State &state, entt::registry &reg, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    SpawnSystem::CreateNew( reg, cache, click_pos, state.currPlayer );
+    SpawnSystem::CreateNew( cache, click_pos, state.currPlayer );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
