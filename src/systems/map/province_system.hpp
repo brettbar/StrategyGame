@@ -70,8 +70,8 @@ inline void Update( State &state ) {
   // }
 }
 
-inline void AssignProvince( u32 owner, Vector2 clickPos ) {
-  i32 provId = DetermineTileIdFromClick( clickPos );
+inline void AssignProvince( u32 owner, Vector2 pos ) {
+  i32 provId = DetermineTileIdFromPosition( pos );
   assert( provId >= 0 );
 
   auto provinces = Global::registry.view<Province::Component>();

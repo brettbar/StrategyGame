@@ -166,7 +166,7 @@ inline void UpdateFOW() {
     Sight::Component sight = view.get<Sight::Component>( entity );
     Unit::Component unit = view.get<Unit::Component>( entity );
 
-    i32 closestId = DetermineTileIdFromClick( unit.position );
+    i32 closestId = DetermineTileIdFromPosition( unit.position );
     assert( closestId >= 0 );
 
     std::shared_ptr<Tile::Component> closest = tiles[closestId];

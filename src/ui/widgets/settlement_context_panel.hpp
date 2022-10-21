@@ -18,7 +18,7 @@ inline entt::entity SettlementDevelopment();
 inline entt::entity SettlementContextPanel( TextureCache &texture_cache ) {
   Element elem = {
     .id = "settlement_context_panel",
-    .type = Type::BASE_PANEL,
+    .type = Type::BasePanel,
     .transform =
       {
         .width = 540,
@@ -63,7 +63,7 @@ inline entt::entity SettlementContextPanel( TextureCache &texture_cache ) {
 inline entt::entity SettlementContextTabGroup( TextureCache &texture_cache ) {
   Element elem = {
     .id = "context_tab_group",
-    .type = Type::PANEL,
+    .type = Type::Panel,
   };
 
   Panel tab_grp = {
@@ -96,7 +96,7 @@ inline entt::entity SettlementContextTabGroup( TextureCache &texture_cache ) {
 inline entt::entity SettlementContextTabButton( Texture2D texture ) {
   Element elem = {
     .id = "context_tab_button",
-    .type = Type::TEXTURE_BUTTON,
+    .type = Type::TextureButton,
   };
 
   TextureButton button = {
@@ -105,6 +105,7 @@ inline entt::entity SettlementContextTabButton( Texture2D texture ) {
     },
     .clickable = true,
     .action = []() { printf( "Settlement tab button pressed\n" ); },
+    .check_clickable = []() -> bool { return true; },
   };
 
   return CreateElement( button, elem );
@@ -113,7 +114,7 @@ inline entt::entity SettlementContextTabButton( Texture2D texture ) {
 inline entt::entity SettlementContextContent() {
   Element elem = {
     .id = "settlement_context_content",
-    .type = Type::PANEL,
+    .type = Type::Panel,
   };
 
   Panel panel = {
@@ -133,7 +134,7 @@ inline entt::entity SettlementContextContent() {
 inline entt::entity SettlementContext() {
   Element elem = {
     .id = "settlement_context",
-    .type = Type::PANEL,
+    .type = Type::Panel,
   };
 
   Panel panel = {
@@ -152,10 +153,12 @@ inline entt::entity SettlementContext() {
   return CreateElement( panel, elem );
 }
 
+// TODO this is getting set to the wrong position for the first frame
+// To replicate, set a breakpoint on the texture button.Update() call
 inline entt::entity SettlementName() {
   Element elem = {
     .id = "settlement_name",
-    .type = Type::TEXT_LABEL,
+    .type = Type::TextLabel,
     .margins = { 0, 0, 16, 16 },
   };
 
@@ -170,10 +173,12 @@ inline entt::entity SettlementName() {
   return CreateElement( name, elem );
 }
 
+// TODO this is getting set to the wrong position for the first frame
+// To replicate, set a breakpoint on the texture button.Update() call
 inline entt::entity SettlementPopulation() {
   Element elem = {
     .id = "settlement_population",
-    .type = Type::TEXT_LABEL,
+    .type = Type::TextLabel,
     .margins = { 0, 0, 16, 16 },
   };
 
@@ -187,10 +192,12 @@ inline entt::entity SettlementPopulation() {
   return CreateElement( name, elem );
 }
 
+// TODO this is getting set to the wrong position for the first frame
+// To replicate, set a breakpoint on the texture button.Update() call
 inline entt::entity SettlementDevelopment() {
   Element elem = {
     .id = "settlement_development",
-    .type = Type::TEXT_LABEL,
+    .type = Type::TextLabel,
     .margins = { 0, 0, 16, 16 },
   };
 

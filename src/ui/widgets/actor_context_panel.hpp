@@ -15,7 +15,7 @@ inline entt::entity ActorSpawnSettlementButton( TextureCache & );
 inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
   Element elem = {
     .id = "actor_context_panel",
-    .type = Type::BASE_PANEL,
+    .type = Type::BasePanel,
     .enabled = false,
     .transform =
       {
@@ -61,7 +61,7 @@ inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
 inline entt::entity ActorActionsPanel( TextureCache &texture_cache ) {
   Element elem = {
     .id = "actor_actions_panel",
-    .type = Type::PANEL,
+    .type = Type::Panel,
     .enabled = false,
   };
 
@@ -80,7 +80,7 @@ inline entt::entity ActorActionsPanel( TextureCache &texture_cache ) {
 inline entt::entity ActorSpawnSettlementButton( TextureCache &texture_cache ) {
   Element elem = {
     .id = "actor_spawn_settlement_button",
-    .type = Type::TEXT_BUTTON,
+    .type = Type::TextButton,
     .enabled = false,
   };
 

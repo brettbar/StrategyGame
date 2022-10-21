@@ -10,7 +10,7 @@ inline entt::entity OverviewTabButton();
 inline entt::entity OverviewBanner() {
   Element elem = {
     .id = "overview_banner",
-    .type = Type::BASE_PANEL,
+    .type = Type::BasePanel,
     .enabled = true,
     .transform =
       {
@@ -49,7 +49,7 @@ inline entt::entity OverviewBanner() {
 inline entt::entity OverviewTabButton( Texture2D texture ) {
   Element elem = {
     .id = "overview_tab_button",
-    .type = Type::TEXT_BUTTON,
+    .type = Type::TextButton,
     .enabled = true,
   };
 }

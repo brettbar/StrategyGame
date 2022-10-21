@@ -8,6 +8,7 @@
 #include "../events.hpp"
 #include "../global.hpp"
 #include "../renderer/textures.hpp"
+#include <ostream>
 #include <raylib.h>
 
 
@@ -61,6 +62,7 @@ inline void UpdateSelection( Vector2 click_pos ) {
   ClearSelection( units_view );
   ClearSelection( prov_view );
 
+
   CheckSelectUnits( units_view, click_pos );
   CheckSelectProvince( prov_view, click_pos );
 }
@@ -73,7 +75,6 @@ inline void ClearSelection( View<T> component_view ) {
   for ( entt::entity entity: component_view ) {
     T &component = Global::registry.get<T>( entity );
     component.selected = false;
-
     Global::registry.remove<Selected::Component>( entity );
   }
 }
@@ -99,7 +100,10 @@ CheckSelectUnits( View<Unit::Component> units_view, vec2 click_pos ) {
 
 inline void
 CheckSelectProvince( View<Province::Component> prov_view, vec2 click_pos ) {
-  u32 tile = DetermineTileIdFromClick( click_pos );
+  i32 tile = DetermineTileIdFromPosition( click_pos );
+
+  if ( tile == -1 )
+    return;
 
   for ( auto &entity: prov_view ) {
     if ( selected_entity != entt::null )

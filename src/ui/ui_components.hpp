@@ -16,12 +16,12 @@ struct Context {
 };
 
 enum class Type {
-  BASE_PANEL,
-  PANEL,
-  TEXT_LABEL,
-  TEXTURE_LABEL,
-  TEXT_BUTTON,
-  TEXTURE_BUTTON,
+  BasePanel,
+  Panel,
+  TextLabel,
+  TextureLabel,
+  TextButton,
+  TextureButton,
 };
 
 enum class Axis {

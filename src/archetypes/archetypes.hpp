@@ -21,6 +21,7 @@ struct Character {
 
   Character( Texture2D sprite, Vector2 spawn ) {
     unit = Unit::Component{
+      .owner = 0,
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,

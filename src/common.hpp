@@ -41,7 +41,7 @@ const u32 MAP_WIDTH = 128;
 const u32 MAP_HEIGHT = 128;
 
 
-inline i32 DetermineTileIdFromClick( Vector2 );
+inline i32 DetermineTileIdFromPosition( Vector2 );
 inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 
 inline void PrintVec2( Vector2 vec ) { printf( "(%f, %f)\n", vec.x, vec.y ); }
@@ -57,8 +57,8 @@ inline void PrintRect( Rectangle rect ) {
     rect.height );
 }
 
-inline i32 DetermineTileIdFromClick( Vector2 clickPos ) {
-  std::unique_ptr<Vector2> target = DetermineTilePos( clickPos );
+inline i32 DetermineTileIdFromPosition( Vector2 pos ) {
+  std::unique_ptr<Vector2> target = DetermineTilePos( pos );
   if ( target == nullptr )
 
     return -1;

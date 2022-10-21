@@ -103,14 +103,14 @@ inline void Draw( TextureCache &texture_cache ) {
       over_any_elem = inside;
 
     bool interactive =
-      ( elem.type == Type::TEXT_BUTTON || elem.type == Type::TEXTURE_BUTTON );
+      ( elem.type == Type::TextButton || elem.type == Type::TextureButton );
 
     switch ( elem.type ) {
-      case Type::TEXT_BUTTON: {
+      case Type::TextButton: {
         TextButton &button = ui_reg.get<TextButton>( entity );
         button.Update();
       } break;
-      case Type::TEXTURE_BUTTON: {
+      case Type::TextureButton: {
         TextureButton &button = ui_reg.get<TextureButton>( entity );
         button.Update();
       } break;
@@ -125,12 +125,12 @@ inline void Draw( TextureCache &texture_cache ) {
            mouseWentDown ) ) {
 
       switch ( elem.type ) {
-        case Type::TEXT_BUTTON: {
+        case Type::TextButton: {
           TextButton &button = ui_reg.get<TextButton>( entity );
           button.Update();
           button.Action();
         } break;
-        case Type::TEXTURE_BUTTON: {
+        case Type::TextureButton: {
           TextureButton &button = ui_reg.get<TextureButton>( entity );
           button.Update();
           button.Action();
@@ -251,10 +251,10 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
 inline void ResizeElement( entt::entity entity, Element &elem ) {
   // TODO maybe these resize-cases should just be update methods on the structs
   switch ( elem.type ) {
-    case Type::PANEL: {
+    case Type::Panel: {
       LayoutPanel( ui_reg.get<Panel>( entity ), entity );
     } break;
-    case Type::TEXT_LABEL: {
+    case Type::TextLabel: {
       TextLabel &label = ui_reg.get<TextLabel>( entity );
 
       const vec2 text_dims = MeasureTextEx(
@@ -266,7 +266,7 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
     } break;
-    case Type::TEXT_BUTTON: {
+    case Type::TextButton: {
       TextButton &button = ui_reg.get<TextButton>( entity );
 
       const vec2 text_dims = MeasureTextEx(
@@ -278,7 +278,7 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
     } break;
-    case Type::TEXTURE_BUTTON: {
+    case Type::TextureButton: {
       Texture2D texture = ui_reg.get<TextureButton>( entity ).texture;
       elem.transform.width = texture.width * UI::SCALE;
       elem.transform.height = texture.height * UI::SCALE;
@@ -322,21 +322,21 @@ inline bool DoInteraction(
 inline void
 DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
   switch ( elem.type ) {
-    case Type::BASE_PANEL: {
+    case Type::BasePanel: {
       auto &panel = ui_reg.get<BasePanel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
         panel.background );
     } break;
-    case Type::PANEL: {
+    case Type::Panel: {
       auto &panel = ui_reg.get<Panel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
         panel.background );
     } break;
-    case Type::TEXT_LABEL: {
+    case Type::TextLabel: {
       auto &label = ui_reg.get<TextLabel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
@@ -354,7 +354,7 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         2.0,
         label.text_color );
     } break;
-    case Type::TEXTURE_BUTTON: {
+    case Type::TextureButton: {
       auto &button = ui_reg.get<TextureButton>( entity );
       DrawTextureEx(
         button.texture,
@@ -364,7 +364,7 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         WHITE );
     } break;
 
-    case Type::TEXT_BUTTON: {
+    case Type::TextButton: {
       auto &button = ui_reg.get<TextButton>( entity );
       Color background = button.background;
 
@@ -420,16 +420,15 @@ inline void ListenForDeselect() {
 inline void ToggleElement( entt::entity entity, bool on ) {
   Element &elem = ui_reg.get<Element>( entity );
   elem.enabled = on;
-  if ( elem.type != Type::PANEL && elem.type != Type::BASE_PANEL )
+  if ( elem.type != Type::Panel && elem.type != Type::BasePanel )
     return;
 
-  if ( ui_reg.any_of<BasePanel>( entity ) ) {
+  if ( ui_reg.all_of<BasePanel>( entity ) ) {
     BasePanel panel = ui_reg.get<BasePanel>( entity );
     for ( auto child: panel.children ) {
       ToggleElement( child, on );
     }
-
-  } else if ( ui_reg.any_of<Panel>( entity ) ) {
+  } else if ( ui_reg.all_of<Panel>( entity ) ) {
     Panel panel = ui_reg.get<Panel>( entity );
     for ( auto child: panel.children ) {
       ToggleElement( child, on );
