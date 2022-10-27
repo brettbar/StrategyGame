@@ -1,12 +1,21 @@
+#pragma once
+
 #include "../common.hpp"
+#include "../components/province.hpp"
 #include "../components/settlement.hpp"
+#include "../global.hpp"
 #include "../renderer/textures.hpp"
+#include "selection_system.hpp"
 
 namespace SettlementSystem {
 
+inline void Init( TextureCache & );
+inline void SpawnSettlement();
 inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
 inline void UpdateSprawl( Settlement::Component & );
+
+inline void DrawSettlement( TextureCache &, bool );
 
 inline std::map<std::string, Image> building_map;
 
@@ -33,6 +42,59 @@ inline void Init( TextureCache &cache ) {
   building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
 }
 
+// inline Texture Temp() {
+//         Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
+//         // ImageAlphaPremultiply( &base );
+//         ImageDraw(
+//           &base,
+//           building_map.at( "roman_m1" ),
+//           { 0, 0, 16, 16 },
+//           { 0, 0, 16, 16 },
+//           WHITE );
+//         return LoadTextureFromImage( base );
+// }
+
+inline void SpawnSettlement() {
+  Unit::Component unit =
+    Global::registry.get<Unit::Component>( SelectionSystem::selected_entity );
+
+  vec2 pos = unit.position;
+  i32 closest_tile = DetermineTileIdFromPosition( pos );
+
+  if ( closest_tile == -1 )
+    return;
+
+  for ( auto entity: Global::registry.view<Province::Component>() ) {
+    Province::Component &prov =
+      Global::registry.get<Province::Component>( entity );
+
+    if ( prov.tile->id == closest_tile ) {
+      if ( prov.owner == unit.owner ) {
+        if ( !Global::registry.any_of<Settlement::Component>( entity ) ) {
+          printf( "hello?\n" );
+          Settlement::Component settlement = {
+            .id = prov.id,
+            .name = "Rome",
+            .development = Settlement::Development::Village,
+            .population =
+              {
+                .current = 200,
+                .birthRate = 40,
+                .deathRate = 10,
+                .growthRate = ( 40.0f - 10.0f ) / 200,
+                .carryingCapacity = 1000,
+              },
+            // .texture = Global::texture_cache[hstr{"roman_m1"}]->texture,
+            .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
+
+          };
+
+          Global::registry.emplace<Settlement::Component>( entity );
+        }
+      }
+    }
+  }
+}
 
 inline void UpdateSettlement( Settlement::Component &settlement ) {
   bool needs_sprawl_update = UpdatePopulation( settlement );
@@ -46,22 +108,20 @@ inline void UpdateSettlement( Settlement::Component &settlement ) {
   // TODO determine development from population
   settlement.development = Settlement::Development::Village;
 
-  // Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
 
-  Image base = LoadImageFromTexture( settlement.texture );
+  // Image base = LoadImageFromTexture( settlement.texture );
 
-  // ImageDraw( &base, image, { 0, 0, 16, 16 }, { 0, 0, 16, 16 }, WHITE );
 
-  for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
-    ImageDraw(
-      &base,
-      building_map.at( "roman_s3" ),
-      { 0, 0, 16, 16 },
-      { ( i * 8.0f ), 0, 16, 16 },
-      WHITE );
-  }
+  // for ( u32 i = 0; i < ( settlement.population.current / 100 ); i++ ) {
+  //   ImageDraw(
+  //     &base,
+  //     building_map.at( "roman_s3" ),
+  //     { 0, 0, 16, 16 },
+  //     { ( i * 8.0f ), 0, 16, 16 },
+  //     WHITE );
+  // }
 
-  settlement.texture = LoadTextureFromImage( base );
+  // settlement.texture = LoadTextureFromImage( base );
 }
 
 inline bool UpdatePopulation( Settlement::Component &settlement ) {
@@ -97,6 +157,62 @@ inline bool UpdatePopulation( Settlement::Component &settlement ) {
   }
 
   return false;
+}
+
+inline void DrawSettlement( TextureCache &cache, bool showOverlays ) {
+  auto settlements =
+    Global::registry.view<Settlement::Component, Province::Component>();
+
+  for ( auto entity: settlements ) {
+    Province::Component &province =
+      settlements.get<Province::Component>( entity );
+    Settlement::Component &settlement =
+      settlements.get<Settlement::Component>( entity );
+
+    // str idString = std::to_string(tile.id);
+    // const char *idText = idString.c_str();
+    // if (debug)
+    //   DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0,
+    //   14
+    //            WHITE);
+
+    // str ownerString = std::to_string(tile.owner);
+    // const char *ownertext = ownerString.c_str();
+    // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0,
+    // 14,
+    //          BLUE);
+
+    //       str coordString = std::to_string((u32)tile.coord.x) + "," +
+    //                         std::to_string((u32)tile.coord.y);
+    //       const char *coordText = coordString.c_str();
+    ////       if (.debug)
+    //         DrawText(coordText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
+    //                  BLUE);
+
+    // str popString = std::to_string(tile.population);
+    // const char *text = popString.c_str();
+    // if (debug)
+    //   DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0,
+    //   14,
+    //            RED);
+
+    // if ( prov.owner <= -1 || settlement.population.current <= 0 )
+    //   continue;
+
+
+    Vector2 settlement_pos = {
+      province.tile->position.x + 24,
+      province.tile->position.y + 24,
+    };
+
+    // // DrawRectangleRec({provPos.x + 50,
+    // //                   provPos.y + 86, 128, 64},
+    // //                  Fade(WHITE, 0.8f));
+    // // DrawSingleBorder(tile);
+
+    // // Draw Settlement
+    DrawTextureV( settlement.texture, settlement_pos, WHITE );
+  }
 }
 
 };// namespace SettlementSystem

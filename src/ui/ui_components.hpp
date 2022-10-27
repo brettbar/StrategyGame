@@ -1,12 +1,11 @@
 #pragma once
 
-
 #include "../common.hpp"
 
 namespace UI {
 
 inline entt::registry ui_reg;
-inline std::map<std::string, entt::entity> ui_lookup;
+inline std::map<std::string, entt::entity> lookup;
 
 inline f32 SCALE = 2.0f;
 
@@ -109,7 +108,7 @@ inline entt::entity CreateElement( T component, Element elem ) {
   ui_reg.emplace<Element>( entity, elem );
   ui_reg.emplace<T>( entity, component );
 
-  ui_lookup.insert_or_assign( elem.id, entity );
+  lookup.insert_or_assign( elem.id, entity );
 
   return entity;
 }

@@ -70,7 +70,7 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    SpawnSystem::CreateNew( cache, click_pos, state.currPlayer );
+    SpawnSystem::SpawnColonist( cache, click_pos, state.currPlayer );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {

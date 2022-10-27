@@ -5,6 +5,7 @@
 #include "../systems/map/map_system.hpp"
 #include "../systems/overlay_system.hpp"
 #include "../systems/selection_system.hpp"
+#include "../systems/settlement_system.hpp"
 #include "fonts.hpp"
 #include "textures.hpp"
 
@@ -72,12 +73,13 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     BeginShaderMode( shader );
     {
       switch ( MapSystem::mode ) {
-        case MapSystem::Mode::TERRAIN:
-          ProvinceSystem::DrawProvinces( texture_cache, false );
-          break;
-        case MapSystem::Mode::POLITICAL:
-          ProvinceSystem::DrawProvinces( texture_cache, true );
-          break;
+        case MapSystem::Mode::TERRAIN: {
+          SettlementSystem::DrawSettlement( texture_cache, false );
+
+        } break;
+        case MapSystem::Mode::POLITICAL: {
+          SettlementSystem::DrawSettlement( texture_cache, false );
+        } break;
       }
     }
     EndShaderMode();

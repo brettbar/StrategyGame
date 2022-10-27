@@ -395,7 +395,7 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
 
-    auto context_panel = ui_lookup.at( "settlement_context_panel" );
+    auto context_panel = lookup.at( "settlement_context_panel" );
     ToggleElement( context_panel, true );
     // Element &elem = ui_reg.get<Element>( context_panel );
     // elem.enabled = true;
@@ -403,7 +403,7 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
     auto actor = game_reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
-    auto context_panel = ui_lookup.at( "actor_context_panel" );
+    auto context_panel = lookup.at( "actor_context_panel" );
     ToggleElement( context_panel, true );
     // entt::entity context_label = ui_lookup.at( "context_label" );
     // ui_reg.get<TextLabel>( context_label ).text = actor.name;
@@ -412,7 +412,7 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
 
 inline void ListenForDeselect() {
   printf( "DeSelectListener?\n" );
-  auto context_panel = ui_lookup.at( "settlement_context_panel" );
+  auto context_panel = lookup.at( "settlement_context_panel" );
   // TODO not deselecting properly?
   ToggleElement( context_panel, false );
 }

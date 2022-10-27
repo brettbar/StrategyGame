@@ -94,7 +94,7 @@ inline void Draw( TextureCache &texture_cache ) {
 
     DrawTextEx(
       Global::font_cache[hstr{ "font_romulus" }]->font,
-      settlement.name,
+      settlement.name.c_str(),
       {
         settlement_pos.x + 16.0f,
         settlement_pos.y + 32.0f,

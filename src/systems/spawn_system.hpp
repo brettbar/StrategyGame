@@ -1,3 +1,5 @@
+// TODO this shouldnt be its own system. Move the spawns to their respective systems.
+
 #pragma once
 
 #include "../archetypes/archetypes.hpp"
@@ -15,7 +17,7 @@
 #include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void CreateNew( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
+inline void SpawnColonist( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
 inline void DeleteSelected();
 Texture2D DetermineTexture( Faction, TextureCache & );
 
@@ -44,7 +46,7 @@ inline void Update( State &state ) {
   // listener.Update( state );
 }
 
-inline void CreateNew(
+inline void SpawnColonist(
   TextureCache &cache,
   Vector2 clickPos,
   std::shared_ptr<PlayerSystem> currPlayer ) {

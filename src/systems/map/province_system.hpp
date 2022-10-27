@@ -17,7 +17,6 @@
 namespace ProvinceSystem {
 
 inline void SetProvinceOwner( u32 owner );
-inline void DrawProvinces( TextureCache &, bool );
 
 // TODO figure out if this really needs to be here
 // Should be able to make it like the listener in ui_system.
@@ -151,60 +150,7 @@ inline void SetProvinceOwner( u32 owner ) {
 }
 
 
-inline void DrawProvinces( TextureCache &cache, bool showOverlays ) {
-  auto provinces = Global::registry.view<Province::Component>();
-  auto settlements = Global::registry.view<Settlement::Component>();
 
-  for ( auto ent: provinces ) {
-    Province::Component &prov = provinces.get<Province::Component>( ent );
-    // Settlement::Component &settlement =
-    //   settlements.get<Settlement::Component>( ent );
-
-    // str idString = std::to_string(tile.id);
-    // const char *idText = idString.c_str();
-    // if (debug)
-    //   DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0,
-    //   14,
-    //            WHITE);
-
-    // str ownerString = std::to_string(tile.owner);
-    // const char *ownertext = ownerString.c_str();
-    // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0,
-    // 14,
-    //          BLUE);
-
-    //       str coordString = std::to_string((u32)tile.coord.x) + "," +
-    //                         std::to_string((u32)tile.coord.y);
-    //       const char *coordText = coordString.c_str();
-    ////       if (.debug)
-    //         DrawText(coordText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
-    //                  BLUE);
-
-    // str popString = std::to_string(tile.population);
-    // const char *text = popString.c_str();
-    // if (debug)
-    //   DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0,
-    //   14,
-    //            RED);
-
-    // if ( prov.owner <= -1 || settlement.population.current <= 0 )
-    //   continue;
-
-
-    // Vector2 settlement_pos = {
-    //   prov.tile->position.x + 24,
-    //   prov.tile->position.y + 24,
-    // };
-
-    // // DrawRectangleRec({provPos.x + 50,
-    // //                   provPos.y + 86, 128, 64},
-    // //                  Fade(WHITE, 0.8f));
-    // // DrawSingleBorder(tile);
-
-    // // Draw Settlement
-    // DrawTextureV( settlement.texture, settlement_pos, WHITE );
-  }
-}
 
 
 //  Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y)

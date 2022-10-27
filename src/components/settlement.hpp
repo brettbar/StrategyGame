@@ -69,10 +69,10 @@ struct Population {
 
 struct Component {
   u32 id;
-  const char *name;
+  std::string name;
   Development development;
   Population population;
-  Texture texture;
+  Texture2D texture;
 };
 
 
