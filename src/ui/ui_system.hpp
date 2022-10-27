@@ -15,7 +15,6 @@
 #include "widgets/overview_banner.hpp"
 #include "widgets/settlement_context_panel.hpp"
 
-#include <iostream>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -127,14 +126,12 @@ inline void Draw( TextureCache &texture_cache ) {
       switch ( elem.type ) {
         case Type::TextButton: {
           TextButton &button = ui_reg.get<TextButton>( entity );
-          // TextButton &button = GetComponent<TextButton>( entity );
 
           if ( button.clickable )
             action_lookup.at( elem.id )();
         } break;
         case Type::TextureButton: {
           TextureButton &button = ui_reg.get<TextureButton>( entity );
-          // TextureButton &button = GetComponent<TextureButton>( entity );
 
           if ( button.clickable )
             action_lookup.at( elem.id )();

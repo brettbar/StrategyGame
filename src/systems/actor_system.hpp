@@ -6,6 +6,7 @@
 #include "map/terrain_system.hpp"
 #include "movement_system.hpp"
 #include "selection_system.hpp"
+#include "settlement_system.hpp"
 
 namespace ActorSystem {
 
@@ -15,13 +16,15 @@ namespace ActorSystem {
 // 2. The colonist is in a province owned by their faction
 // 3. The province does not already contain a settlement
 inline bool ColonistCanPlaceSettlement() {
-  if ( SelectionSystem::selected_entity == entt::null )
+  // 0. if the colonist isnt selected, bail
+  if (
+    SelectionSystem::selected_entity == entt::null ||
+    !Global::registry.all_of<Unit::Component>(
+      SelectionSystem::selected_entity ) )
     return false;
 
-  if ( !Global::registry.all_of<Unit::Component>(
-         SelectionSystem::selected_entity ) )
-    return false;
 
+  // 1. if the colonist is moving, bail
   if ( MovementSystem::UnitIsMoving( SelectionSystem::selected_entity ) )
     return false;
 
@@ -29,9 +32,9 @@ inline bool ColonistCanPlaceSettlement() {
   Unit::Component unit =
     Global::registry.get<Unit::Component>( SelectionSystem::selected_entity );
 
-
   i32 closest_tile = DetermineTileIdFromPosition( unit.position );
 
+  // 2. if they aren't in a tile, bail
   if ( closest_tile == -1 )
     return false;
 
@@ -39,13 +42,15 @@ inline bool ColonistCanPlaceSettlement() {
     Province::Component &prov =
       Global::registry.get<Province::Component>( entity );
 
-    if ( prov.tile->id == closest_tile ) {
-      if ( prov.owner == unit.owner ) {
-        return true;
-      }
+    // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
+    if (
+      prov.tile->id == closest_tile && prov.owner == unit.owner &&
+      !Global::registry.any_of<Settlement::Component>( entity ) ) {
+      return true;
     }
   }
 
+  // Otherwise, default to false
   return false;
 }
 
