@@ -104,8 +104,6 @@ inline entt::entity SettlementContextTabButton( Texture2D texture ) {
       .texture = texture,
     },
     .clickable = true,
-    .action = []() { printf( "Settlement tab button pressed\n" ); },
-    .check_clickable = []() -> bool { return true; },
   };
 
   return CreateElement( button, elem );
@@ -193,7 +191,6 @@ inline entt::entity SettlementPopulation() {
 }
 
 // TODO this is getting set to the wrong position for the first frame
-// To replicate, set a breakpoint on the texture button.Update() call
 inline entt::entity SettlementDevelopment() {
   Element elem = {
     .id = "settlement_development",

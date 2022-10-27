@@ -1,11 +1,8 @@
 #pragma once
 
-#include "../../systems/settlement_system.hpp"
 
 #include "../../renderer/textures.hpp"
 #include "../ui_components.hpp"
-
-#include "../../systems/actor_system.hpp"
 
 namespace UI {
 
@@ -54,7 +51,6 @@ inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
       },
   };
 
-
   return CreateElement( panel, elem );
 }
 
@@ -69,7 +65,6 @@ inline entt::entity ActorActionsPanel( TextureCache &texture_cache ) {
   Panel panel = {
     .children =
       {
-
         ActorSpawnSettlementButton( texture_cache ),
       },
   };
@@ -93,14 +88,6 @@ inline entt::entity ActorSpawnSettlementButton( TextureCache &texture_cache ) {
       .background = RED,
     },
     .clickable = false,
-    .action =
-      []() {
-        printf( "Spawn Settlement clicked!!\n" );
-        SettlementSystem::SpawnSettlement();
-      },
-    .check_clickable = []() -> bool {
-      return ActorSystem::ColonistCanPlaceSettlement();
-    },
   };
 
 

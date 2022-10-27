@@ -53,22 +53,6 @@ inline void Init( TextureCache &cache ) {
   // listener.Listen();
 }
 
-inline void Update( State &state ) {
-  // listener.Update( state );
-
-  // auto view = reg.view<Province::Component>();
-
-  // for ( auto &ent: view ) {
-  //   Province::Component &prov = view.get<Province::Component>( ent );
-
-  //   if ( prov.owner > -1 ) {
-  //     Settlement::Component &settlement = reg.get<Settlement::Component>( ent );
-
-  //     UpdateSettlement( settlement );
-  //   }
-  // }
-}
-
 inline void AssignProvince( u32 owner, Vector2 pos ) {
   i32 provId = DetermineTileIdFromPosition( pos );
   assert( provId >= 0 );
@@ -148,9 +132,6 @@ inline void SetProvinceOwner( u32 owner ) {
 
   AssignProvince( owner, unit.position );
 }
-
-
-
 
 
 //  Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y)

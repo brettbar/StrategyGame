@@ -32,7 +32,7 @@ TEMPORARY TODOS HERE
 
 // namespace fs = std::filesystem;
 
-void LoadResources( );
+void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
 
 void StartGame( State &, TextureCache & );
@@ -62,24 +62,13 @@ int main( void ) {
 
   bool game_started = false;
 
-  // MAIN_MENU_UI::emitter.on<MAIN_MENU_UI::ClickEvent>(
-  //   [&reg](
-  //     const MAIN_MENU_UI::ClickEvent &event,
-  //     MAIN_MENU_UI::Emitter &emitter ) {
-  //     fs::path f{ "output.json" };
-  //     if ( fs::exists( f ) ) {
-  //       printf( "Found existing file!\n" );
-  //       reg = Save::Load();
-  //     }
-  //   } );
-
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
   SetExitKey( KEY_DELETE );
   InitWindow( 1920, 1080, "FieldsOfMars" );
 
-  LoadResources( );
+  LoadResources();
 
   // Main game loop
   f32 MS_PER_UPDATE = 1 / 60.0;
@@ -94,17 +83,9 @@ int main( void ) {
         Input::CheckMenuToggle();
 
         BeginDrawing();
-        {
-          ClearBackground( BLACK );
-
-          // IRONGUI::Draw(
-          //   MAIN_MENU_UI::curr_content,
-          //   IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(),
-          //   IRONGUI::reg.view<IRONGUI::Element, MAIN_MENU_UI::UiFlag>(
-          //     entt::exclude<IRONGUI::Panel> ),
-          //   font_cache );
-        }
+        { ClearBackground( BLACK ); }
         EndDrawing();
+
         break;
 
       case Global::ProgramMode::MODAL_MENU:
@@ -113,12 +94,6 @@ int main( void ) {
         BeginDrawing();
         {
           Renderer::Draw( state, Global::texture_cache );
-          // IRONGUI::Draw(
-          //   GAME_UI::curr_content,
-          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
-          //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>( entt::exclude<IRONGUI::Panel> ),
-          //   font_cache
-          // );
 
           DrawRectangle(
             0,
@@ -126,13 +101,6 @@ int main( void ) {
             GetScreenWidth(),
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
-
-          // IRONGUI::Draw(
-          //   MODAL_MENU_UI::curr_content,
-          //   IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(),
-          //   IRONGUI::reg.view<IRONGUI::Element, MODAL_MENU_UI::UiFlag>(
-          //     entt::exclude<IRONGUI::Panel> ),
-          //   font_cache );
         }
         EndDrawing();
         break;
@@ -171,9 +139,7 @@ int main( void ) {
         CameraUpdate( state.camera, dt );
 
         // Draw everything to screen
-        BeginDrawing();
-        { Draw( state ); }
-        EndDrawing();
+        Draw( state );
 
         break;
     }
@@ -208,7 +174,7 @@ void Update60TPS( State &state ) {
 }
 
 void Update1TPS( State &state ) {
-  ProvinceSystem::Update( state );
+  SettlementSystem::Update( state );
   SpawnSystem::Update( state );
 
   state.day++;
@@ -222,14 +188,10 @@ void Update1TPS( State &state ) {
 }
 
 void Draw( State &state ) {
+  BeginDrawing();
   Renderer::Draw( state, Global::texture_cache );
-  // IRONGUI::Draw(
-  //   GAME_UI::curr_content,
-  //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(),
-  //   IRONGUI::reg.view<IRONGUI::Element, GAME_UI::UiFlag>(
-  //     entt::exclude<IRONGUI::Panel> ),
-  //   font_cache );
   UI::Draw( Global::texture_cache );
+  EndDrawing();
 }
 
 void Exit( TextureCache &cache ) {
@@ -297,8 +259,11 @@ inline Image InitTileOutline() {
   return base;
 }
 
-void LoadResources( ) {
-  LoadResource( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
+void LoadResources() {
+  LoadResource(
+    hstr{ "tile_outline" },
+    InitTileOutline(),
+    Global::texture_cache );
 
   Global::font_cache.load(
     hstr{ "font_romulus" },

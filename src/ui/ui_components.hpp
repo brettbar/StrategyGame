@@ -42,7 +42,6 @@ struct Margins {
   u32 bottom;
 };
 
-
 struct Element {
   std::string id;
   Type type;
@@ -73,15 +72,6 @@ struct TextLabel {
 
 struct TextButton : TextLabel {
   bool clickable;
-  std::function<void()> action;
-  std::function<bool()> check_clickable;
-
-  void Action() {
-    if ( clickable )
-      action();
-  }
-
-  void Update() { clickable = check_clickable(); }
 };
 
 struct TextureLabel {
@@ -90,15 +80,6 @@ struct TextureLabel {
 
 struct TextureButton : TextureLabel {
   bool clickable;
-  std::function<void()> action;
-  std::function<bool()> check_clickable;
-
-  void Action() {
-    if ( clickable )
-      action();
-  }
-
-  void Update() { clickable = check_clickable(); }
 };
 
 template<typename T>

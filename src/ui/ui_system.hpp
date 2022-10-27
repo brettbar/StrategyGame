@@ -6,10 +6,10 @@
 #include "../components/selected.hpp"
 #include "../components/settlement.hpp"
 #include "../events.hpp"
-#include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "../systems/selection_system.hpp"
+#include "ui_actions.hpp"
 #include "ui_components.hpp"
 #include "widgets/actor_context_panel.hpp"
 #include "widgets/overview_banner.hpp"
@@ -108,11 +108,11 @@ inline void Draw( TextureCache &texture_cache ) {
     switch ( elem.type ) {
       case Type::TextButton: {
         TextButton &button = ui_reg.get<TextButton>( entity );
-        button.Update();
+        button.clickable = clickable_lookup.at( elem.id )();
       } break;
       case Type::TextureButton: {
         TextureButton &button = ui_reg.get<TextureButton>( entity );
-        button.Update();
+        button.clickable = clickable_lookup.at( elem.id )();
       } break;
     }
 
@@ -127,13 +127,17 @@ inline void Draw( TextureCache &texture_cache ) {
       switch ( elem.type ) {
         case Type::TextButton: {
           TextButton &button = ui_reg.get<TextButton>( entity );
-          button.Update();
-          button.Action();
+          // TextButton &button = GetComponent<TextButton>( entity );
+
+          if ( button.clickable )
+            action_lookup.at( elem.id )();
         } break;
         case Type::TextureButton: {
           TextureButton &button = ui_reg.get<TextureButton>( entity );
-          button.Update();
-          button.Action();
+          // TextureButton &button = GetComponent<TextureButton>( entity );
+
+          if ( button.clickable )
+            action_lookup.at( elem.id )();
         } break;
       }
     }

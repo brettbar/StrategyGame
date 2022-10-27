@@ -10,6 +10,7 @@
 namespace SettlementSystem {
 
 inline void Init( TextureCache & );
+inline void Update( State & );
 inline void SpawnSettlement();
 inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
@@ -42,6 +43,24 @@ inline void Init( TextureCache &cache ) {
   building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
 }
 
+inline void Update( State &state ) {
+  // listener.Update( state );
+
+  auto view =
+    Global::registry.view<Province::Component, Settlement::Component>();
+
+  for ( auto &ent: view ) {
+    Province::Component &prov = view.get<Province::Component>( ent );
+
+    if ( prov.owner > -1 ) {
+      Settlement::Component &settlement =
+        Global::registry.get<Settlement::Component>( ent );
+
+      UpdateSettlement( settlement );
+    }
+  }
+}
+
 // inline Texture Temp() {
 //         Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
 //         // ImageAlphaPremultiply( &base );
@@ -71,7 +90,8 @@ inline void SpawnSettlement() {
     if ( prov.tile->id == closest_tile ) {
       if ( prov.owner == unit.owner ) {
         if ( !Global::registry.any_of<Settlement::Component>( entity ) ) {
-          printf( "hello?\n" );
+          printf( "spawning settlement\n" );
+
           Settlement::Component settlement = {
             .id = prov.id,
             .name = "Rome",
@@ -84,9 +104,7 @@ inline void SpawnSettlement() {
                 .growthRate = ( 40.0f - 10.0f ) / 200,
                 .carryingCapacity = 1000,
               },
-            // .texture = Global::texture_cache[hstr{"roman_m1"}]->texture,
-            .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
-
+            .texture = LoadTextureFromImage( building_map.at( "roman_m4" ) ),
           };
 
           Global::registry.emplace<Settlement::Component>( entity );
@@ -121,7 +139,8 @@ inline void UpdateSettlement( Settlement::Component &settlement ) {
   //     WHITE );
   // }
 
-  // settlement.texture = LoadTextureFromImage( base );
+  // TODO maybe expensive?
+  settlement.texture = LoadTextureFromImage( building_map.at( "roman_m4" ) );
 }
 
 inline bool UpdatePopulation( Settlement::Component &settlement ) {
