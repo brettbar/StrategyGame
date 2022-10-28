@@ -10,9 +10,8 @@
 
 namespace OverlaySystem {
 
-inline void Draw( TextureCache &texture_cache ) {
+inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
   auto provinces = Global::registry.view<Province::Component>();
-  auto settlements = Global::registry.view<Settlement::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
@@ -59,6 +58,10 @@ inline void Draw( TextureCache &texture_cache ) {
       }
     }
   }
+}
+
+inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
+  auto settlements = Global::registry.view<Settlement::Component>();
 
   for ( auto entity: settlements ) {
     Settlement::Component &settlement =
@@ -66,8 +69,8 @@ inline void Draw( TextureCache &texture_cache ) {
     Province::Component &prov =
       Global::registry.get<Province::Component>( entity );
 
-    std::string popStr =
-      "Pop: " + std::to_string( settlement.population.current );
+    // std::string popStr =
+    //   "Pop: " + std::to_string( settlement.population.current );
 
     // DrawText( popStr.c_str(), provPos.x + 50, provPos.y + 100, 10, BLACK );
 
@@ -83,12 +86,19 @@ inline void Draw( TextureCache &texture_cache ) {
       prov.tile->position.y + 24,
     };
 
+    const vec2 text_dims = MeasureTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      settlement.name.c_str(),
+      14,
+      2.0f );
+
+
     DrawRectangleRec(
       {
         settlement_pos.x + 8,
         settlement_pos.y + 16,
-        32,
-        7,
+        text_dims.x,
+        text_dims.y,
       },
       BLACK );
 
@@ -96,19 +106,19 @@ inline void Draw( TextureCache &texture_cache ) {
       Global::font_cache[hstr{ "font_romulus" }]->font,
       settlement.name.c_str(),
       {
-        settlement_pos.x + 16.0f,
-        settlement_pos.y + 32.0f,
+        settlement_pos.x + 8,
+        settlement_pos.y + 16,
       },
       14,
       2,
       WHITE );
 
-    DrawText(
-      std::to_string( settlement.population.current ).c_str(),
-      settlement_pos.x + 54.0,
-      settlement_pos.y + 32.0,
-      14,
-      WHITE );
+    // DrawText(
+    //   std::to_string( settlement.population.current ).c_str(),
+    //   settlement_pos.x + 54.0,
+    //   settlement_pos.y + 32.0,
+    //   14,
+    //   WHITE );
   }
 }
 

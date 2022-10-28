@@ -17,7 +17,8 @@
 #include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void SpawnColonist( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
+inline void
+SpawnColonist( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
 inline void DeleteSelected();
 Texture2D DetermineTexture( Faction, TextureCache & );
 

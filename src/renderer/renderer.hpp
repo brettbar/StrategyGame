@@ -16,7 +16,7 @@ namespace Renderer {
 inline Shader shader;
 inline Shader outline_shader;
 
-inline void TempDraw( bool debug );
+inline void DrawVillagers( bool debug );
 
 inline void Init( State &state ) {
 
@@ -68,34 +68,37 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     EndShaderMode();
 
     // Overlay shouldn't be ran through shader?
-    OverlaySystem::Draw( texture_cache );
+    OverlaySystem::DrawProvinceOverlays( texture_cache );
+    SelectionSystem::Draw(
+      texture_cache,
+      state.gameState == GameState::EDITOR );
+    OverlaySystem::DrawSettlementOverlays( texture_cache );
+
 
     BeginShaderMode( shader );
     {
       switch ( MapSystem::mode ) {
         case MapSystem::Mode::TERRAIN: {
-          SettlementSystem::DrawSettlement( texture_cache, false );
+          SettlementSystem::Draw( texture_cache, false );
 
         } break;
         case MapSystem::Mode::POLITICAL: {
-          SettlementSystem::DrawSettlement( texture_cache, false );
+          SettlementSystem::Draw( texture_cache, false );
         } break;
       }
     }
     EndShaderMode();
 
     // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-    TempDraw( state.gameState == GameState::EDITOR );
+    DrawVillagers( state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
 
-  SelectionSystem::Draw( texture_cache, state.gameState == GameState::EDITOR );
-
   EndMode2D();
 }
 
-inline void TempDraw( bool debug ) {
+inline void DrawVillagers( bool debug ) {
   entt::basic_view villagers =
     Global::registry.view<Unit::Component, Animated::Component>();
 

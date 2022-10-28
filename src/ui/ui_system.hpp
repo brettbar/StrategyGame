@@ -9,8 +9,8 @@
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "../systems/selection_system.hpp"
-#include "ui_actions.hpp"
 #include "ui_components.hpp"
+#include "ui_lookups.hpp"
 #include "widgets/actor_context_panel.hpp"
 #include "widgets/overview_banner.hpp"
 #include "widgets/settlement_context_panel.hpp"
@@ -42,6 +42,8 @@ inline void Init( TextureCache &texture_cache ) {
   Global::registry.on_destroy<Selected::Component>()
     .connect<&ListenForDeselect>();
 }
+
+inline void Update() {}
 
 inline void Draw( TextureCache &texture_cache ) {
   vec2 mousePos = GetMousePosition();
@@ -104,9 +106,18 @@ inline void Draw( TextureCache &texture_cache ) {
     bool interactive =
       ( elem.type == Type::TextButton || elem.type == Type::TextureButton );
 
+    // UPDATE
     switch ( elem.type ) {
+      case Type::TextLabel: {
+        TextLabel &label = ui_reg.get<TextLabel>( entity );
+        if ( label.dynamic )
+          label.text = update_lookup.at( elem.id )();
+      } break;
       case Type::TextButton: {
         TextButton &button = ui_reg.get<TextButton>( entity );
+        if ( button.dynamic )
+          button.text = update_lookup.at( elem.id )();
+
         button.clickable = clickable_lookup.at( elem.id )();
       } break;
       case Type::TextureButton: {

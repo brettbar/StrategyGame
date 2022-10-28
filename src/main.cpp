@@ -162,7 +162,7 @@ void StartGame( State &state, TextureCache &texture_cache ) {
 
 void LoadGame() {}
 
-void UpdateOnFrame( State &state ) {}
+void UpdateOnFrame( State &state ) { UI::Update(); }
 
 // TODO: look at all of these and see if any belong
 // in UpdateOnFrame

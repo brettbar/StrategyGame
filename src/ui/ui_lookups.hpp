@@ -38,4 +38,27 @@ inline std::map<std::string, std::function<bool()>> clickable_lookup = {
   },
 };
 
+inline std::map<std::string, std::function<std::string()>> update_lookup = {
+  {
+    "settlement_name",
+    []() -> std::string {
+      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+             SelectionSystem::selected_entity ) ) {
+
+        Province::Component &province =
+          Global::registry.get<Province::Component>(
+            SelectionSystem::selected_entity );
+
+        Settlement::Component &settlement =
+          Global::registry.get<Settlement::Component>(
+            SelectionSystem::selected_entity );
+
+        return settlement.name;
+      }
+
+      return "Uninhabited";
+    },
+  },
+};
+
 };// namespace UI

@@ -16,7 +16,7 @@ enum class Development {
   Citadel,
 };
 
-inline std::map<Development, const char *> development = {
+inline std::map<Development, std::string> development = {
   { Development::Uninhabited, "Uninhabited" },
   { Development::Village, "Village" },
   { Development::Town, "Town" },

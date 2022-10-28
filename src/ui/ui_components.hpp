@@ -68,6 +68,7 @@ struct TextLabel {
   i32 font_size;
   Color text_color;
   Color background;
+  bool dynamic = false;
 };
 
 struct TextButton : TextLabel {

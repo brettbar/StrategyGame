@@ -161,10 +161,11 @@ inline entt::entity SettlementName() {
   };
 
   TextLabel name = {
-    .text = "SETTLEMENT_PLACEHOLDER",
+    .text = "Uninhabited",
     .font_size = 32,
     .text_color = WHITE,
     .background = BLACK,
+    .dynamic = true,
   };
 
 

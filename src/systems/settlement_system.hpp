@@ -16,7 +16,7 @@ inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
 inline void UpdateSprawl( Settlement::Component & );
 
-inline void DrawSettlement( TextureCache &, bool );
+inline void Draw( TextureCache &, bool );
 
 inline std::map<std::string, Image> building_map;
 
@@ -44,8 +44,6 @@ inline void Init( TextureCache &cache ) {
 }
 
 inline void Update( State &state ) {
-  // listener.Update( state );
-
   auto view =
     Global::registry.view<Province::Component, Settlement::Component>();
 
@@ -76,6 +74,7 @@ inline void Update( State &state ) {
 inline void SpawnSettlement() {
   Unit::Component unit =
     Global::registry.get<Unit::Component>( SelectionSystem::selected_entity );
+  entt::entity unit_entity = SelectionSystem::selected_entity;
 
   vec2 pos = unit.position;
   i32 closest_tile = DetermineTileIdFromPosition( pos );
@@ -87,6 +86,7 @@ inline void SpawnSettlement() {
     Province::Component &prov =
       Global::registry.get<Province::Component>( entity );
 
+    // TODO pretty sure I am checking this twice, another time in the Actor colonist area
     if ( prov.tile->id == closest_tile ) {
       if ( prov.owner == unit.owner ) {
         if ( !Global::registry.any_of<Settlement::Component>( entity ) ) {
@@ -104,10 +104,14 @@ inline void SpawnSettlement() {
                 .growthRate = ( 40.0f - 10.0f ) / 200,
                 .carryingCapacity = 1000,
               },
-            .texture = LoadTextureFromImage( building_map.at( "roman_m4" ) ),
+            .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
           };
 
-          Global::registry.emplace<Settlement::Component>( entity );
+          Global::registry.emplace<Settlement::Component>( entity, settlement );
+
+          SelectionSystem::selected_entity = entt::null;
+          Global::registry.destroy( unit_entity );
+          return;
         }
       }
     }
@@ -140,7 +144,7 @@ inline void UpdateSettlement( Settlement::Component &settlement ) {
   // }
 
   // TODO maybe expensive?
-  settlement.texture = LoadTextureFromImage( building_map.at( "roman_m4" ) );
+  settlement.texture = LoadTextureFromImage( building_map.at( "roman_m1" ) );
 }
 
 inline bool UpdatePopulation( Settlement::Component &settlement ) {
@@ -178,7 +182,7 @@ inline bool UpdatePopulation( Settlement::Component &settlement ) {
   return false;
 }
 
-inline void DrawSettlement( TextureCache &cache, bool showOverlays ) {
+inline void Draw( TextureCache &cache, bool showOverlays ) {
   auto settlements =
     Global::registry.view<Settlement::Component, Province::Component>();
 
@@ -230,7 +234,7 @@ inline void DrawSettlement( TextureCache &cache, bool showOverlays ) {
     // // DrawSingleBorder(tile);
 
     // // Draw Settlement
-    DrawTextureV( settlement.texture, settlement_pos, WHITE );
+    DrawPerfectTexture( settlement.texture, settlement_pos, WHITE );
   }
 }
 

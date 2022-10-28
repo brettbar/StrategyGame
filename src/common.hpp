@@ -184,7 +184,7 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   //  }
 }
 
-// TODO this probably needs to get moved to the renderer
+// TODO this probably needs to get moved
 inline static void DrawPerfectTexture(
   Texture2D &texture,
   Rectangle rect,
@@ -197,6 +197,14 @@ inline static void DrawPerfectTexture(
 
   DrawTextureRec( texture, rect, position, tint );
 }
+
+
+inline static void
+DrawPerfectTexture( Texture2D &texture, Vector2 position, Color tint ) {
+  SetTextureFilter( texture, TEXTURE_FILTER_BILINEAR );
+  DrawTextureV( texture, position, WHITE );
+}
+
 
 inline static std::string EntityIdToString( entt::entity entity ) {
   if ( entity == entt::null )
