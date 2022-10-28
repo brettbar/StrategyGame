@@ -97,7 +97,6 @@ inline void Draw( TextureCache &texture_cache ) {
     if ( !elem.enabled )
       continue;
 
-
     bool inside = CheckCollisionPointRec( GetMousePosition(), elem.transform );
 
     if ( !over_any_elem )
@@ -175,8 +174,6 @@ inline void Draw( TextureCache &texture_cache ) {
   std::string selected_ent =
     "entity: " + EntityIdToString( SelectionSystem::selected_entity );
   DrawText( selected_ent.c_str(), GetScreenWidth() - 200, 202, 24.0f, GREEN );
-
-  // DrawTexturePro(texture_cache[hstr{"context_panel"}]->texture, {747, 448}, {}, {0, 0}, 0, WHITE);
 }
 
 inline void LayoutPanel( Panel &panel, entt::entity entity ) {

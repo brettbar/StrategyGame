@@ -30,7 +30,7 @@ TEMPORARY TODOS HERE
 
 #include "filesystem"
 
-// namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
@@ -383,4 +383,10 @@ void LoadResources() {
     hstr{ "context_tab_garrison" },
     LoadImage( "assets/textures/UI/Garrison.png" ),
     Global::texture_cache );
+
+  std::string path = "assets/textures/resources";
+  for ( const auto &entry: fs::directory_iterator( path ) ) {
+    std::cout << entry.path().filename() << std::endl;
+    LoadResourceByFilename( entry.path().filename(), Global::texture_cache );
+  }
 }

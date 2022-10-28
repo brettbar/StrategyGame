@@ -137,7 +137,7 @@ inline entt::entity SettlementContext() {
 
   Panel panel = {
     .background = BLACK,
-    .children_axis = Axis::ROW,
+    .children_axis = Axis::COLUMN,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
     .children =

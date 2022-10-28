@@ -20,3 +20,8 @@ inline void LoadResource( hstr id, Image image, TextureCache &cache ) {
   Texture2D tex = LoadTextureFromImage( image );
   cache.load( id, tex );
 }
+
+inline void LoadResourceByFilename( std::string id, TextureCache &cache ) {
+  std::string path = "assets/textures/" + id;
+  LoadResource( hstr{ id.c_str() }, LoadImage( path.c_str() ), cache );
+}
