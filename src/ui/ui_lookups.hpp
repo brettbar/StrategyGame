@@ -59,6 +59,46 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
       return "Uninhabited";
     },
   },
+  {
+    "settlement_population",
+    []() -> std::string {
+      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+             SelectionSystem::selected_entity ) ) {
+
+        Province::Component &province =
+          Global::registry.get<Province::Component>(
+            SelectionSystem::selected_entity );
+
+        Settlement::Component &settlement =
+          Global::registry.get<Settlement::Component>(
+            SelectionSystem::selected_entity );
+
+        return std::to_string( settlement.population.current );
+      }
+
+      return "0";
+    },
+  },
+  {
+    "settlement_development",
+    []() -> std::string {
+      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+             SelectionSystem::selected_entity ) ) {
+
+        Province::Component &province =
+          Global::registry.get<Province::Component>(
+            SelectionSystem::selected_entity );
+
+        Settlement::Component &settlement =
+          Global::registry.get<Settlement::Component>(
+            SelectionSystem::selected_entity );
+
+        return Settlement::development.at( settlement.development );
+      }
+
+      return "Uninhabited";
+    },
+  },
 };
 
 };// namespace UI

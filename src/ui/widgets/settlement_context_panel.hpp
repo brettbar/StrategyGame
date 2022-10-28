@@ -137,7 +137,7 @@ inline entt::entity SettlementContext() {
 
   Panel panel = {
     .background = BLACK,
-    .children_axis = Axis::COLUMN,
+    .children_axis = Axis::ROW,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
     .children =
@@ -186,6 +186,7 @@ inline entt::entity SettlementPopulation() {
     .font_size = 32,
     .text_color = WHITE,
     .background = BLACK,
+    .dynamic = true,
   };
 
   return CreateElement( name, elem );
@@ -200,10 +201,11 @@ inline entt::entity SettlementDevelopment() {
   };
 
   TextLabel name = {
-    .text = "SETTLEMENT_PLACEHOLDER",
+    .text = "Uninhabited",
     .font_size = 32,
     .text_color = WHITE,
     .background = BLACK,
+    .dynamic = true,
   };
 
 
