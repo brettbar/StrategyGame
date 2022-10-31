@@ -32,10 +32,13 @@ ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator
 # WSL
 # ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"
 
+FINAL_PATH = ASSET_PATH + "FinalAnims/"
+
 def main():
     gen_color_maps() 
-    gen_final_anims('Hastati') 
-    gen_final_anims('SenoneWarrior')
+    gen_final_anims('GreekVillager')
+    # gen_final_anims('Hastati') 
+    # gen_final_anims('SenoneWarrior')
 
 def gen_final_anims(sprite_folder):
     # 128 x 128 Color Maps for Sprite
@@ -158,7 +161,7 @@ def gen_final_anims(sprite_folder):
 
 
                     
-    final_anims.save(ASSET_PATH + sprite_folder + "/FinalAnims.png")
+    final_anims.save(FINAL_PATH + sprite_folder + ".png")
 
 
 
