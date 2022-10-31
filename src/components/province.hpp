@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../data/resource.hpp"
 #include "tile.hpp"
 
 namespace Province {
@@ -11,6 +12,7 @@ struct Component {
   bool selected = false;
 
   std::shared_ptr<Tile::Component> tile;
+  std::vector<Resource::RawMaterial> raw_materials;
 };
 
 }// namespace Province
