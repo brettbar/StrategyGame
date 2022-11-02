@@ -32,9 +32,14 @@ ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator
 # WSL
 # ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"
 
+SOURCE_PATH = ASSET_PATH + "Actors/"
+FINAL_PATH = ASSET_PATH + "FinalAnims/"
+FINAL_ANIM_FILE = ASSET_PATH + "Template.png"
+
 def main():
     gen_color_maps() 
-    gen_final_anims('Hastati') 
+    gen_final_anims('GreekVillager')
+    gen_final_anims('RomanHastati') 
     gen_final_anims('SenoneWarrior')
 
 def gen_final_anims(sprite_folder):
@@ -52,13 +57,13 @@ def gen_final_anims(sprite_folder):
 
     # 128 x 128 Source Maps for Sprite
     source_maps = {
-        'Legs': Image.open(ASSET_PATH + sprite_folder + '/Legs.png').convert('RGBA'),
-        'Torso': Image.open(ASSET_PATH + sprite_folder + '/Torso.png').convert('RGBA'),
-        'LeftArm': Image.open(ASSET_PATH + sprite_folder + '/LeftArm.png').convert('RGBA'),
-        'Head': Image.open(ASSET_PATH + sprite_folder + '/Head.png').convert('RGBA'),
-        'LeftEquip': Image.open(ASSET_PATH + sprite_folder + '/LeftEquip.png').convert('RGBA'),
-        'RightEquip': Image.open(ASSET_PATH + sprite_folder + '/RightEquip.png').convert('RGBA'),
-        'RightArm': Image.open(ASSET_PATH + sprite_folder + '/RightArm.png').convert('RGBA'),
+        'Legs': Image.open(SOURCE_PATH + sprite_folder + '/Legs.png').convert('RGBA'),
+        'Torso': Image.open(SOURCE_PATH + sprite_folder + '/Torso.png').convert('RGBA'),
+        'LeftArm': Image.open(SOURCE_PATH + sprite_folder + '/LeftArm.png').convert('RGBA'),
+        'Head': Image.open(SOURCE_PATH + sprite_folder + '/Head.png').convert('RGBA'),
+        'LeftEquip': Image.open(SOURCE_PATH + sprite_folder + '/LeftEquip.png').convert('RGBA'),
+        'RightEquip': Image.open(SOURCE_PATH + sprite_folder + '/RightEquip.png').convert('RGBA'),
+        'RightArm': Image.open(SOURCE_PATH + sprite_folder + '/RightArm.png').convert('RGBA'),
     }
 
     # Entire Animation Spritesheet, separated by Layer
@@ -73,7 +78,7 @@ def gen_final_anims(sprite_folder):
     }
 
     # Entire Animation Spritesheet
-    final_anims = Image.open(ASSET_PATH + 'Test.png').convert('RGBA')
+    final_anims = Image.open(FINAL_ANIM_FILE).convert('RGBA')
     final_anims_dict = dict()
 
     print("Generating Sprite:", sprite_folder)
@@ -158,7 +163,7 @@ def gen_final_anims(sprite_folder):
 
 
                     
-    final_anims.save(ASSET_PATH + sprite_folder + "/FinalAnims.png")
+    final_anims.save(FINAL_PATH + sprite_folder + ".png")
 
 
 
