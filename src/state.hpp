@@ -5,6 +5,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "systems/player_system.hpp"
 
 enum class GameState {
   MENU,

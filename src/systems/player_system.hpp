@@ -25,14 +25,12 @@ inline void Init() {}
 class TempPS {
   public:
   u32 id;
-  const char *factionName;
   Faction faction;
   std::map<const char *, hstr> textureMap;
 
-  TempPS( u32 id, Faction faction, const char *factionName ) {
+  TempPS( u32 id, Faction faction ) {
     this->id = id;
     this->faction = faction;
-    this->factionName = factionName;
     RefreshTextureMap();
   }
   ~TempPS() {}

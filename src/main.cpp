@@ -54,8 +54,7 @@ int main( void ) {
     .month = 1,
     .year = 4,
     .startYear = 4,
-    .currPlayer = std::make_shared<TempPS>(
-      TempPS( 0, Faction::ROMANS, "Roman Republic" ) ),
+    .currPlayer = std::make_shared<TempPS>( TempPS( 0, Faction::ROMANS ) ),
   };
 
   Global::registry.clear();
@@ -322,15 +321,15 @@ void LoadResources() {
 
   LoadResource(
     hstr{ "romanVillagerTexture" },
-    LoadImage( "assets/textures/units/Roman_Villager.png" ),
+    LoadImage( "assets/textures/units/RomanVillager.png" ),
     Global::texture_cache );
   LoadResource(
     hstr{ "greekVillagerTexture" },
-    LoadImage( "assets/textures/units/Greek_Villager.png" ),
+    LoadImage( "assets/textures/units/GreekVillager.png" ),
     Global::texture_cache );
   LoadResource(
     hstr{ "celtVillagerTexture" },
-    LoadImage( "assets/textures/units/Celt_Villager.png" ),
+    LoadImage( "assets/textures/units/CelticVillager.png" ),
     Global::texture_cache );
   LoadResource(
     hstr{ "punicVillagerTexture" },

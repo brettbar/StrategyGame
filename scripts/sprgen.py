@@ -38,9 +38,11 @@ FINAL_ANIM_FILE = ASSET_PATH + "Template.png"
 
 def main():
     gen_color_maps() 
-    gen_final_anims('GreekVillager')
-    gen_final_anims('RomanHastati') 
-    gen_final_anims('SenoneWarrior')
+    gen_final_anims('Romans/RomanVillager')
+    gen_final_anims('Romans/RomanHastati') 
+    gen_final_anims('Greeks/GreekVillager')
+    gen_final_anims('Celts/CelticVillager')
+    gen_final_anims('Celts/CelticWarrior')
 
 def gen_final_anims(sprite_folder):
     # 128 x 128 Color Maps for Sprite
