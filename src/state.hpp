@@ -31,7 +31,8 @@ struct State {
   u32 year;
   u32 startYear;
 
-  std::shared_ptr<TempPS> currPlayer;
+  // std::shared_ptr<TempPS> currPlayer;
+  entt::entity host_player;
 
   Texture2D selectedTexture;
 };

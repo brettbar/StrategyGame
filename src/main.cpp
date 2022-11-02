@@ -45,6 +45,8 @@ void Draw( State & );
 void Exit( TextureCache & );
 
 int main( void ) {
+  Global::registry.clear();
+
   State state = {
     .mapWidth = 128,
     .mapHeight = 128,
@@ -54,12 +56,12 @@ int main( void ) {
     .month = 1,
     .year = 4,
     .startYear = 4,
-    .currPlayer = std::make_shared<TempPS>( TempPS( 0, Faction::ROMANS ) ),
+    // .currPlayer = std::make_shared<TempPS>( TempPS( 0, Faction::ROMANS ) ),
   };
 
-  Global::registry.clear();
 
   bool game_started = false;
+  bool host_mode = true;
 
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
@@ -105,41 +107,43 @@ int main( void ) {
         break;
 
       case Global::ProgramMode::GAME:
-        if ( !game_started ) {
-          StartGame( state, Global::texture_cache );
-          game_started = true;
+        if ( host_mode ) {
+
+          if ( !game_started ) {
+            StartGame( state, Global::texture_cache );
+            game_started = true;
+          }
+
+          // Update Time
+          dt = GetFrameTime();
+          lag += dt;
+          oncelag += dt;
+
+          // Check for Inpu
+          Input::CheckMenuToggle();
+          Input::Handle( state, Global::texture_cache );
+
+          // Update 60 times a second
+          while ( lag >= MS_PER_UPDATE ) {
+            Update60TPS( state );
+            lag -= MS_PER_UPDATE;
+          }
+
+          // Update once per second
+          while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
+            Update1TPS( state );
+            oncelag = 0.0f;
+          }
+
+          // Update once per frame
+          UpdateOnFrame( state );
+
+          // Update Camera
+          CameraUpdate( state.camera, dt );
+
+          // Draw everything to screen
+          Draw( state );
         }
-
-        // Update Time
-        dt = GetFrameTime();
-        lag += dt;
-        oncelag += dt;
-
-        // Check for Inpu
-        Input::CheckMenuToggle();
-        Input::Handle( state, Global::texture_cache );
-
-        // Update 60 times a second
-        while ( lag >= MS_PER_UPDATE ) {
-          Update60TPS( state );
-          lag -= MS_PER_UPDATE;
-        }
-
-        // Update once per second
-        while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-          Update1TPS( state );
-          oncelag = 0.0f;
-        }
-
-        // Update once per frame
-        UpdateOnFrame( state );
-
-        // Update Camera
-        CameraUpdate( state.camera, dt );
-
-        // Draw everything to screen
-        Draw( state );
-
         break;
     }
   }
@@ -158,6 +162,7 @@ void StartGame( State &state, TextureCache &texture_cache ) {
   UI::Init( texture_cache );
   Renderer::Init( state );
 }
+
 
 void LoadGame() {}
 
