@@ -17,8 +17,7 @@
 #include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void
-SpawnColonist( TextureCache &, Vector2, std::shared_ptr<PlayerSystem> );
+inline void SpawnColonist( TextureCache &, Vector2, std::shared_ptr<TempPS> );
 inline void DeleteSelected();
 Texture2D DetermineTexture( Faction, TextureCache & );
 
@@ -50,7 +49,7 @@ inline void Update( State &state ) {
 inline void SpawnColonist(
   TextureCache &cache,
   Vector2 clickPos,
-  std::shared_ptr<PlayerSystem> currPlayer ) {
+  std::shared_ptr<TempPS> currPlayer ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 

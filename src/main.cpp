@@ -54,8 +54,8 @@ int main( void ) {
     .month = 1,
     .year = 4,
     .startYear = 4,
-    .currPlayer = std::make_shared<PlayerSystem>(
-      PlayerSystem( 0, Faction::ROMANS, "Roman Republic" ) ),
+    .currPlayer = std::make_shared<TempPS>(
+      TempPS( 0, Faction::ROMANS, "Roman Republic" ) ),
   };
 
   Global::registry.clear();
