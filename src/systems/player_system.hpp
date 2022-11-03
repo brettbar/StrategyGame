@@ -1,84 +1,111 @@
-//
-// Created by brett on 12/30/2021.
-//
-
 #pragma once
 
+#include "../components/ai.hpp"
+#include "../components/player.hpp"
+#include "../data/factions.hpp"
 #include "../global.hpp"
-
-enum class Faction {
-  ROMANS,
-  GREEKS,
-  CELTS,
-  PUNICS,
-  PERSIANS,
-  GERMANS,
-  SCYTHIANS,
-};
 
 namespace PlayerSystem {
 
-inline void Init() {}
+inline void Init();
+inline void Update();
+inline void HumanUpdate( Player::Component & );
+inline void AIUpdate( Player::Component & );
+
+inline void Init() {
+  for ( u32 i = 0; i < 7; i++ ) {
+    entt::entity new_player = Global::registry.create();
+    if ( i == 0 )
+      Global::registry.emplace<Player::Component>(
+        new_player,
+        true,
+        Faction::ID::Romans );
+    else {
+      Global::registry.emplace<Player::Component>(
+        new_player,
+        true,
+        (Faction::ID) i );
+      Global::registry.emplace<AI::Component>( new_player );
+    }
+  }
+}
+
+inline void Update() {
+  for ( auto entity: Global::registry.view<Player::Component>() ) {
+    Player::Component &player =
+      Global::registry.get<Player::Component>( entity );
+
+    if ( player.is_human ) {
+      HumanUpdate( player );
+    } else {
+      AIUpdate( player );
+    }
+  }
+}
+
+inline void HumanUpdate( Player::Component &player ) {}
+
+inline void AIUpdate( Player::Component &player ) {}
 
 };// namespace PlayerSystem
 
-class TempPS {
-  public:
-  u32 id;
-  Faction faction;
-  std::map<const char *, hstr> textureMap;
+// class TempPS {
+//   public:
+//   u32 id;
+//   Faction faction;
+//   std::map<const char *, hstr> textureMap;
 
-  TempPS( u32 id, Faction faction ) {
-    this->id = id;
-    this->faction = faction;
-    RefreshTextureMap();
-  }
-  ~TempPS() {}
+//   TempPS( u32 id, Faction faction ) {
+//     this->id = id;
+//     this->faction = faction;
+//     RefreshTextureMap();
+//   }
+//   ~TempPS() {}
 
-  void RefreshTextureMap() {
-    switch ( faction ) {
-      case Faction::ROMANS:
-        this->textureMap = {
-          {
-            "Villager",
-            hstr{ "romanVillagerTexture" },
-          },
-        };
-        break;
-      case Faction::GREEKS:
-        this->textureMap = {
-          {
-            "Villager",
-            hstr{ "greekVillagerTexture" },
-          },
-        };
-        break;
-      case Faction::CELTS:
-        this->textureMap = {
-          {
-            "Villager",
-            hstr{ "celtVillagerTexture" },
-          },
-        };
-        break;
-      case Faction::PUNICS:
-        this->textureMap = {
-          {
-            "Villager",
-            hstr{ "punicVillagerTexture" },
-          },
-        };
-        break;
-      case Faction::PERSIANS:
-        this->textureMap = {
-          {
-            "Villager",
-            hstr{ "persianVillagerTexture" },
-          },
-        };
-        break;
-      default:
-        break;
-    }
-  }
-};
+//   void RefreshTextureMap() {
+//     switch ( faction ) {
+//       case Faction::ROMANS:
+//         this->textureMap = {
+//           {
+//             "Villager",
+//             hstr{ "romanVillagerTexture" },
+//           },
+//         };
+//         break;
+//       case Faction::GREEKS:
+//         this->textureMap = {
+//           {
+//             "Villager",
+//             hstr{ "greekVillagerTexture" },
+//           },
+//         };
+//         break;
+//       case Faction::CELTS:
+//         this->textureMap = {
+//           {
+//             "Villager",
+//             hstr{ "celtVillagerTexture" },
+//           },
+//         };
+//         break;
+//       case Faction::PUNICS:
+//         this->textureMap = {
+//           {
+//             "Villager",
+//             hstr{ "punicVillagerTexture" },
+//           },
+//         };
+//         break;
+//       case Faction::PERSIANS:
+//         this->textureMap = {
+//           {
+//             "Villager",
+//             hstr{ "persianVillagerTexture" },
+//           },
+//         };
+//         break;
+//       default:
+//         break;
+//     }
+//   }
+// };

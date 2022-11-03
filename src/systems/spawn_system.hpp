@@ -17,9 +17,8 @@
 #include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void SpawnColonist( TextureCache &, Vector2, std::shared_ptr<TempPS> );
+inline void SpawnColonist( Vector2 );
 inline void DeleteSelected();
-Texture2D DetermineTexture( Faction, TextureCache & );
 
 // struct SpawnListener : Events::Listener {
 //   inline void Receive() override {
@@ -46,10 +45,7 @@ inline void Update( State &state ) {
   // listener.Update( state );
 }
 
-inline void SpawnColonist(
-  TextureCache &cache,
-  Vector2 clickPos,
-  std::shared_ptr<TempPS> currPlayer ) {
+inline void SpawnColonist( Vector2 clickPos ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 
@@ -57,7 +53,10 @@ inline void SpawnColonist(
 
   entt::resource_cache<TextureResource> temp{};
 
-  Texture2D tex = cache[currPlayer->textureMap.at( "Villager" )]->texture;
+  // Texture2D tex = cache[currPlayer->textureMap.at( "Villager" )]->texture;
+
+  Texture2D tex =
+    Global::texture_cache[hstr{ "romanVillagerTexture" }]->texture;
 
   Archetypes::Character character = Archetypes::Character( tex, *spawn );
 

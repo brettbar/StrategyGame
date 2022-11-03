@@ -35,7 +35,7 @@ namespace fs = std::filesystem;
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
 
-void StartGame( State &, TextureCache & );
+void Init( State &, TextureCache & );
 void UpdateOnFrame( State & );
 void Update60TPS( State & );
 void Update1TPS( State & );
@@ -110,7 +110,7 @@ int main( void ) {
         if ( host_mode ) {
 
           if ( !game_started ) {
-            StartGame( state, Global::texture_cache );
+            Init( state, Global::texture_cache );
             game_started = true;
           }
 
@@ -154,8 +154,9 @@ int main( void ) {
   return 0;
 }
 
-void StartGame( State &state, TextureCache &texture_cache ) {
+void Init( State &state, TextureCache &texture_cache ) {
   Terrain::Init();
+  PlayerSystem::Init();
   ProvinceSystem::Init( texture_cache );
   SettlementSystem::Init( texture_cache );
   SpawnSystem::Init();

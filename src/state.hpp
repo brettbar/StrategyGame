@@ -33,6 +33,5 @@ struct State {
 
   // std::shared_ptr<TempPS> currPlayer;
   entt::entity host_player;
-
-  Texture2D selectedTexture;
+  // entt::entity selected_entity;
 };

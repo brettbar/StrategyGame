@@ -16,7 +16,7 @@ namespace Renderer {
 inline Shader shader;
 inline Shader outline_shader;
 
-inline void DrawVillagers( bool debug );
+inline void DrawActors( bool debug );
 
 inline void Init( State &state ) {
 
@@ -90,7 +90,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     EndShaderMode();
 
     // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-    DrawVillagers( state.gameState == GameState::EDITOR );
+    DrawActors( state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
@@ -98,8 +98,8 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
   EndMode2D();
 }
 
-inline void DrawVillagers( bool debug ) {
-  entt::basic_view villagers =
+inline void DrawActors( bool debug ) {
+  entt::basic_view actors =
     Global::registry.view<Unit::Component, Animated::Component>();
 
   Global::registry.sort<Unit::Component>(
@@ -107,7 +107,7 @@ inline void DrawVillagers( bool debug ) {
       return rhs.position.y > lhs.position.y;
     } );
 
-  villagers.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
+  actors.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
     //    DrawTextureV(
     //        unit.sprite,
     //        {unit.position.x - 64.0f, unit.position.y - 64.0f},

@@ -26,8 +26,6 @@ The ultimate final goal a player will have is to become the most
   Can increase by player wide or tall
 
 
-
-
 */
 
 // Long term goal
@@ -49,8 +47,6 @@ enum class Strategy {
   Expand,
 };
 
-struct Component {
-  u32 faction_id;
-};
+struct Component {};
 
 };// namespace AI

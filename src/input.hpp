@@ -70,11 +70,12 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    SpawnSystem::SpawnColonist( cache, click_pos, state.currPlayer );
+    SpawnSystem::SpawnColonist( click_pos );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    ProvinceSystem::AssignProvince( state.currPlayer->id, click_pos );
+    // TODO this is hard coded to 0 since the player is 0
+    ProvinceSystem::AssignProvince( 0, click_pos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
@@ -93,35 +94,35 @@ inline void Handle( State &state, TextureCache &cache ) {
       MovementSystem::SetDestinations( state.camera );
   }
 
-  if ( IsKeyPressed( KEY_ONE ) ) {
-    state.currPlayer->id = 0;
-    state.currPlayer->faction = Faction::ROMANS;
-    state.currPlayer->RefreshTextureMap();
-  }
+  // if ( IsKeyPressed( KEY_ONE ) ) {
+  //   state.currPlayer->id = 0;
+  //   state.currPlayer->faction = Faction::ROMANS;
+  //   state.currPlayer->RefreshTextureMap();
+  // }
 
-  if ( IsKeyPressed( KEY_TWO ) ) {
-    state.currPlayer->id = 1;
-    state.currPlayer->faction = Faction::GREEKS;
-    state.currPlayer->RefreshTextureMap();
-  }
+  // if ( IsKeyPressed( KEY_TWO ) ) {
+  //   state.currPlayer->id = 1;
+  //   state.currPlayer->faction = Faction::GREEKS;
+  //   state.currPlayer->RefreshTextureMap();
+  // }
 
-  if ( IsKeyPressed( KEY_THREE ) ) {
-    state.currPlayer->id = 2;
-    state.currPlayer->faction = Faction::CELTS;
-    state.currPlayer->RefreshTextureMap();
-  }
+  // if ( IsKeyPressed( KEY_THREE ) ) {
+  //   state.currPlayer->id = 2;
+  //   state.currPlayer->faction = Faction::CELTS;
+  //   state.currPlayer->RefreshTextureMap();
+  // }
 
-  if ( IsKeyPressed( KEY_FOUR ) ) {
-    state.currPlayer->id = 3;
-    state.currPlayer->faction = Faction::PUNICS;
-    state.currPlayer->RefreshTextureMap();
-  }
+  // if ( IsKeyPressed( KEY_FOUR ) ) {
+  //   state.currPlayer->id = 3;
+  //   state.currPlayer->faction = Faction::PUNICS;
+  //   state.currPlayer->RefreshTextureMap();
+  // }
 
-  if ( IsKeyPressed( KEY_FIVE ) ) {
-    state.currPlayer->id = 4;
-    state.currPlayer->faction = Faction::PERSIANS;
-    state.currPlayer->RefreshTextureMap();
-  }
+  // if ( IsKeyPressed( KEY_FIVE ) ) {
+  //   state.currPlayer->id = 4;
+  //   state.currPlayer->faction = Faction::PERSIANS;
+  //   state.currPlayer->RefreshTextureMap();
+  // }
 
   if ( IsKeyPressed( KEY_P ) ) {
     MapSystem::mode = MapSystem::Mode::POLITICAL;
