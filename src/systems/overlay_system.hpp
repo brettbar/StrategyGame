@@ -13,50 +13,68 @@ namespace OverlaySystem {
 inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
   auto provinces = Global::world.view<Province::Component>();
 
-  for ( auto ent: provinces ) {
-    Province::Component &prov = provinces.get<Province::Component>( ent );
+  for ( auto entity: provinces ) {
+    Province::Component &prov = provinces.get<Province::Component>( entity );
 
-    // if ( prov.owner > -1 ) {
-    //   Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+    if ( prov.owner != entt::null ) {
+      Player::Component player =
+        Global::world.get<Player::Component>( prov.owner );
 
-    //   switch ( prov.owner ) {
-    //     case 0:
-    //       DrawTextureRec(
-    //         texture_cache[hstr{ "redOverlay" }]->texture,
-    //         frameRec,
-    //         prov.tile->position,
-    //         Fade( WHITE, 0.5 ) );
-    //       break;
-    //     case 1:
-    //       DrawTextureRec(
-    //         texture_cache[hstr{ "blueOverlay" }]->texture,
-    //         frameRec,
-    //         prov.tile->position,
-    //         Fade( WHITE, 0.5 ) );
-    //       break;
-    //     case 2:
-    //       DrawTextureRec(
-    //         texture_cache[hstr{ "greenOverlay" }]->texture,
-    //         frameRec,
-    //         prov.tile->position,
-    //         Fade( WHITE, 0.5 ) );
-    //       break;
-    //     case 3:
-    //       DrawTextureRec(
-    //         texture_cache[hstr{ "purpleOverlay" }]->texture,
-    //         frameRec,
-    //         prov.tile->position,
-    //         Fade( WHITE, 0.5 ) );
-    //       break;
-    //     case 4:
-    //       DrawTextureRec(
-    //         texture_cache[hstr{ "orangeOverlay" }]->texture,
-    //         frameRec,
-    //         prov.tile->position,
-    //         Fade( WHITE, 0.5 ) );
-    //       break;
-    //   }
-    // }
+      Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+
+      switch ( player.faction ) {
+        case Faction::ID::Romans:
+          DrawTextureRec(
+            texture_cache[hstr{ "redOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case Faction::ID::Greeks:
+          DrawTextureRec(
+            texture_cache[hstr{ "blueOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case Faction::ID::Celts:
+          DrawTextureRec(
+            texture_cache[hstr{ "greenOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case Faction::ID::Punics:
+          DrawTextureRec(
+            texture_cache[hstr{ "purpleOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+        case Faction::ID::Persians:
+          DrawTextureRec(
+            texture_cache[hstr{ "orangeOverlay" }]->texture,
+            frameRec,
+            prov.tile->position,
+            Fade( WHITE, 0.5 ) );
+          break;
+          // case Faction::ID::Germans:
+          //   DrawTextureRec(
+          //     texture_cache[hstr{ "greyOverlay" }]->texture,
+          //     frameRec,
+          //     prov.tile->position,
+          //     Fade( WHITE, 0.5 ) );
+          //   break;
+          // case Faction::ID::Scythians:
+          //   DrawTextureRec(
+          //     texture_cache[hstr{ "pinkOverlay" }]->texture,
+          //     frameRec,
+          //     prov.tile->position,
+          //     Fade( WHITE, 0.5 ) );
+          //   break;
+          break;
+      }
+    }
   }
 }
 

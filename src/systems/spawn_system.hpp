@@ -54,8 +54,8 @@ inline void SpawnColonist( entt::entity owner, Vector2 clickPos ) {
 }
 
 inline void SpawnColonist( entt::entity owner ) {
-
-  std::unique_ptr<Vector2> spawn = std::make_unique<Vector2>( Vector2{ 0, 0 } );
+  std::unique_ptr<Vector2> spawn =
+    std::make_unique<Vector2>( Vector2{ 64 * 64, 64 * 64 } );
 
   ActorSystem::CreateColonist( owner, *spawn );
 }

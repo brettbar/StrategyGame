@@ -4,6 +4,9 @@
 
 inline i32 DetermineTileIdFromPosition( Vector2 );
 inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
+inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 );
+inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( UVector2 );
+
 inline void PrintVec2( Vector2 vec ) { printf( "(%f, %f)\n", vec.x, vec.y ); }
 inline u32 RollN( u32 n ) { return rand() % n + 1; }
 
@@ -142,7 +145,7 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   //  }
 }
 
-// TODO this probably needs to get moved
+
 inline static void DrawPerfectTexture(
   Texture2D &texture,
   Rectangle rect,

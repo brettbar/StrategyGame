@@ -57,9 +57,9 @@ inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
   switch ( ai.current_goal ) {
     case AI::Goal::DevelopSettlements: {
       if ( !ai.has_colonist ) {
-        printf( "UPDATE!\n" );
         SpawnSystem::SpawnColonist( player.id );
         ai.has_colonist = true;
+      } else if ( ai.has_colonist && !ai.has_settlement ) {
       }
     } break;
   }

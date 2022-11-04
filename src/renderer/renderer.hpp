@@ -18,6 +18,7 @@ inline Shader outline_shader;
 
 inline void DrawActors( bool debug );
 
+
 inline void Init( State &state ) {
 
   shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );

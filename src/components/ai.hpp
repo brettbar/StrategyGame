@@ -50,6 +50,7 @@ enum class Strategy {
 struct Component {
   Goal current_goal;
   bool has_colonist = false;
+  bool has_settlement = false;
 };
 
 };// namespace AI
