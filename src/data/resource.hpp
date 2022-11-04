@@ -1,8 +1,6 @@
 #pragma once
 
 #include "buildings.hpp"
-#include <map>
-#include <vector>
 
 namespace Resource {
 

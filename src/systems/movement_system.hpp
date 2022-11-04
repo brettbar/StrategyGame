@@ -1,9 +1,11 @@
 #pragma once
 
+#include "../common.hpp"
 #include "../components/animated.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
 #include "../global.hpp"
+#include "../utils.hpp"
 
 namespace MovementSystem {
 

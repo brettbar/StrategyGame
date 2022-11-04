@@ -9,7 +9,8 @@
 #include "../../components/unit.hpp"
 #include "../../global.hpp"
 #include "../../renderer/textures.hpp"
-#include "rlgl.h"
+#include "../../utils.hpp"
+
 #include "terrain_system.hpp"
 #include <chrono>
 #include <string>

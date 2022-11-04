@@ -8,8 +8,7 @@
 #include "../events.hpp"
 #include "../global.hpp"
 #include "../renderer/textures.hpp"
-#include <ostream>
-#include <raylib.h>
+#include "../utils.hpp"
 
 
 namespace SelectionSystem {
