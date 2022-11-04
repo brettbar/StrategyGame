@@ -5,7 +5,7 @@
 #include "../global.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
-#include "map/province_system.hpp"
+#include "province_system.hpp"
 #include <raylib.h>
 
 namespace OverlaySystem {
@@ -16,47 +16,47 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if ( prov.owner > -1 ) {
-      Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+    // if ( prov.owner > -1 ) {
+    //   Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
-      switch ( prov.owner ) {
-        case 0:
-          DrawTextureRec(
-            texture_cache[hstr{ "redOverlay" }]->texture,
-            frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
-          break;
-        case 1:
-          DrawTextureRec(
-            texture_cache[hstr{ "blueOverlay" }]->texture,
-            frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
-          break;
-        case 2:
-          DrawTextureRec(
-            texture_cache[hstr{ "greenOverlay" }]->texture,
-            frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
-          break;
-        case 3:
-          DrawTextureRec(
-            texture_cache[hstr{ "purpleOverlay" }]->texture,
-            frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
-          break;
-        case 4:
-          DrawTextureRec(
-            texture_cache[hstr{ "orangeOverlay" }]->texture,
-            frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
-          break;
-      }
-    }
+    //   switch ( prov.owner ) {
+    //     case 0:
+    //       DrawTextureRec(
+    //         texture_cache[hstr{ "redOverlay" }]->texture,
+    //         frameRec,
+    //         prov.tile->position,
+    //         Fade( WHITE, 0.5 ) );
+    //       break;
+    //     case 1:
+    //       DrawTextureRec(
+    //         texture_cache[hstr{ "blueOverlay" }]->texture,
+    //         frameRec,
+    //         prov.tile->position,
+    //         Fade( WHITE, 0.5 ) );
+    //       break;
+    //     case 2:
+    //       DrawTextureRec(
+    //         texture_cache[hstr{ "greenOverlay" }]->texture,
+    //         frameRec,
+    //         prov.tile->position,
+    //         Fade( WHITE, 0.5 ) );
+    //       break;
+    //     case 3:
+    //       DrawTextureRec(
+    //         texture_cache[hstr{ "purpleOverlay" }]->texture,
+    //         frameRec,
+    //         prov.tile->position,
+    //         Fade( WHITE, 0.5 ) );
+    //       break;
+    //     case 4:
+    //       DrawTextureRec(
+    //         texture_cache[hstr{ "orangeOverlay" }]->texture,
+    //         frameRec,
+    //         prov.tile->position,
+    //         Fade( WHITE, 0.5 ) );
+    //       break;
+    //   }
+    // }
   }
 }
 

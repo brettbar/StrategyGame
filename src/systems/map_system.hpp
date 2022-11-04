@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "../../components/province.hpp"
-#include "../../components/settlement.hpp"
-#include "../../components/sight.hpp"
-#include "../../components/unit.hpp"
-#include "../../global.hpp"
-#include "../../renderer/textures.hpp"
-#include "../../utils.hpp"
+#include "../components/province.hpp"
+#include "../components/settlement.hpp"
+#include "../components/sight.hpp"
+#include "../components/unit.hpp"
+#include "../global.hpp"
+#include "../renderer/textures.hpp"
+#include "../utils.hpp"
 
 // #include "../../common.hpp"
 // #include "../../components/sight.hpp"

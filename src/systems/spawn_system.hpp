@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "../archetypes/archetypes.hpp"
 #include "../common.hpp"
 #include "../components/actor.hpp"
 #include "../components/animated.hpp"
@@ -13,11 +12,13 @@
 #include "../events.hpp"
 #include "../global.hpp"
 
-#include "player_system.hpp"
+#include "actor_system.hpp"
 #include "selection_system.hpp"
 
 namespace SpawnSystem {
-inline void SpawnColonist( Vector2 );
+
+inline void SpawnColonist( entt::entity, Vector2 );
+inline void SpawnColonist( entt::entity );
 inline void DeleteSelected();
 
 // struct SpawnListener : Events::Listener {
@@ -45,28 +46,18 @@ inline void Update( State &state ) {
   // listener.Update( state );
 }
 
-inline void SpawnColonist( Vector2 clickPos ) {
+inline void SpawnColonist( entt::entity owner, Vector2 clickPos ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 
-  entt::entity entity = Global::world.create();
+  ActorSystem::CreateColonist( owner, *spawn );
+}
 
-  entt::resource_cache<TextureResource> temp{};
+inline void SpawnColonist( entt::entity owner ) {
 
-  // Texture2D tex = cache[currPlayer->textureMap.at( "Villager" )]->texture;
+  std::unique_ptr<Vector2> spawn = std::make_unique<Vector2>( Vector2{ 0, 0 } );
 
-  Texture2D tex =
-    Global::texture_cache[hstr{ "romanVillagerTexture" }]->texture;
-
-  Archetypes::Character character = Archetypes::Character( tex, *spawn );
-
-  Global::world.emplace<Actor::Component>(
-    entity,
-    "Marcus Priscus",
-    Actor::Type::Colonist );
-  Global::world.emplace<Unit::Component>( entity, character.unit );
-  Global::world.emplace<Animated::Component>( entity, character.animated );
-  Global::world.emplace<Sight::Component>( entity, character.sight );
+  ActorSystem::CreateColonist( owner, *spawn );
 }
 
 inline void DeleteSelected() {

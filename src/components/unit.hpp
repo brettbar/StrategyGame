@@ -5,7 +5,7 @@
 namespace Unit {
 
 struct Component {
-  i32 owner;
+  entt::entity owner;
   Vector2 position;
   Vector2 destination;
   f32 speed;

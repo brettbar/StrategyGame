@@ -23,4 +23,8 @@ inline TextureCache texture_cache = {};
 inline entt::registry world;
 inline entt::registry local;
 
+// TODO temporary
+inline entt::entity host_player;
+
+
 };// namespace Global

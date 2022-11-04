@@ -47,6 +47,9 @@ enum class Strategy {
   Expand,
 };
 
-struct Component {};
+struct Component {
+  Goal current_goal;
+  bool has_colonist = false;
+};
 
 };// namespace AI

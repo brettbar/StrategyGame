@@ -49,7 +49,7 @@ inline void Update( State &state ) {
   for ( auto &ent: view ) {
     Province::Component &prov = view.get<Province::Component>( ent );
 
-    if ( prov.owner > -1 ) {
+    if ( prov.owner != entt::null ) {
       Settlement::Component &settlement =
         Global::world.get<Settlement::Component>( ent );
 

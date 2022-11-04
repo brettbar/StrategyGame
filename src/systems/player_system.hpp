@@ -5,106 +5,65 @@
 #include "../data/factions.hpp"
 #include "../global.hpp"
 
+#include "spawn_system.hpp"
+
 namespace PlayerSystem {
 
 inline void Init();
 inline void Update();
 inline void HumanUpdate( Player::Component & );
-inline void AIUpdate( Player::Component & );
+inline void AIUpdate( AI::Component &, Player::Component & );
 
 inline void Init() {
-  for ( u32 i = 0; i < 7; i++ ) {
-    entt::entity new_player = Global::world.create();
-    if ( i == 0 )
-      Global::world.emplace<Player::Component>(
-        new_player,
-        true,
-        Faction::ID::Romans );
-    else {
-      Global::world.emplace<Player::Component>(
-        new_player,
-        true,
-        (Faction::ID) i );
-      Global::world.emplace<AI::Component>( new_player );
-    }
-  }
+  Global::host_player = Global::world.create();
+  Global::world.emplace<Player::Component>(
+    Global::host_player,
+    Global::host_player,
+    true,
+    Faction::ID::Romans );
+
+  entt::entity ai_player = Global::world.create();
+  Global::world.emplace<Player::Component>(
+    ai_player,
+    ai_player,
+    false,
+    Faction::ID::Celts );
+  Global::world.emplace<AI::Component>(
+    ai_player,
+    AI::Goal::DevelopSettlements );
 }
 
 inline void Update() {
+  // Change to exclude AI
   for ( auto entity: Global::world.view<Player::Component>() ) {
     Player::Component &player = Global::world.get<Player::Component>( entity );
 
     if ( player.is_human ) {
       HumanUpdate( player );
-    } else {
-      AIUpdate( player );
     }
+  }
+
+  for ( auto entity: Global::world.view<Player::Component, AI::Component>() ) {
+    Player::Component &player = Global::world.get<Player::Component>( entity );
+    AI::Component &ai = Global::world.get<AI::Component>( entity );
+
+    AIUpdate( ai, player );
   }
 }
 
 inline void HumanUpdate( Player::Component &player ) {}
 
-inline void AIUpdate( Player::Component &player ) {}
+inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
+  switch ( ai.current_goal ) {
+    case AI::Goal::DevelopSettlements: {
+      if ( !ai.has_colonist ) {
+        printf( "UPDATE!\n" );
+        SpawnSystem::SpawnColonist( player.id );
+        ai.has_colonist = true;
+      }
+    } break;
+  }
+}
+
 
 };// namespace PlayerSystem
-
-// class TempPS {
-//   public:
-//   u32 id;
-//   Faction faction;
-//   std::map<const char *, hstr> textureMap;
-
-//   TempPS( u32 id, Faction faction ) {
-//     this->id = id;
-//     this->faction = faction;
-//     RefreshTextureMap();
-//   }
-//   ~TempPS() {}
-
-//   void RefreshTextureMap() {
-//     switch ( faction ) {
-//       case Faction::ROMANS:
-//         this->textureMap = {
-//           {
-//             "Villager",
-//             hstr{ "romanVillagerTexture" },
-//           },
-//         };
-//         break;
-//       case Faction::GREEKS:
-//         this->textureMap = {
-//           {
-//             "Villager",
-//             hstr{ "greekVillagerTexture" },
-//           },
-//         };
-//         break;
-//       case Faction::CELTS:
-//         this->textureMap = {
-//           {
-//             "Villager",
-//             hstr{ "celtVillagerTexture" },
-//           },
-//         };
-//         break;
-//       case Faction::PUNICS:
-//         this->textureMap = {
-//           {
-//             "Villager",
-//             hstr{ "punicVillagerTexture" },
-//           },
-//         };
-//         break;
-//       case Faction::PERSIANS:
-//         this->textureMap = {
-//           {
-//             "Villager",
-//             hstr{ "persianVillagerTexture" },
-//           },
-//         };
-//         break;
-//       default:
-//         break;
-//     }
-//   }
-// };

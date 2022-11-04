@@ -1,8 +1,8 @@
-#include "../../common.hpp"
-#include "../../events.hpp"
-#include "../../renderer/textures.hpp"
-#include "../spawn_system.hpp"
+#include "../common.hpp"
+#include "../events.hpp"
+#include "../renderer/textures.hpp"
 #include "map_system.hpp"
+#include "spawn_system.hpp"
 
 #pragma once
 
@@ -37,15 +37,22 @@ inline void Init( TextureCache &cache ) {
 
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    entt::entity provEnt = Global::world.create();
-    Global::world
-      .emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
+    entt::entity entity = Global::world.create();
+
+    Province::Component prov = {
+      .id = i,
+      .owner = entt::null,
+      .selected = false,
+      .tile = tiles[i],
+    };
+
+    Global::world.emplace<Province::Component>( entity, prov );
   }
 
   // listener.Listen();
 }
 
-inline void AssignProvince( u32 owner, Vector2 pos ) {
+inline void AssignProvince( entt::entity owner, Vector2 pos ) {
   i32 provId = DetermineTileIdFromPosition( pos );
   assert( provId >= 0 );
 
@@ -110,7 +117,7 @@ inline void AssignProvince( u32 owner, Vector2 pos ) {
   }
 }
 
-inline void SetProvinceOwner( u32 owner ) {
+inline void SetProvinceOwner( entt::entity owner ) {
   auto selectedView =
     Global::world.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();

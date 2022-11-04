@@ -2,7 +2,7 @@
 #include "../common.hpp"
 #include "../state.hpp"
 #include "../systems/animation_system.hpp"
-#include "../systems/map/map_system.hpp"
+#include "../systems/map_system.hpp"
 #include "../systems/overlay_system.hpp"
 #include "../systems/selection_system.hpp"
 #include "../systems/settlement_system.hpp"

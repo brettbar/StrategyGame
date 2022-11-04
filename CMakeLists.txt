@@ -14,13 +14,12 @@ set(SOURCE_FILES
   # src/systems/ui/irongui/irongui.hpp
   # src/systems/ui/modal_menu.hpp
   # src/systems/ui/game_ui_system.hpp
-  src/systems/map/map_system.hpp
-  src/systems/map/province_system.hpp
+  src/systems/map_system.hpp
+  src/systems/province_system.hpp
   src/systems/movement_system.hpp
   src/systems/animation_system.hpp
   src/systems/selection_system.hpp
   src/systems/spawn_system.hpp
-  src/archetypes/archetypes.hpp
   src/components/actor.hpp
   src/components/animated.hpp
   src/components/province.hpp

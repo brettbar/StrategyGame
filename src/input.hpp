@@ -11,9 +11,9 @@
 #include "renderer/textures.hpp"
 #include "save.hpp"
 #include "state.hpp"
-#include "systems/map/map_system.hpp"
-#include "systems/map/province_system.hpp"
+#include "systems/map_system.hpp"
 #include "systems/movement_system.hpp"
+#include "systems/province_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
 #include "ui/ui_system.hpp"
@@ -71,12 +71,12 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    SpawnSystem::SpawnColonist( click_pos );
+    SpawnSystem::SpawnColonist( Global::host_player, click_pos );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
     // TODO this is hard coded to 0 since the player is 0
-    ProvinceSystem::AssignProvince( 0, click_pos );
+    ProvinceSystem::AssignProvince( Global::host_player, click_pos );
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {

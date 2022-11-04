@@ -19,10 +19,10 @@ TEMPORARY TODOS HERE
 #include "save.hpp"
 #include "state.hpp"
 #include "systems/animation_system.hpp"
-#include "systems/map/map_system.hpp"
-#include "systems/map/province_system.hpp"
+#include "systems/map_system.hpp"
 #include "systems/movement_system.hpp"
 #include "systems/player_system.hpp"
+#include "systems/province_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/settlement_system.hpp"
 #include "systems/spawn_system.hpp"
@@ -174,6 +174,7 @@ void UpdateOnFrame( State &state ) { UI::Update(); }
 void Update60TPS( State &state ) {
   MovementSystem::Update( state.timeScale );
   AnimationSystem::Update( state.timeScale );
+  PlayerSystem::Update();
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
 }

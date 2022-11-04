@@ -8,7 +8,7 @@ namespace Province {
 
 struct Component {
   u32 id;
-  i32 owner;
+  entt::entity owner;
   bool selected = false;
 
   std::shared_ptr<Tile::Component> tile;
