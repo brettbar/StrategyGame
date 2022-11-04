@@ -16,7 +16,6 @@ set(SOURCE_FILES
   # src/systems/ui/game_ui_system.hpp
   src/systems/map/map_system.hpp
   src/systems/map/province_system.hpp
-  src/systems/map/terrain_system.hpp
   src/systems/movement_system.hpp
   src/systems/animation_system.hpp
   src/systems/selection_system.hpp

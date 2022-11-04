@@ -11,7 +11,7 @@ namespace MovementSystem {
 
 inline void SetDestinations( Camera2D camera ) {
   entt::basic_view view =
-    Global::registry
+    Global::world
       .view<Unit::Component, Animated::Component, Selected::Component>();
 
   for ( auto entity: view ) {
@@ -34,7 +34,7 @@ inline void SetDestinations( Camera2D camera ) {
 
 inline void Update( f32 timeScale ) {
   entt::basic_view units =
-    Global::registry.view<Unit::Component, Animated::Component>();
+    Global::world.view<Unit::Component, Animated::Component>();
 
   for ( auto &entity: units ) {
     Unit::Component &unit = units.get<Unit::Component>( entity );
@@ -83,8 +83,8 @@ inline void Update( f32 timeScale ) {
 }
 
 inline bool UnitIsMoving( entt::entity entity ) {
-  if ( Global::registry.all_of<Unit::Component>( entity ) ) {
-    return Global::registry.get<Unit::Component>( entity ).moving;
+  if ( Global::world.all_of<Unit::Component>( entity ) ) {
+    return Global::world.get<Unit::Component>( entity ).moving;
   }
   return false;
 }

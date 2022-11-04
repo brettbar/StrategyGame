@@ -10,9 +10,9 @@ namespace AnimationSystem {
 
 inline void Draw( bool debug ) {
   entt::basic_view villagers =
-    Global::registry.view<Unit::Component, Animated::Component>();
+    Global::world.view<Unit::Component, Animated::Component>();
 
-  Global::registry.sort<Unit::Component>(
+  Global::world.sort<Unit::Component>(
     []( const Unit::Component &lhs, const Unit::Component &rhs ) {
       return rhs.position.y > lhs.position.y;
     } );
@@ -74,7 +74,7 @@ inline void Draw( bool debug ) {
 }
 
 inline void Update( f32 timeScale ) {
-  auto view = Global::registry.view<Animated::Component, Unit::Component>();
+  auto view = Global::world.view<Animated::Component, Unit::Component>();
 
   for ( auto &entity: view ) {
     Animated::Component &anim = view.get<Animated::Component>( entity );

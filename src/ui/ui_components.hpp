@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../global.hpp"
 
 namespace UI {
 
-inline entt::registry ui_reg;
 inline std::map<std::string, entt::entity> lookup;
 
 inline f32 SCALE = 2.0f;
@@ -85,10 +84,10 @@ struct TextureButton : TextureLabel {
 
 template<typename T>
 inline entt::entity CreateElement( T component, Element elem ) {
-  entt::entity entity = ui_reg.create();
+  entt::entity entity = Global::local.create();
 
-  ui_reg.emplace<Element>( entity, elem );
-  ui_reg.emplace<T>( entity, component );
+  Global::local.emplace<Element>( entity, elem );
+  Global::local.emplace<T>( entity, component );
 
   lookup.insert_or_assign( elem.id, entity );
 

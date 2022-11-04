@@ -42,15 +42,14 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
   {
     "settlement_name",
     []() -> std::string {
-      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+      if ( Global::world.all_of<Province::Component, Settlement::Component>(
              SelectionSystem::selected_entity ) ) {
 
-        Province::Component &province =
-          Global::registry.get<Province::Component>(
-            SelectionSystem::selected_entity );
+        Province::Component &province = Global::world.get<Province::Component>(
+          SelectionSystem::selected_entity );
 
         Settlement::Component &settlement =
-          Global::registry.get<Settlement::Component>(
+          Global::world.get<Settlement::Component>(
             SelectionSystem::selected_entity );
 
         return settlement.name;
@@ -62,15 +61,14 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
   {
     "settlement_population",
     []() -> std::string {
-      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+      if ( Global::world.all_of<Province::Component, Settlement::Component>(
              SelectionSystem::selected_entity ) ) {
 
-        Province::Component &province =
-          Global::registry.get<Province::Component>(
-            SelectionSystem::selected_entity );
+        Province::Component &province = Global::world.get<Province::Component>(
+          SelectionSystem::selected_entity );
 
         Settlement::Component &settlement =
-          Global::registry.get<Settlement::Component>(
+          Global::world.get<Settlement::Component>(
             SelectionSystem::selected_entity );
 
         return std::to_string( settlement.population.current );
@@ -82,15 +80,14 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
   {
     "settlement_development",
     []() -> std::string {
-      if ( Global::registry.all_of<Province::Component, Settlement::Component>(
+      if ( Global::world.all_of<Province::Component, Settlement::Component>(
              SelectionSystem::selected_entity ) ) {
 
-        Province::Component &province =
-          Global::registry.get<Province::Component>(
-            SelectionSystem::selected_entity );
+        Province::Component &province = Global::world.get<Province::Component>(
+          SelectionSystem::selected_entity );
 
         Settlement::Component &settlement =
-          Global::registry.get<Settlement::Component>(
+          Global::world.get<Settlement::Component>(
             SelectionSystem::selected_entity );
 
         return Settlement::development.at( settlement.development );

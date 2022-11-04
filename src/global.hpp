@@ -20,6 +20,7 @@ enum class GameMode {
 inline ProgramMode program_mode = ProgramMode::GAME;
 inline FontCache font_cache = {};
 inline TextureCache texture_cache = {};
-inline entt::registry registry;
+inline entt::registry world;
+inline entt::registry local;
 
 };// namespace Global

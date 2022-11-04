@@ -49,7 +49,7 @@ inline void SpawnColonist( Vector2 clickPos ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
   assert( spawn != nullptr );
 
-  entt::entity entity = Global::registry.create();
+  entt::entity entity = Global::world.create();
 
   entt::resource_cache<TextureResource> temp{};
 
@@ -60,18 +60,18 @@ inline void SpawnColonist( Vector2 clickPos ) {
 
   Archetypes::Character character = Archetypes::Character( tex, *spawn );
 
-  Global::registry.emplace<Actor::Component>(
+  Global::world.emplace<Actor::Component>(
     entity,
     "Marcus Priscus",
     Actor::Type::Colonist );
-  Global::registry.emplace<Unit::Component>( entity, character.unit );
-  Global::registry.emplace<Animated::Component>( entity, character.animated );
-  Global::registry.emplace<Sight::Component>( entity, character.sight );
+  Global::world.emplace<Unit::Component>( entity, character.unit );
+  Global::world.emplace<Animated::Component>( entity, character.animated );
+  Global::world.emplace<Sight::Component>( entity, character.sight );
 }
 
 inline void DeleteSelected() {
   auto selectedView =
-    Global::registry.view<Selected::Component, Unit::Component>();
+    Global::world.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null ) {
@@ -79,7 +79,7 @@ inline void DeleteSelected() {
     return;
   }
 
-  Global::registry.destroy( selectedEntity );
+  Global::world.destroy( selectedEntity );
 }
 
 };// namespace SpawnSystem

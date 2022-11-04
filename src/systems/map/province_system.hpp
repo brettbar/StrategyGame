@@ -1,16 +1,8 @@
 #include "../../common.hpp"
-#include "../../components/province.hpp"
-#include "../../components/settlement.hpp"
 #include "../../events.hpp"
 #include "../../renderer/textures.hpp"
 #include "../spawn_system.hpp"
-#include "terrain_system.hpp"
-#include <array>
-#include <raylib.h>
-#include <thread>
-// TODO REMOVE
-#include <iostream>
-#include <string>
+#include "map_system.hpp"
 
 #pragma once
 
@@ -40,13 +32,13 @@ inline void SetProvinceOwner( u32 owner );
 // inline ProvListener listener;
 
 inline void Init( TextureCache &cache ) {
-  auto tView = Global::registry.view<Terrain::TileMap>();
-  Terrain::TileMap tiles = tView.get<Terrain::TileMap>( tView.front() );
+  auto tView = Global::world.view<MapSystem::TileMap>();
+  MapSystem::TileMap tiles = tView.get<MapSystem::TileMap>( tView.front() );
 
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    entt::entity provEnt = Global::registry.create();
-    Global::registry
+    entt::entity provEnt = Global::world.create();
+    Global::world
       .emplace<Province::Component>( provEnt, i, -1, false, tiles[i] );
   }
 
@@ -57,7 +49,7 @@ inline void AssignProvince( u32 owner, Vector2 pos ) {
   i32 provId = DetermineTileIdFromPosition( pos );
   assert( provId >= 0 );
 
-  auto provinces = Global::registry.view<Province::Component>();
+  auto provinces = Global::world.view<Province::Component>();
 
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
@@ -120,7 +112,7 @@ inline void AssignProvince( u32 owner, Vector2 pos ) {
 
 inline void SetProvinceOwner( u32 owner ) {
   auto selectedView =
-    Global::registry.view<Selected::Component, Unit::Component>();
+    Global::world.view<Selected::Component, Unit::Component>();
   auto selectedEntity = selectedView.front();
 
   if ( selectedEntity == entt::null ) {

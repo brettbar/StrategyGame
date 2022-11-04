@@ -44,15 +44,14 @@ inline void Init( TextureCache &cache ) {
 }
 
 inline void Update( State &state ) {
-  auto view =
-    Global::registry.view<Province::Component, Settlement::Component>();
+  auto view = Global::world.view<Province::Component, Settlement::Component>();
 
   for ( auto &ent: view ) {
     Province::Component &prov = view.get<Province::Component>( ent );
 
     if ( prov.owner > -1 ) {
       Settlement::Component &settlement =
-        Global::registry.get<Settlement::Component>( ent );
+        Global::world.get<Settlement::Component>( ent );
 
       UpdateSettlement( settlement );
     }
@@ -73,7 +72,7 @@ inline void Update( State &state ) {
 
 inline void SpawnSettlement() {
   Unit::Component unit =
-    Global::registry.get<Unit::Component>( SelectionSystem::selected_entity );
+    Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
   entt::entity unit_entity = SelectionSystem::selected_entity;
 
   vec2 pos = unit.position;
@@ -82,14 +81,14 @@ inline void SpawnSettlement() {
   if ( closest_tile == -1 )
     return;
 
-  for ( auto entity: Global::registry.view<Province::Component>() ) {
+  for ( auto entity: Global::world.view<Province::Component>() ) {
     Province::Component &prov =
-      Global::registry.get<Province::Component>( entity );
+      Global::world.get<Province::Component>( entity );
 
     // TODO pretty sure I am checking this twice, another time in the Actor colonist area
     if ( prov.tile->id == closest_tile ) {
       if ( prov.owner == unit.owner ) {
-        if ( !Global::registry.any_of<Settlement::Component>( entity ) ) {
+        if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
           printf( "spawning settlement\n" );
 
           Settlement::Component settlement = {
@@ -107,10 +106,10 @@ inline void SpawnSettlement() {
             .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
           };
 
-          Global::registry.emplace<Settlement::Component>( entity, settlement );
+          Global::world.emplace<Settlement::Component>( entity, settlement );
 
           SelectionSystem::selected_entity = entt::null;
-          Global::registry.destroy( unit_entity );
+          Global::world.destroy( unit_entity );
           return;
         }
       }
@@ -184,7 +183,7 @@ inline bool UpdatePopulation( Settlement::Component &settlement ) {
 
 inline void Draw( TextureCache &cache, bool showOverlays ) {
   auto settlements =
-    Global::registry.view<Settlement::Component, Province::Component>();
+    Global::world.view<Settlement::Component, Province::Component>();
 
   for ( auto entity: settlements ) {
     Province::Component &province =

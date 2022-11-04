@@ -63,7 +63,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     BeginShaderMode( shader );
     {
       // Draw Terrain
-      Terrain::Draw( state.camera, texture_cache );
+      MapSystem::Draw( state.camera, texture_cache );
     }
     EndShaderMode();
 
@@ -78,11 +78,11 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     BeginShaderMode( shader );
     {
       switch ( MapSystem::mode ) {
-        case MapSystem::Mode::TERRAIN: {
+        case MapSystem::Mode::Terrain: {
           SettlementSystem::Draw( texture_cache, false );
 
         } break;
-        case MapSystem::Mode::POLITICAL: {
+        case MapSystem::Mode::Political: {
           SettlementSystem::Draw( texture_cache, false );
         } break;
       }
@@ -100,9 +100,9 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
 
 inline void DrawActors( bool debug ) {
   entt::basic_view actors =
-    Global::registry.view<Unit::Component, Animated::Component>();
+    Global::world.view<Unit::Component, Animated::Component>();
 
-  Global::registry.sort<Unit::Component>(
+  Global::world.sort<Unit::Component>(
     []( const Unit::Component &lhs, const Unit::Component &rhs ) {
       return rhs.position.y > lhs.position.y;
     } );

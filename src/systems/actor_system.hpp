@@ -3,7 +3,7 @@
 //
 #include "../components/actor.hpp"
 #include "../global.hpp"
-#include "map/terrain_system.hpp"
+#include "map/map_system.hpp"
 #include "movement_system.hpp"
 #include "selection_system.hpp"
 #include "settlement_system.hpp"
@@ -19,8 +19,7 @@ inline bool ColonistCanPlaceSettlement() {
   // 0. if the colonist isnt selected, bail
   if (
     SelectionSystem::selected_entity == entt::null ||
-    !Global::registry.all_of<Unit::Component>(
-      SelectionSystem::selected_entity ) )
+    !Global::world.all_of<Unit::Component>( SelectionSystem::selected_entity ) )
     return false;
 
 
@@ -30,7 +29,7 @@ inline bool ColonistCanPlaceSettlement() {
 
 
   Unit::Component unit =
-    Global::registry.get<Unit::Component>( SelectionSystem::selected_entity );
+    Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
 
   i32 closest_tile = DetermineTileIdFromPosition( unit.position );
 
@@ -38,14 +37,14 @@ inline bool ColonistCanPlaceSettlement() {
   if ( closest_tile == -1 )
     return false;
 
-  for ( auto entity: Global::registry.view<Province::Component>() ) {
+  for ( auto entity: Global::world.view<Province::Component>() ) {
     Province::Component &prov =
-      Global::registry.get<Province::Component>( entity );
+      Global::world.get<Province::Component>( entity );
 
     // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
     if (
       prov.tile->id == closest_tile && prov.owner == unit.owner &&
-      !Global::registry.any_of<Settlement::Component>( entity ) ) {
+      !Global::world.any_of<Settlement::Component>( entity ) ) {
       return true;
     }
   }

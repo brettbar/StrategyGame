@@ -37,10 +37,8 @@ inline void Init( TextureCache &texture_cache ) {
   SettlementContextPanel( texture_cache );
   ActorContextPanel( texture_cache );
 
-  Global::registry.on_construct<Selected::Component>()
-    .connect<&ListenForSelect>();
-  Global::registry.on_destroy<Selected::Component>()
-    .connect<&ListenForDeselect>();
+  Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
+  Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
 }
 
 inline void Update() {}
@@ -54,8 +52,8 @@ inline void Draw( TextureCache &texture_cache ) {
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
-  auto ui_elements = ui_reg.view<Element>();
-  auto base_panels = ui_reg.view<BasePanel>();
+  auto ui_elements = Global::local.view<Element>();
+  auto base_panels = Global::local.view<BasePanel>();
 
   if ( screen_width > 1920 ) {
     SCALE = 2.0;
@@ -66,8 +64,8 @@ inline void Draw( TextureCache &texture_cache ) {
   }
 
   for ( auto &ent: base_panels ) {
-    Element &elem = ui_reg.get<Element>( ent );
-    BasePanel &parent = ui_reg.get<BasePanel>( ent );
+    Element &elem = Global::local.get<Element>( ent );
+    BasePanel &parent = Global::local.get<BasePanel>( ent );
 
     if ( !elem.enabled )
       continue;
@@ -78,10 +76,10 @@ inline void Draw( TextureCache &texture_cache ) {
     LayoutPanel( parent, ent );
 
     for ( auto &child: parent.children ) {
-      assert( ui_reg.all_of<Panel>( child ) );
+      assert( Global::local.all_of<Panel>( child ) );
 
-      Element &elem = ui_reg.get<Element>( child );
-      Panel &panel = ui_reg.get<Panel>( child );
+      Element &elem = Global::local.get<Element>( child );
+      Panel &panel = Global::local.get<Panel>( child );
       if ( !elem.enabled )
         continue;
 
@@ -92,7 +90,7 @@ inline void Draw( TextureCache &texture_cache ) {
 
   // Check for interactions and Draw everything
   for ( auto &entity: ui_elements ) {
-    Element &elem = ui_reg.get<Element>( entity );
+    Element &elem = Global::local.get<Element>( entity );
 
     if ( !elem.enabled )
       continue;
@@ -108,19 +106,19 @@ inline void Draw( TextureCache &texture_cache ) {
     // UPDATE
     switch ( elem.type ) {
       case Type::TextLabel: {
-        TextLabel &label = ui_reg.get<TextLabel>( entity );
+        TextLabel &label = Global::local.get<TextLabel>( entity );
         if ( label.dynamic )
           label.text = update_lookup.at( elem.id )();
       } break;
       case Type::TextButton: {
-        TextButton &button = ui_reg.get<TextButton>( entity );
+        TextButton &button = Global::local.get<TextButton>( entity );
         if ( button.dynamic )
           button.text = update_lookup.at( elem.id )();
 
         button.clickable = clickable_lookup.at( elem.id )();
       } break;
       case Type::TextureButton: {
-        TextureButton &button = ui_reg.get<TextureButton>( entity );
+        TextureButton &button = Global::local.get<TextureButton>( entity );
         button.clickable = clickable_lookup.at( elem.id )();
       } break;
     }
@@ -135,13 +133,13 @@ inline void Draw( TextureCache &texture_cache ) {
 
       switch ( elem.type ) {
         case Type::TextButton: {
-          TextButton &button = ui_reg.get<TextButton>( entity );
+          TextButton &button = Global::local.get<TextButton>( entity );
 
           if ( button.clickable )
             action_lookup.at( elem.id )();
         } break;
         case Type::TextureButton: {
-          TextureButton &button = ui_reg.get<TextureButton>( entity );
+          TextureButton &button = Global::local.get<TextureButton>( entity );
 
           if ( button.clickable )
             action_lookup.at( elem.id )();
@@ -181,7 +179,7 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
   f32 total_width = 0;
   f32 tallest_child = 0;
   f32 widest_child = 0;
-  Element &panel_elem = ui_reg.get<Element>( entity );
+  Element &panel_elem = Global::local.get<Element>( entity );
 
   f32 end_of_last_x = panel_elem.transform.x;
   f32 end_of_last_y = panel_elem.transform.y;
@@ -189,7 +187,7 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
 
   // For each child
   for ( auto &child: panel.children ) {
-    Element &elem = ui_reg.get<Element>( child );
+    Element &elem = Global::local.get<Element>( child );
 
     ResizeElement( child, elem );
 
@@ -234,7 +232,7 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
   }
 
   for ( auto &child: panel.children ) {
-    rect &elem = ui_reg.get<Element>( child ).transform;
+    rect &elem = Global::local.get<Element>( child ).transform;
 
     total_width += elem.width;
     total_height += elem.height;
@@ -246,7 +244,7 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
       tallest_child = elem.height;
   }
 
-  if ( !ui_reg.all_of<BasePanel>( entity ) ) {
+  if ( !Global::local.all_of<BasePanel>( entity ) ) {
     if ( panel.children_axis == Axis::ROW ) {
       panel_elem.transform.width = total_width;
       panel_elem.transform.height = tallest_child;
@@ -261,10 +259,10 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
   // TODO maybe these resize-cases should just be update methods on the structs
   switch ( elem.type ) {
     case Type::Panel: {
-      LayoutPanel( ui_reg.get<Panel>( entity ), entity );
+      LayoutPanel( Global::local.get<Panel>( entity ), entity );
     } break;
     case Type::TextLabel: {
-      TextLabel &label = ui_reg.get<TextLabel>( entity );
+      TextLabel &label = Global::local.get<TextLabel>( entity );
 
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -276,7 +274,7 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
       elem.transform.height = text_dims.y;
     } break;
     case Type::TextButton: {
-      TextButton &button = ui_reg.get<TextButton>( entity );
+      TextButton &button = Global::local.get<TextButton>( entity );
 
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -288,7 +286,7 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
       elem.transform.height = text_dims.y;
     } break;
     case Type::TextureButton: {
-      Texture2D texture = ui_reg.get<TextureButton>( entity ).texture;
+      Texture2D texture = Global::local.get<TextureButton>( entity ).texture;
       elem.transform.width = texture.width * UI::SCALE;
       elem.transform.height = texture.height * UI::SCALE;
     } break;
@@ -332,21 +330,21 @@ inline void
 DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
   switch ( elem.type ) {
     case Type::BasePanel: {
-      auto &panel = ui_reg.get<BasePanel>( entity );
+      auto &panel = Global::local.get<BasePanel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
         panel.background );
     } break;
     case Type::Panel: {
-      auto &panel = ui_reg.get<Panel>( entity );
+      auto &panel = Global::local.get<Panel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
         panel.background );
     } break;
     case Type::TextLabel: {
-      auto &label = ui_reg.get<TextLabel>( entity );
+      auto &label = Global::local.get<TextLabel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
@@ -364,7 +362,7 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         label.text_color );
     } break;
     case Type::TextureButton: {
-      auto &button = ui_reg.get<TextureButton>( entity );
+      auto &button = Global::local.get<TextureButton>( entity );
       DrawTextureEx(
         button.texture,
         { elem.transform.x, elem.transform.y },
@@ -374,7 +372,7 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
     } break;
 
     case Type::TextButton: {
-      auto &button = ui_reg.get<TextButton>( entity );
+      auto &button = Global::local.get<TextButton>( entity );
       Color background = button.background;
 
       if ( !button.clickable ) {
@@ -406,7 +404,7 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
 
     auto context_panel = lookup.at( "settlement_context_panel" );
     ToggleElement( context_panel, true );
-    // Element &elem = ui_reg.get<Element>( context_panel );
+    // Element &elem = Global::ui_reg.get<Element>( context_panel );
     // elem.enabled = true;
   } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
     auto actor = game_reg.get<Actor::Component>( entity );
@@ -415,7 +413,7 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
     auto context_panel = lookup.at( "actor_context_panel" );
     ToggleElement( context_panel, true );
     // entt::entity context_label = ui_lookup.at( "context_label" );
-    // ui_reg.get<TextLabel>( context_label ).text = actor.name;
+    // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
   }
 }
 
@@ -427,18 +425,18 @@ inline void ListenForDeselect() {
 }
 
 inline void ToggleElement( entt::entity entity, bool on ) {
-  Element &elem = ui_reg.get<Element>( entity );
+  Element &elem = Global::local.get<Element>( entity );
   elem.enabled = on;
   if ( elem.type != Type::Panel && elem.type != Type::BasePanel )
     return;
 
-  if ( ui_reg.all_of<BasePanel>( entity ) ) {
-    BasePanel panel = ui_reg.get<BasePanel>( entity );
+  if ( Global::local.all_of<BasePanel>( entity ) ) {
+    BasePanel panel = Global::local.get<BasePanel>( entity );
     for ( auto child: panel.children ) {
       ToggleElement( child, on );
     }
-  } else if ( ui_reg.all_of<Panel>( entity ) ) {
-    Panel panel = ui_reg.get<Panel>( entity );
+  } else if ( Global::local.all_of<Panel>( entity ) ) {
+    Panel panel = Global::local.get<Panel>( entity );
     for ( auto child: panel.children ) {
       ToggleElement( child, on );
     }

@@ -12,6 +12,7 @@
 #include "save.hpp"
 #include "state.hpp"
 #include "systems/map/map_system.hpp"
+#include "systems/map/province_system.hpp"
 #include "systems/movement_system.hpp"
 #include "systems/selection_system.hpp"
 #include "systems/spawn_system.hpp"
@@ -35,7 +36,7 @@ inline void Handle( State &state, TextureCache &cache ) {
 
   if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
     if ( IsKeyPressed( KEY_S ) ) {
-      Save::Save( Global::registry );
+      Save::Save( Global::world );
     }
 
     if ( IsKeyPressed( KEY_L ) ) {
@@ -125,11 +126,11 @@ inline void Handle( State &state, TextureCache &cache ) {
   // }
 
   if ( IsKeyPressed( KEY_P ) ) {
-    MapSystem::mode = MapSystem::Mode::POLITICAL;
+    MapSystem::mode = MapSystem::Mode::Political;
   }
 
   if ( IsKeyPressed( KEY_T ) ) {
-    MapSystem::mode = MapSystem::Mode::TERRAIN;
+    MapSystem::mode = MapSystem::Mode::Terrain;
   }
 }
 };// namespace Input

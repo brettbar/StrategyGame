@@ -19,8 +19,8 @@ TEMPORARY TODOS HERE
 #include "save.hpp"
 #include "state.hpp"
 #include "systems/animation_system.hpp"
+#include "systems/map/map_system.hpp"
 #include "systems/map/province_system.hpp"
-#include "systems/map/terrain_system.hpp"
 #include "systems/movement_system.hpp"
 #include "systems/player_system.hpp"
 #include "systems/selection_system.hpp"
@@ -45,7 +45,7 @@ void Draw( State & );
 void Exit( TextureCache & );
 
 int main( void ) {
-  Global::registry.clear();
+  Global::world.clear();
 
   State state = {
     .mapWidth = 128,
@@ -155,7 +155,7 @@ int main( void ) {
 }
 
 void Init( State &state, TextureCache &texture_cache ) {
-  Terrain::Init();
+  MapSystem::Init();
   PlayerSystem::Init();
   ProvinceSystem::Init( texture_cache );
   SettlementSystem::Init( texture_cache );

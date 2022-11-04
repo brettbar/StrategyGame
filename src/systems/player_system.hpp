@@ -14,26 +14,25 @@ inline void AIUpdate( Player::Component & );
 
 inline void Init() {
   for ( u32 i = 0; i < 7; i++ ) {
-    entt::entity new_player = Global::registry.create();
+    entt::entity new_player = Global::world.create();
     if ( i == 0 )
-      Global::registry.emplace<Player::Component>(
+      Global::world.emplace<Player::Component>(
         new_player,
         true,
         Faction::ID::Romans );
     else {
-      Global::registry.emplace<Player::Component>(
+      Global::world.emplace<Player::Component>(
         new_player,
         true,
         (Faction::ID) i );
-      Global::registry.emplace<AI::Component>( new_player );
+      Global::world.emplace<AI::Component>( new_player );
     }
   }
 }
 
 inline void Update() {
-  for ( auto entity: Global::registry.view<Player::Component>() ) {
-    Player::Component &player =
-      Global::registry.get<Player::Component>( entity );
+  for ( auto entity: Global::world.view<Player::Component>() ) {
+    Player::Component &player = Global::world.get<Player::Component>( entity );
 
     if ( player.is_human ) {
       HumanUpdate( player );
