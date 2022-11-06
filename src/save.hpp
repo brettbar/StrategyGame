@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/memory.hpp>
 #include <cereal/archives/json.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <fstream>
 #include <sstream>
 
@@ -20,13 +20,15 @@ inline void Save( entt::registry &source ) {
   std::ofstream file( "output.json" );
 
   {
-
     // cereal::JSONOutputArchive output{ storage };
     cereal::JSONOutputArchive output{ file };
 
-    entt::snapshot{ source }.entities( output ).component<Unit::Component, Animated::Component, Sight::Component>( output );
+    entt::snapshot{ source }
+      .entities( output )
+      .component<Unit::Component, Animated::Component, Sight::Component>(
+        output );
 
-    printf("%u\n", (int)source.size());
+    printf( "%u\n", (int) source.size() );
   }
 }
 
@@ -43,7 +45,7 @@ inline entt::registry Load() {
     .entities( input )
     .component<Unit::Component, Animated::Component, Sight::Component>( input );
 
-  printf("%u\n", (int)reg.size());
+  printf( "%u\n", (int) reg.size() );
 
 
   return reg;

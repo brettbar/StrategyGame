@@ -5,6 +5,7 @@ resources:
     - olives
     - fish
     - clay
+    - stone
     - wool
     - flax
     - hide
@@ -13,10 +14,13 @@ resources:
     - iron_ore
     - tin_ore
     - copper_ore
+    - gems
   processed_materials:
     - lumber
     - flour
     - pottery
+    - brick
+    - stone_brick
     - cloth
     - linen
     - leather
@@ -24,11 +28,13 @@ resources:
     - gold
     - iron
     - bronze
-  product:
+  products:
     - olive_oil
-    - Swords
-    - Spears
-    - Shields
-    - Helmets
-    - Armor
-    - Bows
+    - swords
+    - spears
+    - shields
+    - helmets
+    - armour
+    - bows
+    - clothing
+    - jewelry
