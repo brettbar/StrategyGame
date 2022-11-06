@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../../data/factions.hpp"
 #include "../components/ai.hpp"
 #include "../components/player.hpp"
-#include "../data/factions.hpp"
 #include "../global.hpp"
 
 #include "spawn_system.hpp"

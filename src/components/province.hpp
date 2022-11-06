@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../data/resource.hpp"
 #include "../common.hpp"
-#include "../data/resource.hpp"
 #include "tile.hpp"
 
 namespace Province {

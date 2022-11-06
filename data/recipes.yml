@@ -1,0 +1,95 @@
+recipes:
+  raw_materials:
+    - timber:
+        inputs:
+          - trees 
+        building:
+          woodcutter
+        biome: 
+          - forest
+    - wheat:
+        inputs:
+        building:
+          farm
+        biome: 
+          - plains
+    - olives:
+        inputs:
+        building:
+          farm
+        biome: 
+          - plains
+          - hills
+    - fish:
+        inputs:
+          - fish
+        building:
+          fishmonger
+        biome:
+          - rivers
+          - sea
+    - clay:
+      inputs:
+        - clay
+
+
+    
+      
+
+
+  processed_materials:
+    - lumber:
+        inputs:
+          - timber
+        building:
+          sawmill
+    - flour:
+        inputs:
+          - wheat
+        building:
+          mill
+    - pottery:
+        inputs:
+          - clay 
+        building:
+          kiln 
+    - cloth:
+        inputs:
+          - wool 
+        building:
+          weaver 
+    - linen:
+        inputs:
+          - flax
+        building:
+          spinner
+    - leather:
+        inputs:
+          - hide
+        building:
+          tanner
+    - silver:
+        inputs: 
+          - silver_ore
+        building:
+          smith
+    - gold:
+        inputs: 
+          - gold_ore
+        building:
+          smith 
+    - iron:
+        inputs: 
+          - iron_ore
+        building:
+          smith 
+    - bronze:
+        inputs: 
+          - tin_ore
+          - copper_ore
+        building:
+          smith 
+
+
+
+

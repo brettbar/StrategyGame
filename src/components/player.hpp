@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../data/factions.hpp"
 #include "../common.hpp"
-#include "../data/factions.hpp"
 
 namespace Player {
 
