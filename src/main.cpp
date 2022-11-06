@@ -393,6 +393,6 @@ void LoadResources() {
   std::string path = "assets/textures/resources";
   for ( const auto &entry: fs::directory_iterator( path ) ) {
     std::cout << entry.path().filename() << std::endl;
-    LoadResourceByFilename( entry.path().filename(), Global::texture_cache );
+    LoadResourceByFilename( entry.path().filename().generic_string(), Global::texture_cache );
   }
 }

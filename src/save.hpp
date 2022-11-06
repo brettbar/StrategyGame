@@ -1,8 +1,11 @@
 #pragma once
 
-#include <cereal/archives/json.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/unordered_map.hpp>
+//#include <cereal/archives/json.hpp>
+//#include <cereal/types/memory.hpp>
+//#include <cereal/types/unordered_map.hpp>
+#include "../include/cereal/archives/json.hpp"
+#include "../include/cereal/types/memory.hpp"
+#include "../include/cereal/types/unordered_map.hpp"
 #include <fstream>
 #include <sstream>
 

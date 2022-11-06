@@ -1,5 +1,4 @@
 #pragma once
-#include "../../data/resource.hpp"
 #include "../common.hpp"
 
 namespace Settlement {

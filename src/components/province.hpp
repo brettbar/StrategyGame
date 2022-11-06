@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../data/resource.hpp"
 #include "../common.hpp"
 #include "tile.hpp"
 
@@ -12,7 +11,6 @@ struct Component {
   bool selected = false;
 
   std::shared_ptr<Tile::Component> tile;
-  std::vector<Resource::RawMaterial> raw_materials;
 };
 
 }// namespace Province

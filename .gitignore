@@ -1,5 +1,6 @@
 .cache/
 .idea/
+.vs/
 include/
 lib/
 build/
