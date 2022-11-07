@@ -11,11 +11,13 @@
         ]
       },
       {
-        "wheat": {
-          "inputs": null,
-          "building": "farm",
-          "biomes": "plains"
-        }
+        "wheat": [
+          {
+            "inputs": null,
+            "building": "farm",
+            "biome": "plains"
+          }
+        ]
       },
       {
         "olives": [
