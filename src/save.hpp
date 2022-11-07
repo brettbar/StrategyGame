@@ -14,7 +14,7 @@
 #include "components/sight.hpp"
 #include "components/unit.hpp"
 
-using namespace entt::literals;
+// using namespace entt::literals;
 
 namespace Save {
 

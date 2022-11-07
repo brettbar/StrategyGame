@@ -1,6 +1,9 @@
 #pragma once
 
+#include "../include/cereal/archives/json.hpp"
+#include <fstream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -14,9 +17,13 @@ enum class ResourceType {
   ProcessedMaterial,
   Product,
 };
+struct Recipe {
+  const char recipe[10];
+};
 struct Resource {
   std::string name;
   ResourceType type;
+  Recipe recipe;
   // Recipes
 };
 
@@ -34,6 +41,11 @@ struct RawMatRecipe {
 struct ProcMatRecipe {};
 
 inline std::map<std::string, std::vector<RawMatRecipe>> recipes;
+
+inline void LoadData() {
+  std::ifstream file( "data/resources.json" );
+  cereal::JSONInputArchive input{ file };
+}
 
 // MyClass data("hello", 6, true);
 // std::stringstream os;
