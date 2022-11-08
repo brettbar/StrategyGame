@@ -163,7 +163,7 @@ void Init( State &state, TextureCache &texture_cache ) {
   SpawnSystem::Init();
   UI::Init( texture_cache );
   Renderer::Init( state );
-  ResourceSystem::LoadData();
+  // ResourceSystem::LoadData();
 }
 
 

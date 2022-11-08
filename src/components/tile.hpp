@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.hpp"
+#include "../data/biomes.hpp"
 
 namespace Tile {
 
@@ -8,14 +9,6 @@ enum class Visibility {
   UNEXPLORED,
   EXPLORED,
   VISIBILE,
-};
-
-enum class Biome {
-  WATER,
-  BEACH,
-  LAND,
-  HILLS,
-  MTNS,
 };
 
 struct Component {

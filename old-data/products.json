@@ -16,13 +16,13 @@
         "inputs": [
           "iron"
         ],
-        "building": "smith"
+        "building": "sword_smith"
       },
       {
         "inputs": [
           "bronze"
         ],
-        "building": "smith"
+        "building": "sword_smith"
       }
     ]
   },

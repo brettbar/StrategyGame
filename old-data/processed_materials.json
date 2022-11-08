@@ -16,7 +16,7 @@
     ]
   },
   {
-    "brick": [
+    "bricks": [
       {
         "inputs": "clay",
         "building": "kiln"
@@ -24,7 +24,7 @@
     ]
   },
   {
-    "stone_brick": [
+    "stone_bricks": [
       {
         "inputs": "stone",
         "building": "stonemason"

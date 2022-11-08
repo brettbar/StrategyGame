@@ -61,7 +61,7 @@ inline void AssignProvince( entt::entity owner, Vector2 pos ) {
   for ( auto ent: provinces ) {
     Province::Component &prov = provinces.get<Province::Component>( ent );
 
-    if ( prov.id != (u32) provId || prov.tile->biome == Tile::Biome::WATER )
+    if ( prov.id != (u32) provId || prov.tile->biome == Biome::Sea )
       continue;
 
     prov.owner = owner;

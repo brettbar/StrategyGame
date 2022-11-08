@@ -1,67 +1,96 @@
 #pragma once
 
-#include "../include/cereal/archives/json.hpp"
-#include <fstream>
+#include "../data/resources.hpp"
+
 #include <map>
-#include <sstream>
-#include <string>
-#include <vector>
 
 namespace ResourceSystem {
 
-struct RawMaterialRecipe {
-  std::string input;
-  std::string building;
-  std::string biome;
+inline std::map<RawMaterial, std::vector<RawMaterialRecipe>> raw_materials = {
+  {
+    RawMaterial::Timber,
+    {
+      {
+        NaturalResource::Trees,
+        GatheringBuilding::WoodCutter,
+        Biome::Forest,
+      },
+    },
+  },
 
-  template<class Archive>
-  void serialize( Archive &archive ) {
-    archive( input, building, biome );
-  }
+  {
+    RawMaterial::Wheat,
+    {
+      {
+        NaturalResource::Soil,
+        GatheringBuilding::Farm,
+        Biome::Plains,
+      },
+    },
+  },
+
+  {
+    RawMaterial::Olives,
+    {
+      {
+        NaturalResource::Soil,
+        GatheringBuilding::OliveGrove,
+        Biome::Hills,
+      },
+    },
+  },
+
+  {
+    RawMaterial::Fish,
+    {
+      {
+        NaturalResource::Fish,
+        GatheringBuilding::Fisherman,
+        Biome::Sea,// TODO this needs to be something next to the sea
+      },
+    },
+  },
+
+  {
+    RawMaterial::Clay,
+    {
+      {
+        NaturalResource::Clay,
+        GatheringBuilding::OliveGrove,
+        Biome::Hills,
+      },
+    },
+  },
 };
+inline std::map<std::string, std::vector<ProcessedMaterialRecipe>>
+  processed_materials;
+inline std::map<std::string, std::vector<ProductRecipe>> products;
 
-struct RawMaterialRecipes {
-  std::map<std::string, std::vector<RawMaterialRecipe>> recipes;
 
-  template<class Archive>
-  void serialize( Archive &archive ) {
-    archive( recipes );
-  }
-};
+// struct Really {
+//   std::string resource;
+//   std::string value;
 
-struct RawMaterialsRecipes {
-  std::vector<RawMaterialRecipes> recipes;
+//   template<class Archive>
+//   void serialize( Archive &ar ) {
+//     ar( CEREAL_NVP( resource ) );
+//     CEREAL_NVP( value );
+//   }
+// };
+// https://uscilab.github.io/cereal/serialization_archives.html
+// https://stackoverflow.com/questions/64865338/cereal-unable-to-deserialize-a-json-string-unhandled-exception
+// void epilogue( cereal::JSONInputArchive &, const Really & ) {}
+// void prologue( cereal::JSONInputArchive &, const Really & ) {}
+// inline void LoadData() {
+//   std::ifstream file( "data/really.json" );
+//   cereal::JSONInputArchive input{ file };
 
-  template<class Archive>
-  void serialize( Archive &archive ) {
-    archive( recipes );
-  }
-};
+//   Really resources;
+//   input( resources );
 
-inline void LoadData() {
-  std::ifstream file( "data/raw_materials.json" );
-  cereal::JSONInputArchive input{ file };
-  RawMaterialsRecipes recipes;
-
-  input( recipes );
-}
-
-// MyClass data("hello", 6, true);
-// std::stringstream os;
-// {
-//     cereal::JSONOutputArchive archive_out(os);
-//     archive_out(CEREAL_NVP(data));
-// }
-// string json_str = os.str();
-// cout << json_str << endl;
-
-// // deserialize
-// std::stringstream is(json_str);
-// MyClass data_new;
-// {
-//     cereal::JSONInputArchive archive_in(is);
-//     archive_in(data_new);
-//     cout << data_new.y << endl;
+//   std::cout << "SUCCESS INPUT" << std::endl;
+//   cereal::JSONOutputArchive pretty_print( std::cout );
+//   pretty_print( resources );
 // }
 
 };// namespace ResourceSystem

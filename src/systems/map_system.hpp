@@ -76,19 +76,19 @@ inline void Init() {
 
     // Montanas
     if ( tile->noise >= 0.8f )
-      tile->biome = Tile::Biome::MTNS;
+      tile->biome = Biome::Mountains;
     // Colina
     else if ( tile->noise >= 0.75f )
-      tile->biome = Tile::Biome::HILLS;
+      tile->biome = Biome::Hills;
     // Tierra
     else if ( tile->noise >= waterLevel )
-      tile->biome = Tile::Biome::LAND;
+      tile->biome = Biome::Plains;
     //      // Playa
     //      else if (tile->noise >= 0.76f)
     //        tile->biome = BEACH;
     // Mar
     else
-      tile->biome = Tile::Biome::WATER;
+      tile->biome = Biome::Sea;
 
     tile->center = {
       tile->position.x + ( TILE_WIDTH / 2 ),
@@ -132,23 +132,23 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
     //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
     //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
     switch ( tile->biome ) {
-      case Tile::Biome::MTNS:
+      case Biome::Mountains:
         // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( snow_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::Biome::HILLS:
+      case Biome::Hills:
         // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( hills_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::Biome::LAND:
+      case Biome::Plains:
         // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( land_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::Biome::BEACH:
+      case Biome::Desert:
         // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( sand_tile, frameRec, tile->position, WHITE );
         break;
-      case Tile::Biome::WATER:
+      case Biome::Sea:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
         break;
