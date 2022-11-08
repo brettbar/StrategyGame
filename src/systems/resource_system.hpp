@@ -9,42 +9,41 @@
 
 namespace ResourceSystem {
 
-/*
-TODO this probably should be moved to component
-*/
-enum class ResourceType {
-  RawMaterial,
-  ProcessedMaterial,
-  Product,
-};
-struct Recipe {
-  const char recipe[10];
-};
-struct Resource {
-  std::string name;
-  ResourceType type;
-  Recipe recipe;
-  // Recipes
-};
-
-const std::string raw_materials = {};
-const std::string processed_materials = {};
-const std::string products = {};
-
-struct RawMatRecipe {
-  std::string resource;
-  std::vector<std::string> inputs;
+struct RawMaterialRecipe {
+  std::string input;
   std::string building;
   std::string biome;
+
+  template<class Archive>
+  void serialize( Archive &archive ) {
+    archive( input, building, biome );
+  }
 };
 
-struct ProcMatRecipe {};
+struct RawMaterialRecipes {
+  std::map<std::string, std::vector<RawMaterialRecipe>> recipes;
 
-inline std::map<std::string, std::vector<RawMatRecipe>> recipes;
+  template<class Archive>
+  void serialize( Archive &archive ) {
+    archive( recipes );
+  }
+};
+
+struct RawMaterialsRecipes {
+  std::vector<RawMaterialRecipes> recipes;
+
+  template<class Archive>
+  void serialize( Archive &archive ) {
+    archive( recipes );
+  }
+};
 
 inline void LoadData() {
-  std::ifstream file( "data/resources.json" );
+  std::ifstream file( "data/raw_materials.json" );
   cereal::JSONInputArchive input{ file };
+  RawMaterialsRecipes recipes;
+
+  input( recipes );
 }
 
 // MyClass data("hello", 6, true);
