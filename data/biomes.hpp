@@ -7,7 +7,7 @@ enum class Biome {
   Hills,
   Mountains,
   Forest,
-  Taiga,
-  Tundra,
+  Taiga, // Has forest
+  Tundra,// Dont
   Steppe,
 };

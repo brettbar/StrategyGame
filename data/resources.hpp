@@ -72,15 +72,16 @@ enum class Product {
 struct RawMaterialRecipe {
   NaturalResource input;
   GatheringBuilding building;
-  Biome biome;
+  std::vector<Biome> biome;
 };
 
 struct ProcessedMaterialRecipe {
-  std::vector<ProcessedMaterial> inputs;
+  std::vector<RawMaterial> inputs;
   ProcessingBuilding building;
 };
 
 struct ProductRecipe {
-  std::vector<Product> inputs;
+  std::vector<RawMaterial> raw_inputs;
+  std::vector<ProcessedMaterial> processed_inputs;
   ProductionBuilding building;
 };

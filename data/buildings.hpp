@@ -3,11 +3,11 @@
 enum class GatheringBuilding {
   WoodCutter,// nc
   Farm,
-  OliveGrove,//not sure
-  Fisherman, // nc
+  Fisherman,// nc
   Quarry,
-  Shearer,
+  Shepherd,
   Tanner,
+  Mine,
 };
 
 enum class ProcessingBuilding {
@@ -15,7 +15,6 @@ enum class ProcessingBuilding {
   Mill,
   Kiln,// nc
   Stonemason,
-  Weaver,
   Spinner,
   Tanner,
   Smith,
@@ -27,4 +26,5 @@ enum class ProductionBuilding {
   Poleturner,
   Armourer,
   Jeweler,
+  Tailor,
 };
