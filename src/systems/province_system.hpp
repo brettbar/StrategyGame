@@ -44,6 +44,7 @@ inline void Init( TextureCache &cache ) {
       .owner = entt::null,
       .selected = false,
       .tile = tiles[i],
+      .resources = {},
     };
 
     Global::world.emplace<Province::Component>( entity, prov );
