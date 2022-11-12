@@ -377,6 +377,72 @@ inline std::map<Product, std::vector<ProductRecipe>> products = {
     },
   },
 
+  {
+    Product::Helmets,
+    {
+      {
+        {},
+        { ProcessedMaterial::Iron },
+        ProductionBuilding::Armourer,
+      },
+      {
+        {},
+        { ProcessedMaterial::Bronze },
+        ProductionBuilding::Armourer,
+      },
+    },
+  },
+
+  {
+    Product::Armour,
+    {
+      {
+        {},
+        { ProcessedMaterial::Iron },
+        ProductionBuilding::Armourer,
+      },
+      {
+        {},
+        { ProcessedMaterial::Bronze },
+        ProductionBuilding::Armourer,
+      },
+      {
+        {},
+        { ProcessedMaterial::Leather },
+        ProductionBuilding::Armourer,
+      },
+      {
+        {},
+        { ProcessedMaterial::Linen },
+        ProductionBuilding::Armourer,
+      },
+    },
+  },
+
+  {
+    Product::Jewelry,
+    {
+      {
+        { RawMaterial::Gems },
+        {},
+        ProductionBuilding::Jeweler,
+      },
+
+      {
+        {},
+        { ProcessedMaterial::Gold },
+        ProductionBuilding::Jeweler,
+      },
+
+      {
+        {},
+        { ProcessedMaterial::Gold },
+        ProductionBuilding::Jeweler,
+      },
+    },
+  },
+
+
 };
 
 

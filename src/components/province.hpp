@@ -11,6 +11,7 @@ struct Component {
   bool selected = false;
 
   std::shared_ptr<Tile::Component> tile;
+  // std::vector<NaturalResource>
 };
 
 }// namespace Province
