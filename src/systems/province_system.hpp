@@ -1,10 +1,9 @@
-#include "../common.hpp"
+#pragma once
+
 #include "../events.hpp"
 #include "../renderer/textures.hpp"
 #include "map_system.hpp"
 #include "spawn_system.hpp"
-
-#pragma once
 
 namespace ProvinceSystem {
 
@@ -47,10 +46,32 @@ inline void Init( TextureCache &cache ) {
       .resources = {},
     };
 
+    switch ( prov.tile->biome ) {
+      case Biome::Plains: {
+        prov.resources.push_back( NaturalResource::Trees );
+      } break;
+    }
+
     Global::world.emplace<Province::Component>( entity, prov );
   }
 
   // listener.Listen();
+}
+
+inline void Draw() {
+  for ( auto entity: Global::world.view<Province::Component>() ) {
+    auto &prov = Global::world.get<Province::Component>( entity );
+
+    switch ( prov.tile->biome ) {
+      case Biome::Plains: {
+        // std::cout << "Foo!!!" << '\n';
+        Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
+        // std::cout << "Bar!!!" << '\n';
+        DrawPerfectTexture( tex, prov.tile->position, WHITE );
+        // std::cout << "Baz!!!" << '\n';
+      } break;
+    }
+  }
 }
 
 inline void AssignProvince( entt::entity owner, Vector2 pos ) {
@@ -60,7 +81,7 @@ inline void AssignProvince( entt::entity owner, Vector2 pos ) {
   auto provinces = Global::world.view<Province::Component>();
 
   for ( auto ent: provinces ) {
-    Province::Component &prov = provinces.get<Province::Component>( ent );
+    auto &prov = provinces.get<Province::Component>( ent );
 
     if ( prov.id != (u32) provId || prov.tile->biome == Biome::Sea )
       continue;

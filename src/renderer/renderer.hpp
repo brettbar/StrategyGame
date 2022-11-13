@@ -65,6 +65,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     {
       // Draw Terrain
       MapSystem::Draw( state.camera, texture_cache );
+      ProvinceSystem::Draw();
     }
     EndShaderMode();
 
@@ -81,7 +82,6 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
       switch ( MapSystem::mode ) {
         case MapSystem::Mode::Terrain: {
           SettlementSystem::Draw( texture_cache, false );
-
         } break;
         case MapSystem::Mode::Political: {
           SettlementSystem::Draw( texture_cache, false );
@@ -116,7 +116,6 @@ inline void DrawActors( bool debug ) {
 
 
     if ( unit.selected ) {
-
       BeginShaderMode( outline_shader );
       DrawPerfectTexture(
         anim.sprite,

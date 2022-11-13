@@ -146,6 +146,12 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
 }
 
 
+inline static void
+DrawPerfectTexture( Texture2D &texture, Vector2 position, Color tint ) {
+  SetTextureFilter( texture, TEXTURE_FILTER_BILINEAR );
+  DrawTextureV( texture, position, WHITE );
+}
+
 inline static void DrawPerfectTexture(
   Texture2D &texture,
   Rectangle rect,
@@ -157,13 +163,6 @@ inline static void DrawPerfectTexture(
   // SetTextureFilter( texture, TEXTURE_FILTER_POINT );
 
   DrawTextureRec( texture, rect, position, tint );
-}
-
-
-inline static void
-DrawPerfectTexture( Texture2D &texture, Vector2 position, Color tint ) {
-  SetTextureFilter( texture, TEXTURE_FILTER_BILINEAR );
-  DrawTextureV( texture, position, WHITE );
 }
 
 
