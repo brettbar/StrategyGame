@@ -47,51 +47,95 @@ struct Element {
   bool enabled;
   rect transform;
   Margins margins;
+
+  // TODO maybe this causes issues?
+  Element() {}
+  Element( std::string id, Type type ) : id( id ), type( type ) {
+    entt::entity entity = Global::local.create();
+    Global::local.emplace<Element>( entity, *this );
+    lookup.insert_or_assign( this->id, entity );
+  }
 };
 
-struct Panel {
+struct Panel : Element {
   Color background;
   Axis children_axis;
   Align children_horiz_align;
   Align children_vert_align;
-  std::vector<entt::entity> children;
+  std::vector<Element> children;
+
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    Element children...
+  )
+      : Element( id, Type::Panel ) {
+
+    this->background = background;
+    this->children_axis = children_axis;
+    this->children_horiz_align = children_horiz_align;
+    this->children_vert_align = children_vert_align;
+
+    this->children = { children };
+  }
 };
 
-struct BasePanel : Panel {
-  vec2 original_size;
-  std::function<void( Element &, BasePanel & )> update;
-};
+// struct BasePanel : Panel {
+//   vec2 original_size;
+//   std::function<void( Element &, BasePanel & )> update;
+// };
 
-struct TextLabel {
+struct TextLabel : Element {
   std::string text;
   i32 font_size;
   Color text_color;
   Color background;
   bool dynamic = false;
+
+  TextLabel(
+    std::string id,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    Color background
+  )
+      : Element( id, Type::TextLabel ) {
+    this->text = text;
+    this->font_size = font_size;
+    this->text_color = text_color;
+    this->background = background;
+  }
 };
 
 struct TextButton : TextLabel {
   bool clickable;
 };
 
-struct TextureLabel {
+struct TextureLabel : Element {
   Texture2D texture;
+
+  TextureLabel( std::string id ) {
+    this->texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
+  }
 };
 
 struct TextureButton : TextureLabel {
   bool clickable;
 };
 
-template<typename T>
-inline entt::entity CreateElement( T component, Element elem ) {
-  entt::entity entity = Global::local.create();
+// template<typename T>
+// inline entt::entity CreateElement( T component, Element elem ) {
+//   entt::entity entity = Global::local.create();
 
-  Global::local.emplace<Element>( entity, elem );
-  Global::local.emplace<T>( entity, component );
+//   Global::local.emplace<Element>( entity, elem );
+//   Global::local.emplace<T>( entity, component );
 
-  lookup.insert_or_assign( elem.id, entity );
+//   lookup.insert_or_assign( elem.id, entity );
 
-  return entity;
-}
+//   return entity;
+// }
 
 };// namespace UI

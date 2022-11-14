@@ -33,29 +33,45 @@ inline void ListenForDeselect();
 inline void ToggleElement( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
-  OverviewBanner();
+  // OverviewBanner();
 
-  SettlementContextPanel(
-    { SettlementContextTabGroup( {
-        SettlementContextTabButton( "context_tab_overview" ),
-        SettlementContextTabButton( "context_tab_population" ),
-        SettlementContextTabButton( "context_tab_resources" ),
-        SettlementContextTabButton( "context_tab_culture" ),
-        SettlementContextTabButton( "context_tab_religion" ),
-        SettlementContextTabButton( "context_tab_construction" ),
-        SettlementContextTabButton( "context_tab_garrison" ),
-      } ),
-      SettlementContextContent( { SettlementContent( {
-        SettlementName(),
-        SettlementPopulation(),
-        SettlementDevelopment(),
-      } ) } ) }
+  auto context_panel = Panel(
+    "context_panel",
+    Fade( BLACK, 0.5 ),
+    Axis::ROW,
+    Align::START,
+    Align::START,
+    Panel(
+      "context_tab_group",
+      Fade( BLACK, 0.5 ),
+      Axis::COLUMN,
+      Align::START,
+      Align::START,
+      {}
+    )
   );
 
-  ActorContextPanel( { ActorActionsPanel( {
-    ActorSpawnSettlementButton(),
-  } ) } );
-  ModalMenu();
+  // SettlementContextPanel(
+  //   { SettlementContextTabGroup( {
+  //       SettlementContextTabButton( "context_tab_overview" ),
+  //       SettlementContextTabButton( "context_tab_population" ),
+  //       SettlementContextTabButton( "context_tab_resources" ),
+  //       SettlementContextTabButton( "context_tab_culture" ),
+  //       SettlementContextTabButton( "context_tab_religion" ),
+  //       SettlementContextTabButton( "context_tab_construction" ),
+  //       SettlementContextTabButton( "context_tab_garrison" ),
+  //     } ),
+  //     SettlementContextContent( { SettlementContent( {
+  //       SettlementName(),
+  //       SettlementPopulation(),
+  //       SettlementDevelopment(),
+  //     } ) } ) }
+  // );
+
+  // ActorContextPanel( { ActorActionsPanel( {
+  //   ActorSpawnSettlementButton(),
+  // } ) } );
+  // ModalMenu();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
@@ -77,8 +93,8 @@ inline void Draw( TextureCache &texture_cache ) {
   const f32 screen_width = GetScreenWidth();
   const f32 screen_height = GetScreenHeight();
 
-  auto ui_elements = Global::local.view<Element>();
-  auto base_panels = Global::local.view<BasePanel>();
+  // auto ui_elements = Global::local.view<Element>();
+  // auto base_panels = Global::local.view<BasePanel>();
 
   if ( screen_width > 1920 ) {
     SCALE = 2.0;
@@ -88,198 +104,198 @@ inline void Draw( TextureCache &texture_cache ) {
     SCALE = 4.0;
   }
 
-  for ( auto &ent: base_panels ) {
-    Element &elem = Global::local.get<Element>( ent );
-    BasePanel &parent = Global::local.get<BasePanel>( ent );
+  // for ( auto &ent: base_panels ) {
+  //   Element &elem = Global::local.get<Element>( ent );
+  //   BasePanel &parent = Global::local.get<BasePanel>( ent );
 
-    if ( !elem.enabled )
-      continue;
+  //   if ( !elem.enabled )
+  //     continue;
 
-    // 0. Resize the parent panel.
-    parent.update( elem, parent );
+  //   // 0. Resize the parent panel.
+  //   parent.update( elem, parent );
 
-    LayoutPanel( parent, ent );
+  //   LayoutPanel( parent, ent );
 
-    for ( auto &child: parent.children ) {
-      assert( Global::local.all_of<Panel>( child ) );
+  //   for ( auto &child: parent.children ) {
+  //     assert( Global::local.all_of<Panel>( child ) );
 
-      Element &elem = Global::local.get<Element>( child );
-      Panel &panel = Global::local.get<Panel>( child );
-      if ( !elem.enabled )
-        continue;
+  //     Element &elem = Global::local.get<Element>( child );
+  //     Panel &panel = Global::local.get<Panel>( child );
+  //     if ( !elem.enabled )
+  //       continue;
 
-      LayoutPanel( panel, child );
-    }
-  }
+  //     LayoutPanel( panel, child );
+  //   }
+  // }
 
-  // Check for interactions and Draw everything
-  for ( auto &entity: ui_elements ) {
-    Element &elem = Global::local.get<Element>( entity );
+  // // Check for interactions and Draw everything
+  // for ( auto &entity: ui_elements ) {
+  //   Element &elem = Global::local.get<Element>( entity );
 
-    if ( !elem.enabled )
-      continue;
+  //   if ( !elem.enabled )
+  //     continue;
 
-    if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
-      if ( elem.id != "modal_menu" ) {
-        continue;
-      }
-    }
+  //   if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
+  //     if ( elem.id != "modal_menu" ) {
+  //       continue;
+  //     }
+  //   }
 
-    bool inside = CheckCollisionPointRec( GetMousePosition(), elem.transform );
+  //   bool inside = CheckCollisionPointRec( GetMousePosition(), elem.transform );
 
-    if ( !over_any_elem )
-      over_any_elem = inside;
+  //   if ( !over_any_elem )
+  //     over_any_elem = inside;
 
-    bool interactive =
-      ( elem.type == Type::TextButton || elem.type == Type::TextureButton );
+  //   bool interactive =
+  //     ( elem.type == Type::TextButton || elem.type == Type::TextureButton );
 
-    // UPDATE
-    switch ( elem.type ) {
-      case Type::TextLabel: {
-        TextLabel &label = Global::local.get<TextLabel>( entity );
-        if ( label.dynamic )
-          label.text = update_lookup.at( elem.id )();
-      } break;
-      case Type::TextButton: {
-        TextButton &button = Global::local.get<TextButton>( entity );
-        if ( button.dynamic )
-          button.text = update_lookup.at( elem.id )();
+  //   // UPDATE
+  //   switch ( elem.type ) {
+  //     case Type::TextLabel: {
+  //       TextLabel &label = Global::local.get<TextLabel>( entity );
+  //       if ( label.dynamic )
+  //         label.text = update_lookup.at( elem.id )();
+  //     } break;
+  //     case Type::TextButton: {
+  //       TextButton &button = Global::local.get<TextButton>( entity );
+  //       if ( button.dynamic )
+  //         button.text = update_lookup.at( elem.id )();
 
-        button.clickable = clickable_lookup.at( elem.id )();
-      } break;
-      case Type::TextureButton: {
-        TextureButton &button = Global::local.get<TextureButton>( entity );
-        button.clickable = clickable_lookup.at( elem.id )();
-      } break;
-    }
+  //       button.clickable = clickable_lookup.at( elem.id )();
+  //     } break;
+  //     case Type::TextureButton: {
+  //       TextureButton &button = Global::local.get<TextureButton>( entity );
+  //       button.clickable = clickable_lookup.at( elem.id )();
+  //     } break;
+  //   }
 
-    // Check for interactions
-    if ( DoInteraction(
-           entity,
-           inside,
-           interactive,
-           mouseWentUp,
-           mouseWentDown
-         ) ) {
-      switch ( elem.type ) {
-        case Type::TextButton: {
-          TextButton &button = Global::local.get<TextButton>( entity );
+  //   // Check for interactions
+  //   if ( DoInteraction(
+  //          entity,
+  //          inside,
+  //          interactive,
+  //          mouseWentUp,
+  //          mouseWentDown
+  //        ) ) {
+  //     switch ( elem.type ) {
+  //       case Type::TextButton: {
+  //         TextButton &button = Global::local.get<TextButton>( entity );
 
-          if ( button.clickable )
-            action_lookup.at( elem.id )();
-        } break;
-        case Type::TextureButton: {
-          TextureButton &button = Global::local.get<TextureButton>( entity );
+  //         if ( button.clickable )
+  //           action_lookup.at( elem.id )();
+  //       } break;
+  //       case Type::TextureButton: {
+  //         TextureButton &button = Global::local.get<TextureButton>( entity );
 
-          if ( button.clickable )
-            action_lookup.at( elem.id )();
-        } break;
-      }
-    }
+  //         if ( button.clickable )
+  //           action_lookup.at( elem.id )();
+  //       } break;
+  //     }
+  //   }
 
-    // DRAW
-    DrawElement( texture_cache, entity, elem );
-  }
+  //   // DRAW
+  //   DrawElement( texture_cache, entity, elem );
+  // }
 
-  if ( !over_any_elem ) {
-    context.hot = entt::null;
-    context.active = entt::null;
-  }
+  // if ( !over_any_elem ) {
+  //   context.hot = entt::null;
+  //   context.active = entt::null;
+  // }
 
-  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-  DrawFPS( GetScreenWidth() - 100, 2 );
+  // DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+  // DrawFPS( GetScreenWidth() - 100, 2 );
 
-  // TODO make this a part of debug
-  DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
-  std::string foo = "hot: " + EntityIdToString( context.hot );
-  DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
+  // // TODO make this a part of debug
+  // DrawRectangle( GetScreenWidth() - 200, 102, 200, 24.0f, BLACK );
+  // std::string foo = "hot: " + EntityIdToString( context.hot );
+  // DrawText( foo.c_str(), GetScreenWidth() - 200, 102, 24.0f, RED );
 
-  DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
-  std::string bar = "active: " + EntityIdToString( context.active );
-  DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
+  // DrawRectangle( GetScreenWidth() - 200, 152, 200, 24.0f, BLACK );
+  // std::string bar = "active: " + EntityIdToString( context.active );
+  // DrawText( bar.c_str(), GetScreenWidth() - 200, 152, 24.0f, RED );
 
-  DrawRectangle( GetScreenWidth() - 200, 202, 200, 24.0f, BLACK );
-  std::string selected_ent =
-    "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-  DrawText( selected_ent.c_str(), GetScreenWidth() - 200, 202, 24.0f, GREEN );
+  // DrawRectangle( GetScreenWidth() - 200, 202, 200, 24.0f, BLACK );
+  // std::string selected_ent =
+  //   "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+  // DrawText( selected_ent.c_str(), GetScreenWidth() - 200, 202, 24.0f, GREEN );
 }
 
 inline void LayoutPanel( Panel &panel, entt::entity entity ) {
-  f32 total_height = 0;
-  f32 total_width = 0;
-  f32 tallest_child = 0;
-  f32 widest_child = 0;
-  Element &panel_elem = Global::local.get<Element>( entity );
+  // f32 total_height = 0;
+  // f32 total_width = 0;
+  // f32 tallest_child = 0;
+  // f32 widest_child = 0;
+  // Element &panel_elem = Global::local.get<Element>( entity );
 
-  f32 end_of_last_x = panel_elem.transform.x;
-  f32 end_of_last_y = panel_elem.transform.y;
+  // f32 end_of_last_x = panel_elem.transform.x;
+  // f32 end_of_last_y = panel_elem.transform.y;
 
-  // For each child
-  for ( auto &child: panel.children ) {
-    Element &elem = Global::local.get<Element>( child );
+  // // For each child
+  // for ( auto &child: panel.children ) {
+  //   Element &elem = Global::local.get<Element>( child );
 
-    ResizeElement( child, elem );
+  //   ResizeElement( child, elem );
 
-    if ( panel.children_axis == Axis::ROW ) {
-      // 2. Set the child x position based on alignment style.
-      switch ( panel.children_horiz_align ) {
-        case Align::START: {
-          elem.transform.x = end_of_last_x;
-          end_of_last_x = elem.transform.x + elem.transform.width;
-        } break;
-        case Align::SPACE_OUT: {
-        } break;
-      }
+  //   if ( panel.children_axis == Axis::ROW ) {
+  //     // 2. Set the child x position based on alignment style.
+  //     switch ( panel.children_horiz_align ) {
+  //       case Align::START: {
+  //         elem.transform.x = end_of_last_x;
+  //         end_of_last_x = elem.transform.x + elem.transform.width;
+  //       } break;
+  //       case Align::SPACE_OUT: {
+  //       } break;
+  //     }
 
-      // 3. Set the child y position based on alignment style.
-      switch ( panel.children_vert_align ) {
-        case Align::START: {
-          elem.transform.y = panel_elem.transform.y;
-        } break;
-      }
-    } else if ( panel.children_axis == Axis::COLUMN ) {
-      // 2. Set the child x position based on alignment style.
-      switch ( panel.children_horiz_align ) {
-        case Align::START: {
-          elem.transform.x = panel_elem.transform.x;
-        } break;
-        case Align::SPACE_OUT: {
-        } break;
-      }
+  //     // 3. Set the child y position based on alignment style.
+  //     switch ( panel.children_vert_align ) {
+  //       case Align::START: {
+  //         elem.transform.y = panel_elem.transform.y;
+  //       } break;
+  //     }
+  //   } else if ( panel.children_axis == Axis::COLUMN ) {
+  //     // 2. Set the child x position based on alignment style.
+  //     switch ( panel.children_horiz_align ) {
+  //       case Align::START: {
+  //         elem.transform.x = panel_elem.transform.x;
+  //       } break;
+  //       case Align::SPACE_OUT: {
+  //       } break;
+  //     }
 
-      // 3. Set the child y position based on alignment style.
-      switch ( panel.children_vert_align ) {
-        case Align::START: {
-          elem.transform.y = end_of_last_y + elem.margins.top;
-          end_of_last_y =
-            elem.transform.y + elem.transform.height + elem.margins.bottom;
-        } break;
-      }
-    }
-  }
+  //     // 3. Set the child y position based on alignment style.
+  //     switch ( panel.children_vert_align ) {
+  //       case Align::START: {
+  //         elem.transform.y = end_of_last_y + elem.margins.top;
+  //         end_of_last_y =
+  //           elem.transform.y + elem.transform.height + elem.margins.bottom;
+  //       } break;
+  //     }
+  //   }
+  // }
 
-  for ( auto &child: panel.children ) {
-    rect &elem = Global::local.get<Element>( child ).transform;
+  // for ( auto &child: panel.children ) {
+  //   rect &elem = Global::local.get<Element>( child ).transform;
 
-    total_width += elem.width;
-    total_height += elem.height;
+  //   total_width += elem.width;
+  //   total_height += elem.height;
 
-    if ( elem.width > widest_child )
-      widest_child = elem.width;
+  //   if ( elem.width > widest_child )
+  //     widest_child = elem.width;
 
-    if ( elem.height > tallest_child )
-      tallest_child = elem.height;
-  }
+  //   if ( elem.height > tallest_child )
+  //     tallest_child = elem.height;
+  // }
 
-  if ( !Global::local.all_of<BasePanel>( entity ) ) {
-    if ( panel.children_axis == Axis::ROW ) {
-      panel_elem.transform.width = total_width;
-      panel_elem.transform.height = tallest_child;
-    } else if ( panel.children_axis == Axis::COLUMN ) {
-      panel_elem.transform.width = widest_child;
-      panel_elem.transform.height = total_height;
-    }
-  }
+  // if ( !Global::local.all_of<BasePanel>( entity ) ) {
+  //   if ( panel.children_axis == Axis::ROW ) {
+  //     panel_elem.transform.width = total_width;
+  //     panel_elem.transform.height = tallest_child;
+  //   } else if ( panel.children_axis == Axis::COLUMN ) {
+  //     panel_elem.transform.width = widest_child;
+  //     panel_elem.transform.height = total_height;
+  //   }
+  // }
 }
 
 inline void ResizeElement( entt::entity entity, Element &elem ) {
@@ -358,81 +374,81 @@ inline bool DoInteraction(
 
 inline void
 DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
-  switch ( elem.type ) {
-    case Type::BasePanel: {
-      auto &panel = Global::local.get<BasePanel>( entity );
-      DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        panel.background
-      );
-    } break;
-    case Type::Panel: {
-      auto &panel = Global::local.get<Panel>( entity );
-      DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        panel.background
-      );
-    } break;
-    case Type::TextLabel: {
-      auto &label = Global::local.get<TextLabel>( entity );
-      DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        label.background
-      );
+  // switch ( elem.type ) {
+  //   case Type::BasePanel: {
+  //     auto &panel = Global::local.get<BasePanel>( entity );
+  //     DrawRectangleV(
+  //       { elem.transform.x, elem.transform.y },
+  //       { elem.transform.width, elem.transform.height },
+  //       panel.background
+  //     );
+  //   } break;
+  //   case Type::Panel: {
+  //     auto &panel = Global::local.get<Panel>( entity );
+  //     DrawRectangleV(
+  //       { elem.transform.x, elem.transform.y },
+  //       { elem.transform.width, elem.transform.height },
+  //       panel.background
+  //     );
+  //   } break;
+  //   case Type::TextLabel: {
+  //     auto &label = Global::local.get<TextLabel>( entity );
+  //     DrawRectangleV(
+  //       { elem.transform.x, elem.transform.y },
+  //       { elem.transform.width, elem.transform.height },
+  //       label.background
+  //     );
 
-      DrawTextEx(
-        Global::font_cache[hstr{ "font_romulus" }]->font,
-        label.text.c_str(),
-        {
-          elem.transform.x,
-          elem.transform.y,
-        },
-        label.font_size,
-        2.0,
-        label.text_color
-      );
-    } break;
-    case Type::TextureButton: {
-      auto &button = Global::local.get<TextureButton>( entity );
-      DrawTextureEx(
-        button.texture,
-        { elem.transform.x, elem.transform.y },
-        0.0,
-        SCALE,
-        WHITE
-      );
-    } break;
+  //     DrawTextEx(
+  //       Global::font_cache[hstr{ "font_romulus" }]->font,
+  //       label.text.c_str(),
+  //       {
+  //         elem.transform.x,
+  //         elem.transform.y,
+  //       },
+  //       label.font_size,
+  //       2.0,
+  //       label.text_color
+  //     );
+  //   } break;
+  //   case Type::TextureButton: {
+  //     auto &button = Global::local.get<TextureButton>( entity );
+  //     DrawTextureEx(
+  //       button.texture,
+  //       { elem.transform.x, elem.transform.y },
+  //       0.0,
+  //       SCALE,
+  //       WHITE
+  //     );
+  //   } break;
 
-    case Type::TextButton: {
-      auto &button = Global::local.get<TextButton>( entity );
-      Color background = button.background;
+  //   case Type::TextButton: {
+  //     auto &button = Global::local.get<TextButton>( entity );
+  //     Color background = button.background;
 
-      if ( !button.clickable ) {
-        background = Fade( BLACK, 0.5 );
-      }
+  //     if ( !button.clickable ) {
+  //       background = Fade( BLACK, 0.5 );
+  //     }
 
-      DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        background
-      );
+  //     DrawRectangleV(
+  //       { elem.transform.x, elem.transform.y },
+  //       { elem.transform.width, elem.transform.height },
+  //       background
+  //     );
 
-      DrawTextEx(
-        Global::font_cache[hstr{ "font_romulus" }]->font,
-        button.text.c_str(),
-        {
-          elem.transform.x,
-          elem.transform.y + ( 0.5f * elem.transform.height ),
-        },
-        button.font_size,
-        2.0,
-        button.text_color
-      );
-    } break;
-  }
+  //     DrawTextEx(
+  //       Global::font_cache[hstr{ "font_romulus" }]->font,
+  //       button.text.c_str(),
+  //       {
+  //         elem.transform.x,
+  //         elem.transform.y + ( 0.5f * elem.transform.height ),
+  //       },
+  //       button.font_size,
+  //       2.0,
+  //       button.text_color
+  //     );
+  //   } break;
+  // }
 }
 
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
@@ -461,22 +477,22 @@ inline void ListenForDeselect() {
 }
 
 inline void ToggleElement( entt::entity entity, bool on ) {
-  Element &elem = Global::local.get<Element>( entity );
-  elem.enabled = on;
-  if ( elem.type != Type::Panel && elem.type != Type::BasePanel )
-    return;
+  // Element &elem = Global::local.get<Element>( entity );
+  // elem.enabled = on;
+  // if ( elem.type != Type::Panel && elem.type != Type::BasePanel )
+  //   return;
 
-  if ( Global::local.all_of<BasePanel>( entity ) ) {
-    BasePanel panel = Global::local.get<BasePanel>( entity );
-    for ( auto child: panel.children ) {
-      ToggleElement( child, on );
-    }
-  } else if ( Global::local.all_of<Panel>( entity ) ) {
-    Panel panel = Global::local.get<Panel>( entity );
-    for ( auto child: panel.children ) {
-      ToggleElement( child, on );
-    }
-  }
+  // if ( Global::local.all_of<BasePanel>( entity ) ) {
+  //   BasePanel panel = Global::local.get<BasePanel>( entity );
+  //   for ( auto child: panel.children ) {
+  //     ToggleElement( child, on );
+  //   }
+  // } else if ( Global::local.all_of<Panel>( entity ) ) {
+  //   Panel panel = Global::local.get<Panel>( entity );
+  //   for ( auto child: panel.children ) {
+  //     ToggleElement( child, on );
+  //   }
+  // }
 }
 
 inline bool MouseIsOverUI() {
