@@ -1,5 +1,7 @@
 #pragma once
 
+#include <raylib.h>
+#include <raymath.h>
 
 #include "../components/actor.hpp"
 #include "../components/event.hpp"
@@ -12,11 +14,9 @@
 #include "ui_components.hpp"
 #include "ui_lookups.hpp"
 #include "widgets/actor_context_panel.hpp"
+#include "widgets/modal_menu.hpp"
 #include "widgets/overview_banner.hpp"
 #include "widgets/settlement_context_panel.hpp"
-
-#include <raylib.h>
-#include <raymath.h>
 
 namespace UI {
 
@@ -34,14 +34,39 @@ inline void ToggleElement( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   OverviewBanner();
-  SettlementContextPanel( texture_cache );
-  ActorContextPanel( texture_cache );
+
+  SettlementContextPanel(
+    { SettlementContextTabGroup( {
+        SettlementContextTabButton( "context_tab_overview" ),
+        SettlementContextTabButton( "context_tab_population" ),
+        SettlementContextTabButton( "context_tab_resources" ),
+        SettlementContextTabButton( "context_tab_culture" ),
+        SettlementContextTabButton( "context_tab_religion" ),
+        SettlementContextTabButton( "context_tab_construction" ),
+        SettlementContextTabButton( "context_tab_garrison" ),
+      } ),
+      SettlementContextContent( { SettlementContent( {
+        SettlementName(),
+        SettlementPopulation(),
+        SettlementDevelopment(),
+      } ) } ) }
+  );
+
+  ActorContextPanel( { ActorActionsPanel( {
+    ActorSpawnSettlementButton(),
+  } ) } );
+  ModalMenu();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
 }
 
 inline void Update() {}
+
+inline void ToggleModalMenu() {
+  auto elem = Global::local.get<Element>( lookup.at( "modal_menu" ) );
+  elem.enabled = !elem.enabled;
+}
 
 inline void Draw( TextureCache &texture_cache ) {
   vec2 mousePos = GetMousePosition();
@@ -87,13 +112,18 @@ inline void Draw( TextureCache &texture_cache ) {
     }
   }
 
-
   // Check for interactions and Draw everything
   for ( auto &entity: ui_elements ) {
     Element &elem = Global::local.get<Element>( entity );
 
     if ( !elem.enabled )
       continue;
+
+    if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
+      if ( elem.id != "modal_menu" ) {
+        continue;
+      }
+    }
 
     bool inside = CheckCollisionPointRec( GetMousePosition(), elem.transform );
 
@@ -129,8 +159,8 @@ inline void Draw( TextureCache &texture_cache ) {
            inside,
            interactive,
            mouseWentUp,
-           mouseWentDown ) ) {
-
+           mouseWentDown
+         ) ) {
       switch ( elem.type ) {
         case Type::TextButton: {
           TextButton &button = Global::local.get<TextButton>( entity );
@@ -184,7 +214,6 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
   f32 end_of_last_x = panel_elem.transform.x;
   f32 end_of_last_y = panel_elem.transform.y;
 
-
   // For each child
   for ( auto &child: panel.children ) {
     Element &elem = Global::local.get<Element>( child );
@@ -208,8 +237,6 @@ inline void LayoutPanel( Panel &panel, entt::entity entity ) {
           elem.transform.y = panel_elem.transform.y;
         } break;
       }
-
-
     } else if ( panel.children_axis == Axis::COLUMN ) {
       // 2. Set the child x position based on alignment style.
       switch ( panel.children_horiz_align ) {
@@ -268,7 +295,8 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
         Global::font_cache[hstr{ "font_romulus" }]->font,
         label.text.c_str(),
         label.font_size,
-        2.0f );
+        2.0f
+      );
 
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
@@ -280,7 +308,8 @@ inline void ResizeElement( entt::entity entity, Element &elem ) {
         Global::font_cache[hstr{ "font_romulus" }]->font,
         button.text.c_str(),
         button.font_size,
-        2.0f );
+        2.0f
+      );
 
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
@@ -298,7 +327,8 @@ inline bool DoInteraction(
   bool inside,
   bool interactive,
   bool mouseWentUp,
-  bool mouseWentDown ) {
+  bool mouseWentDown
+) {
   bool result = false;
   // std::cout << "hot " << HotId() << " active " << ActiveId() << '\n';
 
@@ -334,21 +364,24 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
-        panel.background );
+        panel.background
+      );
     } break;
     case Type::Panel: {
       auto &panel = Global::local.get<Panel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
-        panel.background );
+        panel.background
+      );
     } break;
     case Type::TextLabel: {
       auto &label = Global::local.get<TextLabel>( entity );
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
-        label.background );
+        label.background
+      );
 
       DrawTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -359,7 +392,8 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         },
         label.font_size,
         2.0,
-        label.text_color );
+        label.text_color
+      );
     } break;
     case Type::TextureButton: {
       auto &button = Global::local.get<TextureButton>( entity );
@@ -368,7 +402,8 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         { elem.transform.x, elem.transform.y },
         0.0,
         SCALE,
-        WHITE );
+        WHITE
+      );
     } break;
 
     case Type::TextButton: {
@@ -382,7 +417,8 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
         { elem.transform.width, elem.transform.height },
-        background );
+        background
+      );
 
       DrawTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -393,7 +429,8 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
         },
         button.font_size,
         2.0,
-        button.text_color );
+        button.text_color
+      );
     } break;
   }
 }
@@ -401,7 +438,6 @@ DrawElement( TextureCache &texture_cache, entt::entity entity, Element &elem ) {
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
-
     auto context_panel = lookup.at( "settlement_context_panel" );
     ToggleElement( context_panel, true );
     // Element &elem = Global::ui_reg.get<Element>( context_panel );

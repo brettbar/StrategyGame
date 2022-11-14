@@ -28,6 +28,7 @@ inline void CheckMenuToggle() {
     } else if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
       Global::program_mode = Global::ProgramMode::GAME;
     }
+    UI::ToggleModalMenu();
   }
 }
 

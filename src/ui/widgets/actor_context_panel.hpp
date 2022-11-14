@@ -6,11 +6,10 @@
 
 namespace UI {
 
-inline entt::entity ActorContextPanel( TextureCache & );
-inline entt::entity ActorActionsPanel( TextureCache & );
-inline entt::entity ActorSpawnSettlementButton( TextureCache & );
+inline entt::entity ActorActionsPanel();
+inline entt::entity ActorSpawnSettlementButton();
 
-inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
+inline entt::entity ActorContextPanel( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "actor_context_panel",
     .type = Type::BasePanel,
@@ -28,10 +27,10 @@ inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
       .children_axis = Axis::ROW,
       .children_horiz_align = Align::START,
       .children_vert_align = Align::START,
-      .children =
-        {
-          ActorActionsPanel( texture_cache ),
-        },
+      .children = children,
+      // {
+      //   ActorActionsPanel(),
+      // },
     },
     .original_size =
       {
@@ -55,7 +54,7 @@ inline entt::entity ActorContextPanel( TextureCache &texture_cache ) {
 }
 
 
-inline entt::entity ActorActionsPanel( TextureCache &texture_cache ) {
+inline entt::entity ActorActionsPanel( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "actor_actions_panel",
     .type = Type::Panel,
@@ -63,17 +62,14 @@ inline entt::entity ActorActionsPanel( TextureCache &texture_cache ) {
   };
 
   Panel panel = {
-    .children =
-      {
-        ActorSpawnSettlementButton( texture_cache ),
-      },
+    .children = children,
   };
 
   return CreateElement( panel, elem );
 }
 
 
-inline entt::entity ActorSpawnSettlementButton( TextureCache &texture_cache ) {
+inline entt::entity ActorSpawnSettlementButton() {
   Element elem = {
     .id = "actor_spawn_settlement_button",
     .type = Type::TextButton,
