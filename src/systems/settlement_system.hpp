@@ -233,7 +233,7 @@ inline void Draw( TextureCache &cache, bool showOverlays ) {
     // // DrawSingleBorder(tile);
 
     // // Draw Settlement
-    DrawPerfectTexture( settlement.texture, settlement_pos, WHITE );
+    DrawTextureV( settlement.texture, settlement_pos, WHITE );
   }
 }
 

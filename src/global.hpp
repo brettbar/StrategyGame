@@ -26,5 +26,4 @@ inline entt::registry local;
 // TODO temporary
 inline entt::entity host_player;
 
-
 };// namespace Global

@@ -4,6 +4,7 @@
 #include "../renderer/textures.hpp"
 #include "map_system.hpp"
 #include "spawn_system.hpp"
+#include <raylib.h>
 
 namespace ProvinceSystem {
 
@@ -58,16 +59,31 @@ inline void Init( TextureCache &cache ) {
   // listener.Listen();
 }
 
-inline void Draw() {
+inline void Draw( Camera2D &camera ) {
+  Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
   for ( auto entity: Global::world.view<Province::Component>() ) {
     auto &prov = Global::world.get<Province::Component>( entity );
+
+    if (
+      prov.tile->position.x - TILE_WIDTH >
+        camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
+      prov.tile->position.x + TILE_WIDTH <
+        camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
+      prov.tile->position.y - TILE_WIDTH >
+        camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
+      prov.tile->position.y + TILE_WIDTH <
+        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
+      continue;
+    }
 
     switch ( prov.tile->biome ) {
       case Biome::Plains: {
         // std::cout << "Foo!!!" << '\n';
-        Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
         // std::cout << "Bar!!!" << '\n';
-        DrawPerfectTexture( tex, prov.tile->position, WHITE );
+        DrawTextureV(
+          tex,
+          { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
+          WHITE );
         // std::cout << "Baz!!!" << '\n';
       } break;
     }

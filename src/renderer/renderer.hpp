@@ -65,7 +65,8 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     {
       // Draw Terrain
       MapSystem::Draw( state.camera, texture_cache );
-      ProvinceSystem::Draw();
+      // TODO this is causing fps to drop to 110
+      ProvinceSystem::Draw( state.camera );
     }
     EndShaderMode();
 
@@ -117,7 +118,7 @@ inline void DrawActors( bool debug ) {
 
     if ( unit.selected ) {
       BeginShaderMode( outline_shader );
-      DrawPerfectTexture(
+      DrawTextureRec(
         anim.sprite,
         anim.frameRec,
         { unit.position.x - 64.0f, unit.position.y - 64.0f },
@@ -125,7 +126,7 @@ inline void DrawActors( bool debug ) {
       EndShaderMode();
     } else {
       BeginShaderMode( shader );
-      DrawPerfectTexture(
+      DrawTextureRec(
         anim.sprite,
         anim.frameRec,
         { unit.position.x - 64.0f, unit.position.y - 64.0f },

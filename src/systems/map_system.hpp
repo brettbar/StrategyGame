@@ -18,7 +18,6 @@
 // #include "../../components/unit.hpp"
 // #include "../../global.hpp"
 // #include "../../renderer/textures.hpp"
-// #include "../../utils.hpp"
 
 #include <chrono>
 #include <string>
@@ -134,27 +133,27 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
     switch ( tile->biome ) {
       case Biome::Mountains:
         // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( snow_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Hills:
         // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Plains:
         // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( land_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Desert:
         // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( sand_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Sea:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
       default:
         // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawPerfectTexture( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
     }
 
