@@ -103,6 +103,8 @@ int main( void ) {
             GetScreenWidth(),
             GetScreenHeight(),
             Fade( BLACK, 0.33f ) );
+
+          UI::Draw( Global::texture_cache );
         }
         EndDrawing();
         break;

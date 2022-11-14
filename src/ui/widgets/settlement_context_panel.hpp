@@ -5,17 +5,8 @@
 
 namespace UI {
 
-inline entt::entity SettlementContextPanel( TextureCache & );
-inline entt::entity SettlementContextTabGroup( TextureCache & );
-inline entt::entity SettlementContextTabButton( Texture2D );
-
-inline entt::entity SettlementContextContent();
-inline entt::entity SettlementContext();
-inline entt::entity SettlementName();
-inline entt::entity SettlementPopulation();
-inline entt::entity SettlementDevelopment();
-
-inline entt::entity SettlementContextPanel( TextureCache &texture_cache ) {
+inline entt::entity
+SettlementContextPanel( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "settlement_context_panel",
     .type = Type::BasePanel,
@@ -32,11 +23,7 @@ inline entt::entity SettlementContextPanel( TextureCache &texture_cache ) {
       .children_axis = Axis::ROW,
       .children_horiz_align = Align::START,
       .children_vert_align = Align::START,
-      .children =
-        {
-          SettlementContextTabGroup( texture_cache ),
-          SettlementContextContent(),
-        },
+      .children = children,
     },
     .original_size =
       {
@@ -60,7 +47,8 @@ inline entt::entity SettlementContextPanel( TextureCache &texture_cache ) {
   return CreateElement( panel, elem );
 }
 
-inline entt::entity SettlementContextTabGroup( TextureCache &texture_cache ) {
+inline entt::entity
+SettlementContextTabGroup( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "context_tab_group",
     .type = Type::Panel,
@@ -71,29 +59,13 @@ inline entt::entity SettlementContextTabGroup( TextureCache &texture_cache ) {
     .children_axis = Axis::COLUMN,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
-    .children =
-      {
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_overview" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_population" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_resources" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_culture" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_religion" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_construction" }]->texture ),
-        SettlementContextTabButton(
-          texture_cache[hstr{ "context_tab_garrison" }]->texture ),
-      },
+    .children = children,
   };
 
   return CreateElement( tab_grp, elem );
 }
 
-inline entt::entity SettlementContextTabButton( Texture2D texture ) {
+inline entt::entity SettlementContextTabButton( std::string tex_id ) {
   Element elem = {
     .id = "context_tab_button",
     .type = Type::TextureButton,
@@ -101,15 +73,16 @@ inline entt::entity SettlementContextTabButton( Texture2D texture ) {
 
   TextureButton button = {
     {
-      .texture = texture,
+      .texture = Global::texture_cache[hstr{ tex_id.c_str() }]->texture,
     },
     .clickable = true,
-  };
+  };// namespace UI
 
   return CreateElement( button, elem );
 }
 
-inline entt::entity SettlementContextContent() {
+inline entt::entity
+SettlementContextContent( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "settlement_context_content",
     .type = Type::Panel,
@@ -120,16 +93,13 @@ inline entt::entity SettlementContextContent() {
     .children_axis = Axis::ROW,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
-    .children =
-      {
-        SettlementContext(),
-      },
+    .children = children,
   };
 
   return CreateElement( panel, elem );
 }
 
-inline entt::entity SettlementContext() {
+inline entt::entity SettlementContent( std::vector<entt::entity> children ) {
   Element elem = {
     .id = "settlement_context",
     .type = Type::Panel,
@@ -140,12 +110,12 @@ inline entt::entity SettlementContext() {
     .children_axis = Axis::COLUMN,
     .children_horiz_align = Align::START,
     .children_vert_align = Align::START,
-    .children =
-      {
-        SettlementName(),
-        SettlementPopulation(),
-        SettlementDevelopment(),
-      },
+    .children = children,
+    // {
+    //   SettlementName(),
+    //   SettlementPopulation(),
+    //   SettlementDevelopment(),
+    // },
   };
 
   return CreateElement( panel, elem );
@@ -211,5 +181,4 @@ inline entt::entity SettlementDevelopment() {
 
   return CreateElement( name, elem );
 }
-
 };// namespace UI
