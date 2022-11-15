@@ -37,7 +37,6 @@ inline void ToggleElement( entt::entity, bool );
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
 
-<<<<<<< Updated upstream
   content = {
     Panel(
       "context_panel",
@@ -73,7 +72,6 @@ inline void Init( TextureCache &texture_cache ) {
   //     } ) } ) }
   // );
 
-=======
   // SettlementContextPanel(
   //   { SettlementContextTabGroup( {
   //       SettlementContextTabButton( "context_tab_overview" ),
@@ -91,7 +89,6 @@ inline void Init( TextureCache &texture_cache ) {
   //     } ) } ) }
   // );
 
->>>>>>> Stashed changes
   // ActorContextPanel( { ActorActionsPanel( {
   //   ActorSpawnSettlementButton(),
   // } ) } );
