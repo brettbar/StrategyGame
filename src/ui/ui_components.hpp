@@ -62,24 +62,39 @@ struct Panel : Element {
   Axis children_axis;
   Align children_horiz_align;
   Align children_vert_align;
+<<<<<<< Updated upstream
   std::vector<Element> children;
 
   Panel(
     std::string id,
+=======
+  std::vector<entt::entity> children;
+
+  Panel(
+>>>>>>> Stashed changes
     Color background,
     Axis children_axis,
     Align children_horiz_align,
     Align children_vert_align,
+<<<<<<< Updated upstream
     Element children...
   )
       : Element( id, Type::Panel ) {
 
+=======
+    std::vector<entt::entity> children
+  ) {
+>>>>>>> Stashed changes
     this->background = background;
     this->children_axis = children_axis;
     this->children_horiz_align = children_horiz_align;
     this->children_vert_align = children_vert_align;
+<<<<<<< Updated upstream
 
     this->children = { children };
+=======
+    this->children = children;
+>>>>>>> Stashed changes
   }
 };
 

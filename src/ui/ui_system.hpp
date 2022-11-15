@@ -37,6 +37,7 @@ inline void ToggleElement( entt::entity, bool );
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
 
+<<<<<<< Updated upstream
   content = {
     Panel(
       "context_panel",
@@ -72,6 +73,25 @@ inline void Init( TextureCache &texture_cache ) {
   //     } ) } ) }
   // );
 
+=======
+  // SettlementContextPanel(
+  //   { SettlementContextTabGroup( {
+  //       SettlementContextTabButton( "context_tab_overview" ),
+  //       SettlementContextTabButton( "context_tab_population" ),
+  //       SettlementContextTabButton( "context_tab_resources" ),
+  //       SettlementContextTabButton( "context_tab_culture" ),
+  //       SettlementContextTabButton( "context_tab_religion" ),
+  //       SettlementContextTabButton( "context_tab_construction" ),
+  //       SettlementContextTabButton( "context_tab_garrison" ),
+  //     } ),
+  //     SettlementContextContent( { SettlementContent( {
+  //       SettlementName(),
+  //       SettlementPopulation(),
+  //       SettlementDevelopment(),
+  //     } ) } ) }
+  // );
+
+>>>>>>> Stashed changes
   // ActorContextPanel( { ActorActionsPanel( {
   //   ActorSpawnSettlementButton(),
   // } ) } );
