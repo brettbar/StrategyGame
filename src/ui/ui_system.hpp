@@ -26,6 +26,7 @@ inline std::vector<Panel> content;
 
 inline void Init( TextureCache & );
 inline void Draw();
+inline void HandlePanelDrawing( Panel & );
 inline void LayoutPanel( Panel &, entt::entity );
 inline void ResizeElement( entt::entity, Element & );
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
@@ -105,20 +106,33 @@ inline void Init( TextureCache &texture_cache ) {
 //   elem.enabled = !elem.enabled;
 // }
 
-inline void Update() {}
+inline void Update() {
+}
 
 inline void Draw() {
   for ( Panel &panel: content ) {
-    if ( !panel.enabled )
-      continue;
-
-    DrawRectangleV(
-      { panel.transform.x, panel.transform.y },
-      { panel.transform.width, panel.transform.height },
-      panel.background
-    );
+    HandlePanelDrawing( panel );
   }
+
+  DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+  DrawFPS( GetScreenWidth() - 100, 2 );
 }
+
+inline void HandlePanelDrawing( Panel &panel ) {
+  if ( !panel.enabled )
+    return;
+
+  for ( auto &child: panel.children ) {
+    if ( std::holds_alternative<Panel>( child ) ) {
+      Panel &child_panel = std::get<Panel>( child );
+      HandlePanelDrawing( child_panel );
+    }
+  }
+
+
+  panel.Draw();
+}
+
 
 // inline void Draw() {
 //   vec2 mousePos = GetMousePosition();

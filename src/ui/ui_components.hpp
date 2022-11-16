@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../global.hpp"
+#include <variant>
 
 namespace UI {
 
@@ -56,7 +57,8 @@ struct Element {
     Margins margins
   )
       : id( id ), type( type ), enabled( enabled ), transform( transform ),
-        margins( margins ) {}
+        margins( margins ) {
+  }
 };
 
 struct Panel : Element {
@@ -65,20 +67,8 @@ struct Panel : Element {
   Align children_horiz_align;
   Align children_vert_align;
   bool absolute_pos = false;
-  std::vector<Element> children;
 
-  Panel(
-    std::string id,
-    Color background,
-    Axis children_axis,
-    Align children_horiz_align,
-    Align children_vert_align,
-    Element children...
-  )
-      : Element( id, Type::Panel, true, {}, {} ), background( background ),
-        children_axis( children_axis ),
-        children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), children( { children } ) {}
+  std::vector<std::variant<Panel>> children;
 
   // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
   Panel(
@@ -91,7 +81,22 @@ struct Panel : Element {
       : Element( id, Type::Panel, true, {}, {} ), background( background ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), children( {} ) {}
+        children_vert_align( children_vert_align ), children( {} ) {
+    this->transform = { 500, 500, 200, 200 };
+  }
+
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    std::variant<Panel> children...
+  )
+      : Element( id, Type::Panel, true, {}, {} ), background( background ),
+        children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ), children( { children } ){};
 
   // Absolute panel with children
   Panel(
@@ -102,18 +107,28 @@ struct Panel : Element {
     Align children_vert_align,
     bool absolute_pos,
     rect transform,
-    Element children...
+    std::variant<Panel> children...
   )
       : Element( id, Type::Panel, true, transform, {} ),
         background( background ), children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ),
-        absolute_pos( absolute_pos ), children( { children } ) {}
+        absolute_pos( absolute_pos ), children( { children } ) {
+  }
 
   //   // entt::entity entity = Global::local.create();
   //   // Global::local.emplace<Element>( entity, *this );
   //   // lookup.insert_or_assign( this->id, entity );
   // }
+  //
+
+  void Draw() {
+    DrawRectangleV(
+      { transform.x, transform.y },
+      { transform.width, transform.height },
+      background
+    );
+  }
 };
 
 // struct BasePanel : Panel {
