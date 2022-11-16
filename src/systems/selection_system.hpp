@@ -43,7 +43,8 @@ inline void Draw( TextureCache &cache, bool isDebug ) {
         cache[hstr{ "tile_outline" }]->texture,
         prov.tile->position.x,
         prov.tile->position.y,
-        WHITE );
+        WHITE
+      );
       // DrawRectangleLinesEx(
       //   { prov.tile->position.x + 32, prov.tile->position.y + 32, 64, 64 },
       //   2,
@@ -57,9 +58,8 @@ inline void UpdateSelection( Vector2 click_pos ) {
   View<Province::Component> prov_view =
     Global::world.view<Province::Component>();
 
-  ClearSelection( units_view );
-  ClearSelection( prov_view );
-
+  ClearSelection<Unit::Component>( units_view );
+  ClearSelection<Province::Component>( prov_view );
 
   CheckSelectUnits( units_view, click_pos );
   CheckSelectProvince( prov_view, click_pos );

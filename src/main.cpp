@@ -102,9 +102,10 @@ int main( void ) {
             0,
             GetScreenWidth(),
             GetScreenHeight(),
-            Fade( BLACK, 0.33f ) );
+            Fade( BLACK, 0.33f )
+          );
 
-          UI::Draw( Global::texture_cache );
+          UI::Draw();
         }
         EndDrawing();
         break;
@@ -200,7 +201,7 @@ void Update1TPS( State &state ) {
 void Draw( State &state ) {
   BeginDrawing();
   Renderer::Draw( state, Global::texture_cache );
-  UI::Draw( Global::texture_cache );
+  UI::Draw();
   EndDrawing();
 }
 
@@ -273,126 +274,155 @@ void LoadResources() {
   LoadResource(
     hstr{ "tile_outline" },
     InitTileOutline(),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   Global::font_cache.load(
     hstr{ "font_romulus" },
-    LoadFont( "assets/fonts/romulus.png" ) );
+    LoadFont( "assets/fonts/romulus.png" )
+  );
 
   Global::font_cache.load(
     hstr{ "font_default" },
-    LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" ) );
+    LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" )
+  );
 
   LoadResource(
     hstr{ "land_tile" },
     LoadImage( "assets/textures/hexagons/Grass.bmp" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "water_tile" },
     LoadImage( "assets/textures/hexagons/Ocean.bmp" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "hills_tile" },
     LoadImage( "assets/textures/hexagons/Hills.bmp" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "sand_tile" },
     LoadImage( "assets/textures/hexagons/Sand.bmp" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "snow_tile" },
     LoadImage( "assets/textures/hexagons/Snow.bmp" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "redOverlay" },
     LoadImage( "assets/textures/overlays/Red.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "blueOverlay" },
     LoadImage( "assets/textures/overlays/Blue.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "greenOverlay" },
     LoadImage( "assets/textures/overlays/Green.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "purpleOverlay" },
     LoadImage( "assets/textures/overlays/Purple.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "orangeOverlay" },
     LoadImage( "assets/textures/overlays/Orange.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "template" },
     LoadImage( "assets/textures/Template.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "romanVillagerTexture" },
     LoadImage( "assets/textures/units/RomanVillager.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "greekVillagerTexture" },
     LoadImage( "assets/textures/units/GreekVillager.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "celtVillagerTexture" },
     LoadImage( "assets/textures/units/CelticVillager.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "punicVillagerTexture" },
     LoadImage( "assets/textures/units/Carthaginian_Villager.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "persianVillagerTexture" },
     LoadImage( "assets/textures/units/Persian_Villager.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "romanVillageTexture" },
     LoadImage( "assets/textures/village_roman.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "buildings" },
     LoadImage( "assets/textures/buildings.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "context_panel" },
     LoadImage( "assets/textures/UI/UI_test.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   LoadResource(
     hstr{ "context_tab_overview" },
     LoadImage( "assets/textures/UI/Overview.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_population" },
     LoadImage( "assets/textures/UI/Population.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_culture" },
     LoadImage( "assets/textures/UI/Culture.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_religion" },
     LoadImage( "assets/textures/UI/Religion.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_resources" },
     LoadImage( "assets/textures/UI/Resources.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_construction" },
     LoadImage( "assets/textures/UI/Construction.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
   LoadResource(
     hstr{ "context_tab_garrison" },
     LoadImage( "assets/textures/UI/Garrison.png" ),
-    Global::texture_cache );
+    Global::texture_cache
+  );
 
   std::string path = "assets/textures/resources";
   for ( const auto &entry: fs::directory_iterator( path ) ) {
@@ -403,6 +433,7 @@ void LoadResources() {
     LoadResource(
       hstr{ filename.c_str() },
       LoadImage( ( path + "/" + filename ).c_str() ),
-      Global::texture_cache );
+      Global::texture_cache
+    );
   }
 }

@@ -48,13 +48,15 @@ struct Element {
   rect transform;
   Margins margins;
 
-  // TODO maybe this causes issues?
-  Element() {}
-  Element( std::string id, Type type ) : id( id ), type( type ) {
-    entt::entity entity = Global::local.create();
-    Global::local.emplace<Element>( entity, *this );
-    lookup.insert_or_assign( this->id, entity );
-  }
+  Element(
+    std::string id,
+    Type type,
+    bool enabled,
+    rect transform,
+    Margins margins
+  )
+      : id( id ), type( type ), enabled( enabled ), transform( transform ),
+        margins( margins ) {}
 };
 
 struct Panel : Element {
@@ -62,6 +64,7 @@ struct Panel : Element {
   Axis children_axis;
   Align children_horiz_align;
   Align children_vert_align;
+  bool absolute_pos = false;
   std::vector<Element> children;
 
   Panel(
@@ -72,14 +75,45 @@ struct Panel : Element {
     Align children_vert_align,
     Element children...
   )
-      : Element( id, Type::Panel ) {
-    this->background = background;
-    this->children_axis = children_axis;
-    this->children_horiz_align = children_horiz_align;
-    this->children_vert_align = children_vert_align;
+      : Element( id, Type::Panel, true, {}, {} ), background( background ),
+        children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ), children( { children } ) {}
 
-    this->children = { children };
-  }
+  // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align
+  )
+      : Element( id, Type::Panel, true, {}, {} ), background( background ),
+        children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ), children( {} ) {}
+
+  // Absolute panel with children
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    bool absolute_pos,
+    rect transform,
+    Element children...
+  )
+      : Element( id, Type::Panel, true, transform, {} ),
+        background( background ), children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ),
+        absolute_pos( absolute_pos ), children( { children } ) {}
+
+  //   // entt::entity entity = Global::local.create();
+  //   // Global::local.emplace<Element>( entity, *this );
+  //   // lookup.insert_or_assign( this->id, entity );
+  // }
 };
 
 // struct BasePanel : Panel {
@@ -87,43 +121,42 @@ struct Panel : Element {
 //   std::function<void( Element &, BasePanel & )> update;
 // };
 
-struct TextLabel : Element {
-  std::string text;
-  i32 font_size;
-  Color text_color;
-  Color background;
-  bool dynamic = false;
+// struct TextLabel : Element {
+//   std::string text;
+//   i32 font_size;
+//   Color text_color;
+//   Color background;
+//   bool dynamic = false;
 
-  TextLabel(
-    std::string id,
-    std::string text,
-    i32 font_size,
-    Color text_color,
-    Color background
-  )
-      : Element( id, Type::TextLabel ) {
-    this->text = text;
-    this->font_size = font_size;
-    this->text_color = text_color;
-    this->background = background;
-  }
-};
+//   TextLabel(
+//     std::string id,
+//     std::string text,
+//     i32 font_size,
+//     Color text_color,
+//     Color background
+//   ) {
+//     this->text = text;
+//     this->font_size = font_size;
+//     this->text_color = text_color;
+//     this->background = background;
+//   }
+// };
 
-struct TextButton : TextLabel {
-  bool clickable;
-};
+// struct TextButton : TextLabel {
+//   bool clickable;
+// };
 
-struct TextureLabel : Element {
-  Texture2D texture;
+// struct TextureLabel : Element {
+//   Texture2D texture;
 
-  TextureLabel( std::string id ) {
-    this->texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
-  }
-};
+//   TextureLabel( std::string id ) {
+//     this->texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
+//   }
+// };
 
-struct TextureButton : TextureLabel {
-  bool clickable;
-};
+// struct TextureButton : TextureLabel {
+//   bool clickable;
+// };
 
 // template<typename T>
 // inline entt::entity CreateElement( T component, Element elem ) {

@@ -17,10 +17,8 @@ using vec2 = Vector2;
 using rect = Rectangle;
 
 template<typename T>
-using View = entt::basic_view<
-  entt::basic_registry<entt::entity>::entity_type,
-  entt::get_t<T>,
-  entt::exclude_t<>>;
+using View =
+  entt::basic_view<entt::get_t<entt::storage_for_t<T>>, entt::exclude_t<>>;
 
 struct IVector2 {
   i32 x;

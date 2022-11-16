@@ -20,7 +20,7 @@
 
 namespace UI {
 
-inline Context context;
+inline Context context = { entt::null, entt::null };
 
 inline std::vector<Panel> content;
 
@@ -36,7 +36,7 @@ inline void ToggleElement( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
-
+  //
   content = {
     Panel(
       "context_panel",
@@ -44,16 +44,18 @@ inline void Init( TextureCache &texture_cache ) {
       Axis::ROW,
       Align::START,
       Align::START,
+      true,
+      { 500, 500, 500, 500 },
       Panel(
         "context_tab_group",
-        Fade( BLACK, 0.5 ),
+        BLUE,
         Axis::COLUMN,
         Align::START,
-        Align::START,
-        {}
+        Align::START
       )
     ),
   };
+
 
   // SettlementContextPanel(
   //   { SettlementContextTabGroup( {
@@ -105,24 +107,16 @@ inline void Init( TextureCache &texture_cache ) {
 
 inline void Update() {}
 
-
 inline void Draw() {
-  for ( Panel panel: content ) {
+  for ( Panel &panel: content ) {
     if ( !panel.enabled )
       continue;
 
-    // parent.update( elem, parent );
-
-    LayoutPanel( parent, ent );
-
-    for ( auto &child: parent.children ) {
-      Element &elem = Global::local.get<Element>( child );
-      Panel &panel = Global::local.get<Panel>( child );
-      if ( !elem.enabled )
-        continue;
-
-      LayoutPanel( panel, child );
-    }
+    DrawRectangleV(
+      { panel.transform.x, panel.transform.y },
+      { panel.transform.width, panel.transform.height },
+      panel.background
+    );
   }
 }
 
@@ -494,30 +488,30 @@ inline void Draw() {
 //   // }
 // }
 
-// inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
-//   printf( "SelectListener?\n" );
-//   if ( game_reg.all_of<Province::Component>( entity ) ) {
-//     auto context_panel = lookup.at( "settlement_context_panel" );
-//     ToggleElement( context_panel, true );
-//     // Element &elem = Global::ui_reg.get<Element>( context_panel );
-//     // elem.enabled = true;
-//   } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-//     auto actor = game_reg.get<Actor::Component>( entity );
-//     printf( "Actor: %s \n", actor.name );
+inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
+  printf( "SelectListener?\n" );
+  // if ( game_reg.all_of<Province::Component>( entity ) ) {
+  //   auto context_panel = lookup.at( "settlement_context_panel" );
+  //   ToggleElement( context_panel, true );
+  //   // Element &elem = Global::ui_reg.get<Element>( context_panel );
+  //   // elem.enabled = true;
+  // } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+  //   auto actor = game_reg.get<Actor::Component>( entity );
+  //   printf( "Actor: %s \n", actor.name );
 
-//     auto context_panel = lookup.at( "actor_context_panel" );
-//     ToggleElement( context_panel, true );
-//     // entt::entity context_label = ui_lookup.at( "context_label" );
-//     // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
-//   }
-// }
+  //   auto context_panel = lookup.at( "actor_context_panel" );
+  //   ToggleElement( context_panel, true );
+  //   // entt::entity context_label = ui_lookup.at( "context_label" );
+  //   // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
+  // }
+}
 
-// inline void ListenForDeselect() {
-//   printf( "DeSelectListener?\n" );
-//   auto context_panel = lookup.at( "settlement_context_panel" );
-//   // TODO not deselecting properly?
-//   ToggleElement( context_panel, false );
-// }
+inline void ListenForDeselect() {
+  printf( "DeSelectListener?\n" );
+  // auto context_panel = lookup.at( "settlement_context_panel" );
+  // // TODO not deselecting properly?
+  // ToggleElement( context_panel, false );
+}
 
 // inline void ToggleElement( entt::entity entity, bool on ) {
 //   // Element &elem = Global::local.get<Element>( entity );
@@ -538,9 +532,9 @@ inline void Draw() {
 //   // }
 // }
 
-// inline bool MouseIsOverUI() {
-//   // This is almost sufficent, but we need to account for panels too
-//   // not just items that can be active
-//   return context.active != entt::null || context.hot != entt::null;
-// }
+inline bool MouseIsOverUI() {
+  // This is almost sufficent, but we need to account for panels too
+  // not just items that can be active
+  return context.active != entt::null || context.hot != entt::null;
+}
 };// namespace UI
