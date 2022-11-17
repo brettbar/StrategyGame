@@ -1,11 +1,12 @@
 #pragma once
 
 #include "../global.hpp"
+#include <iostream>
 #include <variant>
 
 namespace UI {
-inline f32 SCALE = 2.0f;
 
+inline f32 SCALE = 2.0f;
 inline std::map<std::string, entt::entity> lookup;
 
 struct Context {
@@ -40,6 +41,12 @@ struct Margins {
   u32 top;
   u32 bottom;
 };
+
+typedef struct Panel Panel;
+typedef struct TextLabel TextLabel;
+typedef struct TextureButton TextureButton;
+
+using Types = std::variant<Panel, TextLabel, TextureButton>;
 
 struct Element {
   std::string id;
@@ -135,7 +142,7 @@ struct Panel : Element {
   std::function<Vector2()> update_size;
 
   // NOTE: Have to add new types of elements to this
-  std::vector<std::variant<Panel, TextLabel, TextureButton>> children;
+  std::vector<Types> children;
 
   // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
   Panel(
@@ -159,7 +166,7 @@ struct Panel : Element {
     Axis children_axis,
     Align children_horiz_align,
     Align children_vert_align,
-    std::vector<std::variant<Panel, TextLabel, TextureButton>> children
+    std::vector<Types> children
   )
       : Element( id, Type::Panel, background, true, {}, {} ),
         children_axis( children_axis ),
@@ -177,7 +184,7 @@ struct Panel : Element {
     bool resizeable,
     std::function<Vector2()> update_pos,
     std::function<Vector2()> update_size,
-    std::vector<std::variant<Panel, TextLabel, TextureButton>> children
+    std::vector<Types> children
   )
       : Element( id, Type::Panel, background, true, { 0, 0, 500, 200 }, {} ),
         children_axis( children_axis ),
@@ -219,6 +226,19 @@ struct Panel : Element {
     );
   }
 };
+
+
+inline rect &GetTransform( Types *elem ) {
+  if ( std::holds_alternative<Panel>( *elem ) ) {
+    return std::get<Panel>( *elem ).transform;
+  } else if ( std::holds_alternative<TextLabel>( *elem ) ) {
+    return std::get<TextLabel>( *elem ).transform;
+  } else if ( std::holds_alternative<TextureButton>( *elem ) ) {
+    return std::get<TextureButton>( *elem ).transform;
+  }
+
+  std::cout << "No Transform found!!!" << std::endl;
+}
 
 
 // template<typename T>

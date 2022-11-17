@@ -139,6 +139,8 @@ inline void Update() {
 
     LayoutPanel( panel );
   }
+
+  // Interactions?
 }
 
 inline void Draw() {
@@ -170,41 +172,47 @@ inline void LayoutPanel( Panel &panel ) {
       std::get<TextureButton>( child ).Resize();
     }
 
+    // TODO ^ these could probably be consolidated using a template
+
+    rect &transform = GetTransform( &child );
+
     if ( panel.children_axis == Axis::ROW ) {
+
       // 2. Set the child x position based on alignment style.
       switch ( panel.children_horiz_align ) {
         case Align::START: {
-          child.transform.x = end_of_last_x;
-          end_of_last_x = elem.transform.x + elem.transform.width;
+          transform.x = end_of_last_x;
+          end_of_last_x = transform.x + transform.width;
         } break;
         case Align::SPACE_OUT: {
         } break;
       }
 
-      // // 3. Set the child y position based on alignment style.
-      // switch ( panel.children_vert_align ) {
-      //   case Align::START: {
-      //     elem.transform.y = panel_elem.transform.y;
-      //   } break;
-      // }
+      // 3. Set the child y position based on alignment style.
+      switch ( panel.children_vert_align ) {
+        case Align::START: {
+          transform.y = panel.transform.y;
+        } break;
+      }
     } else if ( panel.children_axis == Axis::COLUMN ) {
-      // // 2. Set the child x position based on alignment style.
-      // switch ( panel.children_horiz_align ) {
-      //   case Align::START: {
-      //     elem.transform.x = panel_elem.transform.x;
-      //   } break;
-      //   case Align::SPACE_OUT: {
-      //   } break;
-      // }
+      // 2. Set the child x position based on alignment style.
+      switch ( panel.children_horiz_align ) {
+        case Align::START: {
+          transform.x = panel.transform.x;
+        } break;
+        case Align::SPACE_OUT: {
+        } break;
+      }
 
-      // // 3. Set the child y position based on alignment style.
-      // switch ( panel.children_vert_align ) {
-      //   case Align::START: {
-      //     elem.transform.y = end_of_last_y + elem.margins.top;
-      //     end_of_last_y =
-      //       elem.transform.y + elem.transform.height + elem.margins.bottom;
-      //   } break;
-      // }
+      // 3. Set the child y position based on alignment style.
+      switch ( panel.children_vert_align ) {
+        case Align::START: {
+          transform.y = end_of_last_y;
+          // + elem.margins.top;
+          end_of_last_y = transform.y + transform.height;
+          // + elem.margins.bottom;
+        } break;
+      }
     }
   }
 
