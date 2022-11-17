@@ -50,7 +50,7 @@
 // inline entt::entity
 // SettlementContextTabGroup( std::vector<entt::entity> children ) {
 //   Element elem = {
-//     .id = "context_tab_group",
+//     .id = "settlement_context_tab_group",
 //     .type = Type::Panel,
 //   };
 
@@ -67,7 +67,7 @@
 
 // inline entt::entity SettlementContextTabButton( std::string tex_id ) {
 //   Element elem = {
-//     .id = "context_tab_button",
+//     .id = "settlement_context_tab_button",
 //     .type = Type::TextureButton,
 //   };
 

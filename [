@@ -4,9 +4,10 @@
 #include <variant>
 
 namespace UI {
-inline f32 SCALE = 2.0f;
 
 inline std::map<std::string, entt::entity> lookup;
+
+inline f32 SCALE = 2.0f;
 
 struct Context {
   entt::entity hot;
@@ -44,7 +45,6 @@ struct Margins {
 struct Element {
   std::string id;
   Type type;
-  Color background;
   bool enabled;
   rect transform;
   Margins margins;
@@ -52,70 +52,24 @@ struct Element {
   Element(
     std::string id,
     Type type,
-    Color background,
     bool enabled,
     rect transform,
     Margins margins
   )
-      : id( id ), type( type ), background( background ), enabled( enabled ),
-        transform( transform ), margins( margins ) {
-  }
-};
-
-struct TextLabel : Element {
-  std::string text;
-  i32 font_size;
-  Color text_color;
-  bool dynamic = false;
-
-  TextLabel(
-    std::string id,
-    Color background,
-    std::string text,
-    i32 font_size,
-    Color text_color,
-    bool dynamic
-  )
-      : Element( id, Type::TextLabel, background, true, {}, {} ), text( text ),
-        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-  }
-};
-// struct TextButton : TextLabel {};
-
-struct TextureLabel : Element {
-  Texture2D texture;
-
-  TextureLabel( std::string id )
-      : Element( id, Type::TextureLabel, WHITE, true, {}, {} ),
-        texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
-    this->transform.x = texture.width;
-    this->transform.y = texture.height;
-  }
-};
-
-struct TextureButton : TextureLabel {
-  bool clickable = false;
-
-  TextureButton( std::string id, bool clickable = false )
-      : TextureLabel( id ), clickable( clickable ) {
-  }
-
-  void Draw() {
-    DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
+      : id( id ), type( type ), enabled( enabled ), transform( transform ),
+        margins( margins ) {
   }
 };
 
 struct Panel : Element {
+  Color background;
   Axis children_axis;
   Align children_horiz_align;
   Align children_vert_align;
   bool absolute_pos = false;
-  bool resizeable = false;
-  std::function<Vector2()> update_pos;
-  std::function<Vector2()> update_size;
+  std::function<void( f32, f32 )> update_pos;
 
-  // NOTE: Have to add new types of elements to this
-  std::vector<std::variant<Panel, TextLabel, TextureButton>> children;
+  std::vector<std::variant<Panel>> children;
 
   // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
   Panel(
@@ -125,7 +79,7 @@ struct Panel : Element {
     Align children_horiz_align,
     Align children_vert_align
   )
-      : Element( id, Type::Panel, background, true, {}, {} ),
+      : Element( id, Type::Panel, true, {}, {} ), background( background ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ), children( {} ) {
@@ -139,12 +93,12 @@ struct Panel : Element {
     Axis children_axis,
     Align children_horiz_align,
     Align children_vert_align,
-    std::vector<std::variant<Panel, TextLabel, TextureButton>> children
+    std::variant<Panel> children...
   )
-      : Element( id, Type::Panel, background, true, {}, {} ),
+      : Element( id, Type::Panel, true, {}, {} ), background( background ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), children( children ){};
+        children_vert_align( children_vert_align ), children( { children } ){};
 
   // Absolute panel
   Panel(
@@ -154,38 +108,23 @@ struct Panel : Element {
     Align children_horiz_align,
     Align children_vert_align,
     bool absolute_pos,
-    bool resizeable,
-    std::function<Vector2()> update_pos,
-    std::function<Vector2()> update_size,
-    std::vector<std::variant<Panel, TextLabel, TextureButton>> children
+    std::function<void( f32, f32 )> update_pos,
+    std::variant<Panel> children...
   )
-      : Element( id, Type::Panel, background, true, { 0, 0, 500, 200 }, {} ),
-        children_axis( children_axis ),
+      : Element( id, Type::Panel, true, { 0, 0, 500, 200 }, {} ),
+        background( background ), children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ),
-        absolute_pos( absolute_pos ), resizeable( resizeable ),
-        update_pos( update_pos ), update_size( update_size ),
-        children( children ) {
+        absolute_pos( absolute_pos ), update_pos( update_pos ),
+        children( { children } ) {
   }
 
   // entt::entity entity = Global::local.create();
   // Global::local.emplace<Element>( entity, *this );
   // lookup.insert_or_assign( this->id, entity );
 
-  void Place() {
-    if ( this->absolute_pos ) {
-      Vector2 new_pos = update_pos();
-      this->transform.x = new_pos.x;
-      this->transform.y = new_pos.y;
-    }
-  }
 
   void Resize() {
-    if ( this->resizeable ) {
-      Vector2 new_size = update_size();
-      this->transform.width = new_size.x;
-      this->transform.height = new_size.y;
-    }
   }
 
   void LayoutChildren() {
@@ -200,12 +139,42 @@ struct Panel : Element {
   }
 };
 
+// struct TextLabel : Element {
+//   std::string text;
+//   i32 font_size;
+//   Color text_color;
+//   Color background;
+//   bool dynamic = false;
 
-// TODO probably dont do 2nd level inheritance
+//   TextLabel(
+//     std::string id,
+//     std::string text,
+//     i32 font_size,
+//     Color text_color,
+//     Color background
+//   ) {
+//     this->text = text;
+//     this->font_size = font_size;
+//     this->text_color = text_color;
+//     this->background = background;
+//   }
+// };
+
 // struct TextButton : TextLabel {
 //   bool clickable;
 // };
 
+// struct TextureLabel : Element {
+//   Texture2D texture;
+
+//   TextureLabel( std::string id ) {
+//     this->texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
+//   }
+// };
+
+// struct TextureButton : TextureLabel {
+//   bool clickable;
+// };
 
 // template<typename T>
 // inline entt::entity CreateElement( T component, Element elem ) {

@@ -21,13 +21,12 @@
 namespace UI {
 
 inline Context context = { entt::null, entt::null };
-
 inline std::vector<Panel> content;
 
 inline void Init( TextureCache & );
 inline void Draw();
 inline void HandlePanelDrawing( Panel & );
-inline void LayoutPanel( Panel &, entt::entity );
+inline void LayoutPanel( Panel & );
 inline void ResizeElement( entt::entity, Element & );
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void DrawElement( TextureCache &, entt::entity, Element & );
@@ -37,53 +36,61 @@ inline void ToggleElement( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
-  //
+
+  // TODO maybe I can clean this up by moving some stuff
+  // to the lookup map
   content = {
     Panel(
-      "context_panel",
+      "settlement_context_panel",
       Fade( BLACK, 0.5 ),
       Axis::ROW,
       Align::START,
       Align::START,
       true,
-      { 500, 500, 500, 500 },
-      Panel(
-        "context_tab_group",
-        BLUE,
-        Axis::COLUMN,
-        Align::START,
-        Align::START
-      )
+      true,
+      []() -> Vector2 {
+        return {
+          ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
+          (f32) GetScreenHeight() - 200 * SCALE,
+        };
+      },
+      []() -> Vector2 {
+        return {
+          500 * SCALE,
+          200 * SCALE,
+        };
+      },
+      {
+        Panel(
+          "settlement_context_tab_group",
+          BLUE,
+          Axis::COLUMN,
+          Align::START,
+          Align::START,
+          {
+            TextureButton( "settlement_context_tab_overview" ),
+            TextureButton( "settlement_context_tab_population" ),
+            TextureButton( "settlement_context_tab_resources" ),
+            TextureButton( "settlement_context_tab_culture" ),
+            TextureButton( "settlement_context_tab_religion" ),
+            TextureButton( "settlement_context_tab_construction" ),
+            TextureButton( "settlement_context_tab_garrison" ),
+          }
+        ),
+      }
     ),
   };
 
 
   // SettlementContextPanel(
   //   { SettlementContextTabGroup( {
-  //       SettlementContextTabButton( "context_tab_overview" ),
-  //       SettlementContextTabButton( "context_tab_population" ),
-  //       SettlementContextTabButton( "context_tab_resources" ),
-  //       SettlementContextTabButton( "context_tab_culture" ),
-  //       SettlementContextTabButton( "context_tab_religion" ),
-  //       SettlementContextTabButton( "context_tab_construction" ),
-  //       SettlementContextTabButton( "context_tab_garrison" ),
-  //     } ),
-  //     SettlementContextContent( { SettlementContent( {
-  //       SettlementName(),
-  //       SettlementPopulation(),
-  //       SettlementDevelopment(),
-  //     } ) } ) }
-  // );
-
-  // SettlementContextPanel(
-  //   { SettlementContextTabGroup( {
-  //       SettlementContextTabButton( "context_tab_overview" ),
-  //       SettlementContextTabButton( "context_tab_population" ),
-  //       SettlementContextTabButton( "context_tab_resources" ),
-  //       SettlementContextTabButton( "context_tab_culture" ),
-  //       SettlementContextTabButton( "context_tab_religion" ),
-  //       SettlementContextTabButton( "context_tab_construction" ),
-  //       SettlementContextTabButton( "context_tab_garrison" ),
+  //       SettlementContextTabButton( "settlement_context_tab_overview" ),
+  //       SettlementContextTabButton( "settlement_context_tab_population" ),
+  //       SettlementContextTabButton( "settlement_context_tab_resources" ),
+  //       SettlementContextTabButton( "settlement_context_tab_culture" ),
+  //       SettlementContextTabButton( "settlement_context_tab_religion" ),
+  //       SettlementContextTabButton( "settlement_context_tab_construction" ),
+  //       SettlementContextTabButton( "settlement_context_tab_garrison" ),
   //     } ),
   //     SettlementContextContent( { SettlementContent( {
   //       SettlementName(),
@@ -107,6 +114,26 @@ inline void Init( TextureCache &texture_cache ) {
 // }
 
 inline void Update() {
+  vec2 mousePos = GetMousePosition();
+  bool mouseWentUp = IsMouseButtonReleased( 0 );
+  bool mouseWentDown = IsMouseButtonPressed( 0 );
+  bool mouseHeldDown = IsMouseButtonDown( 0 );
+  bool over_any_elem = false;
+  const f32 screen_width = GetScreenWidth();
+  const f32 screen_height = GetScreenHeight();
+
+  if ( screen_width > 1920 ) {
+    SCALE = 2.0;
+  } else if ( screen_width > 2560 ) {
+    SCALE = 3.0;
+  } else if ( screen_width >= 3840 ) {
+    SCALE = 4.0;
+  }
+
+  for ( Panel &panel: content ) {
+    panel.Place();
+    panel.Resize();
+  }
 }
 
 inline void Draw() {
@@ -126,11 +153,17 @@ inline void HandlePanelDrawing( Panel &panel ) {
     if ( std::holds_alternative<Panel>( child ) ) {
       Panel &child_panel = std::get<Panel>( child );
       HandlePanelDrawing( child_panel );
+    } else if ( std::holds_alternative<TextureButton>( child ) ) {
+      TextureButton &button = std::get<TextureButton>( child );
+      button.Draw();
     }
   }
 
 
   panel.Draw();
+}
+
+inline void LayoutPanel( Panel &panel ) {
 }
 
 

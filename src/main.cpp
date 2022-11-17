@@ -105,6 +105,8 @@ int main( void ) {
             Fade( BLACK, 0.33f )
           );
 
+          // TODO Maybe not like this?
+          UI::Update();
           UI::Draw();
         }
         EndDrawing();
@@ -170,9 +172,12 @@ void Init( State &state, TextureCache &texture_cache ) {
 }
 
 
-void LoadGame() {}
+void LoadGame() {
+}
 
-void UpdateOnFrame( State &state ) { UI::Update(); }
+void UpdateOnFrame( State &state ) {
+  UI::Update();
+}
 
 // TODO: look at all of these and see if any belong
 // in UpdateOnFrame
@@ -389,37 +394,37 @@ void LoadResources() {
   );
 
   LoadResource(
-    hstr{ "context_tab_overview" },
+    hstr{ "settlement_context_tab_overview" },
     LoadImage( "assets/textures/UI/Overview.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_population" },
+    hstr{ "settlement_context_tab_population" },
     LoadImage( "assets/textures/UI/Population.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_culture" },
+    hstr{ "settlement_context_tab_culture" },
     LoadImage( "assets/textures/UI/Culture.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_religion" },
+    hstr{ "settlement_context_tab_religion" },
     LoadImage( "assets/textures/UI/Religion.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_resources" },
+    hstr{ "settlement_context_tab_resources" },
     LoadImage( "assets/textures/UI/Resources.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_construction" },
+    hstr{ "settlement_context_tab_construction" },
     LoadImage( "assets/textures/UI/Construction.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "context_tab_garrison" },
+    hstr{ "settlement_context_tab_garrison" },
     LoadImage( "assets/textures/UI/Garrison.png" ),
     Global::texture_cache
   );
