@@ -79,8 +79,23 @@ struct TextLabel : Element {
       : Element( id, Type::TextLabel, background, true, {}, {} ), text( text ),
         font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
   }
+
+  void Resize() {
+    const vec2 text_dims = MeasureTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      text.c_str(),
+      font_size,
+      2.0f
+    );
+
+    transform.width = text_dims.x;
+    transform.height = text_dims.y;
+  }
 };
-// struct TextButton : TextLabel {};
+
+struct TextButton : TextLabel {
+  bool clickable = false;
+};
 
 struct TextureLabel : Element {
   Texture2D texture;
@@ -90,6 +105,11 @@ struct TextureLabel : Element {
         texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
     this->transform.x = texture.width;
     this->transform.y = texture.height;
+  }
+
+  void Resize() {
+    transform.width = texture.width * UI::SCALE;
+    transform.height = texture.height * UI::SCALE;
   }
 };
 
@@ -199,12 +219,6 @@ struct Panel : Element {
     );
   }
 };
-
-
-// TODO probably dont do 2nd level inheritance
-// struct TextButton : TextLabel {
-//   bool clickable;
-// };
 
 
 // template<typename T>

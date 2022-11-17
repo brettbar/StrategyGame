@@ -107,7 +107,7 @@ int main( void ) {
 
           // TODO Maybe not like this?
           UI::Update();
-          UI::Draw();
+          Renderer::DrawUI( state );
         }
         EndDrawing();
         break;
@@ -205,8 +205,10 @@ void Update1TPS( State &state ) {
 
 void Draw( State &state ) {
   BeginDrawing();
-  Renderer::Draw( state, Global::texture_cache );
-  UI::Draw();
+  {
+    Renderer::Draw( state, Global::texture_cache );
+    Renderer::DrawUI( state );
+  }
   EndDrawing();
 }
 

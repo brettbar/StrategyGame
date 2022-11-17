@@ -27,8 +27,8 @@ inline void Init( TextureCache & );
 inline void Draw();
 inline void HandlePanelDrawing( Panel & );
 inline void LayoutPanel( Panel & );
-inline void ResizeElement( entt::entity, Element & );
-inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
+// inline void ResizeElement( Element & );
+// inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void DrawElement( TextureCache &, entt::entity, Element & );
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
@@ -106,7 +106,7 @@ inline void Init( TextureCache &texture_cache ) {
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
-}// namespace UI
+}
 
 // inline void ToggleModalMenu() {
 //   auto elem = Global::local.get<Element>( lookup.at( "modal_menu" ) );
@@ -131,8 +131,13 @@ inline void Update() {
   }
 
   for ( Panel &panel: content ) {
+    if ( !panel.enabled )
+      continue;
+
     panel.Place();
     panel.Resize();
+
+    LayoutPanel( panel );
   }
 }
 
@@ -143,6 +148,91 @@ inline void Draw() {
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
+}
+
+inline void LayoutPanel( Panel &panel ) {
+  f32 total_height = 0;
+  f32 total_width = 0;
+  f32 tallest_child = 0;
+  f32 widest_child = 0;
+  f32 end_of_last_x = panel.transform.x;
+  f32 end_of_last_y = panel.transform.y;
+
+  if ( !panel.enabled )
+    return;
+
+  for ( auto &child: panel.children ) {
+    if ( std::holds_alternative<Panel>( child ) ) {
+      LayoutPanel( std::get<Panel>( child ) );
+    } else if ( std::holds_alternative<TextLabel>( child ) ) {
+      std::get<TextLabel>( child ).Resize();
+    } else if ( std::holds_alternative<TextureButton>( child ) ) {
+      std::get<TextureButton>( child ).Resize();
+    }
+
+    if ( panel.children_axis == Axis::ROW ) {
+      // 2. Set the child x position based on alignment style.
+      switch ( panel.children_horiz_align ) {
+        case Align::START: {
+          child.transform.x = end_of_last_x;
+          end_of_last_x = elem.transform.x + elem.transform.width;
+        } break;
+        case Align::SPACE_OUT: {
+        } break;
+      }
+
+      // // 3. Set the child y position based on alignment style.
+      // switch ( panel.children_vert_align ) {
+      //   case Align::START: {
+      //     elem.transform.y = panel_elem.transform.y;
+      //   } break;
+      // }
+    } else if ( panel.children_axis == Axis::COLUMN ) {
+      // // 2. Set the child x position based on alignment style.
+      // switch ( panel.children_horiz_align ) {
+      //   case Align::START: {
+      //     elem.transform.x = panel_elem.transform.x;
+      //   } break;
+      //   case Align::SPACE_OUT: {
+      //   } break;
+      // }
+
+      // // 3. Set the child y position based on alignment style.
+      // switch ( panel.children_vert_align ) {
+      //   case Align::START: {
+      //     elem.transform.y = end_of_last_y + elem.margins.top;
+      //     end_of_last_y =
+      //       elem.transform.y + elem.transform.height + elem.margins.bottom;
+      //   } break;
+      // }
+    }
+  }
+
+  // for ( auto &child: panel.children ) {
+  //   rect &elem = Global::local.get<Element>( child ).transform;
+
+  //   total_width += elem.width;
+  //   total_height += elem.height;
+
+  //   if ( elem.width > widest_child )
+  //     widest_child = elem.width;
+
+  //   if ( elem.height > tallest_child )
+  //     tallest_child = elem.height;
+  // }
+
+  // if ( !Global::local.all_of<BasePanel>( entity ) ) {
+  //   if ( panel.children_axis == Axis::ROW ) {
+  //     panel_elem.transform.width = total_width;
+  //     panel_elem.transform.height = tallest_child;
+  //   } else if ( panel.children_axis == Axis::COLUMN ) {
+  //     panel_elem.transform.width = widest_child;
+  //     panel_elem.transform.height = total_height;
+  //   }
+  // }
+}
+
+inline void ResizeElement( std::variant<Panel, TextLabel, TextureButton> ) {
 }
 
 inline void HandlePanelDrawing( Panel &panel ) {
@@ -163,8 +253,133 @@ inline void HandlePanelDrawing( Panel &panel ) {
   panel.Draw();
 }
 
-inline void LayoutPanel( Panel &panel ) {
+
+inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
+  printf( "SelectListener?\n" );
+  // if ( game_reg.all_of<Province::Component>( entity ) ) {
+  //   auto context_panel = lookup.at( "settlement_context_panel" );
+  //   ToggleElement( context_panel, true );
+  //   // Element &elem = Global::ui_reg.get<Element>( context_panel );
+  //   // elem.enabled = true;
+  // } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+  //   auto actor = game_reg.get<Actor::Component>( entity );
+  //   printf( "Actor: %s \n", actor.name );
+
+  //   auto context_panel = lookup.at( "actor_context_panel" );
+  //   ToggleElement( context_panel, true );
+  //   // entt::entity context_label = ui_lookup.at( "context_label" );
+  //   // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
+  // }
 }
+
+inline void ListenForDeselect() {
+  printf( "DeSelectListener?\n" );
+  // auto context_panel = lookup.at( "settlement_context_panel" );
+  // // TODO not deselecting properly?
+  // ToggleElement( context_panel, false );
+}
+
+
+inline bool MouseIsOverUI() {
+  // This is almost sufficent, but we need to account for panels too
+  // not just items that can be active
+  return context.active != entt::null || context.hot != entt::null;
+}
+};// namespace UI
+
+
+/*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*/
+
+// inline void LayoutPanel( Panel &panel ) {
+
+// for ( auto &child: panel.children ) {
+// ResizeElement( elem );
+
+// if ( panel.children_axis == Axis::ROW ) {
+//   // 2. Set the child x position based on alignment style.
+//   switch ( panel.children_horiz_align ) {
+//     case Align::START: {
+//       elem.transform.x = end_of_last_x;
+//       end_of_last_x = elem.transform.x + elem.transform.width;
+//     } break;
+//     case Align::SPACE_OUT: {
+//     } break;
+//   }
+
+//   // 3. Set the child y position based on alignment style.
+//   switch ( panel.children_vert_align ) {
+//     case Align::START: {
+//       elem.transform.y = panel_elem.transform.y;
+//     } break;
+//   }
+// } else if ( panel.children_axis == Axis::COLUMN ) {
+//   // 2. Set the child x position based on alignment style.
+//   switch ( panel.children_horiz_align ) {
+//     case Align::START: {
+//       elem.transform.x = panel_elem.transform.x;
+//     } break;
+//     case Align::SPACE_OUT: {
+//     } break;
+//   }
+
+//   // 3. Set the child y position based on alignment style.
+//   switch ( panel.children_vert_align ) {
+//     case Align::START: {
+//       elem.transform.y = end_of_last_y + elem.margins.top;
+//       end_of_last_y =
+//         elem.transform.y + elem.transform.height + elem.margins.bottom;
+//     } break;
+//   }
+// }
+// for ( auto &child: panel.children ) {
+//   rect &elem = Global::local.get<Element>( child ).transform;
+
+//   total_width += elem.width;
+//   total_height += elem.height;
+
+//   if ( elem.width > widest_child )
+//     widest_child = elem.width;
+
+//   if ( elem.height > tallest_child )
+//     tallest_child = elem.height;
+// }
+
+// if ( !Global::local.all_of<BasePanel>( entity ) ) {
+//   if ( panel.children_axis == Axis::ROW ) {
+//     panel_elem.transform.width = total_width;
+//     panel_elem.transform.height = tallest_child;
+//   } else if ( panel.children_axis == Axis::COLUMN ) {
+//     panel_elem.transform.width = widest_child;
+//     panel_elem.transform.height = total_height;
+//   }
+// }
+// }
 
 
 // inline void Draw() {
@@ -535,31 +750,6 @@ inline void LayoutPanel( Panel &panel ) {
 //   // }
 // }
 
-inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
-  printf( "SelectListener?\n" );
-  // if ( game_reg.all_of<Province::Component>( entity ) ) {
-  //   auto context_panel = lookup.at( "settlement_context_panel" );
-  //   ToggleElement( context_panel, true );
-  //   // Element &elem = Global::ui_reg.get<Element>( context_panel );
-  //   // elem.enabled = true;
-  // } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-  //   auto actor = game_reg.get<Actor::Component>( entity );
-  //   printf( "Actor: %s \n", actor.name );
-
-  //   auto context_panel = lookup.at( "actor_context_panel" );
-  //   ToggleElement( context_panel, true );
-  //   // entt::entity context_label = ui_lookup.at( "context_label" );
-  //   // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
-  // }
-}
-
-inline void ListenForDeselect() {
-  printf( "DeSelectListener?\n" );
-  // auto context_panel = lookup.at( "settlement_context_panel" );
-  // // TODO not deselecting properly?
-  // ToggleElement( context_panel, false );
-}
-
 // inline void ToggleElement( entt::entity entity, bool on ) {
 //   // Element &elem = Global::local.get<Element>( entity );
 //   // elem.enabled = on;
@@ -578,10 +768,3 @@ inline void ListenForDeselect() {
 //   //   }
 //   // }
 // }
-
-inline bool MouseIsOverUI() {
-  // This is almost sufficent, but we need to account for panels too
-  // not just items that can be active
-  return context.active != entt::null || context.hot != entt::null;
-}
-};// namespace UI

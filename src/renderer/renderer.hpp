@@ -6,6 +6,7 @@
 #include "../systems/overlay_system.hpp"
 #include "../systems/selection_system.hpp"
 #include "../systems/settlement_system.hpp"
+#include "../ui/ui_system.hpp"
 #include "fonts.hpp"
 #include "textures.hpp"
 
@@ -35,12 +36,14 @@ inline void Init( State &state ) {
     outline_shader,
     outline_size_loc,
     &outline_size,
-    SHADER_UNIFORM_FLOAT );
+    SHADER_UNIFORM_FLOAT
+  );
   SetShaderValue(
     outline_shader,
     outline_color_loc,
     outline_color,
-    SHADER_UNIFORM_VEC4 );
+    SHADER_UNIFORM_VEC4
+  );
 
 
   state.camera = Camera2D{
@@ -58,6 +61,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
 
   BeginMode2D( state.camera );
 
+  // TODO does this actually do anything?
   BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
   {
 
@@ -74,7 +78,8 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     OverlaySystem::DrawProvinceOverlays( texture_cache );
     SelectionSystem::Draw(
       texture_cache,
-      state.gameState == GameState::EDITOR );
+      state.gameState == GameState::EDITOR
+    );
     OverlaySystem::DrawSettlementOverlays( texture_cache );
 
 
@@ -88,16 +93,23 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
           SettlementSystem::Draw( texture_cache, false );
         } break;
       }
+
+      // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
+      DrawActors( state.gameState == GameState::EDITOR );
     }
     EndShaderMode();
-
-    // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-    DrawActors( state.gameState == GameState::EDITOR );
   }
   EndBlendMode();
 
 
   EndMode2D();
+}
+
+inline void DrawUI( State &state ) {
+  // TODO right now alpha issues are cropping up with the shader
+  // BeginShaderMode( shader );
+  UI::Draw();
+  // EndShaderMode();
 }
 
 inline void DrawActors( bool debug ) {
@@ -107,7 +119,8 @@ inline void DrawActors( bool debug ) {
   Global::world.sort<Unit::Component>(
     []( const Unit::Component &lhs, const Unit::Component &rhs ) {
       return rhs.position.y > lhs.position.y;
-    } );
+    }
+  );
 
   actors.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
     //    DrawTextureV(
@@ -122,7 +135,8 @@ inline void DrawActors( bool debug ) {
         anim.sprite,
         anim.frameRec,
         { unit.position.x - 64.0f, unit.position.y - 64.0f },
-        WHITE );
+        WHITE
+      );
       EndShaderMode();
     } else {
       BeginShaderMode( shader );
@@ -130,7 +144,8 @@ inline void DrawActors( bool debug ) {
         anim.sprite,
         anim.frameRec,
         { unit.position.x - 64.0f, unit.position.y - 64.0f },
-        WHITE );
+        WHITE
+      );
       EndShaderMode();
     }
 
