@@ -7,9 +7,6 @@
 
 namespace UI {
 
-inline f32 SCALE = 2.0f;
-inline std::map<std::string, entt::entity> lookup;
-
 typedef struct Panel Panel;
 typedef struct TextLabel TextLabel;
 typedef struct TextButton TextButton;
@@ -18,6 +15,9 @@ typedef struct TextureButton TextureButton;
 
 using Types =
   std::variant<Panel, TextLabel, TextButton, TextureLabel, TextureButton>;
+
+inline f32 SCALE = 2.0f;
+inline std::map<std::string, Types> lookup;
 
 // struct Context {
 //   entt::entity hot;
@@ -92,7 +92,7 @@ struct TextLabel : Element {
     Color text_color,
     bool dynamic
   )
-      : Element( id, Type::TextLabel, background, true, {}, {} ), text( text ),
+      : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
         font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
   }
 
@@ -129,7 +129,7 @@ struct TextureLabel : Element {
   Texture2D texture;
 
   TextureLabel( std::string id )
-      : Element( id, Type::TextureLabel, WHITE, true, {}, {} ),
+      : Element( id, Type::TextureLabel, WHITE, false, {}, {} ),
         texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
     this->transform.x = texture.width;
     this->transform.y = texture.height;
@@ -169,19 +169,19 @@ struct Panel : Element {
   std::vector<Types> children;
 
   // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
-  Panel(
-    std::string id,
-    Color background,
-    Axis children_axis,
-    Align children_horiz_align,
-    Align children_vert_align
-  )
-      : Element( id, Type::Panel, background, true, {}, {} ),
-        children_axis( children_axis ),
-        children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), children( {} ) {
-    this->transform = { 500, 500, 200, 200 };
-  }
+//  Panel(
+//    std::string id,
+//    Color background,
+//    Axis children_axis,
+//    Align children_horiz_align,
+//    Align children_vert_align
+//  )
+//      : Element( id, Type::Panel, background, false, {}, {} ),
+//        children_axis( children_axis ),
+//        children_horiz_align( children_horiz_align ),
+//        children_vert_align( children_vert_align ), children( {} ) {
+//    this->transform = { 500, 500, 200, 200 };
+//  }
 
   // Relative panel
   Panel(
@@ -192,7 +192,7 @@ struct Panel : Element {
     Align children_vert_align,
     std::vector<Types> children
   )
-      : Element( id, Type::Panel, background, true, {}, {} ),
+      : Element( id, Type::Panel, background, false, {}, {} ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ), children( children ){};
@@ -210,13 +210,15 @@ struct Panel : Element {
     std::function<Vector2()> update_size,
     std::vector<Types> children
   )
-      : Element( id, Type::Panel, background, true, { 0, 0, 500, 200 }, {} ),
+      : Element( id, Type::Panel, background, false, { 0, 0, 500, 200 }, {} ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ),
         absolute_pos( absolute_pos ), resizeable( resizeable ),
         update_pos( update_pos ), update_size( update_size ),
         children( children ) {
+
+    lookup.insert_or_assign( this->id, *this );
   }
 
   // entt::entity entity = Global::local.create();
@@ -337,6 +339,29 @@ inline void UpdateElem( Types &elem ) {
 
   if ( std::holds_alternative<TextButton>( elem ) ) {
     std::get<TextButton>( elem ).Update();
+    return;
+  }
+}
+
+inline void ToggleElem( Types &elem, bool on ) {
+  if ( std::holds_alternative<Panel>( elem ) ) {
+    printf( "Enabling panel\n" );
+    std::get<Panel>( elem ).enabled = on;
+    return;
+  }
+
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    std::get<TextureButton>( elem ).enabled = on;
+    return;
+  }
+
+  if ( std::holds_alternative<TextLabel>( elem ) ) {
+    std::get<TextLabel>( elem ).enabled = on;
+    return;
+  }
+
+  if ( std::holds_alternative<TextButton>( elem ) ) {
+    std::get<TextButton>( elem ).enabled = on;
     return;
   }
 }

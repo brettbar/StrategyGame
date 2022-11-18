@@ -33,10 +33,11 @@ inline bool DoInteraction( Types, bool, bool, bool, bool );
 
 // inline void ResizeElement( Element & );
 // inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
-inline void DrawElement( TextureCache &, entt::entity, Element & );
+// inline void DrawElement( TextureCache &, entt::entity, Element & );
+
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
-inline void ToggleElement( entt::entity, bool );
+inline void RecursiveToggle( Types &, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
@@ -135,12 +136,6 @@ inline void UpdateOnFrame() {
   }
 
   for ( Panel &panel: content ) {
-    if ( !panel.enabled )
-      continue;
-
-    panel.Place();
-    panel.Resize();
-
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
   }
@@ -179,6 +174,9 @@ inline void RecursiveLayout( Panel &panel ) {
 
   if ( !panel.enabled )
     return;
+
+  panel.Place();
+  panel.Resize();
 
   for ( auto &child: panel.children ) {
     if ( std::holds_alternative<Panel>( child ) ) {
@@ -296,7 +294,7 @@ inline void RecursiveInteractions(
       );
     }
 
-    UpdateElem(child);
+    UpdateElem( child );
 
 
     rect &transform = GetTransform( &child );
@@ -361,22 +359,25 @@ inline bool DoInteraction(
 }
 
 
+// TODO replace this param reg with the global one
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
-  // if ( game_reg.all_of<Province::Component>( entity ) ) {
-  //   auto context_panel = lookup.at( "settlement_context_panel" );
-  //   ToggleElement( context_panel, true );
-  //   // Element &elem = Global::ui_reg.get<Element>( context_panel );
-  //   // elem.enabled = true;
-  // } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-  //   auto actor = game_reg.get<Actor::Component>( entity );
-  //   printf( "Actor: %s \n", actor.name );
+  if ( game_reg.all_of<Province::Component>( entity ) ) {
+    auto &context_panel = lookup.at( "settlement_context_panel" );
 
-  //   auto context_panel = lookup.at( "actor_context_panel" );
-  //   ToggleElement( context_panel, true );
-  //   // entt::entity context_label = ui_lookup.at( "context_label" );
-  //   // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
-  // }
+    RecursiveToggle( context_panel, true );
+    // Element &elem = Global::ui_reg.get<Element>( context_panel );
+    // elem.enabled = true;
+  } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+    auto actor = game_reg.get<Actor::Component>( entity );
+    printf( "Actor: %s \n", actor.name );
+
+    // auto context_panel = lookup.at( "actor_context_panel" );
+    // RecursiveToggle( context_panel, true );
+    //
+    // entt::entity context_label = ui_lookup.at( "context_label" );
+    // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
+  }
 }
 
 inline void ListenForDeselect() {
@@ -384,6 +385,20 @@ inline void ListenForDeselect() {
   // auto context_panel = lookup.at( "settlement_context_panel" );
   // // TODO not deselecting properly?
   // ToggleElement( context_panel, false );
+}
+
+inline void RecursiveToggle( Types &elem, bool on ) {
+  // Element &elem = Global::local.get<Element>( entity );
+  // elem.enabled = on;
+
+  ToggleElem( elem, on );
+
+  if ( !std::holds_alternative<Panel>( elem ) )
+    return;
+
+  for ( auto child: std::get<Panel>( elem ).children ) {
+    RecursiveToggle( child, on );
+  }
 }
 
 
@@ -854,24 +869,5 @@ inline bool MouseIsOverUI() {
 //   //       button.text_color
 //   //     );
 //   //   } break;
-//   // }
-// }
-
-// inline void ToggleElement( entt::entity entity, bool on ) {
-//   // Element &elem = Global::local.get<Element>( entity );
-//   // elem.enabled = on;
-//   // if ( elem.type != Type::Panel && elem.type != Type::BasePanel )
-//   //   return;
-
-//   // if ( Global::local.all_of<BasePanel>( entity ) ) {
-//   //   BasePanel panel = Global::local.get<BasePanel>( entity );
-//   //   for ( auto child: panel.children ) {
-//   //     ToggleElement( child, on );
-//   //   }
-//   // } else if ( Global::local.all_of<Panel>( entity ) ) {
-//   //   Panel panel = Global::local.get<Panel>( entity );
-//   //   for ( auto child: panel.children ) {
-//   //     ToggleElement( child, on );
-//   //   }
 //   // }
 // }
