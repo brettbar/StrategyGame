@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../global.hpp"
+#include "ui_lookups.hpp"
 #include <iostream>
 #include <variant>
 
@@ -9,9 +10,23 @@ namespace UI {
 inline f32 SCALE = 2.0f;
 inline std::map<std::string, entt::entity> lookup;
 
+typedef struct Panel Panel;
+typedef struct TextLabel TextLabel;
+typedef struct TextButton TextButton;
+typedef struct TextureLabel TextureLabel;
+typedef struct TextureButton TextureButton;
+
+using Types =
+  std::variant<Panel, TextLabel, TextButton, TextureLabel, TextureButton>;
+
+// struct Context {
+//   entt::entity hot;
+//   entt::entity active;
+// };
+
 struct Context {
-  entt::entity hot;
-  entt::entity active;
+  std::string hot;
+  std::string active;
 };
 
 enum class Type {
@@ -41,12 +56,6 @@ struct Margins {
   u32 top;
   u32 bottom;
 };
-
-typedef struct Panel Panel;
-typedef struct TextLabel TextLabel;
-typedef struct TextureButton TextureButton;
-
-using Types = std::variant<Panel, TextLabel, TextureButton>;
 
 struct Element {
   std::string id;
@@ -98,10 +107,22 @@ struct TextLabel : Element {
     transform.width = text_dims.x;
     transform.height = text_dims.y;
   }
+
+  void Update() {
+    if ( dynamic ) {
+      text = update_lookup.at( id )();
+    }
+  }
 };
 
 struct TextButton : TextLabel {
   bool clickable = false;
+
+  void Update() {
+    TextLabel::Update();
+
+    this->clickable = clickable_lookup.at( id )();
+  }
 };
 
 struct TextureLabel : Element {
@@ -123,12 +144,15 @@ struct TextureLabel : Element {
 struct TextureButton : TextureLabel {
   bool clickable = false;
 
-  TextureButton( std::string id, bool clickable = false )
-      : TextureLabel( id ), clickable( clickable ) {
+  TextureButton( std::string id ) : TextureLabel( id ) {
   }
 
   void Draw() {
     DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
+  }
+
+  void Update() {
+    this->clickable = clickable_lookup.at( id )();
   }
 };
 
@@ -215,9 +239,6 @@ struct Panel : Element {
     }
   }
 
-  void LayoutChildren() {
-  }
-
   void Draw() {
     DrawRectangleV(
       { transform.x, transform.y },
@@ -228,16 +249,96 @@ struct Panel : Element {
 };
 
 
+inline std::string GetId( Types elem ) {
+  if ( std::holds_alternative<Panel>( elem ) ) {
+    return std::get<Panel>( elem ).id;
+  }
+
+  if ( std::holds_alternative<TextLabel>( elem ) ) {
+    return std::get<TextLabel>( elem ).id;
+  }
+
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    return std::get<TextureButton>( elem ).id;
+  }
+
+  std::cout << "Couldn't find the ID!!!" << std::endl;
+
+  return "INVALID_ID";
+}
+
 inline rect &GetTransform( Types *elem ) {
   if ( std::holds_alternative<Panel>( *elem ) ) {
     return std::get<Panel>( *elem ).transform;
-  } else if ( std::holds_alternative<TextLabel>( *elem ) ) {
+  }
+
+  if ( std::holds_alternative<TextLabel>( *elem ) ) {
     return std::get<TextLabel>( *elem ).transform;
-  } else if ( std::holds_alternative<TextureButton>( *elem ) ) {
+  }
+
+  if ( std::holds_alternative<TextureButton>( *elem ) ) {
     return std::get<TextureButton>( *elem ).transform;
   }
 
   std::cout << "No Transform found!!!" << std::endl;
+}
+
+inline bool IsEnabled( Types elem ) {
+  if ( std::holds_alternative<Panel>( elem ) ) {
+    return std::get<Panel>( elem ).enabled;
+  }
+
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    return std::get<TextureButton>( elem ).enabled;
+  }
+
+  if ( std::holds_alternative<TextLabel>( elem ) ) {
+    return std::get<TextLabel>( elem ).enabled;
+  }
+
+  std::cout << "IsEnabled(): Missing a type catch" << std::endl;
+  return false;
+}
+
+inline bool IsInteractive( Types elem ) {
+  if ( std::holds_alternative<TextButton>( elem ) ) {
+    return true;
+  }
+
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    return true;
+  }
+
+  return false;
+}
+
+inline bool IsClickable( Types elem ) {
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    return std::get<TextureButton>( elem ).clickable;
+  }
+
+  if ( std::holds_alternative<TextButton>( elem ) ) {
+    return std::get<TextButton>( elem ).clickable;
+  }
+
+  return false;
+}
+
+inline void UpdateElem( Types &elem ) {
+  if ( std::holds_alternative<TextureButton>( elem ) ) {
+    std::get<TextureButton>( elem ).Update();
+    return;
+  }
+
+  if ( std::holds_alternative<TextLabel>( elem ) ) {
+    std::get<TextLabel>( elem ).Update();
+    return;
+  }
+
+  if ( std::holds_alternative<TextButton>( elem ) ) {
+    std::get<TextButton>( elem ).Update();
+    return;
+  }
 }
 
 

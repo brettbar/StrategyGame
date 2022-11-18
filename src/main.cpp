@@ -106,7 +106,7 @@ int main( void ) {
           );
 
           // TODO Maybe not like this?
-          UI::Update();
+          UI::UpdateOnFrame();
           Renderer::DrawUI( state );
         }
         EndDrawing();
@@ -176,7 +176,7 @@ void LoadGame() {
 }
 
 void UpdateOnFrame( State &state ) {
-  UI::Update();
+  UI::UpdateOnFrame();
 }
 
 // TODO: look at all of these and see if any belong

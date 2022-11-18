@@ -22,7 +22,31 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     },
   },
   {
-    "context_tab_button",
+    "settlement_context_tab_overview",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_population",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_resources",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_culture",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_religion",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_construction",
+    []() { printf( "Settlement tab button pressed\n" ); },
+  },
+  {
+    "settlement_context_tab_garrison",
     []() { printf( "Settlement tab button pressed\n" ); },
   },
 };
@@ -33,7 +57,31 @@ inline std::map<std::string, std::function<bool()>> clickable_lookup = {
     []() -> bool { return ActorSystem::ColonistCanPlaceSettlement(); },
   },
   {
-    "context_tab_button",
+    "settlement_context_tab_overview",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_population",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_resources",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_culture",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_religion",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_construction",
+    []() -> bool { return true; },
+  },
+  {
+    "settlement_context_tab_garrison",
     []() -> bool { return true; },
   },
 };
@@ -43,14 +91,17 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
     "settlement_name",
     []() -> std::string {
       if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity ) ) {
+             SelectionSystem::selected_entity
+           ) ) {
 
         Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity );
+          SelectionSystem::selected_entity
+        );
 
         Settlement::Component &settlement =
           Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity );
+            SelectionSystem::selected_entity
+          );
 
         return settlement.name;
       }
@@ -62,14 +113,17 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
     "settlement_population",
     []() -> std::string {
       if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity ) ) {
+             SelectionSystem::selected_entity
+           ) ) {
 
         Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity );
+          SelectionSystem::selected_entity
+        );
 
         Settlement::Component &settlement =
           Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity );
+            SelectionSystem::selected_entity
+          );
 
         return std::to_string( settlement.population.current );
       }
@@ -81,14 +135,17 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
     "settlement_development",
     []() -> std::string {
       if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity ) ) {
+             SelectionSystem::selected_entity
+           ) ) {
 
         Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity );
+          SelectionSystem::selected_entity
+        );
 
         Settlement::Component &settlement =
           Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity );
+            SelectionSystem::selected_entity
+          );
 
         return Settlement::development.at( settlement.development );
       }

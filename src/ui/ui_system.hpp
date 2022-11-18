@@ -20,13 +20,17 @@
 
 namespace UI {
 
-inline Context context = { entt::null, entt::null };
+// inline Context context = { entt::null, entt::null };
+inline Context context = { "", "" };
 inline std::vector<Panel> content;
 
 inline void Init( TextureCache & );
 inline void Draw();
-inline void HandlePanelDrawing( Panel & );
-inline void LayoutPanel( Panel & );
+inline void RecursiveDraw( Panel & );
+inline void RecursiveLayout( Panel & );
+inline void RecursiveInteractions( Panel &, bool &, bool, bool );
+inline bool DoInteraction( Types, bool, bool, bool, bool );
+
 // inline void ResizeElement( Element & );
 // inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void DrawElement( TextureCache &, entt::entity, Element & );
@@ -113,7 +117,7 @@ inline void Init( TextureCache &texture_cache ) {
 //   elem.enabled = !elem.enabled;
 // }
 
-inline void Update() {
+inline void UpdateOnFrame() {
   vec2 mousePos = GetMousePosition();
   bool mouseWentUp = IsMouseButtonReleased( 0 );
   bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -137,7 +141,8 @@ inline void Update() {
     panel.Place();
     panel.Resize();
 
-    LayoutPanel( panel );
+    RecursiveLayout( panel );
+    RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
   }
 
   // Interactions?
@@ -145,14 +150,26 @@ inline void Update() {
 
 inline void Draw() {
   for ( Panel &panel: content ) {
-    HandlePanelDrawing( panel );
+    RecursiveDraw( panel );
   }
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
+
+  DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
+  std::string foo = "hot: " + context.hot;
+  DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
+
+  DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
+  std::string bar = "active: " + context.active;
+  DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
+
+  DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
+  std::string selected_ent =
+    "entity: " + EntityIdToString( SelectionSystem::selected_entity );
 }
 
-inline void LayoutPanel( Panel &panel ) {
+inline void RecursiveLayout( Panel &panel ) {
   f32 total_height = 0;
   f32 total_width = 0;
   f32 tallest_child = 0;
@@ -165,13 +182,12 @@ inline void LayoutPanel( Panel &panel ) {
 
   for ( auto &child: panel.children ) {
     if ( std::holds_alternative<Panel>( child ) ) {
-      LayoutPanel( std::get<Panel>( child ) );
+      RecursiveLayout( std::get<Panel>( child ) );
     } else if ( std::holds_alternative<TextLabel>( child ) ) {
       std::get<TextLabel>( child ).Resize();
     } else if ( std::holds_alternative<TextureButton>( child ) ) {
       std::get<TextureButton>( child ).Resize();
     }
-
     // TODO ^ these could probably be consolidated using a template
 
     rect &transform = GetTransform( &child );
@@ -216,18 +232,18 @@ inline void LayoutPanel( Panel &panel ) {
     }
   }
 
-  // for ( auto &child: panel.children ) {
-  //   rect &elem = Global::local.get<Element>( child ).transform;
+  for ( auto &child: panel.children ) {
+    rect &transform = GetTransform( &child );
 
-  //   total_width += elem.width;
-  //   total_height += elem.height;
+    total_width += transform.width;
+    total_height += transform.height;
 
-  //   if ( elem.width > widest_child )
-  //     widest_child = elem.width;
+    if ( transform.width > widest_child )
+      widest_child = transform.width;
 
-  //   if ( elem.height > tallest_child )
-  //     tallest_child = elem.height;
-  // }
+    if ( transform.height > tallest_child )
+      tallest_child = transform.height;
+  }
 
   // if ( !Global::local.all_of<BasePanel>( entity ) ) {
   //   if ( panel.children_axis == Axis::ROW ) {
@@ -240,25 +256,108 @@ inline void LayoutPanel( Panel &panel ) {
   // }
 }
 
-inline void ResizeElement( std::variant<Panel, TextLabel, TextureButton> ) {
-}
-
-inline void HandlePanelDrawing( Panel &panel ) {
+inline void RecursiveDraw( Panel &panel ) {
   if ( !panel.enabled )
     return;
+
+  panel.Draw();
 
   for ( auto &child: panel.children ) {
     if ( std::holds_alternative<Panel>( child ) ) {
       Panel &child_panel = std::get<Panel>( child );
-      HandlePanelDrawing( child_panel );
+      RecursiveDraw( child_panel );
     } else if ( std::holds_alternative<TextureButton>( child ) ) {
       TextureButton &button = std::get<TextureButton>( child );
       button.Draw();
     }
   }
+}
+
+inline void RecursiveInteractions(
+  Panel &panel,
+  bool &over_any_elem,
+  bool mouseWentUp,
+  bool mouseWentDown
+) {
+
+  if ( !panel.enabled )
+    return;
+
+  for ( auto &child: panel.children ) {
+    if ( !IsEnabled( child ) )
+      continue;
+
+    if ( std::holds_alternative<Panel>( child ) ) {
+      RecursiveInteractions(
+        std::get<Panel>( child ),
+        over_any_elem,
+        mouseWentUp,
+        mouseWentDown
+      );
+    }
+
+    UpdateElem(child);
 
 
-  panel.Draw();
+    rect &transform = GetTransform( &child );
+
+    bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
+
+    if ( !over_any_elem )
+      over_any_elem = inside;
+
+    if ( DoInteraction(
+           child,
+           inside,
+           IsInteractive( child ),
+           mouseWentUp,
+           mouseWentDown
+         ) ) {
+      if ( IsClickable( child ) ) {
+        std::cout << "INTERACTION DETECTED!!!" << std::endl;
+        action_lookup.at( GetId( child ) )();
+      }
+    }
+  }
+
+  if ( !over_any_elem ) {
+    context.hot = "";
+    context.active = "";
+  }
+}
+
+inline bool DoInteraction(
+  Types child,
+  bool inside,
+  bool interactive,
+  bool mouseWentUp,
+  bool mouseWentDown
+) {
+  bool result = false;
+  std::string entity = GetId( child );
+
+  if ( entity == context.active ) {
+    if ( mouseWentUp ) {
+      if ( entity == context.hot )
+        result = true;// do the button action
+
+      context.active = "";
+    }
+  } else if ( entity == context.hot ) {
+    // if ( mouseWentDown && interactive ) // TODO might want to readd this
+    if ( mouseWentDown )
+      context.active = entity;
+  }
+
+  if ( inside ) {
+    if ( context.active == "" ) {
+      context.hot = entity;
+      if ( mouseWentDown && interactive )
+        context.active = entity;
+    }
+  }
+
+  return result;
 }
 
 
@@ -291,7 +390,7 @@ inline void ListenForDeselect() {
 inline bool MouseIsOverUI() {
   // This is almost sufficent, but we need to account for panels too
   // not just items that can be active
-  return context.active != entt::null || context.hot != entt::null;
+  return context.active != "" || context.hot != "";
 }
 };// namespace UI
 
