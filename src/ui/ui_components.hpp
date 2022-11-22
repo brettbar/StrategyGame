@@ -3,10 +3,12 @@
 #include "../global.hpp"
 #include "ui_lookups.hpp"
 #include <iostream>
+#include <memory>
 #include <variant>
 
 namespace UI {
 
+typedef struct Element Element;
 typedef struct Panel Panel;
 typedef struct TextLabel TextLabel;
 typedef struct TextButton TextButton;
@@ -19,7 +21,7 @@ typedef struct TextureButton TextureButton;
 // TODO, cant use references with std::variant, so probably look for a diff soln
 
 inline f32 SCALE = 2.0f;
-inline std::map<std::string, Types> lookup;
+inline std::map<std::string, std::unique_ptr<Element>> lookup;
 
 // struct Context {
 //   entt::entity hot;
@@ -84,83 +86,83 @@ struct Element {
   }
 };
 
-struct TextLabel : Element {
-  std::string text;
-  i32 font_size;
-  Color text_color;
-  bool dynamic = false;
+// struct TextLabel : Element {
+//   std::string text;
+//   i32 font_size;
+//   Color text_color;
+//   bool dynamic = false;
 
-  TextLabel(
-    std::string id,
-    Color background,
-    std::string text,
-    i32 font_size,
-    Color text_color,
-    bool dynamic
-  )
-      : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
-        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-  }
+//   TextLabel(
+//     std::string id,
+//     Color background,
+//     std::string text,
+//     i32 font_size,
+//     Color text_color,
+//     bool dynamic
+//   )
+//       : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
+//         font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
+//   }
 
-  void Resize() {
-    const vec2 text_dims = MeasureTextEx(
-      Global::font_cache[hstr{ "font_romulus" }]->font,
-      text.c_str(),
-      font_size,
-      2.0f
-    );
+//   void Resize() {
+//     const vec2 text_dims = MeasureTextEx(
+//       Global::font_cache[hstr{ "font_romulus" }]->font,
+//       text.c_str(),
+//       font_size,
+//       2.0f
+//     );
 
-    transform.width = text_dims.x;
-    transform.height = text_dims.y;
-  }
+//     transform.width = text_dims.x;
+//     transform.height = text_dims.y;
+//   }
 
-  void Update() {
-    if ( dynamic ) {
-      text = update_lookup.at( id )();
-    }
-  }
-};
+//   void Update() {
+//     if ( dynamic ) {
+//       text = update_lookup.at( id )();
+//     }
+//   }
+// };
 
-struct TextButton : TextLabel {
-  bool clickable = false;
+// struct TextButton : TextLabel {
+//   bool clickable = false;
 
-  void Update() {
-    TextLabel::Update();
+//   void Update() {
+//     TextLabel::Update();
 
-    this->clickable = clickable_lookup.at( id )();
-  }
-};
+//     this->clickable = clickable_lookup.at( id )();
+//   }
+// };
 
-struct TextureLabel : Element {
-  Texture2D texture;
+// struct TextureLabel : Element {
+//   Texture2D texture;
 
-  TextureLabel( std::string id )
-      : Element( id, Type::TextureLabel, WHITE, false, {}, {} ),
-        texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
-    this->transform.x = texture.width;
-    this->transform.y = texture.height;
-  }
+//   TextureLabel( std::string id )
+//       : Element( id, Type::TextureLabel, WHITE, false, {}, {} ),
+//         texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
+//     this->transform.x = texture.width;
+//     this->transform.y = texture.height;
+//   }
 
-  void Resize() {
-    transform.width = texture.width * UI::SCALE;
-    transform.height = texture.height * UI::SCALE;
-  }
-};
+//   void Resize() {
+//     transform.width = texture.width * UI::SCALE;
+//     transform.height = texture.height * UI::SCALE;
+//   }
+// };
 
-struct TextureButton : TextureLabel {
-  bool clickable = false;
+// struct TextureButton : TextureLabel {
+//   bool clickable = false;
 
-  TextureButton( std::string id ) : TextureLabel( id ) {
-  }
+//   TextureButton( std::string id ) : TextureLabel( id ) {
+//   }
 
-  void Draw() {
-    DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
-  }
+//   void Draw() {
+//     DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
+//   }
 
-  void Update() {
-    this->clickable = clickable_lookup.at( id )();
-  }
-};
+//   void Update() {
+//     this->clickable = clickable_lookup.at( id )();
+//   }
+// };
 
 struct Panel : Element {
   Axis children_axis;
@@ -172,39 +174,9 @@ struct Panel : Element {
   std::function<Vector2()> update_size;
 
   // NOTE: Have to add new types of elements to this
-  std::vector<Types> children;
+  std::vector<std::unique_ptr<Element>> children;
 
-  // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
-  //  Panel(
-  //    std::string id,
-  //    Color background,
-  //    Axis children_axis,
-  //    Align children_horiz_align,
-  //    Align children_vert_align
-  //  )
-  //      : Element( id, Type::Panel, background, false, {}, {} ),
-  //        children_axis( children_axis ),
-  //        children_horiz_align( children_horiz_align ),
-  //        children_vert_align( children_vert_align ), children( {} ) {
-  //    this->transform = { 500, 500, 200, 200 };
-  //  }
-
-  // Relative panel
-  Panel(
-    std::string id,
-    Color background,
-    Axis children_axis,
-    Align children_horiz_align,
-    Align children_vert_align,
-    std::vector<Types> children
-  )
-      : Element( id, Type::Panel, background, false, {}, {} ),
-        children_axis( children_axis ),
-        children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), children( children ){};
-
-  // Absolute panel
-  Panel(
+  static void Create(
     std::string id,
     Color background,
     Axis children_axis,
@@ -213,23 +185,53 @@ struct Panel : Element {
     bool absolute_pos,
     bool resizeable,
     std::function<Vector2()> update_pos,
-    std::function<Vector2()> update_size,
-    std::vector<Types> children
-  )
-      : Element( id, Type::Panel, background, false, { 0, 0, 500, 200 }, {} ),
-        children_axis( children_axis ),
-        children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ),
-        absolute_pos( absolute_pos ), resizeable( resizeable ),
-        update_pos( update_pos ), update_size( update_size ),
-        children( children ) {
+    std::function<Vector2()> update_size
+    // std::vector<std::unique_ptr<Element>> children
+  ) {
+    Panel self = Panel(
+      id,
+      background,
+      children_axis,
+      children_horiz_align,
+      children_vert_align,
+      absolute_pos,
+      resizeable,
+      update_pos,
+      update_size
+      // children
+    );
 
-    lookup.insert_or_assign( this->id, *this );
+    Element elem = static_cast<Element>( self );
+
+    auto ptr = std::unique_ptr<Element>( &elem );
+
+    // lookup.insert_or_assign( id, ptr );
   }
 
-  // entt::entity entity = Global::local.create();
-  // Global::local.emplace<Element>( entity, *this );
-  // lookup.insert_or_assign( this->id, entity );
+  // static std::unique_ptr<Element> Create(
+  //   std::string id,
+  //   Color background,
+  //   Axis children_axis,
+  //   Align children_horiz_align,
+  //   Align children_vert_align,
+  //   std::vector<std::unique_ptr<Element>> children
+  // ) {
+  //   Panel self = Panel(
+  //     id,
+  //     background,
+  //     children_axis,
+  //     children_horiz_align,
+  //     children_vert_align,
+  //     children
+  //   );
+  //   std::unique_ptr<Element> ptr =
+  //     std::make_unique<Element>( static_cast<Element>( self ) );
+
+  //   lookup.insert_or_assign( id, ptr );
+
+  //   return ptr;
+  // }
+
 
   void Place() {
     if ( this->absolute_pos ) {
@@ -254,100 +256,142 @@ struct Panel : Element {
       background
     );
   }
+
+  private:
+  // Absolute panel
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    bool absolute_pos,
+    bool resizeable,
+    std::function<Vector2()> update_pos,
+    std::function<Vector2()> update_size
+    // std::vector<std::unique_ptr<Element>> children
+  )
+      : Element( id, Type::Panel, background, false, { 0, 0, 500, 200 }, {} ),
+        children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ),
+        absolute_pos( absolute_pos ), resizeable( resizeable ),
+        update_pos( update_pos ), update_size( update_size )
+  // children( children )
+  {
+  }
+  // Relative panel
+  // Panel(
+  //   std::string id,
+  //   Color background,
+  //   Axis children_axis,
+  //   Align children_horiz_align,
+  //   Align children_vert_align,
+  //   std::vector<std::unique_ptr<Element>> children
+  // )
+  //     : Element( id, Type::Panel, background, false, {}, {} ),
+  //       children_axis( children_axis ),
+  //       children_horiz_align( children_horiz_align ),
+  //       children_vert_align( children_vert_align ), children( children ){};
+
+
+  // entt::entity entity = Global::local.create();
+  // Global::local.emplace<Element>( entity, *this );
+  // lookup.insert_or_assign( this->id, entity );
 };
 
 
-inline std::string GetId( Types elem ) {
-  if ( std::holds_alternative<Panel>( elem ) ) {
-    return std::get<Panel>( elem ).id;
-  }
+// inline std::string GetId( Types elem ) {
+//   if ( std::holds_alternative<Panel>( elem ) ) {
+//     return std::get<Panel>( elem ).id;
+//   }
 
-  if ( std::holds_alternative<TextLabel>( elem ) ) {
-    return std::get<TextLabel>( elem ).id;
-  }
+//   if ( std::holds_alternative<TextLabel>( elem ) ) {
+//     return std::get<TextLabel>( elem ).id;
+//   }
 
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    return std::get<TextureButton>( elem ).id;
-  }
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     return std::get<TextureButton>( elem ).id;
+//   }
 
-  std::cout << "Couldn't find the ID!!!" << std::endl;
+//   std::cout << "Couldn't find the ID!!!" << std::endl;
 
-  return "INVALID_ID";
-}
+//   return "INVALID_ID";
+// }
 
-inline rect &GetTransform( Types *elem ) {
-  if ( std::holds_alternative<Panel>( *elem ) ) {
-    return std::get<Panel>( *elem ).transform;
-  }
+// inline rect &GetTransform( Types *elem ) {
+//   if ( std::holds_alternative<Panel>( *elem ) ) {
+//     return std::get<Panel>( *elem ).transform;
+//   }
 
-  if ( std::holds_alternative<TextLabel>( *elem ) ) {
-    return std::get<TextLabel>( *elem ).transform;
-  }
+//   if ( std::holds_alternative<TextLabel>( *elem ) ) {
+//     return std::get<TextLabel>( *elem ).transform;
+//   }
 
-  if ( std::holds_alternative<TextureButton>( *elem ) ) {
-    return std::get<TextureButton>( *elem ).transform;
-  }
+//   if ( std::holds_alternative<TextureButton>( *elem ) ) {
+//     return std::get<TextureButton>( *elem ).transform;
+//   }
 
-  std::cout << "No Transform found!!!" << std::endl;
-}
+//   std::cout << "No Transform found!!!" << std::endl;
+// }
 
-inline bool IsEnabled( Types elem ) {
-  if ( std::holds_alternative<Panel>( elem ) ) {
-    return std::get<Panel>( elem ).enabled;
-  }
+// inline bool IsEnabled( Types elem ) {
+//   if ( std::holds_alternative<Panel>( elem ) ) {
+//     return std::get<Panel>( elem ).enabled;
+//   }
 
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    return std::get<TextureButton>( elem ).enabled;
-  }
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     return std::get<TextureButton>( elem ).enabled;
+//   }
 
-  if ( std::holds_alternative<TextLabel>( elem ) ) {
-    return std::get<TextLabel>( elem ).enabled;
-  }
+//   if ( std::holds_alternative<TextLabel>( elem ) ) {
+//     return std::get<TextLabel>( elem ).enabled;
+//   }
 
-  std::cout << "IsEnabled(): Missing a type catch" << std::endl;
-  return false;
-}
+//   std::cout << "IsEnabled(): Missing a type catch" << std::endl;
+//   return false;
+// }
 
-inline bool IsInteractive( Types elem ) {
-  if ( std::holds_alternative<TextButton>( elem ) ) {
-    return true;
-  }
+// inline bool IsInteractive( Types elem ) {
+//   if ( std::holds_alternative<TextButton>( elem ) ) {
+//     return true;
+//   }
 
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    return true;
-  }
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     return true;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
-inline bool IsClickable( Types elem ) {
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    return std::get<TextureButton>( elem ).clickable;
-  }
+// inline bool IsClickable( Types elem ) {
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     return std::get<TextureButton>( elem ).clickable;
+//   }
 
-  if ( std::holds_alternative<TextButton>( elem ) ) {
-    return std::get<TextButton>( elem ).clickable;
-  }
+//   if ( std::holds_alternative<TextButton>( elem ) ) {
+//     return std::get<TextButton>( elem ).clickable;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
-inline void UpdateElem( Types &elem ) {
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    std::get<TextureButton>( elem ).Update();
-    return;
-  }
+// inline void UpdateElem( Types &elem ) {
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     std::get<TextureButton>( elem ).Update();
+//     return;
+//   }
 
-  if ( std::holds_alternative<TextLabel>( elem ) ) {
-    std::get<TextLabel>( elem ).Update();
-    return;
-  }
+//   if ( std::holds_alternative<TextLabel>( elem ) ) {
+//     std::get<TextLabel>( elem ).Update();
+//     return;
+//   }
 
-  if ( std::holds_alternative<TextButton>( elem ) ) {
-    std::get<TextButton>( elem ).Update();
-    return;
-  }
-}
+//   if ( std::holds_alternative<TextButton>( elem ) ) {
+//     std::get<TextButton>( elem ).Update();
+//     return;
+//   }
+// }
 
 // inline void ToggleElem( Types &elem, bool on ) {
 //   if ( std::holds_alternative<Panel>( elem ) ) {
