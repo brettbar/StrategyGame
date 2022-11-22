@@ -388,10 +388,16 @@ inline void ListenForDeselect() {
 }
 
 inline void RecursiveToggle( Types &elem, bool on ) {
+  std::cout << "RecursiveToggle()"
+            << " " << on << std::endl;
   // Element &elem = Global::local.get<Element>( entity );
   // elem.enabled = on;
 
-  ToggleElem( elem, on );
+  // ToggleElem( elem, on );
+
+  if ( std::holds_alternative<Panel>( elem ) ) {
+    std::get<Panel>( elem ).enabled = true;
+  }
 
   if ( !std::holds_alternative<Panel>( elem ) )
     return;

@@ -13,8 +13,10 @@ typedef struct TextButton TextButton;
 typedef struct TextureLabel TextureLabel;
 typedef struct TextureButton TextureButton;
 
-using Types =
-  std::variant<Panel, TextLabel, TextButton, TextureLabel, TextureButton>;
+// using Types =
+//   std::variant<Panel, TextLabel, TextButton, TextureLabel, TextureButton>;
+
+// TODO, cant use references with std::variant, so probably look for a diff soln
 
 inline f32 SCALE = 2.0f;
 inline std::map<std::string, Types> lookup;
@@ -75,6 +77,10 @@ struct Element {
   )
       : id( id ), type( type ), background( background ), enabled( enabled ),
         transform( transform ), margins( margins ) {
+  }
+
+  void Toggle() {
+    this->enabled = true;
   }
 };
 
@@ -169,19 +175,19 @@ struct Panel : Element {
   std::vector<Types> children;
 
   // TODO this probably shouldnt exist, since a panel with no children doesnt make sense
-//  Panel(
-//    std::string id,
-//    Color background,
-//    Axis children_axis,
-//    Align children_horiz_align,
-//    Align children_vert_align
-//  )
-//      : Element( id, Type::Panel, background, false, {}, {} ),
-//        children_axis( children_axis ),
-//        children_horiz_align( children_horiz_align ),
-//        children_vert_align( children_vert_align ), children( {} ) {
-//    this->transform = { 500, 500, 200, 200 };
-//  }
+  //  Panel(
+  //    std::string id,
+  //    Color background,
+  //    Axis children_axis,
+  //    Align children_horiz_align,
+  //    Align children_vert_align
+  //  )
+  //      : Element( id, Type::Panel, background, false, {}, {} ),
+  //        children_axis( children_axis ),
+  //        children_horiz_align( children_horiz_align ),
+  //        children_vert_align( children_vert_align ), children( {} ) {
+  //    this->transform = { 500, 500, 200, 200 };
+  //  }
 
   // Relative panel
   Panel(
@@ -343,28 +349,29 @@ inline void UpdateElem( Types &elem ) {
   }
 }
 
-inline void ToggleElem( Types &elem, bool on ) {
-  if ( std::holds_alternative<Panel>( elem ) ) {
-    printf( "Enabling panel\n" );
-    std::get<Panel>( elem ).enabled = on;
-    return;
-  }
+// inline void ToggleElem( Types &elem, bool on ) {
+//   if ( std::holds_alternative<Panel>( elem ) ) {
+//     printf( "Enabling panel\n" );
+//     std::get<Panel>( elem ).Toggle( on );
 
-  if ( std::holds_alternative<TextureButton>( elem ) ) {
-    std::get<TextureButton>( elem ).enabled = on;
-    return;
-  }
+//     return;
+//   }
 
-  if ( std::holds_alternative<TextLabel>( elem ) ) {
-    std::get<TextLabel>( elem ).enabled = on;
-    return;
-  }
+//   if ( std::holds_alternative<TextureButton>( elem ) ) {
+//     std::get<TextureButton>( elem ).enabled = on;
+//     return;
+//   }
 
-  if ( std::holds_alternative<TextButton>( elem ) ) {
-    std::get<TextButton>( elem ).enabled = on;
-    return;
-  }
-}
+//   if ( std::holds_alternative<TextLabel>( elem ) ) {
+//     std::get<TextLabel>( elem ).enabled = on;
+//     return;
+//   }
+
+//   if ( std::holds_alternative<TextButton>( elem ) ) {
+//     std::get<TextButton>( elem ).enabled = on;
+//     return;
+//   }
+// }
 
 
 // template<typename T>
