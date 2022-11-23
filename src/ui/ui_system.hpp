@@ -22,13 +22,13 @@ namespace UI {
 
 // inline Context context = { entt::null, entt::null };
 inline Context context = { "", "" };
-// inline std::vector<std::unique_ptr<Element>> content;
+inline std::vector<Panel> content;
 
 inline void Init( TextureCache & );
 inline void Draw();
 inline void RecursiveDraw( Panel & );
 inline void RecursiveLayout( Panel & );
-inline void RecursiveInteractions( Panel &, bool &, bool, bool );
+// inline void RecursiveInteractions( Panel &, bool &, bool, bool );
 // inline bool DoInteraction( Types, bool, bool, bool, bool );
 
 // inline void ResizeElement( Element & );
@@ -42,73 +42,58 @@ inline void ListenForDeselect();
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
 
-  Panel::Create(
-    "settlement_context_panel",
-    Fade( BLACK, 0.5 ),
-    Axis::ROW,
-    Align::START,
-    Align::START,
-    true,
-    true,
-    []() -> Vector2 {
-      return {
-        ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
-        (f32) GetScreenHeight() - 200 * SCALE,
-      };
-    },
-    []() -> Vector2 {
-      return {
-        500 * SCALE,
-        200 * SCALE,
-      };
-    }
-  );
-
 
   // TODO maybe I can clean this up by moving some stuff
   // to the lookup map
-  // content = {
-
-  //   // Panel::Create(
-  //   //   "settlement_context_panel",
-  //   //   Fade( BLACK, 0.5 ),
-  //   //   Axis::ROW,
-  //   //   Align::START,
-  //   //   Align::START,
-  //   //   true,
-  //   //   true,
-  //   //   []() -> Vector2 {
-  //   //     return {
-  //   //       ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
-  //   //       (f32) GetScreenHeight() - 200 * SCALE,
-  //   //     };
-  //   //   },
-  //   //   []() -> Vector2 {
-  //   //     return {
-  //   //       500 * SCALE,
-  //   //       200 * SCALE,
-  //   //     };
-  //   //   },
-  //   //   {
-  //   //     // std::make_unique<Element>( Panel(
-  //   //     //   "settlement_context_tab_group",
-  //   //     //   BLUE,
-  //   //     //   Axis::COLUMN,
-  //   //     //   Align::START,
-  //   //     //   Align::START,
-  //   //     //   {
-  //   //     //     TextureButton( "settlement_context_tab_overview" ),
-  //   //     //     TextureButton( "settlement_context_tab_population" ),
-  //   //     //     TextureButton( "settlement_context_tab_resources" ),
-  //   //     //     TextureButton( "settlement_context_tab_culture" ),
-  //   //     //     TextureButton( "settlement_context_tab_religion" ),
-  //   //     //     TextureButton( "settlement_context_tab_construction" ),
-  //   //     //     TextureButton( "settlement_context_tab_garrison" ),
-  //   //     //   }
-  //   //     // ) ),
-  //   //   }
-  //   // ),
-  // };
+  content = {
+    Panel(
+      "settlement_context_panel",
+      Fade( BLACK, 0.5 ),
+      Axis::ROW,
+      Align::START,
+      Align::START,
+      true,
+      true,
+      []() -> Vector2 {
+        return {
+          ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
+          (f32) GetScreenHeight() - 200 * SCALE,
+        };
+      },
+      []() -> Vector2 {
+        return {
+          500 * SCALE,
+          200 * SCALE,
+        };
+      },
+      {
+        Panel(
+          "settlement_context_tab_group",
+          BLUE,
+          Axis::COLUMN,
+          Align::START,
+          Align::START,
+          false,
+          false,
+          []() -> Vector2 {
+            return { 0, 0 };
+          },
+          []() -> Vector2 {
+            return { 0, 0 };
+          },
+          {
+            // TextureButton( "settlement_context_tab_overview" ),
+            // TextureButton( "settlement_context_tab_population" ),
+            // TextureButton( "settlement_context_tab_resources" ),
+            // TextureButton( "settlement_context_tab_culture" ),
+            // TextureButton( "settlement_context_tab_religion" ),
+            // TextureButton( "settlement_context_tab_construction" ),
+            // TextureButton( "settlement_context_tab_garrison" ),
+          }
+        ),
+      }
+    ),
+  };
 
 
   // SettlementContextPanel(
@@ -159,18 +144,18 @@ inline void UpdateOnFrame() {
     SCALE = 4.0;
   }
 
-  // for ( std::unique_ptr<Element> &base: content ) {
-  //   // RecursiveLayout( base );
-  //   // RecursiveInteractions( base, over_any_elem, mouseWentUp, mouseWentDown );
-  // }
+  for ( Panel &base: content ) {
+    RecursiveLayout( base );
+    // RecursiveInteractions( base, over_any_elem, mouseWentUp, mouseWentDown );
+  }
 
   // Interactions?
 }
 
 inline void Draw() {
-  // for ( Panel &panel: content ) {
-  //   RecursiveDraw( panel );
-  // }
+  for ( Panel &panel: content ) {
+    RecursiveDraw( panel );
+  }
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
@@ -188,112 +173,120 @@ inline void Draw() {
     "entity: " + EntityIdToString( SelectionSystem::selected_entity );
 }
 
-// inline void RecursiveLayout( Panel &panel ) {
-//   f32 total_height = 0;
-//   f32 total_width = 0;
-//   f32 tallest_child = 0;
-//   f32 widest_child = 0;
-//   f32 end_of_last_x = panel.transform.x;
-//   f32 end_of_last_y = panel.transform.y;
+inline void RecursiveLayout( Panel &panel ) {
+  f32 total_height = 0;
+  f32 total_width = 0;
+  f32 tallest_child = 0;
+  f32 widest_child = 0;
+  f32 end_of_last_x = panel.transform.x;
+  f32 end_of_last_y = panel.transform.y;
 
-//   if ( !panel.enabled )
-//     return;
+  if ( !panel.enabled )
+    return;
 
-//   panel.Place();
-//   panel.Resize();
+  panel.Place();
+  panel.Resize();
 
-//   for ( auto &child: panel.children ) {
-//     if ( std::holds_alternative<Panel>( child ) ) {
-//       RecursiveLayout( std::get<Panel>( child ) );
-//     } else if ( std::holds_alternative<TextLabel>( child ) ) {
-//       std::get<TextLabel>( child ).Resize();
-//     } else if ( std::holds_alternative<TextureButton>( child ) ) {
-//       std::get<TextureButton>( child ).Resize();
-//     }
-//     // TODO ^ these could probably be consolidated using a template
+  for ( auto &child: panel.children ) {
+    switch ( child.type ) {
+      case Type::Panel: {
+        std::cout << child.id << std::endl;
+        Panel *panel = dynamic_cast<Panel *>( &child );
+        assert( panel != nullptr );
+        RecursiveLayout( *panel );
+      } break;
+      case Type::TextLabel: {
+        //   std::get<TextLabel>( child ).Resize();
+      } break;
+      case Type::TextureButton: {
+        //   std::get<TextureButton>( child ).Resize();
+      } break;
+      default:
+        break;
+    }
+    // TODO ^ these could probably be consolidated using a template
 
-//     rect &transform = GetTransform( &child );
+    rect &transform = child.transform;
 
-//     if ( panel.children_axis == Axis::ROW ) {
+    if ( panel.children_axis == Axis::ROW ) {
 
-//       // 2. Set the child x position based on alignment style.
-//       switch ( panel.children_horiz_align ) {
-//         case Align::START: {
-//           transform.x = end_of_last_x;
-//           end_of_last_x = transform.x + transform.width;
-//         } break;
-//         case Align::SPACE_OUT: {
-//         } break;
-//       }
+      // 2. Set the child x position based on alignment style.
+      switch ( panel.children_horiz_align ) {
+        case Align::START: {
+          transform.x = end_of_last_x;
+          end_of_last_x = transform.x + transform.width;
+        } break;
+        case Align::SPACE_OUT: {
+        } break;
+      }
 
-//       // 3. Set the child y position based on alignment style.
-//       switch ( panel.children_vert_align ) {
-//         case Align::START: {
-//           transform.y = panel.transform.y;
-//         } break;
-//       }
-//     } else if ( panel.children_axis == Axis::COLUMN ) {
-//       // 2. Set the child x position based on alignment style.
-//       switch ( panel.children_horiz_align ) {
-//         case Align::START: {
-//           transform.x = panel.transform.x;
-//         } break;
-//         case Align::SPACE_OUT: {
-//         } break;
-//       }
+      // 3. Set the child y position based on alignment style.
+      switch ( panel.children_vert_align ) {
+        case Align::START: {
+          transform.y = panel.transform.y;
+        } break;
+      }
+    } else if ( panel.children_axis == Axis::COLUMN ) {
+      // 2. Set the child x position based on alignment style.
+      switch ( panel.children_horiz_align ) {
+        case Align::START: {
+          transform.x = panel.transform.x;
+        } break;
+        case Align::SPACE_OUT: {
+        } break;
+      }
 
-//       // 3. Set the child y position based on alignment style.
-//       switch ( panel.children_vert_align ) {
-//         case Align::START: {
-//           transform.y = end_of_last_y;
-//           // + elem.margins.top;
-//           end_of_last_y = transform.y + transform.height;
-//           // + elem.margins.bottom;
-//         } break;
-//       }
-//     }
-//   }
+      // 3. Set the child y position based on alignment style.
+      switch ( panel.children_vert_align ) {
+        case Align::START: {
+          transform.y = end_of_last_y;
+          // + elem.margins.top;
+          end_of_last_y = transform.y + transform.height;
+          // + elem.margins.bottom;
+        } break;
+      }
+    }
+  }
 
-//   for ( auto &child: panel.children ) {
-//     rect &transform = GetTransform( &child );
+  for ( auto &child: panel.children ) {
+    rect &transform = child.transform;
 
-//     total_width += transform.width;
-//     total_height += transform.height;
+    total_width += transform.width;
+    total_height += transform.height;
 
-//     if ( transform.width > widest_child )
-//       widest_child = transform.width;
+    if ( transform.width > widest_child )
+      widest_child = transform.width;
 
-//     if ( transform.height > tallest_child )
-//       tallest_child = transform.height;
-//   }
+    if ( transform.height > tallest_child )
+      tallest_child = transform.height;
+  }
 
-//   // if ( !Global::local.all_of<BasePanel>( entity ) ) {
-//   //   if ( panel.children_axis == Axis::ROW ) {
-//   //     panel_elem.transform.width = total_width;
-//   //     panel_elem.transform.height = tallest_child;
-//   //   } else if ( panel.children_axis == Axis::COLUMN ) {
-//   //     panel_elem.transform.width = widest_child;
-//   //     panel_elem.transform.height = total_height;
-//   //   }
-//   // }
-// }
+  // if ( !Global::local.all_of<BasePanel>( entity ) ) {
+  //   if ( panel.children_axis == Axis::ROW ) {
+  //     panel_elem.transform.width = total_width;
+  //     panel_elem.transform.height = tallest_child;
+  //   } else if ( panel.children_axis == Axis::COLUMN ) {
+  //     panel_elem.transform.width = widest_child;
+  //     panel_elem.transform.height = total_height;
+  //   }
+  // }
+}
 
-// inline void RecursiveDraw( Panel &panel ) {
-//   if ( !panel.enabled )
-//     return;
+inline void RecursiveDraw( Panel &panel ) {
+  if ( !panel.enabled )
+    return;
 
-//   panel.Draw();
+  // panel.Draw();
 
-//   for ( auto &child: panel.children ) {
-//     if ( std::holds_alternative<Panel>( child ) ) {
-//       Panel &child_panel = std::get<Panel>( child );
-//       RecursiveDraw( child_panel );
-//     } else if ( std::holds_alternative<TextureButton>( child ) ) {
-//       TextureButton &button = std::get<TextureButton>( child );
-//       button.Draw();
-//     }
-//   }
-// }
+  for ( auto &child: panel.children ) {
+    // if ( child.type == Type::Panel ) {
+    //   Panel *panel = dynamic_cast<Panel *>( &child );
+    //   RecursiveDraw( *panel );
+    // } else {
+    //   child.Draw();
+    // }
+  }
+}
 
 // inline void RecursiveInteractions(
 //   Panel &panel,
@@ -387,7 +380,7 @@ inline void Draw() {
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
-    auto &context_panel = lookup.at( "settlement_context_panel" );
+    // auto &context_panel = lookup.at( "settlement_context_panel" );
 
     // RecursiveToggle( context_panel, true );
     // Element &elem = Global::ui_reg.get<Element>( context_panel );

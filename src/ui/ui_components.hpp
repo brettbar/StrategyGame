@@ -84,85 +84,95 @@ struct Element {
   void Toggle() {
     this->enabled = true;
   }
+
+  virtual ~Element(){};
+
+  virtual void Place() {
+  }
+  virtual void Resize() {
+  }
+
+  virtual void Draw() {
+  }
 };
 
-// struct TextLabel : Element {
-//   std::string text;
-//   i32 font_size;
-//   Color text_color;
-//   bool dynamic = false;
+struct TextLabel : Element {
+  std::string text;
+  i32 font_size;
+  Color text_color;
+  bool dynamic = false;
 
-//   TextLabel(
-//     std::string id,
-//     Color background,
-//     std::string text,
-//     i32 font_size,
-//     Color text_color,
-//     bool dynamic
-//   )
-//       : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
-//         font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-//   }
+  TextLabel(
+    std::string id,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic
+  )
+      : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
+        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
+  }
 
-//   void Resize() {
-//     const vec2 text_dims = MeasureTextEx(
-//       Global::font_cache[hstr{ "font_romulus" }]->font,
-//       text.c_str(),
-//       font_size,
-//       2.0f
-//     );
+  void Resize() {
+    const vec2 text_dims = MeasureTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      text.c_str(),
+      font_size,
+      2.0f
+    );
 
-//     transform.width = text_dims.x;
-//     transform.height = text_dims.y;
-//   }
+    transform.width = text_dims.x;
+    transform.height = text_dims.y;
+  }
 
-//   void Update() {
-//     if ( dynamic ) {
-//       text = update_lookup.at( id )();
-//     }
-//   }
-// };
+  void Update() {
+    if ( dynamic ) {
+      text = update_lookup.at( id )();
+    }
+  }
+};
 
-// struct TextButton : TextLabel {
-//   bool clickable = false;
+struct TextButton : TextLabel {
+  bool clickable = false;
 
-//   void Update() {
-//     TextLabel::Update();
+  void Update() {
+    TextLabel::Update();
 
-//     this->clickable = clickable_lookup.at( id )();
-//   }
-// };
+    this->clickable = clickable_lookup.at( id )();
+  }
+};
 
-// struct TextureLabel : Element {
-//   Texture2D texture;
+struct TextureLabel : Element {
+  Texture2D texture;
 
-//   TextureLabel( std::string id )
-//       : Element( id, Type::TextureLabel, WHITE, false, {}, {} ),
-//         texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
-//     this->transform.x = texture.width;
-//     this->transform.y = texture.height;
-//   }
+  TextureLabel( std::string id )
+      : Element( id, Type::TextureLabel, WHITE, false, {}, {} ),
+        texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
+    this->transform.x = texture.width;
+    this->transform.y = texture.height;
+  }
 
-//   void Resize() {
-//     transform.width = texture.width * UI::SCALE;
-//     transform.height = texture.height * UI::SCALE;
-//   }
-// };
+  void Resize() {
+    transform.width = texture.width * UI::SCALE;
+    transform.height = texture.height * UI::SCALE;
+  }
+};
 
-// struct TextureButton : TextureLabel {
-//   bool clickable = false;
+struct TextureButton : TextureLabel {
+  bool clickable = false;
 
-//   TextureButton( std::string id ) : TextureLabel( id ) {
-//   }
+  TextureButton( std::string id ) : TextureLabel( id ) {
+  }
 
-//   void Draw() {
-//     DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
-//   }
+  void Draw() override {
+    DrawTextureEx( texture, { transform.x, transform.y }, 0.0, SCALE, WHITE );
+  }
 
-//   void Update() {
-//     this->clickable = clickable_lookup.at( id )();
-//   }
-// };
+  void Update() {
+    this->clickable = clickable_lookup.at( id )();
+  }
+};
 
 struct Panel : Element {
   Axis children_axis;
@@ -172,92 +182,8 @@ struct Panel : Element {
   bool resizeable = false;
   std::function<Vector2()> update_pos;
   std::function<Vector2()> update_size;
+  std::vector<Element> children;
 
-  // NOTE: Have to add new types of elements to this
-  std::vector<std::unique_ptr<Element>> children;
-
-  static void Create(
-    std::string id,
-    Color background,
-    Axis children_axis,
-    Align children_horiz_align,
-    Align children_vert_align,
-    bool absolute_pos,
-    bool resizeable,
-    std::function<Vector2()> update_pos,
-    std::function<Vector2()> update_size
-    // std::vector<std::unique_ptr<Element>> children
-  ) {
-    Panel self = Panel(
-      id,
-      background,
-      children_axis,
-      children_horiz_align,
-      children_vert_align,
-      absolute_pos,
-      resizeable,
-      update_pos,
-      update_size
-      // children
-    );
-
-    Element elem = static_cast<Element>( self );
-
-    auto ptr = std::unique_ptr<Element>( &elem );
-
-    // lookup.insert_or_assign( id, ptr );
-  }
-
-  // static std::unique_ptr<Element> Create(
-  //   std::string id,
-  //   Color background,
-  //   Axis children_axis,
-  //   Align children_horiz_align,
-  //   Align children_vert_align,
-  //   std::vector<std::unique_ptr<Element>> children
-  // ) {
-  //   Panel self = Panel(
-  //     id,
-  //     background,
-  //     children_axis,
-  //     children_horiz_align,
-  //     children_vert_align,
-  //     children
-  //   );
-  //   std::unique_ptr<Element> ptr =
-  //     std::make_unique<Element>( static_cast<Element>( self ) );
-
-  //   lookup.insert_or_assign( id, ptr );
-
-  //   return ptr;
-  // }
-
-
-  void Place() {
-    if ( this->absolute_pos ) {
-      Vector2 new_pos = update_pos();
-      this->transform.x = new_pos.x;
-      this->transform.y = new_pos.y;
-    }
-  }
-
-  void Resize() {
-    if ( this->resizeable ) {
-      Vector2 new_size = update_size();
-      this->transform.width = new_size.x;
-      this->transform.height = new_size.y;
-    }
-  }
-
-  void Draw() {
-    DrawRectangleV(
-      { transform.x, transform.y },
-      { transform.width, transform.height },
-      background
-    );
-  }
-
-  private:
   // Absolute panel
   Panel(
     std::string id,
@@ -268,31 +194,58 @@ struct Panel : Element {
     bool absolute_pos,
     bool resizeable,
     std::function<Vector2()> update_pos,
-    std::function<Vector2()> update_size
-    // std::vector<std::unique_ptr<Element>> children
+    std::function<Vector2()> update_size,
+    std::vector<Element> children
   )
-      : Element( id, Type::Panel, background, false, { 0, 0, 500, 200 }, {} ),
+      : Element( id, Type::Panel, background, true, { 0, 0, 500, 200 }, {} ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ),
         absolute_pos( absolute_pos ), resizeable( resizeable ),
-        update_pos( update_pos ), update_size( update_size )
-  // children( children )
-  {
+        update_pos( update_pos ), update_size( update_size ),
+        children( children ) {
   }
+
   // Relative panel
-  // Panel(
-  //   std::string id,
-  //   Color background,
-  //   Axis children_axis,
-  //   Align children_horiz_align,
-  //   Align children_vert_align,
-  //   std::vector<std::unique_ptr<Element>> children
-  // )
-  //     : Element( id, Type::Panel, background, false, {}, {} ),
-  //       children_axis( children_axis ),
-  //       children_horiz_align( children_horiz_align ),
-  //       children_vert_align( children_vert_align ), children( children ){};
+  Panel(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    std::vector<Element> children
+  )
+      : Element( id, Type::Panel, background, true, {}, {} ),
+        children_axis( children_axis ),
+        children_horiz_align( children_horiz_align ),
+        children_vert_align( children_vert_align ), absolute_pos( false ),
+        resizeable( false ), update_pos( {} ), update_size( {} ),
+        children( children ){};
+
+
+  void Place() override {
+    if ( this->absolute_pos ) {
+      Vector2 new_pos = update_pos();
+      this->transform.x = new_pos.x;
+      this->transform.y = new_pos.y;
+    }
+  }
+
+  void Resize() override {
+    if ( this->resizeable ) {
+      Vector2 new_size = update_size();
+      this->transform.width = new_size.x;
+      this->transform.height = new_size.y;
+    }
+  }
+
+  void Draw() override {
+    DrawRectangleV(
+      { transform.x, transform.y },
+      { transform.width, transform.height },
+      background
+    );
+  }
 
 
   // entt::entity entity = Global::local.create();
