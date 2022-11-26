@@ -18,11 +18,11 @@ inline void SetDestinations( Camera2D camera ) {
     Unit::Component &unit = view.get<Unit::Component>( entity );
     Animated::Component &anim = view.get<Animated::Component>( entity );
 
-    std::unique_ptr<Vector2> tileOrig =
+    std::unique_ptr<Vector2> dest_tile =
       DetermineTilePos( GetScreenToWorld2D( GetMousePosition(), camera ) );
 
-    if ( tileOrig != nullptr ) {
-      unit.destination = *tileOrig;
+    if ( dest_tile != nullptr ) {
+      unit.destination = *dest_tile;
 
       if ( unit.destination.x > unit.position.x )
         anim.direction = Animated::IDLE_DR;
