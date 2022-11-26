@@ -30,11 +30,6 @@ inline void RecursiveDraw( Panel & );
 inline void RecursiveLayout( Panel & );
 inline void RecursiveInteractions( Panel &, bool &, bool, bool );
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
-
-// inline void ResizeElement( Element & );
-// inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
-// inline void DrawElement( TextureCache &, entt::entity, Element & );
-
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
 inline void RecursiveToggle( entt::entity, bool );
@@ -82,6 +77,37 @@ inline void Init( TextureCache &texture_cache ) {
             TextureButton::Create( "settlement_context_tab_construction" ),
             TextureButton::Create( "settlement_context_tab_garrison" ),
           }
+        ),
+      }
+    ),
+    Panel::Create(
+      "actor_context_panel",
+      Fade( BLACK, 0.5 ),
+      Axis::ROW,
+      Align::START,
+      Align::START,
+      true,
+      true,
+      []() -> Vector2 {
+        return {
+          ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
+          (f32) GetScreenHeight() - 200 * SCALE,
+        };
+      },
+      []() -> Vector2 {
+        return {
+          500 * SCALE,
+          200 * SCALE,
+        };
+      },
+      {
+        Panel::Create(
+          "actor_actions_panel",
+          BLACK,
+          Axis::ROW,
+          Align::START,
+          Align::START,
+          {}
         ),
       }
     ),
@@ -359,7 +385,6 @@ inline bool DoInteraction(
       context.active = entt::null;
     }
   } else if ( entity == context.hot ) {
-    // TODO might want to readd this
     // if ( mouseWentDown && interactive )
     if ( mouseWentDown )
       context.active = entity;
