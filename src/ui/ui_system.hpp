@@ -20,8 +20,8 @@
 
 namespace UI {
 
-// inline Context context = { entt::null, entt::null };
-inline Context context = { "", "" };
+inline Context context = { entt::null, entt::null };
+// inline Context context = { "", "" };
 inline std::vector<entt::entity> content;
 
 inline void Init( TextureCache & );
@@ -29,7 +29,7 @@ inline void Draw();
 inline void RecursiveDraw( Panel & );
 inline void RecursiveLayout( Panel & );
 inline void RecursiveInteractions( Panel &, bool &, bool, bool );
-// inline bool DoInteraction( Types, bool, bool, bool, bool );
+inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 
 // inline void ResizeElement( Element & );
 // inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
@@ -37,7 +37,7 @@ inline void RecursiveInteractions( Panel &, bool &, bool, bool );
 
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
-// inline void RecursiveToggle( Types &, bool );
+inline void RecursiveToggle( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
@@ -74,13 +74,13 @@ inline void Init( TextureCache &texture_cache ) {
           Align::START,
           Align::START,
           {
-            // TextureButton( "settlement_context_tab_overview" ),
-            // TextureButton( "settlement_context_tab_population" ),
-            // TextureButton( "settlement_context_tab_resources" ),
-            // TextureButton( "settlement_context_tab_culture" ),
-            // TextureButton( "settlement_context_tab_religion" ),
-            // TextureButton( "settlement_context_tab_construction" ),
-            // TextureButton( "settlement_context_tab_garrison" ),
+            TextureButton::Create( "settlement_context_tab_overview" ),
+            TextureButton::Create( "settlement_context_tab_population" ),
+            TextureButton::Create( "settlement_context_tab_resources" ),
+            TextureButton::Create( "settlement_context_tab_culture" ),
+            TextureButton::Create( "settlement_context_tab_religion" ),
+            TextureButton::Create( "settlement_context_tab_construction" ),
+            TextureButton::Create( "settlement_context_tab_garrison" ),
           }
         ),
       }
@@ -155,11 +155,11 @@ inline void Draw() {
   DrawFPS( GetScreenWidth() - 100, 2 );
 
   DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
-  std::string foo = "hot: " + context.hot;
+  std::string foo = "hot: " + EntityIdToString( context.hot );
   DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
-  std::string bar = "active: " + context.active;
+  std::string bar = "active: " + EntityIdToString( context.active );
   DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
@@ -175,11 +175,12 @@ inline void RecursiveLayout( Panel &parent_panel ) {
   f32 end_of_last_x = parent_panel.elem.transform.x;
   f32 end_of_last_y = parent_panel.elem.transform.y;
 
-  if ( !parent_panel.elem.enabled )
-    return;
-
+  // NOTE: might have to go after the enabled check?
   parent_panel.Place();
   parent_panel.Resize();
+
+  if ( !parent_panel.elem.enabled )
+    return;
 
   for ( entt::entity child: parent_panel.children ) {
 
@@ -191,8 +192,11 @@ inline void RecursiveLayout( Panel &parent_panel ) {
       case Type::TextLabel: {
         //   std::get<TextLabel>( child ).Resize();
       } break;
+      case Type::TextureLabel: {
+        Get<TextureLabel>( child ).Resize();
+      } break;
       case Type::TextureButton: {
-        //   std::get<TextureButton>( child ).Resize();
+        Get<TextureButton>( child ).label.Resize();
       } break;
       default:
         break;
@@ -270,12 +274,18 @@ inline void RecursiveDraw( Panel &panel ) {
   panel.Draw();
 
   for ( entt::entity child: panel.children ) {
-
     switch ( GetType( child ) ) {
       case Type::Panel: {
-        Panel &panel = Get<Panel>( child );
-        RecursiveDraw( panel );
+        RecursiveDraw( Get<Panel>( child ) );
       } break;
+      case Type::TextureLabel: {
+        Get<TextureLabel>( child ).Draw();
+      } break;
+      case Type::TextureButton: {
+        Get<TextureButton>( child ).Draw();
+      } break;
+      default:
+        break;
     }
   }
 }
@@ -287,94 +297,92 @@ inline void RecursiveInteractions(
   bool mouseWentDown
 ) {
 
-  // if ( !panel.enabled )
-  //   return;
+  if ( !panel.elem.enabled )
+    return;
 
-  // for ( auto &child: panel.children ) {
-  //   if ( !IsEnabled( child ) )
-  //     continue;
+  for ( auto &child: panel.children ) {
+    if ( !IsEnabled( child ) )
+      continue;
 
-  //   if ( std::holds_alternative<Panel>( child ) ) {
-  //     RecursiveInteractions(
-  //       std::get<Panel>( child ),
-  //       over_any_elem,
-  //       mouseWentUp,
-  //       mouseWentDown
-  //     );
-  //   }
+    if ( Global::local.all_of<Panel>( child ) ) {
+      RecursiveInteractions(
+        Get<Panel>( child ),
+        over_any_elem,
+        mouseWentUp,
+        mouseWentDown
+      );
+    }
 
-  //   UpdateElem( child );
+    // UpdateElem( child );
 
+    rect &transform = GetTransform( child );
 
-  //   rect &transform = GetTransform( &child );
+    bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
 
-  //   bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
+    if ( !over_any_elem )
+      over_any_elem = inside;
 
-  //   if ( !over_any_elem )
-  //     over_any_elem = inside;
+    if ( DoInteraction(
+           child,
+           inside,
+           IsInteractive( child ),
+           mouseWentUp,
+           mouseWentDown
+         ) ) {
+      if ( IsClickable( child ) ) {
+        std::cout << "INTERACTION DETECTED!!!" << std::endl;
+        action_lookup.at( GetId( child ) )();
+      }
+    }
+  }
 
-  //   if ( DoInteraction(
-  //          child,
-  //          inside,
-  //          IsInteractive( child ),
-  //          mouseWentUp,
-  //          mouseWentDown
-  //        ) ) {
-  //     if ( IsClickable( child ) ) {
-  //       std::cout << "INTERACTION DETECTED!!!" << std::endl;
-  //       action_lookup.at( GetId( child ) )();
-  //     }
-  //   }
-  // }
-
-  // if ( !over_any_elem ) {
-  //   context.hot = "";
-  //   context.active = "";
-  // }
+  if ( !over_any_elem ) {
+    context.hot = entt::null;
+    context.active = entt::null;
+  }
 }
 
-// inline bool DoInteraction(
-//   Types child,
-//   bool inside,
-//   bool interactive,
-//   bool mouseWentUp,
-//   bool mouseWentDown
-// ) {
-//   bool result = false;
-//   std::string entity = GetId( child );
+inline bool DoInteraction(
+  entt::entity entity,
+  bool inside,
+  bool interactive,
+  bool mouseWentUp,
+  bool mouseWentDown
+) {
+  bool result = false;
 
-//   if ( entity == context.active ) {
-//     if ( mouseWentUp ) {
-//       if ( entity == context.hot )
-//         result = true;// do the button action
+  if ( entity == context.active ) {
+    if ( mouseWentUp ) {
+      if ( entity == context.hot )
+        result = true;// do the button action
 
-//       context.active = "";
-//     }
-//   } else if ( entity == context.hot ) {
-//     // if ( mouseWentDown && interactive ) // TODO might want to readd this
-//     if ( mouseWentDown )
-//       context.active = entity;
-//   }
+      context.active = entt::null;
+    }
+  } else if ( entity == context.hot ) {
+    // TODO might want to readd this
+    // if ( mouseWentDown && interactive )
+    if ( mouseWentDown )
+      context.active = entity;
+  }
 
-//   if ( inside ) {
-//     if ( context.active == "" ) {
-//       context.hot = entity;
-//       if ( mouseWentDown && interactive )
-//         context.active = entity;
-//     }
-//   }
+  if ( inside ) {
+    if ( context.active == entt::null ) {
+      context.hot = entity;
+      if ( mouseWentDown && interactive )
+        context.active = entity;
+    }
+  }
 
-//   return result;
-// }
+  return result;
+}
 
 
 // TODO replace this param reg with the global one
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
-    // auto &context_panel = lookup.at( "settlement_context_panel" );
-
-    // RecursiveToggle( context_panel, true );
+    auto &context_panel = lookup.at( "settlement_context_panel" );
+    RecursiveToggle( context_panel, true );
     // Element &elem = Global::ui_reg.get<Element>( context_panel );
     // elem.enabled = true;
   } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
@@ -391,36 +399,30 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
 
 inline void ListenForDeselect() {
   printf( "DeSelectListener?\n" );
-  // auto context_panel = lookup.at( "settlement_context_panel" );
+  auto context_panel = lookup.at( "settlement_context_panel" );
   // // TODO not deselecting properly?
-  // ToggleElement( context_panel, false );
+  RecursiveToggle( context_panel, false );
 }
 
-// inline void RecursiveToggle( Types &elem, bool on ) {
-//   std::cout << "RecursiveToggle()"
-//             << " " << on << std::endl;
-//   // Element &elem = Global::local.get<Element>( entity );
-//   // elem.enabled = on;
+inline void RecursiveToggle( entt::entity entity, bool on ) {
+  std::cout << "RecursiveToggle()"
+            << " " << on << std::endl;
 
-//   // ToggleElem( elem, on );
+  ToggleElem( entity, on );
 
-//   if ( std::holds_alternative<Panel>( elem ) ) {
-//     std::get<Panel>( elem ).enabled = true;
-//   }
+  if ( !Global::local.all_of<Panel>( entity ) )
+    return;
 
-//   if ( !std::holds_alternative<Panel>( elem ) )
-//     return;
-
-//   for ( auto child: std::get<Panel>( elem ).children ) {
-//     RecursiveToggle( child, on );
-//   }
-// }
+  for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
+    RecursiveToggle( child, on );
+  }
+}
 
 
 inline bool MouseIsOverUI() {
   // This is almost sufficent, but we need to account for panels too
   // not just items that can be active
-  return context.active != "" || context.hot != "";
+  return context.active != entt::null || context.hot != entt::null;
 }
 };// namespace UI
 
