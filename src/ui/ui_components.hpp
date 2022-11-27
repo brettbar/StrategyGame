@@ -183,8 +183,20 @@ struct TextButton {
     return entity;
   }
 
+  void Draw() {
+    label.Draw();
+    if ( !clickable ) {
+      DrawRectangleV(
+        { label.elem.transform.x, label.elem.transform.y },
+        { label.elem.transform.width, label.elem.transform.height },
+        Fade( BLACK, 0.7 )
+      );
+    }
+  }
+
+
   void Update() {
-    Update();
+    label.Update();
 
     clickable = clickable_lookup.at( label.elem.id )();
   }
@@ -253,6 +265,16 @@ struct TextureButton {
   static entt::entity Create( std::string id ) {
     entt::entity entity = Global::local.create();
     TextureButton button = TextureButton( id );
+
+    Global::local.emplace<TextureButton>( entity, button );
+    lookup.insert_or_assign( id, entity );
+    return entity;
+  }
+
+  static entt::entity Create( std::string id, bool clickable ) {
+    entt::entity entity = Global::local.create();
+    TextureButton button = TextureButton( id );
+    button.clickable = clickable;
 
     Global::local.emplace<TextureButton>( entity, button );
     lookup.insert_or_assign( id, entity );
@@ -419,7 +441,6 @@ static T &Get( entt::entity entity ) {
   return got;
 }
 
-
 inline Type GetType( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.type;
@@ -465,6 +486,16 @@ inline rect &GetTransform( entt::entity entity ) {
   assert( false );
 }
 
+inline void UpdateElem( entt::entity entity ) {
+  if ( Has<TextLabel>( entity ) ) {
+    Get<TextLabel>( entity ).Update();
+    return;
+  }
+  if ( Has<TextButton>( entity ) ) {
+    Get<TextButton>( entity ).Update();
+    return;
+  }
+}
 
 inline void ToggleElem( entt::entity entity, bool on ) {
   if ( Has<Panel>( entity ) ) {
@@ -543,18 +574,16 @@ inline std::string GetId( entt::entity entity ) {
 }
 
 inline bool IsInteractive( entt::entity entity ) {
-  return Has<TextureButton>( entity );
+  return Has<TextureButton>( entity ) || Has<TextButton>( entity );
 }
 
 inline bool IsClickable( entt::entity entity ) {
   if ( Has<TextureButton>( entity ) ) {
-    // return Get<TextureButton>( entity ).clickable;
-    return true;
+    return Get<TextureButton>( entity ).clickable;
   }
 
   if ( Has<TextButton>( entity ) ) {
-    // return Get<TextureButton>( entity ).clickable;
-    return true;
+    return Get<TextButton>( entity ).clickable;
   }
 
   return false;

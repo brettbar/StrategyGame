@@ -211,7 +211,7 @@ inline void RecursiveDraw( Panel &panel ) {
         Get<TextLabel>( child ).Draw();
       } break;
       case Type::TextButton: {
-        Get<TextButton>( child ).label.Draw();
+        Get<TextButton>( child ).Draw();
       } break;
       case Type::TextureLabel: {
         Get<TextureLabel>( child ).Draw();
@@ -248,7 +248,7 @@ inline void RecursiveInteractions(
       );
     }
 
-    // UpdateElem( child );
+    UpdateElem( child );
 
     rect &transform = GetTransform( child );
 
@@ -264,8 +264,9 @@ inline void RecursiveInteractions(
            mouseWentUp,
            mouseWentDown
          ) ) {
+      std::cout << "INTERACTION DETECTED!!!" << std::endl;
+
       if ( IsClickable( child ) ) {
-        std::cout << "INTERACTION DETECTED!!!" << std::endl;
         action_lookup.at( GetId( child ) )();
       }
     }
@@ -295,12 +296,12 @@ inline bool DoInteraction(
     }
   } else if ( entity == context.hot ) {
     // if ( mouseWentDown && interactive )
-    if ( mouseWentDown )
+    if ( mouseWentDown && interactive )
       context.active = entity;
   }
 
   if ( inside ) {
-    if ( context.active == entt::null ) {
+    if ( context.active == entt::null && interactive ) {
       context.hot = entity;
       if ( mouseWentDown && interactive )
         context.active = entity;

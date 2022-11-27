@@ -35,13 +35,16 @@ inline std::vector<entt::entity> CreateContent() {
           Align::START,
           Align::START,
           {
-            TextureButton::Create( "settlement_context_tab_overview" ),
-            TextureButton::Create( "settlement_context_tab_population" ),
-            TextureButton::Create( "settlement_context_tab_resources" ),
-            TextureButton::Create( "settlement_context_tab_culture" ),
-            TextureButton::Create( "settlement_context_tab_religion" ),
-            TextureButton::Create( "settlement_context_tab_construction" ),
-            TextureButton::Create( "settlement_context_tab_garrison" ),
+            TextureButton::Create( "settlement_context_tab_overview", true ),
+            TextureButton::Create( "settlement_context_tab_population", true ),
+            TextureButton::Create( "settlement_context_tab_resources", true ),
+            TextureButton::Create( "settlement_context_tab_culture", true ),
+            TextureButton::Create( "settlement_context_tab_religion", true ),
+            TextureButton::Create(
+              "settlement_context_tab_construction",
+              true
+            ),
+            TextureButton::Create( "settlement_context_tab_garrison", true ),
           }
         ),
         Panel::Create(
@@ -95,16 +98,24 @@ inline std::vector<entt::entity> CreateContent() {
       },
       {
         Panel::Create(
-          "actor_context_panel",
+          "actor_actions_panel",
           BLACK,
           Axis::ROW,
           Align::START,
           Align::START,
           {
             TextButton::Create(
-              "actor_actions_panel",
+              "actor_spawn_settlement_button",
               PURPLE,
               "Spawn?",
+              26,
+              WHITE,
+              false
+            ),
+            TextButton::Create(
+              "actor_spawn_settlement_button",
+              GREEN,
+              "IDK?",
               26,
               WHITE,
               false
