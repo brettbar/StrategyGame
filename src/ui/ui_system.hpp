@@ -12,6 +12,7 @@
 #include "../renderer/textures.hpp"
 #include "../systems/selection_system.hpp"
 #include "ui_components.hpp"
+#include "ui_content.hpp"
 #include "ui_lookups.hpp"
 #include "widgets/actor_context_panel.hpp"
 #include "widgets/modal_menu.hpp"
@@ -21,7 +22,6 @@
 namespace UI {
 
 inline Context context = { entt::null, entt::null };
-inline std::vector<entt::entity> content;
 
 inline void Init( TextureCache & );
 inline void Draw();
@@ -35,122 +35,8 @@ inline void RecursiveToggle( entt::entity, bool );
 
 inline void Init( TextureCache &texture_cache ) {
   // OverviewBanner();
-
-
-  // TODO maybe I can clean this up by moving some stuff
-  // to the lookup map
-  content = {
-    Panel::Create(
-      "settlement_context_panel",
-      Fade( BLACK, 0.5 ),
-      Axis::ROW,
-      Align::START,
-      Align::START,
-      true,
-      true,
-      []() -> Vector2 {
-        return {
-          ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
-          (f32) GetScreenHeight() - 200 * SCALE,
-        };
-      },
-      []() -> Vector2 {
-        return {
-          500 * SCALE,
-          200 * SCALE,
-        };
-      },
-      {
-        Panel::Create(
-          "settlement_context_tab_group",
-          BLUE,
-          Axis::COLUMN,
-          Align::START,
-          Align::START,
-          {
-            TextureButton::Create( "settlement_context_tab_overview" ),
-            TextureButton::Create( "settlement_context_tab_population" ),
-            TextureButton::Create( "settlement_context_tab_resources" ),
-            TextureButton::Create( "settlement_context_tab_culture" ),
-            TextureButton::Create( "settlement_context_tab_religion" ),
-            TextureButton::Create( "settlement_context_tab_construction" ),
-            TextureButton::Create( "settlement_context_tab_garrison" ),
-          }
-        ),
-        Panel::Create(
-          "settlement_context_content",
-          BLACK,
-          Axis::ROW,
-          Align::START,
-          Align::START,
-          {}
-        ),
-      }
-    ),
-    Panel::Create(
-      "actor_context_panel",
-      Fade( BLACK, 0.5 ),
-      Axis::ROW,
-      Align::START,
-      Align::START,
-      true,
-      true,
-      []() -> Vector2 {
-        return {
-          ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
-          (f32) GetScreenHeight() - 200 * SCALE,
-        };
-      },
-      []() -> Vector2 {
-        return {
-          500 * SCALE,
-          200 * SCALE,
-        };
-      },
-      {
-        Panel::Create(
-          "actor_context_panel",
-          BLACK,
-          Axis::ROW,
-          Align::START,
-          Align::START,
-          {
-            TextButton::Create(
-              "actor_actions_panel",
-              PURPLE,
-              "Spawn?",
-              26,
-              WHITE,
-              false
-            ),
-          }
-        ),
-      }
-    ),
-  };
-
-
-  // SettlementContextPanel(
-  //   { SettlementContextTabGroup( {
-  //       SettlementContextTabButton( "settlement_context_tab_overview" ),
-  //       SettlementContextTabButton( "settlement_context_tab_population" ),
-  //       SettlementContextTabButton( "settlement_context_tab_resources" ),
-  //       SettlementContextTabButton( "settlement_context_tab_culture" ),
-  //       SettlementContextTabButton( "settlement_context_tab_religion" ),
-  //       SettlementContextTabButton( "settlement_context_tab_construction" ),
-  //       SettlementContextTabButton( "settlement_context_tab_garrison" ),
-  //     } ),
-  //     SettlementContextContent( { SettlementContent( {
-  //       SettlementName(),
-  //       SettlementPopulation(),
-  //       SettlementDevelopment(),
-  //     } ) } ) }
-  // );
-
-  // ActorContextPanel( { ActorActionsPanel( {
-  //   ActorSpawnSettlementButton(),
-  // } ) } );
   // ModalMenu();
+  content = CreateContent();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
@@ -454,9 +340,6 @@ inline void ListenForDeselect() {
 }
 
 inline void RecursiveToggle( entt::entity entity, bool on ) {
-  std::cout << "RecursiveToggle()"
-            << " " << on << std::endl;
-
   ToggleElem( entity, on );
 
   if ( !Has<Panel>( entity ) )
