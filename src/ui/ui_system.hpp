@@ -21,7 +21,6 @@
 namespace UI {
 
 inline Context context = { entt::null, entt::null };
-// inline Context context = { "", "" };
 inline std::vector<entt::entity> content;
 
 inline void Init( TextureCache & );
@@ -102,12 +101,21 @@ inline void Init( TextureCache &texture_cache ) {
       },
       {
         Panel::Create(
-          "actor_actions_panel",
+          "actor_context_panel",
           BLACK,
           Axis::ROW,
           Align::START,
           Align::START,
-          {}
+          {
+            TextButton::Create(
+              "actor_actions_panel",
+              PURPLE,
+              "Spawn?",
+              26,
+              WHITE,
+              false
+            ),
+          }
         ),
       }
     ),
@@ -216,7 +224,10 @@ inline void RecursiveLayout( Panel &parent_panel ) {
         RecursiveLayout( child_panel );
       } break;
       case Type::TextLabel: {
-        //   std::get<TextLabel>( child ).Resize();
+        Get<TextLabel>( child ).Resize();
+      } break;
+      case Type::TextButton: {
+        Get<TextButton>( child ).label.Resize();
       } break;
       case Type::TextureLabel: {
         Get<TextureLabel>( child ).Resize();
@@ -282,7 +293,7 @@ inline void RecursiveLayout( Panel &parent_panel ) {
   //     tallest_child = transform.height;
   // }
 
-  // if ( !Global::local.all_of<BasePanel>( entity ) ) {
+  // if ( !Has<BasePanel>( entity ) ) {
   //   if ( panel.children_axis == Axis::ROW ) {
   //     panel_elem.transform.width = total_width;
   //     panel_elem.transform.height = tallest_child;
@@ -303,6 +314,12 @@ inline void RecursiveDraw( Panel &panel ) {
     switch ( GetType( child ) ) {
       case Type::Panel: {
         RecursiveDraw( Get<Panel>( child ) );
+      } break;
+      case Type::TextLabel: {
+        Get<TextLabel>( child ).Draw();
+      } break;
+      case Type::TextButton: {
+        Get<TextButton>( child ).label.Draw();
       } break;
       case Type::TextureLabel: {
         Get<TextureLabel>( child ).Draw();
@@ -330,7 +347,7 @@ inline void RecursiveInteractions(
     if ( !IsEnabled( child ) )
       continue;
 
-    if ( Global::local.all_of<Panel>( child ) ) {
+    if ( Has<Panel>( child ) ) {
       RecursiveInteractions(
         Get<Panel>( child ),
         over_any_elem,
@@ -414,8 +431,8 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
     auto actor = game_reg.get<Actor::Component>( entity );
     printf( "Actor: %s \n", actor.name );
 
-    // auto context_panel = lookup.at( "actor_context_panel" );
-    // RecursiveToggle( context_panel, true );
+    auto context_panel = lookup.at( "actor_context_panel" );
+    RecursiveToggle( context_panel, true );
     //
     // entt::entity context_label = ui_lookup.at( "context_label" );
     // Global::ui_reg.get<TextLabel>( context_label ).text = actor.name;
@@ -425,7 +442,8 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
 inline void ListenForDeselect() {
   printf( "DeSelectListener?\n" );
   auto context_panel = lookup.at( "settlement_context_panel" );
-  // // TODO not deselecting properly?
+  RecursiveToggle( context_panel, false );
+  context_panel = lookup.at( "actor_context_panel" );
   RecursiveToggle( context_panel, false );
 }
 
@@ -435,7 +453,7 @@ inline void RecursiveToggle( entt::entity entity, bool on ) {
 
   ToggleElem( entity, on );
 
-  if ( !Global::local.all_of<Panel>( entity ) )
+  if ( !Has<Panel>( entity ) )
     return;
 
   for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
@@ -534,7 +552,7 @@ inline bool MouseIsOverUI() {
 //     tallest_child = elem.height;
 // }
 
-// if ( !Global::local.all_of<BasePanel>( entity ) ) {
+// if ( !Has<BasePanel>( entity ) ) {
 //   if ( panel.children_axis == Axis::ROW ) {
 //     panel_elem.transform.width = total_width;
 //     panel_elem.transform.height = tallest_child;
@@ -580,7 +598,7 @@ inline bool MouseIsOverUI() {
 //   //   LayoutPanel( parent, ent );
 
 //   //   for ( auto &child: parent.children ) {
-//   //     assert( Global::local.all_of<Panel>( child ) );
+//   //     assert( Has<Panel>( child ) );
 
 //   //     Element &elem = Global::local.get<Element>( child );
 //   //     Panel &panel = Global::local.get<Panel>( child );
@@ -750,7 +768,7 @@ inline bool MouseIsOverUI() {
 //   //     tallest_child = elem.height;
 //   // }
 
-//   // if ( !Global::local.all_of<BasePanel>( entity ) ) {
+//   // if ( !Has<BasePanel>( entity ) ) {
 //   //   if ( panel.children_axis == Axis::ROW ) {
 //   //     panel_elem.transform.width = total_width;
 //   //     panel_elem.transform.height = tallest_child;

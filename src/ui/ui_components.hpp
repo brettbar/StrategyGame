@@ -10,8 +10,8 @@ namespace UI {
 
 typedef struct Element Element;
 typedef struct Panel Panel;
-// typedef struct TextLabel TextLabel;
-// typedef struct TextButton TextButton;
+typedef struct TextLabel TextLabel;
+typedef struct TextButton TextButton;
 typedef struct TextureLabel TextureLabel;
 typedef struct TextureButton TextureButton;
 
@@ -78,53 +78,113 @@ struct Element {
   }
 };
 
+struct TextLabel {
+  Element elem;
+  std::string text;
+  i32 font_size;
+  Color text_color;
+  bool dynamic = false;
 
-// struct TextLabel : Element {
-//   std::string text;
-//   i32 font_size;
-//   Color text_color;
-//   bool dynamic = false;
 
-//   TextLabel(
-//     std::string id,
-//     Color background,
-//     std::string text,
-//     i32 font_size,
-//     Color text_color,
-//     bool dynamic
-//   )
-//       : Element( id, Type::TextLabel, background, false, {}, {} ), text( text ),
-//         font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-//   }
+  void Resize() {
+    const vec2 text_dims = MeasureTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      text.c_str(),
+      font_size,
+      2.0f
+    );
 
-//   void Resize() {
-//     const vec2 text_dims = MeasureTextEx(
-//       Global::font_cache[hstr{ "font_romulus" }]->font,
-//       text.c_str(),
-//       font_size,
-//       2.0f
-//     );
+    elem.transform.width = text_dims.x;
+    elem.transform.height = text_dims.y;
+  }
 
-//     transform.width = text_dims.x;
-//     transform.height = text_dims.y;
-//   }
+  void Update() {
+    if ( dynamic ) {
+      text = update_lookup.at( elem.id )();
+    }
+  }
 
-//   void Update() {
-//     if ( dynamic ) {
-//       text = update_lookup.at( id )();
-//     }
-//   }
-// };
+  void Draw() {
+    DrawRectangleV(
+      { elem.transform.x, elem.transform.y },
+      { elem.transform.width, elem.transform.height },
+      elem.background
+    );
 
-// struct TextButton : TextLabel {
-//   bool clickable = false;
+    DrawTextEx(
+      Global::font_cache[hstr{ "font_romulus" }]->font,
+      text.c_str(),
+      {
+        elem.transform.x,
+        elem.transform.y,
+      },
+      font_size,
+      2.0,
+      text_color
+    );
+  }
 
-//   void Update() {
-//     TextLabel::Update();
+  TextLabel(
+    std::string id,
+    Type type,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic
+  )
+      : elem( Element( id, type, background, false, {}, {} ) ), text( text ),
+        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
+  }
+};
 
-//     this->clickable = clickable_lookup.at( id )();
-//   }
-// };
+struct TextButton {
+  TextLabel label;
+  bool clickable = false;
+
+  static entt::entity Create(
+    std::string id,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic
+  ) {
+    entt::entity entity = Global::local.create();
+    TextButton button =
+      TextButton( id, background, text, font_size, text_color, dynamic );
+
+    Global::local.emplace<TextButton>( entity, button );
+    lookup.insert_or_assign( id, entity );
+    return entity;
+  }
+
+  void Update() {
+    Update();
+
+    clickable = clickable_lookup.at( label.elem.id )();
+  }
+
+  private:
+  TextButton(
+    std::string id,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic
+  )
+      : label( TextLabel(
+          id,
+          Type::TextButton,
+          background,
+          text,
+          font_size,
+          text_color,
+          dynamic
+        ) ) {
+  }
+};
 
 struct TextureLabel {
   Element elem;
@@ -325,29 +385,37 @@ struct Panel {
 };
 
 template<typename T>
+static bool Has( entt::entity entity ) {
+  return Global::local.all_of<T>( entity );
+}
+
+template<typename T>
 static T &Get( entt::entity entity ) {
-  assert( Global::local.all_of<T>( entity ) );
+  assert( Has<T>( entity ) );
   auto &got = Global::local.get<T>( entity );
   return got;
 }
 
+
 inline Type GetType( entt::entity entity ) {
-  if ( Global::local.all_of<Panel>( entity ) ) {
+  if ( Has<Panel>( entity ) ) {
     return Global::local.get<Panel>( entity ).elem.type;
   }
-  // if ( Global::local.all_of<TextLabel>( entity ) ) {
-  //   return Type::TextLabel;
-  // }
 
-  if ( Global::local.all_of<TextureLabel>( entity ) ) {
+  if ( Has<TextLabel>( entity ) ) {
+    return Global::local.get<TextLabel>( entity ).elem.type;
+  }
+
+
+  if ( Has<TextButton>( entity ) ) {
+    return Global::local.get<TextButton>( entity ).label.elem.type;
+  }
+
+  if ( Has<TextureLabel>( entity ) ) {
     return Global::local.get<TextureLabel>( entity ).elem.type;
   }
 
-  // if ( Global::local.all_of<TextButton>( entity ) ) {
-  //   return Type::TextButton;
-  // }
-
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
     return Global::local.get<TextureButton>( entity ).label.elem.type;
   }
 
@@ -355,13 +423,19 @@ inline Type GetType( entt::entity entity ) {
 }
 
 inline rect &GetTransform( entt::entity entity ) {
-  if ( Global::local.all_of<Panel>( entity ) ) {
+  if ( Has<Panel>( entity ) ) {
     return Global::local.get<Panel>( entity ).elem.transform;
   }
-  if ( Global::local.all_of<TextureLabel>( entity ) ) {
+  if ( Has<TextLabel>( entity ) ) {
+    return Global::local.get<TextLabel>( entity ).elem.transform;
+  }
+  if ( Has<TextButton>( entity ) ) {
+    return Global::local.get<TextButton>( entity ).label.elem.transform;
+  }
+  if ( Has<TextureLabel>( entity ) ) {
     return Global::local.get<TextureLabel>( entity ).elem.transform;
   }
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
     return Global::local.get<TextureButton>( entity ).label.elem.transform;
   }
   std::cout << "Invalid Transform!!" << std::endl;
@@ -369,43 +443,51 @@ inline rect &GetTransform( entt::entity entity ) {
 
 
 inline void ToggleElem( entt::entity entity, bool on ) {
-  if ( Global::local.all_of<Panel>( entity ) ) {
+  if ( Has<Panel>( entity ) ) {
     printf( "Enabling panel\n" );
     Get<Panel>( entity ).elem.enabled = on;
     return;
   }
 
-  if ( Global::local.all_of<TextureLabel>( entity ) ) {
+  if ( Has<TextLabel>( entity ) ) {
+    Get<TextLabel>( entity ).elem.enabled = on;
+    return;
+  }
+
+  if ( Has<TextButton>( entity ) ) {
+    Get<TextButton>( entity ).label.elem.enabled = on;
+    return;
+  }
+
+  if ( Has<TextureLabel>( entity ) ) {
     Get<TextureLabel>( entity ).elem.enabled = on;
     return;
   }
 
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
     Get<TextureButton>( entity ).label.elem.enabled = on;
     return;
   }
-
-  // if ( Global::local.all_of<TextLabel>( entity ) ) {
-  //   Get<TextLabel>( entity ).elem.enabled = on;
-  //   return;
-  // }
-
-  // if ( Global::local.all_of<TextButton>( entity ) ) {
-  //   Get<TextButton>( entity ).elem.enabled = on;
-  //   return;
-  // }
 }
 
 inline bool IsEnabled( entt::entity entity ) {
-  if ( Global::local.all_of<Panel>( entity ) ) {
+  if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.enabled;
   }
 
-  if ( Global::local.all_of<TextureLabel>( entity ) ) {
+  if ( Has<TextLabel>( entity ) ) {
+    return Get<TextLabel>( entity ).elem.enabled;
+  }
+
+  if ( Has<TextButton>( entity ) ) {
+    return Get<TextButton>( entity ).label.elem.enabled;
+  }
+
+  if ( Has<TextureLabel>( entity ) ) {
     return Get<TextureLabel>( entity ).elem.enabled;
   }
 
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
     return Get<TextureButton>( entity ).label.elem.enabled;
   }
 
@@ -413,15 +495,23 @@ inline bool IsEnabled( entt::entity entity ) {
 }
 
 inline std::string GetId( entt::entity entity ) {
-  if ( Global::local.all_of<Panel>( entity ) ) {
+  if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.id;
   }
 
-  if ( Global::local.all_of<TextureLabel>( entity ) ) {
+  if ( Has<TextLabel>( entity ) ) {
+    return Get<TextLabel>( entity ).elem.id;
+  }
+
+  if ( Has<TextButton>( entity ) ) {
+    return Get<TextButton>( entity ).label.elem.id;
+  }
+
+  if ( Has<TextureLabel>( entity ) ) {
     return Get<TextureLabel>( entity ).elem.id;
   }
 
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
     return Get<TextureButton>( entity ).label.elem.id;
   }
 
@@ -429,11 +519,16 @@ inline std::string GetId( entt::entity entity ) {
 }
 
 inline bool IsInteractive( entt::entity entity ) {
-  return Global::local.all_of<TextureButton>( entity );
+  return Has<TextureButton>( entity );
 }
 
 inline bool IsClickable( entt::entity entity ) {
-  if ( Global::local.all_of<TextureButton>( entity ) ) {
+  if ( Has<TextureButton>( entity ) ) {
+    // return Get<TextureButton>( entity ).clickable;
+    return true;
+  }
+
+  if ( Has<TextButton>( entity ) ) {
     // return Get<TextureButton>( entity ).clickable;
     return true;
   }
