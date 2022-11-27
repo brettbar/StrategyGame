@@ -85,6 +85,30 @@ struct TextLabel {
   Color text_color;
   bool dynamic = false;
 
+  static entt::entity Create(
+    std::string id,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic
+  ) {
+    entt::entity entity = Global::local.create();
+    TextLabel button = TextLabel(
+      id,
+      Type::TextLabel,
+      background,
+      text,
+      font_size,
+      text_color,
+      dynamic
+    );
+
+    Global::local.emplace<TextLabel>( entity, button );
+    lookup.insert_or_assign( id, entity );
+    return entity;
+  }
+
 
   void Resize() {
     const vec2 text_dims = MeasureTextEx(
@@ -254,8 +278,8 @@ struct Panel {
   Axis children_axis;
   Align children_horiz_align;
   Align children_vert_align;
-  bool absolute_pos = false;
-  bool resizeable = false;
+  bool abs_pos = false;
+  bool abs_size = false;
   std::function<Vector2()> update_pos;
   std::function<Vector2()> update_size;
   std::vector<entt::entity> children;
@@ -266,8 +290,8 @@ struct Panel {
     Axis children_axis,
     Align children_horiz_align,
     Align children_vert_align,
-    bool absolute_pos,
-    bool resizeable,
+    bool abs_pos,
+    bool abs_size,
     std::function<Vector2()> update_pos,
     std::function<Vector2()> update_size,
     std::vector<entt::entity> children
@@ -279,8 +303,8 @@ struct Panel {
       children_axis,
       children_horiz_align,
       children_vert_align,
-      absolute_pos,
-      resizeable,
+      abs_pos,
+      abs_size,
       update_pos,
       update_size,
       children
@@ -317,7 +341,7 @@ struct Panel {
 
 
   void Place() {
-    if ( absolute_pos ) {
+    if ( abs_pos ) {
       Vector2 new_pos = update_pos();
       elem.transform.x = new_pos.x;
       elem.transform.y = new_pos.y;
@@ -325,7 +349,7 @@ struct Panel {
   }
 
   void Resize() {
-    if ( resizeable ) {
+    if ( abs_size ) {
       Vector2 new_size = update_size();
       elem.transform.width = new_size.x;
       elem.transform.height = new_size.y;
@@ -359,10 +383,9 @@ struct Panel {
         ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ),
-        absolute_pos( absolute_pos ), resizeable( resizeable ),
-        update_pos( update_pos ), update_size( update_size ),
-        children( children ) {
+        children_vert_align( children_vert_align ), abs_pos( absolute_pos ),
+        abs_size( resizeable ), update_pos( update_pos ),
+        update_size( update_size ), children( children ) {
   }
 
   // Relative panel
@@ -379,8 +402,8 @@ struct Panel {
         ),
         children_axis( children_axis ),
         children_horiz_align( children_horiz_align ),
-        children_vert_align( children_vert_align ), absolute_pos( false ),
-        resizeable( false ), update_pos( {} ), update_size( {} ),
+        children_vert_align( children_vert_align ), abs_pos( false ),
+        abs_size( false ), update_pos( {} ), update_size( {} ),
         children( children ){};
 };
 
@@ -399,24 +422,23 @@ static T &Get( entt::entity entity ) {
 
 inline Type GetType( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
-    return Global::local.get<Panel>( entity ).elem.type;
+    return Get<Panel>( entity ).elem.type;
   }
 
   if ( Has<TextLabel>( entity ) ) {
-    return Global::local.get<TextLabel>( entity ).elem.type;
+    return Get<TextLabel>( entity ).elem.type;
   }
 
-
   if ( Has<TextButton>( entity ) ) {
-    return Global::local.get<TextButton>( entity ).label.elem.type;
+    return Get<TextButton>( entity ).label.elem.type;
   }
 
   if ( Has<TextureLabel>( entity ) ) {
-    return Global::local.get<TextureLabel>( entity ).elem.type;
+    return Get<TextureLabel>( entity ).elem.type;
   }
 
   if ( Has<TextureButton>( entity ) ) {
-    return Global::local.get<TextureButton>( entity ).label.elem.type;
+    return Get<TextureButton>( entity ).label.elem.type;
   }
 
   return Type::INVALID_TYPE;
@@ -424,21 +446,23 @@ inline Type GetType( entt::entity entity ) {
 
 inline rect &GetTransform( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
-    return Global::local.get<Panel>( entity ).elem.transform;
+    return Get<Panel>( entity ).elem.transform;
   }
   if ( Has<TextLabel>( entity ) ) {
-    return Global::local.get<TextLabel>( entity ).elem.transform;
+    return Get<TextLabel>( entity ).elem.transform;
   }
   if ( Has<TextButton>( entity ) ) {
-    return Global::local.get<TextButton>( entity ).label.elem.transform;
+    return Get<TextButton>( entity ).label.elem.transform;
   }
   if ( Has<TextureLabel>( entity ) ) {
-    return Global::local.get<TextureLabel>( entity ).elem.transform;
+    return Get<TextureLabel>( entity ).elem.transform;
   }
   if ( Has<TextureButton>( entity ) ) {
-    return Global::local.get<TextureButton>( entity ).label.elem.transform;
+    return Get<TextureButton>( entity ).label.elem.transform;
   }
-  std::cout << "Invalid Transform!!" << std::endl;
+
+  std::cout << "GetTransform() Invalid Transform!!" << std::endl;
+  assert( false );
 }
 
 

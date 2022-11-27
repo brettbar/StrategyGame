@@ -77,6 +77,14 @@ inline void Init( TextureCache &texture_cache ) {
             TextureButton::Create( "settlement_context_tab_garrison" ),
           }
         ),
+        Panel::Create(
+          "settlement_context_content",
+          BLACK,
+          Axis::ROW,
+          Align::START,
+          Align::START,
+          {}
+        ),
       }
     ),
     Panel::Create(
@@ -175,8 +183,6 @@ inline void UpdateOnFrame() {
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
   }
-
-  // Interactions?
 }
 
 inline void Draw() {
@@ -280,28 +286,28 @@ inline void RecursiveLayout( Panel &parent_panel ) {
     }
   }
 
-  // for ( entt::entity child: parent_panel.children ) {
-  //   rect &transform = GetTransform( child );
+  if ( !parent_panel.abs_size ) {
+    for ( entt::entity child: parent_panel.children ) {
+      rect &transform = GetTransform( child );
 
-  //   total_width += transform.width;
-  //   total_height += transform.height;
+      total_width += transform.width;
+      total_height += transform.height;
 
-  //   if ( transform.width > widest_child )
-  //     widest_child = transform.width;
+      if ( transform.width > widest_child )
+        widest_child = transform.width;
 
-  //   if ( transform.height > tallest_child )
-  //     tallest_child = transform.height;
-  // }
+      if ( transform.height > tallest_child )
+        tallest_child = transform.height;
+    }
 
-  // if ( !Has<BasePanel>( entity ) ) {
-  //   if ( panel.children_axis == Axis::ROW ) {
-  //     panel_elem.transform.width = total_width;
-  //     panel_elem.transform.height = tallest_child;
-  //   } else if ( panel.children_axis == Axis::COLUMN ) {
-  //     panel_elem.transform.width = widest_child;
-  //     panel_elem.transform.height = total_height;
-  //   }
-  // }
+    if ( parent_panel.children_axis == Axis::ROW ) {
+      parent_panel.elem.transform.width = total_width;
+      parent_panel.elem.transform.height = tallest_child;
+    } else if ( parent_panel.children_axis == Axis::COLUMN ) {
+      parent_panel.elem.transform.width = widest_child;
+      parent_panel.elem.transform.height = total_height;
+    }
+  }
 }
 
 inline void RecursiveDraw( Panel &panel ) {
