@@ -1,12 +1,23 @@
 #pragma once
+
 #include "../common.hpp"
-#include "ui_components.hpp"
+#include "ui_shared.hpp"
 
 namespace UI {
 inline std::vector<entt::entity> content;
 
 inline std::vector<entt::entity> CreateContent() {
   return {
+    Panel::Create(
+      "modal_menu",
+      BLUE,
+      Axis::COLUMN,
+      Align::START,
+      Align::START,
+      {
+
+      }
+    ),
     Panel::Create(
       "settlement_context_panel",
       Fade( BLACK, 0.5 ),
