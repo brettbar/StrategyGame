@@ -13,9 +13,9 @@ struct TextLabel {
 
   static entt::entity Create(
     std::string id,
-    Color background,
     std::string text,
     i32 font_size,
+    Color background,
     Color text_color,
     bool dynamic
   ) {
@@ -114,9 +114,9 @@ struct TextButton {
 
   static entt::entity Create(
     std::string id,
-    Color background,
     std::string text,
     i32 font_size,
+    Color background,
     Color text_color,
     bool dynamic
   ) {
@@ -131,9 +131,9 @@ struct TextButton {
 
   static entt::entity Create(
     std::string id,
-    Color background,
     std::string text,
     i32 font_size,
+    Color background,
     Color text_color,
     bool dynamic,
     bool always_clickable

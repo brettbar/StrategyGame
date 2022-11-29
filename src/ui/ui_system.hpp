@@ -13,10 +13,6 @@
 #include "../systems/selection_system.hpp"
 #include "ui_content.hpp"
 #include "ui_lookups.hpp"
-#include "widgets/actor_context_panel.hpp"
-#include "widgets/modal_menu.hpp"
-#include "widgets/overview_banner.hpp"
-#include "widgets/settlement_context_panel.hpp"
 
 namespace UI {
 
@@ -88,7 +84,6 @@ inline void Draw() {
     Panel &panel = Get<Panel>( base );
     RecursiveDraw( panel );
   }
-
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );

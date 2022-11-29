@@ -23,45 +23,45 @@ inline std::vector<entt::entity> CreateContent() {
       {
         TextButton::Create(
           "modal_menu_load_game",
-          BLUE,
           "Load Game",
           32,
+          BLUE,
           WHITE,
           false,
           true
         ),
         TextButton::Create(
           "modal_menu_save_game",
-          BLUE,
           "Save Game",
           32,
+          BLUE,
           WHITE,
           false,
           true
         ),
         TextButton::Create(
           "modal_menu_settings",
-          BLUE,
           "Settings",
           32,
+          BLUE,
           WHITE,
           false,
           true
         ),
         TextButton::Create(
           "modal_menu_exit_main",
-          BLUE,
           "Exit to Main Menu",
           32,
+          BLUE,
           WHITE,
           false,
           true
         ),
         TextButton::Create(
           "modal_menu_exit_game",
-          BLUE,
           "Exit Game",
           32,
+          BLUE,
           WHITE,
           false,
           true
@@ -117,19 +117,19 @@ inline std::vector<entt::entity> CreateContent() {
           {
             TextLabel::Create(
               "settlement_name",
-              BLACK,
               "Uninhabited",
               32,
+              BLACK,
               WHITE,
               true
             ),
             TextLabel::
-              Create( "settlement_population", BLACK, "0", 32, WHITE, true ),
+              Create( "settlement_population", "0", 32, BLACK, WHITE, true ),
             TextLabel::Create(
               "settlement_development",
-              BLACK,
               "Uninhabited",
               32,
+              BLACK,
               WHITE,
               true
             ),
