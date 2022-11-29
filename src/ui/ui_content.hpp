@@ -8,14 +8,64 @@ inline std::vector<entt::entity> content;
 
 inline std::vector<entt::entity> CreateContent() {
   return {
-    Panel::Create(
+    Panel::CreateAbsPos(
       "modal_menu",
-      BLUE,
+      BLACK,
       Axis::COLUMN,
       Align::START,
       Align::START,
+      []() -> Vector2 {
+        return {
+          ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
+          ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
+        };
+      },
       {
-
+        TextButton::Create(
+          "modal_menu_load_game",
+          BLUE,
+          "Load Game",
+          32,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
+          "modal_menu_save_game",
+          BLUE,
+          "Save Game",
+          32,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
+          "modal_menu_settings",
+          BLUE,
+          "Settings",
+          32,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
+          "modal_menu_exit_main",
+          BLUE,
+          "Exit to Main Menu",
+          32,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
+          "modal_menu_exit_game",
+          BLUE,
+          "Exit Game",
+          32,
+          WHITE,
+          false,
+          true
+        ),
       }
     ),
     Panel::Create(

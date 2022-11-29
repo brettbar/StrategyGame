@@ -81,7 +81,7 @@ int main( void ) {
 
   while ( !WindowShouldClose() ) {
     switch ( Global::program_mode ) {
-      case Global::ProgramMode::MAIN_MENU:
+      case Global::ProgramMode::MainMenu:
         Input::CheckMenuToggle();
 
         BeginDrawing();
@@ -90,7 +90,7 @@ int main( void ) {
 
         break;
 
-      case Global::ProgramMode::MODAL_MENU:
+      case Global::ProgramMode::ModalMenu:
         Input::CheckMenuToggle();
 
         BeginDrawing();
@@ -112,7 +112,7 @@ int main( void ) {
         EndDrawing();
         break;
 
-      case Global::ProgramMode::GAME:
+      case Global::ProgramMode::Game:
         if ( host_mode ) {
 
           if ( !game_started ) {

@@ -6,18 +6,19 @@
 namespace Global {
 
 enum class ProgramMode {
-  MAIN_MENU,
-  MODAL_MENU,
-  GAME,
-  EDITOR,
+  MainMenu,
+  ModalMenu,
+  Game,
+  Editor,
 };
 
+// TODO delete?
 enum class GameMode {
   CAMPAIGN,
   BATTLE,
 };
 
-inline ProgramMode program_mode = ProgramMode::GAME;
+inline ProgramMode program_mode = ProgramMode::Game;
 inline FontCache font_cache = {};
 inline TextureCache texture_cache = {};
 inline entt::registry world;

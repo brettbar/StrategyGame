@@ -17,13 +17,12 @@ struct Panel {
   std::vector<entt::entity> children;
 
   // Absolute-Positioned
-  static entt::entity Create(
+  static entt::entity CreateAbsPos(
     std::string id,
     Color background,
     Axis children_axis,
     Align children_horiz_align,
     Align children_vert_align,
-    bool abs_pos,
     std::function<Vector2()> update_pos,
     std::vector<entt::entity> children
   ) {
@@ -34,7 +33,7 @@ struct Panel {
       children_axis,
       children_horiz_align,
       children_vert_align,
-      abs_pos,
+      true,
       false,
       update_pos,
       {},
@@ -47,34 +46,33 @@ struct Panel {
   }
 
   // // Absolute-Sized
-  // static entt::entity Create(
-  //   std::string id,
-  //   Color background,
-  //   Axis children_axis,
-  //   Align children_horiz_align,
-  //   Align children_vert_align,
-  //   bool abs_size,
-  //   std::function<Vector2()> update_size,
-  //   std::vector<entt::entity> children
-  // ) {
-  //   entt::entity entity = Global::local.create();
-  //   Panel panel = Panel(
-  //     id,
-  //     background,
-  //     children_axis,
-  //     children_horiz_align,
-  //     children_vert_align,
-  //     false,
-  //     abs_size,
-  //     {},
-  //     update_size,
-  //     children
-  //   );
+  static entt::entity CreateAbsSize(
+    std::string id,
+    Color background,
+    Axis children_axis,
+    Align children_horiz_align,
+    Align children_vert_align,
+    std::function<Vector2()> update_size,
+    std::vector<entt::entity> children
+  ) {
+    entt::entity entity = Global::local.create();
+    Panel panel = Panel(
+      id,
+      background,
+      children_axis,
+      children_horiz_align,
+      children_vert_align,
+      false,
+      true,
+      {},
+      update_size,
+      children
+    );
 
-  //   Global::local.emplace<Panel>( entity, panel );
-  //   lookup.insert_or_assign( id, entity );
-  //   return entity;
-  // }
+    Global::local.emplace<Panel>( entity, panel );
+    lookup.insert_or_assign( id, entity );
+    return entity;
+  }
 
   // Absolute-Sized and Positioned
   static entt::entity Create(
@@ -108,6 +106,7 @@ struct Panel {
     return entity;
   }
 
+  // Default Panel
   static entt::entity Create(
     std::string id,
     Color background,

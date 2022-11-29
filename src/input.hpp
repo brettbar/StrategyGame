@@ -23,12 +23,13 @@ namespace Input {
 
 inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_CAPS_LOCK ) ) {
-    if ( Global::program_mode == Global::ProgramMode::GAME ) {
-      Global::program_mode = Global::ProgramMode::MODAL_MENU;
-    } else if ( Global::program_mode == Global::ProgramMode::MODAL_MENU ) {
-      Global::program_mode = Global::ProgramMode::GAME;
+    if ( Global::program_mode == Global::ProgramMode::Game ) {
+      Global::program_mode = Global::ProgramMode::ModalMenu;
+      UI::SetModalMenu( true );
+    } else if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+      Global::program_mode = Global::ProgramMode::Game;
+      UI::SetModalMenu( false );
     }
-    // UI::ToggleModalMenu();
   }
 }
 

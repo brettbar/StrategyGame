@@ -56,34 +56,6 @@ inline std::map<std::string, std::function<bool()>> clickable_lookup = {
     "actor_spawn_settlement_button",
     []() -> bool { return ActorSystem::ColonistCanPlaceSettlement(); },
   },
-  {
-    "settlement_context_tab_overview",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_population",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_resources",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_culture",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_religion",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_construction",
-    []() -> bool { return true; },
-  },
-  {
-    "settlement_context_tab_garrison",
-    []() -> bool { return true; },
-  },
 };
 
 inline std::map<std::string, std::function<std::string()>> update_lookup = {

@@ -43,6 +43,7 @@ struct TextureLabel {
 struct TextureButton {
   TextureLabel label;
   bool clickable = false;
+  bool always_clickable = false;
 
   static entt::entity Create( std::string id ) {
     entt::entity entity = Global::local.create();
@@ -53,10 +54,11 @@ struct TextureButton {
     return entity;
   }
 
-  static entt::entity Create( std::string id, bool clickable ) {
+  static entt::entity Create( std::string id, bool always_clickable ) {
     entt::entity entity = Global::local.create();
     TextureButton button = TextureButton( id );
-    button.clickable = clickable;
+    button.always_clickable = always_clickable;
+    button.clickable = always_clickable;
 
     Global::local.emplace<TextureButton>( entity, button );
     lookup.insert_or_assign( id, entity );
@@ -68,7 +70,8 @@ struct TextureButton {
   }
 
   void Update() {
-    clickable = clickable_lookup.at( label.elem.id )();
+    if ( !always_clickable )
+      clickable = clickable_lookup.at( label.elem.id )();
   }
 
   private:

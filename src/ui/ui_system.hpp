@@ -39,9 +39,9 @@ inline void Init( TextureCache &texture_cache ) {
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
 }
 
-inline void ToggleModalMenu() {
+inline void SetModalMenu( bool on ) {
   Panel &panel = Get<Panel>( lookup.at( "modal_menu" ) );
-  panel.elem.enabled = !panel.elem.enabled;
+  panel.elem.enabled = on;
 }
 
 inline void UpdateOnFrame() {
@@ -61,6 +61,14 @@ inline void UpdateOnFrame() {
     SCALE = 4.0;
   }
 
+  if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+    auto modal_menu = lookup["modal_menu"];
+    Panel &panel = Get<Panel>( modal_menu );
+    RecursiveLayout( panel );
+    RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+    return;
+  }
+
   for ( entt::entity base: content ) {
     Panel &panel = Get<Panel>( base );
     RecursiveLayout( panel );
@@ -69,10 +77,18 @@ inline void UpdateOnFrame() {
 }
 
 inline void Draw() {
+  // TODO hacky
+  if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+    auto modal_menu = lookup["modal_menu"];
+    RecursiveDraw( Get<Panel>( modal_menu ) );
+    return;
+  }
+
   for ( entt::entity base: content ) {
     Panel &panel = Get<Panel>( base );
     RecursiveDraw( panel );
   }
+
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );

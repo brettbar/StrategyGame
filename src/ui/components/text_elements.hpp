@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../ui_lookups.hpp"
 #include "element.hpp"
 
 namespace UI {
@@ -35,7 +34,6 @@ struct TextLabel {
     lookup.insert_or_assign( id, entity );
     return entity;
   }
-
 
   void Resize() {
     const vec2 text_dims = MeasureTextEx(
@@ -112,6 +110,7 @@ struct TextLabel {
 struct TextButton {
   TextLabel label;
   bool clickable = false;
+  bool always_clickable = false;
 
   static entt::entity Create(
     std::string id,
@@ -130,6 +129,27 @@ struct TextButton {
     return entity;
   }
 
+  static entt::entity Create(
+    std::string id,
+    Color background,
+    std::string text,
+    i32 font_size,
+    Color text_color,
+    bool dynamic,
+    bool always_clickable
+  ) {
+    entt::entity entity = Global::local.create();
+    TextButton button =
+      TextButton( id, background, text, font_size, text_color, dynamic );
+
+    button.always_clickable = always_clickable;
+    button.clickable = always_clickable;
+
+    Global::local.emplace<TextButton>( entity, button );
+    lookup.insert_or_assign( id, entity );
+    return entity;
+  }
+
   void Draw() {
     if ( !clickable )
       label.Draw( Fade( BLACK, 0.5 ) );
@@ -141,7 +161,8 @@ struct TextButton {
   void Update() {
     label.Update();
 
-    clickable = clickable_lookup.at( label.elem.id )();
+    if ( !always_clickable )
+      clickable = clickable_lookup.at( label.elem.id )();
   }
 
   private:
