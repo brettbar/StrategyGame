@@ -27,17 +27,13 @@ inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
 inline void RecursiveToggle( entt::entity, bool );
+inline void SetContextNull();
 
 inline void Init( TextureCache &texture_cache ) {
   content = CreateContent();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
-}
-
-inline void SetModalMenu( bool on ) {
-  Panel &panel = Get<Panel>( lookup.at( "modal_menu" ) );
-  panel.elem.enabled = on;
 }
 
 inline void UpdateOnFrame() {
@@ -62,13 +58,12 @@ inline void UpdateOnFrame() {
     Panel &panel = Get<Panel>( modal_menu );
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
-    return;
-  }
-
-  for ( entt::entity base: content ) {
-    Panel &panel = Get<Panel>( base );
-    RecursiveLayout( panel );
-    RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+  } else {
+    for ( entt::entity base: content ) {
+      Panel &panel = Get<Panel>( base );
+      RecursiveLayout( panel );
+      RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+    }
   }
 }
 
@@ -77,13 +72,13 @@ inline void Draw() {
   if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
     auto modal_menu = lookup["modal_menu"];
     RecursiveDraw( Get<Panel>( modal_menu ) );
-    return;
+  } else {
+    for ( entt::entity base: content ) {
+      Panel &panel = Get<Panel>( base );
+      RecursiveDraw( panel );
+    }
   }
 
-  for ( entt::entity base: content ) {
-    Panel &panel = Get<Panel>( base );
-    RecursiveDraw( panel );
-  }
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
@@ -281,8 +276,7 @@ inline void RecursiveInteractions(
   }
 
   if ( !over_any_elem ) {
-    context.hot = entt::null;
-    context.active = entt::null;
+    SetContextNull();
   }
 }
 
@@ -341,8 +335,7 @@ inline void ListenForDeselect() {
   RecursiveToggle( context_panel, false );
   context_panel = lookup.at( "actor_context_panel" );
   RecursiveToggle( context_panel, false );
-  context.hot = entt::null;
-  context.active = entt::null;
+  SetContextNull();
 }
 
 inline void RecursiveToggle( entt::entity entity, bool on ) {
@@ -359,8 +352,19 @@ inline void RecursiveToggle( entt::entity entity, bool on ) {
 
 inline bool MouseIsOverUI() {
   // This is almost sufficent, but we need to account for panels too
-  // not just items that can be active
+  // not just items that can be active?
   return context.active != entt::null || context.hot != entt::null;
+}
+
+inline void SetContextNull() {
+  context.hot = entt::null;
+  context.active = entt::null;
+}
+
+inline void SetModalMenu( bool on ) {
+  RecursiveToggle( lookup.at( "modal_menu" ), on );
+  if ( !on )
+    SetContextNull();
 }
 
 };// namespace UI

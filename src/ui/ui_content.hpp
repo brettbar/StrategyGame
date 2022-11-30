@@ -49,6 +49,15 @@ inline std::vector<entt::entity> CreateContent() {
           true
         ),
         TextButton::Create(
+          "modal_menu_save_exit_main",
+          "Save and Exit to Main Menu",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
           "modal_menu_exit_main",
           "Exit to Main Menu",
           32,
@@ -167,17 +176,17 @@ inline std::vector<entt::entity> CreateContent() {
           {
             TextButton::Create(
               "actor_spawn_settlement_button",
-              PURPLE,
               "Spawn?",
               26,
+              PURPLE,
               WHITE,
               false
             ),
             TextButton::Create(
               "actor_spawn_settlement_button",
-              GREEN,
               "IDK?",
               26,
+              GREEN,
               WHITE,
               false
             ),

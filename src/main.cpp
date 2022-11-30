@@ -93,10 +93,11 @@ int main( void ) {
       case Global::ProgramMode::ModalMenu:
         Input::CheckMenuToggle();
 
+        UI::UpdateOnFrame();
+
         BeginDrawing();
         {
           Renderer::Draw( state, Global::texture_cache );
-
           DrawRectangle(
             0,
             0,
@@ -104,9 +105,6 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f )
           );
-
-          // TODO Maybe not like this?
-          UI::UpdateOnFrame();
           Renderer::DrawUI( state );
         }
         EndDrawing();
