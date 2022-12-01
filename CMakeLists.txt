@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-# set(CMAKE_MAKE_PROGRAM(mingw32-make))
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
 
 set(SOURCE_FILES 
@@ -33,11 +31,6 @@ set(SOURCE_FILES
   src/components/event.hpp)
 
 
-
-project(game)
-
-find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
-
 # if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 #     set(CUSTOMIZE_BUILD ON)
 #     set(SUPPORT_FILEFORMAT_BMP ON)
@@ -64,22 +57,33 @@ find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
 #   client net/client/client.cpp
 # )
 
-#if(UNIX)
 
-#  add_library(raylib SHARED IMPORTED)
-#  set_target_properties(raylib PROPERTIES
-#    IMPORTED_LOCATION_NOCONFIG /usr/local/lib/libraylib.so)
-
-
-
+if (UNIX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+project(game)
+find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-
 # For compiler errors/warnings
 # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+endif(UNIX)
 
 
+if (WIN32)
+     set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+     project(game)
+     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+     add_library(raylib STATIC IMPORTED)
+     set_target_properties(
+             raylib PROPERTIES
+             IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+     )
+     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm)
+     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+endif(WIN32)
 
 
   # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
@@ -89,17 +93,3 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
   # target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/libraylib.so.400 m)
   # target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
   # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/entt/)
-#endif(UNIX)
-
-
-#if(WIN32)
-#  # add_library(raylib STATIC IMPORTED)
-#  # set_target_properties(
-#  #   raylib PROPERTIES
-#  #   IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
-#  #   INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
-#  # )
-#  target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm)
-#  #    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-#  #    target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIRS}/include)
-#endif(WIN32)
