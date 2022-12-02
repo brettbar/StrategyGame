@@ -81,7 +81,7 @@ if (WIN32)
              IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
              INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
      )
-     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm)
+     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm -static)
      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 endif(WIN32)
 
