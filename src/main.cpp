@@ -11,20 +11,15 @@ TEMPORARY TODOS HERE
 */
 #include <raylib.h>
 
-#include "events.hpp"
 #include "input.hpp"
-#include "renderer/fonts.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
-#include "save.hpp"
 #include "state.hpp"
 #include "systems/animation_system.hpp"
 #include "systems/map_system.hpp"
 #include "systems/movement_system.hpp"
 #include "systems/player_system.hpp"
 #include "systems/province_system.hpp"
-#include "systems/resource_system.hpp"
-#include "systems/selection_system.hpp"
 #include "systems/settlement_system.hpp"
 #include "systems/spawn_system.hpp"
 #include "ui/ui_system.hpp"

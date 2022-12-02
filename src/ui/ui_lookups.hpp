@@ -51,11 +51,17 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "modal_menu_load_game",
-    []() { printf( "Load\n" ); },
+    []() {
+      printf( "Load\n" );
+      Save::Load();
+    },
   },
   {
     "modal_menu_save_game",
-    []() { printf( "Save\n" ); },
+    []() {
+      printf( "Save\n" );
+      Save::Save(Global::world);
+    },
   },
   {
     "modal_menu_settings",
@@ -67,11 +73,15 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "modal_menu_exit_main",
-    []() { printf( "ExitMain\n" ); },
+    []() {
+      printf( "ExitMain\n" );
+    },
   },
   {
     "modal_menu_exit_game",
-    []() { printf( "ExitGame\n" ); },
+    []() { printf( "ExitGame\n" );
+      CloseWindow();
+    },
   },
 };
 

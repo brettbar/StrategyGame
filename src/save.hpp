@@ -10,6 +10,8 @@
 #include "components/animated.hpp"
 #include "components/sight.hpp"
 #include "components/unit.hpp"
+#include "components/province.hpp"
+#include "components/settlement.hpp"
 
 // using namespace entt::literals;
 

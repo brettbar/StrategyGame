@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/brettbar/projects/game/build",
+  "command": "/usr/bin/c++  -I/home/brettbar/projects/game/include -std=c++17 -o CMakeFiles/game.dir/src/main.cpp.o -c /home/brettbar/projects/game/src/main.cpp",
+  "file": "/home/brettbar/projects/game/src/main.cpp"
+}
+]
