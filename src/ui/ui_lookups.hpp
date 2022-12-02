@@ -75,7 +75,10 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "modal_menu_exit_main",
-    []() { printf( "ExitMain\n" ); },
+    []() {
+      printf( "ExitMain\n" );
+      Global::program_mode = Global::ProgramMode::MainMenu;
+    },
   },
   {
     "modal_menu_exit_game",

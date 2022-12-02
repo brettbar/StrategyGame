@@ -42,7 +42,6 @@ void Exit( TextureCache & );
 int main( void ) {
   Global::world.clear();
 
-
   bool window_open = true;
 
   // Initialization

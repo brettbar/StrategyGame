@@ -24,7 +24,6 @@ inline void Save( entt::registry &source ) {
 
   std::ofstream file( "output.json" );
   {
-    // cereal::JSONOutputArchive output{ storage };
     cereal::JSONOutputArchive output{ file };
 
     entt::snapshot{ source }
@@ -43,24 +42,25 @@ inline void Save( entt::registry &source ) {
 inline void Load() {
   printf( "Loading from output.json\n" );
 
-  Global::game_started = false;
-  Global::world.clear();
+  // Global::game_started = false;
+  // Global::program_mode = Global::ProgramMode::Game;
+  // Global::world.clear();
 
-  std::ifstream file( "output.json" );
-  {
-    cereal::JSONInputArchive input{ file };
+  // std::ifstream file( "output.json" );
+  // {
+  //   cereal::JSONInputArchive input{ file };
 
-    entt::snapshot_loader{ Global::world }
-      .entities( input )
-      .component<
-        Actor::Component,
-        Unit::Component,
-        Animated::Component,
-        Sight::Component>( input );
+  //   entt::snapshot_loader{ Global::world }
+  //     .entities( input )
+  //     .component<
+  //       Actor::Component,
+  //       Unit::Component,
+  //       Animated::Component,
+  //       Sight::Component>( input );
 
-    printf( "%u\n", (int) Global::world.size() );
-  }
-  file.close();
+  //   printf( "%u\n", (int) Global::world.size() );
+  // }
+  // file.close();
 }
 
 };// namespace SaveSystem
