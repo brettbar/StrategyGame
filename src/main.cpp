@@ -14,7 +14,6 @@ TEMPORARY TODOS HERE
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
-#include "state.hpp"
 #include "systems/animation_system.hpp"
 #include "systems/map_system.hpp"
 #include "systems/movement_system.hpp"
@@ -31,38 +30,26 @@ namespace fs = std::filesystem;
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
 
-void Init( State &, TextureCache & );
-void UpdateOnFrame( State & );
-void Update60TPS( State & );
-void Update1TPS( State & );
+void Init( TextureCache & );
+void UpdateOnFrame();
+void Update60TPS();
+void Update1TPS();
 
-void Draw( State & );
+void Draw();
 
 void Exit( TextureCache & );
 
 int main( void ) {
   Global::world.clear();
 
-  State state = {
-    .mapWidth = 128,
-    .mapHeight = 128,
-    .timeScale = 0.0f,
-    .prevTimeScale = 1.0f,
-    .gameState = GameState::EDITOR,
-    .month = 1,
-    .year = 4,
-    .startYear = 4,
-    // .currPlayer = std::make_shared<TempPS>( TempPS( 0, Faction::ROMANS ) ),
-  };
 
-
-  bool game_started = false;
-  bool host_mode = true;
+  bool window_open = true;
 
   // Initialization
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
-  SetExitKey( KEY_DELETE );
+  SetExitKey( KEY_NULL );
+  // SetExitKey( KEY_DELETE );
   InitWindow( 1920, 1080, "FieldsOfMars" );
 
   LoadResources();
@@ -74,7 +61,12 @@ int main( void ) {
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-  while ( !WindowShouldClose() ) {
+  SetExitKey( KEY_NULL );
+  while ( window_open ) {
+    if ( WindowShouldClose() ) {
+      window_open = false;
+    }
+
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu:
         Input::CheckMenuToggle();
@@ -92,7 +84,7 @@ int main( void ) {
 
         BeginDrawing();
         {
-          Renderer::Draw( state, Global::texture_cache );
+          Renderer::Draw( Global::texture_cache );
           DrawRectangle(
             0,
             0,
@@ -100,17 +92,17 @@ int main( void ) {
             GetScreenHeight(),
             Fade( BLACK, 0.33f )
           );
-          Renderer::DrawUI( state );
+          Renderer::DrawUI();
         }
         EndDrawing();
         break;
 
       case Global::ProgramMode::Game:
-        if ( host_mode ) {
+        if ( Global::host_mode ) {
 
-          if ( !game_started ) {
-            Init( state, Global::texture_cache );
-            game_started = true;
+          if ( !Global::game_started ) {
+            Init( Global::texture_cache );
+            Global::game_started = true;
           }
 
           // Update Time
@@ -120,28 +112,28 @@ int main( void ) {
 
           // Check for Inpu
           Input::CheckMenuToggle();
-          Input::Handle( state, Global::texture_cache );
+          Input::Handle( Global::texture_cache );
 
           // Update 60 times a second
           while ( lag >= MS_PER_UPDATE ) {
-            Update60TPS( state );
+            Update60TPS();
             lag -= MS_PER_UPDATE;
           }
 
           // Update once per second
-          while ( oncelag >= ONCE_A_SECOND * ( 1 / state.timeScale ) ) {
-            Update1TPS( state );
+          while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+            Update1TPS();
             oncelag = 0.0f;
           }
 
           // Update once per frame
-          UpdateOnFrame( state );
+          UpdateOnFrame();
 
           // Update Camera
-          CameraUpdate( state.camera, dt );
+          CameraUpdate( Global::state.camera, dt );
 
           // Draw everything to screen
-          Draw( state );
+          Draw();
         }
         break;
     }
@@ -153,54 +145,51 @@ int main( void ) {
   return 0;
 }
 
-void Init( State &state, TextureCache &texture_cache ) {
+void Init( TextureCache &texture_cache ) {
   MapSystem::Init();
   PlayerSystem::Init();
   ProvinceSystem::Init( texture_cache );
   SettlementSystem::Init( texture_cache );
-  SpawnSystem::Init();
+  // SpawnSystem::Init();
   UI::Init( texture_cache );
-  Renderer::Init( state );
+  Renderer::Init();
   // ResourceSystem::LoadData();
 }
 
 
-void LoadGame() {
-}
-
-void UpdateOnFrame( State &state ) {
+void UpdateOnFrame() {
   UI::UpdateOnFrame();
 }
 
 // TODO: look at all of these and see if any belong
 // in UpdateOnFrame
-void Update60TPS( State &state ) {
-  MovementSystem::Update( state.timeScale );
-  AnimationSystem::Update( state.timeScale );
+void Update60TPS() {
+  MovementSystem::Update( Global::state.timeScale );
+  AnimationSystem::Update( Global::state.timeScale );
   PlayerSystem::Update();
   //  Terrain::UpdateFOW(reg);
   // GAME_UI::Update( reg );
 }
 
-void Update1TPS( State &state ) {
-  SettlementSystem::Update( state );
-  SpawnSystem::Update( state );
+void Update1TPS() {
+  SettlementSystem::Update( Global::state );
+  SpawnSystem::Update( Global::state );
 
-  state.day++;
+  Global::state.day++;
 
-  if ( state.month < 12 )
-    state.month++;
+  if ( Global::state.month < 12 )
+    Global::state.month++;
   else {
-    state.year++;
-    state.month = 1;
+    Global::state.year++;
+    Global::state.month = 1;
   }
 }
 
-void Draw( State &state ) {
+void Draw() {
   BeginDrawing();
   {
-    Renderer::Draw( state, Global::texture_cache );
-    Renderer::DrawUI( state );
+    Renderer::Draw( Global::texture_cache );
+    Renderer::DrawUI();
   }
   EndDrawing();
 }

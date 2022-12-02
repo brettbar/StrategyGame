@@ -11,8 +11,13 @@ namespace Actor {
 enum class Type { Colonist, Army };
 
 struct Component {
-  const char *name;
+  std::string name;
   Type type;
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar( name, type );
+  }
 };
 
 };// namespace Actor

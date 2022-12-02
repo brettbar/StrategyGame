@@ -322,7 +322,6 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
     RecursiveToggle( context_panel, true );
   } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
     auto actor = game_reg.get<Actor::Component>( entity );
-    printf( "Actor: %s \n", actor.name );
 
     auto context_panel = lookup.at( "actor_context_panel" );
     RecursiveToggle( context_panel, true );

@@ -20,9 +20,7 @@ namespace ActorSystem {
 // 3. The province does not already contain a settlement
 inline bool ColonistCanPlaceSettlement() {
   // 0. if the colonist isnt selected, bail
-  if (
-    SelectionSystem::selected_entity == entt::null ||
-    !Global::world.all_of<Unit::Component>( SelectionSystem::selected_entity ) )
+  if ( SelectionSystem::selected_entity == entt::null || !Global::world.all_of<Unit::Component>( SelectionSystem::selected_entity ) )
     return false;
 
 
@@ -72,18 +70,25 @@ inline Texture2D DetermineTextureFromFaction( entt::entity owner ) {
 inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
   Texture2D sprite = DetermineTextureFromFaction( owner );
   entt::entity entity = Global::world.create();
+  Actor::Component actor = {
+    .name = "Marcus Priscus",
+    .type = Actor::Type::Colonist,
+  };
+
   Unit::Component unit = {
     .owner = owner,
     .position = spawn,
     .destination = spawn,
     .speed = 1.0f,
   };
+
   Animated::Animations animations = {
     { Animated::AnimState::IDLE_DR, 2, 0.2f },
     { Animated::AnimState::IDLE_DL, 2, 0.2f },
     { Animated::AnimState::WALK_DL, 8, 0.8f },
     { Animated::AnimState::WALK_DL, 8, 0.8f },
   };
+
   Animated::Component animated = {
     .sprite = sprite,
     .frameRec = { 0, 0, 128, 128 },
@@ -94,14 +99,12 @@ inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
     .animTime = 0.0f,
     .moving = false,
   };
+
   Sight::Component sight = {
     .range = 1,
   };
 
-  Global::world.emplace<Actor::Component>(
-    entity,
-    "Marcus Priscus",
-    Actor::Type::Colonist );
+  Global::world.emplace<Actor::Component>( entity, actor );
   Global::world.emplace<Unit::Component>( entity, unit );
   Global::world.emplace<Animated::Component>( entity, animated );
   Global::world.emplace<Sight::Component>( entity, sight );

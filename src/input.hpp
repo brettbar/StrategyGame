@@ -22,7 +22,7 @@
 namespace Input {
 
 inline void CheckMenuToggle() {
-  if ( IsKeyPressed( KEY_CAPS_LOCK ) ) {
+  if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
     if ( Global::program_mode == Global::ProgramMode::Game ) {
       Global::program_mode = Global::ProgramMode::ModalMenu;
       UI::SetModalMenu( true );
@@ -33,43 +33,44 @@ inline void CheckMenuToggle() {
   }
 }
 
-inline void Handle( State &state, TextureCache &cache ) {
-  Vector2 click_pos = GetScreenToWorld2D( GetMousePosition(), state.camera );
+inline void Handle( TextureCache &cache ) {
+  Vector2 click_pos =
+    GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
   if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
     if ( IsKeyPressed( KEY_S ) ) {
-      Save::Save( Global::world );
+      SaveSystem::Save( Global::world );
     }
 
     if ( IsKeyPressed( KEY_L ) ) {
-      Save::Load();
+      SaveSystem::Load();
     }
   }
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
-    if ( state.timeScale > 0.0f ) {
-      state.prevTimeScale = state.timeScale;
-      state.timeScale = 0.0f;
-    } else if ( state.timeScale == 0.0f ) {
-      state.timeScale = state.prevTimeScale;
+    if ( Global::state.timeScale > 0.0f ) {
+      Global::state.prevTimeScale = Global::state.timeScale;
+      Global::state.timeScale = 0.0f;
+    } else if ( Global::state.timeScale == 0.0f ) {
+      Global::state.timeScale = Global::state.prevTimeScale;
     }
   }
 
   if ( IsKeyPressed( KEY_MINUS ) ) {
-    state.timeScale -= 0.5f;
-    if ( state.timeScale < 0.0f )
-      state.timeScale = 0.0f;
+    Global::state.timeScale -= 0.5f;
+    if ( Global::state.timeScale < 0.0f )
+      Global::state.timeScale = 0.0f;
 
-    if ( state.timeScale == 0.0f && state.prevTimeScale > 0.5f ) {
-      state.prevTimeScale -= 0.5f;
-      state.timeScale = state.prevTimeScale;
+    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
+      Global::state.prevTimeScale -= 0.5f;
+      Global::state.timeScale = Global::state.prevTimeScale;
     }
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) ) {
-    state.timeScale += 0.5f;
-    if ( state.timeScale > 1.5f )
-      state.timeScale = 1.5f;
+    Global::state.timeScale += 0.5f;
+    if ( Global::state.timeScale > 1.5f )
+      Global::state.timeScale = 1.5f;
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
@@ -82,10 +83,10 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
 
   if ( IsKeyPressed( KEY_GRAVE ) ) {
-    if ( state.gameState == GameState::GAME )
-      state.gameState = GameState::EDITOR;
-    else if ( state.gameState == GameState::EDITOR )
-      state.gameState = GameState::GAME;
+    if ( Global::state.gameState == GameState::GAME )
+      Global::state.gameState = GameState::EDITOR;
+    else if ( Global::state.gameState == GameState::EDITOR )
+      Global::state.gameState = GameState::GAME;
   }
 
   if ( IsMouseButtonPressed( 0 ) ) {
@@ -94,7 +95,7 @@ inline void Handle( State &state, TextureCache &cache ) {
   }
   if ( IsMouseButtonPressed( 1 ) ) {
     if ( !UI::MouseIsOverUI() )
-      MovementSystem::SetDestinations( state.camera );
+      MovementSystem::SetDestinations( Global::state.camera );
   }
 
   // if ( IsKeyPressed( KEY_ONE ) ) {

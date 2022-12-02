@@ -1,7 +1,5 @@
 
 #include "../common.hpp"
-#include "../state.hpp"
-#include "../systems/animation_system.hpp"
 #include "../systems/map_system.hpp"
 #include "../systems/overlay_system.hpp"
 #include "../systems/selection_system.hpp"
@@ -20,7 +18,7 @@ inline Shader outline_shader;
 inline void DrawActors( bool debug );
 
 
-inline void Init( State &state ) {
+inline void Init() {
 
   shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
   // LoadShader( 0, 0 );
@@ -46,20 +44,21 @@ inline void Init( State &state ) {
   );
 
 
-  state.camera = Camera2D{
+  Global::state.camera = Camera2D{
     .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
     .target =
-      { ( state.mapWidth * 64.0f ) / 2, ( state.mapHeight * 64.0f ) / 2 },
+      { ( Global::state.mapWidth * 64.0f ) / 2,
+        ( Global::state.mapHeight * 64.0f ) / 2 },
     .rotation = 0,
     .zoom = 2.0f,
   };
 }
 
 
-inline void Draw( State &state, TextureCache &texture_cache ) {
+inline void Draw( TextureCache &texture_cache ) {
   ClearBackground( DARKGRAY );
 
-  BeginMode2D( state.camera );
+  BeginMode2D( Global::state.camera );
 
   // TODO does this actually do anything?
   BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
@@ -68,9 +67,9 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     BeginShaderMode( shader );
     {
       // Draw Terrain
-      MapSystem::Draw( state.camera, texture_cache );
+      MapSystem::Draw( Global::state.camera, texture_cache );
       // TODO this is causing fps to drop to 110
-      ProvinceSystem::Draw( state.camera );
+      ProvinceSystem::Draw( Global::state.camera );
     }
     EndShaderMode();
 
@@ -78,7 +77,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
     OverlaySystem::DrawProvinceOverlays( texture_cache );
     SelectionSystem::Draw(
       texture_cache,
-      state.gameState == GameState::EDITOR
+      Global::state.gameState == GameState::EDITOR
     );
     OverlaySystem::DrawSettlementOverlays( texture_cache );
 
@@ -95,7 +94,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
       }
 
       // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-      DrawActors( state.gameState == GameState::EDITOR );
+      DrawActors( Global::state.gameState == GameState::EDITOR );
     }
     EndShaderMode();
   }
@@ -105,7 +104,7 @@ inline void Draw( State &state, TextureCache &texture_cache ) {
   EndMode2D();
 }
 
-inline void DrawUI( State &state ) {
+inline void DrawUI() {
   // TODO right now alpha issues are cropping up with the shader
   // BeginShaderMode( shader );
   UI::Draw();

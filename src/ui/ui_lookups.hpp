@@ -8,6 +8,8 @@
 #pragma once
 
 #include "../common.hpp"
+
+#include "../save.hpp"
 #include "../systems/actor_system.hpp"
 #include "../systems/settlement_system.hpp"
 
@@ -53,14 +55,14 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "modal_menu_load_game",
     []() {
       printf( "Load\n" );
-      Save::Load();
+      SaveSystem::Load();
     },
   },
   {
     "modal_menu_save_game",
     []() {
       printf( "Save\n" );
-      Save::Save(Global::world);
+      SaveSystem::Save( Global::world );
     },
   },
   {
@@ -73,13 +75,12 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "modal_menu_exit_main",
-    []() {
-      printf( "ExitMain\n" );
-    },
+    []() { printf( "ExitMain\n" ); },
   },
   {
     "modal_menu_exit_game",
-    []() { printf( "ExitGame\n" );
+    []() {
+      printf( "ExitGame\n" );
       CloseWindow();
     },
   },
