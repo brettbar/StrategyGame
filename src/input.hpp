@@ -23,17 +23,17 @@ namespace Input {
 
 inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-    if ( Global::program_mode == Global::ProgramMode::Game ) {
+    if ( Global::program_mode == Global::ProgramMode::Campaign ) {
       Global::program_mode = Global::ProgramMode::ModalMenu;
       UI::SetModalMenu( true );
     } else if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-      Global::program_mode = Global::ProgramMode::Game;
+      Global::program_mode = Global::ProgramMode::Campaign;
       UI::SetModalMenu( false );
     }
   }
 }
 
-inline void Handle( TextureCache &cache ) {
+inline void Handle() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 

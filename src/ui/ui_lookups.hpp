@@ -9,12 +9,14 @@
 
 #include "../common.hpp"
 
+#include "../events.hpp"
 #include "../save.hpp"
 #include "../systems/actor_system.hpp"
 #include "../systems/settlement_system.hpp"
 
 namespace UI {
 
+// TODO maybe this could be refactored to some sort of event queue
 inline std::map<std::string, std::function<void()>> action_lookup = {
   {
     "actor_spawn_settlement_button",
@@ -51,6 +53,34 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "settlement_context_tab_garrison",
     []() { printf( "Settlement tab button pressed\n" ); },
   },
+  // Main Menu
+  {
+    "main_menu_start_game",
+    []() {
+      printf( "Start\n" );
+      Events::event_emitter.publish( Events::UIEvent{ "main_menu_start_game" }
+      );
+    },
+  },
+  {
+    "main_menu_load_game",
+    []() {
+      printf( "Load\n" );
+      SaveSystem::Load();
+    },
+  },
+  {
+    "main_menu_settings",
+    []() { printf( "Settings\n" ); },
+  },
+  {
+    "main_menu_exit_game",
+    []() {
+      printf( "ExitGame\n" );
+      CloseWindow();
+    },
+  },
+  // Modal Menu
   {
     "modal_menu_load_game",
     []() {

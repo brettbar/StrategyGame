@@ -9,15 +9,10 @@ namespace Global {
 enum class ProgramMode {
   MainMenu,
   ModalMenu,
-  Game,
+  Campaign,
   Editor,
 };
 
-// TODO delete?
-enum class GameMode {
-  CAMPAIGN,
-  BATTLE,
-};
 
 inline State state = {
   .mapWidth = 128,
@@ -31,17 +26,12 @@ inline State state = {
   // .currPlayer = std::make_shared<TempPS>( TempPS( 0, Faction::ROMANS ) ),
 };
 
-inline ProgramMode program_mode = ProgramMode::Game;
+inline ProgramMode program_mode = ProgramMode::Campaign;
 inline FontCache font_cache = {};
 inline TextureCache texture_cache = {};
 inline entt::registry world;
 inline entt::registry local;
 
-
-inline bool game_started = false;
-inline bool host_mode = true;
-
 // TODO temporary
 inline entt::entity host_player;
-
 };// namespace Global

@@ -1,3 +1,2 @@
-cmake -S . -B ./build -G "MinGW Makefiles"
-make -C ./build
-.\build\game.exe
+Remove-Item C:\Projects\game\compile_commands.json
+Copy-Item C:\Projects\game\configs\compile_commands.json.windows C:\Projects\game\compile_commands.json

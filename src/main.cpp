@@ -11,6 +11,7 @@ TEMPORARY TODOS HERE
 */
 #include <raylib.h>
 
+#include "events.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
@@ -30,7 +31,10 @@ namespace fs = std::filesystem;
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
 
-void Init( TextureCache & );
+void InitCampaign();
+void StartCampaign();
+
+
 void UpdateOnFrame();
 void Update60TPS();
 void Update1TPS();
@@ -40,46 +44,63 @@ void Draw();
 void Exit( TextureCache & );
 
 int main( void ) {
-  Global::world.clear();
-
-  bool window_open = true;
-
-  // Initialization
-  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
-  SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
-  SetExitKey( KEY_NULL );
-  // SetExitKey( KEY_DELETE );
-  InitWindow( 1920, 1080, "FieldsOfMars" );
-
-  LoadResources();
-
-  // Main game loop
+  /// START Initialization
+  // bool game_started = false;
+  bool campaign_started = false;
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
   f32 oncelag = 0.0f;
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
+  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
+
+  InitWindow( 1920, 1080, "FieldsOfMars" );
+
+  Global::world.clear();
+  Global::local.clear();
+
+  LoadResources();
+  /// END Initialization
+
+  UI::InitMainMenuUI();
+  Renderer::Init();
+
+  // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
-  while ( window_open ) {
-    if ( WindowShouldClose() ) {
-      window_open = false;
-    }
+
+  while ( !WindowShouldClose() ) {
 
     switch ( Global::program_mode ) {
-      case Global::ProgramMode::MainMenu:
-        Input::CheckMenuToggle();
+      case Global::ProgramMode::MainMenu: {
+        Input::Handle();
+
+        // Events::event_emitter.on<Events::UIEvent>(
+        //   []( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
+        //     if ( event.msg == "main_menu_start_game" ) {
+        //       Global::program_mode = Global::ProgramMode::Campaign;
+        //     }
+        //   }
+        // );
+
+        UpdateOnFrame();
+
+        CameraUpdate( Global::state.camera, dt );
 
         BeginDrawing();
-        { ClearBackground( BLACK ); }
+        {
+          ClearBackground( BLACK );
+          Renderer::DrawUI();
+        }
         EndDrawing();
 
-        break;
+      } break;
 
-      case Global::ProgramMode::ModalMenu:
-        Input::CheckMenuToggle();
+      case Global::ProgramMode::ModalMenu: {
+        // Input::CheckMenuToggle();
 
-        UI::UpdateOnFrame();
+        UpdateOnFrame();
 
         BeginDrawing();
         {
@@ -94,47 +115,44 @@ int main( void ) {
           Renderer::DrawUI();
         }
         EndDrawing();
-        break;
+      } break;
 
-      case Global::ProgramMode::Game:
-        if ( Global::host_mode ) {
-
-          if ( !Global::game_started ) {
-            Init( Global::texture_cache );
-            Global::game_started = true;
-          }
-
-          // Update Time
-          dt = GetFrameTime();
-          lag += dt;
-          oncelag += dt;
-
-          // Check for Inpu
-          Input::CheckMenuToggle();
-          Input::Handle( Global::texture_cache );
-
-          // Update 60 times a second
-          while ( lag >= MS_PER_UPDATE ) {
-            Update60TPS();
-            lag -= MS_PER_UPDATE;
-          }
-
-          // Update once per second
-          while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-            Update1TPS();
-            oncelag = 0.0f;
-          }
-
-          // Update once per frame
-          UpdateOnFrame();
-
-          // Update Camera
-          CameraUpdate( Global::state.camera, dt );
-
-          // Draw everything to screen
-          Draw();
+      case Global::ProgramMode::Campaign: {
+        if ( !campaign_started ) {
+          StartCampaign();
+          campaign_started = true;
         }
-        break;
+
+        // Update Time
+        dt = GetFrameTime();
+        lag += dt;
+        oncelag += dt;
+
+        // Check for Input
+        Input::CheckMenuToggle();
+        Input::Handle();
+
+        // Update 60 times a second
+        while ( lag >= MS_PER_UPDATE ) {
+          Update60TPS();
+          lag -= MS_PER_UPDATE;
+        }
+
+        // Update once per second
+        while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+          Update1TPS();
+          oncelag = 0.0f;
+        }
+
+        // Update once per frame
+        UpdateOnFrame();
+
+        // Update Camera
+        CameraUpdate( Global::state.camera, dt );
+
+        // Draw everything to screen
+        Draw();
+      } break;
     }
   }
 
@@ -144,15 +162,18 @@ int main( void ) {
   return 0;
 }
 
-void Init( TextureCache &texture_cache ) {
+void InitCampaign() {
   MapSystem::Init();
   PlayerSystem::Init();
-  ProvinceSystem::Init( texture_cache );
-  SettlementSystem::Init( texture_cache );
-  // SpawnSystem::Init();
-  UI::Init( texture_cache );
+  ProvinceSystem::Init( Global::texture_cache );
+  SettlementSystem::Init( Global::texture_cache );
   Renderer::Init();
   // ResourceSystem::LoadData();
+}
+
+void StartCampaign() {
+  InitCampaign();
+  UI::InitCampaignUI();
 }
 
 
@@ -167,12 +188,10 @@ void Update60TPS() {
   AnimationSystem::Update( Global::state.timeScale );
   PlayerSystem::Update();
   //  Terrain::UpdateFOW(reg);
-  // GAME_UI::Update( reg );
 }
 
 void Update1TPS() {
   SettlementSystem::Update( Global::state );
-  SpawnSystem::Update( Global::state );
 
   Global::state.day++;
 

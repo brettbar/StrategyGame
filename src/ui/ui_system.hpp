@@ -7,18 +7,20 @@
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
 #include "../components/settlement.hpp"
-#include "../events.hpp"
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "../systems/selection_system.hpp"
-#include "ui_content.hpp"
+#include "content/campaign_ui.hpp"
+#include "content/main_menu_ui.hpp"
+#include "content/modal_menu_ui.hpp"
 #include "ui_lookups.hpp"
 
 namespace UI {
 
 inline Context context = { entt::null, entt::null };
+inline std::vector<entt::entity> content;
 
-inline void Init( TextureCache & );
+inline void DisableCurrentContent();
 inline void Draw();
 inline void RecursiveDraw( Panel & );
 inline void RecursiveLayout( Panel & );
@@ -29,11 +31,26 @@ inline void ListenForDeselect();
 inline void RecursiveToggle( entt::entity, bool );
 inline void SetContextNull();
 
-inline void Init( TextureCache &texture_cache ) {
-  content = CreateContent();
+inline void InitMainMenuUI() {
+  DisableCurrentContent();
+  content = CreateMainMenuUI();
+  for ( entt::entity base: content ) {
+    RecursiveToggle( base, true );
+  }
+}
+
+inline void InitCampaignUI() {
+  DisableCurrentContent();
+  content = CreateCampaignUI();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
+}
+
+inline void DisableCurrentContent() {
+  for ( entt::entity base: content ) {
+    RecursiveToggle( base, false );
+  }
 }
 
 inline void UpdateOnFrame() {
@@ -53,30 +70,40 @@ inline void UpdateOnFrame() {
     SCALE = 4.0;
   }
 
-  if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-    auto modal_menu = lookup["modal_menu"];
-    Panel &panel = Get<Panel>( modal_menu );
+  for ( entt::entity base: content ) {
+    Panel &panel = Get<Panel>( base );
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
-  } else {
-    for ( entt::entity base: content ) {
-      Panel &panel = Get<Panel>( base );
-      RecursiveLayout( panel );
-      RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
-    }
   }
+
+  // if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+  //   auto modal_menu = lookup["modal_menu"];
+  //   Panel &panel = Get<Panel>( modal_menu );
+  //   RecursiveLayout( panel );
+  //   RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+  // } else {
+  //   for ( entt::entity base: content ) {
+  //     Panel &panel = Get<Panel>( base );
+  //     RecursiveLayout( panel );
+  //     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+  //   }
+  // }
 }
 
 inline void Draw() {
-  // TODO hacky
-  if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-    auto modal_menu = lookup["modal_menu"];
-    RecursiveDraw( Get<Panel>( modal_menu ) );
-  } else {
-    for ( entt::entity base: content ) {
-      Panel &panel = Get<Panel>( base );
-      RecursiveDraw( panel );
-    }
+  // if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+  //   auto modal_menu = lookup["modal_menu"];
+  //   RecursiveDraw( Get<Panel>( modal_menu ) );
+  // } else {
+  //   for ( entt::entity base: content ) {
+  //     Panel &panel = Get<Panel>( base );
+  //     RecursiveDraw( panel );
+  //   }
+  // }
+  //
+  for ( entt::entity base: content ) {
+    Panel &panel = Get<Panel>( base );
+    RecursiveDraw( panel );
   }
 
 

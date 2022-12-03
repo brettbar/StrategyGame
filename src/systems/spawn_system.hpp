@@ -9,7 +9,6 @@
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
-#include "../events.hpp"
 #include "../global.hpp"
 
 #include "actor_system.hpp"
@@ -21,30 +20,6 @@ inline void SpawnColonist( entt::entity, Vector2 );
 inline void SpawnColonist( entt::entity );
 inline void DeleteSelected();
 
-// struct SpawnListener : Events::Listener {
-//   inline void Receive() override {
-//     if ( currState == nullptr )
-//       return;
-
-//     printf( "SpawnSystem got an event!\n" );
-//     DeleteSelected();
-//   }
-
-//   inline void Listen() {
-//     Events::dispatcher.sink<Event::SpawnEvent>()
-//       .connect<&SpawnListener::Receive>( this );
-//   }
-// };
-
-// inline SpawnListener listener;
-
-inline void Init() {
-  // listener.Listen();
-}
-
-inline void Update( State &state ) {
-  // listener.Update( state );
-}
 
 inline void SpawnColonist( entt::entity owner, Vector2 clickPos ) {
   std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );

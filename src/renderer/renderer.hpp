@@ -19,7 +19,6 @@ inline void DrawActors( bool debug );
 
 
 inline void Init() {
-
   shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
   // LoadShader( 0, 0 );
   outline_shader = LoadShader( 0, "assets/shaders/outline.fs" );
@@ -107,6 +106,7 @@ inline void Draw( TextureCache &texture_cache ) {
 inline void DrawUI() {
   // TODO right now alpha issues are cropping up with the shader
   // BeginShaderMode( shader );
+
   UI::Draw();
   // EndShaderMode();
 }

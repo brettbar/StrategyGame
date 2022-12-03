@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../events.hpp"
 #include "../renderer/textures.hpp"
 #include "map_system.hpp"
 #include "spawn_system.hpp"
@@ -9,27 +8,6 @@
 namespace ProvinceSystem {
 
 inline void SetProvinceOwner( u32 owner );
-
-// TODO figure out if this really needs to be here
-// Should be able to make it like the listener in ui_system.
-// struct ProvListener : Events::Listener {
-//   inline void Receive() override {
-//     if ( this->currState == nullptr ) {
-//       return;
-//     }
-
-//     printf( "ProvinceSystem got an event!\n" );
-//     SetProvinceOwner( this->currState->currPlayer->id );
-//   }
-
-//   inline void Listen() {
-//     Events::dispatcher.sink<Event::ProvEvent>().connect<&ProvListener::Receive>(
-//       this );
-//   }
-// };
-
-
-// inline ProvListener listener;
 
 inline void Init( TextureCache &cache ) {
   auto tView = Global::world.view<MapSystem::TileMap>();
@@ -83,7 +61,8 @@ inline void Draw( Camera2D &camera ) {
         DrawTextureV(
           tex,
           { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
-          WHITE );
+          WHITE
+        );
         // std::cout << "Baz!!!" << '\n';
       } break;
     }

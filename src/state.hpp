@@ -6,6 +6,7 @@
 
 #include "common.hpp"
 
+// TODO remove
 enum class GameState {
   MENU,
   EDITOR,
