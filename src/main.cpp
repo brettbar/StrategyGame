@@ -31,15 +31,9 @@ namespace fs = std::filesystem;
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
 
-void InitCampaign();
-void StartCampaign();
-
-
 void UpdateOnFrame();
 void Update60TPS();
 void Update1TPS();
-
-void Draw();
 
 void Exit( TextureCache & );
 
@@ -54,7 +48,7 @@ int main( void ) {
   f32 dt = 0.0f;
 
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
-  SetTargetFPS( 144 );// Set our game to run at 60 frames-per-second
+  SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
 
   InitWindow( 1920, 1080, "FieldsOfMars" );
 
@@ -64,8 +58,7 @@ int main( void ) {
   LoadResources();
   /// END Initialization
 
-  UI::InitMainMenuUI();
-  Renderer::Init();
+  // UI::InitMainMenuUI();
 
   // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
@@ -76,13 +69,13 @@ int main( void ) {
       case Global::ProgramMode::MainMenu: {
         Input::Handle();
 
-        // Events::event_emitter.on<Events::UIEvent>(
-        //   []( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-        //     if ( event.msg == "main_menu_start_game" ) {
-        //       Global::program_mode = Global::ProgramMode::Campaign;
-        //     }
-        //   }
-        // );
+        Events::event_emitter.on<Events::UIEvent>(
+          []( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
+            if ( event.msg == "main_menu_start_game" ) {
+              Global::program_mode = Global::ProgramMode::Campaign;
+            }
+          }
+        );
 
         UpdateOnFrame();
 
@@ -119,7 +112,13 @@ int main( void ) {
 
       case Global::ProgramMode::Campaign: {
         if ( !campaign_started ) {
-          StartCampaign();
+          MapSystem::Init();
+          PlayerSystem::Init();
+          ProvinceSystem::Init( Global::texture_cache );
+          SettlementSystem::Init( Global::texture_cache );
+          Renderer::Init();
+          // TODO: Something wrong in this, causing weird fps dips
+          // UI::InitCampaignUI();
           campaign_started = true;
         }
 
@@ -151,7 +150,15 @@ int main( void ) {
         CameraUpdate( Global::state.camera, dt );
 
         // Draw everything to screen
-        Draw();
+        BeginDrawing();
+        {
+          Renderer::Draw( Global::texture_cache );
+          Renderer::DrawUI();
+
+          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+          DrawFPS( GetScreenWidth() - 100, 2 );
+        }
+        EndDrawing();
       } break;
     }
   }
@@ -161,21 +168,6 @@ int main( void ) {
 
   return 0;
 }
-
-void InitCampaign() {
-  MapSystem::Init();
-  PlayerSystem::Init();
-  ProvinceSystem::Init( Global::texture_cache );
-  SettlementSystem::Init( Global::texture_cache );
-  Renderer::Init();
-  // ResourceSystem::LoadData();
-}
-
-void StartCampaign() {
-  InitCampaign();
-  UI::InitCampaignUI();
-}
-
 
 void UpdateOnFrame() {
   UI::UpdateOnFrame();
@@ -201,15 +193,6 @@ void Update1TPS() {
     Global::state.year++;
     Global::state.month = 1;
   }
-}
-
-void Draw() {
-  BeginDrawing();
-  {
-    Renderer::Draw( Global::texture_cache );
-    Renderer::DrawUI();
-  }
-  EndDrawing();
 }
 
 void Exit( TextureCache &cache ) {

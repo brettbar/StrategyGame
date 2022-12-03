@@ -32,7 +32,7 @@ inline void RecursiveToggle( entt::entity, bool );
 inline void SetContextNull();
 
 inline void InitMainMenuUI() {
-  DisableCurrentContent();
+  // DisableCurrentContent();
   content = CreateMainMenuUI();
   for ( entt::entity base: content ) {
     RecursiveToggle( base, true );
@@ -40,7 +40,7 @@ inline void InitMainMenuUI() {
 }
 
 inline void InitCampaignUI() {
-  DisableCurrentContent();
+  // DisableCurrentContent();
   content = CreateCampaignUI();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
