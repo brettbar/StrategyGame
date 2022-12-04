@@ -7,12 +7,12 @@ BinPackArguments: false
 BinPackParameters: false
 AlignConsecutiveAssignments: None
 AlignOperands: Align
-AllowAllArgumentsOnNextLine: false
+AllowAllArgumentsOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Never
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
@@ -28,7 +28,7 @@ BraceWrapping:
   AfterNamespace: false
   AfterUnion: false
   BeforeCatch: false
-  BeforeElse: false
+  BeforeElse: true 
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   IndentBraces: false

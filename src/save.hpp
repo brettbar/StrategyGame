@@ -1,11 +1,5 @@
 #pragma once
 
-#include <cereal/archives/json.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <fstream>
-#include <sstream>
-
 #include "../include/entt/entt.hpp"
 #include "components/actor.hpp"
 #include "components/animated.hpp"
@@ -15,26 +9,33 @@
 #include "components/unit.hpp"
 #include "global.hpp"
 
+#include <cereal/archives/json.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <fstream>
+// #include <sstream>
+
 // using namespace entt::literals;
 
 namespace SaveSystem {
 
-inline void Save( entt::registry &source ) {
+inline void Save() {
   printf( "Saving to output.json\n" );
 
   std::ofstream file( "output.json" );
   {
     cereal::JSONOutputArchive output{ file };
 
-    entt::snapshot{ source }
+    /*
+     * For some reason when this component<>thing 
+     * has more than 1 type given to it we get strange linker 
+     * errors
+     */
+    entt::snapshot{ Global::world }
       .entities( output )
-      .component<
-        Actor::Component,
-        Unit::Component,
-        Animated::Component,
-        Sight::Component>( output );
+      .component<Unit::Component>( output );
 
-    printf( "%u\n", (int) source.size() );
+    // printf( "%u\n", (int) source.size() );
   }
   file.close();
 }
@@ -42,25 +43,26 @@ inline void Save( entt::registry &source ) {
 inline void Load() {
   printf( "Loading from output.json\n" );
 
-  // Global::game_started = false;
-  // Global::program_mode = Global::ProgramMode::Game;
-  // Global::world.clear();
 
-  // std::ifstream file( "output.json" );
-  // {
-  //   cereal::JSONInputArchive input{ file };
+  std::ifstream file( "output.json" );
+  {
+    cereal::JSONInputArchive input{ file };
 
-  //   entt::snapshot_loader{ Global::world }
-  //     .entities( input )
-  //     .component<
-  //       Actor::Component,
-  //       Unit::Component,
-  //       Animated::Component,
-  //       Sight::Component>( input );
+    Global::ClearRegistry();
+    assert( Global::world.empty() );
 
-  //   printf( "%u\n", (int) Global::world.size() );
-  // }
-  // file.close();
+    /*
+     * For some reason when this component<>thing 
+     * has more than 1 type given to it we get strange linker 
+     * errors
+     */
+    entt::snapshot_loader{ Global::world }
+      .entities( input )
+      .component<Unit::Component>( input );
+
+    // printf( "%u\n", (int) Global::world.size() );
+  }
+  file.close();
 }
 
 };// namespace SaveSystem

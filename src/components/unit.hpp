@@ -9,12 +9,12 @@ struct Component {
   Vector2 position;
   Vector2 destination;
   f32 speed;
-  bool selected;
+  bool selected = false;
   bool moving = false;
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( position.x, position.y, destination.x, destination.y, speed );
+    ar( owner, position.x, position.y, destination.x, destination.y, speed );
   }
 };
 

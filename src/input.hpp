@@ -25,10 +25,11 @@ inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
     if ( Global::program_mode == Global::ProgramMode::Campaign ) {
       Global::program_mode = Global::ProgramMode::ModalMenu;
-      UI::SetModalMenu( true );
-    } else if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
+      UI::EnableModalMenuUI();
+    }
+    else if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
       Global::program_mode = Global::ProgramMode::Campaign;
-      UI::SetModalMenu( false );
+      UI::EnableCampaignUI();
     }
   }
 }
@@ -37,21 +38,12 @@ inline void Handle() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
-  if ( IsKeyDown( KEY_LEFT_CONTROL ) ) {
-    if ( IsKeyPressed( KEY_S ) ) {
-      SaveSystem::Save( Global::world );
-    }
-
-    if ( IsKeyPressed( KEY_L ) ) {
-      SaveSystem::Load();
-    }
-  }
-
   if ( IsKeyPressed( KEY_SPACE ) ) {
     if ( Global::state.timeScale > 0.0f ) {
       Global::state.prevTimeScale = Global::state.timeScale;
       Global::state.timeScale = 0.0f;
-    } else if ( Global::state.timeScale == 0.0f ) {
+    }
+    else if ( Global::state.timeScale == 0.0f ) {
       Global::state.timeScale = Global::state.prevTimeScale;
     }
   }

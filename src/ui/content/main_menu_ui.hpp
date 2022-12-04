@@ -21,6 +21,15 @@ inline std::vector<entt::entity> CreateMainMenuUI() {
       },
       {
         TextButton::Create(
+          "main_menu_resume_game",
+          "Resume Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true
+        ),
+        TextButton::Create(
           "main_menu_start_game",
           "Start Game",
           32,

@@ -1,8 +1,10 @@
 /*
-  This is where all UI actions will go. I centralize them here because that is easier to keep track of 
-  than having the actions distributed to each ui elements file, importing stuff randomly all over.
-  
-  NOTE: When adding a new ui action, add both an action and clickable lambda to each of these looks up
+  This is where all UI actions will go. I centralize them here because that is
+  easier to keep track of than having the actions distributed to each ui
+  elements file, importing stuff randomly all over.
+
+  NOTE: When adding a new ui action, add both an action and clickable lambda to
+  each of these looks up
 */
 
 #pragma once
@@ -10,9 +12,9 @@
 #include "../common.hpp"
 
 #include "../events.hpp"
-#include "../save.hpp"
 #include "../systems/actor_system.hpp"
 #include "../systems/settlement_system.hpp"
+#include "ui_system.hpp"
 
 namespace UI {
 
@@ -55,6 +57,14 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   // Main Menu
   {
+    "main_menu_resume_game",
+    []() {
+      printf( "Resume\n" );
+      Events::event_emitter.publish( Events::UIEvent{ "main_menu_resume_game" }
+      );
+    },
+  },
+  {
     "main_menu_start_game",
     []() {
       printf( "Start\n" );
@@ -66,7 +76,7 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "main_menu_load_game",
     []() {
       printf( "Load\n" );
-      SaveSystem::Load();
+      Events::event_emitter.publish( Events::UIEvent{ "main_menu_load_game" } );
     },
   },
   {
@@ -83,16 +93,14 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   // Modal Menu
   {
     "modal_menu_load_game",
-    []() {
-      printf( "Load\n" );
-      SaveSystem::Load();
-    },
+    []() { printf( "Load\n" ); },
   },
   {
     "modal_menu_save_game",
     []() {
       printf( "Save\n" );
-      SaveSystem::Save( Global::world );
+      Events::event_emitter.publish( Events::UIEvent{ "modal_menu_save_game" }
+      );
     },
   },
   {
@@ -107,7 +115,8 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "modal_menu_exit_main",
     []() {
       printf( "ExitMain\n" );
-      Global::program_mode = Global::ProgramMode::MainMenu;
+      Events::event_emitter.publish( Events::UIEvent{ "modal_menu_exit_main" }
+      );
     },
   },
   {

@@ -12,9 +12,11 @@ TEMPORARY TODOS HERE
 #include <raylib.h>
 
 #include "events.hpp"
+#include "global.hpp"
 #include "input.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/textures.hpp"
+#include "save.hpp"
 #include "systems/animation_system.hpp"
 #include "systems/map_system.hpp"
 #include "systems/movement_system.hpp"
@@ -39,7 +41,6 @@ void Exit( TextureCache & );
 
 int main( void ) {
   /// START Initialization
-  // bool game_started = false;
   bool campaign_started = false;
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
@@ -52,30 +53,41 @@ int main( void ) {
 
   InitWindow( 1920, 1080, "FieldsOfMars" );
 
-  Global::world.clear();
-  Global::local.clear();
-
   LoadResources();
   /// END Initialization
 
-  // UI::InitMainMenuUI();
+  UI::EnableMainMenuUI();
 
   // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
 
   while ( !WindowShouldClose() ) {
+    Events::event_emitter.on<Events::UIEvent>(
+      [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
+        if ( event.msg == "main_menu_resume_game" ) {
+          UI::EnableCampaignUI();
+        }
+        else if ( event.msg == "main_menu_start_game" ) {
+          Global::ClearRegistry();
+
+          campaign_started = false;
+          UI::EnableCampaignUI();
+        }
+        else if ( event.msg == "main_menu_load_game" ) {
+          SaveSystem::Load();
+        }
+        else if ( event.msg == "modal_menu_save_game" ) {
+          SaveSystem::Save();
+        }
+        else if ( event.msg == "modal_menu_exit_main" ) {
+          UI::EnableMainMenuUI();
+        }
+      }
+    );
 
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu: {
         Input::Handle();
-
-        Events::event_emitter.on<Events::UIEvent>(
-          []( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-            if ( event.msg == "main_menu_start_game" ) {
-              Global::program_mode = Global::ProgramMode::Campaign;
-            }
-          }
-        );
 
         UpdateOnFrame();
 
@@ -91,7 +103,7 @@ int main( void ) {
       } break;
 
       case Global::ProgramMode::ModalMenu: {
-        // Input::CheckMenuToggle();
+        Input::CheckMenuToggle();
 
         UpdateOnFrame();
 
@@ -99,11 +111,7 @@ int main( void ) {
         {
           Renderer::Draw( Global::texture_cache );
           DrawRectangle(
-            0,
-            0,
-            GetScreenWidth(),
-            GetScreenHeight(),
-            Fade( BLACK, 0.33f )
+            0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
           Renderer::DrawUI();
         }
@@ -117,8 +125,7 @@ int main( void ) {
           ProvinceSystem::Init( Global::texture_cache );
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
-          // TODO: Something wrong in this, causing weird fps dips
-          // UI::InitCampaignUI();
+          // UI::EnableCampaignUI();
           campaign_started = true;
         }
 
@@ -195,19 +202,6 @@ void Update1TPS() {
   }
 }
 
-void Exit( TextureCache &cache ) {
-  // @TODO figure out all deallocs or whatever
-
-  UnloadShader( Renderer::shader );
-
-  for ( auto resource: cache ) {
-    UnloadTexture( resource.second->texture );
-  }
-
-  cache.clear();
-  CloseWindow();// Close window and OpenGL context
-}
-
 void CameraUpdate( Camera2D &camera, f32 dt ) {
   f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
@@ -262,19 +256,15 @@ inline Image InitTileOutline() {
 
 void LoadResources() {
   LoadResource(
-    hstr{ "tile_outline" },
-    InitTileOutline(),
-    Global::texture_cache
+    hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache
   );
 
   Global::font_cache.load(
-    hstr{ "font_romulus" },
-    LoadFont( "assets/fonts/romulus.png" )
+    hstr{ "font_romulus" }, LoadFont( "assets/fonts/romulus.png" )
   );
 
   Global::font_cache.load(
-    hstr{ "font_default" },
-    LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" )
+    hstr{ "font_default" }, LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" )
   );
 
   LoadResource(
@@ -372,43 +362,47 @@ void LoadResources() {
     Global::texture_cache
   );
 
-  LoadResource(
+  // TODO at somepoint these UI textures should probably
+  // be set to bilinear and then run through the fragment shader
+  // But before I can do that I need to fix the shader with how
+  // it deals with alpha
+  LoadTexturePointFilter(
     hstr{ "context_panel" },
     LoadImage( "assets/textures/UI/UI_test.png" ),
     Global::texture_cache
   );
 
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_overview" },
     LoadImage( "assets/textures/UI/Overview.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_population" },
     LoadImage( "assets/textures/UI/Population.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_culture" },
     LoadImage( "assets/textures/UI/Culture.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_religion" },
     LoadImage( "assets/textures/UI/Religion.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_resources" },
     LoadImage( "assets/textures/UI/Resources.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_construction" },
     LoadImage( "assets/textures/UI/Construction.png" ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadTexturePointFilter(
     hstr{ "settlement_context_tab_garrison" },
     LoadImage( "assets/textures/UI/Garrison.png" ),
     Global::texture_cache
@@ -426,4 +420,17 @@ void LoadResources() {
       Global::texture_cache
     );
   }
+}
+
+void Exit( TextureCache &cache ) {
+  // @TODO figure out all deallocs or whatever
+
+  UnloadShader( Renderer::shader );
+
+  for ( auto resource: cache ) {
+    UnloadTexture( resource.second->texture );
+  }
+
+  cache.clear();
+  CloseWindow();// Close window and OpenGL context
 }

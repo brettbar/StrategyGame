@@ -18,9 +18,11 @@
 namespace UI {
 
 inline Context context = { entt::null, entt::null };
-inline std::vector<entt::entity> content;
+inline std::vector<entt::entity> _content;
 
+inline void EnableContent();
 inline void DisableCurrentContent();
+
 inline void Draw();
 inline void RecursiveDraw( Panel & );
 inline void RecursiveLayout( Panel & );
@@ -31,24 +33,38 @@ inline void ListenForDeselect();
 inline void RecursiveToggle( entt::entity, bool );
 inline void SetContextNull();
 
-inline void InitMainMenuUI() {
-  // DisableCurrentContent();
-  content = CreateMainMenuUI();
-  for ( entt::entity base: content ) {
-    RecursiveToggle( base, true );
-  }
+inline void EnableMainMenuUI() {
+  Global::program_mode = Global::ProgramMode::MainMenu;
+  DisableCurrentContent();
+  _content = CreateMainMenuUI();
+  EnableContent();
 }
 
-inline void InitCampaignUI() {
-  // DisableCurrentContent();
-  content = CreateCampaignUI();
+inline void EnableCampaignUI() {
+  Global::program_mode = Global::ProgramMode::Campaign;
+  DisableCurrentContent();
+  _content = CreateCampaignUI();
 
   Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>();
   Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>();
 }
 
+inline void EnableModalMenuUI() {
+  Global::program_mode = Global::ProgramMode::ModalMenu;
+  DisableCurrentContent();
+  _content = CreateModalMenuUI();
+  EnableContent();
+}
+
+inline void EnableContent() {
+  for ( entt::entity base: _content ) {
+    RecursiveToggle( base, true );
+  }
+}
+
 inline void DisableCurrentContent() {
-  for ( entt::entity base: content ) {
+  SetContextNull();
+  for ( entt::entity base: _content ) {
     RecursiveToggle( base, false );
   }
 }
@@ -64,13 +80,15 @@ inline void UpdateOnFrame() {
 
   if ( screen_width > 1920 ) {
     SCALE = 2.0;
-  } else if ( screen_width > 2560 ) {
+  }
+  else if ( screen_width > 2560 ) {
     SCALE = 3.0;
-  } else if ( screen_width >= 3840 ) {
+  }
+  else if ( screen_width >= 3840 ) {
     SCALE = 4.0;
   }
 
-  for ( entt::entity base: content ) {
+  for ( entt::entity base: _content ) {
     Panel &panel = Get<Panel>( base );
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
@@ -80,12 +98,14 @@ inline void UpdateOnFrame() {
   //   auto modal_menu = lookup["modal_menu"];
   //   Panel &panel = Get<Panel>( modal_menu );
   //   RecursiveLayout( panel );
-  //   RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+  //   RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown
+  //   );
   // } else {
   //   for ( entt::entity base: content ) {
   //     Panel &panel = Get<Panel>( base );
   //     RecursiveLayout( panel );
-  //     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
+  //     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown
+  //     );
   //   }
   // }
 }
@@ -101,11 +121,10 @@ inline void Draw() {
   //   }
   // }
   //
-  for ( entt::entity base: content ) {
+  for ( entt::entity base: _content ) {
     Panel &panel = Get<Panel>( base );
     RecursiveDraw( panel );
   }
-
 
   DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
   DrawFPS( GetScreenWidth() - 100, 2 );
@@ -119,8 +138,7 @@ inline void Draw() {
   DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
-  std::string selected_ent =
-    "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+  std::string selected_ent = "entity: " + EntityIdToString( SelectionSystem::selected_entity );
 }
 
 inline void RecursiveLayout( Panel &parent_panel ) {
@@ -180,7 +198,8 @@ inline void RecursiveLayout( Panel &parent_panel ) {
           transform.y = parent_panel.elem.transform.y;
         } break;
       }
-    } else if ( parent_panel.children_axis == Axis::COLUMN ) {
+    }
+    else if ( parent_panel.children_axis == Axis::COLUMN ) {
       // 2. Set the child x position based on alignment style.
       switch ( parent_panel.children_horiz_align ) {
         case Align::START: {
@@ -219,7 +238,8 @@ inline void RecursiveLayout( Panel &parent_panel ) {
     if ( parent_panel.children_axis == Axis::ROW ) {
       parent_panel.elem.transform.width = total_width;
       parent_panel.elem.transform.height = tallest_child;
-    } else if ( parent_panel.children_axis == Axis::COLUMN ) {
+    }
+    else if ( parent_panel.children_axis == Axis::COLUMN ) {
       parent_panel.elem.transform.width = widest_child;
       parent_panel.elem.transform.height = total_height;
     }
@@ -255,12 +275,7 @@ inline void RecursiveDraw( Panel &panel ) {
   }
 }
 
-inline void RecursiveInteractions(
-  Panel &panel,
-  bool &over_any_elem,
-  bool mouseWentUp,
-  bool mouseWentDown
-) {
+inline void RecursiveInteractions( Panel &panel, bool &over_any_elem, bool mouseWentUp, bool mouseWentDown ) {
 
   if ( !panel.elem.enabled )
     return;
@@ -270,12 +285,7 @@ inline void RecursiveInteractions(
       continue;
 
     if ( Has<Panel>( child ) ) {
-      RecursiveInteractions(
-        Get<Panel>( child ),
-        over_any_elem,
-        mouseWentUp,
-        mouseWentDown
-      );
+      RecursiveInteractions( Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown );
     }
 
     UpdateElem( child );
@@ -287,13 +297,7 @@ inline void RecursiveInteractions(
     if ( !over_any_elem )
       over_any_elem = inside;
 
-    if ( DoInteraction(
-           child,
-           inside,
-           IsInteractive( child ),
-           mouseWentUp,
-           mouseWentDown
-         ) ) {
+    if ( DoInteraction( child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown ) ) {
       std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
       if ( IsClickable( child ) ) {
@@ -307,13 +311,7 @@ inline void RecursiveInteractions(
   }
 }
 
-inline bool DoInteraction(
-  entt::entity entity,
-  bool inside,
-  bool interactive,
-  bool mouseWentUp,
-  bool mouseWentDown
-) {
+inline bool DoInteraction( entt::entity entity, bool inside, bool interactive, bool mouseWentUp, bool mouseWentDown ) {
   bool result = false;
 
   if ( entity == context.active ) {
@@ -323,7 +321,8 @@ inline bool DoInteraction(
 
       context.active = entt::null;
     }
-  } else if ( entity == context.hot ) {
+  }
+  else if ( entity == context.hot ) {
     // if ( mouseWentDown && interactive )
     if ( mouseWentDown && interactive )
       context.active = entity;
@@ -340,14 +339,13 @@ inline bool DoInteraction(
   return result;
 }
 
-
-// TODO replace this param reg with the global one
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
     auto &context_panel = lookup.at( "settlement_context_panel" );
     RecursiveToggle( context_panel, true );
-  } else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+  }
+  else if ( game_reg.all_of<Actor::Component>( entity ) ) {
     auto actor = game_reg.get<Actor::Component>( entity );
 
     auto context_panel = lookup.at( "actor_context_panel" );
@@ -375,7 +373,6 @@ inline void RecursiveToggle( entt::entity entity, bool on ) {
   }
 }
 
-
 inline bool MouseIsOverUI() {
   // This is almost sufficent, but we need to account for panels too
   // not just items that can be active?
@@ -385,12 +382,6 @@ inline bool MouseIsOverUI() {
 inline void SetContextNull() {
   context.hot = entt::null;
   context.active = entt::null;
-}
-
-inline void SetModalMenu( bool on ) {
-  RecursiveToggle( lookup.at( "modal_menu" ), on );
-  if ( !on )
-    SetContextNull();
 }
 
 };// namespace UI
