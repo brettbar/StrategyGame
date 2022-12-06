@@ -9,7 +9,7 @@
 #include "components/unit.hpp"
 #include "global.hpp"
 
-#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/unordered_map.hpp>
 #include <fstream>
@@ -20,20 +20,22 @@
 namespace SaveSystem {
 
 inline void Save() {
-  printf( "Saving to output.json\n" );
+  printf( "Saving to output\n" );
 
-  std::ofstream file( "output.json" );
+  std::ofstream file( "output.dat", std::ios::binary );
   {
-    cereal::JSONOutputArchive output{ file };
+    cereal::BinaryOutputArchive output{ file };
 
     /*
-     * For some reason when this component<>thing 
-     * has more than 1 type given to it we get strange linker 
-     * errors
+     * Animated::Component will not work here with the others for some reason
      */
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Unit::Component>( output );
+      .component<
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -41,24 +43,26 @@ inline void Save() {
 }
 
 inline void Load() {
-  printf( "Loading from output.json\n" );
+  printf( "Loading from output\n" );
 
 
-  std::ifstream file( "output.json" );
+  std::ifstream file( "output.dat", std::ios::binary );
   {
-    cereal::JSONInputArchive input{ file };
+    cereal::BinaryInputArchive input{ file };
 
     Global::ClearRegistry();
     assert( Global::world.empty() );
 
     /*
-     * For some reason when this component<>thing 
-     * has more than 1 type given to it we get strange linker 
-     * errors
+     * Animated::Component will not work here with the others for some reason
      */
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Unit::Component>( input );
+      .component<
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( input );
 
     // printf( "%u\n", (int) Global::world.size() );
   }

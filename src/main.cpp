@@ -74,7 +74,11 @@ int main( void ) {
           UI::EnableCampaignUI();
         }
         else if ( event.msg == "main_menu_load_game" ) {
+          Global::ClearRegistry();
           SaveSystem::Load();
+
+          campaign_started = false;
+          UI::EnableCampaignUI();
         }
         else if ( event.msg == "modal_menu_save_game" ) {
           SaveSystem::Save();

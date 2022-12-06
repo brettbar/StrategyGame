@@ -1,6 +1,9 @@
 .cache/
 .idea/
 .vs/
+.vscode/
+output.json
+output.*
 include/
 lib/
 build/
