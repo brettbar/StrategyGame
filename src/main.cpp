@@ -61,6 +61,8 @@ int main( void ) {
   // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
 
+  bool campaign_to_load = false;
+
   while ( !WindowShouldClose() ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
@@ -74,11 +76,10 @@ int main( void ) {
           UI::EnableCampaignUI();
         }
         else if ( event.msg == "main_menu_load_game" ) {
-          Global::ClearRegistry();
-          SaveSystem::Load();
-
-          campaign_started = false;
-          UI::EnableCampaignUI();
+          campaign_to_load = true;
+        }
+        else if ( event.msg == "modal_menu_load_game" ) {
+          campaign_to_load = true;
         }
         else if ( event.msg == "modal_menu_save_game" ) {
           SaveSystem::Save();
@@ -88,6 +89,15 @@ int main( void ) {
         }
       }
     );
+
+    if ( campaign_to_load ) {
+      Global::ClearRegistry();
+      SaveSystem::Load();
+
+      campaign_started = false;
+      UI::EnableCampaignUI();
+      campaign_to_load = false;
+    }
 
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu: {

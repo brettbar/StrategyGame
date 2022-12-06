@@ -93,7 +93,11 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   // Modal Menu
   {
     "modal_menu_load_game",
-    []() { printf( "Load\n" ); },
+    []() {
+      printf( "Load\n" );
+      Events::event_emitter.publish( Events::UIEvent{ "modal_menu_load_game" }
+      );
+    },
   },
   {
     "modal_menu_save_game",
