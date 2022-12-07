@@ -62,8 +62,9 @@ int main( void ) {
   SetExitKey( KEY_NULL );
 
   bool campaign_to_load = false;
+  bool hit_exit = false;
 
-  while ( !WindowShouldClose() ) {
+  while ( !WindowShouldClose() && !hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_resume_game" ) {
@@ -77,6 +78,9 @@ int main( void ) {
         }
         else if ( event.msg == "main_menu_load_game" ) {
           campaign_to_load = true;
+        }
+        else if ( event.msg == "main_menu_exit_game" ) {
+          hit_exit = true;
         }
         else if ( event.msg == "modal_menu_load_game" ) {
           campaign_to_load = true;

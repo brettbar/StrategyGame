@@ -19,6 +19,22 @@ struct Component {
   UVector2 coords;
   Biome biome;
   Visibility visibility;
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar(
+      id,
+      noise,
+      position.x,
+      position.y,
+      center.x,
+      center.y,
+      coords.x,
+      coords.y,
+      biome,
+      visibility
+    );
+  }
 };
 
 

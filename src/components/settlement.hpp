@@ -1,6 +1,7 @@
 #pragma once
 #include "../common.hpp"
 #include "../data/buildings.hpp"
+#include <cereal/types/common.hpp>
 
 namespace Settlement {
 
@@ -66,6 +67,24 @@ struct Population {
 
   // higher when settlment development is higher
   f32 carryingCapacity;
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar(
+      current,
+      birthRate,
+      deathRate,
+      growthRate,
+      health,
+      foodConsumption,
+      foodAvailability,
+      famine,
+      disease,
+      degeneracy,
+      density,
+      carryingCapacity
+    );
+  }
 };
 
 struct Component {
@@ -74,6 +93,16 @@ struct Component {
   Development development;
   Population population;
   Texture2D texture;
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar( id, name, development, population, texture );
+  }
+
+  template<class Archive>
+  void serialize( Archive &ar, Population &pop ) {
+    ar( CEREAL_NVP( pop ) );
+  }
 };
 
 

@@ -87,7 +87,7 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "main_menu_exit_game",
     []() {
       printf( "ExitGame\n" );
-      CloseWindow();
+      Events::event_emitter.publish( Events::UIEvent{ "main_menu_exit_game" } );
     },
   },
   // Modal Menu

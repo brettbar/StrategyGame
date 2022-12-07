@@ -2,6 +2,7 @@
 
 #include "../common.hpp"
 #include "../data/resources.hpp"
+#include "cereal/types/vector.hpp"
 #include "tile.hpp"
 
 namespace Province {
@@ -13,6 +14,11 @@ struct Component {
 
   std::shared_ptr<Tile::Component> tile;
   std::vector<NaturalResource> resources;
+
+  template<class Archive>
+  void serialize( Archive &ar ) {
+    ar( id, owner, selected, tile, CEREAL_NVP( resources ) );
+  }
 };
 
 }// namespace Province

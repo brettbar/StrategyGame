@@ -37,7 +37,6 @@ struct Component {
   f32 animTime;
   bool moving;
 
-
   template<class Archive>
   void serialize( Archive &ar ) {
     ar(
@@ -55,7 +54,8 @@ struct Component {
       direction,
       currFrame,
       animTime,
-      moving );
+      moving
+    );
   }
 
   template<class Archive>
