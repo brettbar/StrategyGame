@@ -29,17 +29,17 @@ inline void Save() {
     /*
      * Animated::Component will not work here with the others for some reason
      */
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<
-    //     Actor::Component,
-    //     Unit::Component,
-    //     Animated::Component,
-    //     Sight::Component>( output );
-
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Settlement::Component>( output );
+      .component<
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( output );
+
+    // entt::snapshot{ Global::world }
+    //   .entities( output )
+    //   .component<Province::Component, Settlement::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -60,17 +60,17 @@ inline void Load() {
     /*
      * Animated::Component will not work here with the others for some reason
      */
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<
-    //     Actor::Component,
-    //     Unit::Component,
-    //     Animated::Component,
-    //     Sight::Component>( input );
-
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Settlement::Component>( input );
+      .component<
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( input );
+
+    // entt::snapshot_loader{ Global::world }
+    //   .entities( input )
+    //   .component<Province::Component, Settlement::Component>( input );
 
 
     // printf( "%u\n", (int) Global::world.size() );

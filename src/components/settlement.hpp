@@ -70,20 +70,7 @@ struct Population {
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar(
-      current,
-      birthRate,
-      deathRate,
-      growthRate,
-      health,
-      foodConsumption,
-      foodAvailability,
-      famine,
-      disease,
-      degeneracy,
-      density,
-      carryingCapacity
-    );
+    ar( current, birthRate, deathRate, growthRate, carryingCapacity );
   }
 };
 
@@ -96,12 +83,17 @@ struct Component {
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( id, name, development, population, texture );
+    ar( id, name, development, population );
   }
 
   template<class Archive>
   void serialize( Archive &ar, Population &pop ) {
-    ar( CEREAL_NVP( pop ) );
+    ar( pop );
+  }
+
+  template<class Archive>
+  void serialize( Archive &ar, Texture2D &tex ) {
+    ar( tex.id, tex.width, tex.height, tex.mipmaps, tex.format );
   }
 };
 
