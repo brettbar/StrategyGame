@@ -38,6 +38,8 @@ inline entt::entity host_player;
 inline void ClearRegistry() {
   Global::world = {};
   Global::local = {};
+  Global::world.clear();
+  Global::local.clear();
 }
 
 

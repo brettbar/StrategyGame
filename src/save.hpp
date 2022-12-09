@@ -3,6 +3,7 @@
 #include "../include/entt/entt.hpp"
 #include "components/actor.hpp"
 #include "components/animated.hpp"
+#include "components/player.hpp"
 #include "components/province.hpp"
 #include "components/settlement.hpp"
 #include "components/sight.hpp"
@@ -26,20 +27,31 @@ inline void Save() {
   {
     cereal::BinaryOutputArchive output{ file };
 
-    /*
-     * Animated::Component will not work here with the others for some reason
-     */
-    entt::snapshot{ Global::world }
-      .entities( output )
-      .component<
-        Actor::Component,
-        Unit::Component,
-        Animated::Component,
-        Sight::Component>( output );
+    // entt::snapshot{ Global::world }
+    //   .entities( output )
+    //   .component<
+    //     Actor::Component,
+    //     Unit::Component,
+    //     Animated::Component,
+    //     Sight::Component>( output );
+
+
+    // Think the problem with player is that since we are
+    // serializing an entity it keeps it alive or something
+    // and has issues with PlayerSystem::Init
+
 
     // entt::snapshot{ Global::world }
     //   .entities( output )
-    //   .component<Province::Component, Settlement::Component>( output );
+    //   .component<Player::Component>( output );
+
+    entt::snapshot{ Global::world }
+      .entities( output )
+      .component<Province::Component>( output );
+
+    // entt::snapshot{ Global::world }
+    //   .entities( output )
+    //   .component<Province::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -55,22 +67,27 @@ inline void Load() {
     cereal::BinaryInputArchive input{ file };
 
     Global::ClearRegistry();
-    assert( Global::world.empty() );
-
-    /*
-     * Animated::Component will not work here with the others for some reason
-     */
-    entt::snapshot_loader{ Global::world }
-      .entities( input )
-      .component<
-        Actor::Component,
-        Unit::Component,
-        Animated::Component,
-        Sight::Component>( input );
 
     // entt::snapshot_loader{ Global::world }
     //   .entities( input )
-    //   .component<Province::Component, Settlement::Component>( input );
+    //   .component<
+    //     Actor::Component,
+    //     Unit::Component,
+    //     Animated::Component,
+    //     Sight::Component>( input );
+
+
+    // entt::snapshot_loader{ Global::world }
+    //   .entities( input )
+    //   .component<Player::Component>( input );
+
+    entt::snapshot_loader{ Global::world }
+      .entities( input )
+      .component<Province::Component>( input );
+
+    // entt::snapshot_loader{ Global::world }
+    //   .entities( input )
+    //   .component<Province::Component>( input );
 
 
     // printf( "%u\n", (int) Global::world.size() );

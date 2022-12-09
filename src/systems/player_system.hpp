@@ -17,20 +17,16 @@ inline void AIUpdate( AI::Component &, Player::Component & );
 inline void Init() {
   Global::host_player = Global::world.create();
   Global::world.emplace<Player::Component>(
-    Global::host_player,
-    Global::host_player,
-    true,
-    Faction::ID::Romans );
+    Global::host_player, Global::host_player, true, Faction::ID::Romans
+  );
 
   entt::entity ai_player = Global::world.create();
   Global::world.emplace<Player::Component>(
-    ai_player,
-    ai_player,
-    false,
-    Faction::ID::Celts );
+    ai_player, ai_player, false, Faction::ID::Celts
+  );
   Global::world.emplace<AI::Component>(
-    ai_player,
-    AI::Goal::DevelopSettlements );
+    ai_player, AI::Goal::DevelopSettlements
+  );
 }
 
 inline void Update() {
@@ -59,8 +55,8 @@ inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
       if ( !ai.has_colonist ) {
         SpawnSystem::SpawnColonist( player.id );
         ai.has_colonist = true;
-      } else if ( ai.has_colonist && !ai.has_settlement ) {
       }
+      else if ( ai.has_colonist && !ai.has_settlement ) {}
     } break;
   }
 }
