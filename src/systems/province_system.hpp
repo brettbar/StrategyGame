@@ -9,7 +9,7 @@ namespace ProvinceSystem {
 
 inline void SetProvinceOwner( u32 owner );
 
-inline void Init( TextureCache &cache ) {
+inline void Init() {
   auto tView = Global::world.view<MapSystem::TileMap>();
   MapSystem::TileMap tiles = tView.get<MapSystem::TileMap>( tView.front() );
 

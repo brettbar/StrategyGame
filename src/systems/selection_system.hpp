@@ -88,6 +88,8 @@ CheckSelectUnits( View<Unit::Component> units_view, vec2 click_pos ) {
     if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) ) {
       Global::world.emplace<Selected::Component>( entity, true );
 
+      std::cout << EntityIdToString( entity ) << std::endl;
+      std::cout << EntityIdToString( unit.owner ) << std::endl;
 
       unit.selected = true;
       selected_entity = entity;
@@ -110,6 +112,9 @@ CheckSelectProvince( View<Province::Component> prov_view, vec2 click_pos ) {
 
     if ( tile == prov.tile->id ) {
       Global::world.emplace<Selected::Component>( entity, true );
+
+      std::cout << EntityIdToString( entity ) << std::endl;
+      std::cout << EntityIdToString( prov.owner ) << std::endl;
 
       selected_entity = entity;
     }

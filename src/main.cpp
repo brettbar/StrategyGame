@@ -63,6 +63,7 @@ int main( void ) {
 
   bool campaign_to_load = false;
   bool hit_exit = false;
+  bool fresh_start = true;
 
   while ( !WindowShouldClose() && !hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
@@ -75,6 +76,7 @@ int main( void ) {
 
           campaign_started = false;
           UI::EnableCampaignUI();
+          fresh_start = true;
         }
         else if ( event.msg == "main_menu_load_game" ) {
           campaign_to_load = true;
@@ -101,6 +103,7 @@ int main( void ) {
       campaign_started = false;
       UI::EnableCampaignUI();
       campaign_to_load = false;
+      fresh_start = false;
     }
 
     switch ( Global::program_mode ) {
@@ -137,15 +140,28 @@ int main( void ) {
       } break;
 
       case Global::ProgramMode::Campaign: {
-        if ( !campaign_started ) {
+
+        if ( !campaign_started && fresh_start ) {
           MapSystem::Init();
           PlayerSystem::Init();
-          ProvinceSystem::Init( Global::texture_cache );
+          ProvinceSystem::Init();
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           // UI::EnableCampaignUI();
           campaign_started = true;
         }
+        else if ( !campaign_started && !fresh_start ) {
+          MapSystem::Init();
+          // PlayerSystem::Init();
+
+          // ProvinceSystem::Init();
+          ProvinceSystem::Init();
+          SettlementSystem::Init( Global::texture_cache );
+          Renderer::Init();
+          // UI::EnableCampaignUI();
+          campaign_started = true;
+        }
+
 
         // Update Time
         dt = GetFrameTime();

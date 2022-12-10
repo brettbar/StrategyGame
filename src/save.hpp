@@ -41,13 +41,13 @@ inline void Save() {
     // and has issues with PlayerSystem::Init
 
 
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<Player::Component>( output );
-
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Province::Component>( output );
+      .component<Player::Component>( output );
+
+    // entt::snapshot{ Global::world }
+    //   .entities( output )
+    //   .component<Province::Component>( output );
 
     // entt::snapshot{ Global::world }
     //   .entities( output )
@@ -77,13 +77,13 @@ inline void Load() {
     //     Sight::Component>( input );
 
 
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<Player::Component>( input );
-
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Province::Component>( input );
+      .component<Player::Component>( input );
+
+    // entt::snapshot_loader{ Global::world }
+    //   .entities( input )
+    //   .component<Province::Component>( input );
 
     // entt::snapshot_loader{ Global::world }
     //   .entities( input )
