@@ -27,6 +27,7 @@ TEMPORARY TODOS HERE
 #include "ui/ui_system.hpp"
 
 #include "filesystem"
+#include "utils.hpp"
 
 namespace fs = std::filesystem;
 
@@ -151,15 +152,12 @@ int main( void ) {
           campaign_started = true;
         }
         else if ( !campaign_started && !fresh_start ) {
-          MapSystem::Init();
-          // PlayerSystem::Init();
-
-          // ProvinceSystem::Init();
-          ProvinceSystem::Init();
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           // UI::EnableCampaignUI();
           campaign_started = true;
+
+          std::cout << EntityIdToString( Global::host_player ) << std::endl;
         }
 
 

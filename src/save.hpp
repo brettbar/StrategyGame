@@ -41,17 +41,14 @@ inline void Save() {
     // and has issues with PlayerSystem::Init
 
 
+    // entt::snapshot{ Global::world }
+    //   .entities( output )
+    //   .component<Player::Component>( output );
+
+
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Player::Component>( output );
-
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<Province::Component>( output );
-
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<Province::Component>( output );
+      .component<Tile::Component, Province::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -77,18 +74,13 @@ inline void Load() {
     //     Sight::Component>( input );
 
 
+    // entt::snapshot_loader{ Global::world }
+    //   .entities( input )
+    //   .component<Player::Component>( input );
+
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Player::Component>( input );
-
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<Province::Component>( input );
-
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<Province::Component>( input );
-
+      .component<Tile::Component, Province::Component>( input );
 
     // printf( "%u\n", (int) Global::world.size() );
   }

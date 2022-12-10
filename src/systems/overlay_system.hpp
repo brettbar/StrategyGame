@@ -11,10 +11,11 @@
 namespace OverlaySystem {
 
 inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
-  auto provinces = Global::world.view<Province::Component>();
+  auto provinces = Global::world.view<Tile::Component, Province::Component>();
 
   for ( auto entity: provinces ) {
-    Province::Component &prov = provinces.get<Province::Component>( entity );
+    auto &tile = provinces.get<Tile::Component>( entity );
+    auto &prov = provinces.get<Province::Component>( entity );
 
     if ( prov.owner != entt::null ) {
       Player::Component player =
@@ -27,36 +28,41 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "redOverlay" }]->texture,
             frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
+            tile.position,
+            Fade( WHITE, 0.5 )
+          );
           break;
         case Faction::ID::Greeks:
           DrawTextureRec(
             texture_cache[hstr{ "blueOverlay" }]->texture,
             frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
+            tile.position,
+            Fade( WHITE, 0.5 )
+          );
           break;
         case Faction::ID::Celts:
           DrawTextureRec(
             texture_cache[hstr{ "greenOverlay" }]->texture,
             frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
+            tile.position,
+            Fade( WHITE, 0.5 )
+          );
           break;
         case Faction::ID::Punics:
           DrawTextureRec(
             texture_cache[hstr{ "purpleOverlay" }]->texture,
             frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
+            tile.position,
+            Fade( WHITE, 0.5 )
+          );
           break;
         case Faction::ID::Persians:
           DrawTextureRec(
             texture_cache[hstr{ "orangeOverlay" }]->texture,
             frameRec,
-            prov.tile->position,
-            Fade( WHITE, 0.5 ) );
+            tile.position,
+            Fade( WHITE, 0.5 )
+          );
           break;
           // case Faction::ID::Germans:
           //   DrawTextureRec(
@@ -79,13 +85,14 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
 }
 
 inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
-  auto settlements = Global::world.view<Settlement::Component>();
+  auto settlements =
+    Global::world
+      .view<Tile::Component, Province::Component, Settlement::Component>();
 
   for ( auto entity: settlements ) {
-    Settlement::Component &settlement =
-      settlements.get<Settlement::Component>( entity );
-    Province::Component &prov =
-      Global::world.get<Province::Component>( entity );
+    auto &tile = settlements.get<Tile::Component>( entity );
+    auto &province = settlements.get<Province::Component>( entity );
+    auto &settlement = settlements.get<Settlement::Component>( entity );
 
     // std::string popStr =
     //   "Pop: " + std::to_string( settlement.population.current );
@@ -100,15 +107,16 @@ inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
       continue;
 
     Vector2 settlement_pos = {
-      prov.tile->position.x + 24,
-      prov.tile->position.y + 24,
+      tile.position.x + 24,
+      tile.position.y + 24,
     };
 
     const vec2 text_dims = MeasureTextEx(
       Global::font_cache[hstr{ "font_romulus" }]->font,
       settlement.name.c_str(),
       14,
-      2.0f );
+      2.0f
+    );
 
 
     DrawRectangleRec(
@@ -118,7 +126,8 @@ inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
         text_dims.x,
         text_dims.y,
       },
-      BLACK );
+      BLACK
+    );
 
     DrawTextEx(
       Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -129,7 +138,8 @@ inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
       },
       14,
       2,
-      WHITE );
+      WHITE
+    );
 
     // DrawText(
     //   std::to_string( settlement.population.current ).c_str(),

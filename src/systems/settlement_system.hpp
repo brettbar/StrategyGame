@@ -81,18 +81,19 @@ inline void SpawnSettlement() {
   if ( closest_tile == -1 )
     return;
 
-  for ( auto entity: Global::world.view<Province::Component>() ) {
-    Province::Component &prov =
-      Global::world.get<Province::Component>( entity );
+  for ( auto entity:
+        Global::world.view<Tile::Component, Province::Component>() ) {
+
+    auto &tile = Global::world.get<Tile::Component>( entity );
+    auto &prov = Global::world.get<Province::Component>( entity );
 
     // TODO pretty sure I am checking this twice, another time in the Actor colonist area
-    if ( prov.tile->id == closest_tile ) {
+    if ( tile.id == closest_tile ) {
       if ( prov.owner == unit.owner ) {
         if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
           printf( "spawning settlement\n" );
 
           Settlement::Component settlement = {
-            .id = prov.id,
             .name = "Rome",
             .development = Settlement::Development::Village,
             .population =
@@ -183,13 +184,13 @@ inline bool UpdatePopulation( Settlement::Component &settlement ) {
 
 inline void Draw( TextureCache &cache, bool showOverlays ) {
   auto settlements =
-    Global::world.view<Settlement::Component, Province::Component>();
+    Global::world
+      .view<Tile::Component, Province::Component, Settlement::Component>();
 
   for ( auto entity: settlements ) {
-    Province::Component &province =
-      settlements.get<Province::Component>( entity );
-    Settlement::Component &settlement =
-      settlements.get<Settlement::Component>( entity );
+    auto &tile = settlements.get<Tile::Component>( entity );
+    auto &province = settlements.get<Province::Component>( entity );
+    auto &settlement = settlements.get<Settlement::Component>( entity );
 
     // str idString = std::to_string(tile.id);
     // const char *idText = idString.c_str();
@@ -223,8 +224,8 @@ inline void Draw( TextureCache &cache, bool showOverlays ) {
 
 
     Vector2 settlement_pos = {
-      province.tile->position.x + 24,
-      province.tile->position.y + 24,
+      tile.position.x + 24,
+      tile.position.y + 24,
     };
 
     // // DrawRectangleRec({provPos.x + 50,

@@ -33,8 +33,9 @@ inline Mode mode = Mode::Terrain;
 
 
 using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
-using TileMap =
-  std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
+using TileMap = std::array<entt::entity, MAP_WIDTH * MAP_HEIGHT>;
+
+inline TileMap tile_map = {};
 
 inline void Init();
 inline void Draw( Camera2D &, TextureCache & );
@@ -45,8 +46,6 @@ inline void FilterIslands( NoiseMap &, f32 );
 inline void NormalizeMap( NoiseMap & );
 
 inline void Init() {
-  entt::entity entity = Global::world.create();
-  TileMap tileMap = {};
   f32 seed = 25;
   NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
 
@@ -55,10 +54,8 @@ inline void Init() {
   NormalizeMap( pNoise );
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    // for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    std::shared_ptr<Tile::Component> tile = std::make_shared<Tile::Component>();
-    // tile.id = x + y * 128;
-    tile->id = i;
+    entt::entity entity = Global::world.create();
+    // std::shared_ptr<Tile::Component> tile = std::make_shared<Tile::Component>();
 
     u32 x = i % MAP_WIDTH;
     u32 y = i / MAP_HEIGHT;
@@ -66,45 +63,58 @@ inline void Init() {
     f32 xPos = x * TILE_WIDTH;
     f32 yPos = y * ( TILE_HEIGHT * 0.75 );
 
-    if ( y % 2 == 1 )
-      tile->position = { xPos + ( TILE_WIDTH / 2 ), yPos };
-    else
-      tile->position = { xPos, yPos };
+    Vector2 position;
+    Biome biome;
 
-    tile->noise = pNoise[index( x, y )];
+    f32 noise = pNoise[index( x, y )];
 
     // Montanas
-    if ( tile->noise >= 0.8f )
-      tile->biome = Biome::Mountains;
+    if ( noise >= 0.8f )
+      biome = Biome::Mountains;
     // Colina
-    else if ( tile->noise >= 0.75f )
-      tile->biome = Biome::Hills;
+    else if ( noise >= 0.75f )
+      biome = Biome::Hills;
     // Tierra
-    else if ( tile->noise >= waterLevel )
-      tile->biome = Biome::Plains;
+    else if ( noise >= waterLevel )
+      biome = Biome::Plains;
+    else
+      biome = Biome::Sea;
+
+    if ( y % 2 == 1 )
+      position = { xPos + ( TILE_WIDTH / 2 ), yPos };
+    else
+      position = { xPos, yPos };
+
+    Tile::Component tile = {
+      i,
+      noise,
+      position,
+      {
+        position.x + ( TILE_WIDTH / 2 ),
+        position.y + ( TILE_HEIGHT / 2 ),
+      },
+      { x, y },
+      biome,
+      Tile::Visibility::UNEXPLORED,
+    };
+
+    // tile.id = x + y * 128;
+
+
     //      // Playa
     //      else if (tile->noise >= 0.76f)
     //        tile->biome = BEACH;
     // Mar
-    else
-      tile->biome = Biome::Sea;
 
-    tile->center = {
-      tile->position.x + ( TILE_WIDTH / 2 ),
-      tile->position.y + ( TILE_HEIGHT / 2 ) };
-    tile->coords = { x, y };
-    tile->visibility = Tile::Visibility::UNEXPLORED;
-    tileMap[index( x, y )] = tile;
+
+    tile_map[index( x, y )] = entity;
+
+    Global::world.emplace<Tile::Component>( entity, tile );
   }
-  Global::world.emplace<TileMap>( entity, tileMap );
 }
 
 
 inline void Draw( Camera2D &camera, TextureCache &cache ) {
-  auto tilesView = Global::world.view<TileMap>();
-  auto tilesEntity = tilesView.front();
-  TileMap &tileMap = tilesView.get<TileMap>( tilesEntity );
-
   Texture2D land_tile = cache[hstr{ "land_tile" }]->texture;
   Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
   Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
@@ -113,47 +123,48 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
 
   Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
-  for ( std::shared_ptr<Tile::Component> tile: tileMap ) {
+  for ( entt::entity entity: Global::world.view<Tile::Component>() ) {
+    auto& tile = Global::world.get<Tile::Component>( entity );
 
     if (
-      tile->position.x - TILE_WIDTH >
+      tile.position.x - TILE_WIDTH >
         camera.target.x + ( camera.offset.x / camera.zoom ) ||
-      tile->position.x + TILE_WIDTH <
+      tile.position.x + TILE_WIDTH <
         camera.target.x - ( camera.offset.x / camera.zoom ) ||
-      tile->position.y - TILE_WIDTH >
+      tile.position.y - TILE_WIDTH >
         camera.target.y + ( camera.offset.y / camera.zoom ) ||
-      tile->position.y + TILE_WIDTH <
+      tile.position.y + TILE_WIDTH <
         camera.target.y - ( camera.offset.y / camera.zoom ) ) {
       continue;
     }
 
 
-    //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile->position, WHITE);
-    //    DrawTextureRec(hex, frameRec, tile->position, WHITE);
-    switch ( tile->biome ) {
+    //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+    //    DrawTextureRec(hex, frameRec, tile.position, WHITE);
+    switch ( tile.biome ) {
       case Biome::Mountains:
-        // DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
         break;
       case Biome::Hills:
-        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
         break;
       case Biome::Plains:
-        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
         break;
       case Biome::Desert:
-        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
         break;
       case Biome::Sea:
-        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
         break;
       default:
-        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
         break;
     }
 
@@ -185,11 +196,13 @@ inline void UpdateFOW() {
     i32 closestId = DetermineTileIdFromPosition( unit.position );
     assert( closestId >= 0 );
 
-    std::shared_ptr<Tile::Component> closest = tiles[closestId];
-    u32 x = closest->coords.x;
-    u32 y = closest->coords.y;
+    entt::entity closest_entity = tiles[closestId];
+    Tile::Component closest =
+      Global::world.get<Tile::Component>( closest_entity );
+    u32 x = closest.coords.x;
+    u32 y = closest.coords.y;
 
-    std::array<std::shared_ptr<Tile::Component>, 6> neighbors = {
+    std::array<entt::entity, 6> neighbors = {
       tiles[index( x, y - 1 )],
       tiles[index( x + 1, y )],
       tiles[index( x, y + 1 )],
@@ -205,12 +218,17 @@ inline void UpdateFOW() {
       neighbors[5] = tiles[index( x, y - 1 )];
     }
 
-    for ( auto &neighbor: neighbors ) {
-      if ( neighbor != nullptr )
-        neighbor->visibility = Tile::Visibility::VISIBILE;
+    for ( auto neighbor: neighbors ) {
+      if ( neighbor != entt::null ) {
+
+        Tile::Component neighbor_tile =
+          Global::world.get<Tile::Component>( neighbor );
+
+        neighbor_tile.visibility = Tile::Visibility::VISIBILE;
+      }
     }
 
-    closest->visibility = Tile::Visibility::VISIBILE;
+    closest.visibility = Tile::Visibility::VISIBILE;
   }
 }
 
@@ -350,6 +368,8 @@ inline void NormalizeMap( NoiseMap &pNoise ) {
 
 
 // i = x + W * y;
-inline u32 index( u32 x, u32 y ) { return x + MAP_WIDTH * y; };
+inline u32 index( u32 x, u32 y ) {
+  return x + MAP_WIDTH * y;
+};
 
 };// namespace MapSystem

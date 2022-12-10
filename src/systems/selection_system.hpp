@@ -16,13 +16,14 @@ inline entt::entity selected_entity = entt::null;
 
 template<typename T>
 inline void ClearSelection( View<T> );
-inline void CheckSelectUnits( View<Unit::Component>, vec2 );
-inline void CheckSelectProvince( View<Province::Component>, vec2 );
+inline void CheckSelectUnits( vec2 );
+inline void CheckSelectProvince( vec2 );
 
 inline void Draw( TextureCache &cache, bool isDebug ) {
   auto unitsView = Global::world.view<Selected::Component, Unit::Component>();
   auto provsView =
-    Global::world.view<Selected::Component, Province::Component>();
+    Global::world
+      .view<Tile::Component, Province::Component, Selected::Component>();
 
   // for ( auto entity: unitsView ) {
   //   Unit::Component &unit = unitsView.get<Unit::Component>( entity );
@@ -36,12 +37,14 @@ inline void Draw( TextureCache &cache, bool isDebug ) {
   // }
 
   for ( auto entity: provsView ) {
-    Province::Component &prov = provsView.get<Province::Component>( entity );
+    auto &tile = provsView.get<Tile::Component>( entity );
+    auto &prov = provsView.get<Province::Component>( entity );
+
     if ( isDebug ) {
       DrawTexture(
         cache[hstr{ "tile_outline" }]->texture,
-        prov.tile->position.x,
-        prov.tile->position.y,
+        tile.position.x,
+        tile.position.y,
         WHITE
       );
       // DrawRectangleLinesEx(
@@ -60,8 +63,8 @@ inline void UpdateSelection( Vector2 click_pos ) {
   ClearSelection<Unit::Component>( units_view );
   ClearSelection<Province::Component>( prov_view );
 
-  CheckSelectUnits( units_view, click_pos );
-  CheckSelectProvince( prov_view, click_pos );
+  CheckSelectUnits( click_pos );
+  CheckSelectProvince( click_pos );
 }
 
 template<typename T>
@@ -76,8 +79,9 @@ inline void ClearSelection( View<T> component_view ) {
   }
 }
 
-inline void
-CheckSelectUnits( View<Unit::Component> units_view, vec2 click_pos ) {
+inline void CheckSelectUnits( vec2 click_pos ) {
+  auto units_view = Global::world.view<Unit::Component>();
+
   // use forward iterators and get only the components of interest
   for ( auto &entity: units_view ) {
     if ( selected_entity != entt::null )
@@ -97,20 +101,21 @@ CheckSelectUnits( View<Unit::Component> units_view, vec2 click_pos ) {
   }
 }
 
-inline void
-CheckSelectProvince( View<Province::Component> prov_view, vec2 click_pos ) {
-  i32 tile = DetermineTileIdFromPosition( click_pos );
+inline void CheckSelectProvince( vec2 click_pos ) {
+  i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
+  auto prov_view = Global::world.view<Tile::Component, Province::Component>();
 
-  if ( tile == -1 )
+  if ( tile_pos_id == -1 )
     return;
 
   for ( auto &entity: prov_view ) {
     if ( selected_entity != entt::null )
       return;
 
-    Province::Component &prov = prov_view.get<Province::Component>( entity );
+    auto &tile = prov_view.get<Tile::Component>( entity );
+    auto &prov = prov_view.get<Province::Component>( entity );
 
-    if ( tile == prov.tile->id ) {
+    if ( tile_pos_id == tile.id ) {
       Global::world.emplace<Selected::Component>( entity, true );
 
       std::cout << EntityIdToString( entity ) << std::endl;
