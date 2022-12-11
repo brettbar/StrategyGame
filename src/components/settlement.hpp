@@ -83,7 +83,7 @@ struct Component {
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( id, name, development, population );
+    ar( id, name, development, population, texture );
   }
 
   template<class Archive>

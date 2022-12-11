@@ -154,7 +154,7 @@ int main( void ) {
         }
         else if ( !campaign_started && !fresh_start ) {
           MapSystem::Init();
-          SettlementSystem::Init( Global::texture_cache );
+          // SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           campaign_started = true;
 

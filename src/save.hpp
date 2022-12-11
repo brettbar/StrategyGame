@@ -37,7 +37,14 @@ inline void Save() {
 
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Player::Component, Province::Component>( output );
+      .component<
+        Player::Component,
+        Province::Component,
+        Settlement::Component,
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( output );
 
 
     // entt::snapshot{ Global::world }
@@ -70,7 +77,14 @@ inline void Load() {
 
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Player::Component, Province::Component>( input );
+      .component<
+        Player::Component,
+        Province::Component,
+        Settlement::Component,
+        Actor::Component,
+        Unit::Component,
+        Animated::Component,
+        Sight::Component>( input );
 
     // entt::snapshot_loader{ Global::world }
     //   .entities( input )
