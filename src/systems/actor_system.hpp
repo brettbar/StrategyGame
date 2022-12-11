@@ -38,13 +38,11 @@ inline bool ColonistCanPlaceSettlement() {
   if ( closest_tile == -1 )
     return false;
 
-  for ( auto entity:
-        Global::world.view<Tile::Component, Province::Component>() ) {
-    auto &tile = Global::world.get<Tile::Component>( entity );
+  for ( auto entity: Global::world.view<Province::Component>() ) {
     auto &prov = Global::world.get<Province::Component>( entity );
 
     // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
-    if ( tile.id == closest_tile && prov.owner == unit.owner && !Global::world.any_of<Settlement::Component>( entity ) ) {
+    if ( prov.tile->id == closest_tile && prov.owner == unit.owner && !Global::world.any_of<Settlement::Component>( entity ) ) {
       return true;
     }
   }

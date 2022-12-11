@@ -149,8 +149,11 @@ int main( void ) {
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           campaign_started = true;
+
+          std::cout << EntityIdToString( Global::host_player ) << std::endl;
         }
         else if ( !campaign_started && !fresh_start ) {
+          MapSystem::Init();
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           campaign_started = true;

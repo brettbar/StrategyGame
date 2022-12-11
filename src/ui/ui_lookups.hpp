@@ -23,12 +23,12 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "actor_spawn_settlement_button",
     []() {
       printf( "Spawn Settlement clicked!!\n" );
-      // SettlementSystem::SpawnSettlement();
+      SettlementSystem::SpawnSettlement();
 
       // TODO handle this in main
-      Events::event_emitter.publish( Events::UIEvent{
-        "actor_spawn_settlement_button",
-      } );
+      // Events::event_emitter.publish( Events::UIEvent{
+      //   "actor_spawn_settlement_button",
+      // } );
     },
   },
   {

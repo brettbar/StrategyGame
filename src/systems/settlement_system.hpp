@@ -69,7 +69,7 @@ inline void Update(
 //         return LoadTextureFromImage( base );
 // }
 
-inline void SpawnSettlement( View<Province::Component> provinces ) {
+inline void SpawnSettlement() {
   Unit::Component unit =
     Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
   entt::entity unit_entity = SelectionSystem::selected_entity;
@@ -80,7 +80,7 @@ inline void SpawnSettlement( View<Province::Component> provinces ) {
   if ( closest_tile == -1 )
     return;
 
-  for ( auto entity: provinces ) {
+  for ( auto entity: Global::world.view<Province::Component>() ) {
     auto &prov = Global::world.get<Province::Component>( entity );
 
     // TODO pretty sure I am checking this twice, another time in the Actor colonist area
