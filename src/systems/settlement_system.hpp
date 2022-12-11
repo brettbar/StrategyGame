@@ -9,7 +9,6 @@
 
 namespace SettlementSystem {
 
-inline void Init( TextureCache & );
 inline void Update( State & );
 inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
@@ -17,10 +16,11 @@ inline void UpdateSprawl( Settlement::Component & );
 
 inline void Draw( TextureCache &, bool );
 
-inline std::map<std::string, Image> building_map;
 
-inline void Init( TextureCache &cache ) {
-  Image buildings = LoadImageFromTexture( cache[hstr{ "buildings" }]->texture );
+inline void Init() {
+  Image buildings =
+    LoadImageFromTexture( Global::texture_cache[hstr{ "buildings" }]->texture );
+
   Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
   Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );
   Image roman_m3 = ImageFromImage( buildings, { 0, 32, 16, 16 } );
@@ -31,15 +31,15 @@ inline void Init( TextureCache &cache ) {
   Image roman_s3 = ImageFromImage( buildings, { 48, 0, 16, 16 } );
   Image roman_s4 = ImageFromImage( buildings, { 64, 0, 16, 16 } );
 
-  building_map.insert_or_assign( "roman_m1", ( roman_m1 ) );
-  building_map.insert_or_assign( "roman_m2", ( roman_m2 ) );
-  building_map.insert_or_assign( "roman_m3", ( roman_m3 ) );
-  building_map.insert_or_assign( "roman_m4", ( roman_m4 ) );
+  Settlement::building_map.insert_or_assign( "roman_m1", ( roman_m1 ) );
+  Settlement::building_map.insert_or_assign( "roman_m2", ( roman_m2 ) );
+  Settlement::building_map.insert_or_assign( "roman_m3", ( roman_m3 ) );
+  Settlement::building_map.insert_or_assign( "roman_m4", ( roman_m4 ) );
 
-  building_map.insert_or_assign( "roman_s1", ( roman_s1 ) );
-  building_map.insert_or_assign( "roman_s2", ( roman_s2 ) );
-  building_map.insert_or_assign( "roman_s3", ( roman_s3 ) );
-  building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
+  Settlement::building_map.insert_or_assign( "roman_s1", ( roman_s1 ) );
+  Settlement::building_map.insert_or_assign( "roman_s2", ( roman_s2 ) );
+  Settlement::building_map.insert_or_assign( "roman_s3", ( roman_s3 ) );
+  Settlement::building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
 }
 
 inline void Update(
@@ -100,7 +100,8 @@ inline void SpawnSettlement() {
                 .growthRate = ( 40.0f - 10.0f ) / 200,
                 .carryingCapacity = 1000,
               },
-            .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
+            .texture =
+              LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) ),
           };
 
           Global::world.emplace<Settlement::Component>( entity, settlement );
@@ -140,7 +141,8 @@ inline void UpdateSettlement( Settlement::Component &settlement ) {
   // }
 
   // TODO maybe expensive?
-  settlement.texture = LoadTextureFromImage( building_map.at( "roman_m1" ) );
+  settlement.texture =
+    LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
 }
 
 inline bool UpdatePopulation( Settlement::Component &settlement ) {

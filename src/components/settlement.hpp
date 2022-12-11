@@ -5,6 +5,8 @@
 
 namespace Settlement {
 
+inline std::map<std::string, Image> building_map;
+
 enum class Development {
   Uninhabited,
   Village,
@@ -81,6 +83,7 @@ struct Component {
   Population population;
   Texture2D texture;
 
+  // TOOD might need separate save/load functions for this one
   template<class Archive>
   void serialize( Archive &ar ) {
     ar( id, name, development, population, texture );

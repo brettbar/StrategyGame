@@ -66,6 +66,11 @@ int main( void ) {
   bool hit_exit = false;
   bool fresh_start = true;
 
+  // TODO this really doesnt need to be in SettlementSystem
+  // its just loading images into textures, it should
+  // be organized differently
+  SettlementSystem::Init();
+
   while ( !WindowShouldClose() && !hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
@@ -146,7 +151,6 @@ int main( void ) {
           MapSystem::Init();
           PlayerSystem::Init();
           ProvinceSystem::Init();
-          SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           campaign_started = true;
 
@@ -154,7 +158,6 @@ int main( void ) {
         }
         else if ( !campaign_started && !fresh_start ) {
           MapSystem::Init();
-          // SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
           campaign_started = true;
 
