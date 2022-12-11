@@ -13,7 +13,6 @@
 
 #include "../events.hpp"
 #include "../systems/actor_system.hpp"
-#include "../systems/settlement_system.hpp"
 #include "ui_system.hpp"
 
 namespace UI {
@@ -24,7 +23,12 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "actor_spawn_settlement_button",
     []() {
       printf( "Spawn Settlement clicked!!\n" );
-      SettlementSystem::SpawnSettlement();
+      // SettlementSystem::SpawnSettlement();
+
+      // TODO handle this in main
+      Events::event_emitter.publish( Events::UIEvent{
+        "actor_spawn_settlement_button",
+      } );
     },
   },
   {
@@ -60,23 +64,27 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "main_menu_resume_game",
     []() {
       printf( "Resume\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "main_menu_resume_game" }
-      );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_resume_game",
+      } );
     },
   },
   {
     "main_menu_start_game",
     []() {
       printf( "Start\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "main_menu_start_game" }
-      );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_start_game",
+      } );
     },
   },
   {
     "main_menu_load_game",
     []() {
       printf( "Load\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "main_menu_load_game" } );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_load_game",
+      } );
     },
   },
   {
@@ -87,7 +95,9 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "main_menu_exit_game",
     []() {
       printf( "ExitGame\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "main_menu_exit_game" } );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_exit_game",
+      } );
     },
   },
   // Modal Menu
@@ -95,16 +105,18 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "modal_menu_load_game",
     []() {
       printf( "Load\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "modal_menu_load_game" }
-      );
+      Events::event_emitter.publish( Events::UIEvent{
+        "modal_menu_load_game",
+      } );
     },
   },
   {
     "modal_menu_save_game",
     []() {
       printf( "Save\n" );
-      Events::event_emitter.publish( Events::UIEvent{ "modal_menu_save_game" }
-      );
+      Events::event_emitter.publish( Events::UIEvent{
+        "modal_menu_save_game",
+      } );
     },
   },
   {

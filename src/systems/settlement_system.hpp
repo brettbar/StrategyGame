@@ -11,7 +11,6 @@ namespace SettlementSystem {
 
 inline void Init( TextureCache & );
 inline void Update( State & );
-inline void SpawnSettlement();
 inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
 inline void UpdateSprawl( Settlement::Component & );
@@ -43,15 +42,15 @@ inline void Init( TextureCache &cache ) {
   building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
 }
 
-inline void Update( State &state ) {
-  auto view = Global::world.view<Province::Component, Settlement::Component>();
-
-  for ( auto &ent: view ) {
-    Province::Component &prov = view.get<Province::Component>( ent );
+inline void Update(
+  View<Province::Component, Settlement::Component> settlements,
+  State &state
+) {
+  for ( auto entity: settlements ) {
+    auto &prov = settlements.get<Province::Component>( entity );
 
     if ( prov.owner != entt::null ) {
-      Settlement::Component &settlement =
-        Global::world.get<Settlement::Component>( ent );
+      auto &settlement = Global::world.get<Settlement::Component>( entity );
 
       UpdateSettlement( settlement );
     }
@@ -70,7 +69,7 @@ inline void Update( State &state ) {
 //         return LoadTextureFromImage( base );
 // }
 
-inline void SpawnSettlement() {
+inline void SpawnSettlement( View<Province::Component> provinces ) {
   Unit::Component unit =
     Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
   entt::entity unit_entity = SelectionSystem::selected_entity;
@@ -81,14 +80,11 @@ inline void SpawnSettlement() {
   if ( closest_tile == -1 )
     return;
 
-  for ( auto entity:
-        Global::world.view<Tile::Component, Province::Component>() ) {
-
-    auto &tile = Global::world.get<Tile::Component>( entity );
+  for ( auto entity: provinces ) {
     auto &prov = Global::world.get<Province::Component>( entity );
 
     // TODO pretty sure I am checking this twice, another time in the Actor colonist area
-    if ( tile.id == closest_tile ) {
+    if ( prov.tile->id == closest_tile ) {
       if ( prov.owner == unit.owner ) {
         if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
           printf( "spawning settlement\n" );
@@ -184,11 +180,9 @@ inline bool UpdatePopulation( Settlement::Component &settlement ) {
 
 inline void Draw( TextureCache &cache, bool showOverlays ) {
   auto settlements =
-    Global::world
-      .view<Tile::Component, Province::Component, Settlement::Component>();
+    Global::world.view<Province::Component, Settlement::Component>();
 
   for ( auto entity: settlements ) {
-    auto &tile = settlements.get<Tile::Component>( entity );
     auto &province = settlements.get<Province::Component>( entity );
     auto &settlement = settlements.get<Settlement::Component>( entity );
 
@@ -224,8 +218,8 @@ inline void Draw( TextureCache &cache, bool showOverlays ) {
 
 
     Vector2 settlement_pos = {
-      tile.position.x + 24,
-      tile.position.y + 24,
+      province.tile->position.x + 24,
+      province.tile->position.y + 24,
     };
 
     // // DrawRectangleRec({provPos.x + 50,

@@ -9,6 +9,7 @@
 
 namespace MovementSystem {
 
+// REFACTOR
 inline void SetDestinations( Camera2D camera ) {
   entt::basic_view view =
     Global::world
@@ -32,10 +33,8 @@ inline void SetDestinations( Camera2D camera ) {
   }
 }
 
-inline void Update( f32 timeScale ) {
-  entt::basic_view units =
-    Global::world.view<Unit::Component, Animated::Component>();
-
+inline void
+Update( View<Unit::Component, Animated::Component> units, f32 timeScale ) {
   for ( auto &entity: units ) {
     Unit::Component &unit = units.get<Unit::Component>( entity );
     Animated::Component &anim = units.get<Animated::Component>( entity );
@@ -53,7 +52,8 @@ inline void Update( f32 timeScale ) {
       if ( unit.destination.x > unit.position.x ) {
         anim.state = Animated::WALK_DR;
         unit.moving = true;
-      } else if ( unit.destination.x < unit.position.x ) {
+      }
+      else if ( unit.destination.x < unit.position.x ) {
         anim.state = Animated::WALK_DL;
         unit.moving = true;
       }
@@ -61,7 +61,8 @@ inline void Update( f32 timeScale ) {
         if ( anim.state == Animated::IDLE_DR ) {
           anim.state = Animated::WALK_DR;
           unit.moving = true;
-        } else if ( anim.state == Animated::IDLE_DL ) {
+        }
+        else if ( anim.state == Animated::IDLE_DL ) {
 
           anim.state = Animated::WALK_DL;
           unit.moving = true;

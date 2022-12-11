@@ -148,13 +148,11 @@ int main( void ) {
           ProvinceSystem::Init();
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
-          // UI::EnableCampaignUI();
           campaign_started = true;
         }
         else if ( !campaign_started && !fresh_start ) {
           SettlementSystem::Init( Global::texture_cache );
           Renderer::Init();
-          // UI::EnableCampaignUI();
           campaign_started = true;
 
           std::cout << EntityIdToString( Global::host_player ) << std::endl;
@@ -215,14 +213,22 @@ void UpdateOnFrame() {
 // TODO: look at all of these and see if any belong
 // in UpdateOnFrame
 void Update60TPS() {
-  MovementSystem::Update( Global::state.timeScale );
-  AnimationSystem::Update( Global::state.timeScale );
-  PlayerSystem::Update();
+  auto animated_units =
+    Global::world.view<Unit::Component, Animated::Component>();
+
+  auto players = Global::world.view<Player::Component>();
+
+  MovementSystem::Update( animated_units, Global::state.timeScale );
+  AnimationSystem::Update( animated_units, Global::state.timeScale );
+  PlayerSystem::Update( players );
   //  Terrain::UpdateFOW(reg);
 }
 
 void Update1TPS() {
-  SettlementSystem::Update( Global::state );
+  auto settlements =
+    Global::world.view<Province::Component, Settlement::Component>();
+
+  SettlementSystem::Update( settlements, Global::state );
 
   Global::state.day++;
 

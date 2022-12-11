@@ -29,9 +29,9 @@ inline void Init() {
   );
 }
 
-inline void Update() {
+inline void Update( View<Player::Component> players ) {
   // Change to exclude AI
-  for ( auto entity: Global::world.view<Player::Component>() ) {
+  for ( auto entity: players ) {
     Player::Component &player = Global::world.get<Player::Component>( entity );
 
     if ( player.is_human ) {

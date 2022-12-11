@@ -10,57 +10,52 @@ namespace ProvinceSystem {
 inline void SetProvinceOwner( u32 owner );
 
 inline void Init() {
-  // for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-  auto tile_view = Global::world.view<Tile::Component>();
-
-  for ( entt::entity tile_entity: tile_view ) {
-
-
-    auto &tile = Global::world.get<Tile::Component>( tile_entity );
-
+  for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
     entt::entity prov_entity = Global::world.create();
+
     Province::Component prov = {
       .owner = entt::null,
       .selected = false,
+      .tile = MapSystem::tile_map[i],
       .resources = {},
     };
 
-    switch ( tile.biome ) {
+    switch ( prov.tile->biome ) {
       case Biome::Plains: {
         prov.resources.push_back( NaturalResource::Trees );
       } break;
     }
 
-    Global::world.emplace<Province::Component>( tile_entity, prov );
+    Global::world.emplace<Province::Component>( prov_entity, prov );
   }
 }
 
 inline void Draw( Camera2D &camera ) {
   Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
-  for ( auto entity:
-        Global::world.view<Tile::Component, Province::Component>() ) {
+  for ( auto entity: Global::world.view<Province::Component>() ) {
 
-    auto &tile = Global::world.get<Tile::Component>( entity );
     auto &prov = Global::world.get<Province::Component>( entity );
 
     if (
-      tile.position.x - TILE_WIDTH >
+      prov.tile->position.x - TILE_WIDTH >
         camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
-      tile.position.x + TILE_WIDTH <
+      prov.tile->position.x + TILE_WIDTH <
         camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
-      tile.position.y - TILE_WIDTH >
+      prov.tile->position.y - TILE_WIDTH >
         camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
-      tile.position.y + TILE_WIDTH <
+      prov.tile->position.y + TILE_WIDTH <
         camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
       continue;
     }
 
-    switch ( tile.biome ) {
+    switch ( prov.tile->biome ) {
       case Biome::Plains: {
         // std::cout << "Foo!!!" << '\n';
         // std::cout << "Bar!!!" << '\n';
         DrawTextureV(
-          tex, { tile.position.x + 16.0f, tile.position.y + 16.0f }, WHITE
+          tex,
+          { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
+          WHITE
         );
         // std::cout << "Baz!!!" << '\n';
       } break;
@@ -69,16 +64,15 @@ inline void Draw( Camera2D &camera ) {
 }
 
 inline void AssignProvince( entt::entity owner, Vector2 pos ) {
-  i32 provId = DetermineTileIdFromPosition( pos );
-  assert( provId >= 0 );
+  i32 prov_id = DetermineTileIdFromPosition( pos );
+  assert( prov_id >= 0 );
 
-  auto provinces = Global::world.view<Tile::Component, Province::Component>();
+  auto provinces = Global::world.view<Province::Component>();
 
   for ( auto entity: provinces ) {
-    auto &tile = provinces.get<Tile::Component>( entity );
     auto &prov = provinces.get<Province::Component>( entity );
 
-    if ( tile.id != (u32) provId || tile.biome == Biome::Sea )
+    if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
       continue;
 
     prov.owner = owner;

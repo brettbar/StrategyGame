@@ -1,4 +1,3 @@
-
 #include "../common.hpp"
 #include "../systems/map_system.hpp"
 #include "../systems/overlay_system.hpp"
@@ -30,16 +29,10 @@ inline void Init() {
   float outline_color[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
   SetShaderValue(
-    outline_shader,
-    outline_size_loc,
-    &outline_size,
-    SHADER_UNIFORM_FLOAT
+    outline_shader, outline_size_loc, &outline_size, SHADER_UNIFORM_FLOAT
   );
   SetShaderValue(
-    outline_shader,
-    outline_color_loc,
-    outline_color,
-    SHADER_UNIFORM_VEC4
+    outline_shader, outline_color_loc, outline_color, SHADER_UNIFORM_VEC4
   );
 
 
@@ -55,6 +48,8 @@ inline void Init() {
 
 
 inline void Draw( TextureCache &texture_cache ) {
+
+
   ClearBackground( DARKGRAY );
 
   BeginMode2D( Global::state.camera );
@@ -75,8 +70,7 @@ inline void Draw( TextureCache &texture_cache ) {
     // Overlay shouldn't be ran through shader?
     OverlaySystem::DrawProvinceOverlays( texture_cache );
     SelectionSystem::Draw(
-      texture_cache,
-      Global::state.gameState == GameState::EDITOR
+      texture_cache, Global::state.gameState == GameState::EDITOR
     );
     OverlaySystem::DrawSettlementOverlays( texture_cache );
 
@@ -137,7 +131,8 @@ inline void DrawActors( bool debug ) {
         WHITE
       );
       EndShaderMode();
-    } else {
+    }
+    else {
       BeginShaderMode( shader );
       DrawTextureRec(
         anim.sprite,

@@ -8,15 +8,15 @@
 namespace Province {
 
 struct Component {
-  // u32 id;// TODO should I replace this or remove with entt::entity
   entt::entity owner;
   bool selected = false;
 
+  std::shared_ptr<Tile::Component> tile;
   std::vector<NaturalResource> resources;
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( owner, selected, CEREAL_NVP( resources ) );
+    ar( owner, selected, tile, CEREAL_NVP( resources ) );
   }
 };
 

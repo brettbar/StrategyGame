@@ -11,10 +11,9 @@
 namespace OverlaySystem {
 
 inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
-  auto provinces = Global::world.view<Tile::Component, Province::Component>();
+  auto provinces = Global::world.view<Province::Component>();
 
   for ( auto entity: provinces ) {
-    auto &tile = provinces.get<Tile::Component>( entity );
     auto &prov = provinces.get<Province::Component>( entity );
 
     if ( prov.owner != entt::null ) {
@@ -28,7 +27,7 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "redOverlay" }]->texture,
             frameRec,
-            tile.position,
+            prov.tile->position,
             Fade( WHITE, 0.5 )
           );
           break;
@@ -36,7 +35,7 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "blueOverlay" }]->texture,
             frameRec,
-            tile.position,
+            prov.tile->position,
             Fade( WHITE, 0.5 )
           );
           break;
@@ -44,7 +43,7 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "greenOverlay" }]->texture,
             frameRec,
-            tile.position,
+            prov.tile->position,
             Fade( WHITE, 0.5 )
           );
           break;
@@ -52,7 +51,7 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "purpleOverlay" }]->texture,
             frameRec,
-            tile.position,
+            prov.tile->position,
             Fade( WHITE, 0.5 )
           );
           break;
@@ -60,7 +59,7 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
           DrawTextureRec(
             texture_cache[hstr{ "orangeOverlay" }]->texture,
             frameRec,
-            tile.position,
+            prov.tile->position,
             Fade( WHITE, 0.5 )
           );
           break;
@@ -86,11 +85,9 @@ inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
 
 inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
   auto settlements =
-    Global::world
-      .view<Tile::Component, Province::Component, Settlement::Component>();
+    Global::world.view<Province::Component, Settlement::Component>();
 
   for ( auto entity: settlements ) {
-    auto &tile = settlements.get<Tile::Component>( entity );
     auto &province = settlements.get<Province::Component>( entity );
     auto &settlement = settlements.get<Settlement::Component>( entity );
 
@@ -107,8 +104,8 @@ inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
       continue;
 
     Vector2 settlement_pos = {
-      tile.position.x + 24,
-      tile.position.y + 24,
+      province.tile->position.x + 24,
+      province.tile->position.y + 24,
     };
 
     const vec2 text_dims = MeasureTextEx(

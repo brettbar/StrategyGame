@@ -35,12 +35,6 @@ inline void Save() {
     //     Animated::Component,
     //     Sight::Component>( output );
 
-
-    // Think the problem with player is that since we are
-    // serializing an entity it keeps it alive or something
-    // and has issues with PlayerSystem::Init
-
-
     // entt::snapshot{ Global::world }
     //   .entities( output )
     //   .component<Player::Component>( output );
@@ -48,7 +42,7 @@ inline void Save() {
 
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Tile::Component, Province::Component>( output );
+      .component<Province::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -80,7 +74,7 @@ inline void Load() {
 
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Tile::Component, Province::Component>( input );
+      .component<Province::Component>( input );
 
     // printf( "%u\n", (int) Global::world.size() );
   }

@@ -22,8 +22,7 @@ inline void CheckSelectProvince( vec2 );
 inline void Draw( TextureCache &cache, bool isDebug ) {
   auto unitsView = Global::world.view<Selected::Component, Unit::Component>();
   auto provsView =
-    Global::world
-      .view<Tile::Component, Province::Component, Selected::Component>();
+    Global::world.view<Province::Component, Selected::Component>();
 
   // for ( auto entity: unitsView ) {
   //   Unit::Component &unit = unitsView.get<Unit::Component>( entity );
@@ -37,14 +36,13 @@ inline void Draw( TextureCache &cache, bool isDebug ) {
   // }
 
   for ( auto entity: provsView ) {
-    auto &tile = provsView.get<Tile::Component>( entity );
     auto &prov = provsView.get<Province::Component>( entity );
 
     if ( isDebug ) {
       DrawTexture(
         cache[hstr{ "tile_outline" }]->texture,
-        tile.position.x,
-        tile.position.y,
+        prov.tile->position.x,
+        prov.tile->position.y,
         WHITE
       );
       // DrawRectangleLinesEx(
@@ -103,7 +101,7 @@ inline void CheckSelectUnits( vec2 click_pos ) {
 
 inline void CheckSelectProvince( vec2 click_pos ) {
   i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
-  auto prov_view = Global::world.view<Tile::Component, Province::Component>();
+  auto prov_view = Global::world.view<Province::Component>();
 
   if ( tile_pos_id == -1 )
     return;
@@ -112,10 +110,9 @@ inline void CheckSelectProvince( vec2 click_pos ) {
     if ( selected_entity != entt::null )
       return;
 
-    auto &tile = prov_view.get<Tile::Component>( entity );
     auto &prov = prov_view.get<Province::Component>( entity );
 
-    if ( tile_pos_id == tile.id ) {
+    if ( tile_pos_id == prov.tile->id ) {
       Global::world.emplace<Selected::Component>( entity, true );
 
       std::cout << EntityIdToString( entity ) << std::endl;

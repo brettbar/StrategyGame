@@ -11,6 +11,7 @@ enum class Visibility {
   VISIBILE,
 };
 
+// NOTE: Not part of the ECS
 struct Component {
   u32 id;
   f32 noise;

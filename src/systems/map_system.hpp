@@ -33,7 +33,8 @@ inline Mode mode = Mode::Terrain;
 
 
 using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
-using TileMap = std::array<entt::entity, MAP_WIDTH * MAP_HEIGHT>;
+using TileMap =
+  std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
 inline TileMap tile_map = {};
 
@@ -54,9 +55,6 @@ inline void Init() {
   NormalizeMap( pNoise );
 
   for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-    entt::entity entity = Global::world.create();
-    // std::shared_ptr<Tile::Component> tile = std::make_shared<Tile::Component>();
-
     u32 x = i % MAP_WIDTH;
     u32 y = i / MAP_HEIGHT;
 
@@ -98,18 +96,7 @@ inline void Init() {
       Tile::Visibility::UNEXPLORED,
     };
 
-    // tile.id = x + y * 128;
-
-
-    //      // Playa
-    //      else if (tile->noise >= 0.76f)
-    //        tile->biome = BEACH;
-    // Mar
-
-
-    tile_map[index( x, y )] = entity;
-
-    Global::world.emplace<Tile::Component>( entity, tile );
+    tile_map[index( x, y )] = std::make_shared<Tile::Component>( tile );
   }
 }
 
@@ -123,17 +110,16 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
 
   Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
-  for ( entt::entity entity: Global::world.view<Tile::Component>() ) {
-    auto& tile = Global::world.get<Tile::Component>( entity );
+  for ( auto &tile: tile_map ) {
 
     if (
-      tile.position.x - TILE_WIDTH >
+      tile->position.x - TILE_WIDTH >
         camera.target.x + ( camera.offset.x / camera.zoom ) ||
-      tile.position.x + TILE_WIDTH <
+      tile->position.x + TILE_WIDTH <
         camera.target.x - ( camera.offset.x / camera.zoom ) ||
-      tile.position.y - TILE_WIDTH >
+      tile->position.y - TILE_WIDTH >
         camera.target.y + ( camera.offset.y / camera.zoom ) ||
-      tile.position.y + TILE_WIDTH <
+      tile->position.y + TILE_WIDTH <
         camera.target.y - ( camera.offset.y / camera.zoom ) ) {
       continue;
     }
@@ -141,30 +127,30 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
 
     //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
     //    DrawTextureRec(hex, frameRec, tile.position, WHITE);
-    switch ( tile.biome ) {
+    switch ( tile->biome ) {
       case Biome::Mountains:
         // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Hills:
-        // DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Plains:
-        // DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
+        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Desert:
-        // DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
+        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
         break;
       case Biome::Sea:
-        // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
       default:
-        // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
         break;
     }
 
@@ -186,8 +172,6 @@ inline void Draw( Camera2D &camera, TextureCache &cache ) {
 
 inline void UpdateFOW() {
   auto view = Global::world.view<Unit::Component, Sight::Component>();
-  auto tileView = Global::world.view<TileMap>();
-  TileMap tiles = tileView.get<TileMap>( tileView.front() );
 
   for ( auto &entity: view ) {
     Sight::Component sight = view.get<Sight::Component>( entity );
@@ -196,39 +180,34 @@ inline void UpdateFOW() {
     i32 closestId = DetermineTileIdFromPosition( unit.position );
     assert( closestId >= 0 );
 
-    entt::entity closest_entity = tiles[closestId];
-    Tile::Component closest =
-      Global::world.get<Tile::Component>( closest_entity );
-    u32 x = closest.coords.x;
-    u32 y = closest.coords.y;
+    std::shared_ptr<Tile::Component> closest = tile_map[closestId];
+    u32 x = closest->coords.x;
+    u32 y = closest->coords.y;
 
-    std::array<entt::entity, 6> neighbors = {
-      tiles[index( x, y - 1 )],
-      tiles[index( x + 1, y )],
-      tiles[index( x, y + 1 )],
-      tiles[index( x - 1, y + 1 )],
-      tiles[index( x - 1, y )],
-      tiles[index( x - 1, y - 1 )],
+    std::array<std::shared_ptr<Tile::Component>, 6> neighbors = {
+      tile_map[index( x, y - 1 )],
+      tile_map[index( x + 1, y )],
+      tile_map[index( x, y + 1 )],
+      tile_map[index( x - 1, y + 1 )],
+      tile_map[index( x - 1, y )],
+      tile_map[index( x - 1, y - 1 )],
     };
 
     if ( y % 2 == 1 ) {
-      neighbors[0] = tiles[index( x + 1, y - 1 )];
-      neighbors[2] = tiles[index( x + 1, y + 1 )];
-      neighbors[3] = tiles[index( x, y + 1 )];
-      neighbors[5] = tiles[index( x, y - 1 )];
+      neighbors[0] = tile_map[index( x + 1, y - 1 )];
+      neighbors[2] = tile_map[index( x + 1, y + 1 )];
+      neighbors[3] = tile_map[index( x, y + 1 )];
+      neighbors[5] = tile_map[index( x, y - 1 )];
     }
 
     for ( auto neighbor: neighbors ) {
-      if ( neighbor != entt::null ) {
+      if ( neighbor != nullptr ) {
 
-        Tile::Component neighbor_tile =
-          Global::world.get<Tile::Component>( neighbor );
-
-        neighbor_tile.visibility = Tile::Visibility::VISIBILE;
+        neighbor->visibility = Tile::Visibility::VISIBILE;
       }
     }
 
-    closest.visibility = Tile::Visibility::VISIBILE;
+    closest->visibility = Tile::Visibility::VISIBILE;
   }
 }
 
