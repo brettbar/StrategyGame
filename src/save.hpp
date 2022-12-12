@@ -27,14 +27,6 @@ inline void Save() {
   {
     cereal::BinaryOutputArchive output{ file };
 
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<
-    //     Actor::Component,
-    //     Unit::Component,
-    //     Animated::Component,
-    //     Sight::Component>( output );
-
     entt::snapshot{ Global::world }
       .entities( output )
       .component<
@@ -45,11 +37,6 @@ inline void Save() {
         Unit::Component,
         Animated::Component,
         Sight::Component>( output );
-
-
-    // entt::snapshot{ Global::world }
-    //   .entities( output )
-    //   .component<Province::Component>( output );
 
     // printf( "%u\n", (int) source.size() );
   }
@@ -66,15 +53,6 @@ inline void Load() {
 
     Global::ClearRegistry();
 
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<
-    //     Actor::Component,
-    //     Unit::Component,
-    //     Animated::Component,
-    //     Sight::Component>( input );
-
-
     entt::snapshot_loader{ Global::world }
       .entities( input )
       .component<
@@ -85,10 +63,6 @@ inline void Load() {
         Unit::Component,
         Animated::Component,
         Sight::Component>( input );
-
-    // entt::snapshot_loader{ Global::world }
-    //   .entities( input )
-    //   .component<Province::Component>( input );
 
     // printf( "%u\n", (int) Global::world.size() );
   }
