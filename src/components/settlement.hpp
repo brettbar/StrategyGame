@@ -81,12 +81,12 @@ struct Component {
   std::string name;
   Development development;
   Population population;
-  Texture texture;
+  Texture2D texture;
 
   // TOOD might need separate save/load functions for this one
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar( id, name, development, population, texture );
+    ar( id, name, development, population );
   }
 
   template<class Archive>
@@ -94,10 +94,10 @@ struct Component {
     ar( pop );
   }
 
-  template<class Archive>
-  void serialize( Archive &ar, Texture &tex ) {
-    ar( tex.id, tex.width, tex.height, tex.mipmaps, tex.format );
-  }
+  // template<class Archive>
+  // void serialize( Archive &ar, Texture2D &tex ) {
+  //   ar( tex.id, tex.width, tex.height, tex.mipmaps, tex.format );
+  // }
 };
 
 

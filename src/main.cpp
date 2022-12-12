@@ -159,6 +159,14 @@ int main( void ) {
         else if ( !campaign_started && !fresh_start ) {
           MapSystem::Init();
           Renderer::Init();
+          Global::world.view<Settlement::Component>().each(
+            []( Settlement::Component &settlement ) {
+              settlement.texture =
+                LoadTextureFromImage( Settlement::building_map.at( "roman_m1" )
+                );
+            }
+          );
+
           campaign_started = true;
 
           std::cout << EntityIdToString( Global::host_player ) << std::endl;
