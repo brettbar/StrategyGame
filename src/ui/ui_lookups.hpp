@@ -13,9 +13,12 @@
 
 #include "../events.hpp"
 #include "../systems/actor_system.hpp"
-#include "ui_system.hpp"
 
 namespace UI {
+struct Context {
+  entt::entity hot;
+  entt::entity active;
+};
 
 // TODO maybe this could be refactored to some sort of event queue
 inline std::map<std::string, std::function<void()>> action_lookup = {

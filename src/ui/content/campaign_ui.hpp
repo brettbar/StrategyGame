@@ -36,44 +36,73 @@ inline std::vector<entt::entity> CreateCampaignUI() {
           Align::START,
           {
             TextureButton::Create( "settlement_context_tab_overview", true ),
-            TextureButton::Create( "settlement_context_tab_population", true ),
-            TextureButton::Create( "settlement_context_tab_resources", true ),
-            TextureButton::Create( "settlement_context_tab_culture", true ),
-            TextureButton::Create( "settlement_context_tab_religion", true ),
             TextureButton::Create(
-              "settlement_context_tab_construction",
-              true
+              "settlement_context_tab_construction", true
             ),
-            TextureButton::Create( "settlement_context_tab_garrison", true ),
+            // TextureButton::Create( "settlement_context_tab_population", true ),
+            // TextureButton::Create( "settlement_context_tab_resources", true ),
+            // TextureButton::Create( "settlement_context_tab_culture", true ),
+            // TextureButton::Create( "settlement_context_tab_religion", true ),
+            // TextureButton::Create(
+            //   "settlement_context_tab_construction", true
+            // ),
+            // TextureButton::Create( "settlement_context_tab_garrison", true ),
           }
         ),
-        Panel::Create(
-          "settlement_context_content",
-          BLACK,
-          Axis::ROW,
-          Align::START,
-          Align::START,
-          {
-            TextLabel::Create(
-              "settlement_name",
-              "Uninhabited",
-              32,
-              BLACK,
-              WHITE,
-              true
-            ),
-            TextLabel::
-              Create( "settlement_population", "0", 32, BLACK, WHITE, true ),
-            TextLabel::Create(
-              "settlement_development",
-              "Uninhabited",
-              32,
-              BLACK,
-              WHITE,
-              true
-            ),
-          }
-        ),
+
+        // StackPanel::Create(
+        //   "settlement_context_content",
+        //   BLACK,
+        //   {
+        //     Panel::Create(
+        //       "settlement_context_overview",
+        //       BLACK,
+        //       Axis::ROW,
+        //       Align::START,
+        //       Align::START,
+        //       {
+        //         TextLabel::Create(
+        //           "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
+        //         ),
+        //         TextLabel::Create(
+        //           "settlement_population", "0", 32, BLACK, WHITE, true
+        //         ),
+        //         TextLabel::Create(
+        //           "settlement_development",
+        //           "Uninhabited",
+        //           32,
+        //           BLACK,
+        //           WHITE,
+        //           true
+        //         ),
+        //       }
+        //     ),
+        //     Panel::Create(
+        //       "settlement_context_buildings",
+        //       BLACK,
+        //       Axis::ROW,
+        //       Align::START,
+        //       Align::START,
+        //       {
+        //         TextLabel::Create(
+        //           "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
+        //         ),
+        //         TextLabel::Create(
+        //           "settlement_population", "0", 32, BLACK, WHITE, true
+        //         ),
+        //         TextLabel::Create(
+        //           "settlement_development",
+        //           "Uninhabited",
+        //           32,
+        //           BLACK,
+        //           WHITE,
+        //           true
+        //         ),
+        //       }
+        //     ),
+        //   }
+        // ),
+
       }
     ),
     Panel::Create(
@@ -113,12 +142,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
               false
             ),
             TextButton::Create(
-              "actor_spawn_settlement_button",
-              "IDK?",
-              26,
-              GREEN,
-              WHITE,
-              false
+              "actor_spawn_settlement_button", "IDK?", 26, GREEN, WHITE, false
             ),
           }
         ),

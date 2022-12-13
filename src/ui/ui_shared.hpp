@@ -2,15 +2,22 @@
 
 #include "components/element.hpp"
 #include "components/panel.hpp"
+#include "components/stack_panel.hpp"
 #include "components/text_elements.hpp"
 #include "components/texture_elements.hpp"
-#include <iostream>
 
 namespace UI {
+// TOOD see if we can replace all these with template functions
+
 inline Type GetType( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.type;
   }
+
+  // Todo this is causig the error
+  // if ( Has<StackPanel>( entity ) ) {
+  //   return Get<StackPanel>( entity ).elem.type;
+  // }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.type;
@@ -35,6 +42,9 @@ inline rect &GetTransform( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.transform;
   }
+  // if ( Has<StackPanel>( entity ) ) {
+  //   return Get<StackPanel>( entity ).elem.transform;
+  // }
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.transform;
   }
@@ -65,10 +75,14 @@ inline void UpdateElem( entt::entity entity ) {
 
 inline void ToggleElem( entt::entity entity, bool on ) {
   if ( Has<Panel>( entity ) ) {
-    printf( "Enabling panel\n" );
     Get<Panel>( entity ).elem.enabled = on;
     return;
   }
+
+  // if ( Has<StackPanel>( entity ) ) {
+  //   Get<StackPanel>( entity ).elem.enabled = on;
+  //   return;
+  // }
 
   if ( Has<TextLabel>( entity ) ) {
     Get<TextLabel>( entity ).elem.enabled = on;
@@ -95,6 +109,9 @@ inline bool IsEnabled( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.enabled;
   }
+  // if ( Has<StackPanel>( entity ) ) {
+  //   return Get<StackPanel>( entity ).elem.enabled;
+  // }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.enabled;
@@ -119,6 +136,10 @@ inline std::string GetId( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.id;
   }
+
+  // if ( Has<StackPanel>( entity ) ) {
+  //   return Get<StackPanel>( entity ).elem.id;
+  // }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.id;

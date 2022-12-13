@@ -14,6 +14,7 @@
 #include "content/main_menu_ui.hpp"
 #include "content/modal_menu_ui.hpp"
 #include "ui_lookups.hpp"
+#include "ui_shared.hpp"
 
 namespace UI {
 
@@ -93,34 +94,9 @@ inline void UpdateOnFrame() {
     RecursiveLayout( panel );
     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
   }
-
-  // if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-  //   auto modal_menu = lookup["modal_menu"];
-  //   Panel &panel = Get<Panel>( modal_menu );
-  //   RecursiveLayout( panel );
-  //   RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown
-  //   );
-  // } else {
-  //   for ( entt::entity base: content ) {
-  //     Panel &panel = Get<Panel>( base );
-  //     RecursiveLayout( panel );
-  //     RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown
-  //     );
-  //   }
-  // }
 }
 
 inline void Draw() {
-  // if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-  //   auto modal_menu = lookup["modal_menu"];
-  //   RecursiveDraw( Get<Panel>( modal_menu ) );
-  // } else {
-  //   for ( entt::entity base: content ) {
-  //     Panel &panel = Get<Panel>( base );
-  //     RecursiveDraw( panel );
-  //   }
-  // }
-  //
   for ( entt::entity base: _content ) {
     Panel &panel = Get<Panel>( base );
     RecursiveDraw( panel );
@@ -138,7 +114,8 @@ inline void Draw() {
   DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
 
   DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
-  std::string selected_ent = "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+  std::string selected_ent =
+    "entity: " + EntityIdToString( SelectionSystem::selected_entity );
 }
 
 inline void RecursiveLayout( Panel &parent_panel ) {
@@ -163,6 +140,15 @@ inline void RecursiveLayout( Panel &parent_panel ) {
         Panel &child_panel = Get<Panel>( child );
         RecursiveLayout( child_panel );
       } break;
+      // case Type::StackPanel: {
+      //   StackPanel &child_panel = Get<StackPanel>( child );
+
+      //   for ( entt::entity subchild: child_panel.children ) {
+      //     if ( Has<Panel>( subchild ) ) {
+      //       RecursiveLayout( Get<Panel>( subchild ) );
+      //     }
+      //   }
+      // } break;
       case Type::TextLabel: {
         Get<TextLabel>( child ).Resize();
       } break;
@@ -257,6 +243,14 @@ inline void RecursiveDraw( Panel &panel ) {
       case Type::Panel: {
         RecursiveDraw( Get<Panel>( child ) );
       } break;
+      // case Type::StackPanel: {
+      //   for ( entt::entity subchild: Get<StackPanel>( child ).children ) {
+      //     if ( Has<Panel>( subchild ) ) {
+      //       RecursiveDraw( Get<Panel>( subchild ) );
+      //     }
+      //   }
+
+      // } break;
       case Type::TextLabel: {
         Get<TextLabel>( child ).Draw();
       } break;
@@ -275,7 +269,12 @@ inline void RecursiveDraw( Panel &panel ) {
   }
 }
 
-inline void RecursiveInteractions( Panel &panel, bool &over_any_elem, bool mouseWentUp, bool mouseWentDown ) {
+inline void RecursiveInteractions(
+  Panel &panel,
+  bool &over_any_elem,
+  bool mouseWentUp,
+  bool mouseWentDown
+) {
 
   if ( !panel.elem.enabled )
     return;
@@ -285,8 +284,19 @@ inline void RecursiveInteractions( Panel &panel, bool &over_any_elem, bool mouse
       continue;
 
     if ( Has<Panel>( child ) ) {
-      RecursiveInteractions( Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown );
+      RecursiveInteractions(
+        Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown
+      );
     }
+    // else if ( Has<StackPanel>( child ) ) {
+    //   for ( entt::entity subchild: Get<StackPanel>( child ).children ) {
+    //     if ( Has<Panel>( subchild ) ) {
+    //       RecursiveInteractions(
+    //         Get<Panel>( subchild ), over_any_elem, mouseWentUp, mouseWentDown
+    //       );
+    //     }
+    //   }
+    // }
 
     UpdateElem( child );
 
@@ -297,7 +307,9 @@ inline void RecursiveInteractions( Panel &panel, bool &over_any_elem, bool mouse
     if ( !over_any_elem )
       over_any_elem = inside;
 
-    if ( DoInteraction( child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown ) ) {
+    if ( DoInteraction(
+           child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown
+         ) ) {
       std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
       if ( IsClickable( child ) ) {
@@ -311,7 +323,13 @@ inline void RecursiveInteractions( Panel &panel, bool &over_any_elem, bool mouse
   }
 }
 
-inline bool DoInteraction( entt::entity entity, bool inside, bool interactive, bool mouseWentUp, bool mouseWentDown ) {
+inline bool DoInteraction(
+  entt::entity entity,
+  bool inside,
+  bool interactive,
+  bool mouseWentUp,
+  bool mouseWentDown
+) {
   bool result = false;
 
   if ( entity == context.active ) {
@@ -342,8 +360,26 @@ inline bool DoInteraction( entt::entity entity, bool inside, bool interactive, b
 inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   printf( "SelectListener?\n" );
   if ( game_reg.all_of<Province::Component>( entity ) ) {
-    auto &context_panel = lookup.at( "settlement_context_panel" );
-    RecursiveToggle( context_panel, true );
+    // Enabled the context panel
+    auto &context = lookup.at( "settlement_context_panel" );
+    ToggleElem( context, true );
+    UI::Panel context_panel = Get<UI::Panel>( context );
+
+    // Enable the tab group
+    entt::entity tab_grp = context_panel.children[0];
+    RecursiveToggle( tab_grp, true );
+
+    // Enable the content panel
+    // entt::entity content = context_panel.children[1];
+    // ToggleElem( content, true );
+    // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
+
+    // Enable the overview_panel and its children
+    // entt::entity content_overview = content_panel.children[0];
+    // RecursiveToggle( content_overview, true );
+    // UI::Panel content_overview_panel = Get<UI::Panel>( content_overview );
+
+    // RecursiveToggle( context_panel, true );
   }
   else if ( game_reg.all_of<Actor::Component>( entity ) ) {
     auto actor = game_reg.get<Actor::Component>( entity );

@@ -8,11 +8,6 @@ namespace UI {
 inline f32 SCALE = 2.0f;
 inline std::map<std::string, entt::entity> lookup;
 
-struct Context {
-  entt::entity hot;
-  entt::entity active;
-};
-
 typedef struct Element Element;
 typedef struct Panel Panel;
 typedef struct TextLabel TextLabel;
@@ -23,6 +18,7 @@ typedef struct TextureButton TextureButton;
 enum class Type {
   INVALID_TYPE,
   Panel,
+  StackPanel,
   TextLabel,
   TextureLabel,
   TextButton,
@@ -65,8 +61,7 @@ struct Element {
     Margins margins
   )
       : id( id ), type( type ), background( background ), enabled( enabled ),
-        transform( transform ), margins( margins ) {
-  }
+        transform( transform ), margins( margins ) {}
 };
 
 template<typename T>
