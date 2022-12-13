@@ -64,17 +64,5 @@ struct Element {
         transform( transform ), margins( margins ) {}
 };
 
-template<typename T>
-static bool Has( entt::entity entity ) {
-  return Global::local.all_of<T>( entity );
-}
-
-template<typename T>
-static T &Get( entt::entity entity ) {
-  assert( Has<T>( entity ) );
-  auto &got = Global::local.get<T>( entity );
-  return got;
-}
-
 
 };// namespace UI

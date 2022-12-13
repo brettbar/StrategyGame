@@ -50,58 +50,43 @@ inline std::vector<entt::entity> CreateCampaignUI() {
           }
         ),
 
-        // StackPanel::Create(
-        //   "settlement_context_content",
-        //   BLACK,
-        //   {
-        //     Panel::Create(
-        //       "settlement_context_overview",
-        //       BLACK,
-        //       Axis::ROW,
-        //       Align::START,
-        //       Align::START,
-        //       {
-        //         TextLabel::Create(
-        //           "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
-        //         ),
-        //         TextLabel::Create(
-        //           "settlement_population", "0", 32, BLACK, WHITE, true
-        //         ),
-        //         TextLabel::Create(
-        //           "settlement_development",
-        //           "Uninhabited",
-        //           32,
-        //           BLACK,
-        //           WHITE,
-        //           true
-        //         ),
-        //       }
-        //     ),
-        //     Panel::Create(
-        //       "settlement_context_buildings",
-        //       BLACK,
-        //       Axis::ROW,
-        //       Align::START,
-        //       Align::START,
-        //       {
-        //         TextLabel::Create(
-        //           "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
-        //         ),
-        //         TextLabel::Create(
-        //           "settlement_population", "0", 32, BLACK, WHITE, true
-        //         ),
-        //         TextLabel::Create(
-        //           "settlement_development",
-        //           "Uninhabited",
-        //           32,
-        //           BLACK,
-        //           WHITE,
-        //           true
-        //         ),
-        //       }
-        //     ),
-        //   }
-        // ),
+        StackPanel::Create(
+          "settlement_context_content",
+          BLACK,
+          {
+            Panel::Create(
+              "settlement_context_overview",
+              BLACK,
+              Axis::ROW,
+              Align::START,
+              Align::START,
+              {
+                TextLabel::Create(
+                  "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
+                ),
+                TextLabel::Create(
+                  "settlement_population", "0", 32, BLACK, WHITE, true
+                ),
+                TextLabel::Create(
+                  "settlement_development",
+                  "Uninhabited",
+                  32,
+                  BLACK,
+                  WHITE,
+                  true
+                ),
+              }
+            ),
+            Panel::Create(
+              "settlement_context_buildings",
+              BLACK,
+              Axis::ROW,
+              Align::START,
+              Align::START,
+              {}
+            ),
+          }
+        ),
 
       }
     ),

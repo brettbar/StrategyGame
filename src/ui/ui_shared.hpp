@@ -8,16 +8,27 @@
 
 namespace UI {
 // TOOD see if we can replace all these with template functions
+template<typename T>
+inline bool Has( entt::entity entity ) {
+  return Global::local.all_of<T>( entity );
+}
+
+template<typename T>
+inline T &Get( entt::entity entity ) {
+  assert( Has<T>( entity ) );
+  auto &got = Global::local.get<T>( entity );
+  return got;
+}
+
 
 inline Type GetType( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.type;
   }
 
-  // Todo this is causig the error
-  // if ( Has<StackPanel>( entity ) ) {
-  //   return Get<StackPanel>( entity ).elem.type;
-  // }
+  if ( Has<StackPanel>( entity ) ) {
+    return Get<StackPanel>( entity ).elem.type;
+  }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.type;
@@ -42,9 +53,9 @@ inline rect &GetTransform( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.transform;
   }
-  // if ( Has<StackPanel>( entity ) ) {
-  //   return Get<StackPanel>( entity ).elem.transform;
-  // }
+  if ( Has<StackPanel>( entity ) ) {
+    return Get<StackPanel>( entity ).elem.transform;
+  }
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.transform;
   }
@@ -79,10 +90,10 @@ inline void ToggleElem( entt::entity entity, bool on ) {
     return;
   }
 
-  // if ( Has<StackPanel>( entity ) ) {
-  //   Get<StackPanel>( entity ).elem.enabled = on;
-  //   return;
-  // }
+  if ( Has<StackPanel>( entity ) ) {
+    Get<StackPanel>( entity ).elem.enabled = on;
+    return;
+  }
 
   if ( Has<TextLabel>( entity ) ) {
     Get<TextLabel>( entity ).elem.enabled = on;
@@ -109,9 +120,9 @@ inline bool IsEnabled( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.enabled;
   }
-  // if ( Has<StackPanel>( entity ) ) {
-  //   return Get<StackPanel>( entity ).elem.enabled;
-  // }
+  if ( Has<StackPanel>( entity ) ) {
+    return Get<StackPanel>( entity ).elem.enabled;
+  }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.enabled;
@@ -137,9 +148,9 @@ inline std::string GetId( entt::entity entity ) {
     return Get<Panel>( entity ).elem.id;
   }
 
-  // if ( Has<StackPanel>( entity ) ) {
-  //   return Get<StackPanel>( entity ).elem.id;
-  // }
+  if ( Has<StackPanel>( entity ) ) {
+    return Get<StackPanel>( entity ).elem.id;
+  }
 
   if ( Has<TextLabel>( entity ) ) {
     return Get<TextLabel>( entity ).elem.id;

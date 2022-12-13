@@ -5,6 +5,8 @@
 
 namespace UI {
 
+// A stack panel is a panel that only ever has one
+// active child.
 struct StackPanel {
   Element elem;
   u32 curr_index = 0;
@@ -27,6 +29,13 @@ struct StackPanel {
     return entity;
   }
 
+  void Draw() {
+    DrawRectangleV(
+      { elem.transform.x, elem.transform.y },
+      { elem.transform.width, elem.transform.height },
+      elem.background
+    );
+  }
 
   private:
   // Relative panel
