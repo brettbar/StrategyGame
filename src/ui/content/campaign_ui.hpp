@@ -1,7 +1,14 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../ui_shared.hpp"
+
+#include "../ui_common.hpp"
+
+#include "../components/panel.hpp"
+#include "../components/stack_panel.hpp"
+#include "../components/text_elements.hpp"
+#include "../components/texture_elements.hpp"
+
 
 namespace UI {
 
@@ -52,7 +59,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
 
         StackPanel::Create(
           "settlement_context_content",
-          BLACK,
+          RED,
           {
             Panel::Create(
               "settlement_context_overview",
@@ -77,14 +84,14 @@ inline std::vector<entt::entity> CreateCampaignUI() {
                 ),
               }
             ),
-            Panel::Create(
-              "settlement_context_buildings",
-              BLACK,
-              Axis::ROW,
-              Align::START,
-              Align::START,
-              {}
-            ),
+            // Panel::Create(
+            //   "settlement_context_buildings",
+            //   BLACK,
+            //   Axis::ROW,
+            //   Align::START,
+            //   Align::START,
+            //   {}
+            // ),
           }
         ),
 

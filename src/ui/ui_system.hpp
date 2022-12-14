@@ -1,8 +1,5 @@
 #pragma once
 
-#include <raylib.h>
-#include <raymath.h>
-
 #include "../components/actor.hpp"
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
@@ -13,9 +10,10 @@
 #include "content/campaign_ui.hpp"
 #include "content/main_menu_ui.hpp"
 #include "content/modal_menu_ui.hpp"
-#include "ui_lookups.hpp"
-#include "ui_shared.hpp"
 
+#include "ui_common.hpp"
+#include "ui_lookups.hpp"
+#include "ui_utils.hpp"
 
 namespace UI {
 
@@ -25,16 +23,11 @@ inline std::vector<entt::entity> _content;
 inline void EnableContent();
 inline void DisableCurrentContent();
 
-// TODO figure out how to remove these duplicate functions
 inline void RecursiveLayout( Panel & );
-// inline void RecursiveLayout( StackPanel & );
-
 inline void RecursiveInteractions( Panel &, bool &, bool, bool );
-// inline void RecursiveInteractions( StackPanel &, bool &, bool, bool );
 
-inline void Draw();
 inline void RecursiveDraw( Panel & );
-// inline void RecursiveDraw( StackPanel & );
+inline void Draw();
 
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void ListenForSelect( entt::registry &, entt::entity );
@@ -149,11 +142,19 @@ inline void RecursiveLayout( Panel &parent_panel ) {
         RecursiveLayout( child_panel );
       } break;
       case Type::StackPanel: {
+
         StackPanel &child_panel = Get<StackPanel>( child );
-        // if
 
+        entt::entity single_child =
+          child_panel.children[child_panel.curr_index];
 
-        // RecursiveLayout( child_panel );
+        assert( Has<Panel>( single_child ) );
+        Panel &single_child_panel = Get<Panel>( single_child );
+        single_child_panel.elem.transform.x = child_panel.elem.transform.x;
+        single_child_panel.elem.transform.y = child_panel.elem.transform.y;
+
+        RecursiveLayout( Get<Panel>( single_child ) );
+
       } break;
       case Type::TextLabel: {
         Get<TextLabel>( child ).Resize();
@@ -238,50 +239,6 @@ inline void RecursiveLayout( Panel &parent_panel ) {
   }
 }
 
-// inline void RecursiveLayout( StackPanel &parent_panel ) {
-//   f32 total_height = 0;
-//   f32 total_width = 0;
-//   f32 tallest_child = 0;
-//   f32 widest_child = 0;
-//   f32 end_of_last_x = parent_panel.elem.transform.x;
-//   f32 end_of_last_y = parent_panel.elem.transform.y;
-
-//   // NOTE: might have to go after the enabled check?
-//   // parent_panel.Place();
-//   // parent_panel.Resize();
-
-//   if ( !parent_panel.elem.enabled )
-//     return;
-
-//   for ( entt::entity child: parent_panel.children ) {
-
-//     switch ( GetType( child ) ) {
-//       case Type::Panel: {
-//         Panel &child_panel = Get<Panel>( child );
-//         RecursiveLayout( child_panel );
-//       } break;
-//       case Type::StackPanel: {
-//         StackPanel &child_panel = Get<StackPanel>( child );
-//         RecursiveLayout( child_panel );
-//       } break;
-//       case Type::TextLabel: {
-//         Get<TextLabel>( child ).Resize();
-//       } break;
-//       case Type::TextButton: {
-//         Get<TextButton>( child ).label.Resize();
-//       } break;
-//       case Type::TextureLabel: {
-//         Get<TextureLabel>( child ).Resize();
-//       } break;
-//       case Type::TextureButton: {
-//         Get<TextureButton>( child ).label.Resize();
-//       } break;
-//       default:
-//         break;
-//     }
-//   }
-// }
-
 inline void RecursiveDraw( Panel &panel ) {
   if ( !panel.elem.enabled )
     return;
@@ -294,7 +251,15 @@ inline void RecursiveDraw( Panel &panel ) {
         RecursiveDraw( Get<Panel>( child ) );
       } break;
       case Type::StackPanel: {
-        RecursiveDraw( Get<StackPanel>( child ) );
+        StackPanel &child_panel = Get<StackPanel>( child );
+
+        child_panel.Draw();
+
+        assert( Has<Panel>( child_panel.children[child_panel.curr_index] ) );
+
+        RecursiveDraw( Get<Panel>( child_panel.children[child_panel.curr_index]
+        ) );
+
       } break;
       case Type::TextLabel: {
         Get<TextLabel>( child ).Draw();
@@ -313,39 +278,6 @@ inline void RecursiveDraw( Panel &panel ) {
     }
   }
 }
-
-// inline void RecursiveDraw( StackPanel &panel ) {
-//   if ( !panel.elem.enabled )
-//     return;
-
-//   panel.Draw();
-
-//   for ( entt::entity child: panel.children ) {
-//     switch ( GetType( child ) ) {
-//       case Type::Panel: {
-//         RecursiveDraw( Get<Panel>( child ) );
-//       } break;
-//       case Type::StackPanel: {
-//         RecursiveDraw( Get<StackPanel>( child ) );
-//       } break;
-//       case Type::TextLabel: {
-//         Get<TextLabel>( child ).Draw();
-//       } break;
-//       case Type::TextButton: {
-//         Get<TextButton>( child ).Draw();
-//       } break;
-//       case Type::TextureLabel: {
-//         Get<TextureLabel>( child ).Draw();
-//       } break;
-//       case Type::TextureButton: {
-//         Get<TextureButton>( child ).Draw();
-//       } break;
-//       default:
-//         break;
-//     }
-//   }
-// }
-
 
 inline void RecursiveInteractions(
   Panel &panel,
@@ -367,8 +299,15 @@ inline void RecursiveInteractions(
       );
     }
     else if ( Has<StackPanel>( child ) ) {
+      StackPanel &child_panel = Get<StackPanel>( child );
+
+      assert( Has<Panel>( child_panel.children[child_panel.curr_index] ) );
+
       RecursiveInteractions(
-        Get<StackPanel>( child ), over_any_elem, mouseWentUp, mouseWentDown
+        Get<Panel>( child_panel.children[child_panel.curr_index] ),
+        over_any_elem,
+        mouseWentUp,
+        mouseWentDown
       );
     }
 
@@ -396,56 +335,6 @@ inline void RecursiveInteractions(
     SetContextNull();
   }
 }
-
-// inline void RecursiveInteractions(
-//   StackPanel &panel,
-//   bool &over_any_elem,
-//   bool mouseWentUp,
-//   bool mouseWentDown
-// ) {
-
-//   if ( !panel.elem.enabled )
-//     return;
-
-//   for ( auto &child: panel.children ) {
-//     if ( !IsEnabled( child ) )
-//       continue;
-
-//     if ( Has<Panel>( child ) ) {
-//       RecursiveInteractions(
-//         Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown
-//       );
-//     }
-//     else if ( Has<StackPanel>( child ) ) {
-//       RecursiveInteractions(
-//         Get<StackPanel>( child ), over_any_elem, mouseWentUp, mouseWentDown
-//       );
-//     }
-
-//     UpdateElem( child );
-
-//     rect &transform = GetTransform( child );
-
-//     bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
-
-//     if ( !over_any_elem )
-//       over_any_elem = inside;
-
-//     if ( DoInteraction(
-//            child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown
-//          ) ) {
-//       std::cout << "INTERACTION DETECTED!!!" << std::endl;
-
-//       if ( IsClickable( child ) ) {
-//         action_lookup.at( GetId( child ) )();
-//       }
-//     }
-//   }
-
-//   if ( !over_any_elem ) {
-//     SetContextNull();
-//   }
-// }
 
 inline bool DoInteraction(
   entt::entity entity,
@@ -486,24 +375,18 @@ inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
   if ( game_reg.all_of<Province::Component>( entity ) ) {
     // Enabled the context panel
     auto &context = lookup.at( "settlement_context_panel" );
-    ToggleElem( context, true );
-    UI::Panel context_panel = Get<UI::Panel>( context );
+    RecursiveToggle( context, true );
+    // ToggleElem( context, true );
+    // UI::Panel context_panel = Get<UI::Panel>( context );
 
-    // Enable the tab group
-    entt::entity tab_grp = context_panel.children[0];
-    RecursiveToggle( tab_grp, true );
+    // // Enable the tab group
+    // entt::entity tab_grp = context_panel.children[0];
+    // RecursiveToggle( tab_grp, true );
 
-    // Enable the content panel
-    entt::entity content = context_panel.children[1];
-    ToggleElem( content, true );
-    UI::StackPanel content_panel = Get<UI::StackPanel>( content );
-
-    // Enable the overview_panel and its children
-    entt::entity content_overview = content_panel.children[0];
-    RecursiveToggle( content_overview, true );
-    UI::Panel content_overview_panel = Get<UI::Panel>( content_overview );
-
-    // RecursiveToggle( context_panel, true );
+    // // Enable the content panel
+    // entt::entity content = context_panel.children[1];
+    // RecursiveToggle( content, true );
+    // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
   }
   else if ( game_reg.all_of<Actor::Component>( entity ) ) {
     auto actor = game_reg.get<Actor::Component>( entity );
@@ -525,11 +408,17 @@ inline void ListenForDeselect() {
 inline void RecursiveToggle( entt::entity entity, bool on ) {
   ToggleElem( entity, on );
 
-  if ( !Has<Panel>( entity ) )
+  if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
     return;
 
-  for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
-    RecursiveToggle( child, on );
+  if ( Has<StackPanel>( entity ) ) {
+    StackPanel &stack_panel = Get<StackPanel>( entity );
+    RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
+  }
+  else if ( Has<Panel>( entity ) ) {
+    for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
+      RecursiveToggle( child, on );
+    }
   }
 }
 

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../ui_shared.hpp"
+
+#include "../components/panel.hpp"
+#include "../components/text_elements.hpp"
+#include "../ui_common.hpp"
 
 namespace UI {
 
@@ -21,31 +24,13 @@ inline std::vector<entt::entity> CreateModalMenuUI() {
       },
       {
         TextButton::Create(
-          "modal_menu_load_game",
-          "Load Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "modal_menu_load_game", "Load Game", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "modal_menu_save_game",
-          "Save Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "modal_menu_save_game", "Save Game", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "modal_menu_settings",
-          "Settings",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "modal_menu_settings", "Settings", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
           "modal_menu_save_exit_main",
@@ -66,13 +51,7 @@ inline std::vector<entt::entity> CreateModalMenuUI() {
           true
         ),
         TextButton::Create(
-          "modal_menu_exit_game",
-          "Exit Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "modal_menu_exit_game", "Exit Game", 32, BLUE, WHITE, false, true
         ),
       }
     ),

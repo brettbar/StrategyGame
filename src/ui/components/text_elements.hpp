@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../ui_common.hpp"
+#include "../ui_lookups.hpp"
+
 #include "element.hpp"
 
 namespace UI {
@@ -21,13 +24,7 @@ struct TextLabel {
   ) {
     entt::entity entity = Global::local.create();
     TextLabel button = TextLabel(
-      id,
-      Type::TextLabel,
-      background,
-      text,
-      font_size,
-      text_color,
-      dynamic
+      id, Type::TextLabel, background, text, font_size, text_color, dynamic
     );
 
     Global::local.emplace<TextLabel>( entity, button );
@@ -103,8 +100,7 @@ struct TextLabel {
     bool dynamic
   )
       : elem( Element( id, type, background, false, {}, {} ) ), text( text ),
-        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-  }
+        font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {}
 };
 
 struct TextButton {
@@ -182,8 +178,7 @@ struct TextButton {
           font_size,
           text_color,
           dynamic
-        ) ) {
-  }
+        ) ) {}
 };
 
 };// namespace UI

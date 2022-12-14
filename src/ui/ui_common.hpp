@@ -1,13 +1,56 @@
 #pragma once
 
-#include "components/element.hpp"
-#include "components/panel.hpp"
-#include "components/stack_panel.hpp"
-#include "components/text_elements.hpp"
-#include "components/texture_elements.hpp"
+#include "../common.hpp"
+#include "../global.hpp"
+
+#include "ui_common.hpp"
 
 namespace UI {
-// TOOD see if we can replace all these with template functions
+
+struct Context {
+  entt::entity hot;
+  entt::entity active;
+};
+
+inline f32 SCALE = 2.0f;
+
+typedef struct Element Element;
+typedef struct Panel Panel;
+typedef struct StackPanel StackPanel;
+typedef struct TextLabel TextLabel;
+typedef struct TextButton TextButton;
+typedef struct TextureLabel TextureLabel;
+typedef struct TextureButton TextureButton;
+
+enum class Type {
+  INVALID_TYPE,
+  Panel,
+  StackPanel,
+  TextLabel,
+  TextureLabel,
+  TextButton,
+  TextureButton,
+};
+
+enum class Axis {
+  ROW,
+  COLUMN,
+};
+
+enum class Align {
+  START,
+  CENTER,
+  END,
+  SPACE_OUT,
+};
+
+struct Margins {
+  u32 left;
+  u32 right;
+  u32 top;
+  u32 bottom;
+};
+
 template<typename T>
 inline bool Has( entt::entity entity ) {
   return Global::local.all_of<T>( entity );

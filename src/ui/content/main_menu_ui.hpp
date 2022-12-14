@@ -1,7 +1,11 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../ui_shared.hpp"
+
+#include "../ui_common.hpp"
+
+#include "../components/panel.hpp"
+#include "../components/text_elements.hpp"
 
 namespace UI {
 
@@ -21,49 +25,19 @@ inline std::vector<entt::entity> CreateMainMenuUI() {
       },
       {
         TextButton::Create(
-          "main_menu_resume_game",
-          "Resume Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "main_menu_resume_game", "Resume Game", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "main_menu_start_game",
-          "Start Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "main_menu_start_game", "Start Game", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "main_menu_load_game",
-          "Load Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "main_menu_load_game", "Load Game", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "main_menu_settings",
-          "Settings",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "main_menu_settings", "Settings", 32, BLUE, WHITE, false, true
         ),
         TextButton::Create(
-          "main_menu_exit_game",
-          "Exit Game",
-          32,
-          BLUE,
-          WHITE,
-          false,
-          true
+          "main_menu_exit_game", "Exit Game", 32, BLUE, WHITE, false, true
         ),
       }
     ),

@@ -72,6 +72,7 @@ int main( void ) {
   SettlementSystem::Init();
 
   while ( !WindowShouldClose() && !hit_exit ) {
+    // TODO this monolithic event handler needs to be handled differently
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_resume_game" ) {

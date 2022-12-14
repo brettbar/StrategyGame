@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../global.hpp"
+#include "../ui_lookups.hpp"
 #include "element.hpp"
 
 namespace UI {
@@ -176,8 +177,7 @@ struct Panel {
         children_horiz_align( children_horiz_align ),
         children_vert_align( children_vert_align ), abs_pos( absolute_pos ),
         abs_size( resizeable ), update_pos( update_pos ),
-        update_size( update_size ), children( children ) {
-  }
+        update_size( update_size ), children( children ) {}
 
   // Relative panel
   Panel(

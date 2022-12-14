@@ -9,16 +9,13 @@
 
 #pragma once
 
-#include "../common.hpp"
 
 #include "../events.hpp"
 #include "../systems/actor_system.hpp"
 
 namespace UI {
-struct Context {
-  entt::entity hot;
-  entt::entity active;
-};
+
+inline std::map<std::string, entt::entity> lookup;
 
 // TODO maybe this could be refactored to some sort of event queue
 inline std::map<std::string, std::function<void()>> action_lookup = {
@@ -36,7 +33,11 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "settlement_context_tab_overview",
-    []() { printf( "Settlement tab button pressed\n" ); },
+    []() {
+      printf( "Settlement tab button pressed\n" );
+      // entt::entity foo = lookup.at( "settlement_context_tab_overview" );
+      // auto &button = Get<TextureButton>( foo );
+    },
   },
   {
     "settlement_context_tab_population",
@@ -56,7 +57,12 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   {
     "settlement_context_tab_construction",
-    []() { printf( "Settlement tab button pressed\n" ); },
+    []() {
+      printf( "Settlement tab button pressed\n" );
+      Events::event_emitter.publish( Events::UIEvent{
+        "settlement_context_tab_construction",
+      } );
+    },
   },
   {
     "settlement_context_tab_garrison",

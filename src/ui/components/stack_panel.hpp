@@ -1,12 +1,15 @@
 #pragma once
 
 #include "../../global.hpp"
+#include "../ui_lookups.hpp"
+#include "../ui_utils.hpp"
 #include "element.hpp"
 
 namespace UI {
 
 // A stack panel is a panel that only ever has one
 // active child.
+
 struct StackPanel {
   Element elem;
   u32 curr_index = 0;
@@ -14,6 +17,9 @@ struct StackPanel {
   // bool abs_size = false;
   // std::function<Vector2()> update_pos;
   // std::function<Vector2()> update_size;
+
+  // TODO determine if this will always only be a Panel
+  // as child
   std::vector<entt::entity> children;
 
   static entt::entity Create(
@@ -37,6 +43,12 @@ struct StackPanel {
     );
   }
 
+  void SwitchChild( u32 index ) {
+    ToggleElem( children[curr_index], false );
+    curr_index = index;
+    ToggleElem( children[curr_index], true );
+  }
+
   private:
   // Relative panel
   StackPanel(
@@ -44,14 +56,7 @@ struct StackPanel {
     Color background,
     std::vector<entt::entity> children
   )
-      : elem( Element(
-          id,
-          Type::StackPanel,
-          background,
-          false,
-          { 0, 0, 80, 200 },
-          {}
-        ) ),
+      : elem( Element( id, Type::StackPanel, background, false, {}, {} ) ),
         children( children ){};
 };
 
