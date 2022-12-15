@@ -4,11 +4,6 @@
 
 #include "../ui_common.hpp"
 
-#include "../components/panel.hpp"
-#include "../components/stack_panel.hpp"
-#include "../components/text_elements.hpp"
-#include "../components/texture_elements.hpp"
-
 
 namespace UI {
 
@@ -17,7 +12,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
     Panel::Create(
       "settlement_context_panel",
       Fade( BLACK, 0.5 ),
-      Axis::ROW,
+      Axis::Row,
       Align::START,
       Align::START,
       true,
@@ -64,7 +59,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
             Panel::Create(
               "settlement_context_overview",
               BLACK,
-              Axis::ROW,
+              Axis::Row,
               Align::START,
               Align::START,
               {
@@ -100,7 +95,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
     Panel::Create(
       "actor_context_panel",
       Fade( BLACK, 0.5 ),
-      Axis::ROW,
+      Axis::Row,
       Align::START,
       Align::START,
       true,
@@ -121,7 +116,7 @@ inline std::vector<entt::entity> CreateCampaignUI() {
         Panel::Create(
           "actor_actions_panel",
           BLACK,
-          Axis::ROW,
+          Axis::Row,
           Align::START,
           Align::START,
           {

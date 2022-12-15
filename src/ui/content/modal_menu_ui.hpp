@@ -13,7 +13,7 @@ inline std::vector<entt::entity> CreateModalMenuUI() {
     Panel::CreateAbsPos(
       "modal_menu",
       BLACK,
-      Axis::COLUMN,
+      Axis::Column,
       Align::START,
       Align::START,
       []() -> Vector2 {

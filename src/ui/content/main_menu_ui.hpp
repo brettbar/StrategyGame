@@ -14,7 +14,7 @@ inline std::vector<entt::entity> CreateMainMenuUI() {
     Panel::CreateAbsPos(
       "main_menu",
       BLACK,
-      Axis::COLUMN,
+      Axis::Column,
       Align::START,
       Align::START,
       []() -> Vector2 {

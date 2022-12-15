@@ -4,16 +4,18 @@
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
 #include "../components/settlement.hpp"
+
 #include "../renderer/fonts.hpp"
 #include "../renderer/textures.hpp"
 #include "../systems/selection_system.hpp"
+
 #include "content/campaign_ui.hpp"
 #include "content/main_menu_ui.hpp"
 #include "content/modal_menu_ui.hpp"
 
 #include "ui_common.hpp"
-#include "ui_lookups.hpp"
 #include "ui_utils.hpp"
+
 
 namespace UI {
 
@@ -70,6 +72,7 @@ inline void DisableCurrentContent() {
     RecursiveToggle( base, false );
   }
 }
+
 
 inline void UpdateOnFrame() {
   vec2 mousePos = GetMousePosition();
@@ -174,37 +177,37 @@ inline void RecursiveLayout( Panel &parent_panel ) {
     // TODO ^ these could probably be consolidated using a template
     rect &transform = GetTransform( child );
 
-    if ( parent_panel.children_axis == Axis::ROW ) {
+    if ( parent_panel.children_axis == Axis::Row ) {
       // 2. Set the child x position based on alignment style.
       switch ( parent_panel.children_horiz_align ) {
-        case Align::START: {
+        case Align::Start: {
           transform.x = end_of_last_x;
           end_of_last_x = transform.x + transform.width;
         } break;
-        case Align::SPACE_OUT: {
+        case Align::SpaceOut: {
         } break;
       }
 
       // 3. Set the child y position based on alignment style.
       switch ( parent_panel.children_vert_align ) {
-        case Align::START: {
+        case Align::Start: {
           transform.y = parent_panel.elem.transform.y;
         } break;
       }
     }
-    else if ( parent_panel.children_axis == Axis::COLUMN ) {
+    else if ( parent_panel.children_axis == Axis::Column ) {
       // 2. Set the child x position based on alignment style.
       switch ( parent_panel.children_horiz_align ) {
-        case Align::START: {
+        case Align::Start: {
           transform.x = parent_panel.elem.transform.x;
         } break;
-        case Align::SPACE_OUT: {
+        case Align::SpaceOut: {
         } break;
       }
 
       // 3. Set the child y position based on alignment style.
       switch ( parent_panel.children_vert_align ) {
-        case Align::START: {
+        case Align::Start: {
           transform.y = end_of_last_y;
           // + elem.margins.top;
           end_of_last_y = transform.y + transform.height;
@@ -228,11 +231,11 @@ inline void RecursiveLayout( Panel &parent_panel ) {
         tallest_child = transform.height;
     }
 
-    if ( parent_panel.children_axis == Axis::ROW ) {
+    if ( parent_panel.children_axis == Axis::Row ) {
       parent_panel.elem.transform.width = total_width;
       parent_panel.elem.transform.height = tallest_child;
     }
-    else if ( parent_panel.children_axis == Axis::COLUMN ) {
+    else if ( parent_panel.children_axis == Axis::Column ) {
       parent_panel.elem.transform.width = widest_child;
       parent_panel.elem.transform.height = total_height;
     }
@@ -431,6 +434,12 @@ inline bool MouseIsOverUI() {
 inline void SetContextNull() {
   context.hot = entt::null;
   context.active = entt::null;
+}
+
+inline void SwitchChild( StackPanel &sp, u32 index ) {
+  ToggleElem( sp.children[sp.curr_index], false );
+  sp.curr_index = index;
+  ToggleElem( sp.children[sp.curr_index], true );
 }
 
 };// namespace UI

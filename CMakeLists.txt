@@ -71,7 +71,10 @@ endif(UNIX)
 
 
 if (WIN32)
+     # set(CMAKE_C_COMPILER "C:/msys64/ucrt64/bin/clang.exe")
+     # set(CMAKE_CXX_COMPILER "C:/msys64/ucrt64/bin/clang++.exe")
      set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+
      project(game)
      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
@@ -81,8 +84,9 @@ if (WIN32)
              IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
              INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
      )
-     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm -static)
+     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm -static )
      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+     
 endif(WIN32)
 
 
