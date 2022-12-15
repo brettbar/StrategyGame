@@ -12,12 +12,4 @@ enum class Type {
 };
 
 
-typedef struct Element Element;
-typedef struct Panel Panel;
-typedef struct StackPanel StackPanel;
-typedef struct TextLabel TextLabel;
-typedef struct TextButton TextButton;
-typedef struct TextureLabel TextureLabel;
-typedef struct TextureButton TextureButton;
-
 };// namespace UI

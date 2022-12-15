@@ -4,6 +4,11 @@
 
 #include "../ui_common.hpp"
 
+#include "../components/element.hpp"
+#include "../components/panel.hpp"
+#include "../components/text_elements.hpp"
+#include "../components/texture_elements.hpp"
+
 
 namespace UI {
 
@@ -13,8 +18,8 @@ inline std::vector<entt::entity> CreateCampaignUI() {
       "settlement_context_panel",
       Fade( BLACK, 0.5 ),
       Axis::Row,
-      Align::START,
-      Align::START,
+      Align::Start,
+      Align::Start,
       true,
       true,
       []() -> Vector2 {
@@ -33,9 +38,9 @@ inline std::vector<entt::entity> CreateCampaignUI() {
         Panel::Create(
           "settlement_context_tab_group",
           BLUE,
-          Axis::COLUMN,
-          Align::START,
-          Align::START,
+          Axis::Column,
+          Align::Start,
+          Align::Start,
           {
             TextureButton::Create( "settlement_context_tab_overview", true ),
             TextureButton::Create(
@@ -60,8 +65,8 @@ inline std::vector<entt::entity> CreateCampaignUI() {
               "settlement_context_overview",
               BLACK,
               Axis::Row,
-              Align::START,
-              Align::START,
+              Align::Start,
+              Align::Start,
               {
                 TextLabel::Create(
                   "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
@@ -96,8 +101,8 @@ inline std::vector<entt::entity> CreateCampaignUI() {
       "actor_context_panel",
       Fade( BLACK, 0.5 ),
       Axis::Row,
-      Align::START,
-      Align::START,
+      Align::Start,
+      Align::Start,
       true,
       true,
       []() -> Vector2 {
@@ -117,8 +122,8 @@ inline std::vector<entt::entity> CreateCampaignUI() {
           "actor_actions_panel",
           BLACK,
           Axis::Row,
-          Align::START,
-          Align::START,
+          Align::Start,
+          Align::Start,
           {
             TextButton::Create(
               "actor_spawn_settlement_button",
