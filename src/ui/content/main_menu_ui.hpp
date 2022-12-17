@@ -2,8 +2,6 @@
 
 #include "../../common.hpp"
 
-#include "../ui_common.hpp"
-
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"
 
@@ -15,8 +13,8 @@ inline std::vector<entt::entity> CreateMainMenuUI() {
       "main_menu",
       BLACK,
       Axis::Column,
-      Align::START,
-      Align::START,
+      Align::Start,
+      Align::Start,
       []() -> Vector2 {
         return {
           ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),

@@ -2,8 +2,6 @@
 
 #include "../../common.hpp"
 
-#include "../ui_common.hpp"
-
 #include "../components/element.hpp"
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"

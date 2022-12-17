@@ -4,7 +4,6 @@
 
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"
-#include "../ui_common.hpp"
 
 namespace UI {
 
@@ -14,8 +13,8 @@ inline std::vector<entt::entity> CreateModalMenuUI() {
       "modal_menu",
       BLACK,
       Axis::Column,
-      Align::START,
-      Align::START,
+      Align::Start,
+      Align::Start,
       []() -> Vector2 {
         return {
           ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),

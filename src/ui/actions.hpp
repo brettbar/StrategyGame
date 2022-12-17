@@ -1,24 +1,13 @@
 #pragma once
 
-#include "../common.hpp"
 #include "../global.hpp"
 
 #include "../events.hpp"
-#include "../systems/actor_system.hpp"
-
-#include "ui_shared.hpp"
+#include "../systems/settlement_system.hpp"
+#include "ui_lookup.hpp"
 
 namespace UI {
 
-struct Context {
-  entt::entity hot;
-  entt::entity active;
-};
-
-inline f32 SCALE = 2.0f;
-
-
-// TODO maybe this could be refactored to some sort of event queue
 inline std::map<std::string, std::function<void()>> action_lookup = {
   {
     "actor_spawn_settlement_button",
@@ -37,10 +26,10 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     []() {
       printf( "Settlement tab button pressed\n" );
       entt::entity foo = lookup.at( "settlement_context_tab_overview" );
-      auto &button = Get<TextureButton>( foo );
-      entt::entity content = lookup.at( "settlement_context_tab_overview" );
-      StackPanel &sp = Get<StackPanel>( content );
-      SwitchChild( sp, 0 );
+      // auto &button = Get<TextureButton>( foo );
+      // entt::entity content = lookup.at( "settlement_context_tab_overview" );
+      // StackPanel &sp = Get<StackPanel>( content );
+      // SwitchChild( sp, 0 );
     },
   },
   {
@@ -64,10 +53,10 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     []() {
       printf( "Settlement tab button pressed\n" );
       entt::entity foo = lookup.at( "settlement_context_tab_overview" );
-      auto &button = Get<TextureButton>( foo );
-      entt::entity content = lookup.at( "settlement_context_tab_overview" );
-      StackPanel &sp = Get<StackPanel>( content );
-      SwitchChild( sp, 0 );
+      // auto &button = Get<TextureButton>( foo );
+      // entt::entity content = lookup.at( "settlement_context_tab_overview" );
+      // StackPanel &sp = Get<StackPanel>( content );
+      // SwitchChild( sp, 0 );
     },
   },
   {
@@ -159,81 +148,4 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
 };
 
-inline std::map<std::string, std::function<bool()>> clickable_lookup = {
-  {
-    "actor_spawn_settlement_button",
-    []() -> bool { return ActorSystem::ColonistCanPlaceSettlement(); },
-  },
 };
-
-inline std::map<std::string, std::function<std::string()>> update_lookup = {
-  {
-    "settlement_name",
-    []() -> std::string {
-      if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity
-           ) ) {
-
-        Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity
-        );
-
-        Settlement::Component &settlement =
-          Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity
-          );
-
-        return settlement.name;
-      }
-
-      return "Uninhabited";
-    },
-  },
-  {
-    "settlement_population",
-    []() -> std::string {
-      if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity
-           ) ) {
-
-        Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity
-        );
-
-        Settlement::Component &settlement =
-          Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity
-          );
-
-        return std::to_string( settlement.population.current );
-      }
-
-      return "0";
-    },
-  },
-  {
-    "settlement_development",
-    []() -> std::string {
-      if ( Global::world.all_of<Province::Component, Settlement::Component>(
-             SelectionSystem::selected_entity
-           ) ) {
-
-        Province::Component &province = Global::world.get<Province::Component>(
-          SelectionSystem::selected_entity
-        );
-
-        Settlement::Component &settlement =
-          Global::world.get<Settlement::Component>(
-            SelectionSystem::selected_entity
-          );
-
-        return Settlement::development.at( settlement.development );
-      }
-
-      return "Uninhabited";
-    },
-  },
-};
-
-
-};// namespace UI

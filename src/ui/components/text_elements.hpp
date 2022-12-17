@@ -2,6 +2,9 @@
 
 #include "element.hpp"
 
+#include "../clickable.hpp"
+#include "../updates.hpp"
+
 namespace UI {
 
 struct TextLabel {

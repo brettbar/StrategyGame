@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../updates.hpp"
 #include "element.hpp"
 
 namespace UI {
