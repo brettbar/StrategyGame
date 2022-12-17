@@ -4,7 +4,11 @@
 
 #include "../events.hpp"
 #include "../systems/settlement_system.hpp"
+
+#include "components/panel.hpp"
+#include "components/texture_elements.hpp"
 #include "ui_lookup.hpp"
+#include "ui_utils.hpp"
 
 namespace UI {
 
@@ -25,11 +29,9 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "settlement_context_tab_overview",
     []() {
       printf( "Settlement tab button pressed\n" );
-      entt::entity foo = lookup.at( "settlement_context_tab_overview" );
-      // auto &button = Get<TextureButton>( foo );
-      // entt::entity content = lookup.at( "settlement_context_tab_overview" );
-      // StackPanel &sp = Get<StackPanel>( content );
-      // SwitchChild( sp, 0 );
+      entt::entity content = lookup.at( "settlement_context_content" );
+      StackPanel &sp = Get<StackPanel>( content );
+      SwitchChild( sp, 0 );
     },
   },
   {
@@ -52,11 +54,9 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "settlement_context_tab_construction",
     []() {
       printf( "Settlement tab button pressed\n" );
-      entt::entity foo = lookup.at( "settlement_context_tab_overview" );
-      // auto &button = Get<TextureButton>( foo );
-      // entt::entity content = lookup.at( "settlement_context_tab_overview" );
-      // StackPanel &sp = Get<StackPanel>( content );
-      // SwitchChild( sp, 0 );
+      entt::entity content = lookup.at( "settlement_context_content" );
+      StackPanel &sp = Get<StackPanel>( content );
+      SwitchChild( sp, 1 );
     },
   },
   {

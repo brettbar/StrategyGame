@@ -82,14 +82,18 @@ inline std::vector<entt::entity> CreateCampaignUI() {
                 ),
               }
             ),
-            // Panel::Create(
-            //   "settlement_context_buildings",
-            //   BLACK,
-            //   Axis::ROW,
-            //   Align::START,
-            //   Align::START,
-            //   {}
-            // ),
+            Panel::Create(
+              "settlement_context_construction",
+              BLACK,
+              Axis::Row,
+              Align::Start,
+              Align::Start,
+              {
+                TextLabel::Create(
+                  "building_0", "building", 32, BLACK, WHITE, false
+                ),
+              }
+            ),
           }
         ),
 

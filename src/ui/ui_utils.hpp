@@ -117,6 +117,30 @@ inline void ToggleElem( entt::entity entity, bool on ) {
   }
 }
 
+
+inline void RecursiveToggle( entt::entity entity, bool on ) {
+  ToggleElem( entity, on );
+
+  if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
+    return;
+
+  if ( Has<StackPanel>( entity ) ) {
+    StackPanel &stack_panel = Get<StackPanel>( entity );
+    RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
+  }
+  else if ( Has<Panel>( entity ) ) {
+    for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
+      RecursiveToggle( child, on );
+    }
+  }
+}
+
+inline void SwitchChild( StackPanel &sp, u32 index ) {
+  RecursiveToggle( sp.children[sp.curr_index], false );
+  sp.curr_index = index;
+  RecursiveToggle( sp.children[sp.curr_index], true );
+}
+
 inline bool IsEnabled( entt::entity entity ) {
   if ( Has<Panel>( entity ) ) {
     return Get<Panel>( entity ).elem.enabled;

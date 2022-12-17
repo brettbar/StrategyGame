@@ -33,7 +33,6 @@ inline void Draw();
 inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
 inline void ListenForSelect( entt::registry &, entt::entity );
 inline void ListenForDeselect();
-inline void RecursiveToggle( entt::entity, bool );
 inline void SetContextNull();
 
 
@@ -408,23 +407,6 @@ inline void ListenForDeselect() {
   SetContextNull();
 }
 
-inline void RecursiveToggle( entt::entity entity, bool on ) {
-  ToggleElem( entity, on );
-
-  if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
-    return;
-
-  if ( Has<StackPanel>( entity ) ) {
-    StackPanel &stack_panel = Get<StackPanel>( entity );
-    RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
-  }
-  else if ( Has<Panel>( entity ) ) {
-    for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
-      RecursiveToggle( child, on );
-    }
-  }
-}
-
 inline bool MouseIsOverUI() {
   // This is almost sufficent, but we need to account for panels too
   // not just items that can be active?
@@ -436,10 +418,5 @@ inline void SetContextNull() {
   context.active = entt::null;
 }
 
-inline void SwitchChild( StackPanel &sp, u32 index ) {
-  ToggleElem( sp.children[sp.curr_index], false );
-  sp.curr_index = index;
-  ToggleElem( sp.children[sp.curr_index], true );
-}
 
 };// namespace UI
