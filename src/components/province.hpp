@@ -12,7 +12,7 @@ struct Component {
   bool selected = false;
 
   std::shared_ptr<Tile::Component> tile;
-  std::vector<NaturalResource> resources;
+  std::vector<Resources::Natural> resources;
 
   template<class Archive>
   void serialize( Archive &ar ) {

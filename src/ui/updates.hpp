@@ -72,7 +72,7 @@ inline std::map<std::string, std::function<std::string()>> update_lookup = {
             SelectionSystem::selected_entity
           );
 
-        return Settlement::development.at( settlement.development );
+        return Settlement::dev_names.at( settlement.development );
       }
 
       return "Uninhabited";
