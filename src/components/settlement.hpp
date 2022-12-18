@@ -1,6 +1,6 @@
 #pragma once
 #include "../common.hpp"
-#include "../data/buildings.hpp"
+
 #include <cereal/types/common.hpp>
 
 namespace Settlement {
@@ -82,6 +82,9 @@ struct Component {
   Development development;
   Population population;
   Texture2D texture;
+
+  // Building
+
 
   // TOOD might need separate save/load functions for this one
   template<class Archive>

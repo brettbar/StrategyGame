@@ -69,6 +69,12 @@ enum class Product {
   Jewelry,
 };
 
+enum class BuildingType {
+  Gathering,
+  Processing,
+  Producton,
+};
+
 enum class GatheringBuildingName {
   WoodCutter,// nc
   Farm,
@@ -114,6 +120,12 @@ struct ProductRecipe {
   std::vector<ProcessedMaterial> processed_inputs;
   ProductionBuildingName building;
 };
+
+template<typename T>
+struct Building {
+  std::vector<T> recipes;
+};
+
 
 inline std::map<RawMaterial, std::vector<RawMaterialRecipe>> raw_materials = {
   {
