@@ -5,7 +5,7 @@
 #include "../components/ai.hpp"
 #include "../components/player.hpp"
 #include "../global.hpp"
-#include <filesystem>
+
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -25,29 +25,25 @@ inline void Init() {
 
   std::cout << "Current Working Directory: " << cwd.generic_string()
             << std::endl;
-  //
+
   std::ifstream f{ ".\\data\\factions.json" };
   {
-    std::stringstream buffer;
-    buffer << f.rdbuf();
-    std::cout << buffer.str() << std::endl;
+    nlohmann::json js = nlohmann::json::parse( f );
 
-    // json data = json::parse( f );
-    // std::cout << data << std::endl;
-
-    std::string str = R"({"json": "beta"})";
-    nlohmann::json js = nlohmann::json::parse( str );
+    std::cout << js << std::endl;
+    std::cout << js["romans"] << std::endl;
+    std::cout << js["romans"]["adjectival"] << std::endl;
   }
   f.close();
 
   Global::host_player = Global::world.create();
   Global::world.emplace<Player::Component>(
-    Global::host_player, Global::host_player, true, Faction::ID::Romans
+    Global::host_player, Global::host_player, true, "romans"
   );
 
   entt::entity ai_player = Global::world.create();
   Global::world.emplace<Player::Component>(
-    ai_player, ai_player, false, Faction::ID::Celts
+    ai_player, ai_player, false, "celts"
   );
   Global::world.emplace<AI::Component>(
     ai_player, AI::Goal::DevelopSettlements

@@ -52,16 +52,10 @@ inline bool ColonistCanPlaceSettlement() {
 }
 
 inline Texture2D DetermineTextureFromFaction( entt::entity owner ) {
-  switch ( Global::world.get<Player::Component>( owner ).faction ) {
-    case Faction::ID::Romans:
-      return Global::texture_cache[hstr{ "romanVillagerTexture" }]->texture;
-    case Faction::ID::Greeks:
-      return Global::texture_cache[hstr{ "greekVillagerTexture" }]->texture;
-    case Faction::ID::Celts:
-      return Global::texture_cache[hstr{ "celtVillagerTexture" }]->texture;
-  }
-
-  return Global::texture_cache[hstr{ "romanVillagerTexture" }]->texture;
+  std::string faction = Global::world.get<Player::Component>( owner ).faction;
+  return Global::texture_cache[hstr{
+                                 ( faction + "_villager_texture" ).c_str() }]
+    ->texture;
 }
 
 inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
@@ -106,5 +100,4 @@ inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
   Global::world.emplace<Animated::Component>( entity, animated );
   Global::world.emplace<Sight::Component>( entity, sight );
 }
-
 };// namespace ActorSystem

@@ -69,9 +69,6 @@ int main( void ) {
   bool fresh_start = true;
 
 
-  std::string str = R"({"json": "beta"})";
-  nlohmann::json js = nlohmann::json::parse( str );
-
   // TODO this really doesnt need to be in SettlementSystem
   // its just loading images into textures, it should
   // be organized differently
@@ -385,27 +382,27 @@ void LoadResources() {
   );
 
   LoadResource(
-    hstr{ "romanVillagerTexture" },
+    hstr{ "romans_villager_texture" },
     LoadImage( "assets/textures/units/RomanVillager.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "greekVillagerTexture" },
+    hstr{ "greeks_villager_texture" },
     LoadImage( "assets/textures/units/GreekVillager.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "celtVillagerTexture" },
+    hstr{ "celts_villager_texture" },
     LoadImage( "assets/textures/units/CelticVillager.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "punicVillagerTexture" },
+    hstr{ "punics_villager_texture" },
     LoadImage( "assets/textures/units/Carthaginian_Villager.png" ),
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "persianVillagerTexture" },
+    hstr{ "persians_villager_texture" },
     LoadImage( "assets/textures/units/Persian_Villager.png" ),
     Global::texture_cache
   );
