@@ -73,25 +73,34 @@ set(SOURCE_FILES
 
 
 # if (WIN32)
-     set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
-     project(game LANGUAGES CXX)
+project(game LANGUAGES CXX)
 
-     add_library(raylib STATIC IMPORTED)
-     set_target_properties(
-             raylib PROPERTIES
-             IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
-             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
-     )
 
-    include(FetchContent)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-    FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
-    FetchContent_MakeAvailable(json)
+add_library(raylib STATIC IMPORTED)
+set_target_properties(
+       raylib PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+)
 
-    add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-    target_link_libraries(${PROJECT_NAME} PRIVATE raylib opengl32 gdi32 winmm nlohmann_json::nlohmann_json -static )
-   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+find_package(nlohmann_json 3.11.2 REQUIRED)
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+target_link_libraries(
+  ${PROJECT_NAME} 
+  PRIVATE 
+  nlohmann_json::nlohmann_json 
+  raylib 
+  opengl32 
+  gdi32 
+  winmm 
+  -static 
+  )
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
      
 # endif(WIN32)
 

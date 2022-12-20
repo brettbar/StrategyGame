@@ -26,8 +26,12 @@ TEMPORARY TODOS HERE
 #include "systems/spawn_system.hpp"
 #include "ui/ui_system.hpp"
 
-#include "filesystem"
 #include "utils.hpp"
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <nlohmann/json.hpp>
+#include <ostream>
 
 namespace fs = std::filesystem;
 
@@ -65,6 +69,11 @@ int main( void ) {
   bool campaign_to_load = false;
   bool hit_exit = false;
   bool fresh_start = true;
+
+
+  std::string str = R"({"json": "beta"})";
+  // nlohmann::json js = nlohmann::json::parse( str );
+  nlohmann::json j;
 
   // TODO this really doesnt need to be in SettlementSystem
   // its just loading images into textures, it should
@@ -288,7 +297,7 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
-inline Image InitTileOutline() {
+Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
