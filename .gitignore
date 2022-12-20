@@ -9,3 +9,5 @@ lib/
 build/
 cmake-build-debug/
 net/target/
+x64/
+packages/

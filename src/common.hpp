@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../include/entt/entt.hpp"
 // TODO see which of these includes can be removed
 #include <map>
 #include <raylib.h>
 #include <raymath.h>
 #include <vector>
+#include <entt/entt.hpp>
 
 using ECS = entt::registry;
 using u32 = unsigned int;
