@@ -5,7 +5,10 @@
 #include "../components/ai.hpp"
 #include "../components/player.hpp"
 #include "../global.hpp"
+#include <filesystem>
+#include <fstream>
 
+#include <nlohmann/json.hpp>
 
 #include "spawn_system.hpp"
 
@@ -18,21 +21,24 @@ inline void AIUpdate( AI::Component &, Player::Component & );
 
 inline void Init() {
 
-  // std::filesystem::path cwd = std::filesystem::current_path();
+  std::filesystem::path cwd = std::filesystem::current_path();
 
-  // std::cout << "Current Working Directory: " << cwd.generic_string()
-  //           << std::endl;
-  // //
-  // std::ifstream f{ ".\\data\\factions.json" };
-  // {
-  //   std::stringstream buffer;
-  //   buffer << f.rdbuf();
-  //   std::cout << buffer.str() << std::endl;
+  std::cout << "Current Working Directory: " << cwd.generic_string()
+            << std::endl;
+  //
+  std::ifstream f{ ".\\data\\factions.json" };
+  {
+    std::stringstream buffer;
+    buffer << f.rdbuf();
+    std::cout << buffer.str() << std::endl;
 
-  //   // json data = json::parse( f );
-  //   // std::cout << data << std::endl;
-  // }
-  // f.close();
+    // json data = json::parse( f );
+    // std::cout << data << std::endl;
+
+    std::string str = R"({"json": "beta"})";
+    nlohmann::json js = nlohmann::json::parse( str );
+  }
+  f.close();
 
   Global::host_player = Global::world.create();
   Global::world.emplace<Player::Component>(

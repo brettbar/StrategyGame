@@ -29,9 +29,7 @@ TEMPORARY TODOS HERE
 #include "utils.hpp"
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <ostream>
 
 namespace fs = std::filesystem;
 
@@ -72,8 +70,7 @@ int main( void ) {
 
 
   std::string str = R"({"json": "beta"})";
-  // nlohmann::json js = nlohmann::json::parse( str );
-  nlohmann::json j;
+  nlohmann::json js = nlohmann::json::parse( str );
 
   // TODO this really doesnt need to be in SettlementSystem
   // its just loading images into textures, it should

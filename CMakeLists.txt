@@ -58,21 +58,21 @@ set(SOURCE_FILES
 # )
 
 
-# if (UNIX)
-#      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#      project(game)
+if (UNIX)
+     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+     project(game)
 
-#      find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
+     find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
 
-#      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-#      # For compiler errors/warnings
-#      # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-#      target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-#      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-# endif(UNIX)
+     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+     # For compiler errors/warnings
+     # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+     target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+endif(UNIX)
 
 
-# if (WIN32)
+if (WIN32)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
 project(game LANGUAGES CXX)
@@ -102,7 +102,7 @@ target_link_libraries(
   )
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
      
-# endif(WIN32)
+endif(WIN32)
 
 
   # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
