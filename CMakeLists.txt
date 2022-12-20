@@ -58,25 +58,24 @@ set(SOURCE_FILES
 # )
 
 
-if (UNIX)
-     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-     project(game)
-     find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
-     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-     # For compiler errors/warnings
-     # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-     target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-endif(UNIX)
+# if (UNIX)
+#      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#      project(game)
+
+#      find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
+
+#      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+#      # For compiler errors/warnings
+#      # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+#      target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+#      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+# endif(UNIX)
 
 
-if (WIN32)
-     # set(CMAKE_C_COMPILER "C:/msys64/ucrt64/bin/clang.exe")
-     # set(CMAKE_CXX_COMPILER "C:/msys64/ucrt64/bin/clang++.exe")
+# if (WIN32)
      set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
-     project(game)
-     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+     project(game LANGUAGES CXX)
 
      add_library(raylib STATIC IMPORTED)
      set_target_properties(
@@ -84,10 +83,17 @@ if (WIN32)
              IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
              INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
      )
-     target_link_libraries(${PROJECT_NAME} raylib opengl32 gdi32 winmm -static )
-     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+
+    include(FetchContent)
+
+    FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+    FetchContent_MakeAvailable(json)
+
+    add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE raylib opengl32 gdi32 winmm nlohmann_json::nlohmann_json -static )
+   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
      
-endif(WIN32)
+# endif(WIN32)
 
 
   # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)

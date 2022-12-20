@@ -1,0 +1,13 @@
+{
+  "romans": {
+    "adjectival": "Roman",
+    "denonym": "Romans",
+    "starting_government": "republic",
+    "settledness": "settled",
+    "government_names": {
+      "empire": "Empire",
+      "republic": "Republic",
+      "federation": "Federation"
+    }
+  }
+}

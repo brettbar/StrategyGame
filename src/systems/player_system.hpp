@@ -5,7 +5,15 @@
 #include "../components/player.hpp"
 #include "../global.hpp"
 
+#include <filesystem>
+#include <fstream>
+
+#include <nlohmann/json.hpp>
+
 #include "spawn_system.hpp"
+
+
+using json = nlohmann::json;
 
 namespace PlayerSystem {
 
@@ -15,6 +23,25 @@ inline void HumanUpdate( Player::Component & );
 inline void AIUpdate( AI::Component &, Player::Component & );
 
 inline void Init() {
+
+  std::filesystem::path cwd = std::filesystem::current_path();
+
+  std::cout << "Current Working Directory: " << cwd.generic_string()
+            << std::endl;
+  //
+  std::ifstream f( ".\\data\\factions.json" );
+  {
+    std::stringstream buffer;
+    buffer << f.rdbuf();
+    std::cout << buffer.str() << std::endl;
+
+    // json data = json::parse( f );
+    std::string str( R"({"json": "beta"})" );
+    json js = json::parse( str );
+    // std::cout << data << std::endl;
+  }
+  f.close();
+
   Global::host_player = Global::world.create();
   Global::world.emplace<Player::Component>(
     Global::host_player, Global::host_player, true, Faction::ID::Romans

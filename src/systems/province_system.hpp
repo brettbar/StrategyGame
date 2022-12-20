@@ -22,7 +22,7 @@ inline void Init() {
 
     switch ( prov.tile->biome ) {
       case Biome::Plains: {
-        prov.resources.push_back( NaturalResource::Trees );
+        prov.resources.push_back( Resources::Natural::Trees );
       } break;
     }
 

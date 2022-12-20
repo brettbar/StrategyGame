@@ -2,6 +2,7 @@
 // be in json
 #pragma once
 
+#include "settlement.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -71,6 +72,11 @@ inline std::vector<std::string> production{
   "armourer",
   "jeweler",
   "tailor",
+};
+
+inline std::map<Settlement::Development, std::vector<std::string>>
+  available_buildings = {
+
 };
 
 
