@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\GameNetworkingSockets.redist.1.4.1\build\native\GameNetworkingSockets.redist.props" Condition="Exists('packages\GameNetworkingSockets.redist.1.4.1\build\native\GameNetworkingSockets.redist.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -101,5 +102,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('packages\GameNetworkingSockets.redist.1.4.1\build\native\GameNetworkingSockets.redist.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\GameNetworkingSockets.redist.1.4.1\build\native\GameNetworkingSockets.redist.props'))" />
   </Target>
 </Project>
