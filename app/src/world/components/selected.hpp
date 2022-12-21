@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 
 namespace Selected {
 
@@ -8,4 +8,4 @@ struct Component {
   bool isSelected;
 };
 
-}// namespace c_Selected
+}// namespace Selected

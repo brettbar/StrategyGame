@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../common.hpp"
-#include "../global.hpp"
+#include "../shared/common.hpp"
+#include "../shared/global.hpp"
 
-#include "../events.hpp"
+#include "../shared/events.hpp"
 
-#include "../components/province.hpp"
-#include "../components/settlement.hpp"
-#include "../systems/selection_system.hpp"
+#include "../world/components/province.hpp"
+#include "../world/components/settlement.hpp"
+#include "../world/systems/selection_system.hpp"
 
 namespace UI {
 

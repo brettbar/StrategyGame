@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 
 
 namespace Sight {
@@ -16,8 +16,8 @@ struct Component {
 
   template<class Archive>
   void serialize( Archive &ar ) {
-    ar ( range );
+    ar( range );
   }
 };
 
-}// namespace Component
+}// namespace Sight

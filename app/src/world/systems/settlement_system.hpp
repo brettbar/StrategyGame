@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
+#include "../../shared/textures.hpp"
 #include "../components/province.hpp"
 #include "../components/settlement.hpp"
-#include "../global.hpp"
-#include "../renderer/textures.hpp"
 #include "selection_system.hpp"
 
 namespace SettlementSystem {

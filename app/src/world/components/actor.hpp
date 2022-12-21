@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 
 namespace Actor {
 

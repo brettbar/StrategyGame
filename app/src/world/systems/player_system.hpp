@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../../data/factions.hpp"
-#include "../common.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
 #include "../components/ai.hpp"
 #include "../components/player.hpp"
-#include "../global.hpp"
 
 #include <fstream>
 

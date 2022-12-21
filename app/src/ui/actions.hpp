@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../global.hpp"
+#include "../shared/global.hpp"
 
-#include "../events.hpp"
-#include "../systems/settlement_system.hpp"
+#include "../shared/events.hpp"
+#include "../world/systems/settlement_system.hpp"
 
 #include "components/panel.hpp"
 #include "components/texture_elements.hpp"

@@ -3,9 +3,9 @@
 //
 #pragma once
 
+#include "../../shared/global.hpp"
 #include "../components/actor.hpp"
 #include "../components/player.hpp"
-#include "../global.hpp"
 #include "map_system.hpp"
 #include "movement_system.hpp"
 #include "selection_system.hpp"

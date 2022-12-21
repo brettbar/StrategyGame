@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../common.hpp"
+#include "../../shared/common.hpp"
+
 
 #include "../components/element.hpp"
 #include "../components/panel.hpp"

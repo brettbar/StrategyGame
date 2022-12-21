@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 #include "../components/animated.hpp"
 #include "../components/unit.hpp"
 #include "movement_system.hpp"

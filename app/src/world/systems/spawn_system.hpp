@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
 #include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/event.hpp"
 #include "../components/selected.hpp"
 #include "../components/sight.hpp"
 #include "../components/unit.hpp"
-#include "../global.hpp"
 
 #include "actor_system.hpp"
 #include "selection_system.hpp"

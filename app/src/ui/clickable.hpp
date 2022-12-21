@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../global.hpp"
-#include "../systems/actor_system.hpp"
+#include "../shared/global.hpp"
+
+#include "../world/systems/actor_system.hpp"
 
 
 namespace UI {

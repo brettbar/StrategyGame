@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../common.hpp"
-#include "../data/resources.hpp"
+#include "../../../data/resources.hpp"
+#include "../../shared/common.hpp"
 #include "cereal/types/vector.hpp"
 #include "tile.hpp"
 

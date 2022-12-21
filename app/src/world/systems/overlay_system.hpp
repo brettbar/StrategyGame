@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/fonts.hpp"
+#include "../../shared/global.hpp"
+#include "../../shared/textures.hpp"
 #include "../components/settlement.hpp"
-#include "../global.hpp"
-#include "../renderer/fonts.hpp"
-#include "../renderer/textures.hpp"
 #include "province_system.hpp"
 #include <raylib.h>
 

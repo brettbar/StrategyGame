@@ -3,24 +3,25 @@
 rights reserved.
 */
 
+#include "renderer/renderer.hpp"
 #include "shared/common.hpp"
-#include "shared/global.hpp"
 #include "shared/events.hpp"
+#include "shared/global.hpp"
 #include "shared/input.hpp"
 #include "shared/save.hpp"
-#include "renderer/renderer.hpp"
 #include "shared/textures.hpp"
-#include "systems/animation_system.hpp"
-#include "systems/map_system.hpp"
-#include "systems/movement_system.hpp"
-#include "systems/player_system.hpp"
-#include "systems/province_system.hpp"
-#include "systems/settlement_system.hpp"
-#include "systems/spawn_system.hpp"
+
+#include "world/systems/animation_system.hpp"
+#include "world/systems/map_system.hpp"
+#include "world/systems/movement_system.hpp"
+#include "world/systems/player_system.hpp"
+#include "world/systems/province_system.hpp"
+#include "world/systems/settlement_system.hpp"
+#include "world/systems/spawn_system.hpp"
 
 #include "ui/ui_system.hpp"
 
-#include "utils.hpp"
+#include "shared/utils.hpp"
 
 #include <filesystem>
 #include <fstream>

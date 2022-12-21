@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
+#include "../../shared/textures.hpp"
+#include "../../shared/utils.hpp"
 #include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
-#include "../global.hpp"
-#include "../renderer/textures.hpp"
-#include "../utils.hpp"
 
 
 namespace SelectionSystem {

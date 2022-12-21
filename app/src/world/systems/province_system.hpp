@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../renderer/textures.hpp"
+#include "../../shared/textures.hpp"
 #include "map_system.hpp"
 #include "spawn_system.hpp"
 #include <raylib.h>

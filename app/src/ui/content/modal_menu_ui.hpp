@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../common.hpp"
+#include "../../shared/common.hpp"
 
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"

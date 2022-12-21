@@ -1,8 +1,8 @@
 #pragma once
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 
-#include "../data/buildings.hpp"
-#include "../data/settlement.hpp"
+#include "../../../data/buildings.hpp"
+#include "../../../data/settlement.hpp"
 
 #include <cereal/types/common.hpp>
 

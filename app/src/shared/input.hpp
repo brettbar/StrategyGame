@@ -6,19 +6,19 @@
 
 #pragma once
 
+#include "../ui/ui_system.hpp"
+#include "../world/components/sight.hpp"
+#include "../world/components/unit.hpp"
+#include "../world/systems/map_system.hpp"
+#include "../world/systems/movement_system.hpp"
+#include "../world/systems/province_system.hpp"
+#include "../world/systems/selection_system.hpp"
+#include "../world/systems/spawn_system.hpp"
 #include "common.hpp"
-#include "components/sight.hpp"
-#include "components/unit.hpp"
 #include "global.hpp"
-#include "renderer/textures.hpp"
 #include "save.hpp"
 #include "state.hpp"
-#include "systems/map_system.hpp"
-#include "systems/movement_system.hpp"
-#include "systems/province_system.hpp"
-#include "systems/selection_system.hpp"
-#include "systems/spawn_system.hpp"
-#include "ui/ui_system.hpp"
+#include "textures.hpp"
 #include <raylib.h>
 
 namespace Input {

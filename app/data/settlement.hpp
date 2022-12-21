@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../src/common.hpp"
+#include "../src/shared/common.hpp"
 
 namespace Settlement {
 

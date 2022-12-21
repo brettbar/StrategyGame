@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../components/actor.hpp"
-#include "../components/event.hpp"
-#include "../components/selected.hpp"
-#include "../components/settlement.hpp"
+#include "../world/components/actor.hpp"
+#include "../world/components/event.hpp"
+#include "../world/components/selected.hpp"
+#include "../world/components/settlement.hpp"
 
-#include "../renderer/fonts.hpp"
-#include "../renderer/textures.hpp"
-#include "../systems/selection_system.hpp"
+#include "../shared/fonts.hpp"
+#include "../shared/textures.hpp"
+#include "../world/systems/selection_system.hpp"
 
 #include "content/campaign_ui.hpp"
 #include "content/main_menu_ui.hpp"

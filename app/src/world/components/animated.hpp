@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../common.hpp"
+#include "../../shared/common.hpp"
 #include <cereal/types/common.hpp>
 #include <cereal/types/vector.hpp>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../global.hpp"
+#include "../../shared/global.hpp"
 #include "../ui_lookup.hpp"
 #include "../ui_shared.hpp"
 

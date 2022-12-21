@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "components/actor.hpp"
-#include "components/animated.hpp"
-#include "components/player.hpp"
-#include "components/province.hpp"
-#include "components/settlement.hpp"
-#include "components/sight.hpp"
-#include "components/unit.hpp"
+#include "../world/components/actor.hpp"
+#include "../world/components/animated.hpp"
+#include "../world/components/player.hpp"
+#include "../world/components/province.hpp"
+#include "../world/components/settlement.hpp"
+#include "../world/components/sight.hpp"
+#include "../world/components/unit.hpp"
 #include "global.hpp"
 
 #include <cereal/archives/binary.hpp>
