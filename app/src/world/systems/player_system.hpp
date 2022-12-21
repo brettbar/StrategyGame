@@ -25,8 +25,9 @@ inline void Init() {
   std::cout << "Current Working Directory: " << cwd.generic_string()
             << std::endl;
 
-  std::ifstream f{ ".\\data\\factions.json" };
+  std::ifstream f( "app/data/factions.json" );
   {
+
     nlohmann::json js = nlohmann::json::parse( f );
 
     std::cout << js << std::endl;
