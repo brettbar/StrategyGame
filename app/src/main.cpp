@@ -1,0 +1,488 @@
+/*
+  Authored by Brett Barinaga on 11/29/21. Copyright (c) Brett Barinaga, All
+rights reserved.
+*/
+
+#include "shared/common.hpp"
+#include "shared/global.hpp"
+#include "shared/events.hpp"
+#include "shared/input.hpp"
+#include "shared/save.hpp"
+#include "renderer/renderer.hpp"
+#include "shared/textures.hpp"
+#include "systems/animation_system.hpp"
+#include "systems/map_system.hpp"
+#include "systems/movement_system.hpp"
+#include "systems/player_system.hpp"
+#include "systems/province_system.hpp"
+#include "systems/settlement_system.hpp"
+#include "systems/spawn_system.hpp"
+
+#include "ui/ui_system.hpp"
+
+#include "utils.hpp"
+
+#include <filesystem>
+#include <fstream>
+
+#include <nlohmann/json.hpp>
+
+namespace fs = std::filesystem;
+
+void LoadResources();
+void CameraUpdate( Camera2D &, f32 );
+
+void UpdateOnFrame();
+void Update60TPS();
+void Update1TPS();
+
+void Exit( TextureCache & );
+
+int main( void ) {
+  /// START Initialization
+  bool campaign_started = false;
+  f32 MS_PER_UPDATE = 1 / 60.0;
+  f32 ONCE_A_SECOND = 1;
+  f32 oncelag = 0.0f;
+  f32 lag = 0.0f;
+  f32 dt = 0.0f;
+
+  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
+
+  InitWindow( 1920, 1080, "FieldsOfMars" );
+
+  LoadResources();
+  /// END Initialization
+
+  UI::EnableMainMenuUI();
+
+  // this has to be right before WindowShouldClose() for some reason
+  SetExitKey( KEY_NULL );
+
+  bool campaign_to_load = false;
+  bool hit_exit = false;
+  bool fresh_start = true;
+
+
+  // TODO this really doesnt need to be in SettlementSystem
+  // its just loading images into textures, it should
+  // be organized differently
+  SettlementSystem::Init();
+
+  while ( !WindowShouldClose() && !hit_exit ) {
+    // TODO this monolithic event handler needs to be handled differently
+    Events::event_emitter.on<Events::UIEvent>(
+      [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
+        if ( event.msg == "main_menu_resume_game" ) {
+          UI::EnableCampaignUI();
+        }
+        else if ( event.msg == "main_menu_start_game" ) {
+          Global::ClearRegistry();
+
+          campaign_started = false;
+          UI::EnableCampaignUI();
+          fresh_start = true;
+        }
+        else if ( event.msg == "main_menu_load_game" ) {
+          campaign_to_load = true;
+        }
+        else if ( event.msg == "main_menu_exit_game" ) {
+          hit_exit = true;
+        }
+        else if ( event.msg == "modal_menu_load_game" ) {
+          campaign_to_load = true;
+        }
+        else if ( event.msg == "modal_menu_save_game" ) {
+          SaveSystem::Save();
+        }
+        else if ( event.msg == "modal_menu_exit_main" ) {
+          UI::EnableMainMenuUI();
+        }
+      }
+    );
+
+    if ( campaign_to_load ) {
+      Global::ClearRegistry();
+      SaveSystem::Load();
+
+      campaign_started = false;
+      UI::EnableCampaignUI();
+      campaign_to_load = false;
+      fresh_start = false;
+    }
+
+    switch ( Global::program_mode ) {
+      case Global::ProgramMode::MainMenu: {
+        Input::Handle();
+
+        UpdateOnFrame();
+
+        CameraUpdate( Global::state.camera, dt );
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Renderer::DrawUI();
+        }
+        EndDrawing();
+
+      } break;
+
+      case Global::ProgramMode::ModalMenu: {
+        Input::CheckMenuToggle();
+
+        UpdateOnFrame();
+
+        BeginDrawing();
+        {
+          Renderer::Draw( Global::texture_cache );
+          DrawRectangle(
+            0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
+          );
+          Renderer::DrawUI();
+        }
+        EndDrawing();
+      } break;
+
+      case Global::ProgramMode::Campaign: {
+
+        if ( !campaign_started && fresh_start ) {
+          MapSystem::Init();
+          PlayerSystem::Init();
+          ProvinceSystem::Init();
+          Renderer::Init();
+          campaign_started = true;
+
+          std::cout << EntityIdToString( Global::host_player ) << std::endl;
+        }
+        else if ( !campaign_started && !fresh_start ) {
+          MapSystem::Init();
+          Renderer::Init();
+          Global::world.view<Settlement::Component>().each(
+            []( Settlement::Component &settlement ) {
+              settlement.texture =
+                LoadTextureFromImage( Settlement::building_map.at( "roman_m1" )
+                );
+            }
+          );
+
+          campaign_started = true;
+
+          std::cout << EntityIdToString( Global::host_player ) << std::endl;
+        }
+
+
+        // Update Time
+        dt = GetFrameTime();
+        lag += dt;
+        oncelag += dt;
+
+        // Check for Input
+        Input::CheckMenuToggle();
+        Input::Handle();
+
+        // Update 60 times a second
+        while ( lag >= MS_PER_UPDATE ) {
+          Update60TPS();
+          lag -= MS_PER_UPDATE;
+        }
+
+        // Update once per second
+        while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+          Update1TPS();
+          oncelag = 0.0f;
+        }
+
+        // Update once per frame
+        UpdateOnFrame();
+
+        // Update Camera
+        CameraUpdate( Global::state.camera, dt );
+
+        // Draw everything to screen
+        BeginDrawing();
+        {
+          Renderer::Draw( Global::texture_cache );
+          Renderer::DrawUI();
+
+          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+          DrawFPS( GetScreenWidth() - 100, 2 );
+        }
+        EndDrawing();
+      } break;
+    }
+  }
+
+  // Perform clean up and teardown
+  Exit( Global::texture_cache );
+
+  return 0;
+}
+
+void UpdateOnFrame() {
+  UI::UpdateOnFrame();
+}
+
+// TODO: look at all of these and see if any belong
+// in UpdateOnFrame
+void Update60TPS() {
+  auto animated_units =
+    Global::world.view<Unit::Component, Animated::Component>();
+
+  auto players = Global::world.view<Player::Component>();
+
+  MovementSystem::Update( animated_units, Global::state.timeScale );
+  AnimationSystem::Update( animated_units, Global::state.timeScale );
+  PlayerSystem::Update( players );
+  //  Terrain::UpdateFOW(reg);
+}
+
+void Update1TPS() {
+  auto settlements =
+    Global::world.view<Province::Component, Settlement::Component>();
+
+  SettlementSystem::Update( settlements, Global::state );
+
+  Global::state.day++;
+
+  if ( Global::state.month < 12 )
+    Global::state.month++;
+  else {
+    Global::state.year++;
+    Global::state.month = 1;
+  }
+}
+
+void CameraUpdate( Camera2D &camera, f32 dt ) {
+  f32 cameraSpeed = 500.0f;
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
+  if ( IsKeyDown( KEY_D ) )
+    camera.target.x += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    camera.target.y += dt * cameraSpeed / camera.zoom;
+
+  if ( IsKeyDown( KEY_Z ) )
+    camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    camera.zoom += 0.05f;
+
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  camera.zoom += ( mouseWheelDelta * 0.2f );
+  if ( camera.zoom > 8.0f )
+    camera.zoom = 8.0f;
+  else if ( camera.zoom < 0.08f )
+    camera.zoom = 0.08f;
+
+  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
+}
+
+Image InitTileOutline() {
+  Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
+
+  // N -> NE
+  ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
+  // NE -> SE
+  ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
+  // SE -> S
+  ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
+  // S -> SW
+  ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
+  // SW -> NW
+  ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
+  // NW -> N
+  ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
+
+  return base;
+}
+
+void LoadResources() {
+  LoadResource(
+    hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache
+  );
+
+  Global::font_cache.load(
+    hstr{ "font_romulus" }, LoadFont( "assets/fonts/romulus.png" )
+  );
+
+  Global::font_cache.load(
+    hstr{ "font_default" }, LoadFont( "assets/fonts/Perfect-DOS-VGA-437.png" )
+  );
+
+  LoadResource(
+    hstr{ "land_tile" },
+    LoadImage( "assets/images/hexagons/Grass.bmp" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "water_tile" },
+    LoadImage( "assets/images/hexagons/Ocean.bmp" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "hills_tile" },
+    LoadImage( "assets/images/hexagons/Hills.bmp" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "sand_tile" },
+    LoadImage( "assets/images/hexagons/Sand.bmp" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "snow_tile" },
+    LoadImage( "assets/images/hexagons/Snow.bmp" ),
+    Global::texture_cache
+  );
+
+  LoadResource(
+    hstr{ "redOverlay" },
+    LoadImage( "assets/images/overlays/Red.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "blueOverlay" },
+    LoadImage( "assets/images/overlays/Blue.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "greenOverlay" },
+    LoadImage( "assets/images/overlays/Green.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "purpleOverlay" },
+    LoadImage( "assets/images/overlays/Purple.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "orangeOverlay" },
+    LoadImage( "assets/images/overlays/Orange.png" ),
+    Global::texture_cache
+  );
+
+  LoadResource(
+    hstr{ "template" },
+    LoadImage( "assets/images/Template.png" ),
+    Global::texture_cache
+  );
+
+  LoadResource(
+    hstr{ "romans_villager_texture" },
+    LoadImage( "assets/images/units/RomanVillager.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "greeks_villager_texture" },
+    LoadImage( "assets/images/units/GreekVillager.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "celts_villager_texture" },
+    LoadImage( "assets/images/units/CelticVillager.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "punics_villager_texture" },
+    LoadImage( "assets/images/units/Carthaginian_Villager.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "persians_villager_texture" },
+    LoadImage( "assets/images/units/Persian_Villager.png" ),
+    Global::texture_cache
+  );
+  LoadResource(
+    hstr{ "romanVillageTexture" },
+    LoadImage( "assets/images/village_roman.png" ),
+    Global::texture_cache
+  );
+
+  LoadResource(
+    hstr{ "buildings" },
+    LoadImage( "assets/images/buildings.png" ),
+    Global::texture_cache
+  );
+
+  // TODO at somepoint these UI textures should probably
+  // be set to bilinear and then run through the fragment shader
+  // But before I can do that I need to fix the shader with how
+  // it deals with alpha
+  LoadTexturePointFilter(
+    hstr{ "context_panel" },
+    LoadImage( "assets/images/UI/UI_test.png" ),
+    Global::texture_cache
+  );
+
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_overview" },
+    LoadImage( "assets/images/UI/Overview.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_population" },
+    LoadImage( "assets/images/UI/Population.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_culture" },
+    LoadImage( "assets/images/UI/Culture.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_religion" },
+    LoadImage( "assets/images/UI/Religion.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_resources" },
+    LoadImage( "assets/images/UI/Resources.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_construction" },
+    LoadImage( "assets/images/UI/Construction.png" ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "settlement_context_tab_garrison" },
+    LoadImage( "assets/images/UI/Garrison.png" ),
+    Global::texture_cache
+  );
+
+  std::string path = "assets/images/resources";
+  for ( const auto &entry: fs::directory_iterator( path ) ) {
+    std::cout << entry.path().filename() << std::endl;
+
+    std::string filename = entry.path().filename().generic_string();
+
+    LoadResource(
+      hstr{ filename.c_str() },
+      LoadImage( ( path + "/" + filename ).c_str() ),
+      Global::texture_cache
+    );
+  }
+}
+
+void Exit( TextureCache &cache ) {
+  // @TODO figure out all deallocs or whatever
+
+  UnloadShader( Renderer::shader );
+
+  for ( auto resource: cache ) {
+    UnloadTexture( resource.second->texture );
+  }
+
+  cache.clear();
+  CloseWindow();// Close window and OpenGL context
+}
