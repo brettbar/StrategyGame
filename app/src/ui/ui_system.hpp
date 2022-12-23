@@ -119,6 +119,17 @@ inline void Draw() {
   DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
   std::string selected_ent =
     "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+  DrawText( selected_ent.c_str(), GetScreenWidth() - 600, 202, 24.0f, RED );
+
+
+  DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
+  DrawText(
+    std::to_string( Global::state.timeScale ).c_str(),
+    GetScreenWidth() - 600,
+    252,
+    24.0f,
+    WHITE
+  );
 }
 
 inline void RecursiveLayout( Panel &parent_panel ) {

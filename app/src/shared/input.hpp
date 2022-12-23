@@ -14,6 +14,7 @@
 #include "../world/systems/province_system.hpp"
 #include "../world/systems/selection_system.hpp"
 #include "../world/systems/spawn_system.hpp"
+#include "commands.hpp"
 #include "common.hpp"
 #include "global.hpp"
 #include "save.hpp"
@@ -41,30 +42,24 @@ inline void Handle() {
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
-    if ( Global::state.timeScale > 0.0f ) {
-      Global::state.prevTimeScale = Global::state.timeScale;
-      Global::state.timeScale = 0.0f;
-    }
-    else if ( Global::state.timeScale == 0.0f ) {
-      Global::state.timeScale = Global::state.prevTimeScale;
-    }
+    Commands::queue.enqueue( Commands::Command{
+      Commands::Type::TimeChange,
+      "Player request Pause",
+    } );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) ) {
-    Global::state.timeScale -= 0.5f;
-    if ( Global::state.timeScale < 0.0f )
-      Global::state.timeScale = 0.0f;
-
-    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
-      Global::state.prevTimeScale -= 0.5f;
-      Global::state.timeScale = Global::state.prevTimeScale;
-    }
+    Commands::queue.enqueue( Commands::Command{
+      Commands::Type::TimeChange,
+      "Player request Slower",
+    } );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) ) {
-    Global::state.timeScale += 0.5f;
-    if ( Global::state.timeScale > 1.5f )
-      Global::state.timeScale = 1.5f;
+    Commands::queue.enqueue( Commands::Command{
+      Commands::Type::TimeChange,
+      "Player request Faster",
+    } );
   }
 
   if ( IsKeyPressed( KEY_V ) ) {

@@ -4,6 +4,7 @@ rights reserved.
 */
 
 #include "renderer/renderer.hpp"
+#include "shared/commands.hpp"
 #include "shared/common.hpp"
 #include "shared/events.hpp"
 #include "shared/global.hpp"
@@ -70,6 +71,7 @@ int main( void ) {
   // its just loading images into textures, it should
   // be organized differently
   SettlementSystem::Init();
+  Commands::Listen();
 
   while ( !WindowShouldClose() && !hit_exit ) {
     // TODO this monolithic event handler needs to be handled differently
@@ -112,6 +114,7 @@ int main( void ) {
       campaign_to_load = false;
       fresh_start = false;
     }
+
 
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu: {
@@ -172,6 +175,8 @@ int main( void ) {
 
           std::cout << EntityIdToString( Global::host_player ) << std::endl;
         }
+
+        Commands::FireAll();
 
 
         // Update Time
