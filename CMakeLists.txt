@@ -7,7 +7,6 @@ set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
 
 set(SOURCE_FILES 
   app/src/main.cpp
-  app/src/shared/input.hpp
   app/src/shared/common.hpp
   app/src/renderer/renderer.hpp
   app/src/world/systems/player_system.hpp
@@ -37,7 +36,7 @@ if (UNIX)
      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
      # For compiler errors/warnings
      # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-     target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+     target_link_libraries(${PROJECT_NAME} PRIVATE raylib GameNetworkingSockets)
      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 endif(UNIX)
 

@@ -3,12 +3,13 @@
 rights reserved.
 */
 
+#include "interface/input.hpp"
+
 #include "renderer/renderer.hpp"
 #include "shared/commands.hpp"
 #include "shared/common.hpp"
 #include "shared/events.hpp"
 #include "shared/global.hpp"
-#include "shared/input.hpp"
 #include "shared/save.hpp"
 #include "shared/textures.hpp"
 
@@ -20,7 +21,7 @@ rights reserved.
 #include "world/systems/settlement_system.hpp"
 #include "world/systems/spawn_system.hpp"
 
-#include "ui/ui_system.hpp"
+#include "interface/ui_system.hpp"
 
 #include "shared/utils.hpp"
 
@@ -28,6 +29,7 @@ rights reserved.
 #include <fstream>
 
 #include <nlohmann/json.hpp>
+
 
 namespace fs = std::filesystem;
 
@@ -115,7 +117,6 @@ int main( void ) {
       fresh_start = false;
     }
 
-
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu: {
         Input::Handle();
@@ -151,6 +152,7 @@ int main( void ) {
 
       case Global::ProgramMode::Campaign: {
 
+
         if ( !campaign_started && fresh_start ) {
           MapSystem::Init();
           PlayerSystem::Init();
@@ -177,7 +179,6 @@ int main( void ) {
         }
 
         Commands::FireAll();
-
 
         // Update Time
         dt = GetFrameTime();

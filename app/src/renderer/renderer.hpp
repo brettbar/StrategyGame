@@ -1,7 +1,7 @@
+#include "../interface/ui_system.hpp"
 #include "../shared/common.hpp"
 #include "../shared/fonts.hpp"
 #include "../shared/textures.hpp"
-#include "../ui/ui_system.hpp"
 #include "../world/systems/map_system.hpp"
 #include "../world/systems/overlay_system.hpp"
 #include "../world/systems/selection_system.hpp"

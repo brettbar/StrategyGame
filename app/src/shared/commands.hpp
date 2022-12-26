@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../world/systems/province_system.hpp"
+#include "../world/systems/spawn_system.hpp"
 #include "common.hpp"
 #include "global.hpp"
 #include <iostream>
@@ -8,32 +10,50 @@ namespace Commands {
 
 enum class Type {
   TimeChange,
+  Spawn,
+  Selection,
+  Move,
 };
 
 struct Command {
-  // std::string requester;
   Type type;
 
   std::string msg;
+  Vector2 click_pos;
 };
 
-struct Queue : entt::dispatcher {};
+struct Queue : entt::dispatcher {
+  void Enqueue( const Command &cmd ) {
+    // Send the command to all other players
+
+    this->enqueue( cmd );
+  }
+};
 
 inline void HandleTimeChangeRequest( const Command & );
+inline void HandleSpawnRequest( const Command & );
 
-// TODO figure out how to execute command that
-// was called with enqueue
 struct Listener {
 
-  void receive( const Command &cmd ) {
-
+  void Receive( const Command &cmd ) {
     switch ( cmd.type ) {
-      case Commands::Type::TimeChange: {
+      case Type::TimeChange: {
         HandleTimeChangeRequest( cmd );
+        return;
+      }
+      case Type::Spawn: {
+        HandleSpawnRequest( cmd );
+        return;
+      }
+      case Type::Selection: {
+        SelectionSystem::UpdateSelection( cmd.click_pos );
+        return;
+      }
+      case Type::Move: {
+        MovementSystem::SetDestinations( Global::state.camera );
+        return;
       }
     }
-
-    //
   }
 
 
@@ -43,8 +63,9 @@ struct Listener {
 inline Listener listener;
 inline Queue queue;
 
+
 inline void Listen() {
-  queue.sink<Command>().connect<&Listener::receive>( listener );
+  queue.sink<Command>().connect<&Listener::Receive>( listener );
 
   // dispatcher.sink<another_event>().connect<&Listener::method>( listener );
 }
@@ -88,6 +109,18 @@ inline void HandleTimeChangeRequest( const Command &cmd ) {
       Global::state.timeScale = 1.5f;
 
     return;
+  }
+}
+
+inline void HandleSpawnRequest( const Command &cmd ) {
+
+  if ( cmd.msg == "Player spawn Villager" ) {
+    SpawnSystem::SpawnColonist( Global::host_player, cmd.click_pos );
+    return;
+  }
+
+  if ( cmd.msg == "Player spawn City" ) {
+    ProvinceSystem::AssignProvince( Global::host_player, cmd.click_pos );
   }
 }
 
