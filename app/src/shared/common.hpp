@@ -6,6 +6,7 @@
 #include <vector>
 #include <entt/entt.hpp>
 #include <map>
+#include <string>
 
 using ECS = entt::registry;
 using u32 = unsigned int;

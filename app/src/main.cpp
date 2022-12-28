@@ -40,11 +40,17 @@ void UpdateOnFrame();
 void Update60TPS();
 void Update1TPS();
 
+void StartCampaign();
+void LoadCampaign();
+
 void Exit( TextureCache & );
 
 int main( void ) {
-  /// START Initialization
   bool campaign_started = false;
+  bool campaign_to_load = false;
+  bool hit_exit = false;
+  bool fresh_start = true;
+
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
   f32 oncelag = 0.0f;
@@ -55,19 +61,11 @@ int main( void ) {
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
 
   InitWindow( 1920, 1080, "FieldsOfMars" );
-
   LoadResources();
-  /// END Initialization
-
   UI::EnableMainMenuUI();
 
   // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
-
-  bool campaign_to_load = false;
-  bool hit_exit = false;
-  bool fresh_start = true;
-
 
   // TODO this really doesnt need to be in SettlementSystem
   // its just loading images into textures, it should
@@ -107,12 +105,13 @@ int main( void ) {
       }
     );
 
+    // Check and prep for campaign load
     if ( campaign_to_load ) {
       Global::ClearRegistry();
       SaveSystem::Load();
 
-      campaign_started = false;
       UI::EnableCampaignUI();
+      campaign_started = false;
       campaign_to_load = false;
       fresh_start = false;
     }
@@ -131,7 +130,6 @@ int main( void ) {
           Renderer::DrawUI();
         }
         EndDrawing();
-
       } break;
 
       case Global::ProgramMode::ModalMenu: {
@@ -151,63 +149,52 @@ int main( void ) {
       } break;
 
       case Global::ProgramMode::Campaign: {
-
-
+        // 1. Check for init
         if ( !campaign_started && fresh_start ) {
-          MapSystem::Init();
-          PlayerSystem::Init();
-          ProvinceSystem::Init();
-          Renderer::Init();
+          StartCampaign();
           campaign_started = true;
-
-          std::cout << EntityIdToString( Global::host_player ) << std::endl;
         }
         else if ( !campaign_started && !fresh_start ) {
-          MapSystem::Init();
-          Renderer::Init();
-          Global::world.view<Settlement::Component>().each(
-            []( Settlement::Component &settlement ) {
-              settlement.texture =
-                LoadTextureFromImage( Settlement::building_map.at( "roman_m1" )
-                );
-            }
-          );
-
+          LoadCampaign();
           campaign_started = true;
-
-          std::cout << EntityIdToString( Global::host_player ) << std::endl;
         }
-
-        Commands::FireAll();
 
         // Update Time
         dt = GetFrameTime();
         lag += dt;
         oncelag += dt;
 
-        // Check for Input
+        // 2. Check for Input
         Input::CheckMenuToggle();
         Input::Handle();
 
-        // Update 60 times a second
-        while ( lag >= MS_PER_UPDATE ) {
-          Update60TPS();
-          lag -= MS_PER_UPDATE;
+        // 3. Check for network traffic if multiplayer
+
+        // 4. Process all commands
+        Commands::FireAll();
+
+        // 5. Run all Updates
+        {
+          // Update 60 times a second
+          while ( lag >= MS_PER_UPDATE ) {
+            Update60TPS();
+            lag -= MS_PER_UPDATE;
+          }
+
+          // Update once per second
+          while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+            Update1TPS();
+            oncelag = 0.0f;
+          }
+
+          // Update once per frame
+          UpdateOnFrame();
+
+          // Update Camera
+          CameraUpdate( Global::state.camera, dt );
         }
 
-        // Update once per second
-        while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-          Update1TPS();
-          oncelag = 0.0f;
-        }
-
-        // Update once per frame
-        UpdateOnFrame();
-
-        // Update Camera
-        CameraUpdate( Global::state.camera, dt );
-
-        // Draw everything to screen
+        // 6. Draw everything
         BeginDrawing();
         {
           Renderer::Draw( Global::texture_cache );
@@ -227,12 +214,31 @@ int main( void ) {
   return 0;
 }
 
+void StartCampaign() {
+  MapSystem::Init();
+  PlayerSystem::Init();
+  ProvinceSystem::Init();
+  Renderer::Init();
+  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
+}
+
+void LoadCampaign() {
+  MapSystem::Init();
+  Renderer::Init();
+  Global::world.view<Settlement::Component>().each(
+    []( Settlement::Component &settlement ) {
+      settlement.texture =
+        LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
+    }
+  );
+  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
+}
+
 void UpdateOnFrame() {
   UI::UpdateOnFrame();
 }
 
-// TODO: look at all of these and see if any belong
-// in UpdateOnFrame
+// TODO: look at all of these and see if any belong in UpdateOnFrame
 void Update60TPS() {
   auto animated_units =
     Global::world.view<Unit::Component, Animated::Component>();
