@@ -1,7 +1,7 @@
 [
 {
-  "directory": "/home/brettbar/projects/game/build",
-  "command": "/usr/bin/c++  -I/home/brettbar/projects/game/include -std=c++17 -o CMakeFiles/game.dir/src/main.cpp.o -c /home/brettbar/projects/game/src/main.cpp",
-  "file": "/home/brettbar/projects/game/src/main.cpp"
+  "directory": "C:/Projects/game/out/build/x64-Debug",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -IC:/Projects/game/include -isystem \"C:/Program Files (x86)/nlohmann_json/include\" -isystem C:/Projects/game/include/raylib -g -Wall -std=c++20 -o CMakeFiles\\game.dir\\app\\src\\main.cpp.obj -c C:\\Projects\\game\\app\\src\\main.cpp",
+  "file": "C:\\Projects\\game\\app\\src\\main.cpp"
 }
 ]

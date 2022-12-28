@@ -1,7 +1,13 @@
 .cache/
 .idea/
+.vs/
+.vscode/
+output.json
+output.*
 include/
 lib/
 build/
 cmake-build-debug/
 net/target/
+x64/
+packages/

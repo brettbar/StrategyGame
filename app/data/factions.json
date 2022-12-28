@@ -1,0 +1,128 @@
+{
+  "romans": {
+    "primary_color": "red",
+    "secondary_color": "gold",
+    "adjectival": "Roman",
+    "denonym": "Romans",
+    "starting_government": "republic",
+    "settledness": "settled",
+    "government_names": {
+      "empire": "Empire",
+      "republic": "Republic",
+      "federation": "Tribes"
+    },
+    "leader_title": {
+      "empire": "Imperator",
+      "republic": "Consul",
+      "federation": "Rex"
+    }
+  },
+  "greeks": {
+    "primary_color": "cyan",
+    "secondary_color": "gold",
+    "adjectival": "Greek",
+    "denonym": "Greeks",
+    "starting_government": "federation",
+    "settledness": "settled",
+    "government_names": {
+      "empire": "Kingdom",
+      "republic": "Republic",
+      "federation": "Cities"
+    },
+    "leader_title": {
+      "empire": "Basileus",
+      "republic": "Archon",
+      "federation": "Polemarchos"
+    }
+  },
+  "celts": {
+    "primary_color": "green",
+    "secondary_color": "gold",
+    "adjectival": "Celtic",
+    "denonym": "Celts",
+    "starting_government": "federation",
+    "settledness": "tribal",
+    "government_names": {
+      "empire": "Kingdom",
+      "republic": "Republic",
+      "federation": "Tribes"
+    },
+    "leader_names": {
+      "empire": "Katurigja",
+      "republic": "Katuwiro",
+      "federation": "Katuwalo"
+    }
+  },
+  "punics": {
+    "primary_color": "white",
+    "secondary_color": "purple",
+    "adjectival": "Punic",
+    "denonym": "Phoenicians",
+    "starting_government": "republic",
+    "settledness": "settled",
+    "government_names": {
+      "empire": "Empire",
+      "republic": "Colonies",
+      "federation": "Cities"
+    },
+    "leader_names": {
+      "empire": "Melech",
+      "republic": "Shophetim",
+      "federation": "Nagid"
+    }
+  },
+  "persians": {
+    "primary_color": "orange",
+    "secondary_color": "white",
+    "adjectival": "Persian",
+    "denonym": "Persians",
+    "starting_government": "empire",
+    "settledness": "settled",
+    "government_names": {
+      "empire": "Empire",
+      "republic": "Republic",
+      "federation": "Federation"
+    },
+    "leader_names": {
+      "empire": "Shananshah",
+      "republic": "Shah",
+      "federation": "Padishah"
+    }
+  },
+  "germans": {
+    "primary_color": "grey",
+    "secondary_color": "white",
+    "adjectival": "Germanic",
+    "denonym": "Germans",
+    "starting_government": "federation",
+    "settledness": "tribal",
+    "government_names": {
+      "empire": "Reik",
+      "republic": "Republic",
+      "federation": "Federation"
+    },
+    "leader_names": {
+      "empire": "Kuningaz",
+      "republic": "Theudanaz",
+      "federation": "Riks"
+    }
+  },
+  "scythians": {
+    "primary_color": "pink",
+    "secondary_color": "white",
+    "adjectival": "Scythian",
+    "denonym": "Scythians",
+    "starting_government": "federation",
+    "settledness": "nomadic",
+    "government_names": {
+      "empire": "Kingdom",
+      "republic": "Republic",
+      "federation": "Horde"
+    },
+    "leader_names": {
+      "empire": "Horselord",
+      "republic": "Horselord",
+      "federation": "Horselord"
+    }
+  }
+}
