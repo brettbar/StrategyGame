@@ -65,6 +65,25 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
   },
   // Main Menu
   {
+
+    "main_menu_host_game",
+    []() {
+      printf( "Host\n" );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_host_game",
+      } );
+    },
+  },
+  {
+    "main_menu_join_game",
+    []() {
+      printf( "Join\n" );
+      Events::event_emitter.publish( Events::UIEvent{
+        "main_menu_join_game",
+      } );
+    },
+  },
+  {
     "main_menu_resume_game",
     []() {
       printf( "Resume\n" );

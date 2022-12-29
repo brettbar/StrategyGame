@@ -18,6 +18,7 @@ class Host {
   HSteamNetConnection net_connection;
 
 
+  public:
   Host( const char *addr ) {
     identity_local.Clear();
     signal_service_addr = addr;
@@ -40,6 +41,7 @@ class Client {
   int virtual_port_remote = 0;// Only used when connecting
 
 
+  public:
   Client() {
     identity_remote.Clear();
   }
@@ -49,7 +51,6 @@ class Client {
       "Identity %s is attempting to connect to server",
       SteamNetworkingIdentityRender( identity_remote ).c_str()
     );
-    ISteamNetworkingConnectionSignaling
   }
 };
 
