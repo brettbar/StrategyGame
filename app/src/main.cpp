@@ -31,6 +31,7 @@ rights reserved.
 #include <fstream>
 
 #include <nlohmann/json.hpp>
+#include <thread>
 
 
 namespace fs = std::filesystem;
@@ -52,6 +53,8 @@ int main( void ) {
   bool campaign_to_load = false;
   bool hit_exit = false;
   bool fresh_start = true;
+  bool hosting_mp = false;
+  bool joining_mp = false;
 
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
@@ -80,10 +83,10 @@ int main( void ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_host_game" ) {
-          Network::Host host = Network::Host( "localhost:10202" );
+          hosting_mp = true;
         }
         else if ( event.msg == "main_menu_join_game" ) {
-          Network::Client client = Network::Client();
+          joining_mp = true;
         }
         else if ( event.msg == "main_menu_resume_game" ) {
           UI::EnableCampaignUI();
@@ -112,6 +115,13 @@ int main( void ) {
         }
       }
     );
+
+    if ( hosting_mp ) {
+      auto host = Network::Host();
+      host.Setup();
+    }
+
+    if ( joining_mp ) {}
 
     // Check and prep for campaign load
     if ( campaign_to_load ) {

@@ -1,58 +1,69 @@
+#include <steam/isteammatchmaking.h>
+#include <steam/isteamnetworkingsockets.h>
+#include <steam/steam_api.h>
+#include <steam/steamnetworkingtypes.h>
+
+
 #include <assert.h>
 
+#include <stdarg.h>
 #include <stdio.h>
-#include <steam/isteamnetworkingsockets.h>
-#include <steam/isteamnetworkingutils.h>
-#include <steam/steamnetworkingtypes.h>
+
+
+#include <iostream>
 
 
 namespace Network {
 
-class Host {
-  int virtual_port_local = 0;// Used when listening and when connecting
 
+// typedef void (*FSteamNetworkingSocketsDebugOutput)( ESteamNetworkingSocketsDebugOutputType nType, const char *pszMsg );
+
+struct Host {
   SteamNetworkingIdentity identity_local;
-  const char *signal_service_addr;
+  int virtual_port = 0;
 
-  HSteamListenSocket listen_socket;
-  HSteamNetConnection net_connection;
+  inline static void DebugOutput(
+    ESteamNetworkingSocketsDebugOutputType eType,
+    const char *pszMsg
+  ) {
+    printf( "Network:: %s", pszMsg );
+    std::cout << "Network::" << pszMsg << std::endl;
+    assert( !"TEST FAILED" );
+  }
 
 
-  public:
-  Host( const char *addr ) {
+  inline void Setup() {
     identity_local.Clear();
-    signal_service_addr = addr;
-  }
 
-  void Listen() {
-    printf(
-      "Identity %s is starting server",
-      SteamNetworkingIdentityRender( identity_local ).c_str()
-    );
-    listen_socket = SteamNetworkingSockets()->CreateListenSocketP2P(
-      virtual_port_local, 0, nullptr
-    );
-    assert( listen_socket != k_HSteamListenSocket_Invalid );
+
+    printf( "%lldx\n", SteamNetworkingUtils()->GetLocalTimestamp() );
+
+
+    // SteamNetworkingUtils()->InitRelayNetworkAccess();
+
+    // SteamNetworkingUtils()->SetDebugOutputFunction(
+    //   k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
+    // );
+
+    // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+    //   k_ESteamNetworkingConfig_LogLevel_P2PRendezvous,
+    //   k_ESteamNetworkingSocketsDebugOutputType_Debug
+    // );
+
+    // SteamNetworkingUtils()->SetGlobalConfigValueString(
+    //   k_ESteamNetworkingConfig_P2P_STUN_ServerList, "stun.l.google.com:19302"
+    // );
+
+    // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+    //   k_ESteamNetworkingConfig_P2P_Transport_ICE_Enable,
+    //   k_nSteamNetworkingConfig_P2P_Transport_ICE_Enable_All
+    // );
+
+
+    // auto socket = SteamNetworkingSockets()->CreateListenSocketP2P(
+    //   virtual_port, 0, nullptr
+    // );
   }
 };
-
-class Client {
-  SteamNetworkingIdentity identity_remote;
-  int virtual_port_remote = 0;// Only used when connecting
-
-
-  public:
-  Client() {
-    identity_remote.Clear();
-  }
-
-  void Connect() {
-    printf(
-      "Identity %s is attempting to connect to server",
-      SteamNetworkingIdentityRender( identity_remote ).c_str()
-    );
-  }
-};
-
 
 };// namespace Network
