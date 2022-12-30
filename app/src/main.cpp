@@ -2,6 +2,8 @@
   Authored by Brett Barinaga on 11/29/21. Copyright (c) Brett Barinaga, All
 rights reserved.
 */
+#include "steam/steam_api.h"
+
 
 #include "interface/input.hpp"
 
@@ -12,6 +14,7 @@ rights reserved.
 #include "shared/global.hpp"
 #include "shared/save.hpp"
 #include "shared/textures.hpp"
+
 
 #include "world/systems/animation_system.hpp"
 #include "world/systems/map_system.hpp"
@@ -31,6 +34,7 @@ rights reserved.
 #include <fstream>
 
 #include <nlohmann/json.hpp>
+#include <stdlib.h>
 #include <thread>
 
 
@@ -47,6 +51,11 @@ void StartCampaign();
 void LoadCampaign();
 
 void Exit( TextureCache & );
+
+void SteamAPIDebugTextHook( int severity, const char *msg ) {
+  printf( "S::%d", severity );
+  printf( "%s\n", msg );
+}
 
 int main( void ) {
   bool campaign_started = false;
@@ -65,6 +74,24 @@ int main( void ) {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
 
+  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
+    return EXIT_FAILURE;
+  }
+
+  if ( !SteamAPI_Init() ) {
+    printf( "SteamAPI_Init() failed!\n" );
+    return EXIT_FAILURE;
+  }
+
+  if ( !SteamUser()->BLoggedOn() ) {
+    printf( "Steam user is not logged in\n" );
+    return EXIT_FAILURE;
+  }
+
+  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
+
+  printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
+
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
   UI::EnableMainMenuUI();
@@ -77,6 +104,11 @@ int main( void ) {
   // be organized differently
   SettlementSystem::Init();
   Commands::Listen();
+
+  if ( !SteamInput()->Init( false ) ) {
+    printf( "SteamInput()->Init failed.\n" );
+    return EXIT_FAILURE;
+  }
 
   while ( !WindowShouldClose() && !hit_exit ) {
     // TODO this monolithic event handler needs to be handled differently
@@ -229,7 +261,7 @@ int main( void ) {
   // Perform clean up and teardown
   Exit( Global::texture_cache );
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void StartCampaign() {
@@ -522,5 +554,6 @@ void Exit( TextureCache &cache ) {
   }
 
   cache.clear();
+  SteamAPI_Shutdown();
   CloseWindow();// Close window and OpenGL context
 }
