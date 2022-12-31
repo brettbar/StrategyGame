@@ -108,7 +108,6 @@ int main( void ) {
   SettlementSystem::Init();
   Commands::Listen();
 
-  Network net = Network();
 
   if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
@@ -154,13 +153,14 @@ int main( void ) {
     );
 
     if ( creating_lobby ) {
-      // net_client.Host();
-      net.Host();
+      auto host = Network::Host();
+      host.Run();
       creating_lobby = false;
     }
 
     if ( joining_lobby ) {
-      net.Client();
+      auto client = Network::Client();
+      client.Run();
       joining_lobby = false;
     }
 
@@ -270,7 +270,7 @@ int main( void ) {
   }
 
   // TODO move this into the Exit function
-  net.Exit();
+  // net.Exit();
 
   // Perform clean up and teardown
   Exit( Global::texture_cache );
