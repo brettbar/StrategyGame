@@ -2,6 +2,7 @@
   Authored by Brett Barinaga on 11/29/21. Copyright (c) Brett Barinaga, All
 rights reserved.
 */
+#include "steam/isteamnetworkingutils.h"
 #include "steam/steam_api.h"
 
 
@@ -16,6 +17,7 @@ rights reserved.
 #include "shared/textures.hpp"
 
 
+#include "steam/steam_api_common.h"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
@@ -30,6 +32,7 @@ rights reserved.
 
 #include "shared/utils.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 
@@ -62,8 +65,8 @@ int main( void ) {
   bool campaign_to_load = false;
   bool hit_exit = false;
   bool fresh_start = true;
-  bool hosting_mp = false;
-  bool joining_mp = false;
+  bool creating_lobby = false;
+  bool joining_lobby = false;
 
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
@@ -105,6 +108,8 @@ int main( void ) {
   SettlementSystem::Init();
   Commands::Listen();
 
+  Network net = Network();
+
   if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
     return EXIT_FAILURE;
@@ -115,10 +120,10 @@ int main( void ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_host_game" ) {
-          hosting_mp = true;
+          creating_lobby = true;
         }
         else if ( event.msg == "main_menu_join_game" ) {
-          joining_mp = true;
+          joining_lobby = true;
         }
         else if ( event.msg == "main_menu_resume_game" ) {
           UI::EnableCampaignUI();
@@ -148,12 +153,18 @@ int main( void ) {
       }
     );
 
-    if ( hosting_mp ) {
-      auto host = Network::Host();
-      host.Setup();
+    if ( creating_lobby ) {
+      // net_client.Host();
+      net.Host();
+      creating_lobby = false;
     }
 
-    if ( joining_mp ) {}
+    if ( joining_lobby ) {
+      net.Client();
+      joining_lobby = false;
+    }
+
+    SteamAPI_RunCallbacks();
 
     // Check and prep for campaign load
     if ( campaign_to_load ) {
@@ -257,6 +268,9 @@ int main( void ) {
       } break;
     }
   }
+
+  // TODO move this into the Exit function
+  net.Exit();
 
   // Perform clean up and teardown
   Exit( Global::texture_cache );
@@ -545,6 +559,7 @@ void LoadResources() {
 }
 
 void Exit( TextureCache &cache ) {
+
   // @TODO figure out all deallocs or whatever
 
   UnloadShader( Renderer::shader );
@@ -554,6 +569,8 @@ void Exit( TextureCache &cache ) {
   }
 
   cache.clear();
+
   SteamAPI_Shutdown();
+
   CloseWindow();// Close window and OpenGL context
 }

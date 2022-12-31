@@ -1,40 +1,85 @@
-#include "steam/isteammatchmaking.h"
+#pragma once
+
+#include "steam/steam_api_common.h"
+#include "steam/steamnetworkingtypes.h"
 #include <steam/steam_api.h>
 
-
 #include <assert.h>
-
+#include <chrono>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <thread>
+
+struct Network {
+
+  STEAM_CALLBACK(
+    Network,
+    OnNetConnectionStatusChanged,
+    SteamNetConnectionStatusChangedCallback_t
+  );
+
+  HSteamListenSocket socket;
 
 
-#include <iostream>
+  static void DebugOutput(
+    ESteamNetworkingSocketsDebugOutputType eType,
+    const char *pszMsg
+  ) {
+    printf( "%s\n", pszMsg );
+  }
 
 
-namespace Network {
+  void Host() {
+    SteamNetworkingIdentity identity_local;
+    identity_local.Clear();
+    identity_local.SetLocalHost();
 
-inline CSteamID lobby_id;
+    SteamNetworkingUtils()->InitRelayNetworkAccess();
+
+    SteamNetworkingUtils()->SetDebugOutputFunction(
+      k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
+    );
+
+    socket = SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
 
 
-// typedef void (*FSteamNetworkingSocketsDebugOutput)( ESteamNetworkingSocketsDebugOutputType nType, const char *pszMsg );
+    // HSteamNetPollGroup poll_grp = SteamNetworkingSockets()->CreatePollGroup();
+  }
 
-struct Host {
+  void Client() {
+    SteamNetworkingIdentity identity_remote;
+    identity_remote.Clear();
+    identity_remote.SetLocalHost();
 
-  inline void Setup() {
+    SteamNetworkingUtils()->InitRelayNetworkAccess();
 
-    SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, 2 );
-    LobbyCreated_t lobby_data = LobbyCreated_t();
+    SteamNetworkingUtils()->SetDebugOutputFunction(
+      k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
+    );
 
-    lobby_id = lobby_data.m_ulSteamIDLobby;
+    HSteamNetConnection conn =
+      SteamNetworkingSockets()->ConnectP2P( identity_remote, 0, 0, nullptr );
+  }
 
-    SteamMatchmaking()->SetLobbyJoinable( lobby_data.m_ulSteamIDLobby, true );
+  void Exit() {
+    printf( "Closing socket\n" );
+    SteamNetworkingSockets()->CloseListenSocket( socket );
   }
 };
 
-struct Client {
-  inline void Setup() {
-    SteamMatchmaking()->JoinLobby( lobby_id );
-  }
-};
+inline void Network::OnNetConnectionStatusChanged(
+  SteamNetConnectionStatusChangedCallback_t *pCallback
+) {
+  printf( "OnNetConnectionStatusChanged()!!!" );
+  HSteamNetConnection conn = pCallback->m_hConn;
+  SteamNetConnectionInfo_t info = pCallback->m_info;
+  ESteamNetworkingConnectionState old_state = pCallback->m_eOldState;
+  ESteamNetworkingConnectionState new_state = info.m_eState;
 
-};// namespace Network
+  if ( info.m_hListenSocket && old_state == k_ESteamNetworkingConnectionState_None && new_state == k_ESteamNetworkingConnectionState_Connecting ) {
+
+  }
+}
