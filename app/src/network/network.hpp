@@ -17,6 +17,8 @@
 
 namespace Network {
 
+inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
+
 static void DebugOutput(
   ESteamNetworkingSocketsDebugOutputType eType,
   const char *pszMsg
@@ -24,20 +26,17 @@ static void DebugOutput(
   printf( "%s\n", pszMsg );
 }
 
-inline void
-OnNetConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t *cb ) {
-  printf( "!!!!!!!OnNetConnectionStatusChanged\n" );
-
-  SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
-}
 
 inline void Setup() {
   SteamNetworkingUtils()->SetDebugOutputFunction(
     k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
   );
 
-  SteamNetworkingUtils()->SetGlobalCallback_SteamNetConnectionStatusChanged(
-    OnNetConnectionStatusChanged
+  SteamNetworkingUtils()->InitRelayNetworkAccess();
+
+  // Remove auth
+  SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+    k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
   );
 }
 
@@ -50,6 +49,18 @@ inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
 
   assert( r == k_EResultOK );
 }
+
+struct ClientConnectionData {
+  bool active;
+  CSteamID steam_user_id;
+  // uint64 tick_count_last_data;
+  HSteamNetConnection conn;
+
+  ClientConnectionData() {
+    active = false;
+    conn = 0;
+  }
+};
 
 
 // struct Client {

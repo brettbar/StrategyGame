@@ -1,37 +1,68 @@
 #pragma once
 
 #include "network.hpp"
+#include "steam/isteammatchmaking.h"
+#include "steam/isteamnetworkingsockets.h"
 #include "steam/steam_api_common.h"
+#include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
+#include "steam/steamtypes.h"
 
 namespace Network {
 
+
 struct Host {
-  // STEAM_CALLBACK(
-  //   Host,
-  //   OnHostNetConnectionStatusChanged,
-  //   SteamNetConnectionStatusChangedCallback_t
-  // );
+  CSteamID _lobby_id;
+  CSteamID _server_id;
 
-  HSteamListenSocket socket;
-  HSteamNetConnection conn;
-
-  CSteamID steam_lobby_id;
+  ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+  HSteamListenSocket _socket;
 
   void OnLobbyCreated( LobbyCreated_t *, bool );
   CCallResult<Host, LobbyCreated_t> result_lobby_created;
 
   STEAM_CALLBACK( Host, OnLobbyChatMsg, LobbyChatMsg_t );
 
-  //   STEAM_CALLBACK(
-  //     Host,
-  //     OnNetConnectionStatusChanged,
-  //     SteamNetConnectionStatusChangedCallback_t
-  //   );
+  STEAM_CALLBACK(
+    Host,
+    OnNetConnectionStatusChanged,
+    SteamNetConnectionStatusChangedCallback_t
+  );
+
+  Host() {
+    // zero the client connection data
+    memset( &_clients, 0, sizeof( _clients ) );
+
+
+    // poll_grp = SteamNetworkingSockets()->CreatePollGroup();
+
+    // make this if debug
+    SetupUsingIP();
+  }
 
   ~Host() {
     // Close connection
     printf( "~Host()\n" );
+
+    SteamNetworkingSockets()->CloseListenSocket( _socket );
+    // SteamNetworkingSockets()->DestroyPollGroup( poll_grp );
+  }
+
+  // This is useful for localhost testing on the same machine
+  void SetupUsingIP() {
+    SteamNetworkingIPAddr addr = SteamNetworkingIPAddr();
+    addr.SetIPv6LocalHost( 10202 );
+
+    printf( "Hosting with addr: %d\n", addr.GetIPv4() );
+    _socket =
+      SteamNetworkingSockets()->CreateListenSocketIP( addr, 0, nullptr );
+    assert( _socket != k_HSteamListenSocket_Invalid );
+  }
+
+  // This is useful for real production, different machines
+  void SetupUsingP2P() {
+    _socket = SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
+    assert( _socket != k_HSteamListenSocket_Invalid );
   }
 
 
@@ -42,22 +73,22 @@ struct Host {
     result_lobby_created.Set( steam_api_call, this, &Host::OnLobbyCreated );
   }
 
-  void CheckForMessages() {
-    if ( conn != k_HSteamNetConnection_Invalid ) {
-      SteamNetworkingMessage_t *msg;
-      int r =
-        SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
+  // void CheckForMessages() {
+  //   if ( conn != k_HSteamNetConnection_Invalid ) {
+  //     SteamNetworkingMessage_t *msg;
+  //     int r =
+  //       SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
 
-      assert( r == 0 || r == 1 );
+  //     assert( r == 0 || r == 1 );
 
-      if ( r == 1 ) {
-        printf( "Host >> Received message '%s'\n", (char *) msg->GetData() );
-        msg->Release();
+  //     if ( r == 1 ) {
+  //       printf( "Host >> Received message '%s'\n", (char *) msg->GetData() );
+  //       msg->Release();
 
-        SendMessageToPeer( conn, "Host >> Hey client, I got your message\n" );
-      }
-    }
-  }
+  //       SendMessageToPeer( conn, "Host >> Hey client, I got your message\n" );
+  //     }
+  //   }
+  // }
 };
 
 
@@ -65,16 +96,14 @@ inline void Host::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
   if ( cb->m_eResult == k_EResultOK ) {
     printf( "Lobby created successfully\n" );
 
-    steam_lobby_id = cb->m_ulSteamIDLobby;
+    _lobby_id = cb->m_ulSteamIDLobby;
 
     char rgchLobbyName[256];
     sprintf_s( rgchLobbyName, "%s's lobby", SteamFriends()->GetPersonaName() );
-    SteamMatchmaking()->SetLobbyData( steam_lobby_id, "name", rgchLobbyName );
+    SteamMatchmaking()->SetLobbyData( _lobby_id, "name", rgchLobbyName );
     printf( "Hosting lobby %s\n", rgchLobbyName );
 
     // TODO Move to after a player is found
-    socket = SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
-    assert( socket != k_HSteamListenSocket_Invalid );
   }
   else {
     printf( "Failed to create lobby, lost connection to steam back-end\n" );
@@ -87,7 +116,71 @@ inline void Host::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
     param->m_ulSteamIDLobby, param->m_iChatID, nullptr, buf, sizeof( buf ), NULL
   );
 
-  printf( "Host >> ChatMsg found: %s\n", buf );
+  printf( "> %s\n", buf );
+}
+
+inline void Host::OnNetConnectionStatusChanged(
+  SteamNetConnectionStatusChangedCallback_t *cb
+) {
+  printf( "Host >> !!!!!!!OnNetConnectionStatusChanged\n" );
+
+  SteamNetConnectionInfo_t info = cb->m_info;
+  ESteamNetworkingConnectionState old_state = cb->m_eOldState;
+
+  if ( info.m_eState == k_ESteamNetworkingConnectionState_Connecting && old_state == k_ESteamNetworkingConnectionState_None ) {
+    printf( "Accepting client connection\n" );
+
+    for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      if ( !_clients[i].active ) {
+        EResult res = SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
+
+        if ( res != k_EResultOK ) {
+          char msg[256];
+          sprintf_s( msg, "AcceptConnection returned %d", res );
+          printf( "%s\n", msg );
+
+          SteamNetworkingSockets()->CloseConnection(
+            cb->m_hConn,
+            k_ESteamNetConnectionEnd_AppException_Generic,
+            "Failed to accept connection",
+            false
+          );
+          return;
+        }
+
+        _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
+        _clients[i].active = true;
+        _clients[i].conn = cb->m_hConn;
+
+        SendMessageToPeer(
+          cb->m_hConn, "Host >> Hey Client, I'll let you in \n"
+        );
+      }
+    }
+
+    printf( "Rejecting connection; server full\n" );
+    SteamNetworkingSockets()->CloseConnection(
+      cb->m_hConn,
+      k_ESteamNetConnectionEnd_AppException_Generic,
+      "Server full!",
+      false
+    );
+  }
+  // check if client has disconnected
+  else if ( ( old_state == k_ESteamNetworkingConnectionState_Connecting || old_state == k_ESteamNetworkingConnectionState_Connected ) && info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ) {
+    for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      if ( !_clients[i].active )
+        continue;
+
+      if ( _clients[i].steam_user_id == info.m_identityRemote.GetSteamID() ) {
+        printf( "Disconnected dropped user\n" );
+
+        SteamNetworkingSockets()->CloseConnection(
+          _clients[i].conn, k_ESteamNetConnectionEnd_App_Min + 1, nullptr, false
+        );
+      }
+    }
+  }
 }
 
 };// namespace Network

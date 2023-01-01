@@ -1,6 +1,8 @@
 #pragma once
 
 #include "network.hpp"
+#include "steam/isteammatchmaking.h"
+#include "steam/isteamnetworkingsockets.h"
 #include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
 
@@ -8,7 +10,12 @@ namespace Network {
 
 
 struct Client {
-  HSteamNetConnection conn;
+  CSteamID _player_ids[MAX_PLAYERS_PER_SERVER];
+  CSteamID _server_id;
+  CSteamID _lobby_id;
+  HSteamNetConnection _server_conn;
+
+  SteamNetworkingIdentity remote;
 
   void OnLobbyMatchList( LobbyMatchList_t *, bool );
   CCallResult<Client, LobbyMatchList_t> result_lobby_match_list;
@@ -17,9 +24,23 @@ struct Client {
   CCallResult<Client, LobbyEnter_t> result_lobby_entered;
 
   STEAM_CALLBACK( Client, OnLobbyChatMsg, LobbyChatMsg_t );
+  STEAM_CALLBACK(
+    Client,
+    OnNetConnectionStatusChanged,
+    SteamNetConnectionStatusChangedCallback_t
+  );
+
+  void InitiateServerConnection( CSteamID );
 
   ~Client() {
     printf( "~Client()\n" );
+    if ( _server_conn != k_HSteamNetConnection_Invalid )
+      SteamNetworkingSockets()->CloseConnection(
+        _server_conn, k_ESteamNetConnectionEnd_App_Min + 1, nullptr, false
+      );
+
+    _server_id = CSteamID();
+    _server_conn = k_HSteamNetConnection_Invalid;
   }
 
   void Init() {
@@ -27,17 +48,6 @@ struct Client {
     result_lobby_match_list.Set(
       steam_api_call, this, &Client::OnLobbyMatchList
     );
-  }
-
-  void Join( CSteamID server_id ) {
-    SteamNetworkingIdentity identity;
-    identity.SetSteamID( server_id );
-
-    conn = SteamNetworkingSockets()->ConnectP2P( identity, 0, 0, nullptr );
-    assert( conn != k_HSteamNetConnection_Invalid );
-
-    printf( "Client::Join()\n" );
-    SendMessageToPeer( conn, "Client >> Hello from Client!!!\n" );
   }
 
   void CheckForMessages() {}
@@ -49,12 +59,10 @@ inline void Client::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
     param->m_ulSteamIDLobby, param->m_iChatID, nullptr, buf, sizeof( buf ), NULL
   );
 
-  printf( "Client >> ChatMsg found: %s\n", buf );
+  printf( "Lobby: %s\n", buf );
 }
 
 inline void Client::OnLobbyMatchList( LobbyMatchList_t *cb, bool io_failure ) {
-  printf( "Client >> OnMatchLobbyList\n" );
-
   for ( uint32 i_lobby = 0; i_lobby < cb->m_nLobbiesMatching; i_lobby++ ) {
     CSteamID steam_lobby_id = SteamMatchmaking()->GetLobbyByIndex( i_lobby );
 
@@ -62,8 +70,6 @@ inline void Client::OnLobbyMatchList( LobbyMatchList_t *cb, bool io_failure ) {
       SteamMatchmaking()->GetLobbyData( steam_lobby_id, "name" );
 
     if ( lobby_name && lobby_name[0] ) {
-      printf( "Client >> Lobby name found: %s\n", lobby_name );
-
       if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
         printf( "Client >> Found %s, attempting join\n", lobby_name );
 
@@ -87,7 +93,7 @@ inline void Client::OnLobbyEntered( LobbyEnter_t *cb, bool io_failure ) {
     return;
   }
 
-  printf( "Client >> Joined the lobby!\n" );
+  _lobby_id = cb->m_ulSteamIDLobby;
 
   char msg[4 * 1024];
   sprintf_s(
@@ -97,12 +103,60 @@ inline void Client::OnLobbyEntered( LobbyEnter_t *cb, bool io_failure ) {
     SteamFriends()->GetPersonaName()
   );
 
-  SteamMatchmaking()->SendLobbyChatMsg(
-    cb->m_ulSteamIDLobby, msg, sizeof( msg )
-  );
+  SteamMatchmaking()->SendLobbyChatMsg( _lobby_id, msg, sizeof( msg ) );
 
-  // TODO might need the servers id instaed of the lobby id
-  Join( cb->m_ulSteamIDLobby );
+  CSteamID owner_id = SteamMatchmaking()->GetLobbyOwner( _lobby_id );
+
+  InitiateServerConnection( owner_id );
+}
+
+inline void Client::OnNetConnectionStatusChanged(
+  SteamNetConnectionStatusChangedCallback_t *cb
+) {
+  printf( "Client >> !!!!!!!OnNetConnectionStatusChanged\n" );
+  printf( "current state is %d\n", cb->m_info.m_eState );
+
+  switch ( cb->m_info.m_eState ) {
+    case k_ESteamNetworkingConnectionState_Connecting: {
+      printf( "Client >> Connecting?...\n" );
+    } break;
+  }
+
+  // SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
+}
+
+inline void Client::InitiateServerConnection( CSteamID owner_id ) {
+  if ( _lobby_id.IsValid() ) {
+    SteamMatchmaking()->LeaveLobby( _lobby_id );
+  }
+
+  _server_id = owner_id;
+
+
+  // This is useful for localhost testing on the same machine
+  SteamNetworkingIPAddr addr;
+  addr.SetIPv6LocalHost( 10202 );
+  printf( "Client listening on addr: %d\n", addr.GetIPv4() );
+  _server_conn =
+    SteamNetworkingSockets()->ConnectByIPAddress( addr, 0, nullptr );
+  if ( _server_conn == k_HSteamNetConnection_Invalid ) {
+    SteamNetworkingSockets()->CloseConnection(
+      _server_conn,
+      k_ESteamNetConnectionEnd_App_Generic,
+      "Failed to join, closing conn\n",
+      false
+    );
+  }
+
+
+  /// This is useful for real production, different machines
+  // SteamNetworkingIdentity identity;
+  // identity.SetSteamID( owner_id );
+  // _server_conn =
+  //   SteamNetworkingSockets()->ConnectP2P( identity, 0, 0, nullptr );
+  // assert( _server_conn != k_HSteamNetConnection_Invalid );
+
+  SendMessageToPeer( _server_conn, "Client >> Hello from Client!!!\n" );
 }
 
 };// namespace Network

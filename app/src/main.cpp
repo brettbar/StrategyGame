@@ -101,8 +101,6 @@ int main( void ) {
 
   SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
 
-  // SteamNetworkingUtils()->InitRelayNetworkAccess();
-
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
   InitWindow( 1920, 1080, "FieldsOfMars" );
@@ -119,8 +117,8 @@ int main( void ) {
   Commands::Listen();
 
   // TODO probably shouldnt instatiate both
-  Network::Host *host = new Network::Host();
-  Network::Client *client = new Network::Client();
+  Network::Host *host = nullptr;
+  Network::Client *client = nullptr;
   Network::Setup();
 
 
@@ -170,13 +168,13 @@ int main( void ) {
     );
 
     if ( creating_lobby && is_host ) {
-      delete client;
+      host = new Network::Host();
       host->Init();
       creating_lobby = false;
     }
 
     if ( joining_lobby && !is_host ) {
-      delete host;
+      client = new Network::Client();
       client->Init();
       joining_lobby = false;
     }
@@ -184,10 +182,9 @@ int main( void ) {
     SteamAPI_RunCallbacks();
 
     if ( is_host ) {
-      host->CheckForMessages();
+      // host->CheckForMessages();
     }
     else {
-
       client->CheckForMessages();
     }
 
