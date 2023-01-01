@@ -13,9 +13,8 @@ struct Client {
   CSteamID _player_ids[MAX_PLAYERS_PER_SERVER];
   CSteamID _server_id;
   CSteamID _lobby_id;
-  HSteamNetConnection _server_conn;
 
-  SteamNetworkingIdentity remote;
+  HSteamNetConnection _server_conn;
 
   void OnLobbyMatchList( LobbyMatchList_t *, bool );
   CCallResult<Client, LobbyMatchList_t> result_lobby_match_list;
@@ -50,7 +49,9 @@ struct Client {
     );
   }
 
-  void CheckForMessages() {}
+  void CheckForMessages() {
+    Network::CheckForMessages( _server_conn );
+  }
 };
 
 inline void Client::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
@@ -113,9 +114,6 @@ inline void Client::OnLobbyEntered( LobbyEnter_t *cb, bool io_failure ) {
 inline void Client::OnNetConnectionStatusChanged(
   SteamNetConnectionStatusChangedCallback_t *cb
 ) {
-  printf( "Client >> !!!!!!!OnNetConnectionStatusChanged\n" );
-  printf( "current state is %d\n", cb->m_info.m_eState );
-
   switch ( cb->m_info.m_eState ) {
     case k_ESteamNetworkingConnectionState_Connecting: {
       printf( "Client >> Connecting?...\n" );
@@ -156,7 +154,7 @@ inline void Client::InitiateServerConnection( CSteamID owner_id ) {
   //   SteamNetworkingSockets()->ConnectP2P( identity, 0, 0, nullptr );
   // assert( _server_conn != k_HSteamNetConnection_Invalid );
 
-  SendMessageToPeer( _server_conn, "Client >> Hello from Client!!!\n" );
+  SendMessageToPeer( _server_conn, "Client >> Hello from Client!!!" );
 }
 
 };// namespace Network

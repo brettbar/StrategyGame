@@ -19,13 +19,24 @@ namespace Network {
 
 inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
+struct ClientConnectionData {
+  bool active;
+  CSteamID steam_user_id;
+  // uint64 tick_count_last_data;
+  HSteamNetConnection conn;
+
+  ClientConnectionData() {
+    active = false;
+    conn = 0;
+  }
+};
+
 static void DebugOutput(
   ESteamNetworkingSocketsDebugOutputType eType,
   const char *pszMsg
 ) {
   printf( "%s\n", pszMsg );
 }
-
 
 inline void Setup() {
   SteamNetworkingUtils()->SetDebugOutputFunction(
@@ -50,97 +61,20 @@ inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
   assert( r == k_EResultOK );
 }
 
-struct ClientConnectionData {
-  bool active;
-  CSteamID steam_user_id;
-  // uint64 tick_count_last_data;
-  HSteamNetConnection conn;
+inline void CheckForMessages( HSteamNetConnection conn ) {
+  if ( conn != k_HSteamNetConnection_Invalid ) {
+    SteamNetworkingMessage_t *msg;
+    int r =
+      SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
 
-  ClientConnectionData() {
-    active = false;
-    conn = 0;
+    assert( r == 0 || r == 1 );
+
+    if ( r == 1 ) {
+      printf( "Received message: '%s'\n", (char *) msg->GetData() );
+      msg->Release();
+    }
   }
-};
+}
 
-
-// struct Client {
-//   STEAM_CALLBACK(
-//     Client,
-//     OnClientNetConnectionStatusChanged,
-//     SteamNetConnectionStatusChangedCallback_t
-//   );
-
-//   HSteamListenSocket socket;
-//   HSteamNetConnection conn;
-
-//   void Run() {
-//     SteamNetworkingIdentity identity_remote;
-
-
-//     printf(
-//       "Client:: My ID is %lld, I think the server's is %lld\n",
-//       SteamUser()->GetSteamID().ConvertToUint64(),
-//       identity_remote.GetSteamID64()
-//     );
-
-//     SteamNetworkingUtils()->SetDebugOutputFunction(
-//       k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
-//     );
-
-//     conn =
-//       SteamNetworkingSockets()->ConnectP2P( identity_remote, 0, 0, nullptr );
-
-//     printf( "End of run...\n" );
-//   }
-// };
-
-
-// void Exit() {
-//   printf( "Closing socket\n" );
-//   SteamNetworkingSockets()->CloseListenSocket( socket );
-// }
-
-
-// inline void Host::OnHostNetConnectionStatusChanged(
-//   SteamNetConnectionStatusChangedCallback_t *pCallback
-// ) {
-//   printf( "Host::OnNetConnectionStatusChanged()!!!\n" );
-
-//   HSteamNetConnection conn = pCallback->m_hConn;
-//   SteamNetConnectionInfo_t info = pCallback->m_info;
-//   ESteamNetworkingConnectionState old_state = pCallback->m_eOldState;
-//   ESteamNetworkingConnectionState new_state = info.m_eState;
-
-//   if ( info.m_hListenSocket && old_state == k_ESteamNetworkingConnectionState_None && new_state == k_ESteamNetworkingConnectionState_Connecting ) {
-//     EResult res = SteamNetworkingSockets()->AcceptConnection( conn );
-//     if ( res != k_EResultOK ) {
-//       printf( "AcceptConnection returned %d", res );
-//       SteamNetworkingSockets()->CloseConnection(
-//         conn,
-//         k_ESteamNetConnectionEnd_AppException_Generic,
-//         "Failed to accept connecton",
-//         false
-//       );
-//       return;
-//     }
-
-//     const char *msg = "Welcome to the server";
-
-//     SteamNetworkingSockets()->SendMessageToConnection(
-//       conn, msg, strlen( msg ), k_nSteamNetworkingSend_Reliable, nullptr
-//     );
-//   }
-// }
-
-// inline void Client::OnClientNetConnectionStatusChanged(
-//   SteamNetConnectionStatusChangedCallback_t *pCallback
-// ) {
-//   printf( "Client::OnNetConnectionStatusChanged()!!!\n" );
-
-//   HSteamNetConnection conn = pCallback->m_hConn;
-//   SteamNetConnectionInfo_t info = pCallback->m_info;
-//   ESteamNetworkingConnectionState old_state = pCallback->m_eOldState;
-//   ESteamNetworkingConnectionState new_state = info.m_eState;
-// }
 
 };// namespace Network

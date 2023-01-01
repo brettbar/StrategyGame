@@ -182,10 +182,12 @@ int main( void ) {
     SteamAPI_RunCallbacks();
 
     if ( is_host ) {
-      // host->CheckForMessages();
+      if ( host )
+        host->CheckForMessages();
     }
     else {
-      client->CheckForMessages();
+      if ( client )
+        client->CheckForMessages();
     }
 
 

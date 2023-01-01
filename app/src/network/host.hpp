@@ -16,6 +16,7 @@ struct Host {
   CSteamID _server_id;
 
   ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+
   HSteamListenSocket _socket;
 
   void OnLobbyCreated( LobbyCreated_t *, bool );
@@ -65,7 +66,6 @@ struct Host {
     assert( _socket != k_HSteamListenSocket_Invalid );
   }
 
-
   void Init() {
     SteamAPICall_t steam_api_call =
       SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, 2 );
@@ -73,22 +73,14 @@ struct Host {
     result_lobby_created.Set( steam_api_call, this, &Host::OnLobbyCreated );
   }
 
-  // void CheckForMessages() {
-  //   if ( conn != k_HSteamNetConnection_Invalid ) {
-  //     SteamNetworkingMessage_t *msg;
-  //     int r =
-  //       SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
+  void CheckForMessages() {
+    for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      if ( !_clients[i].active )
+        continue;
 
-  //     assert( r == 0 || r == 1 );
-
-  //     if ( r == 1 ) {
-  //       printf( "Host >> Received message '%s'\n", (char *) msg->GetData() );
-  //       msg->Release();
-
-  //       SendMessageToPeer( conn, "Host >> Hey client, I got your message\n" );
-  //     }
-  //   }
-  // }
+      Network::CheckForMessages( _clients[i].conn );
+    }
+  }
 };
 
 
@@ -122,13 +114,24 @@ inline void Host::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
 inline void Host::OnNetConnectionStatusChanged(
   SteamNetConnectionStatusChangedCallback_t *cb
 ) {
-  printf( "Host >> !!!!!!!OnNetConnectionStatusChanged\n" );
-
   SteamNetConnectionInfo_t info = cb->m_info;
   ESteamNetworkingConnectionState old_state = cb->m_eOldState;
 
+  if ( _socket == k_HSteamListenSocket_Invalid ) {
+    printf( "Invalid socket, bailing\n" );
+    return;
+  }
+
+  if ( info.m_hListenSocket != _socket ) {
+    printf( "Socket doesn't match?, bailing\n" );
+    return;
+  }
+
+
   if ( info.m_eState == k_ESteamNetworkingConnectionState_Connecting && old_state == k_ESteamNetworkingConnectionState_None ) {
-    printf( "Accepting client connection\n" );
+    printf(
+      "Accepting client connection %s\n", info.m_szConnectionDescription
+    );
 
     for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
       if ( !_clients[i].active ) {
@@ -152,9 +155,9 @@ inline void Host::OnNetConnectionStatusChanged(
         _clients[i].active = true;
         _clients[i].conn = cb->m_hConn;
 
-        SendMessageToPeer(
-          cb->m_hConn, "Host >> Hey Client, I'll let you in \n"
-        );
+        SendMessageToPeer( cb->m_hConn, "Host >> Hey Client, I'll let you in" );
+
+        return;
       }
     }
 
