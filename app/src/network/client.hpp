@@ -119,12 +119,11 @@ inline void Client::OnNetConnectionStatusChanged(
       printf( "Client >> Connecting?...\n" );
     } break;
   }
-
-  // SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
 }
 
 inline void Client::InitiateServerConnection( CSteamID owner_id ) {
   if ( _lobby_id.IsValid() ) {
+    printf( "Initiating connection, can leave lobby now\n" );
     SteamMatchmaking()->LeaveLobby( _lobby_id );
   }
 
@@ -132,11 +131,21 @@ inline void Client::InitiateServerConnection( CSteamID owner_id ) {
 
 
   // This is useful for localhost testing on the same machine
-  SteamNetworkingIPAddr addr;
-  addr.SetIPv6LocalHost( 10202 );
-  printf( "Client listening on addr: %d\n", addr.GetIPv4() );
-  _server_conn =
-    SteamNetworkingSockets()->ConnectByIPAddress( addr, 0, nullptr );
+  if ( LOCAL ) {
+    SteamNetworkingIPAddr addr;
+    addr.SetIPv6LocalHost( 10202 );
+    printf( "Client listening on addr: %d\n", addr.GetIPv4() );
+    _server_conn =
+      SteamNetworkingSockets()->ConnectByIPAddress( addr, 0, nullptr );
+  }
+  /// This is useful for real production, different machines
+  else {
+    SteamNetworkingIdentity identity;
+    identity.SetSteamID( owner_id );
+    _server_conn =
+      SteamNetworkingSockets()->ConnectP2P( identity, 0, 0, nullptr );
+  }
+
   if ( _server_conn == k_HSteamNetConnection_Invalid ) {
     SteamNetworkingSockets()->CloseConnection(
       _server_conn,
@@ -144,15 +153,8 @@ inline void Client::InitiateServerConnection( CSteamID owner_id ) {
       "Failed to join, closing conn\n",
       false
     );
+    return;
   }
-
-
-  /// This is useful for real production, different machines
-  // SteamNetworkingIdentity identity;
-  // identity.SetSteamID( owner_id );
-  // _server_conn =
-  //   SteamNetworkingSockets()->ConnectP2P( identity, 0, 0, nullptr );
-  // assert( _server_conn != k_HSteamNetConnection_Invalid );
 
   SendMessageToPeer( _server_conn, "Client >> Hello from Client!!!" );
 }

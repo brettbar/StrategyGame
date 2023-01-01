@@ -38,7 +38,10 @@ struct Host {
     // poll_grp = SteamNetworkingSockets()->CreatePollGroup();
 
     // make this if debug
-    SetupUsingIP();
+    if ( LOCAL )
+      SetupUsingIP();
+    else
+      SetupUsingP2P();
   }
 
   ~Host() {

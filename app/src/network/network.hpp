@@ -19,6 +19,9 @@ namespace Network {
 
 inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
+// TODO this should have a better system later, but for now it will do
+inline const bool LOCAL = true;
+
 struct ClientConnectionData {
   bool active;
   CSteamID steam_user_id;
@@ -45,10 +48,11 @@ inline void Setup() {
 
   SteamNetworkingUtils()->InitRelayNetworkAccess();
 
+  // TODO see if I can remove this
   // Remove auth
-  SteamNetworkingUtils()->SetGlobalConfigValueInt32(
-    k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
-  );
+  // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+  //   k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
+  // );
 }
 
 inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
