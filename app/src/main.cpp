@@ -26,7 +26,10 @@ rights reserved.
 #include "world/systems/settlement_system.hpp"
 #include "world/systems/spawn_system.hpp"
 
+#include "network/client.hpp"
+#include "network/host.hpp"
 #include "network/network.hpp"
+
 
 #include "interface/ui_system.hpp"
 
@@ -65,8 +68,12 @@ int main( void ) {
   bool campaign_to_load = false;
   bool hit_exit = false;
   bool fresh_start = true;
+
   bool creating_lobby = false;
   bool joining_lobby = false;
+  // TODO could cause issues by not getting reset
+  bool is_host = false;
+
 
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
@@ -86,12 +93,15 @@ int main( void ) {
     return EXIT_FAILURE;
   }
 
+
   if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
     return EXIT_FAILURE;
   }
 
   SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
+
+  // SteamNetworkingUtils()->InitRelayNetworkAccess();
 
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
@@ -108,6 +118,11 @@ int main( void ) {
   SettlementSystem::Init();
   Commands::Listen();
 
+  // TODO probably shouldnt instatiate both
+  Network::Host *host = new Network::Host();
+  Network::Client *client = new Network::Client();
+  Network::Setup();
+
 
   if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
@@ -120,9 +135,11 @@ int main( void ) {
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_host_game" ) {
           creating_lobby = true;
+          is_host = true;
         }
         else if ( event.msg == "main_menu_join_game" ) {
           joining_lobby = true;
+          is_host = false;
         }
         else if ( event.msg == "main_menu_resume_game" ) {
           UI::EnableCampaignUI();
@@ -152,19 +169,28 @@ int main( void ) {
       }
     );
 
-    if ( creating_lobby ) {
-      auto host = Network::Host();
-      host.Run();
+    if ( creating_lobby && is_host ) {
+      delete client;
+      host->Init();
       creating_lobby = false;
     }
 
-    if ( joining_lobby ) {
-      auto client = Network::Client();
-      client.Run();
+    if ( joining_lobby && !is_host ) {
+      delete host;
+      client->Init();
       joining_lobby = false;
     }
 
     SteamAPI_RunCallbacks();
+
+    if ( is_host ) {
+      host->CheckForMessages();
+    }
+    else {
+
+      client->CheckForMessages();
+    }
+
 
     // Check and prep for campaign load
     if ( campaign_to_load ) {
@@ -270,7 +296,11 @@ int main( void ) {
   }
 
   // TODO move this into the Exit function
-  // net.Exit();
+  // Delete host and client
+  if ( host )
+    delete host;
+  if ( client )
+    delete client;
 
   // Perform clean up and teardown
   Exit( Global::texture_cache );
