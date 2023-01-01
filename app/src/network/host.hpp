@@ -18,6 +18,7 @@ struct Host {
   ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
 
   HSteamListenSocket _socket;
+  // HSteamNetPollGroup _poll_grp;
 
   void OnLobbyCreated( LobbyCreated_t *, bool );
   CCallResult<Host, LobbyCreated_t> result_lobby_created;
@@ -35,7 +36,7 @@ struct Host {
     memset( &_clients, 0, sizeof( _clients ) );
 
 
-    // poll_grp = SteamNetworkingSockets()->CreatePollGroup();
+    // _poll_grp = SteamNetworkingSockets()->CreatePollGroup();
 
     // make this if debug
     if ( LOCAL )

@@ -13,9 +13,7 @@ inline void Update( State & );
 inline void UpdateSettlement( Settlement::Component & );
 inline bool UpdatePopulation( Settlement::Component & );
 inline void UpdateSprawl( Settlement::Component & );
-
 inline void Draw( TextureCache &, bool );
-
 
 inline void Init() {
   Image buildings =

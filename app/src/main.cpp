@@ -53,6 +53,8 @@ void UpdateOnFrame();
 void Update60TPS();
 void Update1TPS();
 
+void RunGameLoop();
+
 void StartCampaign();
 void LoadCampaign();
 
@@ -64,26 +66,6 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
 }
 
 int main( void ) {
-  bool campaign_started = false;
-  bool campaign_to_load = false;
-  bool hit_exit = false;
-  bool fresh_start = true;
-
-  bool creating_lobby = false;
-  bool joining_lobby = false;
-  // TODO could cause issues by not getting reset
-  bool is_host = false;
-
-
-  f32 MS_PER_UPDATE = 1 / 60.0;
-  f32 ONCE_A_SECOND = 1;
-  f32 oncelag = 0.0f;
-  f32 lag = 0.0f;
-  f32 dt = 0.0f;
-
-  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
-  SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
-
   if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
     return EXIT_FAILURE;
   }
@@ -103,6 +85,8 @@ int main( void ) {
 
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
+  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
   UI::EnableMainMenuUI();
@@ -110,22 +94,58 @@ int main( void ) {
   // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
 
-  // TODO this really doesnt need to be in SettlementSystem
-  // its just loading images into textures, it should
-  // be organized differently
-  SettlementSystem::Init();
-  Commands::Listen();
-
-  // TODO probably shouldnt instatiate both
-  Network::Host *host = nullptr;
-  Network::Client *client = nullptr;
-  Network::Setup();
-
 
   if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
     return EXIT_FAILURE;
   }
+
+  // This call will block and run until the game exists
+  RunGameLoop();
+
+  // Perform clean up and teardown
+  // @TODO figure out all deallocs or whatever
+  UnloadShader( Renderer::shader );
+  for ( auto resource: Global::texture_cache ) {
+    UnloadTexture( resource.second->texture );
+  }
+  Global::texture_cache.clear();
+  SteamAPI_Shutdown();
+  CloseWindow();// Close window and OpenGL context
+
+  return EXIT_SUCCESS;
+}
+
+void RunGameLoop() {
+  bool campaign_started = false;
+  bool campaign_to_load = false;
+  bool hit_exit = false;
+  bool fresh_start = true;
+
+  bool creating_lobby = false;
+  bool joining_lobby = false;
+  // TODO could cause issues by not getting reset
+  bool is_host = false;
+
+
+  f32 MS_PER_UPDATE = 1 / 60.0;
+  f32 ONCE_A_SECOND = 1;
+  f32 oncelag = 0.0f;
+  f32 lag = 0.0f;
+  f32 dt = 0.0f;
+
+  // LEFTOFF here, prolly wanna move this
+  // Thinking commands should only matter to the game running,
+  // thus could go in the normal start/load sequence
+  // Stuff like ui menu button presses dont need to be commands,
+  // They should be their own thing that doesnt relate to the game simulation
+  Commands::Listen();
+
+  // TODO(refactor)
+  Network::Host *host = nullptr;
+  Network::Client *client = nullptr;
+  Network::Setup();
+
 
   while ( !WindowShouldClose() && !hit_exit ) {
     // TODO this monolithic event handler needs to be handled differently
@@ -140,7 +160,7 @@ int main( void ) {
           is_host = false;
         }
         else if ( event.msg == "main_menu_resume_game" ) {
-          UI::EnableCampaignUI();
+          campaign_to_load = true;
         }
         else if ( event.msg == "main_menu_start_game" ) {
           Global::ClearRegistry();
@@ -300,16 +320,12 @@ int main( void ) {
     delete host;
   if ( client )
     delete client;
-
-  // Perform clean up and teardown
-  Exit( Global::texture_cache );
-
-  return EXIT_SUCCESS;
 }
 
 void StartCampaign() {
   MapSystem::Init();
   PlayerSystem::Init();
+  SettlementSystem::Init();
   ProvinceSystem::Init();
   Renderer::Init();
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
@@ -587,19 +603,4 @@ void LoadResources() {
   }
 }
 
-void Exit( TextureCache &cache ) {
-
-  // @TODO figure out all deallocs or whatever
-
-  UnloadShader( Renderer::shader );
-
-  for ( auto resource: cache ) {
-    UnloadTexture( resource.second->texture );
-  }
-
-  cache.clear();
-
-  SteamAPI_Shutdown();
-
-  CloseWindow();// Close window and OpenGL context
-}
+void Exit( TextureCache &cache ) {}
