@@ -97,12 +97,21 @@ inline void Client::OnLobbyEntered( LobbyEnter_t *cb, bool io_failure ) {
   _lobby_id = cb->m_ulSteamIDLobby;
 
   char msg[4 * 1024];
+#if _WINDLL
   sprintf_s(
     msg,
     sizeof( msg ),
     "Player %s joined as Client\n",
     SteamFriends()->GetPersonaName()
   );
+#else
+  snprintf(
+    msg,
+    sizeof( msg ),
+    "Player %s joined as Client\n",
+    SteamFriends()->GetPersonaName()
+  );
+#endif
 
   SteamMatchmaking()->SendLobbyChatMsg( _lobby_id, msg, sizeof( msg ) );
 

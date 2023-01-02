@@ -1,12 +1,6 @@
 #pragma once
 
 #include "network.hpp"
-#include "steam/isteammatchmaking.h"
-#include "steam/isteamnetworkingsockets.h"
-#include "steam/steam_api_common.h"
-#include "steam/steamclientpublic.h"
-#include "steam/steamnetworkingtypes.h"
-#include "steam/steamtypes.h"
 
 namespace Network {
 
@@ -95,7 +89,17 @@ inline void Host::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
     _lobby_id = cb->m_ulSteamIDLobby;
 
     char rgchLobbyName[256];
+#if _WINDLL
     sprintf_s( rgchLobbyName, "%s's lobby", SteamFriends()->GetPersonaName() );
+#else
+    snprintf(
+      rgchLobbyName,
+      sizeof( rgchLobbyName ),
+      "%s's lobby",
+      SteamFriends()->GetPersonaName()
+    );
+#endif
+
     SteamMatchmaking()->SetLobbyData( _lobby_id, "name", rgchLobbyName );
     printf( "Hosting lobby %s\n", rgchLobbyName );
 
@@ -143,7 +147,13 @@ inline void Host::OnNetConnectionStatusChanged(
 
         if ( res != k_EResultOK ) {
           char msg[256];
+#if _WINDLL
           sprintf_s( msg, "AcceptConnection returned %d", res );
+#else
+          snprintf( msg, sizeof( msg ), "AcceptConnection returned %d", res );
+#endif
+
+
           printf( "%s\n", msg );
 
           SteamNetworkingSockets()->CloseConnection(

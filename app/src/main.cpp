@@ -2,6 +2,10 @@
   Authored by Brett Barinaga on 11/29/21. Copyright (c) Brett Barinaga, All
 rights reserved.
 */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+
 #include "steam/isteamnetworkingutils.h"
 #include "steam/steam_api.h"
 
