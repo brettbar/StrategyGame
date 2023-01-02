@@ -1,3 +1,8 @@
+// Thinking commands should only matter to the game running,
+// thus could go in the normal start/load sequence
+// Stuff like ui menu button presses dont need to be commands,
+// They should be their own thing that doesnt relate to the game simulation
+
 #pragma once
 
 #include "../world/systems/province_system.hpp"
@@ -34,7 +39,6 @@ inline void HandleTimeChangeRequest( const Command & );
 inline void HandleSpawnRequest( const Command & );
 
 struct Listener {
-
   void Receive( const Command &cmd ) {
     switch ( cmd.type ) {
       case Type::TimeChange: {

@@ -52,22 +52,19 @@ namespace fs = std::filesystem;
 
 void LoadResources();
 void CameraUpdate( Camera2D &, f32 );
-
 void UpdateOnFrame();
 void Update60TPS();
 void Update1TPS();
-
 void RunGameLoop();
-
 void StartCampaign();
 void LoadCampaign();
-
 void Exit( TextureCache & );
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "S::%d", severity );
   printf( "%s\n", msg );
 }
+
 
 int main( void ) {
   if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
@@ -79,9 +76,13 @@ int main( void ) {
     return EXIT_FAILURE;
   }
 
-
   if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
+    return EXIT_FAILURE;
+  }
+
+  if ( !SteamInput()->Init( false ) ) {
+    printf( "SteamInput()->Init failed.\n" );
     return EXIT_FAILURE;
   }
 
@@ -91,18 +92,10 @@ int main( void ) {
 
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
+  SetExitKey( KEY_NULL );
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
   UI::EnableMainMenuUI();
-
-  // this has to be right before WindowShouldClose() for some reason
-  SetExitKey( KEY_NULL );
-
-
-  if ( !SteamInput()->Init( false ) ) {
-    printf( "SteamInput()->Init failed.\n" );
-    return EXIT_FAILURE;
-  }
 
   // This call will block and run until the game exists
   RunGameLoop();
@@ -131,25 +124,16 @@ void RunGameLoop() {
   // TODO could cause issues by not getting reset
   bool is_host = false;
 
-
   f32 MS_PER_UPDATE = 1 / 60.0;
   f32 ONCE_A_SECOND = 1;
   f32 oncelag = 0.0f;
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
-  // LEFTOFF here, prolly wanna move this
-  // Thinking commands should only matter to the game running,
-  // thus could go in the normal start/load sequence
-  // Stuff like ui menu button presses dont need to be commands,
-  // They should be their own thing that doesnt relate to the game simulation
-  Commands::Listen();
-
   // TODO(refactor)
   Network::Host *host = nullptr;
   Network::Client *client = nullptr;
   Network::Setup();
-
 
   while ( !WindowShouldClose() && !hit_exit ) {
     // TODO this monolithic event handler needs to be handled differently
@@ -215,7 +199,9 @@ void RunGameLoop() {
     }
 
 
-    // Check and prep for campaign load
+    // // Check and prep for campaign load
+    // TODO idk why this has to be called here
+    // or else loading doesnt work
     if ( campaign_to_load ) {
       Global::ClearRegistry();
       SaveSystem::Load();
@@ -332,12 +318,14 @@ void StartCampaign() {
   SettlementSystem::Init();
   ProvinceSystem::Init();
   Renderer::Init();
+  Commands::Listen();
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
 }
 
 void LoadCampaign() {
   MapSystem::Init();
   Renderer::Init();
+  Commands::Listen();
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
       settlement.texture =
