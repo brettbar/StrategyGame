@@ -36,6 +36,8 @@ rights reserved.
 #include <stdlib.h>
 #include <thread>
 
+namespace fs = std::filesystem;
+
 void LoadResources();
 
 

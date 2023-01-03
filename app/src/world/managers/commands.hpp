@@ -36,7 +36,6 @@ struct Queue : entt::dispatcher {
   }
 };
 
-
 class IManager {
   public:
   void PostCommand( Type type, const char *msg ) {
@@ -62,7 +61,6 @@ class IManager {
 
   private:
   IManager() {
-    // TODO don't know if this will work
     this->Listen();
   }
 
