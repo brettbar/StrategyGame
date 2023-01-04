@@ -5,7 +5,37 @@
 namespace Network {
 
 
-struct Host {
+class IHost {
+  public:
+  static IHost *Host() {
+    static IHost instance;
+    return &instance;
+  }
+
+  void Init() {
+    SteamAPICall_t steam_api_call =
+      SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, 2 );
+
+    result_lobby_created.Set( steam_api_call, this, &IHost::OnLobbyCreated );
+  }
+
+  void CheckForMessages() {
+    for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      if ( !_clients[i].active )
+        continue;
+
+      Network::CheckForMessages( _clients[i].conn );
+    }
+  }
+
+  void Delete() {
+    delete this;
+  }
+
+  private:
+  IHost( IHost const & ) = delete;
+  void operator=( const IHost & ) = delete;
+
   CSteamID _lobby_id;
   CSteamID _server_id;
 
@@ -15,17 +45,17 @@ struct Host {
   // HSteamNetPollGroup _poll_grp;
 
   void OnLobbyCreated( LobbyCreated_t *, bool );
-  CCallResult<Host, LobbyCreated_t> result_lobby_created;
+  CCallResult<IHost, LobbyCreated_t> result_lobby_created;
 
-  STEAM_CALLBACK( Host, OnLobbyChatMsg, LobbyChatMsg_t );
+  STEAM_CALLBACK( IHost, OnLobbyChatMsg, LobbyChatMsg_t );
 
   STEAM_CALLBACK(
-    Host,
+    IHost,
     OnNetConnectionStatusChanged,
     SteamNetConnectionStatusChangedCallback_t
   );
 
-  Host() {
+  IHost() {
     // zero the client connection data
     memset( &_clients, 0, sizeof( _clients ) );
 
@@ -39,13 +69,14 @@ struct Host {
       SetupUsingP2P();
   }
 
-  ~Host() {
+  ~IHost() {
     // Close connection
-    printf( "~Host()\n" );
+    printf( "~IHost()\n" );
 
     SteamNetworkingSockets()->CloseListenSocket( _socket );
     // SteamNetworkingSockets()->DestroyPollGroup( poll_grp );
   }
+
 
   // This is useful for localhost testing on the same machine
   void SetupUsingIP() {
@@ -63,26 +94,14 @@ struct Host {
     _socket = SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
     assert( _socket != k_HSteamListenSocket_Invalid );
   }
-
-  void Init() {
-    SteamAPICall_t steam_api_call =
-      SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, 2 );
-
-    result_lobby_created.Set( steam_api_call, this, &Host::OnLobbyCreated );
-  }
-
-  void CheckForMessages() {
-    for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
-      if ( !_clients[i].active )
-        continue;
-
-      Network::CheckForMessages( _clients[i].conn );
-    }
-  }
 };
 
+inline IHost *Host() {
+  return IHost::Host();
+}
 
-inline void Host::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
+
+inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
   if ( cb->m_eResult == k_EResultOK ) {
     printf( "Lobby created successfully\n" );
 
@@ -110,7 +129,7 @@ inline void Host::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
   }
 }
 
-inline void Host::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
+inline void IHost::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
   char buf[4 * 1024];
   SteamMatchmaking()->GetLobbyChatEntry(
     param->m_ulSteamIDLobby, param->m_iChatID, nullptr, buf, sizeof( buf ), NULL
@@ -119,7 +138,7 @@ inline void Host::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
   printf( "> %s\n", buf );
 }
 
-inline void Host::OnNetConnectionStatusChanged(
+inline void IHost::OnNetConnectionStatusChanged(
   SteamNetConnectionStatusChangedCallback_t *cb
 ) {
   SteamNetConnectionInfo_t info = cb->m_info;
@@ -169,7 +188,9 @@ inline void Host::OnNetConnectionStatusChanged(
         _clients[i].active = true;
         _clients[i].conn = cb->m_hConn;
 
-        SendMessageToPeer( cb->m_hConn, "Host >> Hey Client, I'll let you in" );
+        SendMessageToPeer(
+          cb->m_hConn, "IHost >> Hey Client, I'll let you in"
+        );
 
         return;
       }

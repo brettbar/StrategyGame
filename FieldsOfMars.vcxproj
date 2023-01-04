@@ -97,6 +97,10 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy /y /d "$(SolutionDir)include\steam\lib\steam_api64.dll" "$(OutDir)";
+copy /y /d "$(SolutionDir)include\raylib\lib\raylib.lib" "$(OutDir)";</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

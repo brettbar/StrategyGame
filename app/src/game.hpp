@@ -64,8 +64,10 @@ inline void RunGameLoop() {
   AppState *state = new AppState();
 
   // TODO(refactor)
-  Network::Host *host = nullptr;
-  Network::Client *client = nullptr;
+  // Network::Host *host = nullptr;
+  Network::Host();
+  // Network::Client *client = nullptr;
+  Network::Client();
   Network::Setup();
 
 
@@ -73,26 +75,25 @@ inline void RunGameLoop() {
     CheckForEvents( state );
 
     if ( state->creating_lobby && state->is_host ) {
-      host = new Network::Host();
-      host->Init();
+      // host = new Network::Host();
+      Network::Host()->Init();
       state->creating_lobby = false;
     }
 
     if ( state->joining_lobby && !state->is_host ) {
-      client = new Network::Client();
-      client->Init();
+      // client = new Network::Client();
+      // client->Init();
+      Network::Client()->Init();
       state->joining_lobby = false;
     }
 
     SteamAPI_RunCallbacks();
 
     if ( state->is_host ) {
-      if ( host )
-        host->CheckForMessages();
+      Network::Host()->CheckForMessages();
     }
     else {
-      if ( client )
-        client->CheckForMessages();
+      Network::Client()->CheckForMessages();
     }
 
 
@@ -126,10 +127,14 @@ inline void RunGameLoop() {
 
   // TODO move this into the Exit function
   // Delete host and client
-  if ( host )
-    delete host;
-  if ( client )
-    delete client;
+  // if ( host )
+  //   delete host;
+
+  Network::Host()->Delete();
+  Network::Client()->Delete();
+
+  // if ( client )
+  //   delete client;
 
   delete state;
 }
@@ -297,12 +302,12 @@ inline void LoadCampaign() {
 }
 
 
-void UpdateOnFrame() {
+inline void UpdateOnFrame() {
   UI::UpdateOnFrame();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
-void Update60TPS() {
+inline void Update60TPS() {
   auto animated_units =
     Global::world.view<Unit::Component, Animated::Component>();
 
@@ -314,7 +319,7 @@ void Update60TPS() {
   //  Terrain::UpdateFOW(reg);
 }
 
-void Update1TPS() {
+inline void Update1TPS() {
   auto settlements =
     Global::world.view<Province::Component, Settlement::Component>();
 
@@ -330,7 +335,7 @@ void Update1TPS() {
   }
 }
 
-void CameraUpdate( Camera2D &camera, f32 dt ) {
+inline void CameraUpdate( Camera2D &camera, f32 dt ) {
   f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
   // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
@@ -363,7 +368,7 @@ void CameraUpdate( Camera2D &camera, f32 dt ) {
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
-Image InitTileOutline() {
+inline Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
