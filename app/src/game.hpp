@@ -70,7 +70,6 @@ inline void RunGameLoop() {
   Network::Client();
   Network::Setup();
 
-
   while ( !WindowShouldClose() && !state->hit_exit ) {
     CheckForEvents( state );
 
@@ -87,8 +86,6 @@ inline void RunGameLoop() {
       state->joining_lobby = false;
     }
 
-    SteamAPI_RunCallbacks();
-
     if ( state->is_host ) {
       Network::Host()->CheckForMessages();
     }
@@ -96,6 +93,7 @@ inline void RunGameLoop() {
       Network::Client()->CheckForMessages();
     }
 
+    SteamAPI_RunCallbacks();
 
     // // Check and prep for campaign load
     // TODO idk why this has to be called here

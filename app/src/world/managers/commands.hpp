@@ -39,11 +39,11 @@ struct Queue : entt::dispatcher {
 class IManager {
   public:
   void PostCommand( Type type, const char *msg ) {
-    _queue.Enqueue( Command{ type, msg } );
+    _queue.Enqueue( { type, msg } );
   }
 
   void PostCommand( Type type, const char *msg, Vector2 pos ) {
-    _queue.Enqueue( Command{ type, msg, pos } );
+    _queue.Enqueue( { type, msg, pos } );
   }
 
   void FireAll() {
