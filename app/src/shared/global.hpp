@@ -1,8 +1,9 @@
 #pragma once
 
 #include "fonts.hpp"
-#include "textures.hpp"
 #include "state.hpp"
+#include "textures.hpp"
+
 
 namespace Global {
 
@@ -18,7 +19,6 @@ inline State state = {
   .mapHeight = 128,
   .timeScale = 0.0f,
   .prevTimeScale = 1.0f,
-  .gameState = GameState::EDITOR,
   .month = 1,
   .year = 4,
   .startYear = 4,

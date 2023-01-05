@@ -105,7 +105,7 @@ void LoadResources() {
   std::string asset_folder = "app/assets/";
 
   LoadResource(
-    hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache
+    hstr{ "tile_outline" }, Campaign::InitTileOutline(), Global::texture_cache
   );
 
   Global::font_cache.load(

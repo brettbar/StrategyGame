@@ -37,14 +37,14 @@ inline void SetContextNull();
 
 
 inline void EnableMainMenuUI() {
-  Global::program_mode = Global::ProgramMode::MainMenu;
+  assert( Global::program_mode == Global::ProgramMode::MainMenu );
   DisableCurrentContent();
   _content = CreateMainMenuUI();
   EnableContent();
 }
 
 inline void EnableCampaignUI() {
-  Global::program_mode = Global::ProgramMode::Campaign;
+  assert( Global::program_mode == Global::ProgramMode::Campaign );
   DisableCurrentContent();
   _content = CreateCampaignUI();
 
@@ -53,7 +53,7 @@ inline void EnableCampaignUI() {
 }
 
 inline void EnableModalMenuUI() {
-  Global::program_mode = Global::ProgramMode::ModalMenu;
+  assert( Global::program_mode == Global::ProgramMode::ModalMenu );
   DisableCurrentContent();
   _content = CreateModalMenuUI();
   EnableContent();

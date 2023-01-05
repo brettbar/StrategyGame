@@ -1,3 +1,5 @@
+// TODO this should be moved or removed
+
 //
 // Created by brett on 1/1/2022.
 //
@@ -5,13 +7,6 @@
 #pragma once
 
 #include "common.hpp"
-
-// TODO remove
-enum class GameState {
-  MENU,
-  EDITOR,
-  GAME,
-};
 
 enum class RunState {
   RUNNING,
@@ -24,7 +19,6 @@ struct State {
   f32 timeScale;
   f32 prevTimeScale;
   Camera2D camera;
-  GameState gameState;
 
   u32 day;
   u32 month;
