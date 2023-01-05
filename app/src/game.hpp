@@ -11,11 +11,8 @@
 
 #include "interface/input.hpp"
 
-#include "app.hpp"
 #include "campaign.hpp"
 
-
-namespace fs = std::filesystem;
 
 void RunMainMenu( GameState * );
 void RunModalMenu();
@@ -23,97 +20,93 @@ void RunModalMenu();
 void CameraUpdate( Camera2D &, f32 );
 void Exit( TextureCache & );
 
+
 /*
 ========================================================
   Main game loop 
 ========================================================
 */
+
 inline void RunGameLoop() {
   GameState *state = new GameState();
+  Campaign *campaign = nullptr;
 
-  // TODO(refactor)
-  // Network::Host *host = nullptr;
-  Network::Host();
-  // Network::Client *client = nullptr;
-  Network::Client();
+  // Network::Host();
+  // Network::Client();
   Network::Setup();
 
-  while ( !WindowShouldClose() && state->GameShouldRun() ) {
+  bool creating_lobby = false;
+  bool joining_lobby = false;
+  bool pending_new_campaign = false;
+  bool pending_load_campaign = false;
+  bool hit_exit = false;
+  bool is_host = false;
+
+  while ( !WindowShouldClose() && !hit_exit ) {
+
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_host_game" ) {
-          // state->creating_lobby = true;
-          // state->is_host = true;
-          state->HostCampaign();
+          creating_lobby = true;
+          // TODO make it so you can host an existing game
+          pending_new_campaign = true;
+          is_host = true;
         }
         else if ( event.msg == "main_menu_join_game" ) {
-          // state->joining_lobby = true;
-          // state->is_host = false;
-          state->JoinCampaign();
+          joining_lobby = true;
+          pending_new_campaign = true;
         }
         else if ( event.msg == "main_menu_resume_game" ) {
-          // state->pending_load_campaign = true;
-          state->LoadCampaign();
+          pending_load_campaign = true;
         }
         else if ( event.msg == "main_menu_start_game" ) {
-          // state->pending_new_campaign = true;
-          state->StartCampaign();
+          pending_new_campaign = true;
         }
         else if ( event.msg == "main_menu_load_game" ) {
-          // state->pending_load_campaign = true;
-          state->LoadCampaign();
+          pending_load_campaign = true;
         }
         else if ( event.msg == "main_menu_exit_game" ) {
-          // state->hit_exit = true;
-          state->ExitCampaign();
+          hit_exit = true;
         }
         else if ( event.msg == "modal_menu_load_game" ) {
-          // state->pending_load_campaign = true;
-
-          // TODO prompt for save before exiting
-          state->LoadCampaign();
+          pending_load_campaign = true;
         }
         else if ( event.msg == "modal_menu_save_game" ) {
           SaveSystem::Save();
-          //state->SaveCampaign();
         }
         else if ( event.msg == "modal_menu_exit_main" ) {
           UI::EnableMainMenuUI();
-          // TODO prompt for save before exiting
-          //state->ExitCampaign():
         }
       }
     );
 
 
-    // if ( state->creating_lobby && state->is_host ) {
-    //   // host = new Network::Host();
-    //   Network::Host()->Init();
-    //   state->creating_lobby = false;
-    // }
+    if ( pending_new_campaign ) {
+      campaign = new Campaign();
+      pending_new_campaign = false;
+    }
+    else if ( pending_load_campaign ) {
+      // campaign = new Campaign();
+      // pending_load_campaign = true;
+    }
 
-    // if ( state->joining_lobby && !state->is_host ) {
-    //   // client = new Network::Client();
-    //   // client->Init();
-    //   Network::Client()->Init();
-    //   state->joining_lobby = false;
-    // }
+    if ( creating_lobby && is_host ) {
+      Network::Host()->Init();
+      creating_lobby = false;
+    }
 
-    // if ( state->is_host ) {
-    //   Network::Host()->CheckForMessages();
-    // }
-    // else {
-    //   Network::Client()->CheckForMessages();
-    // }
+    if ( joining_lobby && !state->is_host ) {
+      Network::Client()->Init();
+      joining_lobby = false;
+    }
 
+    if ( state->is_host ) {
+      Network::Host()->CheckForMessages();
+    }
+    else {
+      Network::Client()->CheckForMessages();
+    }
 
-    // If we are starting a new campaign
-    // if ( !state->in_a_campaign && state->pending_new_campaign ) {
-    // }
-
-    // If we are loading an existing campaign
-    // else if ( !state->in_a_campaign && state->pending_load_campaign ) {
-    // }
 
     SteamAPI_RunCallbacks();
 
@@ -127,7 +120,8 @@ inline void RunGameLoop() {
         break;
 
       case Global::ProgramMode::Campaign:
-        Campaign::Run( state );
+        assert( campaign );
+        campaign->Run( state );
         break;
     }
   }
@@ -143,6 +137,7 @@ inline void RunGameLoop() {
   // if ( client )
   //   delete client;
 
+  delete campaign;
   delete state;
 }
 

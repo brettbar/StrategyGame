@@ -14,29 +14,75 @@
 
 #include "interface/input.hpp"
 
-#include "app.hpp"
+// TODO this is a weird spot to put this, but both game and campaign use it? maybe refactor
+inline void CameraUpdate( Camera2D &camera, f32 dt ) {
+  f32 cameraSpeed = 500.0f;
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
+  if ( IsKeyDown( KEY_D ) )
+    camera.target.x += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    camera.target.y += dt * cameraSpeed / camera.zoom;
+
+  if ( IsKeyDown( KEY_Z ) )
+    camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    camera.zoom += 0.05f;
+
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  camera.zoom += ( mouseWheelDelta * 0.2f );
+  if ( camera.zoom > 8.0f )
+    camera.zoom = 8.0f;
+  else if ( camera.zoom < 0.08f )
+    camera.zoom = 0.08f;
+
+  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
+}
+
+struct GameState {
+  const f32 MS_PER_UPDATE = 1 / 60.0;
+  const f32 ONCE_A_SECOND = 1;
+  f32 oncelag = 0.0f;
+  f32 lag = 0.0f;
+  f32 dt = 0.0f;
+
+  bool is_host = false;
+};
 
 class Campaign {
   public:
-  private:
-  void Start();
-  void Load();
-  void UpdateOnFrame();
-  void Update60TPS();
-  void Update1TPS();
+  Campaign() {
+    Global::program_mode = Global::ProgramMode::Campaign;
+    UI::EnableCampaignUI();
+    Start();
+  }
 
-  inline void Run( GameState *state ) {
-    // 1. Check for init
-    if ( !state->campaign_started && !state->loading_campaign ) {
-      Start();
-      state->campaign_started = true;
-    }
-    else if ( !state->campaign_started && state->loading_campaign ) {
-      Load();
-      state->campaign_started = true;
-      state->loading_campaign = false;
-    }
+  Campaign( const char * ) {
+    // TODO make take in file path
+    SaveSystem::Load();
 
+    Global::program_mode = Global::ProgramMode::Campaign;
+    UI::EnableCampaignUI();
+
+    Load();
+  }
+
+  ~Campaign() {
+    Global::ClearRegistry();
+  }
+
+  void HostCampaign() {}
+
+  void Run( GameState *state ) {
     // Update Time
     state->dt = GetFrameTime();
     state->lag += state->dt;
@@ -85,7 +131,8 @@ class Campaign {
     EndDrawing();
   }
 
-  inline void Start() {
+  private:
+  void Start() {
     MapSystem::Init();
     PlayerSystem::Init();
     SettlementSystem::Init();
@@ -99,7 +146,7 @@ class Campaign {
     // std::cout << EntityIdToString( Global::host_player ) << std::endl;
   }
 
-  inline void Load() {
+  void Load() {
     MapSystem::Init();
     Renderer::Init();
     // Commands::Listen();
@@ -116,12 +163,12 @@ class Campaign {
   }
 
 
-  inline void UpdateOnFrame() {
+  void UpdateOnFrame() {
     UI::UpdateOnFrame();
   }
 
   // TODO: look at all of these and see if any belong in UpdateOnFrame
-  inline void Update60TPS() {
+  void Update60TPS() {
     auto animated_units =
       Global::world.view<Unit::Component, Animated::Component>();
 
@@ -133,7 +180,7 @@ class Campaign {
     //  Terrain::UpdateFOW(reg);
   }
 
-  inline void Update1TPS() {
+  void Update1TPS() {
     auto settlements =
       Global::world.view<Province::Component, Settlement::Component>();
 
@@ -147,25 +194,5 @@ class Campaign {
       Global::state.year++;
       Global::state.month = 1;
     }
-  }
-
-  // TODO(rf) can probably go somewhere else
-  inline Image InitTileOutline() {
-    Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
-
-    // N -> NE
-    ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
-    // NE -> SE
-    ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
-    // SE -> S
-    ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
-    // S -> SW
-    ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
-    // SW -> NW
-    ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
-    // NW -> N
-    ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
-
-    return base;
   }
 };

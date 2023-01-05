@@ -100,12 +100,30 @@ int main( void ) {
   return EXIT_SUCCESS;
 }
 
+Image InitTileOutline() {
+  Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
+
+  // N -> NE
+  ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
+  // NE -> SE
+  ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
+  // SE -> S
+  ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
+  // S -> SW
+  ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
+  // SW -> NW
+  ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
+  // NW -> N
+  ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
+
+  return base;
+}
 
 void LoadResources() {
   std::string asset_folder = "app/assets/";
 
   LoadResource(
-    hstr{ "tile_outline" }, Campaign::InitTileOutline(), Global::texture_cache
+    hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache
   );
 
   Global::font_cache.load(
