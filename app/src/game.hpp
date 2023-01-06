@@ -56,9 +56,6 @@ inline void RunGameLoop() {
           joining_lobby = true;
           pending_new_campaign = true;
         }
-        else if ( event.msg == "main_menu_resume_game" ) {
-          pending_load_campaign = true;
-        }
         else if ( event.msg == "main_menu_start_game" ) {
           pending_new_campaign = true;
         }
@@ -76,18 +73,23 @@ inline void RunGameLoop() {
         }
         else if ( event.msg == "modal_menu_exit_main" ) {
           UI::EnableMainMenuUI();
+          Global::program_mode = Global::ProgramMode::MainMenu;
         }
       }
     );
 
 
     if ( pending_new_campaign ) {
+      if ( campaign )
+        delete campaign;
       campaign = new Campaign();
       pending_new_campaign = false;
     }
     else if ( pending_load_campaign ) {
-      // campaign = new Campaign();
-      // pending_load_campaign = true;
+      if ( campaign )
+        delete campaign;
+      campaign = new Campaign( "output.dat" );
+      pending_load_campaign = false;
     }
 
     if ( creating_lobby && is_host ) {

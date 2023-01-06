@@ -80,8 +80,6 @@ class Campaign {
     Global::ClearRegistry();
   }
 
-  void HostCampaign() {}
-
   void Run( GameState *state ) {
     // Update Time
     state->dt = GetFrameTime();
