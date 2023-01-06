@@ -24,7 +24,6 @@ class Campaign {
 
   public:
   Campaign() {
-    Global::program_mode = Global::ProgramMode::Campaign;
     UI::EnableCampaignUI();
     Start();
   }
@@ -33,7 +32,6 @@ class Campaign {
     // TODO make take in file path
     SaveSystem::Load();
 
-    Global::program_mode = Global::ProgramMode::Campaign;
     UI::EnableCampaignUI();
 
     Load();

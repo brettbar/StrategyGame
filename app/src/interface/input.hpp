@@ -27,16 +27,10 @@ namespace Input {
 
 inline void CheckMenuToggle() {
   if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-    if ( Global::program_mode == Global::ProgramMode::Campaign ) {
-      Global::program_mode = Global::ProgramMode::ModalMenu;
-      UI::EnableModalMenuUI();
-    }
-    else if ( Global::program_mode == Global::ProgramMode::ModalMenu ) {
-      Global::program_mode = Global::ProgramMode::Campaign;
-      UI::EnableCampaignUI();
-    }
+    Events::event_emitter.publish( Events::UIEvent{ "toggle_modal_menu" } );
   }
 }
+
 
 inline void Handle() {
   Vector2 click_pos =
@@ -71,13 +65,6 @@ inline void Handle() {
       Commands::Type::Spawn, "Player spawn City", click_pos
     );
   }
-
-  // if ( IsKeyPressed( KEY_GRAVE ) ) {
-  //   if ( Global::state.gameState == GameState::GAME )
-  //     Global::state.gameState = GameState::EDITOR;
-  //   else if ( Global::state.gameState == GameState::EDITOR )
-  //     Global::state.gameState = GameState::GAME;
-  // }
 
   if ( IsMouseButtonPressed( 0 ) ) {
     if ( !UI::MouseIsOverUI() )

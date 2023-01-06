@@ -27,6 +27,13 @@ void Exit( TextureCache & );
 ========================================================
 */
 
+enum class ProgramMode {
+  MainMenu,
+  ModalMenu,
+  Campaign,
+  Editor,
+};
+
 inline void RunGameLoop() {
   Campaign *campaign = nullptr;
 
@@ -43,6 +50,8 @@ inline void RunGameLoop() {
   f32 oncelag = 0.0f;
   f32 lag = 0.0f;
   f32 dt = 0.0f;
+
+  ProgramMode program_mode = ProgramMode::MainMenu;
 
   while ( !WindowShouldClose() && !hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
@@ -74,7 +83,17 @@ inline void RunGameLoop() {
         }
         else if ( event.msg == "modal_menu_exit_main" ) {
           UI::EnableMainMenuUI();
-          Global::program_mode = Global::ProgramMode::MainMenu;
+          program_mode = ProgramMode::MainMenu;
+        }
+        else if ( event.msg == "toggle_modal_menu" ) {
+          if ( program_mode == ProgramMode::Campaign ) {
+            program_mode = ProgramMode::ModalMenu;
+            UI::EnableModalMenuUI();
+          }
+          else if ( program_mode == ProgramMode::ModalMenu ) {
+            program_mode = ProgramMode::Campaign;
+            UI::EnableCampaignUI();
+          }
         }
       }
     );
@@ -84,12 +103,14 @@ inline void RunGameLoop() {
       if ( campaign )
         delete campaign;
       campaign = new Campaign();
+      program_mode = ProgramMode::Campaign;
       pending_new_campaign = false;
     }
     else if ( pending_load_campaign ) {
       if ( campaign )
         delete campaign;
       campaign = new Campaign( "output.dat" );
+      program_mode = ProgramMode::Campaign;
       pending_load_campaign = false;
     }
 
@@ -113,16 +134,16 @@ inline void RunGameLoop() {
 
     SteamAPI_RunCallbacks();
 
-    switch ( Global::program_mode ) {
-      case Global::ProgramMode::MainMenu:
+    switch ( program_mode ) {
+      case ProgramMode::MainMenu:
         RunMainMenu( dt );
         break;
 
-      case Global::ProgramMode::ModalMenu:
+      case ProgramMode::ModalMenu:
         RunModalMenu();
         break;
 
-      case Global::ProgramMode::Campaign:
+      case ProgramMode::Campaign:
         assert( campaign );
         campaign->Run( dt, lag, oncelag );
         break;
@@ -145,7 +166,7 @@ inline void RunGameLoop() {
 
 
 inline void RunMainMenu( f32 dt ) {
-  Input::Handle();
+  // Input::Handle();
 
   UI::UpdateOnFrame();
 
