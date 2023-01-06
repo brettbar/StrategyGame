@@ -14,7 +14,7 @@
 #include "campaign.hpp"
 
 
-void RunMainMenu( GameState * );
+void RunMainMenu( f32 );
 void RunModalMenu();
 
 void CameraUpdate( Camera2D &, f32 );
@@ -28,11 +28,8 @@ void Exit( TextureCache & );
 */
 
 inline void RunGameLoop() {
-  GameState *state = new GameState();
   Campaign *campaign = nullptr;
 
-  // Network::Host();
-  // Network::Client();
   Network::Setup();
 
   bool creating_lobby = false;
@@ -42,8 +39,12 @@ inline void RunGameLoop() {
   bool hit_exit = false;
   bool is_host = false;
 
-  while ( !WindowShouldClose() && !hit_exit ) {
+  // TODO these lags might need to be moved to Campaign
+  f32 oncelag = 0.0f;
+  f32 lag = 0.0f;
+  f32 dt = 0.0f;
 
+  while ( !WindowShouldClose() && !hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
         if ( event.msg == "main_menu_host_game" ) {
@@ -97,12 +98,12 @@ inline void RunGameLoop() {
       creating_lobby = false;
     }
 
-    if ( joining_lobby && !state->is_host ) {
+    if ( joining_lobby && !is_host ) {
       Network::Client()->Init();
       joining_lobby = false;
     }
 
-    if ( state->is_host ) {
+    if ( is_host ) {
       Network::Host()->CheckForMessages();
     }
     else {
@@ -114,7 +115,7 @@ inline void RunGameLoop() {
 
     switch ( Global::program_mode ) {
       case Global::ProgramMode::MainMenu:
-        RunMainMenu( state );
+        RunMainMenu( dt );
         break;
 
       case Global::ProgramMode::ModalMenu:
@@ -123,7 +124,7 @@ inline void RunGameLoop() {
 
       case Global::ProgramMode::Campaign:
         assert( campaign );
-        campaign->Run( state );
+        campaign->Run( dt, lag, oncelag );
         break;
     }
   }
@@ -140,16 +141,15 @@ inline void RunGameLoop() {
   //   delete client;
 
   delete campaign;
-  delete state;
 }
 
 
-inline void RunMainMenu( GameState *state ) {
+inline void RunMainMenu( f32 dt ) {
   Input::Handle();
 
   UI::UpdateOnFrame();
 
-  CameraUpdate( Global::state.camera, state->dt );
+  CameraUpdate( Global::state.camera, dt );
 
   BeginDrawing();
   {
@@ -173,4 +173,84 @@ inline void RunModalMenu() {
     Renderer::DrawUI();
   }
   EndDrawing();
+}
+
+// TODO A bit weird to put this here instead of in campaign
+inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
+  // 1. Update Time
+  dt = GetFrameTime();
+  lag += dt;
+  oncelag += dt;
+
+  // 2. Check for Input
+  Input::CheckMenuToggle();
+  Input::Handle();
+
+  // 3. Process all commands
+  Commands::Manager()->FireAll();
+
+  // 5. Run all Updates
+  {
+    // Update 60 times a second
+    while ( lag >= _MS_PER_UPDATE ) {
+      Update60TPS();
+      lag -= _MS_PER_UPDATE;
+    }
+
+    // Update once per second
+    while ( oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+      Update1TPS();
+      oncelag = 0.0f;
+    }
+
+    // Update once per frame
+    UpdateOnFrame();
+
+    // Update Camera
+    CameraUpdate( Global::state.camera, dt );
+  }
+
+  // 6. Draw everything
+  BeginDrawing();
+  {
+    Renderer::Draw( Global::texture_cache );
+    Renderer::DrawUI();
+
+    DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+    DrawFPS( GetScreenWidth() - 100, 2 );
+  }
+  EndDrawing();
+}
+
+inline void CameraUpdate( Camera2D &camera, f32 dt ) {
+  f32 cameraSpeed = 500.0f;
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
+  if ( IsKeyDown( KEY_D ) )
+    camera.target.x += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    camera.target.y += dt * cameraSpeed / camera.zoom;
+
+  if ( IsKeyDown( KEY_Z ) )
+    camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    camera.zoom += 0.05f;
+
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  camera.zoom += ( mouseWheelDelta * 0.2f );
+  if ( camera.zoom > 8.0f )
+    camera.zoom = 8.0f;
+  else if ( camera.zoom < 0.08f )
+    camera.zoom = 0.08f;
+
+  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
