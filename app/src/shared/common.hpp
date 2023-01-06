@@ -1,12 +1,16 @@
 #pragma once
 
 // TODO see which of these includes can be removed
+#include <entt/entt.hpp>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <nlohmann/json.hpp>
 #include <raylib.h>
 #include <raymath.h>
-#include <vector>
-#include <entt/entt.hpp>
-#include <map>
 #include <string>
+#include <vector>
+
 
 using ECS = entt::registry;
 using u32 = unsigned int;

@@ -5,10 +5,6 @@
 #include "../components/ai.hpp"
 #include "../components/player.hpp"
 
-#include <fstream>
-
-#include <nlohmann/json.hpp>
-
 #include "spawn_system.hpp"
 
 namespace PlayerSystem {
