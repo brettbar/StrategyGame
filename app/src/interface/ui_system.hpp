@@ -10,8 +10,10 @@
 #include "../world/systems/selection_system.hpp"
 
 #include "content/campaign_ui.hpp"
+#include "content/faction_select_menu.hpp"
 #include "content/main_menu_ui.hpp"
 #include "content/modal_menu_ui.hpp"
+
 
 #include "actions.hpp"
 #include "ui_utils.hpp"
@@ -53,6 +55,12 @@ inline void EnableCampaignUI() {
 inline void EnableModalMenuUI() {
   DisableCurrentContent();
   _content = CreateModalMenuUI();
+  EnableContent();
+}
+
+inline void EnableFactionSelectMenuUI() {
+  DisableCurrentContent();
+  _content = CreateFactionSelectMenuUI();
   EnableContent();
 }
 

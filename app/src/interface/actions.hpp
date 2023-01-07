@@ -5,6 +5,7 @@
 #include "../shared/events.hpp"
 #include "../world/systems/settlement_system.hpp"
 
+
 #include "components/panel.hpp"
 #include "components/texture_elements.hpp"
 #include "ui_lookup.hpp"
@@ -63,7 +64,9 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
     "settlement_context_tab_garrison",
     []() { printf( "Settlement tab button pressed\n" ); },
   },
-  // Main Menu
+  /*======================================================/
+                        Main Menu
+  /======================================================*/
   {
 
     "main_menu_host_game",
@@ -114,7 +117,68 @@ inline std::map<std::string, std::function<void()>> action_lookup = {
       } );
     },
   },
-  // Modal Menu
+  /*======================================================/
+                      Faction Select Menu
+  /======================================================*/
+  {
+    "faction_select_romans",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_romans",
+      } );
+    },
+  },
+  {
+    "faction_select_greeks",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_greeks",
+      } );
+    },
+  },
+  {
+    "faction_select_celts",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_celts",
+      } );
+    },
+  },
+  {
+    "faction_select_punics",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_punics",
+      } );
+    },
+  },
+  {
+    "faction_select_persians",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_persians",
+      } );
+    },
+  },
+  {
+    "faction_select_scythians",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_scythians",
+      } );
+    },
+  },
+  {
+    "faction_select_germans",
+    []() {
+      Events::event_emitter.publish( Events::UIEvent{
+        "faction_select_germans",
+      } );
+    },
+  },
+  /*======================================================/
+                        Modal Menu
+  /======================================================*/
   {
     "modal_menu_load_game",
     []() {
