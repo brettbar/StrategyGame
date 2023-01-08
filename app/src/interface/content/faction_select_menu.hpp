@@ -5,7 +5,54 @@
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"
 
+
 namespace UI {
+
+inline std::vector<entt::entity> CreateFactionButtons() {
+  // TODO replace with read in from json
+  std::map<std::string, Color> factions = {
+    { "romans", RED },
+    { "greeks", BLUE },
+    { "celts", GREEN },
+    { "punics", PURPLE },
+    { "persians", ORANGE },
+    { "scythians", PINK },
+    { "germans", GRAY },
+  };
+  // TODO replace with read in from json
+  std::map<std::string, std::string> full_names = {
+    { "romans", "Roman Republic" },
+    { "greeks", "Greek Cities" },
+    { "celts", "Celtic Tribes" },
+    { "punics", "Punic Colonies" },
+    { "persians", "Persian Empire" },
+    { "scythians", "Scythian Horde" },
+    { "germans", "Germanic Federation" },
+  };
+
+  std::vector<entt::entity> text_buttons = {
+    TextLabel::Create(
+      "faction_select_label", "Select your faction", 32, BLACK, WHITE, false
+    ),
+  };
+
+  for ( const auto &[name, color]: factions ) {
+    std::string id = "faction_select_" + name;
+
+    text_buttons.push_back( TextButton::Create(
+      id,
+      full_names[name],
+      32,
+      color,
+      WHITE,
+      false,
+      true,
+      [id]() { Events::event_emitter.publish( Events::UIEvent{ id } ); }
+    ) );
+  }
+
+  return text_buttons;
+}
 
 inline std::vector<entt::entity> CreateFactionSelectMenuUI() {
   return {
@@ -21,59 +68,10 @@ inline std::vector<entt::entity> CreateFactionSelectMenuUI() {
           ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
         };
       },
-      {
-        TextLabel::Create(
-          "faction_select_label", "Select your faction", 32, BLACK, WHITE, false
-        ),
-        TextButton::Create(
-          "faction_select_romans", "Roman Republic", 32, RED, WHITE, false, true
-        ),
-        TextButton::Create(
-          "faction_select_greeks", "Greek Cities", 32, BLUE, WHITE, false, true
-        ),
-        TextButton::Create(
-          "faction_select_celts", "Celtic Tribes", 32, GREEN, WHITE, false, true
-        ),
-        TextButton::Create(
-          "faction_select_punics",
-          "Phoenician Colonies",
-          32,
-          PURPLE,
-          WHITE,
-          false,
-          true
-        ),
-        TextButton::Create(
-          "faction_select_persians",
-          "Persian Empire",
-          32,
-          ORANGE,
-          WHITE,
-          false,
-          true
-        ),
-        TextButton::Create(
-          "faction_select_scythians",
-          "Scythian Horde",
-          32,
-          PINK,
-          WHITE,
-          false,
-          true
-        ),
-        TextButton::Create(
-          "faction_select_germans",
-          "Germanic Federation",
-          32,
-          GRAY,
-          WHITE,
-          false,
-          true
-        ),
-
-
-      }
+      CreateFactionButtons()
     ),
   };
 }
+
+
 };// namespace UI

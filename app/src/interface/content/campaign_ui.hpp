@@ -8,6 +8,8 @@
 #include "../components/text_elements.hpp"
 #include "../components/texture_elements.hpp"
 
+#include "../ui_utils.hpp"
+
 
 namespace UI {
 
@@ -41,9 +43,29 @@ inline std::vector<entt::entity> CreateCampaignUI() {
           Align::Start,
           Align::Start,
           {
-            TextureButton::Create( "settlement_context_tab_overview", true ),
             TextureButton::Create(
-              "settlement_context_tab_construction", true
+              "settlement_context_tab_overview",
+              true,
+
+              []() {
+                printf( "Settlement tab button pressed\n" );
+                entt::entity content =
+                  lookup.at( "settlement_context_content" );
+                StackPanel &sp = Get<StackPanel>( content );
+                SwitchChild( sp, 0 );
+              }
+            ),
+            TextureButton::Create(
+              "settlement_context_tab_construction",
+              true,
+              []() {
+                printf( "Settlement tab button pressed\n" );
+                entt::entity content =
+                  lookup.at( "settlement_context_content" );
+                StackPanel &sp = Get<StackPanel>( content );
+                SwitchChild( sp, 1 );
+              }
+
             ),
             // TextureButton::Create( "settlement_context_tab_population", true ),
             // TextureButton::Create( "settlement_context_tab_resources", true ),
@@ -134,10 +156,16 @@ inline std::vector<entt::entity> CreateCampaignUI() {
               26,
               PURPLE,
               WHITE,
-              false
-            ),
-            TextButton::Create(
-              "actor_spawn_settlement_button", "IDK?", 26, GREEN, WHITE, false
+              false,
+              []() {
+                printf( "Spawn Settlement clicked!!\n" );
+                SettlementSystem::SpawnSettlement();
+
+                // TODO handle this in main
+                // Events::event_emitter.publish( Events::UIEvent{
+                //   "actor_spawn_settlement_button",
+                // } );
+              }
             ),
           }
         ),

@@ -107,6 +107,7 @@ struct TextButton {
   TextLabel label;
   bool clickable = false;
   bool always_clickable = false;
+  std::function<void()> action;
 
   static entt::entity Create(
     std::string id,
@@ -114,11 +115,13 @@ struct TextButton {
     i32 font_size,
     Color background,
     Color text_color,
-    bool dynamic
+    bool dynamic,
+    std::function<void()> action
   ) {
     entt::entity entity = Global::local.create();
-    TextButton button =
-      TextButton( id, background, text, font_size, text_color, dynamic );
+    TextButton button = TextButton(
+      id, background, text, font_size, text_color, dynamic, action
+    );
 
     Global::local.emplace<TextButton>( entity, button );
     lookup.insert_or_assign( id, entity );
@@ -132,11 +135,13 @@ struct TextButton {
     Color background,
     Color text_color,
     bool dynamic,
-    bool always_clickable
+    bool always_clickable,
+    std::function<void()> action
   ) {
     entt::entity entity = Global::local.create();
-    TextButton button =
-      TextButton( id, background, text, font_size, text_color, dynamic );
+    TextButton button = TextButton(
+      id, background, text, font_size, text_color, dynamic, action
+    );
 
     button.always_clickable = always_clickable;
     button.clickable = always_clickable;
@@ -161,6 +166,10 @@ struct TextButton {
       clickable = clickable_lookup.at( label.elem.id )();
   }
 
+  void Action() {
+    action();
+  }
+
   private:
   TextButton(
     std::string id,
@@ -168,7 +177,8 @@ struct TextButton {
     std::string text,
     i32 font_size,
     Color text_color,
-    bool dynamic
+    bool dynamic,
+    std::function<void()> action
   )
       : label( TextLabel(
           id,
@@ -178,7 +188,8 @@ struct TextButton {
           font_size,
           text_color,
           dynamic
-        ) ) {}
+        ) ),
+        action( action ) {}
 };
 
 };// namespace UI

@@ -3,11 +3,11 @@
 #include "../include/entt/entt.hpp"
 #include "../world/components/actor.hpp"
 #include "../world/components/animated.hpp"
-#include "../world/components/player.hpp"
 #include "../world/components/province.hpp"
 #include "../world/components/settlement.hpp"
 #include "../world/components/sight.hpp"
 #include "../world/components/unit.hpp"
+#include "../world/systems/player.hpp"
 #include "global.hpp"
 
 #include <cereal/archives/binary.hpp>

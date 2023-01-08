@@ -23,22 +23,89 @@ inline std::vector<entt::entity> CreateMainMenuUI() {
       },
       {
         TextButton::Create(
-          "main_menu_host_game", "Host Game", 32, BLUE, WHITE, false, true
+          "main_menu_host_game",
+          "Host Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() {
+            printf( "Host\n" );
+            Events::event_emitter.publish( Events::UIEvent{
+              "main_menu_host_game",
+            } );
+          }
         ),
         TextButton::Create(
-          "main_menu_join_game", "Join Game", 32, BLUE, WHITE, false, true
+          "main_menu_join_game",
+          "Join Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() {
+            printf( "Join\n" );
+            Events::event_emitter.publish( Events::UIEvent{
+              "main_menu_join_game",
+            } );
+          }
         ),
         TextButton::Create(
-          "main_menu_start_game", "Start Game", 32, BLUE, WHITE, false, true
+          "main_menu_start_game",
+          "Start Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() {
+            printf( "Start\n" );
+            Events::event_emitter.publish( Events::UIEvent{
+              "main_menu_start_game",
+            } );
+          }
         ),
         TextButton::Create(
-          "main_menu_load_game", "Load Game", 32, BLUE, WHITE, false, true
+          "main_menu_load_game",
+          "Load Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() {
+            printf( "Load\n" );
+            Events::event_emitter.publish( Events::UIEvent{
+              "main_menu_load_game",
+            } );
+          }
         ),
         TextButton::Create(
-          "main_menu_settings", "Settings", 32, BLUE, WHITE, false, true
+          "main_menu_settings",
+          "Settings",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() { printf( "Settings\n" ); }
         ),
         TextButton::Create(
-          "main_menu_exit_game", "Exit Game", 32, BLUE, WHITE, false, true
+          "main_menu_exit_game",
+          "Exit Game",
+          32,
+          BLUE,
+          WHITE,
+          false,
+          true,
+          []() {
+            printf( "ExitGame\n" );
+            Events::event_emitter.publish( Events::UIEvent{
+              "main_menu_exit_game",
+            } );
+          }
         ),
       }
     ),

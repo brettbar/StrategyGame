@@ -5,10 +5,9 @@
 #include "world/systems/animation_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
-#include "world/systems/player_system.hpp"
+#include "world/systems/player.hpp"
 #include "world/systems/province_system.hpp"
 #include "world/systems/settlement_system.hpp"
-#include "world/systems/spawn_system.hpp"
 
 #include "renderer/renderer.hpp"
 
@@ -24,16 +23,11 @@ class Campaign {
 
   public:
   Campaign() {
-    UI::EnableCampaignUI();
     Start();
   }
 
   Campaign( const char * ) {
     // TODO make take in file path
-    SaveSystem::Load();
-
-    UI::EnableCampaignUI();
-
     Load();
   }
 
@@ -44,8 +38,6 @@ class Campaign {
   void Run( f32 &, f32 &, f32 & );
 
   private:
-  std::vector<IPlayer> _players;
-
   const f32 _MS_PER_UPDATE = 1 / 60.0;
   const f32 _ONCE_A_SECOND = 1;
 
@@ -57,8 +49,9 @@ class Campaign {
 };
 
 inline void Campaign::Start() {
+  UI::EnableCampaignUI();
   MapSystem::Init();
-  PlayerSystem::Init();
+  Player::System::Init();
   SettlementSystem::Init();
   ProvinceSystem::Init();
   Renderer::Init();
@@ -71,6 +64,8 @@ inline void Campaign::Start() {
 }
 
 inline void Campaign::Load() {
+  SaveSystem::Load();
+  UI::EnableCampaignUI();
   MapSystem::Init();
   Renderer::Init();
   // Commands::Listen();
@@ -100,7 +95,7 @@ inline void Campaign::Update60TPS() {
 
   MovementSystem::Update( animated_units, Global::state.timeScale );
   AnimationSystem::Update( animated_units, Global::state.timeScale );
-  PlayerSystem::Update( players );
+  Player::System::Update( players );
   //  Terrain::UpdateFOW(reg);
 }
 

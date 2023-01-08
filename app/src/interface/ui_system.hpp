@@ -15,7 +15,6 @@
 #include "content/modal_menu_ui.hpp"
 
 
-#include "actions.hpp"
 #include "ui_utils.hpp"
 
 namespace UI {
@@ -344,7 +343,8 @@ inline void RecursiveInteractions(
       std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
       if ( IsClickable( child ) ) {
-        action_lookup.at( GetId( child ) )();
+        // action_lookup.at( GetId( child ) )();
+        DoAction( child );
       }
     }
   }

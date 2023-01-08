@@ -212,4 +212,18 @@ inline bool IsClickable( entt::entity entity ) {
   return false;
 }
 
+inline void DoAction( entt::entity entity ) {
+  if ( Has<TextButton>( entity ) ) {
+
+    auto &button = Get<TextButton>( entity );
+    button.Action();
+  }
+
+
+  if ( Has<TextureButton>( entity ) ) {
+    auto &button = Get<TextureButton>( entity );
+    button.Action();
+  }
+}
+
 };// namespace UI
