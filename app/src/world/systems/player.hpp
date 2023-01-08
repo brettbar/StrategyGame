@@ -5,11 +5,36 @@
 #include "../components/ai.hpp"
 
 namespace Player {
+  inline std::map<std::string, Color> color_map = {
+    { "red", RED },
+    { "gold", GOLD },
+    { "cyan", BLUE },
+    { "green", GREEN },
+    { "white", WHITE },
+    { "purple", PURPLE },
+    { "orange", ORANGE },
+    { "pink", PINK },
+    { "grey", GRAY },
+  };
+
+  struct Faction {
+    std::string id;
+    std::string primary;
+    std::string secondary;
+
+    template<class Archive>
+    void serialize( Archive &ar ) {
+      ar( id, primary, secondary );
+    }
+  };
+
+  // LEFTOFF
+  inline std::map<std::string, Faction> factions = {};
 
   struct Component {
     entt::entity id;
     bool is_human;
-    std::string faction;
+    Faction faction;
 
     template<class Archive>
     void serialize( Archive &ar ) {
@@ -18,9 +43,9 @@ namespace Player {
   };
 
   inline Texture2D DetermineTextureFromFaction( entt::entity owner ) {
-    std::string faction = Global::world.get<Component>( owner ).faction;
-    return Global::texture_cache[hstr{
-                                   ( faction + "_villager_texture" ).c_str() }]
+    std::string faction_id = Global::world.get<Component>( owner ).faction.id;
+    return Global::texture_cache[hstr{ ( faction_id + "_villager_texture" )
+                                         .c_str() }]
       ->texture;
   }
 
@@ -42,8 +67,20 @@ namespace Player {
         nlohmann::json js = nlohmann::json::parse( f );
 
         std::cout << js << std::endl;
-        std::cout << js["romans"] << std::endl;
-        std::cout << js["romans"]["adjectival"] << std::endl;
+        // std::cout << js["romans"] << std::endl;
+        // std::cout << js["romans"]["adjectival"] << std::endl;
+        for ( auto &element: js.items() ) {
+          std::cout << element.key() << std::endl;
+          std::cout << element.value() << std::endl;
+
+          Faction faction = {
+            element.key(),
+            element.value().at( "primary" ),
+            element.value().at( "secondary" ),
+          };
+
+          factions.emplace( element.key(), faction );
+        }
       }
       f.close();
 
