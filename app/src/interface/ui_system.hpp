@@ -10,10 +10,11 @@
 #include "../world/systems/selection_system.hpp"
 
 #include "content/campaign_ui.hpp"
+#include "content/faction_select_menu.hpp"
 #include "content/main_menu_ui.hpp"
 #include "content/modal_menu_ui.hpp"
 
-#include "actions.hpp"
+
 #include "ui_utils.hpp"
 
 namespace UI {
@@ -37,14 +38,12 @@ inline void SetContextNull();
 
 
 inline void EnableMainMenuUI() {
-  Global::program_mode = Global::ProgramMode::MainMenu;
   DisableCurrentContent();
   _content = CreateMainMenuUI();
   EnableContent();
 }
 
 inline void EnableCampaignUI() {
-  Global::program_mode = Global::ProgramMode::Campaign;
   DisableCurrentContent();
   _content = CreateCampaignUI();
 
@@ -53,9 +52,14 @@ inline void EnableCampaignUI() {
 }
 
 inline void EnableModalMenuUI() {
-  Global::program_mode = Global::ProgramMode::ModalMenu;
   DisableCurrentContent();
   _content = CreateModalMenuUI();
+  EnableContent();
+}
+
+inline void EnableFactionSelectMenuUI() {
+  DisableCurrentContent();
+  _content = CreateFactionSelectMenuUI();
   EnableContent();
 }
 
@@ -339,7 +343,8 @@ inline void RecursiveInteractions(
       std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
       if ( IsClickable( child ) ) {
-        action_lookup.at( GetId( child ) )();
+        // action_lookup.at( GetId( child ) )();
+        DoAction( child );
       }
     }
   }

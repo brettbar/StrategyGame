@@ -3,301 +3,101 @@
 rights reserved.
 */
 
-#include "interface/input.hpp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
-#include "renderer/renderer.hpp"
-#include "shared/commands.hpp"
+#include "steam/isteamnetworkingutils.h"
+#include "steam/steam_api.h"
+
+
 #include "shared/common.hpp"
-#include "shared/events.hpp"
 #include "shared/global.hpp"
-#include "shared/save.hpp"
 #include "shared/textures.hpp"
 
-#include "world/systems/animation_system.hpp"
-#include "world/systems/map_system.hpp"
-#include "world/systems/movement_system.hpp"
-#include "world/systems/player_system.hpp"
-#include "world/systems/province_system.hpp"
-#include "world/systems/settlement_system.hpp"
-#include "world/systems/spawn_system.hpp"
+
+#include "steam/steam_api_common.h"
+
+#include "network/client.hpp"
+#include "network/host.hpp"
+#include "network/network.hpp"
+
+#include "game.hpp"
+
 
 #include "interface/ui_system.hpp"
 
 #include "shared/utils.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
-
+#include <stdlib.h>
+#include <thread>
 
 namespace fs = std::filesystem;
 
 void LoadResources();
-void CameraUpdate( Camera2D &, f32 );
 
-void UpdateOnFrame();
-void Update60TPS();
-void Update1TPS();
 
-void StartCampaign();
-void LoadCampaign();
+void SteamAPIDebugTextHook( int severity, const char *msg ) {
+  printf( "S::%d", severity );
+  printf( "%s\n", msg );
+}
 
-void Exit( TextureCache & );
-
+/*
+========================================================
+  Main application entrypoint
+========================================================
+*/
 int main( void ) {
-  bool campaign_started = false;
-  bool campaign_to_load = false;
-  bool hit_exit = false;
-  bool fresh_start = true;
+  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
+    return EXIT_FAILURE;
+  }
 
-  f32 MS_PER_UPDATE = 1 / 60.0;
-  f32 ONCE_A_SECOND = 1;
-  f32 oncelag = 0.0f;
-  f32 lag = 0.0f;
-  f32 dt = 0.0f;
+  if ( !SteamAPI_Init() ) {
+    printf( "SteamAPI_Init() failed!\n" );
+    return EXIT_FAILURE;
+  }
+
+  if ( !SteamUser()->BLoggedOn() ) {
+    printf( "Steam user is not logged in\n" );
+    return EXIT_FAILURE;
+  }
+
+  if ( !SteamInput()->Init( false ) ) {
+    printf( "SteamInput()->Init failed.\n" );
+    return EXIT_FAILURE;
+  }
+
+  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
+
+  printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
-
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
   UI::EnableMainMenuUI();
 
-  // this has to be right before WindowShouldClose() for some reason
   SetExitKey( KEY_NULL );
 
-  // TODO this really doesnt need to be in SettlementSystem
-  // its just loading images into textures, it should
-  // be organized differently
-  SettlementSystem::Init();
-  Commands::Listen();
 
-  while ( !WindowShouldClose() && !hit_exit ) {
-    // TODO this monolithic event handler needs to be handled differently
-    Events::event_emitter.on<Events::UIEvent>(
-      [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-        if ( event.msg == "main_menu_resume_game" ) {
-          UI::EnableCampaignUI();
-        }
-        else if ( event.msg == "main_menu_start_game" ) {
-          Global::ClearRegistry();
-
-          campaign_started = false;
-          UI::EnableCampaignUI();
-          fresh_start = true;
-        }
-        else if ( event.msg == "main_menu_load_game" ) {
-          campaign_to_load = true;
-        }
-        else if ( event.msg == "main_menu_exit_game" ) {
-          hit_exit = true;
-        }
-        else if ( event.msg == "modal_menu_load_game" ) {
-          campaign_to_load = true;
-        }
-        else if ( event.msg == "modal_menu_save_game" ) {
-          SaveSystem::Save();
-        }
-        else if ( event.msg == "modal_menu_exit_main" ) {
-          UI::EnableMainMenuUI();
-        }
-      }
-    );
-
-    // Check and prep for campaign load
-    if ( campaign_to_load ) {
-      Global::ClearRegistry();
-      SaveSystem::Load();
-
-      UI::EnableCampaignUI();
-      campaign_started = false;
-      campaign_to_load = false;
-      fresh_start = false;
-    }
-
-    switch ( Global::program_mode ) {
-      case Global::ProgramMode::MainMenu: {
-        Input::Handle();
-
-        UpdateOnFrame();
-
-        CameraUpdate( Global::state.camera, dt );
-
-        BeginDrawing();
-        {
-          ClearBackground( BLACK );
-          Renderer::DrawUI();
-        }
-        EndDrawing();
-      } break;
-
-      case Global::ProgramMode::ModalMenu: {
-        Input::CheckMenuToggle();
-
-        UpdateOnFrame();
-
-        BeginDrawing();
-        {
-          Renderer::Draw( Global::texture_cache );
-          DrawRectangle(
-            0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-          );
-          Renderer::DrawUI();
-        }
-        EndDrawing();
-      } break;
-
-      case Global::ProgramMode::Campaign: {
-        // 1. Check for init
-        if ( !campaign_started && fresh_start ) {
-          StartCampaign();
-          campaign_started = true;
-        }
-        else if ( !campaign_started && !fresh_start ) {
-          LoadCampaign();
-          campaign_started = true;
-        }
-
-        // Update Time
-        dt = GetFrameTime();
-        lag += dt;
-        oncelag += dt;
-
-        // 2. Check for Input
-        Input::CheckMenuToggle();
-        Input::Handle();
-
-        // 3. Check for network traffic if multiplayer
-
-        // 4. Process all commands
-        Commands::FireAll();
-
-        // 5. Run all Updates
-        {
-          // Update 60 times a second
-          while ( lag >= MS_PER_UPDATE ) {
-            Update60TPS();
-            lag -= MS_PER_UPDATE;
-          }
-
-          // Update once per second
-          while ( oncelag >= ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-            Update1TPS();
-            oncelag = 0.0f;
-          }
-
-          // Update once per frame
-          UpdateOnFrame();
-
-          // Update Camera
-          CameraUpdate( Global::state.camera, dt );
-        }
-
-        // 6. Draw everything
-        BeginDrawing();
-        {
-          Renderer::Draw( Global::texture_cache );
-          Renderer::DrawUI();
-
-          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-          DrawFPS( GetScreenWidth() - 100, 2 );
-        }
-        EndDrawing();
-      } break;
-    }
-  }
+  // This call will block and run until the game exists
+  RunGameLoop();
 
   // Perform clean up and teardown
-  Exit( Global::texture_cache );
-
-  return 0;
-}
-
-void StartCampaign() {
-  MapSystem::Init();
-  PlayerSystem::Init();
-  ProvinceSystem::Init();
-  Renderer::Init();
-  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
-}
-
-void LoadCampaign() {
-  MapSystem::Init();
-  Renderer::Init();
-  Global::world.view<Settlement::Component>().each(
-    []( Settlement::Component &settlement ) {
-      settlement.texture =
-        LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
-    }
-  );
-  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
-}
-
-void UpdateOnFrame() {
-  UI::UpdateOnFrame();
-}
-
-// TODO: look at all of these and see if any belong in UpdateOnFrame
-void Update60TPS() {
-  auto animated_units =
-    Global::world.view<Unit::Component, Animated::Component>();
-
-  auto players = Global::world.view<Player::Component>();
-
-  MovementSystem::Update( animated_units, Global::state.timeScale );
-  AnimationSystem::Update( animated_units, Global::state.timeScale );
-  PlayerSystem::Update( players );
-  //  Terrain::UpdateFOW(reg);
-}
-
-void Update1TPS() {
-  auto settlements =
-    Global::world.view<Province::Component, Settlement::Component>();
-
-  SettlementSystem::Update( settlements, Global::state );
-
-  Global::state.day++;
-
-  if ( Global::state.month < 12 )
-    Global::state.month++;
-  else {
-    Global::state.year++;
-    Global::state.month = 1;
+  // @TODO figure out all deallocs or whatever
+  UnloadShader( Renderer::shader );
+  for ( auto resource: Global::texture_cache ) {
+    UnloadTexture( resource.second->texture );
   }
-}
+  Global::texture_cache.clear();
+  SteamAPI_Shutdown();
+  CloseWindow();// Close window and OpenGL context
 
-void CameraUpdate( Camera2D &camera, f32 dt ) {
-  f32 cameraSpeed = 500.0f;
-  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
-  // PrintVec2(target);
-
-  // camera.offset = target;
-
-  if ( IsKeyDown( KEY_D ) )
-    camera.target.x += dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_A ) )
-    camera.target.x -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_W ) )
-    camera.target.y -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_S ) )
-    camera.target.y += dt * cameraSpeed / camera.zoom;
-
-  if ( IsKeyDown( KEY_Z ) )
-    camera.zoom -= 0.05f;
-  if ( IsKeyDown( KEY_X ) )
-    camera.zoom += 0.05f;
-
-  f32 mouseWheelDelta = GetMouseWheelMove();
-
-  camera.zoom += ( mouseWheelDelta * 0.2f );
-  if ( camera.zoom > 8.0f )
-    camera.zoom = 8.0f;
-  else if ( camera.zoom < 0.08f )
-    camera.zoom = 0.08f;
-
-  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
+  return EXIT_SUCCESS;
 }
 
 Image InitTileOutline() {
@@ -492,17 +292,4 @@ void LoadResources() {
       Global::texture_cache
     );
   }
-}
-
-void Exit( TextureCache &cache ) {
-  // @TODO figure out all deallocs or whatever
-
-  UnloadShader( Renderer::shader );
-
-  for ( auto resource: cache ) {
-    UnloadTexture( resource.second->texture );
-  }
-
-  cache.clear();
-  CloseWindow();// Close window and OpenGL context
 }

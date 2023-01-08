@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../interface/ui_system.hpp"
 #include "../shared/common.hpp"
 #include "../shared/fonts.hpp"
@@ -71,7 +73,9 @@ inline void Draw( TextureCache &texture_cache ) {
     // Overlay shouldn't be ran through shader?
     OverlaySystem::DrawProvinceOverlays( texture_cache );
     SelectionSystem::Draw(
-      texture_cache, Global::state.gameState == GameState::EDITOR
+      // texture_cache, Global::state.gameState == GameState::EDITOR
+      texture_cache,
+      true
     );
     OverlaySystem::DrawSettlementOverlays( texture_cache );
 
@@ -88,7 +92,10 @@ inline void Draw( TextureCache &texture_cache ) {
       }
 
       // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-      DrawActors( Global::state.gameState == GameState::EDITOR );
+      DrawActors(
+        // Global::state.gameState == GameState::EDITOR
+        true
+      );
     }
     EndShaderMode();
   }

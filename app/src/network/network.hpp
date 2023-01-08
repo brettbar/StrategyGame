@@ -1,57 +1,84 @@
-#include <assert.h>
+#pragma once
 
-#include <stdio.h>
-#include <steam/isteamnetworkingsockets.h>
-#include <steam/isteamnetworkingutils.h>
+#include <steam/isteammatchmaking.h>
+#include <steam/steam_api.h>
+#include <steam/steam_api_common.h>
+#include <steam/steamclientpublic.h>
 #include <steam/steamnetworkingtypes.h>
 
+#include <assert.h>
+#include <chrono>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <thread>
 
 namespace Network {
 
-class Host {
-  int virtual_port_local = 0;// Used when listening and when connecting
+inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
-  SteamNetworkingIdentity identity_local;
-  const char *signal_service_addr;
+// TODO this should have a better system later, but for now it will do
+inline const bool LOCAL = true;
 
-  HSteamListenSocket listen_socket;
-  HSteamNetConnection net_connection;
+struct ClientConnectionData {
+  bool active;
+  CSteamID steam_user_id;
+  // uint64 tick_count_last_data;
+  HSteamNetConnection conn;
 
-
-  Host( const char *addr ) {
-    identity_local.Clear();
-    signal_service_addr = addr;
-  }
-
-  void Listen() {
-    printf(
-      "Identity %s is starting server",
-      SteamNetworkingIdentityRender( identity_local ).c_str()
-    );
-    listen_socket = SteamNetworkingSockets()->CreateListenSocketP2P(
-      virtual_port_local, 0, nullptr
-    );
-    assert( listen_socket != k_HSteamListenSocket_Invalid );
+  ClientConnectionData() {
+    active = false;
+    conn = 0;
   }
 };
 
-class Client {
-  SteamNetworkingIdentity identity_remote;
-  int virtual_port_remote = 0;// Only used when connecting
+static void DebugOutput(
+  ESteamNetworkingSocketsDebugOutputType eType,
+  const char *pszMsg
+) {
+  printf( "%s\n", pszMsg );
+}
 
+inline void Setup() {
+  SteamNetworkingUtils()->SetDebugOutputFunction(
+    k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
+  );
 
-  Client() {
-    identity_remote.Clear();
+  SteamNetworkingUtils()->InitRelayNetworkAccess();
+
+  // TODO see if I can remove this
+  // Remove auth
+  // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+  //   k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
+  // );
+}
+
+inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
+  printf( "Sending msg '%s'\n", msg );
+
+  EResult r = SteamNetworkingSockets()->SendMessageToConnection(
+    conn, msg, (int) strlen( msg ) + 1, k_nSteamNetworkingSend_Reliable, nullptr
+  );
+
+  assert( r == k_EResultOK );
+}
+
+inline void CheckForMessages( HSteamNetConnection conn ) {
+  if ( conn != k_HSteamNetConnection_Invalid ) {
+    SteamNetworkingMessage_t *msg;
+    int r =
+      SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
+
+    assert( r == 0 || r == 1 );
+
+    if ( r == 1 ) {
+      printf( "Received message: '%s'\n", (char *) msg->GetData() );
+      msg->Release();
+    }
   }
-
-  void Connect() {
-    printf(
-      "Identity %s is attempting to connect to server",
-      SteamNetworkingIdentityRender( identity_remote ).c_str()
-    );
-    ISteamNetworkingConnectionSignaling
-  }
-};
+}
 
 
 };// namespace Network

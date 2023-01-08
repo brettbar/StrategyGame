@@ -34,78 +34,58 @@ if (UNIX)
      find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
 
      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+ 
+     add_library(steam_api SHARED IMPORTED)
+     set_target_properties(
+       steam_api PROPERTIES
+       IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+       INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
+     )
+
      # For compiler errors/warnings
      # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-     target_link_libraries(${PROJECT_NAME} PRIVATE raylib GameNetworkingSockets)
+     target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api)
      target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 endif(UNIX)
 
 
-if (WIN32)
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+ if (WIN32)
+   set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
-  project(game LANGUAGES CXX)
-
-
-  add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-
-  add_library(raylib STATIC IMPORTED)
-  set_target_properties(
-        raylib PROPERTIES
-        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
-        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
-  )
-
-  find_package(nlohmann_json 3.11.2 REQUIRED)
-
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-  target_link_libraries(
-    ${PROJECT_NAME} 
-    PRIVATE 
-    nlohmann_json::nlohmann_json 
-    raylib 
-    opengl32 
-    gdi32 
-    winmm 
-    -static 
-    )
-  target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-     
-endif(WIN32)
+   project(game LANGUAGES CXX)
 
 
-  # target_link_libraries(${PROJECT_NAME} raylib GameNetworkingSockets)
-  # target_link_libraries(server GameNetworkingSockets)
-  # target_link_libraries(client GameNetworkingSockets)
+   add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-  # target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/lib/libraylib.so.400 m)
-  # target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
-  # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/entt/)
+   add_library(raylib STATIC IMPORTED)
+   set_target_properties(
+         raylib PROPERTIES
+         IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+   )
+   add_library(steam_api SHARED IMPORTED)
+   set_target_properties(
+           steam_api PROPERTIES
+           IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+           INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
+   )
 
+   find_package(nlohmann_json 3.11.2 REQUIRED)
 
-# if (NOT raylib_FOUND) # If there's none, fetch and build raylib
-#     set(CUSTOMIZE_BUILD ON)
-#     set(SUPPORT_FILEFORMAT_BMP ON)
-#   include(FetchContent)
-#   FetchContent_Declare(
-#     raylib
-#     URL https://github.com/raysan5/raylib/archive/refs/tags/4.0.0.tar.gz
-#   )
-#   FetchContent_GetProperties(raylib)
-#   if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
-#     set(FETCHCONTENT_QUIET NO)
-#     FetchContent_Populate(raylib)
-#     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
-#     add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
-#   endif()
-# endif()
+   target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+   target_link_libraries(
+     ${PROJECT_NAME}
+     PRIVATE
+     nlohmann_json::nlohmann_json
+     raylib
+     steam_api
+     opengl32
+     gdi32
+     winmm
+     -static
+     )
+   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
+ endif(WIN32)
 
-# add_executable(
-#   server net/server/server.cpp
-# )
-
-# add_executable(
-#   client net/client/client.cpp
-# )
 
