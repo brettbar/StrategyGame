@@ -40,75 +40,6 @@ struct ProgramState {
   ProgramMode mode = ProgramMode::MainMenu;
 };
 
-inline void CheckInput( ProgramState *pstate ) {
-  Events::event_emitter.on<Events::UIEvent>(
-    [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-      if ( event.msg == "main_menu_host_game" ) {
-        pstate->creating_lobby = true;
-        // TODO make it so you can host an existing game
-        pstate->pending_new_campaign = true;
-        pstate->is_host = true;
-      }
-      else if ( event.msg == "main_menu_join_game" ) {
-        pstate->joining_lobby = true;
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "main_menu_start_game" ) {
-        // pending_new_campaign = true;
-        UI::EnableFactionSelectMenuUI();
-      }
-      else if ( event.msg == "main_menu_load_game" ) {
-        pstate->pending_load_campaign = true;
-      }
-      else if ( event.msg == "main_menu_exit_game" ) {
-        pstate->hit_exit = true;
-      }
-      else if ( event.msg == "modal_menu_load_game" ) {
-        pstate->pending_load_campaign = true;
-      }
-      else if ( event.msg == "modal_menu_save_game" ) {
-        SaveSystem::Save();
-      }
-      else if ( event.msg == "modal_menu_exit_main" ) {
-        UI::EnableMainMenuUI();
-        pstate->mode = ProgramMode::MainMenu;
-      }
-      else if ( event.msg == "toggle_modal_menu" ) {
-        if ( pstate->mode == ProgramMode::Campaign ) {
-          pstate->mode = ProgramMode::ModalMenu;
-          UI::EnableModalMenuUI();
-        }
-        else if ( pstate->mode == ProgramMode::ModalMenu ) {
-          pstate->mode = ProgramMode::Campaign;
-          UI::EnableCampaignUI();
-        }
-      }
-      // TODO refactor this to not be so repetitive
-      else if ( event.msg == "faction_select_romans" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_greeks" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_celts" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_punics" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_persians" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_scythians" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_germans" ) {
-        pstate->pending_new_campaign = true;
-      }
-    }
-  );
-};
-
 inline void RunGameLoop() {
   Campaign *campaign = nullptr;
   ProgramState *pstate = new ProgramState();
@@ -122,10 +53,76 @@ inline void RunGameLoop() {
   f32 dt = 0.0f;
 
   while ( !WindowShouldClose() && !pstate->hit_exit ) {
-    CheckInput( pstate );
-
+    Events::event_emitter.on<Events::UIEvent>(
+      [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
+        if ( event.msg == "main_menu_host_game" ) {
+          pstate->creating_lobby = true;
+          // TODO make it so you can host an existing game
+          pstate->pending_new_campaign = true;
+          pstate->is_host = true;
+        }
+        else if ( event.msg == "main_menu_join_game" ) {
+          pstate->joining_lobby = true;
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "main_menu_start_game" ) {
+          // pending_new_campaign = true;
+          UI::EnableFactionSelectMenuUI();
+        }
+        else if ( event.msg == "main_menu_load_game" ) {
+          pstate->pending_load_campaign = true;
+        }
+        else if ( event.msg == "main_menu_exit_game" ) {
+          pstate->hit_exit = true;
+        }
+        else if ( event.msg == "modal_menu_load_game" ) {
+          pstate->pending_load_campaign = true;
+        }
+        else if ( event.msg == "modal_menu_save_game" ) {
+          SaveSystem::Save();
+        }
+        else if ( event.msg == "modal_menu_exit_main" ) {
+          UI::EnableMainMenuUI();
+          pstate->mode = ProgramMode::MainMenu;
+        }
+        else if ( event.msg == "toggle_modal_menu" ) {
+          if ( pstate->mode == ProgramMode::Campaign ) {
+            pstate->mode = ProgramMode::ModalMenu;
+            UI::EnableModalMenuUI();
+          }
+          else if ( pstate->mode == ProgramMode::ModalMenu ) {
+            pstate->mode = ProgramMode::Campaign;
+            UI::EnableCampaignUI();
+          }
+        }
+        // TODO refactor this to not be so repetitive
+        else if ( event.msg == "faction_select_romans" ) {
+          printf( "faction_select_romans \n" );
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_greeks" ) {
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_celts" ) {
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_punics" ) {
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_persians" ) {
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_scythians" ) {
+          pstate->pending_new_campaign = true;
+        }
+        else if ( event.msg == "faction_select_germans" ) {
+          pstate->pending_new_campaign = true;
+        }
+      }
+    );
 
     if ( pstate->pending_new_campaign ) {
+      printf( "pending new!!\n" );
       if ( campaign )
         delete campaign;
       campaign = new Campaign();
@@ -187,8 +184,10 @@ inline void RunGameLoop() {
   // if ( client )
   //   delete client;
 
-  delete campaign;
-  delete pstate;
+  if ( campaign )
+    delete campaign;
+  if ( pstate )
+    delete pstate;
 }
 
 

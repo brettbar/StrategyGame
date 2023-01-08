@@ -9,13 +9,11 @@ set(SOURCE_FILES
   app/src/main.cpp
   app/src/shared/common.hpp
   app/src/renderer/renderer.hpp
-  app/src/world/systems/player_system.hpp
   app/src/world/systems/map_system.hpp
   app/src/world/systems/province_system.hpp
   app/src/world/systems/movement_system.hpp
   app/src/world/systems/animation_system.hpp
   app/src/world/systems/selection_system.hpp
-  app/src/world/systems/spawn_system.hpp
   app/src/world/systems/actor_system.hpp
   app/src/world/components/actor.hpp
   app/src/world/components/animated.hpp
