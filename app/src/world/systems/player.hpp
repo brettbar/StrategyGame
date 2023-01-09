@@ -93,13 +93,13 @@ namespace Player {
         Global::host_player, Global::host_player, true, "romans"
       );
 
-      entt::entity ai_player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        ai_player, ai_player, false, "celts"
-      );
-      Global::world.emplace<AI::Component>(
-        ai_player, AI::Goal::DevelopSettlements
-      );
+      // entt::entity ai_player = Global::world.create();
+      // Global::world.emplace<Player::Component>(
+      //   ai_player, ai_player, false, "celts"
+      // );
+      // Global::world.emplace<AI::Component>(
+      //   ai_player, AI::Goal::DevelopSettlements
+      // );
     }
 
     inline void Update( View<Player::Component> players ) {

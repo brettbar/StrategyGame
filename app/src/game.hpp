@@ -52,6 +52,8 @@ inline void RunGameLoop() {
   f32 lag = 0.0f;
   f32 dt = 0.0f;
 
+  std::string choice = "";
+
   while ( !WindowShouldClose() && !pstate->hit_exit ) {
     Events::event_emitter.on<Events::UIEvent>(
       [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
@@ -99,24 +101,31 @@ inline void RunGameLoop() {
         else if ( event.msg == "faction_select_romans" ) {
           printf( "faction_select_romans \n" );
           pstate->pending_new_campaign = true;
+          choice = "romans";
         }
         else if ( event.msg == "faction_select_greeks" ) {
           pstate->pending_new_campaign = true;
+          choice = "greeks";
         }
         else if ( event.msg == "faction_select_celts" ) {
           pstate->pending_new_campaign = true;
+          choice = "celts";
         }
         else if ( event.msg == "faction_select_punics" ) {
           pstate->pending_new_campaign = true;
+          choice = "punics";
         }
         else if ( event.msg == "faction_select_persians" ) {
           pstate->pending_new_campaign = true;
+          choice = "persians";
         }
         else if ( event.msg == "faction_select_scythians" ) {
           pstate->pending_new_campaign = true;
+          choice = "scythians";
         }
         else if ( event.msg == "faction_select_germans" ) {
           pstate->pending_new_campaign = true;
+          choice = "germans";
         }
       }
     );
@@ -126,6 +135,12 @@ inline void RunGameLoop() {
       if ( campaign )
         delete campaign;
       campaign = new Campaign();
+
+      Global::host_player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        Global::host_player, Global::host_player, true, choice
+      );
+
       pstate->mode = ProgramMode::Campaign;
       pstate->pending_new_campaign = false;
     }
