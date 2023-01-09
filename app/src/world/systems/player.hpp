@@ -30,7 +30,6 @@ namespace Player {
     }
   };
 
-  // LEFTOFF
   inline std::map<std::string, Faction> factions = {};
 
   struct Component {
@@ -87,11 +86,6 @@ namespace Player {
         }
       }
       f.close();
-
-      Global::host_player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        Global::host_player, Global::host_player, true, "romans"
-      );
 
       // entt::entity ai_player = Global::world.create();
       // Global::world.emplace<Player::Component>(
