@@ -19,12 +19,14 @@ namespace Player {
 
   struct Faction {
     std::string id;
-    std::string primary;
-    std::string secondary;
+    std::string primary_color;
+    std::string secondary_color;
+    std::string adjectival;
+    std::string denonym;
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( id, primary, secondary );
+      ar( id, primary_color, secondary_color, adjectival, denonym );
     }
   };
 
@@ -75,8 +77,10 @@ namespace Player {
 
           Faction faction = {
             element.key(),
-            element.value().at( "primary" ),
-            element.value().at( "secondary" ),
+            element.value().at( "primary_color" ),
+            element.value().at( "secondary_color" ),
+            element.value().at( "adjectival" ),
+            element.value().at( "denonym" ),
           };
 
           factions.emplace( element.key(), faction );

@@ -13,12 +13,6 @@
 
 #include "interface/input.hpp"
 
-// TODO we might wanna replace Player and the Player component stuff
-// with this
-struct IPlayer {
-  const char *id;
-};
-
 class Campaign {
 
   public:
