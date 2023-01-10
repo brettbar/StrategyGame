@@ -10,20 +10,17 @@ namespace UI {
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
-    bool abs_pos = false;
-    bool abs_size = false;
-    std::function<Vector2()> update_pos;
-    std::function<Vector2()> update_size;
+    std::function<void( Panel & )> update;
     std::vector<entt::entity> children;
 
-    // Absolute-Positioned
-    static entt::entity CreateAbsPos(
+    // With update
+    static entt::entity CreateDynamic(
       std::string id,
       Color background,
       Axis children_axis,
       Align children_horiz_align,
       Align children_vert_align,
-      std::function<Vector2()> update_pos,
+      std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     ) {
       entt::entity entity = Global::local.create();
@@ -34,70 +31,7 @@ namespace UI {
         children_horiz_align,
         children_vert_align,
         true,
-        false,
-        update_pos,
-        {},
-        children
-      );
-
-      Global::local.emplace<Panel>( entity, panel );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
-    // // Absolute-Sized
-    static entt::entity CreateAbsSize(
-      std::string id,
-      Color background,
-      Axis children_axis,
-      Align children_horiz_align,
-      Align children_vert_align,
-      std::function<Vector2()> update_size,
-      std::vector<entt::entity> children
-    ) {
-      entt::entity entity = Global::local.create();
-      Panel panel = Panel(
-        id,
-        background,
-        children_axis,
-        children_horiz_align,
-        children_vert_align,
-        false,
-        true,
-        {},
-        update_size,
-        children
-      );
-
-      Global::local.emplace<Panel>( entity, panel );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
-    // Absolute-Sized and Positioned
-    static entt::entity Create(
-      std::string id,
-      Color background,
-      Axis children_axis,
-      Align children_horiz_align,
-      Align children_vert_align,
-      bool abs_pos,
-      bool abs_size,
-      std::function<Vector2()> update_pos,
-      std::function<Vector2()> update_size,
-      std::vector<entt::entity> children
-    ) {
-      entt::entity entity = Global::local.create();
-      Panel panel = Panel(
-        id,
-        background,
-        children_axis,
-        children_horiz_align,
-        children_vert_align,
-        abs_pos,
-        abs_size,
-        update_pos,
-        update_size,
+        update,
         children
       );
 
@@ -131,20 +65,24 @@ namespace UI {
     }
 
 
-    void Place() {
-      if ( abs_pos ) {
-        Vector2 new_pos = update_pos();
-        elem.transform.x = new_pos.x;
-        elem.transform.y = new_pos.y;
-      }
-    }
+    // void Place() {
+    //   if ( abs_pos ) {
+    //     Vector2 new_pos = update();
+    //     elem.transform.x = new_pos.x;
+    //     elem.transform.y = new_pos.y;
+    //   }
+    // }
 
-    void Resize() {
-      if ( abs_size ) {
-        Vector2 new_size = update_size();
-        elem.transform.width = new_size.x;
-        elem.transform.height = new_size.y;
-      }
+    // void Resize() {
+    //   if ( abs_size ) {
+    //     Vector2 new_size = update();
+    //     elem.transform.width = new_size.x;
+    //     elem.transform.height = new_size.y;
+    //   }
+    // }
+    void Update() {
+      if ( update )
+        update( *this );
     }
 
     void Draw() {
@@ -163,10 +101,8 @@ private:
       Axis children_axis,
       Align children_horiz_align,
       Align children_vert_align,
-      bool absolute_pos,
-      bool resizeable,
-      std::function<Vector2()> update_pos,
-      std::function<Vector2()> update_size,
+      bool absolute,
+      std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     )
         : elem( Element(
@@ -179,9 +115,8 @@ private:
           ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
-          children_vert_align( children_vert_align ), abs_pos( absolute_pos ),
-          abs_size( resizeable ), update_pos( update_pos ),
-          update_size( update_size ), children( children ) {}
+          children_vert_align( children_vert_align ), update( update ),
+          children( children ) {}
 
     // Relative panel
     Panel(
@@ -197,8 +132,7 @@ private:
           ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
-          children_vert_align( children_vert_align ), abs_pos( false ),
-          abs_size( false ), update_pos( {} ), update_size( {} ),
+          children_vert_align( children_vert_align ), update( {} ),
           children( children ){};
   };
 

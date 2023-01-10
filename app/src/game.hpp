@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interface/ui_system.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -60,12 +61,12 @@ inline void RunGameLoop() {
         if ( event.msg == "main_menu_host_game" ) {
           pstate->creating_lobby = true;
           // TODO make it so you can host an existing game
-          pstate->pending_new_campaign = true;
+          // pstate->pending_new_campaign = true;
           pstate->is_host = true;
         }
         else if ( event.msg == "main_menu_join_game" ) {
           pstate->joining_lobby = true;
-          pstate->pending_new_campaign = true;
+          // pstate->pending_new_campaign = true;
         }
         else if ( event.msg == "main_menu_start_game" ) {
           // pending_new_campaign = true;
@@ -153,11 +154,13 @@ inline void RunGameLoop() {
     }
 
     if ( pstate->creating_lobby && pstate->is_host ) {
+      UI::EnableLobby();
       Network::Host()->Init();
       pstate->creating_lobby = false;
     }
 
     if ( pstate->joining_lobby && !pstate->is_host ) {
+      UI::EnableLobby();
       Network::Client()->Init();
       pstate->joining_lobby = false;
     }
