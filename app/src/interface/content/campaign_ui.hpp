@@ -15,7 +15,7 @@ namespace UI {
 
   inline std::vector<entt::entity> CreateCampaignUI() {
     return {
-      Panel::CreateDynamic(
+      Panel::CreateAbsolute(
         "settlement_context_panel",
         Fade( BLACK, 0.5 ),
         Axis::Row,
@@ -123,7 +123,7 @@ namespace UI {
 
         }
       ),
-      Panel::CreateDynamic(
+      Panel::CreateAbsolute(
         "actor_context_panel",
         Fade( BLACK, 0.5 ),
         Axis::Row,

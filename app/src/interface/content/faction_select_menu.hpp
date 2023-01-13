@@ -56,7 +56,7 @@ namespace UI {
 
   inline std::vector<entt::entity> CreateFactionSelectMenuUI() {
     return {
-      Panel::CreateDynamic(
+      Panel::CreateAbsolute(
         "facton_select_menu",
         BLACK,
         Axis::Column,

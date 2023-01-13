@@ -4,17 +4,16 @@
 
 namespace UI {
 
-  // TODO replace update_pos, update_size with one update fn
   struct Panel {
     Element elem;
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
+    bool abs_size = false;
     std::function<void( Panel & )> update;
     std::vector<entt::entity> children;
 
-    // With update
-    static entt::entity CreateDynamic(
+    static entt::entity CreateAbsolute(
       std::string id,
       Color background,
       Axis children_axis,
@@ -101,7 +100,7 @@ private:
       Axis children_axis,
       Align children_horiz_align,
       Align children_vert_align,
-      bool absolute,
+      bool abs_size,
       std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     )
@@ -115,8 +114,8 @@ private:
           ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
-          children_vert_align( children_vert_align ), update( update ),
-          children( children ) {}
+          children_vert_align( children_vert_align ), abs_size( abs_size ),
+          update( update ), children( children ) {}
 
     // Relative panel
     Panel(

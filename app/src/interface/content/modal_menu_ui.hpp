@@ -9,7 +9,7 @@ namespace UI {
 
   inline std::vector<entt::entity> CreateModalMenuUI() {
     return {
-      Panel::CreateDynamic(
+      Panel::CreateAbsolute(
         "modal_menu",
         BLACK,
         Axis::Column,

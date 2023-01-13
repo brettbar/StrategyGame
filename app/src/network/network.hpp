@@ -1,3 +1,5 @@
+// TODO call leave lobby in CLient and Host when appropriate
+
 #pragma once
 
 #include <steam/isteammatchmaking.h>
@@ -17,68 +19,76 @@
 
 namespace Network {
 
-inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
+  inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
-// TODO this should have a better system later, but for now it will do
-inline const bool LOCAL = true;
+  // TODO this should have a better system later, but for now it will do
+  inline const bool LOCAL = true;
 
-struct ClientConnectionData {
-  bool active;
-  CSteamID steam_user_id;
-  // uint64 tick_count_last_data;
-  HSteamNetConnection conn;
+  inline bool is_host = false;
 
-  ClientConnectionData() {
-    active = false;
-    conn = 0;
+  inline CSteamID lobby_id;
+
+  struct ClientConnectionData {
+    bool active;
+    CSteamID steam_user_id;
+    // uint64 tick_count_last_data;
+    HSteamNetConnection conn;
+
+    ClientConnectionData() {
+      active = false;
+      conn = 0;
+    }
+  };
+
+  static void DebugOutput(
+    ESteamNetworkingSocketsDebugOutputType eType,
+    const char *pszMsg
+  ) {
+    printf( "%s\n", pszMsg );
   }
-};
 
-static void DebugOutput(
-  ESteamNetworkingSocketsDebugOutputType eType,
-  const char *pszMsg
-) {
-  printf( "%s\n", pszMsg );
-}
+  inline void Setup() {
+    SteamNetworkingUtils()->SetDebugOutputFunction(
+      k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
+    );
 
-inline void Setup() {
-  SteamNetworkingUtils()->SetDebugOutputFunction(
-    k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
-  );
+    SteamNetworkingUtils()->InitRelayNetworkAccess();
 
-  SteamNetworkingUtils()->InitRelayNetworkAccess();
+    // TODO see if I can remove this
+    // Remove auth
+    // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+    //   k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
+    // );
+  }
 
-  // TODO see if I can remove this
-  // Remove auth
-  // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
-  //   k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
-  // );
-}
+  inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
+    printf( "Sending msg '%s'\n", msg );
 
-inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
-  printf( "Sending msg '%s'\n", msg );
+    EResult r = SteamNetworkingSockets()->SendMessageToConnection(
+      conn,
+      msg,
+      (int) strlen( msg ) + 1,
+      k_nSteamNetworkingSend_Reliable,
+      nullptr
+    );
 
-  EResult r = SteamNetworkingSockets()->SendMessageToConnection(
-    conn, msg, (int) strlen( msg ) + 1, k_nSteamNetworkingSend_Reliable, nullptr
-  );
+    assert( r == k_EResultOK );
+  }
 
-  assert( r == k_EResultOK );
-}
+  inline void CheckForMessages( HSteamNetConnection conn ) {
+    if ( conn != k_HSteamNetConnection_Invalid ) {
+      SteamNetworkingMessage_t *msg;
+      int r =
+        SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
 
-inline void CheckForMessages( HSteamNetConnection conn ) {
-  if ( conn != k_HSteamNetConnection_Invalid ) {
-    SteamNetworkingMessage_t *msg;
-    int r =
-      SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
+      assert( r == 0 || r == 1 );
 
-    assert( r == 0 || r == 1 );
-
-    if ( r == 1 ) {
-      printf( "Received message: '%s'\n", (char *) msg->GetData() );
-      msg->Release();
+      if ( r == 1 ) {
+        printf( "Received message: '%s'\n", (char *) msg->GetData() );
+        msg->Release();
+      }
     }
   }
-}
 
 
 };// namespace Network
