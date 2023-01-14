@@ -24,12 +24,85 @@ public:
       Network::is_host = false;
     }
 
-    void CheckForMessages() {
-      Network::CheckForMessages( _server_conn );
+    void CheckForMessage() {
+      if ( _server_conn != k_HSteamNetConnection_Invalid ) {
+        SteamNetworkingMessage_t *msg;
+        int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
+          _server_conn, &msg, 1
+        );
+
+        assert( r == 0 || r == 1 );
+
+        if ( r == 1 ) {
+          printf( "Received message: '%s'\n", (char *) msg->GetData() );
+          msg->Release();
+        }
+      }
     }
 
     void Delete() {
       delete this;
+    }
+
+    std::vector<CSteamID> GetLobbyList() {
+      std::vector<CSteamID> lobby_list = {};
+
+      for ( uint32 i_lobby = 0; i_lobby < _lobby_list_arr; i_lobby++ ) {
+        CSteamID steam_lobby_id =
+          SteamMatchmaking()->GetLobbyByIndex( i_lobby );
+        const char *lobby_name =
+          SteamMatchmaking()->GetLobbyData( steam_lobby_id, "name" );
+
+        if ( !lobby_name || !lobby_name[0] )
+          continue;
+
+        lobby_list.push_back( steam_lobby_id );
+
+        // printf( "Lobby found: %s \n", lobby_name );
+
+        // if ( lobby_name && lobby_name[0] ) {
+        //   if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
+        //     printf( "IClient >> Found %s, attempting join\n", lobby_name );
+
+        //     SteamAPICall_t steam_api_call =
+        //       SteamMatchmaking()->JoinLobby( steam_lobby_id );
+
+        //     result_lobby_entered.Set(
+        //       steam_api_call, this, &IClient::OnLobbyEntered
+        //     );
+        //   }
+        // }
+        // else {
+        //   SteamMatchmaking()->RequestLobbyData( steam_lobby_id );
+        // }
+      }
+
+      return lobby_list;
+    }
+
+    bool AttemptJoinLobby( CSteamID lobby_id ) {
+      const char *lobby_name =
+        SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
+
+      if ( lobby_name && lobby_name[0] ) {
+        if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
+          printf( "IClient >> Found %s, attempting join\n", lobby_name );
+
+          SteamAPICall_t steam_api_call =
+            SteamMatchmaking()->JoinLobby( lobby_id );
+
+          result_lobby_entered.Set(
+            steam_api_call, this, &IClient::OnLobbyEntered
+          );
+
+          return true;
+        }
+      }
+      else {
+        SteamMatchmaking()->RequestLobbyData( lobby_id );
+      }
+
+      return false;
     }
 
 private:
@@ -41,6 +114,7 @@ private:
     // CSteamID _lobby_id;
 
     HSteamNetConnection _server_conn;
+    u32 _lobby_list_arr;
 
     void OnLobbyMatchList( LobbyMatchList_t *, bool );
     CCallResult<IClient, LobbyMatchList_t> result_lobby_match_list;
@@ -54,6 +128,7 @@ private:
       OnNetConnectionStatusChanged,
       SteamNetConnectionStatusChangedCallback_t
     );
+
 
     void InitiateServerConnection( CSteamID );
 
@@ -90,28 +165,7 @@ private:
 
   inline void
   IClient::OnLobbyMatchList( LobbyMatchList_t *cb, bool io_failure ) {
-    for ( uint32 i_lobby = 0; i_lobby < cb->m_nLobbiesMatching; i_lobby++ ) {
-      CSteamID steam_lobby_id = SteamMatchmaking()->GetLobbyByIndex( i_lobby );
-
-      const char *lobby_name =
-        SteamMatchmaking()->GetLobbyData( steam_lobby_id, "name" );
-
-      if ( lobby_name && lobby_name[0] ) {
-        if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
-          printf( "IClient >> Found %s, attempting join\n", lobby_name );
-
-          SteamAPICall_t steam_api_call =
-            SteamMatchmaking()->JoinLobby( steam_lobby_id );
-
-          result_lobby_entered.Set(
-            steam_api_call, this, &IClient::OnLobbyEntered
-          );
-        }
-      }
-      else {
-        SteamMatchmaking()->RequestLobbyData( steam_lobby_id );
-      }
-    }
+    _lobby_list_arr = cb->m_nLobbiesMatching;
   }
 
   inline void IClient::OnLobbyEntered( LobbyEnter_t *cb, bool io_failure ) {
@@ -155,14 +209,19 @@ private:
       case k_ESteamNetworkingConnectionState_Connecting: {
         printf( "IClient >> Connecting?...\n" );
       } break;
+      case k_ESteamNetworkingConnectionState_Connected: {
+        printf( "IClient >> Connected!...\n" );
+        break;
+      }
     }
   }
 
   inline void IClient::InitiateServerConnection( CSteamID owner_id ) {
-    if ( Network::lobby_id.IsValid() ) {
-      printf( "Initiating connection, can leave lobby now\n" );
-      SteamMatchmaking()->LeaveLobby( Network::lobby_id );
-    }
+    // TODO move to after game is started?
+    // if ( Network::lobby_id.IsValid() ) {
+    //   printf( "Initiating connection, can leave lobby now\n" );
+    //   SteamMatchmaking()->LeaveLobby( Network::lobby_id );
+    // }
 
     _server_id = owner_id;
 
@@ -193,7 +252,7 @@ private:
       return;
     }
 
-    SendMessageToPeer( _server_conn, "IClient >> Hello from IClient!!!" );
+    SendMessageOnConnection( _server_conn, "IClient >> Hello from IClient!!!" );
 
     // TODO make this only close when the game is started
     SteamMatchmaking()->LeaveLobby( lobby_id );

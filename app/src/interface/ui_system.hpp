@@ -7,85 +7,18 @@
 
 #include "../shared/fonts.hpp"
 #include "../shared/textures.hpp"
-#include "../world/systems/selection_system.hpp"
-
-#include "content/campaign_ui.hpp"
-#include "content/faction_select_menu.hpp"
-#include "content/lobby_ui.hpp"
-#include "content/main_menu_ui.hpp"
-#include "content/modal_menu_ui.hpp"
-
 
 #include "ui_utils.hpp"
 
+#include "ui_manager.hpp"
+
 namespace UI {
-
-  inline Context context = { entt::null, entt::null };
-  inline std::vector<entt::entity> _content;
-
-  inline void EnableContent();
-  inline void DisableCurrentContent();
 
   inline void RecursiveLayout( Panel & );
   inline void RecursiveInteractions( Panel &, bool &, bool, bool );
 
   inline void RecursiveDraw( Panel & );
   inline void Draw();
-
-  inline bool DoInteraction( entt::entity, bool, bool, bool, bool );
-  inline void ListenForSelect( entt::registry &, entt::entity );
-  inline void ListenForDeselect();
-  inline void SetContextNull();
-
-  // TOOD these Enable functions can probably be consolidated
-
-  inline void EnableMainMenuUI() {
-    DisableCurrentContent();
-    _content = CreateMainMenuUI();
-    EnableContent();
-  }
-
-  inline void EnableCampaignUI() {
-    DisableCurrentContent();
-    _content = CreateCampaignUI();
-
-    Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>(
-    );
-    Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>(
-    );
-  }
-
-  inline void EnableModalMenuUI() {
-    DisableCurrentContent();
-    _content = CreateModalMenuUI();
-    EnableContent();
-  }
-
-  inline void EnableFactionSelectMenuUI() {
-    DisableCurrentContent();
-    _content = CreateFactionSelectMenuUI();
-    EnableContent();
-  }
-
-  inline void EnableLobby() {
-    DisableCurrentContent();
-    _content = CreateLobbyUI();
-    EnableContent();
-  }
-
-  inline void EnableContent() {
-    for ( entt::entity base: _content ) {
-      RecursiveToggle( base, true );
-    }
-  }
-
-  inline void DisableCurrentContent() {
-    SetContextNull();
-    for ( entt::entity base: _content ) {
-      RecursiveToggle( base, false );
-    }
-  }
-
 
   inline void UpdateOnFrame() {
     vec2 mousePos = GetMousePosition();
@@ -106,7 +39,7 @@ namespace UI {
       SCALE = 4.0;
     }
 
-    for ( entt::entity base: _content ) {
+    for ( entt::entity base: Manager()->CurrentContent() ) {
       Panel &panel = Get<Panel>( base );
       RecursiveLayout( panel );
       RecursiveInteractions( panel, over_any_elem, mouseWentUp, mouseWentDown );
@@ -114,7 +47,7 @@ namespace UI {
   }
 
   inline void Draw() {
-    for ( entt::entity base: _content ) {
+    for ( entt::entity base: Manager()->CurrentContent() ) {
       Panel &panel = Get<Panel>( base );
       RecursiveDraw( panel );
     }
@@ -122,19 +55,7 @@ namespace UI {
     DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
     DrawFPS( GetScreenWidth() - 100, 2 );
 
-    DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
-    std::string foo = "hot: " + EntityIdToString( context.hot );
-    DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
-
-    DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
-    std::string bar = "active: " + EntityIdToString( context.active );
-    DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
-
-    DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
-    std::string selected_ent =
-      "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-    DrawText( selected_ent.c_str(), GetScreenWidth() - 600, 202, 24.0f, RED );
-
+    Manager()->DrawManagerDebugInfo();
 
     DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
     DrawText(
@@ -349,7 +270,7 @@ namespace UI {
       if ( !over_any_elem )
         over_any_elem = inside;
 
-      if ( DoInteraction(
+      if ( Manager()->DoInteraction(
              child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown
            ) ) {
         std::cout << "INTERACTION DETECTED!!!" << std::endl;
@@ -364,86 +285,6 @@ namespace UI {
     if ( !over_any_elem ) {
       SetContextNull();
     }
-  }
-
-  inline bool DoInteraction(
-    entt::entity entity,
-    bool inside,
-    bool interactive,
-    bool mouseWentUp,
-    bool mouseWentDown
-  ) {
-    bool result = false;
-
-    if ( entity == context.active ) {
-      if ( mouseWentUp ) {
-        if ( entity == context.hot )
-          result = true;// do the button action
-
-        context.active = entt::null;
-      }
-    }
-    else if ( entity == context.hot ) {
-      // if ( mouseWentDown && interactive )
-      if ( mouseWentDown && interactive )
-        context.active = entity;
-    }
-
-    if ( inside ) {
-      if ( context.active == entt::null && interactive ) {
-        context.hot = entity;
-        if ( mouseWentDown && interactive )
-          context.active = entity;
-      }
-    }
-
-    return result;
-  }
-
-  inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
-    printf( "SelectListener?\n" );
-    if ( game_reg.all_of<Province::Component>( entity ) ) {
-      // Enabled the context panel
-      auto &context = lookup.at( "settlement_context_panel" );
-      RecursiveToggle( context, true );
-      // ToggleElem( context, true );
-      // UI::Panel context_panel = Get<UI::Panel>( context );
-
-      // // Enable the tab group
-      // entt::entity tab_grp = context_panel.children[0];
-      // RecursiveToggle( tab_grp, true );
-
-      // // Enable the content panel
-      // entt::entity content = context_panel.children[1];
-      // RecursiveToggle( content, true );
-      // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
-    }
-    else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-      auto actor = game_reg.get<Actor::Component>( entity );
-
-      auto context_panel = lookup.at( "actor_context_panel" );
-      RecursiveToggle( context_panel, true );
-    }
-  }
-
-  inline void ListenForDeselect() {
-    printf( "DeSelectListener?\n" );
-    auto context_panel = lookup.at( "settlement_context_panel" );
-    RecursiveToggle( context_panel, false );
-    context_panel = lookup.at( "actor_context_panel" );
-    RecursiveToggle( context_panel, false );
-    SetContextNull();
-  }
-
-  inline bool MouseIsOverUI() {
-    // This is almost sufficent, but we need to account for panels too
-    // not just items that can be active?
-    return context.active != entt::null || context.hot != entt::null;
-  }
-
-  inline void SetContextNull() {
-    context.hot = entt::null;
-    context.active = entt::null;
   }
 
 

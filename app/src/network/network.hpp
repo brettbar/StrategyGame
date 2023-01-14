@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../shared/common.hpp"
+
 #include <steam/isteammatchmaking.h>
 #include <steam/steam_api.h>
 #include <steam/steam_api_common.h>
@@ -40,7 +42,7 @@ namespace Network {
     }
   };
 
-  static void DebugOutput(
+  inline void DebugOutput(
     ESteamNetworkingSocketsDebugOutputType eType,
     const char *pszMsg
   ) {
@@ -61,7 +63,8 @@ namespace Network {
     // );
   }
 
-  inline void SendMessageToPeer( HSteamNetConnection conn, const char *msg ) {
+  inline void
+  SendMessageOnConnection( HSteamNetConnection conn, const char *msg ) {
     printf( "Sending msg '%s'\n", msg );
 
     EResult r = SteamNetworkingSockets()->SendMessageToConnection(
@@ -75,20 +78,18 @@ namespace Network {
     assert( r == k_EResultOK );
   }
 
-  inline void CheckForMessages( HSteamNetConnection conn ) {
-    if ( conn != k_HSteamNetConnection_Invalid ) {
-      SteamNetworkingMessage_t *msg;
-      int r =
-        SteamNetworkingSockets()->ReceiveMessagesOnConnection( conn, &msg, 1 );
+  // inline std::vector<CSteamID> GetLobbyMembers() {
+  //   std::vector<CSteamID> members = {};
 
-      assert( r == 0 || r == 1 );
+  //   for ( uint32 i = 0; i < SteamMatchmaking()->GetNumLobbyMembers( lobby_id );
+  //         i++ ) {
+  //     members.push_back(
+  //       SteamMatchmaking()->GetLobbyMemberByIndex( lobby_id, i )
+  //     );
+  //   }
 
-      if ( r == 1 ) {
-        printf( "Received message: '%s'\n", (char *) msg->GetData() );
-        msg->Release();
-      }
-    }
-  }
+  //   return members;
+  // }
 
 
 };// namespace Network

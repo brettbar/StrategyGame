@@ -148,6 +148,7 @@ namespace Commands {
   }// namespace
 
 
+  // This is not unused, ignore clangd
   inline IManager *Manager() {
     return IManager::Manager();
   }

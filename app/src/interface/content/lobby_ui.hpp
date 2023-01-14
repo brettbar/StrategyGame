@@ -25,6 +25,7 @@ namespace UI {
         members = {};
       }
 
+
       auto labels = std::vector<entt::entity>() = { TextLabel::Create(
         "lobby_member_" + std::string( SteamFriends()->GetPersonaName() ),
         "User: " + std::string( SteamFriends()->GetPersonaName() ),

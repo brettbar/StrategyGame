@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interface/ui_system.hpp"
+#include "interface/ui_manager.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -70,7 +70,7 @@ inline void RunGameLoop() {
         }
         else if ( event.msg == "main_menu_start_game" ) {
           // pending_new_campaign = true;
-          UI::EnableFactionSelectMenuUI();
+          UI::Manager()->EnableFactionSelectMenuUI();
         }
         else if ( event.msg == "main_menu_load_game" ) {
           pstate->pending_load_campaign = true;
@@ -85,17 +85,17 @@ inline void RunGameLoop() {
           SaveSystem::Save();
         }
         else if ( event.msg == "modal_menu_exit_main" ) {
-          UI::EnableMainMenuUI();
+          UI::Manager()->EnableMainMenuUI();
           pstate->mode = ProgramMode::MainMenu;
         }
         else if ( event.msg == "toggle_modal_menu" ) {
           if ( pstate->mode == ProgramMode::Campaign ) {
             pstate->mode = ProgramMode::ModalMenu;
-            UI::EnableModalMenuUI();
+            UI::Manager()->EnableModalMenuUI();
           }
           else if ( pstate->mode == ProgramMode::ModalMenu ) {
             pstate->mode = ProgramMode::Campaign;
-            UI::EnableCampaignUI();
+            UI::Manager()->EnableCampaignUI();
           }
         }
         // TODO refactor this to not be so repetitive
@@ -154,22 +154,24 @@ inline void RunGameLoop() {
     }
 
     if ( pstate->creating_lobby && pstate->is_host ) {
-      UI::EnableLobby();
+      UI::Manager()->EnableLobby();
       Network::Host()->Init();
       pstate->creating_lobby = false;
     }
 
     if ( pstate->joining_lobby && !pstate->is_host ) {
-      UI::EnableLobby();
+      // UI::EnableLobby();
+      UI::Manager()->EnableLobbyBrowser();
       Network::Client()->Init();
       pstate->joining_lobby = false;
     }
 
     if ( pstate->is_host ) {
       Network::Host()->CheckForMessages();
+      Network::Host()->EvaluateMessages();
     }
     else {
-      Network::Client()->CheckForMessages();
+      Network::Client()->CheckForMessage();
     }
 
 

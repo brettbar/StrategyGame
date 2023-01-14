@@ -5,19 +5,43 @@
 
 namespace Network {
 
+  namespace {
+    enum class MessageType {
+      Lobby,
+    };
+    struct Message {
+      MessageType type;
+      std::string content;
+    };
+    struct MessageQueue : entt::dispatcher {
+      void Enqueue( const Message &msg ) {
+        this->enqueue( msg );
+      }
+    };
+  };// namespace
+
 
   class IHost {
+
 public:
+    MessageQueue msg_queue;
+
     static IHost *Host() {
       static IHost instance;
       return &instance;
     }
 
     void Init() {
-      SteamAPICall_t steam_api_call =
-        SteamMatchmaking()->CreateLobby( k_ELobbyTypePublic, 2 );
+      SteamAPICall_t steam_api_call = SteamMatchmaking()->CreateLobby(
+        k_ELobbyTypePublic, MAX_PLAYERS_PER_SERVER
+      );
 
       result_lobby_created.Set( steam_api_call, this, &IHost::OnLobbyCreated );
+
+      msg_queue = {};
+
+      msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
+
 
       Network::is_host = true;
     }
@@ -27,7 +51,43 @@ public:
         if ( !_clients[i].active )
           continue;
 
-        Network::CheckForMessages( _clients[i].conn );
+        CheckForMessage( _clients[i].conn );
+      }
+    }
+
+    void CheckForMessage( HSteamNetConnection conn ) {
+      if ( conn != k_HSteamNetConnection_Invalid ) {
+        SteamNetworkingMessage_t *msg;
+        int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
+          conn, &msg, 1
+        );
+
+        assert( r == 0 || r == 1 );
+
+        if ( r == 1 ) {
+          printf( "Received message: '%s'\n", (char *) msg->GetData() );
+
+          msg_queue.Enqueue( Message{
+            MessageType::Lobby,
+            std::string( (char *) msg->GetData() ),
+          } );
+
+          msg->Release();
+        }
+      }
+    }
+
+    void EvaluateMessages() {
+      msg_queue.update();
+    }
+
+    void ProcessMessage( const Message &msg ) {
+      switch ( msg.type ) {
+        case MessageType::Lobby: {
+          printf( "Processed message: '%s'\n", msg.content.c_str() );
+
+          return;
+        }
       }
     }
 
@@ -114,13 +174,13 @@ private:
     }
 
 
-    void SendMessageToAllPeers( const char *msg ) {
+    void SendMessageToAllClients( const char *msg ) {
 
       for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
         if ( !_clients[i].active )
           continue;
 
-        SendMessageToPeer( _clients[i].conn, msg );
+        SendMessageOnConnection( _clients[i].conn, msg );
       }
     }
   };
@@ -173,7 +233,7 @@ private:
       NULL
     );
 
-    printf( "> %s\n", buf );
+    printf( "Lobby: %s\n", buf );
   }
 
   inline void IHost::OnNetConnectionStatusChanged(
@@ -227,15 +287,15 @@ private:
           _clients[i].active = true;
           _clients[i].conn = cb->m_hConn;
 
-          SendMessageToPeer(
+          SendMessageOnConnection(
             cb->m_hConn, "IHost >> Hey Client, I'll let you in"
           );
 
-          SendMessageToAllPeers( "New client connected" );
+          SendMessageToAllClients( "New client connected" );
 
 
           // TODO make this only close when the game is started
-          SteamMatchmaking()->LeaveLobby( lobby_id );
+          // SteamMatchmaking()->LeaveLobby( lobby_id );
 
           return;
         }
