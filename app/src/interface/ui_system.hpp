@@ -283,9 +283,43 @@ namespace UI {
     }
 
     if ( !over_any_elem ) {
-      SetContextNull();
+      Manager()->SetContextNull();
     }
   }
 
+  inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
+    printf( "SelectListener?\n" );
+    if ( game_reg.all_of<Province::Component>( entity ) ) {
+      // Enabled the context panel
+      auto &context = lookup.at( "settlement_context_panel" );
+      RecursiveToggle( context, true );
+      // ToggleElem( context, true );
+      // UI::Panel context_panel = Get<UI::Panel>( context );
+
+      // // Enable the tab group
+      // entt::entity tab_grp = context_panel.children[0];
+      // RecursiveToggle( tab_grp, true );
+
+      // // Enable the content panel
+      // entt::entity content = context_panel.children[1];
+      // RecursiveToggle( content, true );
+      // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
+    }
+    else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+      auto actor = game_reg.get<Actor::Component>( entity );
+
+      auto context_panel = lookup.at( "actor_context_panel" );
+      RecursiveToggle( context_panel, true );
+    }
+  }
+
+  inline void ListenForDeselect() {
+    printf( "DeSelectListener?\n" );
+    auto context_panel = lookup.at( "settlement_context_panel" );
+    RecursiveToggle( context_panel, false );
+    context_panel = lookup.at( "actor_context_panel" );
+    RecursiveToggle( context_panel, false );
+    Manager()->SetContextNull();
+  }
 
 };// namespace UI

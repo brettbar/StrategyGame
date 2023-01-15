@@ -23,16 +23,13 @@ namespace Global {
   inline FontCache font_cache = {};
   inline TextureCache texture_cache = {};
   inline entt::registry world;
-  inline entt::registry local;
 
   // TODO temporary
   inline entt::entity host_player;
 
   inline void ClearRegistry() {
     Global::world = {};
-    Global::local = {};
     Global::world.clear();
-    Global::local.clear();
   }
 
 

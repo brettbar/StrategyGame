@@ -26,89 +26,22 @@ namespace UI {
         },
         {
           TextButton::Create(
-            "main_menu_host_game",
-            "Host Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() {
-              printf( "Host\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "main_menu_host_game",
-              } );
-            }
+            "main_menu_host_game", "Host Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "main_menu_join_game",
-            "Join Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() {
-              printf( "Join\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "main_menu_join_game",
-              } );
-            }
+            "main_menu_join_game", "Join Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "main_menu_start_game",
-            "Start Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() {
-              printf( "Start\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "main_menu_start_game",
-              } );
-            }
+            "main_menu_start_game", "Start Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "main_menu_load_game",
-            "Load Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() {
-              printf( "Load\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "main_menu_load_game",
-              } );
-            }
+            "main_menu_load_game", "Load Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "main_menu_settings",
-            "Settings",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() { printf( "Settings\n" ); }
+            "main_menu_settings", "Settings", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "main_menu_exit_game",
-            "Exit Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() {
-              printf( "ExitGame\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "main_menu_exit_game",
-              } );
-            }
+            "main_menu_exit_game", "Exit Game", 32, BLUE, WHITE, false, true
           ),
         }
       ),

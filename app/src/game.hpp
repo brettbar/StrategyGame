@@ -13,6 +13,7 @@
 #include "interface/input.hpp"
 
 #include "campaign.hpp"
+#include <raylib.h>
 
 /*
 ========================================================
@@ -33,7 +34,8 @@ enum class ProgramMode {
 
 struct ProgramState {
   bool creating_lobby = false;
-  bool joining_lobby = false;
+  bool looking_for_lobby = false;
+  bool in_lobby = false;
   bool pending_new_campaign = false;
   bool pending_load_campaign = false;
   bool hit_exit = false;
@@ -56,80 +58,93 @@ inline void RunGameLoop() {
   std::string choice = "";
 
   while ( !WindowShouldClose() && !pstate->hit_exit ) {
-    Events::event_emitter.on<Events::UIEvent>(
-      [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-        if ( event.msg == "main_menu_host_game" ) {
-          pstate->creating_lobby = true;
-          // TODO make it so you can host an existing game
-          // pstate->pending_new_campaign = true;
-          pstate->is_host = true;
+    Events::event_emitter.on<Events::UIEvent>( [&](
+                                                 const Events::UIEvent &event,
+                                                 Events::EventEmitter &emitter
+                                               ) {
+      if ( event.msg == "main_menu_host_game" ) {
+        pstate->creating_lobby = true;
+        // TODO make it so you can host an existing game
+        // pstate->pending_new_campaign = true;
+        pstate->is_host = true;
+      }
+      else if ( event.msg == "main_menu_join_game" ) {
+        pstate->looking_for_lobby = true;
+        // pstate->pending_new_campaign = true;
+      }
+      else if ( event.msg == "joined_lobby" ) {
+        pstate->in_lobby = true;
+        // if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
+        //   printf( "Sending joined lobby event!\n" );
+        // }
+      }
+      else if ( event.msg == "main_menu_start_game" ) {
+        // pending_new_campaign = true;
+        UI::Manager()->EnableFactionSelectMenuUI();
+      }
+      else if ( event.msg == "main_menu_load_game" ) {
+        pstate->pending_load_campaign = true;
+      }
+      else if ( event.msg == "main_menu_exit_game" ) {
+        pstate->hit_exit = true;
+      }
+      else if ( event.msg == "modal_menu_load_game" ) {
+        pstate->pending_load_campaign = true;
+      }
+      else if ( event.msg == "modal_menu_save_game" ) {
+        SaveSystem::Save();
+      }
+      else if ( event.msg == "modal_menu_exit_main" ) {
+        UI::Manager()->EnableMainMenuUI();
+        pstate->mode = ProgramMode::MainMenu;
+      }
+      else if ( event.msg == "modal_menu_exit_game" ) {
+        CloseWindow();
+      }
+      else if ( event.msg == "toggle_modal_menu" ) {
+        if ( pstate->mode == ProgramMode::Campaign ) {
+          pstate->mode = ProgramMode::ModalMenu;
+          UI::Manager()->EnableModalMenuUI();
         }
-        else if ( event.msg == "main_menu_join_game" ) {
-          pstate->joining_lobby = true;
-          // pstate->pending_new_campaign = true;
-        }
-        else if ( event.msg == "main_menu_start_game" ) {
-          // pending_new_campaign = true;
-          UI::Manager()->EnableFactionSelectMenuUI();
-        }
-        else if ( event.msg == "main_menu_load_game" ) {
-          pstate->pending_load_campaign = true;
-        }
-        else if ( event.msg == "main_menu_exit_game" ) {
-          pstate->hit_exit = true;
-        }
-        else if ( event.msg == "modal_menu_load_game" ) {
-          pstate->pending_load_campaign = true;
-        }
-        else if ( event.msg == "modal_menu_save_game" ) {
-          SaveSystem::Save();
-        }
-        else if ( event.msg == "modal_menu_exit_main" ) {
-          UI::Manager()->EnableMainMenuUI();
-          pstate->mode = ProgramMode::MainMenu;
-        }
-        else if ( event.msg == "toggle_modal_menu" ) {
-          if ( pstate->mode == ProgramMode::Campaign ) {
-            pstate->mode = ProgramMode::ModalMenu;
-            UI::Manager()->EnableModalMenuUI();
-          }
-          else if ( pstate->mode == ProgramMode::ModalMenu ) {
-            pstate->mode = ProgramMode::Campaign;
-            UI::Manager()->EnableCampaignUI();
-          }
-        }
-        // TODO refactor this to not be so repetitive
-        else if ( event.msg == "faction_select_romans" ) {
-          printf( "faction_select_romans \n" );
-          pstate->pending_new_campaign = true;
-          choice = "romans";
-        }
-        else if ( event.msg == "faction_select_greeks" ) {
-          pstate->pending_new_campaign = true;
-          choice = "greeks";
-        }
-        else if ( event.msg == "faction_select_celts" ) {
-          pstate->pending_new_campaign = true;
-          choice = "celts";
-        }
-        else if ( event.msg == "faction_select_punics" ) {
-          pstate->pending_new_campaign = true;
-          choice = "punics";
-        }
-        else if ( event.msg == "faction_select_persians" ) {
-          pstate->pending_new_campaign = true;
-          choice = "persians";
-        }
-        else if ( event.msg == "faction_select_scythians" ) {
-          pstate->pending_new_campaign = true;
-          choice = "scythians";
-        }
-        else if ( event.msg == "faction_select_germans" ) {
-          pstate->pending_new_campaign = true;
-          choice = "germans";
+        else if ( pstate->mode == ProgramMode::ModalMenu ) {
+          pstate->mode = ProgramMode::Campaign;
+          UI::Manager()->EnableCampaignUI();
         }
       }
-    );
+      // TODO refactor this to not be so repetitive
+      else if ( event.msg == "faction_select_romans" ) {
+        printf( "faction_select_romans \n" );
+        pstate->pending_new_campaign = true;
+        choice = "romans";
+      }
+      else if ( event.msg == "faction_select_greeks" ) {
+        pstate->pending_new_campaign = true;
+        choice = "greeks";
+      }
+      else if ( event.msg == "faction_select_celts" ) {
+        pstate->pending_new_campaign = true;
+        choice = "celts";
+      }
+      else if ( event.msg == "faction_select_punics" ) {
+        pstate->pending_new_campaign = true;
+        choice = "punics";
+      }
+      else if ( event.msg == "faction_select_persians" ) {
+        pstate->pending_new_campaign = true;
+        choice = "persians";
+      }
+      else if ( event.msg == "faction_select_scythians" ) {
+        pstate->pending_new_campaign = true;
+        choice = "scythians";
+      }
+      else if ( event.msg == "faction_select_germans" ) {
+        pstate->pending_new_campaign = true;
+        choice = "germans";
+      }
+      else {
+        printf( "Error, unregistered UI event fired: %s\n", event.msg.c_str() );
+      }
+    } );
 
     if ( pstate->pending_new_campaign ) {
       printf( "pending new!!\n" );
@@ -141,6 +156,11 @@ inline void RunGameLoop() {
       Global::world.emplace<Player::Component>(
         Global::host_player, Global::host_player, true, choice
       );
+
+      Global::world.on_construct<Selected::Component>()
+        .connect<&UI::ListenForSelect>();
+      Global::world.on_destroy<Selected::Component>()
+        .connect<&UI::ListenForDeselect>();
 
       pstate->mode = ProgramMode::Campaign;
       pstate->pending_new_campaign = false;
@@ -159,11 +179,16 @@ inline void RunGameLoop() {
       pstate->creating_lobby = false;
     }
 
-    if ( pstate->joining_lobby && !pstate->is_host ) {
+    if ( pstate->looking_for_lobby && !pstate->is_host ) {
       // UI::EnableLobby();
       UI::Manager()->EnableLobbyBrowser();
       Network::Client()->Init();
-      pstate->joining_lobby = false;
+      pstate->looking_for_lobby = false;
+    }
+
+    if ( pstate->in_lobby && !pstate->is_host ) {
+      UI::Manager()->EnableLobby();
+      pstate->in_lobby = false;
     }
 
     if ( pstate->is_host ) {

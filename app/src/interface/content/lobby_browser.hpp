@@ -30,10 +30,7 @@ namespace UI {
           GREEN,
           WHITE,
           true,
-          true,
-          [lobby_id]() {
-            if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {}
-          }
+          true
         ) );
       }
 

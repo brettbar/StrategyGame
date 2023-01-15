@@ -40,14 +40,7 @@ namespace UI {
       std::string id = "faction_select_" + name;
 
       text_buttons.push_back( TextButton::Create(
-        id,
-        full_names[name],
-        32,
-        color,
-        WHITE,
-        false,
-        true,
-        [id]() { Events::event_emitter.publish( Events::UIEvent{ id } ); }
+        id, full_names[name], 32, color, WHITE, false, true
       ) );
     }
 

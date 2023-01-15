@@ -44,30 +44,30 @@ namespace UI {
             Align::Start,
             Align::Start,
             {
-              TextureButton::Create(
-                "settlement_context_tab_overview",
-                true,
+              // TextureButton::Create(
+              //   "settlement_context_tab_overview",
+              //   true,
 
-                []() {
-                  printf( "Settlement tab button pressed\n" );
-                  entt::entity content =
-                    lookup.at( "settlement_context_content" );
-                  StackPanel &sp = Get<StackPanel>( content );
-                  SwitchChild( sp, 0 );
-                }
-              ),
-              TextureButton::Create(
-                "settlement_context_tab_construction",
-                true,
-                []() {
-                  printf( "Settlement tab button pressed\n" );
-                  entt::entity content =
-                    lookup.at( "settlement_context_content" );
-                  StackPanel &sp = Get<StackPanel>( content );
-                  SwitchChild( sp, 1 );
-                }
+              //   []() {
+              //     printf( "Settlement tab button pressed\n" );
+              //     entt::entity content =
+              //       lookup.at( "settlement_context_content" );
+              //     StackPanel &sp = Get<StackPanel>( content );
+              //     SwitchChild( sp, 0 );
+              //   }
+              // ),
+              // TextureButton::Create(
+              //   "settlement_context_tab_construction",
+              //   true,
+              //   []() {
+              //     printf( "Settlement tab button pressed\n" );
+              //     entt::entity content =
+              //       lookup.at( "settlement_context_content" );
+              //     StackPanel &sp = Get<StackPanel>( content );
+              //     SwitchChild( sp, 1 );
+              //   }
 
-              ),
+              // ),
               // TextureButton::Create( "settlement_context_tab_population", true ),
               // TextureButton::Create( "settlement_context_tab_resources", true ),
               // TextureButton::Create( "settlement_context_tab_culture", true ),

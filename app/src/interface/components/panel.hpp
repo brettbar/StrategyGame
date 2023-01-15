@@ -2,6 +2,8 @@
 
 #include "element.hpp"
 
+#include "../ui_manager.hpp"
+
 namespace UI {
 
   struct Panel {
@@ -22,7 +24,7 @@ namespace UI {
       std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     ) {
-      entt::entity entity = Global::local.create();
+      entt::entity entity = Manager()->_reg.create();
       Panel panel = Panel(
         id,
         background,
@@ -34,7 +36,7 @@ namespace UI {
         children
       );
 
-      Global::local.emplace<Panel>( entity, panel );
+      Manager()->_reg.emplace<Panel>( entity, panel );
       lookup.insert_or_assign( id, entity );
       return entity;
     }
@@ -48,7 +50,7 @@ namespace UI {
       Align children_vert_align,
       std::vector<entt::entity> children
     ) {
-      entt::entity entity = Global::local.create();
+      entt::entity entity = Manager()->_reg.create();
       Panel panel = Panel(
         id,
         background,
@@ -58,7 +60,7 @@ namespace UI {
         children
       );
 
-      Global::local.emplace<Panel>( entity, panel );
+      Manager()->_reg.emplace<Panel>( entity, panel );
       lookup.insert_or_assign( id, entity );
       return entity;
     }
@@ -153,10 +155,10 @@ private:
       Color background,
       std::vector<entt::entity> children
     ) {
-      entt::entity entity = Global::local.create();
+      entt::entity entity = Manager()->_reg.create();
       StackPanel panel = StackPanel( id, background, children );
 
-      Global::local.emplace<StackPanel>( entity, panel );
+      Manager()->_reg.emplace<StackPanel>( entity, panel );
       lookup.insert_or_assign( id, entity );
       return entity;
     }

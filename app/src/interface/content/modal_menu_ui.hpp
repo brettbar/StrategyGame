@@ -26,46 +26,13 @@ namespace UI {
         },
         {
           TextButton::Create(
-            "modal_menu_load_game",
-            "Load Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-
-            []() {
-              printf( "Load\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "modal_menu_load_game",
-              } );
-            }
+            "modal_menu_load_game", "Load Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "modal_menu_save_game",
-            "Save Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-
-            []() {
-              printf( "Save\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "modal_menu_save_game",
-              } );
-            }
+            "modal_menu_save_game", "Save Game", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
-            "modal_menu_settings",
-            "Settings",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-            []() { printf( "Settings\n" ); }
+            "modal_menu_settings", "Settings", 32, BLUE, WHITE, false, true
           ),
           TextButton::Create(
             "modal_menu_save_exit_main",
@@ -74,9 +41,7 @@ namespace UI {
             BLUE,
             WHITE,
             false,
-            true,
-
-            []() { printf( "SaveExitMain\n" ); }
+            true
           ),
           TextButton::Create(
             "modal_menu_exit_main",
@@ -85,26 +50,10 @@ namespace UI {
             BLUE,
             WHITE,
             false,
-            true,
-            []() {
-              printf( "ExitMain\n" );
-              Events::event_emitter.publish( Events::UIEvent{
-                "modal_menu_exit_main" } );
-            }
+            true
           ),
           TextButton::Create(
-            "modal_menu_exit_game",
-            "Exit Game",
-            32,
-            BLUE,
-            WHITE,
-            false,
-            true,
-
-            []() {
-              printf( "ExitGame\n" );
-              CloseWindow();
-            }
+            "modal_menu_exit_game", "Exit Game", 32, BLUE, WHITE, false, true
           ),
         }
       ),

@@ -43,7 +43,7 @@ class Campaign {
 };
 
 inline void Campaign::Start() {
-  UI::EnableCampaignUI();
+  UI::Manager()->EnableCampaignUI();
   MapSystem::Init();
   Player::System::Init();
   SettlementSystem::Init();
@@ -59,7 +59,7 @@ inline void Campaign::Start() {
 
 inline void Campaign::Load() {
   SaveSystem::Load();
-  UI::EnableCampaignUI();
+  UI::Manager()->EnableCampaignUI();
   MapSystem::Init();
   Renderer::Init();
   // Commands::Listen();

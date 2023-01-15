@@ -79,7 +79,7 @@ int main( void ) {
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
-  UI::EnableMainMenuUI();
+  UI::Manager()->EnableMainMenuUI();
 
   SetExitKey( KEY_NULL );
 
