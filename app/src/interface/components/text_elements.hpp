@@ -17,24 +17,6 @@ namespace UI {
     Color text_color;
     bool dynamic = false;
 
-    static entt::entity Create(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      TextLabel button = TextLabel(
-        id, Type::TextLabel, background, text, font_size, text_color, dynamic
-      );
-
-      Manager()->_reg.emplace<TextLabel>( entity, button );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
     void Resize() {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -95,10 +77,22 @@ namespace UI {
 
     TextLabel(
       std::string id,
-      Type type,
-      Color background,
       std::string text,
       i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic
+    )
+        : elem( Element( id, Type::TextLabel, background, false, {}, {} ) ),
+          text( text ), font_size( font_size ), text_color( text_color ),
+          dynamic( dynamic ) {}
+
+    TextLabel(
+      Type type,
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
       Color text_color,
       bool dynamic
     )
@@ -110,45 +104,7 @@ namespace UI {
   struct TextButton {
     TextLabel label;
     bool clickable = false;
-    bool always_clickable = false;
-
-    static entt::entity Create(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      TextButton button =
-        TextButton( id, background, text, font_size, text_color, dynamic );
-
-      Manager()->_reg.emplace<TextButton>( entity, button );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
-    static entt::entity Create(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic,
-      bool always_clickable
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      TextButton button =
-        TextButton( id, background, text, font_size, text_color, dynamic );
-
-      button.always_clickable = always_clickable;
-      button.clickable = always_clickable;
-
-      Manager()->_reg.emplace<TextButton>( entity, button );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
+    bool always_clickable = true;
 
     void Draw() {
       if ( !clickable )
@@ -169,24 +125,44 @@ namespace UI {
       Events::event_emitter.publish( Events::UIEvent{ label.elem.id } );
     }
 
-private:
     TextButton(
       std::string id,
-      Color background,
       std::string text,
       i32 font_size,
+      Color background,
       Color text_color,
       bool dynamic
     )
         : label( TextLabel(
-            id,
             Type::TextButton,
-            background,
+            id,
             text,
             font_size,
+            background,
             text_color,
             dynamic
-          ) ) {}
+          ) ),
+          always_clickable( true ) {}
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      bool always_clickable
+    )
+        : label( TextLabel(
+            Type::TextButton,
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            dynamic
+          ) ),
+          always_clickable( always_clickable ) {}
   };
 
 };// namespace UI

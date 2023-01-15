@@ -15,57 +15,6 @@ namespace UI {
     std::function<void( Panel & )> update;
     std::vector<entt::entity> children;
 
-    static entt::entity CreateAbsolute(
-      std::string id,
-      Color background,
-      Axis children_axis,
-      Align children_horiz_align,
-      Align children_vert_align,
-      std::function<void( Panel & )> update,
-      std::vector<entt::entity> children
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      Panel panel = Panel(
-        id,
-        background,
-        children_axis,
-        children_horiz_align,
-        children_vert_align,
-        true,
-        update,
-        children
-      );
-
-      Manager()->_reg.emplace<Panel>( entity, panel );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
-    // Default Panel
-    static entt::entity Create(
-      std::string id,
-      Color background,
-      Axis children_axis,
-      Align children_horiz_align,
-      Align children_vert_align,
-      std::vector<entt::entity> children
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      Panel panel = Panel(
-        id,
-        background,
-        children_axis,
-        children_horiz_align,
-        children_vert_align,
-        children
-      );
-
-      Manager()->_reg.emplace<Panel>( entity, panel );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
-
     // void Place() {
     //   if ( abs_pos ) {
     //     Vector2 new_pos = update();
@@ -94,7 +43,6 @@ namespace UI {
       );
     }
 
-private:
     // Absolute panel
     Panel(
       std::string id,
@@ -150,19 +98,6 @@ private:
     // as child
     std::vector<entt::entity> children;
 
-    static entt::entity Create(
-      std::string id,
-      Color background,
-      std::vector<entt::entity> children
-    ) {
-      entt::entity entity = Manager()->_reg.create();
-      StackPanel panel = StackPanel( id, background, children );
-
-      Manager()->_reg.emplace<StackPanel>( entity, panel );
-      lookup.insert_or_assign( id, entity );
-      return entity;
-    }
-
     void Draw() {
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
@@ -171,8 +106,6 @@ private:
       );
     }
 
-
-private:
     // Relative panel
     StackPanel(
       std::string id,

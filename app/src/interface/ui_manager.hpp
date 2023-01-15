@@ -1,7 +1,12 @@
 #pragma once
 
 #include "../shared/common.hpp"
+#include "../shared/utils.hpp"
 #include "ui_shared.hpp"
+
+// TODO remove
+#include "../world/systems//selection_system.hpp"
+
 
 // #include "content/campaign_ui.hpp"
 // #include "content/faction_select_menu.hpp"
@@ -12,6 +17,18 @@
 
 
 namespace UI {
+  // enum class Page {
+  //   MainMenu,
+  //   LobbyBrowser,
+  //   Lobby,
+  //   Campaign,
+  //   ModalMenu,
+  // };
+  using Page = std::vector<entt::entity>;
+  struct Scene {
+    std::vector<Page> pages;
+    u32 curr_page_i;
+  };
 
   class IManager {
 
@@ -22,18 +39,6 @@ public:
     }
     IManager( IManager const & ) = delete;
     void operator=( const IManager & ) = delete;
-
-    std::vector<entt::entity> CurrentContent() {
-      return _content;
-    }
-
-
-    // TODO can we make this private?
-    entt::registry _reg;
-    inline void ClearRegistry() {
-      _reg = {};
-      _reg.clear();
-    }
 
     bool DoInteraction(
       entt::entity entity,
@@ -69,6 +74,22 @@ public:
       return result;
     }
 
+    // TODO(rf) this shouldnt use the selection system directly
+    void DrawManagerDebugInfo() {
+      DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
+      std::string foo = "hot: " + EntityIdToString( _context.hot );
+      DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
+
+      DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
+      std::string bar = "active: " + EntityIdToString( _context.active );
+      DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
+
+      DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
+      std::string selected_ent =
+        "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+      DrawText( selected_ent.c_str(), GetScreenWidth() - 600, 202, 24.0f, RED );
+    }
+
     bool MouseIsOverUI() {
       // This is almost sufficent, but we need to account for panels too
       // not just items that can be active?
@@ -80,82 +101,19 @@ public:
       _context.active = entt::null;
     }
 
-    // void EnableMainMenuUI() {
-    //   DisableCurrentContent();
-    //   _content = CreateMainMenuUI();
-    //   EnableContent();
-    // }
+    void ClearRegistry() {
+      registry = {};
+      registry.clear();
+    }
 
-    // void EnableCampaignUI() {
-    //   DisableCurrentContent();
-    //   _content = CreateCampaignUI();
-    // }
-
-    // void EnableModalMenuUI() {
-    //   DisableCurrentContent();
-    //   _content = CreateModalMenuUI();
-    //   EnableContent();
-    // }
-
-    // void EnableFactionSelectMenuUI() {
-    //   DisableCurrentContent();
-    //   _content = CreateFactionSelectMenuUI();
-    //   EnableContent();
-    // }
-
-    // void EnableLobbyBrowser() {
-    //   DisableCurrentContent();
-    //   _content = CreateLobbyBrowser();
-    //   EnableContent();
-    // }
-
-    // void EnableLobby() {
-    //   DisableCurrentContent();
-    //   _content = CreateLobbyUI();
-    //   EnableContent();
-    // }
-
-
-    // void EnableContent() {
-    //   for ( entt::entity base: _content ) {
-    //     RecursiveToggle( base, true );
-    //   }
-    // }
-
-    // void DisableCurrentContent() {
-    //   SetContextNull();
-    //   for ( entt::entity base: _content ) {
-    //     RecursiveToggle( base, false );
-    //   }
-    // }
-
-    // void DrawManagerDebugInfo() {
-    //   DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
-    //   std::string foo = "hot: " + EntityIdToString( _context.hot );
-    //   DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
-
-    //   DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
-    //   std::string bar = "active: " + EntityIdToString( _context.active );
-    //   DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
-
-    //   DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
-    //   std::string selected_ent =
-    //     "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-    //   DrawText( selected_ent.c_str(), GetScreenWidth() - 600, 202, 24.0f, RED );
-    // }
+    // TODO(??) make private
+    entt::registry registry;
+    std::map<std::string, entt::entity> lookup;
+    std::vector<entt::entity> active_page;
 
 private:
-    enum class Page {
-      MainMenu,
-      LobbyBrowser,
-      Lobby,
-      Campaign,
-      ModalMenu,
-    };
-
     Context _context = { entt::null, entt::null };
 
-    std::vector<entt::entity> _content;
 
     IManager() {}
     ~IManager() {}
@@ -165,3 +123,53 @@ private:
     return IManager::Manager();
   }
 };// namespace UI
+
+
+// void EnableMainMenuUI() {
+//   DisableCurrentContent();
+//   _content = CreateMainMenuUI();
+//   EnableContent();
+// }
+
+// void EnableCampaignUI() {
+//   DisableCurrentContent();
+//   _content = CreateCampaignUI();
+// }
+
+// void EnableModalMenuUI() {
+//   DisableCurrentContent();
+//   _content = CreateModalMenuUI();
+//   EnableContent();
+// }
+
+// void EnableFactionSelectMenuUI() {
+//   DisableCurrentContent();
+//   _content = CreateFactionSelectMenuUI();
+//   EnableContent();
+// }
+
+// void EnableLobbyBrowser() {
+//   DisableCurrentContent();
+//   _content = CreateLobbyBrowser();
+//   EnableContent();
+// }
+
+// void EnableLobby() {
+//   DisableCurrentContent();
+//   _content = CreateLobbyUI();
+//   EnableContent();
+// }
+
+
+// void EnableContent() {
+//   for ( entt::entity base: _content ) {
+//     RecursiveToggle( base, true );
+//   }
+// }
+
+// void DisableCurrentContent() {
+//   SetContextNull();
+//   for ( entt::entity base: _content ) {
+//     RecursiveToggle( base, false );
+//   }
+// }

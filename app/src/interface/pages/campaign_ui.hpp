@@ -10,17 +10,20 @@
 
 #include "../ui_utils.hpp"
 
+#include "../ui_system.hpp"
+
 
 namespace UI {
 
   inline std::vector<entt::entity> CreateCampaignUI() {
     return {
-      Panel::CreateAbsolute(
+      Create<Panel>( {
         "settlement_context_panel",
         Fade( BLACK, 0.5 ),
         Axis::Row,
         Align::Start,
         Align::Start,
+        true,
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -37,7 +40,7 @@ namespace UI {
           self.elem.transform.height = updated_size.y;
         },
         {
-          Panel::Create(
+          Create<Panel>( {
             "settlement_context_tab_group",
             BLUE,
             Axis::Column,
@@ -76,59 +79,73 @@ namespace UI {
               //   "settlement_context_tab_construction", true
               // ),
               // TextureButton::Create( "settlement_context_tab_garrison", true ),
-            }
-          ),
+            },
+          } ),
 
-          StackPanel::Create(
+          Create<StackPanel>( {
+
             "settlement_context_content",
             RED,
             {
-              Panel::Create(
+              Create<Panel>( {
                 "settlement_context_overview",
                 BLACK,
                 Axis::Row,
                 Align::Start,
                 Align::Start,
                 {
-                  TextLabel::Create(
-                    "settlement_name", "Uninhabited", 32, BLACK, WHITE, true
-                  ),
-                  TextLabel::Create(
-                    "settlement_population", "0", 32, BLACK, WHITE, true
-                  ),
-                  TextLabel::Create(
+                  Create<TextLabel>( {
+                    "settlement_name",
+                    "Uninhabited",
+                    32,
+                    BLACK,
+                    WHITE,
+                    true,
+                  } ),
+                  Create<TextLabel>( {
+                    "settlement_population",
+                    "0",
+                    32,
+                    BLACK,
+                    WHITE,
+                    true,
+                  } ),
+                  Create<TextLabel>( {
                     "settlement_development",
                     "Uninhabited",
                     32,
                     BLACK,
                     WHITE,
-                    true
-                  ),
-                }
-              ),
-              Panel::Create(
-                "settlement_context_construction",
-                BLACK,
-                Axis::Row,
-                Align::Start,
-                Align::Start,
-                {
-                  TextLabel::Create(
-                    "building_0", "building", 32, BLACK, WHITE, false
-                  ),
-                }
-              ),
-            }
-          ),
+                    true,
+                  } ),
+                },
+              } ),
+              Create<Panel>(
 
-        }
-      ),
-      Panel::CreateAbsolute(
+                {
+                  "settlement_context_construction",
+                  BLACK,
+                  Axis::Row,
+                  Align::Start,
+                  Align::Start,
+                  {
+                    Create<TextLabel>(
+                      { "building_0", "building", 32, BLACK, WHITE, false }
+                    ),
+                  },
+                }
+              ),
+            },
+          } ),
+        },
+      } ),
+      Create<Panel>( {
         "actor_context_panel",
         Fade( BLACK, 0.5 ),
         Axis::Row,
         Align::Start,
         Align::Start,
+        true,
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -146,34 +163,34 @@ namespace UI {
           self.elem.transform.height = updated_size.y;
         },
         {
-          Panel::Create(
+          Create<Panel>( {
             "actor_actions_panel",
             BLACK,
             Axis::Row,
             Align::Start,
             Align::Start,
             {
-              TextButton::Create(
+              Create<TextButton>( {
                 "actor_spawn_settlement_button",
                 "Spawn?",
                 26,
                 PURPLE,
                 WHITE,
                 false,
-                []() {
-                  printf( "Spawn Settlement clicked!!\n" );
-                  SettlementSystem::SpawnSettlement();
+                // []() {
+                //   printf( "Spawn Settlement clicked!!\n" );
+                //   SettlementSystem::SpawnSettlement();
 
-                  // TODO handle this in main
-                  // Events::event_emitter.publish( Events::UIEvent{
-                  //   "actor_spawn_settlement_button",
-                  // } );
-                }
-              ),
-            }
-          ),
-        }
-      ),
+                //   // TODO handle this in main
+                //   // Events::event_emitter.publish( Events::UIEvent{
+                //   //   "actor_spawn_settlement_button",
+                //   // } );
+                // },
+              } ),
+            },
+          } ),
+        },
+      } ),
     };
   }
 

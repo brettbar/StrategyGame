@@ -5,6 +5,7 @@
 #include "../components/panel.hpp"
 #include "../components/text_elements.hpp"
 
+#include "../ui_system.hpp"
 
 namespace UI {
 
@@ -31,16 +32,21 @@ namespace UI {
     };
 
     std::vector<entt::entity> text_buttons = {
-      TextLabel::Create(
-        "faction_select_label", "Select your faction", 32, BLACK, WHITE, false
-      ),
+      Create<TextLabel>( {
+        "faction_select_label",
+        "Select your faction",
+        32,
+        BLACK,
+        WHITE,
+        false,
+      } ),
     };
 
     for ( const auto &[name, color]: factions ) {
       std::string id = "faction_select_" + name;
 
-      text_buttons.push_back( TextButton::Create(
-        id, full_names[name], 32, color, WHITE, false, true
+      text_buttons.push_back( Create<TextButton>(
+        { id, full_names[name], 32, color, WHITE, false, true }
       ) );
     }
 
@@ -49,12 +55,13 @@ namespace UI {
 
   inline std::vector<entt::entity> CreateFactionSelectMenuUI() {
     return {
-      Panel::CreateAbsolute(
+      Create<Panel>( {
         "facton_select_menu",
         BLACK,
         Axis::Column,
         Align::Start,
         Align::Start,
+        true,
         []( Panel &self ) {
           vec2 update_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
@@ -63,8 +70,8 @@ namespace UI {
           self.elem.transform.x = update_pos.x;
           self.elem.transform.y = update_pos.y;
         },
-        CreateFactionButtons()
-      ),
+        CreateFactionButtons(),
+      } ),
     };
   }
 
