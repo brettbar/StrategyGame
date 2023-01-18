@@ -13,12 +13,12 @@
 
 
 namespace UI {
-
   inline std::vector<entt::entity> CreateLobbyBrowser() {
 
     // TODO better way of making the id and label
     auto update_children = []( std::vector<entt::entity> &children ) {
       auto lobbies = Network::Client()->GetLobbyList();
+
 
       for ( auto lobby_id: lobbies ) {
         const char *lobby_name =
@@ -26,10 +26,20 @@ namespace UI {
 
         std::string id = "lobby_entry_" + std::string( lobby_name );
 
+
         if ( !Manager()->lookup.contains( id ) ) {
-          children.push_back( Create<TextButton>(
-            { id, std::string( lobby_name ), 24, GREEN, WHITE, true, true }
-          ) );
+          std::cout << "Lobby Name: " << lobby_name << std::endl;
+          std::cout << "Making ID: " << id << std::endl;
+
+          // TODO only clickable based on host/client checksum compat
+          auto button_e = Create<TextButton>(
+            { id, std::string( lobby_name ), 24, GREEN, WHITE, false, true }
+          );
+
+          TextButton &button = Manager()->registry.get<TextButton>( button_e );
+          button.label.elem.Enable();
+
+          children.push_back( button_e );
         }
       }
 

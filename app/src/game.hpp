@@ -72,14 +72,11 @@ inline void RunGameLoop() {
         pstate->looking_for_lobby = true;
         // pstate->pending_new_campaign = true;
       }
-      else if ( event.msg == "joined_lobby" ) {
+      else if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
         pstate->in_lobby = true;
         // if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
         //   printf( "Sending joined lobby event!\n" );
         // }
-      }
-      else if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
-        printf( "!!!!!!!!\n" );
       }
       else if ( event.msg == "main_menu_start_game" ) {
         // pending_new_campaign = true;
@@ -180,15 +177,15 @@ inline void RunGameLoop() {
     }
 
     if ( pstate->creating_lobby && pstate->is_host ) {
-      UI::System::SwitchPage( UI::Lobby );
       Network::Host()->Init();
+      UI::System::SwitchPage( UI::Lobby );
       pstate->creating_lobby = false;
     }
 
     if ( pstate->looking_for_lobby && !pstate->is_host ) {
       // UI::EnableLobby();
-      UI::System::SwitchPage( UI::LobbyBrowser );
       Network::Client()->Init();
+      UI::System::SwitchPage( UI::LobbyBrowser );
       pstate->looking_for_lobby = false;
     }
 

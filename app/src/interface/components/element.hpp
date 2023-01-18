@@ -54,10 +54,6 @@ namespace UI {
     bool IsEnabled() {
       return enabled;
     }
-
-    // std::string GetID() {
-    //   return id;
-    // }
   };
 
 };// namespace UI

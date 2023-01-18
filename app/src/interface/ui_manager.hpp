@@ -3,6 +3,7 @@
 #include "../shared/common.hpp"
 #include "../shared/utils.hpp"
 #include "components/panel.hpp"
+#include "components/text_elements.hpp"
 #include "ui_shared.hpp"
 
 // TODO remove
@@ -137,8 +138,8 @@ private:
   template<typename T>
   inline entt::entity Create( T element ) {
     entt::entity entity = Manager()->registry.create();
-    Manager()->registry.template emplace<T>( entity, element );
-    Manager()->lookup.insert_or_assign( element.id, entity );
+    Manager()->registry.emplace<T>( entity, element );
+    Manager()->lookup.insert_or_assign( element.ID(), entity );
     return entity;
   }
 

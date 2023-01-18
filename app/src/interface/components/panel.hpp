@@ -8,13 +8,16 @@ namespace UI {
 
   struct Panel {
     Element elem;
-    std::string &id = elem.id;
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
     bool abs_size = false;
     std::function<void( Panel & )> update;
     std::vector<entt::entity> children;
+
+    std::string ID() {
+      return elem.id;
+    }
 
     // void Place() {
     //   if ( abs_pos ) {
@@ -89,7 +92,6 @@ namespace UI {
   ////
   struct StackPanel {
     Element elem;
-    std::string &id = elem.id;
     u32 curr_index = 0;
     // bool abs_pos = false;
     // bool abs_size = false;
@@ -99,6 +101,10 @@ namespace UI {
     // TODO determine if this will always only be a Panel
     // as child
     std::vector<entt::entity> children;
+
+    std::string ID() {
+      return elem.id;
+    }
 
     void Draw() {
       DrawRectangleV(

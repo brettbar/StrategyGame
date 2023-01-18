@@ -11,8 +11,11 @@ namespace UI {
 
   struct TextureLabel {
     Element elem;
-    std::string &id = elem.id;
     Texture2D texture;
+
+    std::string ID() {
+      return elem.id;
+    }
 
     void Resize() {
       elem.transform.width = texture.width * UI::SCALE;
@@ -35,10 +38,13 @@ namespace UI {
 
   struct TextureButton {
     TextureLabel label;
-    std::string &id = label.elem.id;
     bool clickable = false;
     bool always_clickable = false;
     // std::function<void()> action;
+
+    std::string ID() {
+      return label.ID();
+    }
 
     void Draw() {
       label.Draw();

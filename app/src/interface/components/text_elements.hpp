@@ -12,11 +12,14 @@ namespace UI {
 
   struct TextLabel {
     Element elem;
-    std::string &id = elem.id;
     std::string text;
     i32 font_size;
     Color text_color;
     bool dynamic = false;
+
+    std::string ID() {
+      return elem.id;
+    }
 
     void Resize() {
       const vec2 text_dims = MeasureTextEx(
@@ -32,6 +35,7 @@ namespace UI {
 
     void Update() {
       if ( elem.enabled && dynamic ) {
+        assert(update_lookup.contains(elem.id));
         text = update_lookup.at( elem.id )();
       }
     }
@@ -104,9 +108,12 @@ namespace UI {
 
   struct TextButton {
     TextLabel label;
-    std::string &id = label.elem.id;
     bool always_clickable;
     bool clickable = false;
+
+    std::string ID() {
+      return label.ID();
+    }
 
     void Draw() {
       if ( !clickable )

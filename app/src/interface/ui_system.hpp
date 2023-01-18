@@ -118,10 +118,10 @@ namespace UI {
       // NOTE: might have to go after the enabled check?
       // parent_panel.Place();
       // parent_panel.Resize();
-      parent_panel.Update();
-
       if ( !parent_panel.elem.enabled )
         return;
+
+      parent_panel.Update();
 
       for ( entt::entity child: parent_panel.children ) {
 
