@@ -78,6 +78,9 @@ inline void RunGameLoop() {
         //   printf( "Sending joined lobby event!\n" );
         // }
       }
+      else if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
+        printf( "!!!!!!!!\n" );
+      }
       else if ( event.msg == "main_menu_start_game" ) {
         // pending_new_campaign = true;
         UI::System::SwitchPage( UI::FactonSelectMenu );
@@ -171,6 +174,7 @@ inline void RunGameLoop() {
         delete campaign;
       campaign = new Campaign( "output.dat" );
       UI::System::EnableCampaignUI();
+
       pstate->mode = ProgramMode::Campaign;
       pstate->pending_load_campaign = false;
     }

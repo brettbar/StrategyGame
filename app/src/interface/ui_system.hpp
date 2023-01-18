@@ -14,11 +14,11 @@ namespace UI {
 
     void EnableContent();
     void DisableCurrentContent();
-    inline void RecursiveLayout( Panel & );
-    inline void RecursiveInteractions( Panel &, bool &, bool, bool );
+    void RecursiveLayout( Panel & );
+    void RecursiveInteractions( Panel &, bool &, bool, bool );
 
-    inline void RecursiveDraw( Panel & );
-    inline void Draw();
+    void RecursiveDraw( Panel & );
+    void Draw();
 
     inline void Init() {
       Manager()->pages = {
@@ -43,42 +43,6 @@ namespace UI {
       DisableCurrentContent();
       Manager()->SetScene( Campaign );
     }
-
-    // inline void EnableMainMenuUI() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateMainMenuUI();
-    //   EnableContent();
-    // }
-
-    // inline void EnableCampaignUI() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateCampaignUI();
-    // }
-
-    // inline void EnableModalMenuUI() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateModalMenuUI();
-    //   EnableContent();
-    // }
-
-    // inline void EnableFactionSelectMenuUI() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateFactionSelectMenuUI();
-    //   EnableContent();
-    // }
-
-    // inline void EnableLobbyBrowser() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateLobbyBrowser();
-    //   EnableContent();
-    // }
-
-    // inline void EnableLobby() {
-    //   DisableCurrentContent();
-    //   Manager()->active_page = CreateLobbyUI();
-    //   EnableContent();
-    // }
-
 
     inline void EnableContent() {
       for ( entt::entity base: Manager()->ActivePage() ) {

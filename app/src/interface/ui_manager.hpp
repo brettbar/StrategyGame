@@ -29,7 +29,6 @@ namespace UI {
 
   using Page = std::vector<entt::entity>;
 
-
   class IManager {
 
 public:
@@ -50,6 +49,7 @@ public:
       static IManager instance;
       return &instance;
     }
+
     IManager( IManager const & ) = delete;
     void operator=( const IManager & ) = delete;
 
