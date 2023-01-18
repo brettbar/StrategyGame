@@ -80,7 +80,7 @@ inline void RunGameLoop() {
       }
       else if ( event.msg == "main_menu_start_game" ) {
         // pending_new_campaign = true;
-        UI::Manager()->EnableFactionSelectMenuUI();
+        UI::System::SwitchPage( UI::FactonSelectMenu );
       }
       else if ( event.msg == "main_menu_load_game" ) {
         pstate->pending_load_campaign = true;
@@ -95,7 +95,7 @@ inline void RunGameLoop() {
         SaveSystem::Save();
       }
       else if ( event.msg == "modal_menu_exit_main" ) {
-        UI::Manager()->EnableMainMenuUI();
+        UI::System::SwitchPage( UI::MainMenu );
         pstate->mode = ProgramMode::MainMenu;
       }
       else if ( event.msg == "modal_menu_exit_game" ) {
@@ -104,11 +104,11 @@ inline void RunGameLoop() {
       else if ( event.msg == "toggle_modal_menu" ) {
         if ( pstate->mode == ProgramMode::Campaign ) {
           pstate->mode = ProgramMode::ModalMenu;
-          UI::Manager()->EnableModalMenuUI();
+          UI::System::SwitchPage( UI::ModalMenu );
         }
         else if ( pstate->mode == ProgramMode::ModalMenu ) {
           pstate->mode = ProgramMode::Campaign;
-          UI::Manager()->EnableCampaignUI();
+          UI::System::SwitchPage( UI::Campaign );
         }
       }
       // TODO refactor this to not be so repetitive
@@ -151,6 +151,7 @@ inline void RunGameLoop() {
       if ( campaign )
         delete campaign;
       campaign = new Campaign();
+      UI::System::EnableCampaignUI();
 
       Global::host_player = Global::world.create();
       Global::world.emplace<Player::Component>(
@@ -158,9 +159,9 @@ inline void RunGameLoop() {
       );
 
       Global::world.on_construct<Selected::Component>()
-        .connect<&UI::ListenForSelect>();
+        .connect<&UI::System::ListenForSelect>();
       Global::world.on_destroy<Selected::Component>()
-        .connect<&UI::ListenForDeselect>();
+        .connect<&UI::System::ListenForDeselect>();
 
       pstate->mode = ProgramMode::Campaign;
       pstate->pending_new_campaign = false;
@@ -169,25 +170,26 @@ inline void RunGameLoop() {
       if ( campaign )
         delete campaign;
       campaign = new Campaign( "output.dat" );
+      UI::System::EnableCampaignUI();
       pstate->mode = ProgramMode::Campaign;
       pstate->pending_load_campaign = false;
     }
 
     if ( pstate->creating_lobby && pstate->is_host ) {
-      UI::Manager()->EnableLobby();
+      UI::System::SwitchPage( UI::Lobby );
       Network::Host()->Init();
       pstate->creating_lobby = false;
     }
 
     if ( pstate->looking_for_lobby && !pstate->is_host ) {
       // UI::EnableLobby();
-      UI::Manager()->EnableLobbyBrowser();
+      UI::System::SwitchPage( UI::LobbyBrowser );
       Network::Client()->Init();
       pstate->looking_for_lobby = false;
     }
 
     if ( pstate->in_lobby && !pstate->is_host ) {
-      UI::Manager()->EnableLobby();
+      UI::System::SwitchPage( UI::Lobby );
       pstate->in_lobby = false;
     }
 
@@ -239,7 +241,7 @@ inline void RunGameLoop() {
 inline void RunMainMenu( f32 dt ) {
   // Input::Handle();
 
-  UI::UpdateOnFrame();
+  UI::System::UpdateOnFrame();
 
   CameraUpdate( Global::state.camera, dt );
 
@@ -254,7 +256,7 @@ inline void RunMainMenu( f32 dt ) {
 inline void RunModalMenu() {
   Input::CheckMenuToggle();
 
-  UI::UpdateOnFrame();
+  UI::System::UpdateOnFrame();
 
   BeginDrawing();
   {

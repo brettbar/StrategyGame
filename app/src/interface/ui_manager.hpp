@@ -2,10 +2,11 @@
 
 #include "../shared/common.hpp"
 #include "../shared/utils.hpp"
+#include "components/panel.hpp"
 #include "ui_shared.hpp"
 
 // TODO remove
-#include "../world/systems//selection_system.hpp"
+#include "../world/systems/selection_system.hpp"
 
 
 // #include "content/campaign_ui.hpp"
@@ -17,22 +18,34 @@
 
 
 namespace UI {
-  // enum class Page {
-  //   MainMenu,
-  //   LobbyBrowser,
-  //   Lobby,
-  //   Campaign,
-  //   ModalMenu,
-  // };
-  using Page = std::vector<entt::entity>;
-  struct Scene {
-    std::vector<Page> pages;
-    u32 curr_page_i;
+  enum PageType {
+    MainMenu,
+    FactonSelectMenu,
+    ModalMenu,
+    Campaign,
+    LobbyBrowser,
+    Lobby,
   };
+
+  using Page = std::vector<entt::entity>;
+
 
   class IManager {
 
 public:
+    // TODO(??) make private
+    entt::registry registry;
+    std::map<std::string, entt::entity> lookup;
+    std::vector<Page> pages;
+
+    Page &ActivePage() {
+      return pages[_active_page_i];
+    }
+
+    void SetScene( PageType page ) {
+      _active_page_i = page;
+    }
+
     static IManager *Manager() {
       static IManager instance;
       return &instance;
@@ -106,13 +119,9 @@ public:
       registry.clear();
     }
 
-    // TODO(??) make private
-    entt::registry registry;
-    std::map<std::string, entt::entity> lookup;
-    std::vector<entt::entity> active_page;
-
 private:
     Context _context = { entt::null, entt::null };
+    u32 _active_page_i = PageType::MainMenu;
 
 
     IManager() {}
@@ -122,54 +131,16 @@ private:
   inline IManager *Manager() {
     return IManager::Manager();
   }
+
+  // TODO(??) I would prefer this be in the system namespace
+  // But calling System::Create everytime feels clunky
+  template<typename T>
+  inline entt::entity Create( T element ) {
+    entt::entity entity = Manager()->registry.create();
+    Manager()->registry.template emplace<T>( entity, element );
+    Manager()->lookup.insert_or_assign( element.id, entity );
+    return entity;
+  }
+
+
 };// namespace UI
-
-
-// void EnableMainMenuUI() {
-//   DisableCurrentContent();
-//   _content = CreateMainMenuUI();
-//   EnableContent();
-// }
-
-// void EnableCampaignUI() {
-//   DisableCurrentContent();
-//   _content = CreateCampaignUI();
-// }
-
-// void EnableModalMenuUI() {
-//   DisableCurrentContent();
-//   _content = CreateModalMenuUI();
-//   EnableContent();
-// }
-
-// void EnableFactionSelectMenuUI() {
-//   DisableCurrentContent();
-//   _content = CreateFactionSelectMenuUI();
-//   EnableContent();
-// }
-
-// void EnableLobbyBrowser() {
-//   DisableCurrentContent();
-//   _content = CreateLobbyBrowser();
-//   EnableContent();
-// }
-
-// void EnableLobby() {
-//   DisableCurrentContent();
-//   _content = CreateLobbyUI();
-//   EnableContent();
-// }
-
-
-// void EnableContent() {
-//   for ( entt::entity base: _content ) {
-//     RecursiveToggle( base, true );
-//   }
-// }
-
-// void DisableCurrentContent() {
-//   SetContextNull();
-//   for ( entt::entity base: _content ) {
-//     RecursiveToggle( base, false );
-//   }
-// }

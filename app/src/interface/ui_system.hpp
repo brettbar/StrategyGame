@@ -1,35 +1,97 @@
 #pragma once
 
-#include "../world/components/actor.hpp"
-#include "../world/components/event.hpp"
-#include "../world/components/selected.hpp"
-#include "../world/components/settlement.hpp"
-
-#include "../shared/fonts.hpp"
-#include "../shared/textures.hpp"
-
-#include "ui_utils.hpp"
-
+#include "pages/campaign_ui.hpp"
+#include "pages/faction_select_menu.hpp"
+#include "pages/lobby_browser.hpp"
+#include "pages/lobby_ui.hpp"
+#include "pages/main_menu_ui.hpp"
+#include "pages/modal_menu_ui.hpp"
 #include "ui_manager.hpp"
 
 namespace UI {
-  // TODO(??) I would prefer this be in the system namespace
-  // But calling System::Create everytime feels clunky
-  template<typename T>
-  inline entt::entity Create( T element ) {
-    entt::entity entity = Manager()->registry.create();
-    Manager()->registry.emplace<T>( entity, element );
-    Manager()->lookup.insert_or_assign( element.elem.id, entity );
-    return entity;
-  }
 
   namespace System {
 
+    void EnableContent();
+    void DisableCurrentContent();
     inline void RecursiveLayout( Panel & );
     inline void RecursiveInteractions( Panel &, bool &, bool, bool );
 
     inline void RecursiveDraw( Panel & );
     inline void Draw();
+
+    inline void Init() {
+      Manager()->pages = {
+        CreateMainMenuUI(),
+        CreateFactionSelectMenuUI(),
+        CreateModalMenuUI(),
+        CreateCampaignUI(),
+        CreateLobbyBrowser(),
+        CreateLobbyUI(),
+      };
+      Manager()->SetScene( MainMenu );
+      EnableContent();
+    }
+
+    inline void SwitchPage( PageType page ) {
+      DisableCurrentContent();
+      Manager()->SetScene( page );
+      EnableContent();
+    }
+
+    inline void EnableCampaignUI() {
+      DisableCurrentContent();
+      Manager()->SetScene( Campaign );
+    }
+
+    // inline void EnableMainMenuUI() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateMainMenuUI();
+    //   EnableContent();
+    // }
+
+    // inline void EnableCampaignUI() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateCampaignUI();
+    // }
+
+    // inline void EnableModalMenuUI() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateModalMenuUI();
+    //   EnableContent();
+    // }
+
+    // inline void EnableFactionSelectMenuUI() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateFactionSelectMenuUI();
+    //   EnableContent();
+    // }
+
+    // inline void EnableLobbyBrowser() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateLobbyBrowser();
+    //   EnableContent();
+    // }
+
+    // inline void EnableLobby() {
+    //   DisableCurrentContent();
+    //   Manager()->active_page = CreateLobbyUI();
+    //   EnableContent();
+    // }
+
+
+    inline void EnableContent() {
+      for ( entt::entity base: Manager()->ActivePage() ) {
+        RecursiveToggle( base, true );
+      }
+    }
+
+    inline void DisableCurrentContent() {
+      Manager()->SetContextNull();
+      for ( entt::entity base: Manager()->ActivePage() ) {
+        RecursiveToggle( base, false );
+      }
+    }
 
 
     inline void UpdateOnFrame() {
@@ -51,7 +113,7 @@ namespace UI {
         SCALE = 4.0;
       }
 
-      for ( entt::entity base: Manager()->active_page ) {
+      for ( entt::entity base: Manager()->ActivePage() ) {
         Panel &panel = Get<Panel>( base );
         RecursiveLayout( panel );
         RecursiveInteractions(
@@ -61,7 +123,7 @@ namespace UI {
     }
 
     inline void Draw() {
-      for ( entt::entity base: Manager()->active_page ) {
+      for ( entt::entity base: Manager()->ActivePage() ) {
         Panel &panel = Get<Panel>( base );
         RecursiveDraw( panel );
       }
@@ -339,4 +401,5 @@ namespace UI {
     }
 
   };// namespace System
-};  // namespace UI
+
+};// namespace UI

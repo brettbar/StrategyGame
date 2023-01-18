@@ -10,8 +10,6 @@
 
 #include "../ui_utils.hpp"
 
-#include "../ui_system.hpp"
-
 
 namespace UI {
 
@@ -176,6 +174,7 @@ namespace UI {
                 26,
                 PURPLE,
                 WHITE,
+                false,
                 false,
                 // []() {
                 //   printf( "Spawn Settlement clicked!!\n" );

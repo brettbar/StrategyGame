@@ -13,6 +13,8 @@
 
 #include "interface/input.hpp"
 
+#include "interface/ui_system.hpp"
+
 class Campaign {
 
   public:
@@ -43,7 +45,6 @@ class Campaign {
 };
 
 inline void Campaign::Start() {
-  UI::Manager()->EnableCampaignUI();
   MapSystem::Init();
   Player::System::Init();
   SettlementSystem::Init();
@@ -59,7 +60,6 @@ inline void Campaign::Start() {
 
 inline void Campaign::Load() {
   SaveSystem::Load();
-  UI::Manager()->EnableCampaignUI();
   MapSystem::Init();
   Renderer::Init();
   // Commands::Listen();
@@ -77,7 +77,7 @@ inline void Campaign::Load() {
 
 
 inline void Campaign::UpdateOnFrame() {
-  UI::UpdateOnFrame();
+  UI::System::UpdateOnFrame();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame

@@ -12,6 +12,7 @@ namespace UI {
 
   struct TextLabel {
     Element elem;
+    std::string &id = elem.id;
     std::string text;
     i32 font_size;
     Color text_color;
@@ -30,7 +31,7 @@ namespace UI {
     }
 
     void Update() {
-      if ( dynamic ) {
+      if ( elem.enabled && dynamic ) {
         text = update_lookup.at( elem.id )();
       }
     }
@@ -103,8 +104,9 @@ namespace UI {
 
   struct TextButton {
     TextLabel label;
+    std::string &id = label.elem.id;
+    bool always_clickable;
     bool clickable = false;
-    bool always_clickable = true;
 
     void Draw() {
       if ( !clickable )
@@ -117,7 +119,7 @@ namespace UI {
     void Update() {
       label.Update();
 
-      if ( !always_clickable )
+      if ( label.elem.enabled && !always_clickable )
         clickable = clickable_lookup.at( label.elem.id )();
     }
 
@@ -142,7 +144,7 @@ namespace UI {
             text_color,
             dynamic
           ) ),
-          always_clickable( true ) {}
+          always_clickable( true ), clickable( true ) {}
 
     TextButton(
       std::string id,
@@ -162,7 +164,7 @@ namespace UI {
             text_color,
             dynamic
           ) ),
-          always_clickable( always_clickable ) {}
+          always_clickable( always_clickable ), clickable( always_clickable ) {}
   };
 
 };// namespace UI

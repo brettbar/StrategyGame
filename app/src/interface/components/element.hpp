@@ -55,9 +55,9 @@ namespace UI {
       return enabled;
     }
 
-    std::string GetID() {
-      return id;
-    }
+    // std::string GetID() {
+    //   return id;
+    // }
   };
 
 };// namespace UI

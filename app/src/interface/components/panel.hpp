@@ -8,6 +8,7 @@ namespace UI {
 
   struct Panel {
     Element elem;
+    std::string &id = elem.id;
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
@@ -88,6 +89,7 @@ namespace UI {
   ////
   struct StackPanel {
     Element elem;
+    std::string &id = elem.id;
     u32 curr_index = 0;
     // bool abs_pos = false;
     // bool abs_size = false;

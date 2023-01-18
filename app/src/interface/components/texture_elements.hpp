@@ -11,6 +11,7 @@ namespace UI {
 
   struct TextureLabel {
     Element elem;
+    std::string &id = elem.id;
     Texture2D texture;
 
     void Resize() {
@@ -34,6 +35,7 @@ namespace UI {
 
   struct TextureButton {
     TextureLabel label;
+    std::string &id = label.elem.id;
     bool clickable = false;
     bool always_clickable = false;
     // std::function<void()> action;
@@ -43,7 +45,7 @@ namespace UI {
     }
 
     void Update() {
-      if ( !always_clickable )
+      if ( label.elem.enabled && !always_clickable )
         clickable = clickable_lookup.at( label.elem.id )();
     }
 
