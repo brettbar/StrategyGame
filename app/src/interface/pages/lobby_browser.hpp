@@ -16,28 +16,27 @@ namespace UI {
 
   inline std::vector<entt::entity> CreateLobbyBrowser() {
     // TODO better way of making the id and label
-    // auto children = []() -> std::vector<entt::entity> {
-    //   std::vector<entt::entity> lobby_buttons = {};
-    //   auto lobbies = Network::Client()->GetLobbyList();
+    auto children = []() -> std::vector<entt::entity> {
+      std::vector<entt::entity> lobby_buttons = {};
+      auto lobbies = Network::Client()->GetLobbyList();
 
-    //   for ( auto lobby_id: lobbies ) {
-    //     const char *lobby_name =
-    //       SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
+      for ( auto lobby_id: lobbies ) {
+        const char *lobby_name =
+          SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
+        std::string id = "lobby_entry_" + std::string( lobby_name );
 
-    //     lobby_buttons.push_back( TextButton::Create(
-    //       "lobby_entry_" + std::string( lobby_name ),
-    //       std::string( lobby_name ),
-    //       16,
-    //       GREEN,
-    //       WHITE,
-    //       true,
-    //       true
-    //     ) );
-    //   }
+        if ( !Manager()->lookup.contains( id ) ) {
+          lobby_buttons.push_back( Create<TextButton>(
+            { id, std::string( lobby_name ), 16, GREEN, WHITE, true, true }
+          ) );
+        }
 
-    //   return lobby_buttons;
-    // };
+        // TODO remove buttons if lobby no longer exists
+      }
+
+      return lobby_buttons;
+    };
 
     return {
       Create<Panel>( {
@@ -47,7 +46,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
-        []( Panel &self ) {
+        [children]( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
             ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
@@ -55,7 +54,7 @@ namespace UI {
           self.elem.transform.x = updated_pos.x;
           self.elem.transform.y = updated_pos.y;
 
-          // self.children = children();
+          self.children = children();
         },
         {},
       } ),
