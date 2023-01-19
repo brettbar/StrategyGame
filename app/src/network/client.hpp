@@ -52,41 +52,6 @@ public:
         lobby_list.push_back( steam_lobby_id );
       }
       return lobby_list;
-
-
-      // std::vector<CSteamID> lobby_list = {};
-
-      // for ( uint32 i_lobby = 0; i_lobby < _lobby_list_arr; i_lobby++ ) {
-      //   CSteamID steam_lobby_id =
-      //     SteamMatchmaking()->GetLobbyByIndex( i_lobby );
-      //   const char *lobby_name =
-      //     SteamMatchmaking()->GetLobbyData( steam_lobby_id, "name" );
-
-      //   if ( !lobby_name || !lobby_name[0] )
-      //     continue;
-
-      //   lobby_list.push_back( steam_lobby_id );
-
-      //   // printf( "Lobby found: %s \n", lobby_name );
-
-      //   // if ( lobby_name && lobby_name[0] ) {
-      //   //   if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
-      //   //     printf( "IClient >> Found %s, attempting join\n", lobby_name );
-
-      //   //     SteamAPICall_t steam_api_call =
-      //   //       SteamMatchmaking()->JoinLobby( steam_lobby_id );
-
-      //   //     result_lobby_entered.Set(
-      //   //       steam_api_call, this, &IClient::OnLobbyEntered
-      //   //     );
-      //   //   }
-      //   // }
-      //   // else {
-      //   //   SteamMatchmaking()->RequestLobbyData( steam_lobby_id );
-      //   // }
-      // }
-
-      // return lobby_list;
     }
 
     bool AttemptJoinLobby( CSteamID lobby_id ) {

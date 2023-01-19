@@ -154,7 +154,6 @@ private:
       // SteamNetworkingSockets()->DestroyPollGroup( poll_grp );
     }
 
-
     // This is useful for localhost testing on the same machine
     void SetupUsingIP() {
       SteamNetworkingIPAddr addr = SteamNetworkingIPAddr();
@@ -188,7 +187,6 @@ private:
   inline IHost *Host() {
     return IHost::Host();
   }
-
 
   inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
     if ( cb->m_eResult == k_EResultOK ) {
