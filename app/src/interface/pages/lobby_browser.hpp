@@ -17,24 +17,34 @@ namespace UI {
 
     // TODO better way of making the id and label
     auto update_children = []( std::vector<entt::entity> &children ) {
-      auto lobbies = Network::Client()->GetLobbyList();
+      for ( CSteamID lobby_id: Network::Client()->GetLobbyList() ) {
 
-
-      for ( auto lobby_id: lobbies ) {
         const char *lobby_name =
           SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
-        std::string id = "lobby_entry_" + std::string( lobby_name );
-
-
-        if ( !Manager()->lookup.contains( id ) ) {
+        if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) ) {
           std::cout << "Lobby Name: " << lobby_name << std::endl;
-          std::cout << "Making ID: " << id << std::endl;
+
+          std::string button_id = "lobby_entry_" + std::string( lobby_name );
+
+          std::function<void()> action = [button_id, lobby_id]() {
+            Events::event_emitter.publish( Events::JoinLobby{
+              .origin = button_id,
+              .lobby_id = lobby_id,
+            } );
+          };
+
 
           // TODO only clickable based on host/client checksum compat
-          auto button_e = Create<TextButton>(
-            { id, std::string( lobby_name ), 24, GREEN, WHITE, false, true }
-          );
+          entt::entity button_e = Create<TextButton>( {
+            lobby_name,
+            std::string( lobby_name ),
+            24,
+            GREEN,
+            WHITE,
+            false,
+            action,
+          } );
 
           TextButton &button = Manager()->registry.get<TextButton>( button_e );
           button.label.elem.Enable();

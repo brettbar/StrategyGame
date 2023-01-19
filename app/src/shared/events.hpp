@@ -1,15 +1,23 @@
 #pragma once
 
 #include "common.hpp"
+#include <steamclientpublic.h>
 
 namespace Events {
 
-struct UIEvent {
-  std::string msg;
-};
+  struct ButtonClick {
+    std::string origin;
+    std::string msg;
+  };
 
-struct EventEmitter : entt::emitter<EventEmitter> {};
+  struct JoinLobby {
+    std::string origin;
+    CSteamID lobby_id;
+  };
 
-inline EventEmitter event_emitter;
+
+  struct EventEmitter : entt::emitter<EventEmitter> {};
+
+  inline EventEmitter event_emitter;
 
 };// namespace Events

@@ -35,7 +35,7 @@ namespace UI {
 
     void Update() {
       if ( elem.enabled && dynamic ) {
-        assert(update_lookup.contains(elem.id));
+        assert( update_lookup.contains( elem.id ) );
         text = update_lookup.at( elem.id )();
       }
     }
@@ -108,8 +108,11 @@ namespace UI {
 
   struct TextButton {
     TextLabel label;
-    bool always_clickable;
-    bool clickable = false;
+    bool always_clickable = true;
+    bool clickable = true;
+
+    std::function<void()> action;
+
 
     std::string ID() {
       return label.ID();
@@ -131,7 +134,7 @@ namespace UI {
     }
 
     void Action() {
-      Events::event_emitter.publish( Events::UIEvent{ label.elem.id } );
+      action();
     }
 
     TextButton(
@@ -150,8 +153,31 @@ namespace UI {
             background,
             text_color,
             dynamic
+          ) ) {
+      action = [id]() {
+        Events::event_emitter.publish( Events::ButtonClick{ id } );
+      };
+    }
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      std::function<void()> action
+    )
+        : label( TextLabel(
+            Type::TextButton,
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            dynamic
           ) ),
-          always_clickable( true ), clickable( true ) {}
+          action( action ) {}
 
     TextButton(
       std::string id,
@@ -171,7 +197,12 @@ namespace UI {
             text_color,
             dynamic
           ) ),
-          always_clickable( always_clickable ), clickable( always_clickable ) {}
+          always_clickable( always_clickable ), clickable( always_clickable ) {
+
+      action = [id]() {
+        Events::event_emitter.publish( Events::ButtonClick{ id } );
+      };
+    }
   };
 
 };// namespace UI

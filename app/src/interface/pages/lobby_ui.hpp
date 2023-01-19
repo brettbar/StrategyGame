@@ -30,7 +30,7 @@ namespace UI {
 
       auto labels = std::vector<entt::entity>() = { Create<TextLabel>(
         { "lobby_member_" + std::string( SteamFriends()->GetPersonaName() ),
-          "User: " + std::string( SteamFriends()->GetPersonaName() ),
+          "Me: " + std::string( SteamFriends()->GetPersonaName() ),
           32,
           PURPLE,
           WHITE,
@@ -43,9 +43,9 @@ namespace UI {
 
         // TODO put in steam user in
         std::string label =
-          "User: " + std::string( SteamFriends()->GetFriendPersonaName(
-                       members[i].steam_user_id
-                     ) );
+          "Guest: " + std::string( SteamFriends()->GetFriendPersonaName(
+                        members[i].steam_user_id
+                      ) );
 
 
         labels.push_back( Create<TextLabel>( { id, label, 32, RED, WHITE, true }

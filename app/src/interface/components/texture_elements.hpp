@@ -57,7 +57,7 @@ namespace UI {
 
     void Action() {
       // action();
-      Events::event_emitter.publish( Events::UIEvent{ label.elem.id } );
+      Events::event_emitter.publish( Events::ButtonClick{ label.elem.id } );
     }
 
     TextureButton( std::string id )
