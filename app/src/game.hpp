@@ -103,35 +103,9 @@ inline void RunGameLoop() {
             UI::System::SwitchPage( UI::Campaign );
           }
         }
-        // TODO refactor this to not be so repetitive
-        else if ( event.origin == "faction_select_romans" ) {
-          printf( "faction_select_romans \n" );
+        else if ( event.origin == "faction_select" ) {
           pstate->pending_new_campaign = true;
-          choice = "romans";
-        }
-        else if ( event.origin == "faction_select_greeks" ) {
-          pstate->pending_new_campaign = true;
-          choice = "greeks";
-        }
-        else if ( event.origin == "faction_select_celts" ) {
-          pstate->pending_new_campaign = true;
-          choice = "celts";
-        }
-        else if ( event.origin == "faction_select_punics" ) {
-          pstate->pending_new_campaign = true;
-          choice = "punics";
-        }
-        else if ( event.origin == "faction_select_persians" ) {
-          pstate->pending_new_campaign = true;
-          choice = "persians";
-        }
-        else if ( event.origin == "faction_select_scythians" ) {
-          pstate->pending_new_campaign = true;
-          choice = "scythians";
-        }
-        else if ( event.origin == "faction_select_germans" ) {
-          pstate->pending_new_campaign = true;
-          choice = "germans";
+          choice = event.msg;
         }
         else {
           printf(
@@ -145,7 +119,6 @@ inline void RunGameLoop() {
         printf( "JoinLobby!!! origin %s\n", event.origin.c_str() );
         if ( event.origin == "lobby_entry_Conquistador's lobby" ) {
           pstate->in_lobby = true;
-
 
           if ( Network::Client()->AttemptJoinLobby( event.lobby_id ) ) {
             printf( "Sending joined lobby event!\n" );
