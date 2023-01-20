@@ -49,7 +49,6 @@ public:
 
       msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
 
-
       Network::is_host = true;
     }
 
@@ -102,6 +101,10 @@ public:
       delete this;
     }
 
+
+    // TODO right now this is based on conn info
+    // Maybe should be lobby instead? Or maybe clients
+    // show be based on conn info instead
     std::vector<CSteamID> GetConnectedUsers() {
       std::vector<CSteamID> clients = {};
 

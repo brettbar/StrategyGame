@@ -54,6 +54,7 @@ public:
       return lobby_list;
     }
 
+    // TODO right now this is based on lobby info
     std::vector<CSteamID> GetConnectedUsers() {
       std::vector<CSteamID> other_users = {};
 
