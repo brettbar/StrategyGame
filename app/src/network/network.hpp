@@ -28,7 +28,7 @@ namespace Network {
 
   inline bool is_host = false;
 
-  inline CSteamID lobby_id;
+  // inline CSteamID lobby_id;
 
   struct ClientConnectionData {
     bool active;

@@ -1,3 +1,10 @@
+/*
+  0. Clicked Host Game
+  1. Host singleton is Created, Init called
+  2. Lobby is created (Created Lobby)
+  3. OnLobbyCreated is fired, Lobby meta data set
+ */
+
 #pragma once
 
 #include "network.hpp"
@@ -95,12 +102,12 @@ public:
       delete this;
     }
 
-    std::vector<ClientConnectionData> GetConnectedUsers() {
-      std::vector<ClientConnectionData> clients = {};
+    std::vector<CSteamID> GetConnectedUsers() {
+      std::vector<CSteamID> clients = {};
 
       for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( _clients[i].active ) {
-          clients.push_back( _clients[i] );
+          clients.push_back( _clients[i].steam_user_id );
         }
       }
 
@@ -111,7 +118,7 @@ private:
     IHost( IHost const & ) = delete;
     void operator=( const IHost & ) = delete;
 
-    // CSteamID _lobby_id;
+    CSteamID _lobby_id;
     CSteamID _server_id;
 
 
@@ -192,7 +199,7 @@ private:
     if ( cb->m_eResult == k_EResultOK ) {
       printf( "Lobby created successfully\n" );
 
-      Network::lobby_id = cb->m_ulSteamIDLobby;
+      _lobby_id = cb->m_ulSteamIDLobby;
 
       char rgchLobbyName[256];
 #if _WINDLL
@@ -208,9 +215,7 @@ private:
       );
 #endif
 
-      SteamMatchmaking()->SetLobbyData(
-        Network::lobby_id, "name", rgchLobbyName
-      );
+      SteamMatchmaking()->SetLobbyData( _lobby_id, "name", rgchLobbyName );
       printf( "Hosting lobby %s\n", rgchLobbyName );
 
       // TODO Move to after a player is found

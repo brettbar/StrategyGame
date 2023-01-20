@@ -16,26 +16,28 @@ namespace UI {
   inline std::vector<entt::entity> CreateLobbyUI() {
 
     // TODO better way of making the id and label
-    auto children = []() -> std::vector<entt::entity> {
-      std::vector<Network::ClientConnectionData> members = {};
+    auto update_children = []( std::vector<entt::entity> &children ) {
+      std::vector<CSteamID> members = {};
 
       if ( Network::is_host ) {
         members = Network::Host()->GetConnectedUsers();
       }
       else {
         // TODO client get conencted users
-        members = {};
+        members = Network::Client()->GetConnectedUsers();
       }
 
 
-      auto labels = std::vector<entt::entity>() = { Create<TextLabel>(
-        { "lobby_member_" + std::string( SteamFriends()->GetPersonaName() ),
-          "Me: " + std::string( SteamFriends()->GetPersonaName() ),
-          32,
-          PURPLE,
-          WHITE,
-          true }
-      ) };
+      // auto labels = std::vector<entt::entity>() = {
+      //   // Create<TextLabel>(
+      //   //   { "lobby_member_" + std::string( SteamFriends()->GetPersonaName() ),
+      //   //     "Me: " + std::string( SteamFriends()->GetPersonaName() ),
+      //   //     32,
+      //   //     PURPLE,
+      //   //     WHITE,
+      //   //     true }
+      //   // ),
+      // };
 
       for ( u32 i = 0; i < members.size(); i++ ) {
         // TODO put in steam user in
@@ -43,16 +45,15 @@ namespace UI {
 
         // TODO put in steam user in
         std::string label =
-          "Guest: " + std::string( SteamFriends()->GetFriendPersonaName(
-                        members[i].steam_user_id
-                      ) );
+          "Guest: " +
+          std::string( SteamFriends()->GetFriendPersonaName( members[i] ) );
 
-
-        labels.push_back( Create<TextLabel>( { id, label, 32, RED, WHITE, true }
-        ) );
+        if ( !Manager()->lookup.contains( std::string( id ) ) ) {
+          children.push_back(
+            Create<TextLabel>( { id, label, 32, RED, WHITE, true } )
+          );
+        }
       }
-
-      return labels;
     };
 
     return {
@@ -63,7 +64,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
-        [children]( Panel &self ) {
+        [update_children]( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
             ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
@@ -71,7 +72,7 @@ namespace UI {
           self.elem.transform.x = updated_pos.x;
           self.elem.transform.y = updated_pos.y;
 
-          self.children = children();
+          update_children( self.children );
         },
         {},
       } ),

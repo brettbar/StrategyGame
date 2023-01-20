@@ -54,6 +54,20 @@ public:
       return lobby_list;
     }
 
+    std::vector<CSteamID> GetConnectedUsers() {
+      std::vector<CSteamID> other_users = {};
+
+      for ( u32 i = 0; i < SteamMatchmaking()->GetNumLobbyMembers( _lobby_id );
+            i++ ) {
+        CSteamID member =
+          SteamMatchmaking()->GetLobbyMemberByIndex( _lobby_id, i );
+
+        other_users.push_back( member );
+      }
+
+      return other_users;
+    }
+
     bool AttemptJoinLobby( CSteamID lobby_id ) {
       const char *lobby_name =
         SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
@@ -85,7 +99,7 @@ private:
 
     CSteamID _player_ids[MAX_PLAYERS_PER_SERVER];
     CSteamID _server_id;
-    // CSteamID _lobby_id;
+    CSteamID _lobby_id;
 
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
@@ -148,7 +162,7 @@ private:
       return;
     }
 
-    Network::lobby_id = cb->m_ulSteamIDLobby;
+    _lobby_id = cb->m_ulSteamIDLobby;
 
     char msg[4 * 1024];
 #if _WINDLL
@@ -167,11 +181,9 @@ private:
     );
 #endif
 
-    SteamMatchmaking()->SendLobbyChatMsg(
-      Network::lobby_id, msg, sizeof( msg )
-    );
+    SteamMatchmaking()->SendLobbyChatMsg( _lobby_id, msg, sizeof( msg ) );
 
-    CSteamID owner_id = SteamMatchmaking()->GetLobbyOwner( Network::lobby_id );
+    CSteamID owner_id = SteamMatchmaking()->GetLobbyOwner( _lobby_id );
 
     InitiateServerConnection( owner_id );
   }
@@ -229,7 +241,7 @@ private:
     SendMessageOnConnection( _server_conn, "IClient >> Hello from IClient!!!" );
 
     // TODO make this only close when the game is started
-    SteamMatchmaking()->LeaveLobby( lobby_id );
+    // SteamMatchmaking()->LeaveLobby( _lobby_id );
   }
 
 };// namespace Network
