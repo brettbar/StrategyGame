@@ -74,13 +74,9 @@ namespace UI {
               );
             },
           } ),
-          Create<Panel>( {
+          Create<GridPanel>( {
             "lobby_members",
             BLACK,
-            Axis::Column,
-            Align::Start,
-            Align::Start,
-            true,
             [update_children]( Panel &self ) {
               vec2 updated_pos = {
                 ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),

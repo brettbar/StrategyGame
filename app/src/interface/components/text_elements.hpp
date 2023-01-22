@@ -22,6 +22,10 @@ namespace UI {
       return elem.id;
     }
 
+    Type Type() {
+      return elem.Type();
+    }
+
     void Resize() {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -114,7 +118,7 @@ namespace UI {
           dynamic( dynamic ), update( update ) {}
 
     TextLabel(
-      Type type,
+      enum Type type,
       std::string id,
       std::string text,
       i32 font_size,
@@ -137,6 +141,10 @@ namespace UI {
 
     std::string ID() {
       return label.ID();
+    }
+
+    Type Type() {
+      return label.Type();
     }
 
     void Draw() {

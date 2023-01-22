@@ -54,6 +54,10 @@ namespace UI {
     bool IsEnabled() {
       return enabled;
     }
+
+    Type Type() {
+      return type;
+    }
   };
 
 };// namespace UI

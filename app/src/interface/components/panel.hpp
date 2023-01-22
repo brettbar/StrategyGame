@@ -19,21 +19,10 @@ namespace UI {
       return elem.id;
     }
 
-    // void Place() {
-    //   if ( abs_pos ) {
-    //     Vector2 new_pos = update();
-    //     elem.transform.x = new_pos.x;
-    //     elem.transform.y = new_pos.y;
-    //   }
-    // }
+    Type Type() {
+      return elem.Type();
+    }
 
-    // void Resize() {
-    //   if ( abs_size ) {
-    //     Vector2 new_size = update();
-    //     elem.transform.width = new_size.x;
-    //     elem.transform.height = new_size.y;
-    //   }
-    // }
     void Update() {
       if ( update )
         update( *this );
@@ -106,6 +95,10 @@ namespace UI {
       return elem.id;
     }
 
+    Type Type() {
+      return elem.Type();
+    }
+
     void Draw() {
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
@@ -121,6 +114,39 @@ namespace UI {
       std::vector<entt::entity> children
     )
         : elem( Element( id, Type::StackPanel, background, false, {}, {} ) ),
+          children( children ){};
+  };
+
+  struct GridPanel {
+    Element elem;
+    u32 grid_width;
+    u32 grid_height;
+    std::function<void( Panel & )> update;
+    std::vector<entt::entity> children;
+
+    std::string ID() {
+      return elem.id;
+    }
+
+    Type Type() {
+      return elem.Type();
+    }
+
+    void Draw() {
+      DrawRectangleV(
+        { elem.transform.x, elem.transform.y },
+        { elem.transform.width, elem.transform.height },
+        elem.background
+      );
+    }
+
+    GridPanel(
+      std::string id,
+      Color background,
+      std::function<void( Panel & )> update,
+      std::vector<entt::entity> children
+    )
+        : elem( Element( id, Type::GridPanel, background, false, {}, {} ) ),
           children( children ){};
   };
 

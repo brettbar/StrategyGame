@@ -107,6 +107,11 @@ namespace UI {
       );
     }
 
+    inline void RecursiveLayout( GridPanel &panel ) {}
+    inline void RecursiveDraw( GridPanel &panel ) {}
+    inline void
+    RecursiveInteractions( GridPanel &panel, bool &, bool &, bool & ) {}
+
     inline void RecursiveLayout( Panel &parent_panel ) {
       f32 total_height = 0;
       f32 total_width = 0;
@@ -144,6 +149,10 @@ namespace UI {
 
             RecursiveLayout( Get<Panel>( single_child ) );
 
+          } break;
+          case Type::GridPanel: {
+            GridPanel &child_panel = Get<GridPanel>( child );
+            RecursiveLayout( child_panel );
           } break;
           case Type::TextLabel: {
             Get<TextLabel>( child ).Resize();
@@ -228,6 +237,7 @@ namespace UI {
       }
     }
 
+
     inline void RecursiveDraw( Panel &panel ) {
       if ( !panel.elem.enabled )
         return;
@@ -251,6 +261,9 @@ namespace UI {
               Get<Panel>( child_panel.children[child_panel.curr_index] )
             );
 
+          } break;
+          case Type::GridPanel: {
+            RecursiveDraw( Get<GridPanel>( child ) );
           } break;
           case Type::TextLabel: {
             Get<TextLabel>( child ).Draw();
@@ -299,6 +312,11 @@ namespace UI {
             over_any_elem,
             mouseWentUp,
             mouseWentDown
+          );
+        }
+        else if ( Has<GridPanel>( child ) ) {
+          RecursiveInteractions(
+            Get<GridPanel>( child ), over_any_elem, mouseWentUp, mouseWentDown
           );
         }
 

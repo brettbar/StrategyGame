@@ -1,4 +1,4 @@
-// TODO call leave lobby in CLient and Host when appropriate
+// TODO call leave lobby in Client and Host when appropriate
 
 #pragma once
 

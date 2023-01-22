@@ -1,3 +1,7 @@
+// TODO(rf)
+// This probably should get removed, it makes more sense just to place the updates in the
+// constructor calls
+
 #pragma once
 
 #include "../shared/common.hpp"

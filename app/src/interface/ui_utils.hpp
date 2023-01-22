@@ -8,6 +8,8 @@
 #include <iostream>
 
 
+// TODO(rf) many of these should be replaced with template
+
 namespace UI {
 
   template<typename T>
@@ -15,6 +17,7 @@ namespace UI {
     return Manager()->registry.all_of<T>( entity );
   }
 
+  // TODO Check assert
   template<typename T>
   inline T &Get( entt::entity entity ) {
     assert( Has<T>( entity ) );
@@ -24,27 +27,31 @@ namespace UI {
 
   inline Type GetType( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.type;
+      return Get<Panel>( entity ).Type();
     }
 
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.type;
+      return Get<StackPanel>( entity ).Type();
+    }
+
+    if ( Has<GridPanel>( entity ) ) {
+      return Get<GridPanel>( entity ).Type();
     }
 
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.type;
+      return Get<TextLabel>( entity ).Type();
     }
 
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.type;
+      return Get<TextButton>( entity ).Type();
     }
 
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.type;
+      return Get<TextureLabel>( entity ).Type();
     }
 
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.type;
+      return Get<TextureButton>( entity ).Type();
     }
 
     return Type::INVALID_TYPE;
@@ -56,6 +63,9 @@ namespace UI {
     }
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.transform;
+    }
+    if ( Has<GridPanel>( entity ) ) {
+      return Get<GridPanel>( entity ).elem.transform;
     }
     if ( Has<TextLabel>( entity ) ) {
       return Get<TextLabel>( entity ).elem.transform;
@@ -96,6 +106,11 @@ namespace UI {
       return;
     }
 
+    if ( Has<GridPanel>( entity ) ) {
+      Get<GridPanel>( entity ).elem.enabled = on;
+      return;
+    }
+
     if ( Has<TextLabel>( entity ) ) {
       Get<TextLabel>( entity ).elem.enabled = on;
       return;
@@ -121,12 +136,18 @@ namespace UI {
   inline void RecursiveToggle( entt::entity entity, bool on ) {
     ToggleElem( entity, on );
 
-    if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
+    if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) && !Has<GridPanel>( entity ) )
       return;
 
     if ( Has<StackPanel>( entity ) ) {
       StackPanel &stack_panel = Get<StackPanel>( entity );
       RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
+    }
+    else if ( Has<GridPanel>( entity ) ) {
+      for ( entt::entity child:
+            Manager()->registry.get<GridPanel>( entity ).children ) {
+        RecursiveToggle( child, on );
+      }
     }
     else if ( Has<Panel>( entity ) ) {
       for ( entt::entity child:
@@ -136,6 +157,7 @@ namespace UI {
     }
   }
 
+  // TODO maybe should be put on StackPanel struct as method?
   inline void SwitchChild( StackPanel &sp, u32 index ) {
     RecursiveToggle( sp.children[sp.curr_index], false );
     sp.curr_index = index;
@@ -146,8 +168,13 @@ namespace UI {
     if ( Has<Panel>( entity ) ) {
       return Get<Panel>( entity ).elem.enabled;
     }
+
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.enabled;
+    }
+
+    if ( Has<GridPanel>( entity ) ) {
+      return Get<GridPanel>( entity ).elem.enabled;
     }
 
     if ( Has<TextLabel>( entity ) ) {
@@ -176,6 +203,10 @@ namespace UI {
 
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.id;
+    }
+
+    if ( Has<GridPanel>( entity ) ) {
+      return Get<GridPanel>( entity ).elem.id;
     }
 
     if ( Has<TextLabel>( entity ) ) {

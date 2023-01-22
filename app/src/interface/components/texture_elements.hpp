@@ -17,6 +17,10 @@ namespace UI {
       return elem.id;
     }
 
+    Type Type() {
+      return elem.Type();
+    }
+
     void Resize() {
       elem.transform.width = texture.width * UI::SCALE;
       elem.transform.height = texture.height * UI::SCALE;
@@ -28,7 +32,7 @@ namespace UI {
       );
     }
 
-    TextureLabel( std::string id, Type type )
+    TextureLabel( std::string id, enum Type type )
         : elem( Element( id, type, WHITE, false, {}, {} ) ),
           texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
       elem.transform.x = texture.width * UI::SCALE;
@@ -44,6 +48,10 @@ namespace UI {
 
     std::string ID() {
       return label.ID();
+    }
+
+    Type Type() {
+      return label.Type();
     }
 
     void Draw() {
