@@ -318,22 +318,33 @@ private:
           //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
           // );
 
-          // Tell the new connection who the host is
-          nlohmann::json host_payload = {
-            { "type", "player_connected" },
-          };
-          host_payload["data"] = {
-            { "is_host", true },
-            { "player_id", "player_0" },
-            {
-              "steam_name",
-              std::string( SteamFriends()->GetFriendPersonaName(
-                _clients[0].steam_user_id
-              ) ),
-            } };
-          SendMessageOnConnection( cb->m_hConn, host_payload.dump().c_str() );
+          // Tell the new client about all the current clients
+          for ( auto client: _clients ) {
+            // Skip ourselves
+            if ( client.player_id == _clients[i].player_id )
+              continue;
 
 
+            nlohmann::json host_payload = {
+              { "type", "player_connected" },
+            };
+            host_payload["data"] = {
+              { "is_host", ( client.player_id == "player_0" ) },
+              { "player_id", client.player_id },
+              {
+                "steam_name",
+                std::string(
+                  SteamFriends()->GetFriendPersonaName( client.steam_user_id )
+                ),
+              } };
+
+            SendMessageOnConnection(
+              _clients[i].conn, host_payload.dump().c_str()
+            );
+          }
+
+
+          // Tell all the current clietns about the new client
           nlohmann::json payload = {
             { "type", "player_connected" },
           };
@@ -346,9 +357,15 @@ private:
                 _clients[i].steam_user_id
               ) ),
             } };
+          // SendMessageToAllClients( payload.dump().c_str() );
 
+          // We start at 1 since the host already knows
+          for ( uint32 j = 1; j < MAX_PLAYERS_PER_SERVER; j++ ) {
+            if ( !_clients[i].active || i == j )// we don't need to tell ourselves
+              continue;
 
-          SendMessageToAllClients( payload.dump().c_str() );
+            SendMessageOnConnection( _clients[j].conn, payload.dump().c_str() );
+          }
 
 
           // TODO make this only close when the game is started

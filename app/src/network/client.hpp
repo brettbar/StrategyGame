@@ -47,7 +47,6 @@ public:
             }
           }
 
-
           printf( "Received message: '%s'\n", message );
           msg->Release();
         }
