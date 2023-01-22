@@ -127,7 +127,6 @@ private:
     IHost( IHost const & ) = delete;
     void operator=( const IHost & ) = delete;
 
-    CSteamID _lobby_id;
     CSteamID _server_id;
 
 
@@ -211,7 +210,7 @@ private:
     if ( cb->m_eResult == k_EResultOK ) {
       printf( "Lobby created successfully\n" );
 
-      _lobby_id = cb->m_ulSteamIDLobby;
+      Network::lobby_id = cb->m_ulSteamIDLobby;
 
       char rgchLobbyName[256];
 #if _WINDLL
@@ -227,13 +226,15 @@ private:
       );
 #endif
 
-      SteamMatchmaking()->SetLobbyData( _lobby_id, "name", rgchLobbyName );
+      SteamMatchmaking()->SetLobbyData(
+        Network::lobby_id, "name", rgchLobbyName
+      );
       printf( "Hosting lobby %s\n", rgchLobbyName );
 
       _clients[0].player_id = "player_0";
       _clients[0].active = true;
       _clients[0].steam_user_id =
-        SteamMatchmaking()->GetLobbyOwner( _lobby_id );
+        SteamMatchmaking()->GetLobbyOwner( Network::lobby_id );
 
 
       // TODO Move to after a player is found
@@ -320,8 +321,7 @@ private:
 
           // Tell the new client about all the current clients
           for ( auto client: _clients ) {
-            // Skip ourselves
-            if ( client.player_id == _clients[i].player_id )
+            if ( !client.active )
               continue;
 
 

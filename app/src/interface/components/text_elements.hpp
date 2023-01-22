@@ -16,6 +16,7 @@ namespace UI {
     i32 font_size;
     Color text_color;
     bool dynamic = false;
+    std::function<std::string()> update;
 
     std::string ID() {
       return elem.id;
@@ -35,8 +36,15 @@ namespace UI {
 
     void Update() {
       if ( elem.enabled && dynamic ) {
-        assert( update_lookup.contains( elem.id ) );
-        text = update_lookup.at( elem.id )();
+        if ( update_lookup.contains( elem.id ) ) {
+          text = update_lookup.at( elem.id )();
+        }
+        else if ( update ) {
+          text = update();
+        }
+        else {
+          printf( "ERROR :: Update not found for elem %s\n", elem.id.c_str() );
+        }
       }
     }
 
@@ -91,6 +99,19 @@ namespace UI {
         : elem( Element( id, Type::TextLabel, background, false, {}, {} ) ),
           text( text ), font_size( font_size ), text_color( text_color ),
           dynamic( dynamic ) {}
+
+    TextLabel(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      std::function<std::string()> update
+    )
+        : elem( Element( id, Type::TextLabel, background, false, {}, {} ) ),
+          text( text ), font_size( font_size ), text_color( text_color ),
+          dynamic( dynamic ), update( update ) {}
 
     TextLabel(
       Type type,

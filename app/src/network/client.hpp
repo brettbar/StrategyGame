@@ -120,7 +120,6 @@ private:
     IClient( IClient const & ) = delete;
     void operator=( const IClient & ) = delete;
 
-    CSteamID _lobby_id;
 
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
@@ -184,7 +183,7 @@ private:
       return;
     }
 
-    _lobby_id = cb->m_ulSteamIDLobby;
+    Network::lobby_id = cb->m_ulSteamIDLobby;
 
     char msg[4 * 1024];
 #if _WINDLL
@@ -203,9 +202,11 @@ private:
     );
 #endif
 
-    SteamMatchmaking()->SendLobbyChatMsg( _lobby_id, msg, sizeof( msg ) );
+    SteamMatchmaking()->SendLobbyChatMsg(
+      Network::lobby_id, msg, sizeof( msg )
+    );
 
-    CSteamID owner_id = SteamMatchmaking()->GetLobbyOwner( _lobby_id );
+    CSteamID owner_id = SteamMatchmaking()->GetLobbyOwner( Network::lobby_id );
 
     InitiateServerConnection( owner_id );
   }

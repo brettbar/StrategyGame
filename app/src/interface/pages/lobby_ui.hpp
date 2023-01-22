@@ -23,21 +23,9 @@ namespace UI {
         members = Network::Host()->GetConnectedUsers();
       }
       else {
-        // TODO client get conencted users
+        // TODO client get connected users
         members = Network::Client()->GetConnectedUsers();
       }
-
-
-      // auto labels = std::vector<entt::entity>() = {
-      //   // Create<TextLabel>(
-      //   //   { "lobby_member_" + std::string( SteamFriends()->GetPersonaName() ),
-      //   //     "Me: " + std::string( SteamFriends()->GetPersonaName() ),
-      //   //     32,
-      //   //     PURPLE,
-      //   //     WHITE,
-      //   //     true }
-      //   // ),
-      // };
 
       for ( u32 i = 0; i < members.size(); i++ ) {
         // TODO put in steam user in
@@ -51,10 +39,8 @@ namespace UI {
               Create<TextLabel>( { id, label, 32, ORANGE, WHITE, true } )
             );
           }
-
           continue;
         }
-
 
         // TODO put in steam user in
         std::string label = "Guest: " + members[i];
@@ -74,18 +60,40 @@ namespace UI {
         Axis::Column,
         Align::Start,
         Align::Start,
-        true,
-        [update_children]( Panel &self ) {
-          vec2 updated_pos = {
-            ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
-            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-          };
-          self.elem.transform.x = updated_pos.x;
-          self.elem.transform.y = updated_pos.y;
+        {
+          Create<TextLabel>( {
+            "lobby_title",
+            "",
+            32,
+            GREEN,
+            WHITE,
+            true,
+            []() -> std::string {
+              return SteamMatchmaking()->GetLobbyData(
+                Network::lobby_id, "name"
+              );
+            },
+          } ),
+          Create<Panel>( {
+            "lobby_members",
+            BLACK,
+            Axis::Column,
+            Align::Start,
+            Align::Start,
+            true,
+            [update_children]( Panel &self ) {
+              vec2 updated_pos = {
+                ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
+                ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
+              };
+              self.elem.transform.x = updated_pos.x;
+              self.elem.transform.y = updated_pos.y;
 
-          update_children( self.children );
+              update_children( self.children );
+            },
+            {},
+          } ),
         },
-        {},
       } ),
     };
   }
