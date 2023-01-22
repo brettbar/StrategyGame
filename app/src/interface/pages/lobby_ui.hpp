@@ -17,7 +17,7 @@ namespace UI {
 
     // TODO better way of making the id and label
     auto update_children = []( std::vector<entt::entity> &children ) {
-      std::vector<CSteamID> members = {};
+      std::vector<std::string> members = {};
 
       if ( Network::is_host ) {
         members = Network::Host()->GetConnectedUsers();
@@ -44,9 +44,7 @@ namespace UI {
         std::string id = "lobby_member_" + std::to_string( i );
 
         if ( i == 0 ) {
-          std::string label =
-            "Host: " +
-            std::string( SteamFriends()->GetFriendPersonaName( members[i] ) );
+          std::string label = "Host: " + members[i];
 
           if ( !Manager()->lookup.contains( std::string( id ) ) ) {
             children.push_back(
@@ -59,9 +57,7 @@ namespace UI {
 
 
         // TODO put in steam user in
-        std::string label =
-          "Guest: " +
-          std::string( SteamFriends()->GetFriendPersonaName( members[i] ) );
+        std::string label = "Guest: " + members[i];
 
         if ( !Manager()->lookup.contains( std::string( id ) ) ) {
           children.push_back(

@@ -34,7 +34,9 @@ public:
         assert( r == 0 || r == 1 );
 
         if ( r == 1 ) {
-          printf( "Received message: '%s'\n", (char *) msg->GetData() );
+          char *message = (char *) msg->GetData();
+
+          printf( "Received message: '%s'\n", message );
           msg->Release();
         }
       }
@@ -55,19 +57,21 @@ public:
     }
 
 
-    // TODO right now this is based on lobby info
-    std::vector<CSteamID> GetConnectedUsers() {
-      std::vector<CSteamID> other_users = {};
+    std::vector<std::string> GetConnectedUsers() {
+      return _peers;
 
-      for ( u32 i = 0; i < SteamMatchmaking()->GetNumLobbyMembers( _lobby_id );
-            i++ ) {
-        CSteamID member =
-          SteamMatchmaking()->GetLobbyMemberByIndex( _lobby_id, i );
+      // TODO right now this is based on lobby info
+      // std::vector<CSteamID> other_users = {};
 
-        other_users.push_back( member );
-      }
+      // for ( u32 i = 0; i < SteamMatchmaking()->GetNumLobbyMembers( _lobby_id );
+      //       i++ ) {
+      //   CSteamID member =
+      //     SteamMatchmaking()->GetLobbyMemberByIndex( _lobby_id, i );
 
-      return other_users;
+      //   other_users.push_back( member );
+      // }
+
+      // return other_users;
     }
 
     bool AttemptJoinLobby( CSteamID lobby_id ) {
@@ -103,6 +107,8 @@ private:
 
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
+
+    std::vector<std::string> _peers = {};
 
     void OnLobbyMatchList( LobbyMatchList_t *, bool );
     CCallResult<IClient, LobbyMatchList_t> result_lobby_match_list;

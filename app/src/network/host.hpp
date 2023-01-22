@@ -105,12 +105,14 @@ public:
     // TODO right now this is based on conn info
     // Maybe should be lobby instead? Or maybe clients
     // show be based on conn info instead
-    std::vector<CSteamID> GetConnectedUsers() {
-      std::vector<CSteamID> clients = {};
+    std::vector<std::string> GetConnectedUsers() {
+      std::vector<std::string> clients = {};
 
       for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( _clients[i].active ) {
-          clients.push_back( _clients[i].steam_user_id );
+          clients.push_back( std::string(
+            SteamFriends()->GetFriendPersonaName( _clients[i].steam_user_id )
+          ) );
         }
       }
 
@@ -185,7 +187,8 @@ private:
 
     void SendMessageToAllClients( const char *msg ) {
 
-      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      // We start at 1 since host is always i=0
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( !_clients[i].active )
           continue;
 
@@ -283,7 +286,6 @@ private:
             snprintf( msg, sizeof( msg ), "AcceptConnection returned %d", res );
 #endif
 
-
             printf( "%s\n", msg );
 
             SteamNetworkingSockets()->CloseConnection(
@@ -295,20 +297,26 @@ private:
             return;
           }
 
-          _clients[i].player_id = "player_" + std::to_string( i );
+          // printf( "Annoying number: %s\n", std::to_string( i ).c_str() );
+
+          char player_id[128];
+          sprintf( player_id, "player_%d", i );
+
+          _clients[i].player_id = player_id;
           _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
           _clients[i].active = true;
           _clients[i].conn = cb->m_hConn;
 
-          SendMessageOnConnection(
-            cb->m_hConn, "IHost >> Hey Client, I'll let you in"
-          );
+          // SendMessageOnConnection(
+          //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
+          // );
 
           SendMessageToAllClients(
-            ( std::string( SteamFriends()->GetFriendPersonaName(
+            ( "Player Connected: " +
+              std::string( SteamFriends()->GetFriendPersonaName(
                 _clients[i].steam_user_id
               ) ) +
-              " connected as " + _clients[i].player_id )
+              " as " + _clients[i].player_id )
               .c_str()
           );
 
