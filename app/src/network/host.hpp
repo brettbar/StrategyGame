@@ -221,6 +221,12 @@ private:
       SteamMatchmaking()->SetLobbyData( _lobby_id, "name", rgchLobbyName );
       printf( "Hosting lobby %s\n", rgchLobbyName );
 
+      _clients[0].player_id = "player_0";
+      _clients[0].active = true;
+      _clients[0].steam_user_id =
+        SteamMatchmaking()->GetLobbyOwner( _lobby_id );
+
+
       // TODO Move to after a player is found
     }
     else {
@@ -289,6 +295,7 @@ private:
             return;
           }
 
+          _clients[i].player_id = "player_" + std::to_string( i );
           _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
           _clients[i].active = true;
           _clients[i].conn = cb->m_hConn;
@@ -297,7 +304,13 @@ private:
             cb->m_hConn, "IHost >> Hey Client, I'll let you in"
           );
 
-          SendMessageToAllClients( "New client connected" );
+          SendMessageToAllClients(
+            ( std::string( SteamFriends()->GetFriendPersonaName(
+                _clients[i].steam_user_id
+              ) ) +
+              " connected as " + _clients[i].player_id )
+              .c_str()
+          );
 
 
           // TODO make this only close when the game is started

@@ -31,6 +31,8 @@ namespace Network {
   // inline CSteamID lobby_id;
 
   struct ClientConnectionData {
+    std::string player_id;
+
     bool active;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;

@@ -54,6 +54,7 @@ public:
       return lobby_list;
     }
 
+
     // TODO right now this is based on lobby info
     std::vector<CSteamID> GetConnectedUsers() {
       std::vector<CSteamID> other_users = {};
@@ -98,8 +99,6 @@ private:
     IClient( IClient const & ) = delete;
     void operator=( const IClient & ) = delete;
 
-    CSteamID _player_ids[MAX_PLAYERS_PER_SERVER];
-    CSteamID _server_id;
     CSteamID _lobby_id;
 
     HSteamNetConnection _server_conn;
@@ -129,7 +128,6 @@ private:
           _server_conn, k_ESteamNetConnectionEnd_App_Min + 1, nullptr, false
         );
 
-      _server_id = CSteamID();
       _server_conn = k_HSteamNetConnection_Invalid;
     }
   };
@@ -170,14 +168,14 @@ private:
     sprintf_s(
       msg,
       sizeof( msg ),
-      "Player %s joined as IClient\n",
+      "Player %s joined lobby\n",
       SteamFriends()->GetPersonaName()
     );
 #else
     snprintf(
       msg,
       sizeof( msg ),
-      "Player %s joined as IClient\n",
+      "Player %s joined lobby\n",
       SteamFriends()->GetPersonaName()
     );
 #endif
@@ -209,9 +207,6 @@ private:
     //   printf( "Initiating connection, can leave lobby now\n" );
     //   SteamMatchmaking()->LeaveLobby( Network::lobby_id );
     // }
-
-    _server_id = owner_id;
-
 
     // This is useful for localhost testing on the same machine
     if ( LOCAL ) {

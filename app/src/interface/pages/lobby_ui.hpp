@@ -43,6 +43,21 @@ namespace UI {
         // TODO put in steam user in
         std::string id = "lobby_member_" + std::to_string( i );
 
+        if ( i == 0 ) {
+          std::string label =
+            "Host: " +
+            std::string( SteamFriends()->GetFriendPersonaName( members[i] ) );
+
+          if ( !Manager()->lookup.contains( std::string( id ) ) ) {
+            children.push_back(
+              Create<TextLabel>( { id, label, 32, ORANGE, WHITE, true } )
+            );
+          }
+
+          continue;
+        }
+
+
         // TODO put in steam user in
         std::string label =
           "Guest: " +
