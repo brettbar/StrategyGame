@@ -36,6 +36,18 @@ public:
         if ( r == 1 ) {
           char *message = (char *) msg->GetData();
 
+          nlohmann::json body = nlohmann::json::parse( message );
+
+          if ( body["type"] == "player_connected" ) {
+            auto player_id = body["data"]["player_id"];
+            auto name = body["data"]["steam_name"];
+
+            if ( !_peers.contains( player_id ) ) {
+              _peers[player_id] = name;
+            }
+          }
+
+
           printf( "Received message: '%s'\n", message );
           msg->Release();
         }
@@ -58,7 +70,13 @@ public:
 
 
     std::vector<std::string> GetConnectedUsers() {
-      return _peers;
+      std::vector<std::string> list = {};
+
+      for ( auto &[key, val]: _peers ) {
+        list.push_back( key + ": " + val );
+      }
+
+      return list;
 
       // TODO right now this is based on lobby info
       // std::vector<CSteamID> other_users = {};
@@ -108,7 +126,7 @@ private:
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
 
-    std::vector<std::string> _peers = {};
+    std::map<std::string, std::string> _peers = {};
 
     void OnLobbyMatchList( LobbyMatchList_t *, bool );
     CCallResult<IClient, LobbyMatchList_t> result_lobby_match_list;

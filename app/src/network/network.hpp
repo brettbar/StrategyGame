@@ -31,7 +31,7 @@ namespace Network {
   // inline CSteamID lobby_id;
 
   struct ClientConnectionData {
-    const char *player_id;
+    std::string player_id;
 
     bool active;
     CSteamID steam_user_id;

@@ -102,17 +102,21 @@ public:
     }
 
 
-    // TODO right now this is based on conn info
-    // Maybe should be lobby instead? Or maybe clients
-    // show be based on conn info instead
     std::vector<std::string> GetConnectedUsers() {
       std::vector<std::string> clients = {};
 
-      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
+      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( _clients[i].active ) {
-          clients.push_back( std::string(
-            SteamFriends()->GetFriendPersonaName( _clients[i].steam_user_id )
-          ) );
+
+          // if ( i > 0 ) {
+          // std::cout << "player_id :: " << _clients[i].player_id << std::endl;
+          // }
+
+          std::string text =
+            std::string( _clients[i].player_id ) + ": " +
+            SteamFriends()->GetFriendPersonaName( _clients[i].steam_user_id );
+
+          clients.push_back( text );
         }
       }
 
@@ -128,7 +132,8 @@ private:
 
 
     // Used after lobby is done
-    ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
     HSteamListenSocket _socket;
     // HSteamNetPollGroup _poll_grp;
@@ -146,7 +151,8 @@ private:
 
     IHost() {
       // zero the client connection data
-      memset( &_clients, 0, sizeof( _clients ) );
+      // memset( &_clients, 0, sizeof( _clients ) );
+      _clients = {};
 
 
       // _poll_grp = SteamNetworkingSockets()->CreatePollGroup();
@@ -273,7 +279,7 @@ private:
         "Accepting client connection %s\n", info.m_szConnectionDescription
       );
 
-      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      for ( int i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
         if ( !_clients[i].active ) {
           EResult res =
             SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
@@ -299,10 +305,11 @@ private:
 
           // printf( "Annoying number: %s\n", std::to_string( i ).c_str() );
 
-          char player_id[128];
-          sprintf( player_id, "player_%d", i );
+          // char player_id[128];
+          // sprintf( player_id, "player_%d", i );
+          // printf( "buf result: %s\n", player_id );
 
-          _clients[i].player_id = player_id;
+          _clients[i].player_id = "player_" + std::to_string( i );
           _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
           _clients[i].active = true;
           _clients[i].conn = cb->m_hConn;
@@ -311,14 +318,37 @@ private:
           //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
           // );
 
-          SendMessageToAllClients(
-            ( "Player Connected: " +
+          // Tell the new connection who the host is
+          nlohmann::json host_payload = {
+            { "type", "player_connected" },
+          };
+          host_payload["data"] = {
+            { "is_host", true },
+            { "player_id", "player_0" },
+            {
+              "steam_name",
+              std::string( SteamFriends()->GetFriendPersonaName(
+                _clients[0].steam_user_id
+              ) ),
+            } };
+          SendMessageOnConnection( cb->m_hConn, host_payload.dump().c_str() );
+
+
+          nlohmann::json payload = {
+            { "type", "player_connected" },
+          };
+          payload["data"] = {
+            { "is_host", false },
+            { "player_id", _clients[i].player_id },
+            {
+              "steam_name",
               std::string( SteamFriends()->GetFriendPersonaName(
                 _clients[i].steam_user_id
-              ) ) +
-              " as " + _clients[i].player_id )
-              .c_str()
-          );
+              ) ),
+            } };
+
+
+          SendMessageToAllClients( payload.dump().c_str() );
 
 
           // TODO make this only close when the game is started
