@@ -138,7 +138,7 @@ namespace UI {
         const u32 x = i % panel.grid_width;
         const u32 y = ( i - x ) / panel.grid_width;
 
-        positions[i] = { x * width_per_child, y * height_per_child };
+        positions.push_back( { x * width_per_child, y * height_per_child } );
       }
 
 
