@@ -77,7 +77,10 @@ namespace UI {
           Create<GridPanel>( {
             "lobby_members",
             BLACK,
-            [update_children]( Panel &self ) {
+            4,
+            2,
+            [update_children]( GridPanel &self ) {
+              std::cout << "Update Lobby Members!!!\n";
               vec2 updated_pos = {
                 ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
                 ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,

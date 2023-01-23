@@ -78,7 +78,7 @@ namespace UI {
           children( children ){};
   };
 
-  ////
+  // NOTE For right now, StackPanels can only have Panels as their direct children
   struct StackPanel {
     Element elem;
     u32 curr_index = 0;
@@ -117,11 +117,13 @@ namespace UI {
           children( children ){};
   };
 
+  // NOTE For right now, GridPanels can only have Panels as their direct children
+  // Those panels must be relatively sized/positioned
   struct GridPanel {
     Element elem;
-    u32 grid_width;
-    u32 grid_height;
-    std::function<void( Panel & )> update;
+    const u32 grid_width;
+    const u32 grid_height;
+    std::function<void( GridPanel & )> update;
     std::vector<entt::entity> children;
 
     std::string ID() {
@@ -140,14 +142,22 @@ namespace UI {
       );
     }
 
+    void Update() {
+      if ( update )
+        update( *this );
+    }
+
     GridPanel(
       std::string id,
       Color background,
-      std::function<void( Panel & )> update,
+      const u32 grid_width,
+      const u32 grid_height,
+      std::function<void( GridPanel & )> update,
       std::vector<entt::entity> children
     )
         : elem( Element( id, Type::GridPanel, background, false, {}, {} ) ),
-          children( children ){};
+          grid_width( grid_width ), grid_height( grid_height ),
+          update( update ), children( children ){};
   };
 
 };// namespace UI

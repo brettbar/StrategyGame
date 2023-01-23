@@ -107,11 +107,163 @@ namespace UI {
       );
     }
 
-    inline void RecursiveLayout( GridPanel &panel ) {}
-    inline void RecursiveDraw( GridPanel &panel ) {}
-    inline void
-    RecursiveInteractions( GridPanel &panel, bool &, bool &, bool & ) {}
+    inline void RecursiveLayout( GridPanel &panel ) {
+      if ( !panel.elem.IsEnabled() )
+        return;
 
+      panel.Update();
+
+      f32 total_width = 0;
+      f32 total_height = 0;
+
+      // TODO wrong, need to use the grid stuff
+      for ( auto child: panel.children ) {
+        rect &transform = GetTransform( child );
+        total_width += transform.width;
+        total_height += transform.height;
+      }
+
+      panel.elem.transform.width = total_width;
+      panel.elem.transform.height = total_height;
+
+
+      f32 width_per_child = panel.elem.transform.width / panel.grid_width;
+      f32 height_per_child = panel.elem.transform.height / panel.grid_height;
+
+
+      std::vector<vec2> positions = {};
+
+      for ( u32 i = 0; i < panel.children.size(); i++ ) {
+
+        const u32 x = i % panel.grid_width;
+        const u32 y = ( i - x ) / panel.grid_width;
+
+        positions[i] = { x * width_per_child, y * height_per_child };
+      }
+
+
+      for ( u32 c = 0; c < panel.children.size(); c++ ) {
+        entt::entity child = panel.children[c];
+        rect &transform = GetTransform( child );
+
+        vec2 new_pos = positions[c];
+        transform.x = new_pos.x;
+        transform.y = new_pos.y;
+      }
+    }
+
+    inline void RecursiveDraw( GridPanel &panel ) {
+      if ( !panel.elem.enabled )
+        return;
+
+      panel.Draw();
+
+      for ( entt::entity child: panel.children ) {
+        switch ( GetType( child ) ) {
+          case Type::Panel: {
+            RecursiveDraw( Get<Panel>( child ) );
+          } break;
+          case Type::StackPanel: {
+            StackPanel &child_panel = Get<StackPanel>( child );
+
+            child_panel.Draw();
+
+            assert( Has<Panel>( child_panel.children[child_panel.curr_index] )
+            );
+
+            RecursiveDraw(
+              Get<Panel>( child_panel.children[child_panel.curr_index] )
+            );
+
+          } break;
+          case Type::GridPanel: {
+            RecursiveDraw( Get<GridPanel>( child ) );
+          } break;
+          case Type::TextLabel: {
+            Get<TextLabel>( child ).Draw();
+          } break;
+          case Type::TextButton: {
+            Get<TextButton>( child ).Draw();
+          } break;
+          case Type::TextureLabel: {
+            Get<TextureLabel>( child ).Draw();
+          } break;
+          case Type::TextureButton: {
+            Get<TextureButton>( child ).Draw();
+          } break;
+          default:
+            break;
+        }
+      }
+    }
+
+    inline void RecursiveInteractions(
+      GridPanel &panel,
+      bool &over_any_elem,
+      bool mouseWentUp,
+      bool mouseWentDown
+    ) {
+
+      if ( !panel.elem.enabled )
+        return;
+
+      for ( auto &child: panel.children ) {
+        if ( !IsEnabled( child ) )
+          continue;
+
+        if ( Has<Panel>( child ) ) {
+          RecursiveInteractions(
+            Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown
+          );
+        }
+        else if ( Has<StackPanel>( child ) ) {
+          StackPanel &child_panel = Get<StackPanel>( child );
+
+          assert( Has<Panel>( child_panel.children[child_panel.curr_index] ) );
+
+          RecursiveInteractions(
+            Get<Panel>( child_panel.children[child_panel.curr_index] ),
+            over_any_elem,
+            mouseWentUp,
+            mouseWentDown
+          );
+        }
+        else if ( Has<GridPanel>( child ) ) {
+          RecursiveInteractions(
+            Get<GridPanel>( child ), over_any_elem, mouseWentUp, mouseWentDown
+          );
+        }
+
+        UpdateElem( child );
+
+        rect &transform = GetTransform( child );
+
+        bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
+
+        if ( !over_any_elem )
+          over_any_elem = inside;
+
+        if ( Manager()->DoInteraction(
+               child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown
+             ) ) {
+          std::cout << "INTERACTION DETECTED!!!" << std::endl;
+
+          if ( IsClickable( child ) ) {
+            // action_lookup.at( GetId( child ) )();
+            DoAction( child );
+          }
+        }
+      }
+
+      if ( !over_any_elem ) {
+        Manager()->SetContextNull();
+      }
+    }
+
+    // TODO this and the panel one are likely causing
+    // That visual bug on the first frame.
+    // We make a call to draw before the panel is sized if its
+    // relative
     inline void RecursiveLayout( Panel &parent_panel ) {
       f32 total_height = 0;
       f32 total_width = 0;
