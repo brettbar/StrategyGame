@@ -55,7 +55,7 @@ namespace UI {
       return enabled;
     }
 
-    Type Type() {
+    Type GetType() {
       return type;
     }
   };

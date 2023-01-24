@@ -27,27 +27,27 @@ namespace UI {
 
   inline Type GetType( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).Type();
+      return Get<Panel>( entity ).GetType();
     }
 
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).Type();
+      return Get<StackPanel>( entity ).GetType();
     }
 
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).Type();
+      return Get<TextLabel>( entity ).GetType();
     }
 
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).Type();
+      return Get<TextButton>( entity ).GetType();
     }
 
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).Type();
+      return Get<TextureLabel>( entity ).GetType();
     }
 
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).Type();
+      return Get<TextureButton>( entity ).GetType();
     }
 
     return Type::INVALID_TYPE;

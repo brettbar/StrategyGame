@@ -19,8 +19,8 @@ namespace UI {
       return elem.id;
     }
 
-    Type Type() {
-      return elem.Type();
+    Type GetType() {
+      return elem.GetType();
     }
 
     void Update() {
@@ -95,8 +95,8 @@ namespace UI {
       return elem.id;
     }
 
-    Type Type() {
-      return elem.Type();
+    Type GetType() {
+      return elem.GetType();
     }
 
     void Draw() {

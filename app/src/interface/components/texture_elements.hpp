@@ -17,8 +17,8 @@ namespace UI {
       return elem.id;
     }
 
-    Type Type() {
-      return elem.Type();
+    Type GetType() {
+      return elem.GetType();
     }
 
     void Resize() {
@@ -50,8 +50,8 @@ namespace UI {
       return label.ID();
     }
 
-    Type Type() {
-      return label.Type();
+    Type GetType() {
+      return label.GetType();
     }
 
     void Draw() {
