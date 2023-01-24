@@ -34,10 +34,6 @@ namespace UI {
       return Get<StackPanel>( entity ).Type();
     }
 
-    if ( Has<GridPanel>( entity ) ) {
-      return Get<GridPanel>( entity ).Type();
-    }
-
     if ( Has<TextLabel>( entity ) ) {
       return Get<TextLabel>( entity ).Type();
     }
@@ -63,9 +59,6 @@ namespace UI {
     }
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.transform;
-    }
-    if ( Has<GridPanel>( entity ) ) {
-      return Get<GridPanel>( entity ).elem.transform;
     }
     if ( Has<TextLabel>( entity ) ) {
       return Get<TextLabel>( entity ).elem.transform;
@@ -106,11 +99,6 @@ namespace UI {
       return;
     }
 
-    if ( Has<GridPanel>( entity ) ) {
-      Get<GridPanel>( entity ).elem.enabled = on;
-      return;
-    }
-
     if ( Has<TextLabel>( entity ) ) {
       Get<TextLabel>( entity ).elem.enabled = on;
       return;
@@ -136,18 +124,12 @@ namespace UI {
   inline void RecursiveToggle( entt::entity entity, bool on ) {
     ToggleElem( entity, on );
 
-    if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) && !Has<GridPanel>( entity ) )
+    if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
       return;
 
     if ( Has<StackPanel>( entity ) ) {
       StackPanel &stack_panel = Get<StackPanel>( entity );
       RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
-    }
-    else if ( Has<GridPanel>( entity ) ) {
-      for ( entt::entity child:
-            Manager()->registry.get<GridPanel>( entity ).children ) {
-        RecursiveToggle( child, on );
-      }
     }
     else if ( Has<Panel>( entity ) ) {
       for ( entt::entity child:
@@ -171,10 +153,6 @@ namespace UI {
 
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.enabled;
-    }
-
-    if ( Has<GridPanel>( entity ) ) {
-      return Get<GridPanel>( entity ).elem.enabled;
     }
 
     if ( Has<TextLabel>( entity ) ) {
@@ -203,10 +181,6 @@ namespace UI {
 
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.id;
-    }
-
-    if ( Has<GridPanel>( entity ) ) {
-      return Get<GridPanel>( entity ).elem.id;
     }
 
     if ( Has<TextLabel>( entity ) ) {

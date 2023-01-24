@@ -117,47 +117,4 @@ namespace UI {
           children( children ){};
   };
 
-  // NOTE For right now, GridPanels can only have Panels as their direct children
-  // Those panels must be relatively sized/positioned
-  struct GridPanel {
-    Element elem;
-    const u32 grid_width;
-    const u32 grid_height;
-    std::function<void( GridPanel & )> update;
-    std::vector<entt::entity> children;
-
-    std::string ID() {
-      return elem.id;
-    }
-
-    Type Type() {
-      return elem.Type();
-    }
-
-    void Draw() {
-      DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        elem.background
-      );
-    }
-
-    void Update() {
-      if ( update )
-        update( *this );
-    }
-
-    GridPanel(
-      std::string id,
-      Color background,
-      const u32 grid_width,
-      const u32 grid_height,
-      std::function<void( GridPanel & )> update,
-      std::vector<entt::entity> children
-    )
-        : elem( Element( id, Type::GridPanel, background, false, {}, {} ) ),
-          grid_width( grid_width ), grid_height( grid_height ),
-          update( update ), children( children ){};
-  };
-
 };// namespace UI

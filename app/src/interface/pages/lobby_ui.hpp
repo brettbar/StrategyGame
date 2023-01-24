@@ -12,46 +12,61 @@
 #include "../../network/network.hpp"
 
 namespace UI {
+  inline entt::entity
+  CreateMemberPanel( std::string id, std::string member, bool is_host ) {
+    std::string label = "something wrong";
+    Color color = RED;
+
+    if ( is_host ) {
+      label = "Host: " + member;
+      color = ORANGE;
+    }
+    else
+      label = "Guest: " + member;
+
+    entt::entity panel = Create<Panel>( {
+      id,
+      BLACK,
+      Axis::Column,
+      Align::Start,
+      Align::Start,
+      { Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false }
+      ) },
+    } );
+
+    RecursiveToggle( panel, true );
+
+    return panel;
+  }
+
 
   inline std::vector<entt::entity> CreateLobbyUI() {
 
     // TODO better way of making the id and label
-    auto update_children = []( std::vector<entt::entity> &children ) {
-      std::vector<std::string> members = {};
+    auto update_children =
+      []( std::vector<entt::entity> &children, u32 start, u32 end ) {
+        std::vector<std::string> members = {};
 
-      if ( Network::is_host ) {
-        members = Network::Host()->GetConnectedUsers();
-      }
-      else {
-        // TODO client get connected users
-        members = Network::Client()->GetConnectedUsers();
-      }
+        if ( Network::is_host ) {
+          members = Network::Host()->GetConnectedUsers();
+        }
+        else {
+          // TODO client get connected users
+          members = Network::Client()->GetConnectedUsers();
+        }
 
-      for ( u32 i = 0; i < members.size(); i++ ) {
-        // TODO put in steam user in
-        std::string id = "lobby_member_" + std::to_string( i );
+        for ( u32 i = start; i < end; i++ ) {
+          if ( i >= members.size() )
+            return;
 
-        if ( i == 0 ) {
-          std::string label = "Host: " + members[i];
+          // TODO put in steam user in
+          std::string id = "lobby_member_" + std::to_string( i );
 
           if ( !Manager()->lookup.contains( std::string( id ) ) ) {
-            children.push_back(
-              Create<TextLabel>( { id, label, 32, ORANGE, WHITE, true } )
-            );
+            children.push_back( CreateMemberPanel( id, members[i], i == 0 ) );
           }
-          continue;
         }
-
-        // TODO put in steam user in
-        std::string label = "Guest: " + members[i];
-
-        if ( !Manager()->lookup.contains( std::string( id ) ) ) {
-          children.push_back(
-            Create<TextLabel>( { id, label, 32, RED, WHITE, true } )
-          );
-        }
-      }
-    };
+      };
 
     return {
       Create<Panel>( {
@@ -60,6 +75,15 @@ namespace UI {
         Axis::Column,
         Align::Start,
         Align::Start,
+        true,
+        []( Panel &self ) {
+          vec2 updated_pos = {
+            ( (f32) GetScreenWidth() / 2 ) - ( 400 * SCALE / 2.0f ),
+            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
+          };
+          self.elem.transform.x = updated_pos.x;
+          self.elem.transform.y = updated_pos.y;
+        },
         {
           Create<TextLabel>( {
             "lobby_title",
@@ -74,21 +98,27 @@ namespace UI {
               );
             },
           } ),
-          Create<GridPanel>( {
-            "lobby_members",
+          Create<Panel>( {
+            "lobby_members_1_4",
             BLACK,
-            4,
-            2,
-            [update_children]( GridPanel &self ) {
-              std::cout << "Update Lobby Members!!!\n";
-              vec2 updated_pos = {
-                ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
-                ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-              };
-              self.elem.transform.x = updated_pos.x;
-              self.elem.transform.y = updated_pos.y;
-
-              update_children( self.children );
+            Axis::Row,
+            Align::Start,
+            Align::Start,
+            true,
+            [update_children]( Panel &self ) {
+              update_children( self.children, 0, 3 );
+            },
+            {},
+          } ),
+          Create<Panel>( {
+            "lobby_members_5_8",
+            BLACK,
+            Axis::Row,
+            Align::Start,
+            Align::Start,
+            true,
+            [update_children]( Panel &self ) {
+              update_children( self.children, 4, 7 );
             },
             {},
           } ),

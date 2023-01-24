@@ -7,7 +7,6 @@ namespace UI {
     INVALID_TYPE,
     Panel,
     StackPanel,
-    GridPanel,
     TextLabel,
     TextureLabel,
     TextButton,
