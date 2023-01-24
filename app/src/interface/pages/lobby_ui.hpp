@@ -39,34 +39,71 @@ namespace UI {
     return panel;
   }
 
+  inline std::vector<entt::entity> CreateOpenSlots( u32 start, u32 end ) {
+    std::vector<entt::entity> open_slots = {};
+
+    std::string label = "Open Slot";
+
+    for ( u32 i = start; i < end; i++ ) {
+      std::string id = "open_slot_" + std::to_string( i );
+
+      entt::entity panel = Create<Panel>( {
+        id,
+        BLACK,
+        Axis::Column,
+        Align::Start,
+        Align::Start,
+        { Create<TextLabel>( { id + "_label", label, 24, GRAY, WHITE, false }
+        ) },
+      } );
+
+      open_slots.push_back( panel );
+      RecursiveToggle( panel, true );
+    }
+
+
+    return open_slots;
+  }
+
 
   inline std::vector<entt::entity> CreateLobbyUI() {
 
     // TODO better way of making the id and label
-    auto update_children =
-      []( std::vector<entt::entity> &children, u32 start, u32 end ) {
-        std::vector<std::string> members = {};
+    auto update_children = [](
+                             std::vector<entt::entity> &children,
+                             u32 start,
+                             u32 end
+                           ) {
+      std::vector<std::string> members = {};
 
-        if ( Network::is_host ) {
-          members = Network::Host()->GetConnectedUsers();
-        }
-        else {
-          // TODO client get connected users
-          members = Network::Client()->GetConnectedUsers();
-        }
+      if ( Network::is_host ) {
+        members = Network::Host()->GetConnectedUsers();
+      }
+      else {
+        // TODO client get connected users
+        members = Network::Client()->GetConnectedUsers();
+      }
 
-        for ( u32 i = start; i < end; i++ ) {
-          if ( i >= members.size() )
-            return;
+      // for ( u32 i = start; i < end; i++ ) {
 
-          // TODO put in steam user in
-          std::string id = "lobby_member_" + std::to_string( i );
+      //   if ( i >= members.size() ) {
+      //     // TODO put in steam user in
+      //     std::string id = "Open Slot: " + std::to_string( i );
 
-          if ( !Manager()->lookup.contains( std::string( id ) ) ) {
-            children.push_back( CreateMemberPanel( id, members[i], i == 0 ) );
-          }
-        }
-      };
+      //     if ( !Manager()->lookup.contains( std::string( id ) ) ) {
+      //       children.push_back( CreateOpenSlot( id ) );
+      //     }
+      //   }
+      //   else {
+      //     // TODO put in steam user in
+      //     std::string id = "lobby_member_" + std::to_string( i );
+
+      //     if ( !Manager()->lookup.contains( std::string( id ) ) ) {
+      //       children.push_back( CreateMemberPanel( id, members[i], i == 0 ) );
+      //     }
+      //   }
+      // }
+    };
 
     return {
       Create<Panel>( {
@@ -106,9 +143,11 @@ namespace UI {
             Align::Start,
             true,
             [update_children]( Panel &self ) {
-              update_children( self.children, 0, 3 );
+              update_children(
+                self.children, 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 )
+              );
             },
-            {},
+            CreateOpenSlots( 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 ) ),
           } ),
           Create<Panel>( {
             "lobby_members_5_8",
@@ -118,9 +157,16 @@ namespace UI {
             Align::Start,
             true,
             [update_children]( Panel &self ) {
-              update_children( self.children, 4, 7 );
+              update_children(
+                self.children,
+                Network::MAX_PLAYERS_PER_SERVER / 2,
+                Network::MAX_PLAYERS_PER_SERVER
+              );
             },
-            {},
+            CreateOpenSlots(
+              Network::MAX_PLAYERS_PER_SERVER / 2,
+              Network::MAX_PLAYERS_PER_SERVER
+            ),
           } ),
         },
       } ),
