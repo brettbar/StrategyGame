@@ -25,6 +25,34 @@ namespace UI {
     return got;
   }
 
+  inline std::string GetId( entt::entity entity ) {
+    if ( Has<Panel>( entity ) ) {
+      return Get<Panel>( entity ).elem.id;
+    }
+
+    if ( Has<StackPanel>( entity ) ) {
+      return Get<StackPanel>( entity ).elem.id;
+    }
+
+    if ( Has<TextLabel>( entity ) ) {
+      return Get<TextLabel>( entity ).elem.id;
+    }
+
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).label.elem.id;
+    }
+
+    if ( Has<TextureLabel>( entity ) ) {
+      return Get<TextureLabel>( entity ).elem.id;
+    }
+
+    if ( Has<TextureButton>( entity ) ) {
+      return Get<TextureButton>( entity ).label.elem.id;
+    }
+
+    return "INVALID_ID";
+  }
+
   inline Type GetType( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
       return Get<Panel>( entity ).GetType();
@@ -163,6 +191,23 @@ namespace UI {
     }
   }
 
+  inline void RecursiveDelete( entt::entity entity ) {
+    if ( Has<StackPanel>( entity ) ) {
+      StackPanel &stack_panel = Get<StackPanel>( entity );
+      RecursiveDelete( stack_panel.children[stack_panel.curr_index] );
+    }
+    else if ( Has<Panel>( entity ) ) {
+      for ( entt::entity child:
+            Manager()->registry.get<Panel>( entity ).children ) {
+        RecursiveDelete( child );
+      }
+    }
+    else {
+      Manager()->lookup.erase( GetId( entity ) );
+      Manager()->registry.destroy( entity );
+    }
+  }
+
   // TODO maybe should be put on StackPanel struct as method?
   inline void SwitchChild( StackPanel &sp, u32 index ) {
     RecursiveToggle( sp.children[sp.curr_index], false );
@@ -198,33 +243,6 @@ namespace UI {
     return false;
   }
 
-  inline std::string GetId( entt::entity entity ) {
-    if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.id;
-    }
-
-    if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.id;
-    }
-
-    if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.id;
-    }
-
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.id;
-    }
-
-    if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.id;
-    }
-
-    if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.id;
-    }
-
-    return "INVALID_ID";
-  }
 
   inline bool IsInteractive( entt::entity entity ) {
     return Has<TextureButton>( entity ) || Has<TextButton>( entity );

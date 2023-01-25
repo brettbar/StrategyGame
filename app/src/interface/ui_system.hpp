@@ -161,6 +161,7 @@ namespace UI {
           default:
             break;
         }
+
         // TODO ^ these could probably be consolidated using a template
         rect &transform = GetTransform( child );
         Margins &margin = GetMargins( child );

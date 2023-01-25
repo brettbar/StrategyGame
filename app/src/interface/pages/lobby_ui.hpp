@@ -12,32 +12,33 @@
 #include "../../network/network.hpp"
 
 namespace UI {
-  // inline entt::entity
-  // CreateMemberPanel( std::string id, std::string member, bool is_host ) {
-  //   std::string label = "something wrong";
-  //   Color color = RED;
+  inline entt::entity
+  CreateMemberPanel( std::string id, std::string member, bool is_host ) {
+    std::string label = "something wrong";
+    Color color = RED;
 
-  //   if ( is_host ) {
-  //     label = "Host: " + member;
-  //     color = ORANGE;
-  //   }
-  //   else
-  //     label = "Guest: " + member;
+    if ( is_host ) {
+      label = "Host: " + member;
+      color = ORANGE;
+    }
+    else
+      label = "Guest: " + member;
 
-  //   entt::entity panel = Create<Panel>( {
-  //     id,
-  //     BLACK,
-  //     Axis::Column,
-  //     Align::Start,
-  //     Align::Start,
-  //     { Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false }
-  //     ) },
-  //   } );
+    entt::entity panel = Create<Panel>( {
+      id,
+      BLACK,
+      Axis::Column,
+      Align::Start,
+      Align::Start,
+      Margins{ 16, 16, 0, 0 },
+      { Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false }
+      ) },
+    } );
 
-  //   RecursiveToggle( panel, true );
+    RecursiveToggle( panel, true );
 
-  //   return panel;
-  // }
+    return panel;
+  }
 
   inline std::vector<entt::entity> CreateOpenSlots( u32 start, u32 end ) {
     std::vector<entt::entity> open_slots = {};
@@ -66,7 +67,6 @@ namespace UI {
       RecursiveToggle( panel, true );
     }
 
-
     return open_slots;
   }
 
@@ -91,6 +91,15 @@ namespace UI {
 
       for ( u32 i = start; i < end; i++ ) {
         if ( i >= members.size() )
+          return;
+
+        std::string id = "lobby_member_" + std::to_string( i );
+        if ( !Manager()->lookup.contains( id ) ) {
+          RecursiveDelete( Manager()->lookup["open_slot_" + std::to_string( i )]
+          );
+
+          children[i] = CreateMemberPanel( id, members[i], i == 0 );
+        }
       }
 
       // for ( u32 i = start; i < end; i++ ) {
