@@ -74,54 +74,32 @@ namespace UI {
   inline std::vector<entt::entity> CreateLobbyUI() {
 
     // TODO better way of making the id and label
-    auto update_children = [](
-                             std::vector<entt::entity> &children,
-                             u32 start,
-                             u32 end
-                           ) {
-      std::vector<std::string> members = {};
+    auto update_children =
+      []( std::vector<entt::entity> &children, u32 start, u32 end ) {
+        std::vector<std::string> members = {};
 
-      if ( Network::is_host ) {
-        members = Network::Host()->GetConnectedUsers();
-      }
-      else {
-        // TODO client get connected users
-        members = Network::Client()->GetConnectedUsers();
-      }
-
-      for ( u32 i = start; i < end; i++ ) {
-        if ( i >= members.size() )
-          return;
-
-        std::string id = "lobby_member_" + std::to_string( i );
-        if ( !Manager()->lookup.contains( id ) ) {
-          RecursiveDelete( Manager()->lookup["open_slot_" + std::to_string( i )]
-          );
-
-          children[i] = CreateMemberPanel( id, members[i], i == 0 );
+        if ( Network::is_host ) {
+          members = Network::Host()->GetConnectedUsers();
         }
-      }
+        else {
+          // TODO client get connected users
+          members = Network::Client()->GetConnectedUsers();
+        }
 
-      // for ( u32 i = start; i < end; i++ ) {
+        for ( u32 i = start; i < end; i++ ) {
+          if ( i >= members.size() )
+            return;
 
-      //   if ( i >= members.size() ) {
-      //     // TODO put in steam user in
-      //     std::string id = "Open Slot: " + std::to_string( i );
+          std::string id = "lobby_member_" + std::to_string( i );
+          if ( !Manager()->lookup.contains( id ) ) {
+            RecursiveDelete(
+              Manager()->lookup["open_slot_" + std::to_string( i )]
+            );
 
-      //     if ( !Manager()->lookup.contains( std::string( id ) ) ) {
-      //       children.push_back( CreateOpenSlot( id ) );
-      //     }
-      //   }
-      //   else {
-      //     // TODO put in steam user in
-      //     std::string id = "lobby_member_" + std::to_string( i );
-
-      //     if ( !Manager()->lookup.contains( std::string( id ) ) ) {
-      //       children.push_back( CreateMemberPanel( id, members[i], i == 0 ) );
-      //     }
-      //   }
-      // }
-    };
+            children[i] = CreateMemberPanel( id, members[i], i == 0 );
+          }
+        }
+      };
 
     return {
       Create<Panel>( {
