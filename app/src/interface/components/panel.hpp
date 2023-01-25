@@ -67,11 +67,25 @@ namespace UI {
       Axis children_axis,
       Align children_horiz_align,
       Align children_vert_align,
+      std::vector<entt::entity> children = {}
+    )
+        : elem( Element( id, Type::Panel, background, false, {}, {} ) ),
+          children_axis( children_axis ),
+          children_horiz_align( children_horiz_align ),
+          children_vert_align( children_vert_align ), update( {} ),
+          children( children ){};
+    //
+    // Relative panel
+    Panel(
+      std::string id,
+      Color background,
+      Axis children_axis,
+      Align children_horiz_align,
+      Align children_vert_align,
+      Margins margins,
       std::vector<entt::entity> children
     )
-        : elem(
-            Element( id, Type::Panel, background, false, { 0, 0, 80, 200 }, {} )
-          ),
+        : elem( Element( id, Type::Panel, background, false, {}, margins ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), update( {} ),

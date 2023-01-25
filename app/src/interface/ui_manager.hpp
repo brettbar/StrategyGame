@@ -90,18 +90,18 @@ public:
 
     // TODO(rf) this shouldnt use the selection system directly
     void DrawManagerDebugInfo() {
-      DrawRectangle( GetScreenWidth() - 600, 102, 200, 24.0f, BLACK );
-      std::string foo = "hot: " + EntityIdToString( _context.hot );
-      DrawText( foo.c_str(), GetScreenWidth() - 600, 102, 24.0f, RED );
+      // DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
+      // std::string foo = "hot: " + EntityIdToString( _context.hot );
+      // DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
 
-      DrawRectangle( GetScreenWidth() - 600, 152, 200, 24.0f, BLACK );
-      std::string bar = "active: " + EntityIdToString( _context.active );
-      DrawText( bar.c_str(), GetScreenWidth() - 600, 152, 24.0f, RED );
+      // DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
+      // std::string bar = "active: " + EntityIdToString( _context.active );
+      // DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
 
-      DrawRectangle( GetScreenWidth() - 600, 202, 200, 24.0f, BLACK );
-      std::string selected_ent =
-        "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-      DrawText( selected_ent.c_str(), GetScreenWidth() - 600, 202, 24.0f, RED );
+      // DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
+      // std::string selected_ent =
+      //   "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+      // DrawText( selected_ent.c_str(), GetScreenWidth() - 300, 202, 24.0f, RED );
     }
 
     bool MouseIsOverUI() {

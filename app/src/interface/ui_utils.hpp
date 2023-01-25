@@ -77,6 +77,30 @@ namespace UI {
     assert( false );
   }
 
+  inline Margins &GetMargins( entt::entity entity ) {
+    if ( Has<Panel>( entity ) ) {
+      return Get<Panel>( entity ).elem.margins;
+    }
+    if ( Has<StackPanel>( entity ) ) {
+      return Get<StackPanel>( entity ).elem.margins;
+    }
+    if ( Has<TextLabel>( entity ) ) {
+      return Get<TextLabel>( entity ).elem.margins;
+    }
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).label.elem.margins;
+    }
+    if ( Has<TextureLabel>( entity ) ) {
+      return Get<TextureLabel>( entity ).elem.margins;
+    }
+    if ( Has<TextureButton>( entity ) ) {
+      return Get<TextureButton>( entity ).label.elem.margins;
+    }
+
+    std::cout << "GetTransform() Invalid Transform!!" << std::endl;
+    assert( false );
+  }
+
   inline void UpdateElem( entt::entity entity ) {
     if ( Has<TextLabel>( entity ) ) {
       Get<TextLabel>( entity ).Update();

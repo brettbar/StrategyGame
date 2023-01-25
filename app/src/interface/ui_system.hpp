@@ -163,13 +163,14 @@ namespace UI {
         }
         // TODO ^ these could probably be consolidated using a template
         rect &transform = GetTransform( child );
+        Margins &margin = GetMargins( child );
 
         if ( parent_panel.children_axis == Axis::Row ) {
           // 2. Set the child x position based on alignment style.
           switch ( parent_panel.children_horiz_align ) {
             case Align::Start: {
-              transform.x = end_of_last_x;
-              end_of_last_x = transform.x + transform.width;
+              transform.x = end_of_last_x + margin.left;
+              end_of_last_x = transform.x + transform.width + margin.right;
             } break;
             case Align::SpaceOut: {
             } break;
