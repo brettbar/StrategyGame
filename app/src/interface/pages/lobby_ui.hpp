@@ -40,31 +40,37 @@ namespace UI {
     return panel;
   }
 
+  inline entt::entity CreateOpenSlot( u32 i ) {
+    std::string id = "open_slot_" + std::to_string( i );
+
+    entt::entity panel = Create<Panel>( {
+      id,
+      BLACK,
+      Axis::Column,
+      Align::Start,
+      Align::Start,
+      Margins{ 16, 16, 0, 0 },
+      { Create<TextLabel>(
+        { id + "_label",
+          "Open Slot " + std::to_string( i + 1 ),
+          24,
+          GRAY,
+          WHITE,
+          false }
+      ) },
+    } );
+
+    RecursiveToggle( panel, true );
+
+    return panel;
+  }
+
   inline std::vector<entt::entity> CreateOpenSlots( u32 start, u32 end ) {
     std::vector<entt::entity> open_slots = {};
 
     for ( u32 i = start; i < end; i++ ) {
-      std::string id = "open_slot_" + std::to_string( i );
-
-      entt::entity panel = Create<Panel>( {
-        id,
-        BLACK,
-        Axis::Column,
-        Align::Start,
-        Align::Start,
-        Margins{ 16, 16, 0, 0 },
-        { Create<TextLabel>(
-          { id + "_label",
-            "Open Slot " + std::to_string( i + 1 ),
-            24,
-            GRAY,
-            WHITE,
-            false }
-        ) },
-      } );
-
+      entt::entity panel = CreateOpenSlot( i );
       open_slots.push_back( panel );
-      RecursiveToggle( panel, true );
     }
 
     return open_slots;
@@ -82,21 +88,27 @@ namespace UI {
           members = Network::Host()->GetConnectedUsers();
         }
         else {
-          // TODO client get connected users
           members = Network::Client()->GetConnectedUsers();
         }
 
         for ( u32 i = start; i < end; i++ ) {
-          if ( i >= members.size() )
-            return;
-
           std::string id = "lobby_member_" + std::to_string( i );
-          if ( !Manager()->lookup.contains( id ) ) {
-            RecursiveDelete(
-              Manager()->lookup["open_slot_" + std::to_string( i )]
-            );
 
-            children[i] = CreateMemberPanel( id, members[i], i == 0 );
+          if ( i >= members.size() ) {
+            // We know the user is disconnected
+            if ( Manager()->lookup.contains( id ) ) {
+              RecursiveDelete( Manager()->lookup[id] );
+              children[i] = CreateOpenSlot( i );
+            }
+          }
+          else {
+            if ( !Manager()->lookup.contains( id ) ) {
+              RecursiveDelete(
+                Manager()->lookup["open_slot_" + std::to_string( i )]
+              );
+
+              children[i] = CreateMemberPanel( id, members[i], i == 0 );
+            }
           }
         }
       };

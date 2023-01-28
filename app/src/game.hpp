@@ -205,8 +205,10 @@ inline void RunGameLoop() {
 
   // TODO move this into the Exit function
 
-  Network::Host()->Delete();
-  Network::Client()->Delete();
+  if ( Network::is_host )
+    Network::Host()->Delete();
+  else
+    Network::Client()->Delete();
 
   if ( campaign )
     delete campaign;

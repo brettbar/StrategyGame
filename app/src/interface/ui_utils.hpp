@@ -53,34 +53,6 @@ namespace UI {
     return "INVALID_ID";
   }
 
-  inline Type GetType( entt::entity entity ) {
-    if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).GetType();
-    }
-
-    if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).GetType();
-    }
-
-    if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).GetType();
-    }
-
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).GetType();
-    }
-
-    if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).GetType();
-    }
-
-    if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).GetType();
-    }
-
-    return Type::INVALID_TYPE;
-  }
-
   inline rect &GetTransform( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
       return Get<Panel>( entity ).elem.transform;

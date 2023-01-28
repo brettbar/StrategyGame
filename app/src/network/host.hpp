@@ -1,8 +1,11 @@
 /*
   0. Clicked Host Game
-  1. Host singleton is Created, Init called
-  2. Lobby is created (Created Lobby)
-  3. OnLobbyCreated is fired, Lobby meta data set
+  1. Host() :: Host singleton is Created, Networking is setup using IP or P2P
+  2. Init() :: Lobby is Created, MessageQueue begins processing messages
+  3. OnLobbyCreated() :: Lobby is created and people can now connect
+  4. Client attempts to connect, triggering SteamNetConnectionStatusChangedCallback_t,
+  5. OnNetConnectionStatusChanged() :: connection is checks and accepts client connection, giving slot in _clients
+  6. Once a client joins, all 
  */
 
 #pragma once
@@ -385,7 +388,7 @@ private:
     }
     // check if client has disconnected
     else if ( ( old_state == k_ESteamNetworkingConnectionState_Connecting || old_state == k_ESteamNetworkingConnectionState_Connected ) && info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ) {
-      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; ++i ) {
         if ( !_clients[i].active )
           continue;
 
@@ -398,6 +401,10 @@ private:
             nullptr,
             false
           );
+
+          _clients[i].active = false;
+          _clients[i].player_id = "";
+          _clients[i].steam_user_id = CSteamID();
         }
       }
     }

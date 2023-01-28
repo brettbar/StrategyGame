@@ -126,40 +126,34 @@ namespace UI {
 
       for ( entt::entity child: parent_panel.children ) {
 
-        switch ( GetType( child ) ) {
-          case Type::Panel: {
-            Panel &child_panel = Get<Panel>( child );
-            RecursiveLayout( child_panel );
-          } break;
-          case Type::StackPanel: {
+        if ( Has<Panel>( child ) ) {
+          Panel &child_panel = Get<Panel>( child );
+          RecursiveLayout( child_panel );
+        }
+        else if ( Has<StackPanel>( child ) ) {
+          StackPanel &child_panel = Get<StackPanel>( child );
 
-            StackPanel &child_panel = Get<StackPanel>( child );
+          entt::entity single_child =
+            child_panel.children[child_panel.curr_index];
 
-            entt::entity single_child =
-              child_panel.children[child_panel.curr_index];
+          assert( Has<Panel>( single_child ) );
+          Panel &single_child_panel = Get<Panel>( single_child );
+          single_child_panel.elem.transform.x = child_panel.elem.transform.x;
+          single_child_panel.elem.transform.y = child_panel.elem.transform.y;
 
-            assert( Has<Panel>( single_child ) );
-            Panel &single_child_panel = Get<Panel>( single_child );
-            single_child_panel.elem.transform.x = child_panel.elem.transform.x;
-            single_child_panel.elem.transform.y = child_panel.elem.transform.y;
-
-            RecursiveLayout( Get<Panel>( single_child ) );
-
-          } break;
-          case Type::TextLabel: {
-            Get<TextLabel>( child ).Resize();
-          } break;
-          case Type::TextButton: {
-            Get<TextButton>( child ).label.Resize();
-          } break;
-          case Type::TextureLabel: {
-            Get<TextureLabel>( child ).Resize();
-          } break;
-          case Type::TextureButton: {
-            Get<TextureButton>( child ).label.Resize();
-          } break;
-          default:
-            break;
+          RecursiveLayout( Get<Panel>( single_child ) );
+        }
+        else if ( Has<TextLabel>( child ) ) {
+          Get<TextLabel>( child ).Resize();
+        }
+        else if ( Has<TextButton>( child ) ) {
+          Get<TextButton>( child ).label.Resize();
+        }
+        else if ( Has<TextureLabel>( child ) ) {
+          Get<TextureLabel>( child ).Resize();
+        }
+        else if ( Has<TextureButton>( child ) ) {
+          Get<TextureButton>( child ).label.Resize();
         }
 
         // TODO ^ these could probably be consolidated using a template
@@ -239,37 +233,31 @@ namespace UI {
       panel.Draw();
 
       for ( entt::entity child: panel.children ) {
-        switch ( GetType( child ) ) {
-          case Type::Panel: {
-            RecursiveDraw( Get<Panel>( child ) );
-          } break;
-          case Type::StackPanel: {
-            StackPanel &child_panel = Get<StackPanel>( child );
+        if ( Has<Panel>( child ) ) {
+          RecursiveDraw( Get<Panel>( child ) );
+        }
+        else if ( Has<StackPanel>( child ) ) {
+          StackPanel &child_panel = Get<StackPanel>( child );
 
-            child_panel.Draw();
+          child_panel.Draw();
 
-            assert( Has<Panel>( child_panel.children[child_panel.curr_index] )
-            );
+          assert( Has<Panel>( child_panel.children[child_panel.curr_index] ) );
 
-            RecursiveDraw(
-              Get<Panel>( child_panel.children[child_panel.curr_index] )
-            );
-
-          } break;
-          case Type::TextLabel: {
-            Get<TextLabel>( child ).Draw();
-          } break;
-          case Type::TextButton: {
-            Get<TextButton>( child ).Draw();
-          } break;
-          case Type::TextureLabel: {
-            Get<TextureLabel>( child ).Draw();
-          } break;
-          case Type::TextureButton: {
-            Get<TextureButton>( child ).Draw();
-          } break;
-          default:
-            break;
+          RecursiveDraw(
+            Get<Panel>( child_panel.children[child_panel.curr_index] )
+          );
+        }
+        else if ( Has<TextLabel>( child ) ) {
+          Get<TextLabel>( child ).Draw();
+        }
+        else if ( Has<TextButton>( child ) ) {
+          Get<TextButton>( child ).Draw();
+        }
+        else if ( Has<TextureLabel>( child ) ) {
+          Get<TextureLabel>( child ).Draw();
+        }
+        else if ( Has<TextureButton>( child ) ) {
+          Get<TextureButton>( child ).Draw();
         }
       }
     }

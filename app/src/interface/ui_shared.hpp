@@ -3,17 +3,6 @@
 
 namespace UI {
 
-  enum class Type {
-    INVALID_TYPE,
-    Panel,
-    StackPanel,
-    TextLabel,
-    TextureLabel,
-    TextButton,
-    TextureButton,
-  };
-
-
   struct Context {
     entt::entity hot;
     entt::entity active;

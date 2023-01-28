@@ -26,7 +26,6 @@ namespace UI {
 
   struct Element {
     std::string id;
-    Type type;
     Color background;
     bool enabled;
     rect transform;
@@ -34,13 +33,12 @@ namespace UI {
 
     Element(
       std::string id,
-      Type type,
       Color background,
       bool enabled,
       rect transform,
       Margins margins
     )
-        : id( id ), type( type ), background( background ), enabled( enabled ),
+        : id( id ), background( background ), enabled( enabled ),
           transform( transform ), margins( margins ) {}
 
     void Enable() {
@@ -53,10 +51,6 @@ namespace UI {
 
     bool IsEnabled() {
       return enabled;
-    }
-
-    Type GetType() {
-      return type;
     }
   };
 

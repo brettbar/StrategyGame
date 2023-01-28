@@ -17,10 +17,6 @@ namespace UI {
       return elem.id;
     }
 
-    Type GetType() {
-      return elem.GetType();
-    }
-
     void Resize() {
       elem.transform.width = texture.width * UI::SCALE;
       elem.transform.height = texture.height * UI::SCALE;
@@ -32,8 +28,8 @@ namespace UI {
       );
     }
 
-    TextureLabel( std::string id, enum Type type )
-        : elem( Element( id, type, WHITE, false, {}, {} ) ),
+    TextureLabel( std::string id )
+        : elem( Element( id, WHITE, false, {}, {} ) ),
           texture( Global::texture_cache[hstr{ id.c_str() }]->texture ) {
       elem.transform.x = texture.width * UI::SCALE;
       elem.transform.y = texture.height * UI::SCALE;
@@ -50,10 +46,6 @@ namespace UI {
       return label.ID();
     }
 
-    Type GetType() {
-      return label.GetType();
-    }
-
     void Draw() {
       label.Draw();
     }
@@ -68,8 +60,7 @@ namespace UI {
       Events::event_emitter.publish( Events::ButtonClick{ label.elem.id } );
     }
 
-    TextureButton( std::string id )
-        : label( TextureLabel( id, Type::TextureButton ) ) {}
+    TextureButton( std::string id ) : label( TextureLabel( id ) ) {}
   };
 
 

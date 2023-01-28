@@ -19,10 +19,6 @@ namespace UI {
       return elem.id;
     }
 
-    Type GetType() {
-      return elem.GetType();
-    }
-
     void Update() {
       if ( update )
         update( *this );
@@ -47,14 +43,7 @@ namespace UI {
       std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     )
-        : elem( Element(
-            id,
-            Type::Panel,
-            background,
-            false,
-            { 0, 0, 500, 200 },
-            {}
-          ) ),
+        : elem( Element( id, background, false, { 0, 0, 500, 200 }, {} ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), abs_size( abs_size ),
@@ -69,7 +58,7 @@ namespace UI {
       Align children_vert_align,
       std::vector<entt::entity> children = {}
     )
-        : elem( Element( id, Type::Panel, background, false, {}, {} ) ),
+        : elem( Element( id, background, false, {}, {} ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), update( {} ),
@@ -85,7 +74,7 @@ namespace UI {
       Margins margins,
       std::vector<entt::entity> children
     )
-        : elem( Element( id, Type::Panel, background, false, {}, margins ) ),
+        : elem( Element( id, background, false, {}, margins ) ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), update( {} ),
@@ -109,10 +98,6 @@ namespace UI {
       return elem.id;
     }
 
-    Type GetType() {
-      return elem.GetType();
-    }
-
     void Draw() {
       DrawRectangleV(
         { elem.transform.x, elem.transform.y },
@@ -127,7 +112,7 @@ namespace UI {
       Color background,
       std::vector<entt::entity> children
     )
-        : elem( Element( id, Type::StackPanel, background, false, {}, {} ) ),
+        : elem( Element( id, background, false, {}, {} ) ),
           children( children ){};
   };
 

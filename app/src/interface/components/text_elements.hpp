@@ -22,10 +22,6 @@ namespace UI {
       return elem.id;
     }
 
-    Type GetType() {
-      return elem.GetType();
-    }
-
     void Resize() {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -100,9 +96,9 @@ namespace UI {
       Color text_color,
       bool dynamic
     )
-        : elem( Element( id, Type::TextLabel, background, false, {}, {} ) ),
-          text( text ), font_size( font_size ), text_color( text_color ),
-          dynamic( dynamic ) {}
+        : elem( Element( id, background, false, {}, {} ) ), text( text ),
+          font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
+    }
 
     TextLabel(
       std::string id,
@@ -113,22 +109,9 @@ namespace UI {
       bool dynamic,
       std::function<std::string()> update
     )
-        : elem( Element( id, Type::TextLabel, background, false, {}, {} ) ),
-          text( text ), font_size( font_size ), text_color( text_color ),
-          dynamic( dynamic ), update( update ) {}
-
-    TextLabel(
-      enum Type type,
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic
-    )
-        : elem( Element( id, type, background, false, {}, {} ) ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-    }
+        : elem( Element( id, background, false, {}, {} ) ), text( text ),
+          font_size( font_size ), text_color( text_color ), dynamic( dynamic ),
+          update( update ) {}
   };
 
   struct TextButton {
@@ -141,10 +124,6 @@ namespace UI {
 
     std::string ID() {
       return label.ID();
-    }
-
-    Type GetType() {
-      return label.GetType();
     }
 
     void Draw() {
@@ -174,15 +153,9 @@ namespace UI {
       Color text_color,
       bool dynamic
     )
-        : label( TextLabel(
-            Type::TextButton,
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            dynamic
-          ) ) {
+        : label(
+            TextLabel( id, text, font_size, background, text_color, dynamic )
+          ) {
       action = [id]() {
         Events::event_emitter.publish( Events::ButtonClick{ id } );
       };
@@ -197,15 +170,9 @@ namespace UI {
       bool dynamic,
       std::function<void()> action
     )
-        : label( TextLabel(
-            Type::TextButton,
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            dynamic
-          ) ),
+        : label(
+            TextLabel( id, text, font_size, background, text_color, dynamic )
+          ),
           action( action ) {}
 
     TextButton(
@@ -217,15 +184,9 @@ namespace UI {
       bool dynamic,
       bool always_clickable
     )
-        : label( TextLabel(
-            Type::TextButton,
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            dynamic
-          ) ),
+        : label(
+            TextLabel( id, text, font_size, background, text_color, dynamic )
+          ),
           always_clickable( always_clickable ), clickable( always_clickable ) {
 
       action = [id]() {
@@ -233,5 +194,4 @@ namespace UI {
       };
     }
   };
-
 };// namespace UI

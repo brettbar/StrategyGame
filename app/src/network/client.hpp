@@ -1,3 +1,8 @@
+/*
+  0. Clicked Join Game
+  1. 
+ */
+
 #pragma once
 
 #include "network.hpp"
@@ -76,19 +81,6 @@ public:
       }
 
       return list;
-
-      // TODO right now this is based on lobby info
-      // std::vector<CSteamID> other_users = {};
-
-      // for ( u32 i = 0; i < SteamMatchmaking()->GetNumLobbyMembers( _lobby_id );
-      //       i++ ) {
-      //   CSteamID member =
-      //     SteamMatchmaking()->GetLobbyMemberByIndex( _lobby_id, i );
-
-      //   other_users.push_back( member );
-      // }
-
-      // return other_users;
     }
 
     bool AttemptJoinLobby( CSteamID lobby_id ) {
