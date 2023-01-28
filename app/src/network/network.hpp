@@ -34,6 +34,7 @@ namespace Network {
     std::string player_id;
 
     bool active;
+    bool readied_up;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
     HSteamNetConnection conn;
@@ -78,7 +79,9 @@ namespace Network {
       nullptr
     );
 
-    assert( r == k_EResultOK );
+    // printf( "Message Result %d\n", r );
+
+    // assert( r == k_EResultOK );
   }
 
   // inline std::vector<CSteamID> GetLobbyMembers() {

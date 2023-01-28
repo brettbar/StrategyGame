@@ -12,6 +12,31 @@
 #include "../../network/network.hpp"
 
 namespace UI {
+  inline entt::entity CreateReadyOrStart() {
+    if ( Network::is_host ) {
+      return Create<TextButton>( {
+        "host_started_game",
+        "Start Game",
+        24,
+        RED,
+        WHITE,
+        false,
+        true,// todo make false
+      } );
+    }
+    else {
+      return Create<TextButton>( {
+        "client_ready_up",
+        "Ready Up",
+        24,
+        RED,
+        WHITE,
+        false,
+        true,// todo make false
+      } );
+    }
+  }
+
   inline entt::entity
   CreateMemberPanel( std::string id, std::string member, bool is_host ) {
     std::string label = "something wrong";
@@ -31,8 +56,12 @@ namespace UI {
       Align::Start,
       Align::Start,
       Margins{ 16, 16, 0, 0 },
-      { Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false }
-      ) },
+      {
+        Create<TextButton>(
+          { "player_select_faction", "Select Faction", 24, color, WHITE, false }
+        ),
+        Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false } ),
+      },
     } );
 
     RecursiveToggle( panel, true );
@@ -176,6 +205,7 @@ namespace UI {
               Network::MAX_PLAYERS_PER_SERVER
             ),
           } ),
+          CreateReadyOrStart(),
         },
       } ),
     };

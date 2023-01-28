@@ -32,6 +32,83 @@ namespace Network {
 
 
   class IHost {
+private:
+    IHost( IHost const & ) = delete;
+    void operator=( const IHost & ) = delete;
+
+    CSteamID _server_id;
+
+
+    // Used after lobby is done
+    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
+
+    HSteamListenSocket _socket;
+    // HSteamNetPollGroup _poll_grp;
+
+    void OnLobbyCreated( LobbyCreated_t *, bool );
+    CCallResult<IHost, LobbyCreated_t> result_lobby_created;
+
+    STEAM_CALLBACK( IHost, OnLobbyChatMsg, LobbyChatMsg_t );
+
+    STEAM_CALLBACK(
+      IHost,
+      OnNetConnectionStatusChanged,
+      SteamNetConnectionStatusChangedCallback_t
+    );
+
+    IHost() {
+      // zero the client connection data
+      // memset( &_clients, 0, sizeof( _clients ) );
+      _clients = {};
+
+
+      // _poll_grp = SteamNetworkingSockets()->CreatePollGroup();
+
+      // make this if debug
+      if ( LOCAL )
+        SetupUsingIP();
+      else
+        SetupUsingP2P();
+    }
+
+    ~IHost() {
+      // Close connection
+      printf( "~IHost()\n" );
+
+      SteamNetworkingSockets()->CloseListenSocket( _socket );
+      // SteamNetworkingSockets()->DestroyPollGroup( poll_grp );
+    }
+
+    // This is useful for localhost testing on the same machine
+    void SetupUsingIP() {
+      SteamNetworkingIPAddr addr = SteamNetworkingIPAddr();
+      addr.SetIPv6LocalHost( 10202 );
+
+      printf( "Hosting with addr: %d\n", addr.GetIPv4() );
+      _socket =
+        SteamNetworkingSockets()->CreateListenSocketIP( addr, 0, nullptr );
+      assert( _socket != k_HSteamListenSocket_Invalid );
+    }
+
+    // This is useful for real production, different machines
+    void SetupUsingP2P() {
+      _socket =
+        SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
+      assert( _socket != k_HSteamListenSocket_Invalid );
+    }
+
+
+    void SendMessageToAllClients( const char *msg ) {
+
+      // We start at 1 since host is always i=0
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
+        if ( !_clients[i].active )
+          continue;
+
+        SendMessageOnConnection( _clients[i].conn, msg );
+      }
+    }
 
 public:
     MessageQueue msg_queue;
@@ -124,84 +201,6 @@ public:
       }
 
       return clients;
-    }
-
-private:
-    IHost( IHost const & ) = delete;
-    void operator=( const IHost & ) = delete;
-
-    CSteamID _server_id;
-
-
-    // Used after lobby is done
-    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
-    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
-
-    HSteamListenSocket _socket;
-    // HSteamNetPollGroup _poll_grp;
-
-    void OnLobbyCreated( LobbyCreated_t *, bool );
-    CCallResult<IHost, LobbyCreated_t> result_lobby_created;
-
-    STEAM_CALLBACK( IHost, OnLobbyChatMsg, LobbyChatMsg_t );
-
-    STEAM_CALLBACK(
-      IHost,
-      OnNetConnectionStatusChanged,
-      SteamNetConnectionStatusChangedCallback_t
-    );
-
-    IHost() {
-      // zero the client connection data
-      // memset( &_clients, 0, sizeof( _clients ) );
-      _clients = {};
-
-
-      // _poll_grp = SteamNetworkingSockets()->CreatePollGroup();
-
-      // make this if debug
-      if ( LOCAL )
-        SetupUsingIP();
-      else
-        SetupUsingP2P();
-    }
-
-    ~IHost() {
-      // Close connection
-      printf( "~IHost()\n" );
-
-      SteamNetworkingSockets()->CloseListenSocket( _socket );
-      // SteamNetworkingSockets()->DestroyPollGroup( poll_grp );
-    }
-
-    // This is useful for localhost testing on the same machine
-    void SetupUsingIP() {
-      SteamNetworkingIPAddr addr = SteamNetworkingIPAddr();
-      addr.SetIPv6LocalHost( 10202 );
-
-      printf( "Hosting with addr: %d\n", addr.GetIPv4() );
-      _socket =
-        SteamNetworkingSockets()->CreateListenSocketIP( addr, 0, nullptr );
-      assert( _socket != k_HSteamListenSocket_Invalid );
-    }
-
-    // This is useful for real production, different machines
-    void SetupUsingP2P() {
-      _socket =
-        SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
-      assert( _socket != k_HSteamListenSocket_Invalid );
-    }
-
-
-    void SendMessageToAllClients( const char *msg ) {
-
-      // We start at 1 since host is always i=0
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
-        if ( !_clients[i].active )
-          continue;
-
-        SendMessageOnConnection( _clients[i].conn, msg );
-      }
     }
   };
 

@@ -193,5 +193,20 @@ namespace UI {
         Events::event_emitter.publish( Events::ButtonClick{ id } );
       };
     }
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      bool always_clickable,
+      std::function<void()> action
+    )
+        : label(
+            TextLabel( id, text, font_size, background, text_color, dynamic )
+          ),
+          action( action ) {}
   };
 };// namespace UI

@@ -80,6 +80,9 @@ inline void RunGameLoop() {
         else if ( event.origin == "main_menu_exit_game" ) {
           pstate->hit_exit = true;
         }
+        else if ( event.origin == "player_select_faction" ) {
+          UI::System::SwitchPage( UI::FactonSelectMenu );
+        }
         else if ( event.origin == "modal_menu_load_game" ) {
           pstate->pending_load_campaign = true;
         }
