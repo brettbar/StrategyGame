@@ -180,6 +180,7 @@ inline void RunGameLoop() {
     }
 
     if ( pstate->is_host ) {
+      Network::Host()->SendPing();
       Network::Host()->CheckForMessages();
       Network::Host()->EvaluateMessages();
     }

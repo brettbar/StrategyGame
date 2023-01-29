@@ -11,6 +11,7 @@
 #pragma once
 
 #include "network.hpp"
+#include <chrono>
 #include <isteammatchmaking.h>
 
 namespace Network {
@@ -98,6 +99,15 @@ private:
       assert( _socket != k_HSteamListenSocket_Invalid );
     }
 
+    void SendPing() {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
+        if ( !_clients[i].active )
+          continue;
+
+        const auto now = std::chrono::system_clock::now();
+        SendMessageOnConnection( _clients[i].conn, "ping" );
+      }
+    }
 
     void SendMessageToAllClients( const char *msg ) {
 
