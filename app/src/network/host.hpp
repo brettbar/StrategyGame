@@ -99,15 +99,15 @@ private:
       assert( _socket != k_HSteamListenSocket_Invalid );
     }
 
-    void SendPing() {
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
-        if ( !_clients[i].active )
-          continue;
+    // void SendPing() {
+    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
+    //     if ( !_clients[i].active )
+    //       continue;
 
-        const auto now = std::chrono::system_clock::now();
-        SendMessageOnConnection( _clients[i].conn, "ping" );
-      }
-    }
+    //     const auto now = std::chrono::system_clock::now();
+    //     SendMessageOnConnection( _clients[i].conn, "ping" );
+    //   }
+    // }
 
     void SendMessageToAllClients( const char *msg ) {
 
@@ -287,104 +287,107 @@ public:
     }
 
 
+    // Check if a client has connected
     if ( info.m_eState == k_ESteamNetworkingConnectionState_Connecting && old_state == k_ESteamNetworkingConnectionState_None ) {
       printf(
         "Accepting client connection %s\n", info.m_szConnectionDescription
       );
 
-      for ( int i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
-        if ( !_clients[i].active ) {
-          EResult res =
-            SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
+      // Connection from a new client
+      // Search for an available slot
+      for ( int i = 1; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+        if ( _clients[i].active )
+          continue;
 
-          if ( res != k_EResultOK ) {
-            char msg[256];
+        EResult res = SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
+
+        if ( res != k_EResultOK ) {
+          char msg[256];
 #if _WINDLL
-            sprintf_s( msg, "AcceptConnection returned %d", res );
+          sprintf_s( msg, "AcceptConnection returned %d", res );
 #else
-            snprintf( msg, sizeof( msg ), "AcceptConnection returned %d", res );
+          snprintf( msg, sizeof( msg ), "AcceptConnection returned %d", res );
 #endif
 
-            printf( "%s\n", msg );
+          printf( "%s\n", msg );
 
-            SteamNetworkingSockets()->CloseConnection(
-              cb->m_hConn,
-              k_ESteamNetConnectionEnd_AppException_Generic,
-              "Failed to accept connection",
-              false
-            );
-            return;
-          }
-
-          // printf( "Annoying number: %s\n", std::to_string( i ).c_str() );
-
-          // char player_id[128];
-          // sprintf( player_id, "player_%d", i );
-          // printf( "buf result: %s\n", player_id );
-
-          _clients[i].player_id = "player_" + std::to_string( i );
-          _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
-          _clients[i].active = true;
-          _clients[i].conn = cb->m_hConn;
-
-          // SendMessageOnConnection(
-          //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
-          // );
-
-          // Tell the new client about all the current clients
-          for ( auto client: _clients ) {
-            if ( !client.active )
-              continue;
-
-
-            nlohmann::json host_payload = {
-              { "type", "player_connected" },
-            };
-            host_payload["data"] = {
-              { "is_host", ( client.player_id == "player_0" ) },
-              { "player_id", client.player_id },
-              {
-                "steam_name",
-                std::string(
-                  SteamFriends()->GetFriendPersonaName( client.steam_user_id )
-                ),
-              } };
-
-            SendMessageOnConnection(
-              _clients[i].conn, host_payload.dump().c_str()
-            );
-          }
-
-
-          // Tell all the current clietns about the new client
-          nlohmann::json payload = {
-            { "type", "player_connected" },
-          };
-          payload["data"] = {
-            { "is_host", false },
-            { "player_id", _clients[i].player_id },
-            {
-              "steam_name",
-              std::string( SteamFriends()->GetFriendPersonaName(
-                _clients[i].steam_user_id
-              ) ),
-            } };
-          // SendMessageToAllClients( payload.dump().c_str() );
-
-          // We start at 1 since the host already knows
-          for ( uint32 j = 1; j < MAX_PLAYERS_PER_SERVER; j++ ) {
-            if ( !_clients[i].active || i == j )// we don't need to tell ourselves
-              continue;
-
-            SendMessageOnConnection( _clients[j].conn, payload.dump().c_str() );
-          }
-
-
-          // TODO make this only close when the game is started
-          // SteamMatchmaking()->LeaveLobby( lobby_id );
-
+          SteamNetworkingSockets()->CloseConnection(
+            cb->m_hConn,
+            k_ESteamNetConnectionEnd_AppException_Generic,
+            "Failed to accept connection",
+            false
+          );
           return;
         }
+
+        // printf( "Annoying number: %s\n", std::to_string( i ).c_str() );
+
+        // char player_id[128];
+        // sprintf( player_id, "player_%d", i );
+        // printf( "buf result: %s\n", player_id );
+
+        _clients[i].player_id = "player_" + std::to_string( i );
+        _clients[i].steam_user_id = info.m_identityRemote.GetSteamID();
+        _clients[i].active = true;
+        _clients[i].conn = cb->m_hConn;
+
+        // SendMessageOnConnection(
+        //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
+        // );
+
+        // Tell the new client about all the current clients
+        for ( auto client: _clients ) {
+          if ( !client.active )
+            continue;
+
+
+          nlohmann::json host_payload = {
+            { "type", "player_connected" },
+          };
+          host_payload["data"] = {
+            { "is_host", ( client.player_id == "player_0" ) },
+            { "player_id", client.player_id },
+            {
+              "steam_name",
+              std::string(
+                SteamFriends()->GetFriendPersonaName( client.steam_user_id )
+              ),
+            } };
+
+          SendMessageOnConnection(
+            _clients[i].conn, host_payload.dump().c_str()
+          );
+        }
+
+
+        // Tell all the current clietns about the new client
+        nlohmann::json payload = {
+          { "type", "player_connected" },
+        };
+        payload["data"] = {
+          { "is_host", false },
+          { "player_id", _clients[i].player_id },
+          {
+            "steam_name",
+            std::string(
+              SteamFriends()->GetFriendPersonaName( _clients[i].steam_user_id )
+            ),
+          } };
+        // SendMessageToAllClients( payload.dump().c_str() );
+
+        // We start at 1 since the host already knows
+        for ( uint32 j = 1; j < MAX_PLAYERS_PER_SERVER; j++ ) {
+          if ( !_clients[i].active || i == j )// we don't need to tell ourselves
+            continue;
+
+          SendMessageOnConnection( _clients[j].conn, payload.dump().c_str() );
+        }
+
+
+        // TODO make this only close when the game is started
+        // SteamMatchmaking()->LeaveLobby( lobby_id );
+
+        return;
       }
 
       printf( "Rejecting connection; server full\n" );
