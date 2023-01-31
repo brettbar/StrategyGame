@@ -191,7 +191,6 @@ public:
       delete this;
     }
 
-
     std::vector<std::string> GetConnectedUsers() {
       std::vector<std::string> clients = {};
 
