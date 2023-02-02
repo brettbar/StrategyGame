@@ -22,6 +22,7 @@ namespace UI {
   enum PageType {
     MainMenu,
     FactonSelectMenu,
+    SinglePlayerLobby,
     ModalMenu,
     Campaign,
     LobbyBrowser,

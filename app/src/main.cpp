@@ -83,9 +83,10 @@ int main( void ) {
 
   SetExitKey( KEY_NULL );
 
+  Network::Setup();
 
   // This call will block and run until the game exists
-  RunGameLoop();
+  Game()->MainLoop();
 
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever

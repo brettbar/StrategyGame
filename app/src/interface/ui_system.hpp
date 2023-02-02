@@ -6,6 +6,7 @@
 #include "pages/lobby_ui.hpp"
 #include "pages/main_menu_ui.hpp"
 #include "pages/modal_menu_ui.hpp"
+#include "pages/singleplayer_lobby.hpp"
 #include "ui_manager.hpp"
 
 namespace UI {
@@ -24,6 +25,7 @@ namespace UI {
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
+        CreateSinglePlayerLobby(),
         CreateModalMenuUI(),
         CreateCampaignUI(),
         CreateLobbyBrowser(),

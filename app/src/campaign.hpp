@@ -70,9 +70,79 @@ inline void Campaign::Load() {
     }
   );
 
-  // Make sure the singleton is initialized
   Commands::Manager();
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
+}
+
+// Runs inside game loop
+inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
+  // 1. Update Time
+  dt = GetFrameTime();
+  lag += dt;
+  oncelag += dt;
+
+  // 2. Check for Input
+  Input::CheckMenuToggle();
+  Input::Handle();
+
+  // 3. Process all commands
+  Commands::Manager()->FireAll();
+
+  // TODO
+  // Add an explicity Eval step and Execute step
+  //
+  // Eval:
+  // - 0. (happens in game regardless of campaign) Process Events
+  // 1. Receive Messages
+  // 2. Receive Commands
+  // 3. Validate Messages
+  // 4. Validate Commands (like remove duplicates or something)
+
+  // Exec:
+  // 1. Update the campaign state with changes from Commands
+  // 2. Update UI with Messages
+
+  /*================================================================
+   *                      EVALUATION 
+   ===============================================================*/
+  {
+
+  };
+  /*================================================================
+   *                      /EVALUATION 
+   ===============================================================*/
+
+  // 5. Run all Updates
+  {
+    // Update 60 times a second
+    while ( lag >= _MS_PER_UPDATE ) {
+      Update60TPS();
+      lag -= _MS_PER_UPDATE;
+    }
+
+    // Update once per second
+    while ( oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+      Update1TPS();
+      oncelag = 0.0f;
+    }
+
+    // Update once per frame
+    UpdateOnFrame();
+
+    // Update Camera
+    CameraUpdate( Global::state.camera, dt );
+  }
+
+  // 6. Draw everything
+  BeginDrawing();
+  {
+    Renderer::Draw( Global::texture_cache );
+    Renderer::DrawUI();
+
+    DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+    DrawFPS( GetScreenWidth() - 100, 2 );
+  }
+  EndDrawing();
 }
 
 

@@ -1,8 +1,6 @@
-// Thinking commands should only matter to the game running,
-// thus could go in the normal start/load sequence
-// Stuff like ui menu button presses dont need to be commands,
-// They should be their own thing that doesnt relate to the game simulation
-
+/*
+   * Commands are essentially requests to modify the game state.
+ */
 #pragma once
 
 #include "../../shared/common.hpp"

@@ -7,16 +7,50 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 );
 inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( UVector2 );
 
-inline void PrintVec2( Vector2 vec ) { printf( "(%f, %f)\n", vec.x, vec.y ); }
-inline u32 RollN( u32 n ) { return rand() % n + 1; }
+inline void CameraUpdate( Camera2D &camera, f32 dt ) {
+  f32 cameraSpeed = 500.0f;
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
+  if ( IsKeyDown( KEY_D ) )
+    camera.target.x += dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    camera.target.x -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    camera.target.y -= dt * cameraSpeed / camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    camera.target.y += dt * cameraSpeed / camera.zoom;
+
+  if ( IsKeyDown( KEY_Z ) )
+    camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    camera.zoom += 0.05f;
+
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  camera.zoom += ( mouseWheelDelta * 0.2f );
+  if ( camera.zoom > 8.0f )
+    camera.zoom = 8.0f;
+  else if ( camera.zoom < 0.08f )
+    camera.zoom = 0.08f;
+
+  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
+}
+
+inline void PrintVec2( Vector2 vec ) {
+  printf( "(%f, %f)\n", vec.x, vec.y );
+}
+inline u32 RollN( u32 n ) {
+  return rand() % n + 1;
+}
 
 inline void PrintRect( Rectangle rect ) {
   printf(
-    "(x:%f, y:%f, w:%f, h:%f)\n",
-    rect.x,
-    rect.y,
-    rect.width,
-    rect.height );
+    "(x:%f, y:%f, w:%f, h:%f)\n", rect.x, rect.y, rect.width, rect.height
+  );
 }
 
 inline i32 DetermineTileIdFromPosition( Vector2 pos ) {
@@ -30,7 +64,8 @@ inline i32 DetermineTileIdFromPosition( Vector2 pos ) {
 
   if ( row % 2 == 1 ) {
     column = ( target->x - 32.0 ) / 64.0;
-  } else {
+  }
+  else {
     column = target->x / 64.0;
   }
 
@@ -74,7 +109,8 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
     if ( !rowIsOdd )
 
       column--;
-  } else if ( relY < ( m * relX ) - c ) {// RIGHT edge
+  }
+  else if ( relY < ( m * relX ) - c ) {// RIGHT edge
     row--;
     if ( rowIsOdd )
 
@@ -128,7 +164,8 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
     if ( !rowIsOdd )
 
       column--;
-  } else if ( relY < ( m * relX ) - c ) {// RIGHT edge
+  }
+  else if ( relY < ( m * relX ) - c ) {// RIGHT edge
     row--;
     if ( rowIsOdd )
 
