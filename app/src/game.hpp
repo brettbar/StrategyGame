@@ -33,6 +33,8 @@ class IGame {
     while ( !WindowShouldClose() && ShouldRun() ) {
       CheckForEvents();
 
+      UI::System::CheckForMessages();
+
       HandleMessages();
 
       SteamAPI_RunCallbacks();
@@ -57,6 +59,9 @@ class IGame {
   f32 _lag = 0.0f;
   f32 _dt = 0.0f;
 
+  // TODO move
+  std::string faction_str = "";
+
   IGame( IGame const & ) = delete;
   void operator=( const IGame & ) = delete;
 
@@ -71,10 +76,6 @@ class IGame {
   /*=============================================================
                         Begin: Singleplayer
   =============================================================*/
-  void StartSinglePlayerCampaign() {
-    _single_player = true;
-    UI::System::SwitchPage( UI::FactonSelectMenu );
-  }
   /*=============================================================
                         End: Singleplayer
   =============================================================*/
@@ -253,7 +254,8 @@ class IGame {
           LookForMultiplayerCampaign();
         }
         else if ( event.origin == "main_menu_start_game" ) {
-          StartSinglePlayerCampaign();
+          _single_player = true;
+          UI::System::SwitchPage( UI::FactionSelectMenu );
         }
         else if ( event.origin == "main_menu_load_game" ) {
           LoadGame();
@@ -262,7 +264,13 @@ class IGame {
           ExitGame();
         }
         else if ( event.origin == "player_select_faction" ) {
-          UI::System::SwitchPage( UI::FactonSelectMenu );
+          UI::System::SwitchPage( UI::FactionSelectMenu );
+        }
+        else if ( event.origin == "singleplayer_faction_label" ) {
+          UI::System::SwitchPage( UI::FactionSelectMenu );
+        }
+        else if ( event.origin == "singleplayer_lobby_start_game" ) {
+          StartCampaign( faction_str );
         }
         else if ( event.origin == "modal_menu_load_game" ) {
           LoadGame();
@@ -283,6 +291,29 @@ class IGame {
           // StartCampaign( event.msg );
           if ( _single_player ) {
             UI::System::SwitchPage( UI::SinglePlayerLobby );
+            faction_str = event.msg;
+
+            Messages::message_emitter.publish( Messages::FactionSelected{
+              { "singleplayer_faction_selected", event.msg },
+              [&]() -> Color {
+                if ( event.msg == "romans" )
+                  return RED;
+                if ( event.msg == "greeks" )
+                  return BLUE;
+                if ( event.msg == "celts" )
+                  return GREEN;
+                if ( event.msg == "punics" )
+                  return PURPLE;
+                if ( event.msg == "germans" )
+                  return GRAY;
+                if ( event.msg == "scythians" )
+                  return PINK;
+                if ( event.msg == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
           }
           else {
             UI::System::SwitchPage( UI::Lobby );

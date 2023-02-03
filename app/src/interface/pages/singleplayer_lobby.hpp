@@ -39,6 +39,23 @@ namespace UI {
             WHITE,
             false,
           } ),
+          Create<TextLabel>( {
+            "singleplayer_faction_selected",
+            "Waiting to Select Faction",
+            32,
+            GRAY,
+            WHITE,
+            // TODO remove dynamic as a bool
+            false,
+          } ),
+          Create<TextButton>( {
+            "singleplayer_lobby_start_game",
+            "Start Game",
+            32,
+            BLUE,
+            WHITE,
+            false,
+          } ),
         },
       } ),
     };

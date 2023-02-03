@@ -1,3 +1,4 @@
+// Used for sending data from the UI to the Game State
 #pragma once
 
 #include "common.hpp"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../shared/messages.hpp"
 #include "pages/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
 #include "pages/lobby_browser.hpp"
@@ -59,6 +60,28 @@ namespace UI {
       }
     }
 
+    inline void CheckForMessages() {
+      Messages::message_emitter.on<Messages::FactionSelected>(
+        [&](
+          const Messages::FactionSelected msg, Messages::MessageEmitter &emitter
+        ) {
+          entt::entity element = Manager()->lookup.at( msg.dest_id );
+          if ( Has<TextLabel>( element ) ) {
+            Get<TextLabel>( element ).Update( msg.updated_value );
+
+            if ( msg.dest_id == "singleplayer_faction_selected" ) {
+              Get<TextLabel>( element ).elem.background = msg.color;
+            }
+          }
+          else if ( Has<TextButton>( element ) ) {
+            Get<TextButton>( element ).Update( msg.updated_value );
+          }
+          else {
+            printf( "WARNING: Sent message to invalid element type.\n" );
+          }
+        }
+      );
+    }
 
     inline void UpdateOnFrame() {
       vec2 mousePos = GetMousePosition();

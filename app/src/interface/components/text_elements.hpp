@@ -3,7 +3,6 @@
 #include "element.hpp"
 
 #include "../clickable.hpp"
-#include "../updates.hpp"
 //
 // TODO this might be a circular dependency issue
 #include "../ui_manager.hpp"
@@ -36,15 +35,18 @@ namespace UI {
 
     void Update() {
       if ( elem.enabled && dynamic ) {
-        if ( update_lookup.contains( elem.id ) ) {
-          text = update_lookup.at( elem.id )();
-        }
-        else if ( update ) {
+        if ( update ) {
           text = update();
         }
         else {
           printf( "ERROR :: Update not found for elem %s\n", elem.id.c_str() );
         }
+      }
+    }
+
+    void Update( std::string updated_text ) {
+      if ( elem.enabled ) {
+        text = updated_text;
       }
     }
 
@@ -139,6 +141,10 @@ namespace UI {
 
       if ( label.elem.enabled && !always_clickable )
         clickable = clickable_lookup.at( label.elem.id )();
+    }
+
+    void Update( std::string updated_text ) {
+      label.Update( updated_text );
     }
 
     void Action() {

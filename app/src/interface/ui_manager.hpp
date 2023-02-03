@@ -1,11 +1,14 @@
 #pragma once
 
 #include "../shared/common.hpp"
+#include "../shared/events.hpp"
+#include "../shared/messages.hpp"
 #include "../shared/utils.hpp"
 #include "components/panel.hpp"
 #include "components/text_elements.hpp"
 #include "ui_shared.hpp"
 
+//
 // TODO remove
 #include "../world/systems/selection_system.hpp"
 
@@ -21,7 +24,7 @@
 namespace UI {
   enum PageType {
     MainMenu,
-    FactonSelectMenu,
+    FactionSelectMenu,
     SinglePlayerLobby,
     ModalMenu,
     Campaign,
@@ -51,6 +54,7 @@ public:
       static IManager instance;
       return &instance;
     }
+
 
     IManager( IManager const & ) = delete;
     void operator=( const IManager & ) = delete;
