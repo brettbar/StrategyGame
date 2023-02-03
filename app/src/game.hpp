@@ -51,7 +51,6 @@ class IGame {
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
-  bool _is_host = false;
   bool _hit_exit = false;
   ProgramMode _mode = ProgramMode::MainMenu;
 
@@ -86,7 +85,7 @@ class IGame {
   =============================================================*/
   void HostMultiplayerCampaign() {
     _single_player = false;
-    _is_host = true;
+    Network::is_host = true;
     Network::Host()->Init();
     UI::System::SwitchPage( UI::Lobby );
   }
@@ -95,7 +94,7 @@ class IGame {
 
   void LookForMultiplayerCampaign() {
     _single_player = false;
-    _is_host = false;
+    Network::is_host = false;
     Network::Client()->Init();
     UI::System::SwitchPage( UI::LobbyBrowser );
   }
@@ -108,7 +107,7 @@ class IGame {
   }
 
   void HandleMessages() {
-    if ( _is_host ) {
+    if ( Network::is_host ) {
       // Network::Host()->SendPing();
       Network::Host()->CheckForMessages();
       Network::Host()->EvaluateMessages();
@@ -286,6 +285,29 @@ class IGame {
         }
         else if ( event.origin == "toggle_modal_menu" ) {
           ToggleModalMenu();
+        }
+        else if ( event.origin == "ready_up" ) {
+          Messages::message_emitter.publish( Messages::FactionSelected{
+            { "player_select_faction", event.msg },
+            [&]() -> Color {
+              if ( event.msg == "romans" )
+                return RED;
+              if ( event.msg == "greeks" )
+                return BLUE;
+              if ( event.msg == "celts" )
+                return GREEN;
+              if ( event.msg == "punics" )
+                return PURPLE;
+              if ( event.msg == "germans" )
+                return GRAY;
+              if ( event.msg == "scythians" )
+                return PINK;
+              if ( event.msg == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
+          } );
         }
         else if ( event.origin == "faction_select" ) {
           // StartCampaign( event.msg );

@@ -13,28 +13,18 @@
 
 namespace UI {
   inline entt::entity CreateReadyOrStart() {
-    if ( Network::is_host ) {
-      return Create<TextButton>( {
-        "host_started_game",
-        "Start Game",
-        24,
-        RED,
-        WHITE,
-        false,
-        true,// todo make false
-      } );
-    }
-    else {
-      return Create<TextButton>( {
-        "client_ready_up",
-        "Ready Up",
-        24,
-        RED,
-        WHITE,
-        false,
-        true,// todo make false
-      } );
-    }
+    std::function<std::string()> update = []() -> std::string {
+      return ( Network::is_host ) ? "Start Game" : "Ready Up";
+    };
+
+    return Create<TextButton>( {
+      "ready_up",
+      "Ready Up",
+      32,
+      RED,
+      WHITE,
+      update,
+    } );
   }
 
   inline entt::entity
@@ -57,10 +47,23 @@ namespace UI {
       Align::Start,
       Margins{ 16, 16, 0, 0 },
       {
-        Create<TextButton>(
-          { "player_select_faction", "Select Faction", 24, color, WHITE, false }
-        ),
-        Create<TextLabel>( { id + "_label", label, 24, color, WHITE, false } ),
+        Create<TextButton>( {
+          "player_select_faction",
+          "Select Faction",
+          24,
+          color,
+          WHITE,
+          false,
+        } ),
+        // Create<TextureLabel>( { "romans_villager_texture" } ),
+        Create<TextLabel>( {
+          id + "_label",
+          label,
+          24,
+          color,
+          WHITE,
+          false,
+        } ),
       },
     } );
 

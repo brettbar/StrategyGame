@@ -173,6 +173,28 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
+      std::function<std::string()> update
+    )
+        : label( TextLabel(
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            true,
+            update
+          ) ) {
+      action = [id]() {
+        Events::event_emitter.publish( Events::ButtonClick{ id } );
+      };
+    }
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
       bool dynamic,
       std::function<void()> action
     )
@@ -180,6 +202,7 @@ namespace UI {
             TextLabel( id, text, font_size, background, text_color, dynamic )
           ),
           action( action ) {}
+
 
     TextButton(
       std::string id,
