@@ -47,7 +47,7 @@ namespace UI {
           } );
 
           TextButton &button = Manager()->registry.get<TextButton>( button_e );
-          button.label.elem.Enable();
+          button.elem.Enable();
 
           children.push_back( button_e );
         }

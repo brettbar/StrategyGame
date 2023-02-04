@@ -116,36 +116,31 @@ namespace UI {
           update( update ) {}
   };
 
-  struct TextButton {
-    TextLabel label;
+  struct TextButton : TextLabel {
     bool always_clickable = true;
     bool clickable = true;
 
     std::function<void()> action;
 
-
-    std::string ID() {
-      return label.ID();
-    }
-
     void Draw() {
       if ( !clickable )
-        label.Draw( Fade( BLACK, 0.5 ) );
+        TextLabel::Draw( Fade( BLACK, 0.5 ) );
       else
-        label.Draw();
+        TextLabel::Draw();
     }
-
 
     void Update() {
-      label.Update();
+      TextLabel::Update();
 
-      if ( label.elem.enabled && !always_clickable )
-        clickable = clickable_lookup.at( label.elem.id )();
+      if ( elem.enabled && !always_clickable )
+        clickable = clickable_lookup.at( elem.id )();
     }
 
-    void Update( std::string updated_text ) {
-      label.Update( updated_text );
+    void Update( std::string msg ) {
+      if ( elem.enabled )
+        text = msg;
     }
+
 
     void Action() {
       action();
@@ -159,9 +154,7 @@ namespace UI {
       Color text_color,
       bool dynamic
     )
-        : label(
-            TextLabel( id, text, font_size, background, text_color, dynamic )
-          ) {
+        : TextLabel( id, text, font_size, background, text_color, dynamic ) {
       action = [id]() {
         Events::event_emitter.publish( Events::ButtonClick{ id } );
       };
@@ -175,7 +168,7 @@ namespace UI {
       Color text_color,
       std::function<std::string()> update
     )
-        : label( TextLabel(
+        : TextLabel(
             id,
             text,
             font_size,
@@ -183,7 +176,7 @@ namespace UI {
             text_color,
             true,
             update
-          ) ) {
+          ) {
       action = [id]() {
         Events::event_emitter.publish( Events::ButtonClick{ id } );
       };
@@ -198,9 +191,7 @@ namespace UI {
       bool dynamic,
       std::function<void()> action
     )
-        : label(
-            TextLabel( id, text, font_size, background, text_color, dynamic )
-          ),
+        : TextLabel( id, text, font_size, background, text_color, dynamic ),
           action( action ) {}
 
 
@@ -213,9 +204,7 @@ namespace UI {
       bool dynamic,
       bool always_clickable
     )
-        : label(
-            TextLabel( id, text, font_size, background, text_color, dynamic )
-          ),
+        : TextLabel( id, text, font_size, background, text_color, dynamic ),
           always_clickable( always_clickable ), clickable( always_clickable ) {
 
       action = [id]() {
@@ -233,9 +222,7 @@ namespace UI {
       bool always_clickable,
       std::function<void()> action
     )
-        : label(
-            TextLabel( id, text, font_size, background, text_color, dynamic )
-          ),
+        : TextLabel( id, text, font_size, background, text_color, dynamic ),
           action( action ) {}
   };
 };// namespace UI

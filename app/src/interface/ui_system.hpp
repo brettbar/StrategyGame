@@ -74,7 +74,13 @@ namespace UI {
             }
           }
           else if ( Has<TextButton>( element ) ) {
+            printf( "UPDATING with %s\n", msg.updated_value.c_str() );
+
             Get<TextButton>( element ).Update( msg.updated_value );
+
+            if ( msg.dest_id == "player_select_faction" ) {
+              Get<TextButton>( element ).elem.background = msg.color;
+            }
           }
           else {
             printf( "WARNING: Sent message to invalid element type.\n" );
@@ -172,7 +178,7 @@ namespace UI {
           Get<TextLabel>( child ).Resize();
         }
         else if ( Has<TextButton>( child ) ) {
-          Get<TextButton>( child ).label.Resize();
+          Get<TextButton>( child ).Resize();
         }
         else if ( Has<TextureLabel>( child ) ) {
           Get<TextureLabel>( child ).Resize();

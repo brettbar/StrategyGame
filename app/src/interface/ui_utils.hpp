@@ -34,12 +34,12 @@ namespace UI {
       return Get<StackPanel>( entity ).elem.id;
     }
 
-    if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.id;
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).elem.id;
     }
 
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.id;
+    if ( Has<TextLabel>( entity ) ) {
+      return Get<TextLabel>( entity ).elem.id;
     }
 
     if ( Has<TextureLabel>( entity ) ) {
@@ -60,11 +60,11 @@ namespace UI {
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.transform;
     }
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).elem.transform;
+    }
     if ( Has<TextLabel>( entity ) ) {
       return Get<TextLabel>( entity ).elem.transform;
-    }
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.transform;
     }
     if ( Has<TextureLabel>( entity ) ) {
       return Get<TextureLabel>( entity ).elem.transform;
@@ -84,11 +84,11 @@ namespace UI {
     if ( Has<StackPanel>( entity ) ) {
       return Get<StackPanel>( entity ).elem.margins;
     }
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).elem.margins;
+    }
     if ( Has<TextLabel>( entity ) ) {
       return Get<TextLabel>( entity ).elem.margins;
-    }
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.margins;
     }
     if ( Has<TextureLabel>( entity ) ) {
       return Get<TextureLabel>( entity ).elem.margins;
@@ -102,12 +102,12 @@ namespace UI {
   }
 
   inline void UpdateElem( entt::entity entity ) {
-    if ( Has<TextLabel>( entity ) ) {
-      Get<TextLabel>( entity ).Update();
-      return;
-    }
     if ( Has<TextButton>( entity ) ) {
       Get<TextButton>( entity ).Update();
+      return;
+    }
+    if ( Has<TextLabel>( entity ) ) {
+      Get<TextLabel>( entity ).Update();
       return;
     }
   }
@@ -123,13 +123,13 @@ namespace UI {
       return;
     }
 
-    if ( Has<TextLabel>( entity ) ) {
-      Get<TextLabel>( entity ).elem.enabled = on;
+    if ( Has<TextButton>( entity ) ) {
+      Get<TextButton>( entity ).elem.enabled = on;
       return;
     }
 
-    if ( Has<TextButton>( entity ) ) {
-      Get<TextButton>( entity ).label.elem.enabled = on;
+    if ( Has<TextLabel>( entity ) ) {
+      Get<TextLabel>( entity ).elem.enabled = on;
       return;
     }
 
@@ -196,12 +196,12 @@ namespace UI {
       return Get<StackPanel>( entity ).elem.enabled;
     }
 
-    if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.enabled;
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity ).elem.enabled;
     }
 
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).label.elem.enabled;
+    if ( Has<TextLabel>( entity ) ) {
+      return Get<TextLabel>( entity ).elem.enabled;
     }
 
     if ( Has<TextureLabel>( entity ) ) {

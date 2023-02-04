@@ -71,6 +71,7 @@ class IGame {
     return !_hit_exit;
   }
 
+  void CheckForEvents();
 
   /*=============================================================
                         Begin: Singleplayer
@@ -243,50 +244,92 @@ class IGame {
   }
 
 
-  void CheckForEvents() {
-    Events::event_emitter.on<Events::ButtonClick>(
-      [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
-        if ( event.origin == "main_menu_host_game" ) {
-          HostMultiplayerCampaign();
+  void ExitGameLoopCleanup() {
+    if ( Network::is_host )
+      Network::Host()->Delete();
+    else
+      Network::Client()->Delete();
+
+    DeleteCampaignInstance();
+
+    delete this;
+  }
+};
+
+inline void IGame::CheckForEvents() {
+  Events::event_emitter.on<Events::ButtonClick>(
+    [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
+      if ( event.origin == "main_menu_host_game" ) {
+        HostMultiplayerCampaign();
+      }
+      else if ( event.origin == "main_menu_join_game" ) {
+        LookForMultiplayerCampaign();
+      }
+      else if ( event.origin == "main_menu_start_game" ) {
+        _single_player = true;
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin == "main_menu_load_game" ) {
+        LoadGame();
+      }
+      else if ( event.origin == "main_menu_exit_game" ) {
+        ExitGame();
+      }
+      else if ( event.origin == "player_select_faction" ) {
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin == "singleplayer_faction_label" ) {
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin == "singleplayer_lobby_start_game" ) {
+        StartCampaign( faction_str );
+      }
+      else if ( event.origin == "modal_menu_load_game" ) {
+        LoadGame();
+      }
+      else if ( event.origin == "modal_menu_save_game" ) {
+        SaveGame();
+      }
+      else if ( event.origin == "modal_menu_exit_main" ) {
+        ReturnToMain();
+      }
+      else if ( event.origin == "modal_menu_exit_game" ) {
+        ExitGame();
+      }
+      else if ( event.origin == "toggle_modal_menu" ) {
+        ToggleModalMenu();
+      }
+      else if ( event.origin == "faction_select" ) {
+        // StartCampaign( event.msg );
+        if ( _single_player ) {
+          faction_str = event.msg;
+
+          Messages::message_emitter.publish( Messages::FactionSelected{
+            { "singleplayer_faction_selected", event.msg },
+            [&]() -> Color {
+              if ( event.msg == "romans" )
+                return RED;
+              if ( event.msg == "greeks" )
+                return BLUE;
+              if ( event.msg == "celts" )
+                return GREEN;
+              if ( event.msg == "punics" )
+                return PURPLE;
+              if ( event.msg == "germans" )
+                return GRAY;
+              if ( event.msg == "scythians" )
+                return PINK;
+              if ( event.msg == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
+          } );
+          UI::System::SwitchPage( UI::SinglePlayerLobby );
         }
-        else if ( event.origin == "main_menu_join_game" ) {
-          LookForMultiplayerCampaign();
-        }
-        else if ( event.origin == "main_menu_start_game" ) {
-          _single_player = true;
-          UI::System::SwitchPage( UI::FactionSelectMenu );
-        }
-        else if ( event.origin == "main_menu_load_game" ) {
-          LoadGame();
-        }
-        else if ( event.origin == "main_menu_exit_game" ) {
-          ExitGame();
-        }
-        else if ( event.origin == "player_select_faction" ) {
-          UI::System::SwitchPage( UI::FactionSelectMenu );
-        }
-        else if ( event.origin == "singleplayer_faction_label" ) {
-          UI::System::SwitchPage( UI::FactionSelectMenu );
-        }
-        else if ( event.origin == "singleplayer_lobby_start_game" ) {
-          StartCampaign( faction_str );
-        }
-        else if ( event.origin == "modal_menu_load_game" ) {
-          LoadGame();
-        }
-        else if ( event.origin == "modal_menu_save_game" ) {
-          SaveGame();
-        }
-        else if ( event.origin == "modal_menu_exit_main" ) {
-          ReturnToMain();
-        }
-        else if ( event.origin == "modal_menu_exit_game" ) {
-          ExitGame();
-        }
-        else if ( event.origin == "toggle_modal_menu" ) {
-          ToggleModalMenu();
-        }
-        else if ( event.origin == "ready_up" ) {
+        else {
+          faction_str = event.msg;
+
           Messages::message_emitter.publish( Messages::FactionSelected{
             { "player_select_faction", event.msg },
             [&]() -> Color {
@@ -308,69 +351,27 @@ class IGame {
                 return BLACK;
             }(),
           } );
-        }
-        else if ( event.origin == "faction_select" ) {
-          // StartCampaign( event.msg );
-          if ( _single_player ) {
-            UI::System::SwitchPage( UI::SinglePlayerLobby );
-            faction_str = event.msg;
-
-            Messages::message_emitter.publish( Messages::FactionSelected{
-              { "singleplayer_faction_selected", event.msg },
-              [&]() -> Color {
-                if ( event.msg == "romans" )
-                  return RED;
-                if ( event.msg == "greeks" )
-                  return BLUE;
-                if ( event.msg == "celts" )
-                  return GREEN;
-                if ( event.msg == "punics" )
-                  return PURPLE;
-                if ( event.msg == "germans" )
-                  return GRAY;
-                if ( event.msg == "scythians" )
-                  return PINK;
-                if ( event.msg == "persians" )
-                  return ORANGE;
-                else
-                  return BLACK;
-              }(),
-            } );
-          }
-          else {
-            UI::System::SwitchPage( UI::Lobby );
-          }
-        }
-        else {
-          printf(
-            "Error, unregistered UI event fired: %s\n", event.origin.c_str()
-          );
+          UI::System::SwitchPage( UI::Lobby );
         }
       }
-    );
-
-    Events::event_emitter.on<Events::JoinLobby>(
-      [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
-        printf( "JoinLobby!!! origin %s\n", event.origin.c_str() );
-
-        if ( event.origin == "lobby_entry_Conquistador's lobby" ) {
-          JoinMultiplayerLobby( event.lobby_id );
-        }
+      else {
+        printf(
+          "Error, unregistered UI event fired: %s\n", event.origin.c_str()
+        );
       }
-    );
-  }
+    }
+  );
 
-  void ExitGameLoopCleanup() {
-    if ( Network::is_host )
-      Network::Host()->Delete();
-    else
-      Network::Client()->Delete();
+  Events::event_emitter.on<Events::JoinLobby>(
+    [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
+      printf( "JoinLobby!!! origin %s\n", event.origin.c_str() );
 
-    DeleteCampaignInstance();
-
-    delete this;
-  }
-};
+      if ( event.origin == "lobby_entry_Conquistador's lobby" ) {
+        JoinMultiplayerLobby( event.lobby_id );
+      }
+    }
+  );
+}
 
 inline IGame *Game() {
   return IGame::Game();
