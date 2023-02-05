@@ -5,7 +5,6 @@
 #include "network/host.hpp"
 
 #include "shared/common.hpp"
-#include "shared/events.hpp"
 #include "shared/save.hpp"
 
 #include "renderer/renderer.hpp"
@@ -259,47 +258,47 @@ class IGame {
 inline void IGame::CheckForEvents() {
   Events::event_emitter.on<Events::ButtonClick>(
     [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
-      if ( event.origin == "main_menu_host_game" ) {
+      if ( event.origin_id == "main_menu_host_game" ) {
         HostMultiplayerCampaign();
       }
-      else if ( event.origin == "main_menu_join_game" ) {
+      else if ( event.origin_id == "main_menu_join_game" ) {
         LookForMultiplayerCampaign();
       }
-      else if ( event.origin == "main_menu_start_game" ) {
+      else if ( event.origin_id == "main_menu_start_game" ) {
         _single_player = true;
         UI::System::SwitchPage( UI::FactionSelectMenu );
       }
-      else if ( event.origin == "main_menu_load_game" ) {
+      else if ( event.origin_id == "main_menu_load_game" ) {
         LoadGame();
       }
-      else if ( event.origin == "main_menu_exit_game" ) {
+      else if ( event.origin_id == "main_menu_exit_game" ) {
         ExitGame();
       }
-      else if ( event.origin == "player_select_faction" ) {
+      else if ( event.origin_id == "player_select_faction" ) {
         UI::System::SwitchPage( UI::FactionSelectMenu );
       }
-      else if ( event.origin == "singleplayer_faction_label" ) {
+      else if ( event.origin_id == "singleplayer_faction_label" ) {
         UI::System::SwitchPage( UI::FactionSelectMenu );
       }
-      else if ( event.origin == "singleplayer_lobby_start_game" ) {
+      else if ( event.origin_id == "singleplayer_lobby_start_game" ) {
         StartCampaign( faction_str );
       }
-      else if ( event.origin == "modal_menu_load_game" ) {
+      else if ( event.origin_id == "modal_menu_load_game" ) {
         LoadGame();
       }
-      else if ( event.origin == "modal_menu_save_game" ) {
+      else if ( event.origin_id == "modal_menu_save_game" ) {
         SaveGame();
       }
-      else if ( event.origin == "modal_menu_exit_main" ) {
+      else if ( event.origin_id == "modal_menu_exit_main" ) {
         ReturnToMain();
       }
-      else if ( event.origin == "modal_menu_exit_game" ) {
+      else if ( event.origin_id == "modal_menu_exit_game" ) {
         ExitGame();
       }
-      else if ( event.origin == "toggle_modal_menu" ) {
+      else if ( event.origin_id == "toggle_modal_menu" ) {
         ToggleModalMenu();
       }
-      else if ( event.origin == "faction_select" ) {
+      else if ( event.origin_id == "faction_select" ) {
         // StartCampaign( event.msg );
         if ( _single_player ) {
           faction_str = event.msg;
@@ -356,7 +355,7 @@ inline void IGame::CheckForEvents() {
       }
       else {
         printf(
-          "Error, unregistered UI event fired: %s\n", event.origin.c_str()
+          "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
         );
       }
     }
@@ -364,9 +363,9 @@ inline void IGame::CheckForEvents() {
 
   Events::event_emitter.on<Events::JoinLobby>(
     [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
-      printf( "JoinLobby!!! origin %s\n", event.origin.c_str() );
+      printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
 
-      if ( event.origin == "lobby_entry_Conquistador's lobby" ) {
+      if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
         JoinMultiplayerLobby( event.lobby_id );
       }
     }

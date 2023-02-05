@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../clickable.hpp"
-#include "../updates.hpp"
 #include "element.hpp"
 
 // TODO this might be a circular dependency issue
@@ -51,8 +49,8 @@ namespace UI {
     }
 
     void Update() {
-      if ( label.elem.enabled && !always_clickable )
-        clickable = clickable_lookup.at( label.elem.id )();
+      // if ( label.elem.enabled && !always_clickable )
+      //   clickable = clickable_lookup.at( label.elem.id )();
     }
 
     void Action() {

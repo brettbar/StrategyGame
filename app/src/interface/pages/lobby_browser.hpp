@@ -29,7 +29,7 @@ namespace UI {
 
           std::function<void()> action = [button_id, lobby_id]() {
             Events::event_emitter.publish( Events::JoinLobby{
-              .origin = button_id,
+              .origin_id = button_id,
               .lobby_id = lobby_id,
             } );
           };

@@ -2,8 +2,6 @@
 
 #include "element.hpp"
 
-#include "../clickable.hpp"
-//
 // TODO this might be a circular dependency issue
 #include "../ui_manager.hpp"
 
@@ -15,7 +13,9 @@ namespace UI {
     i32 font_size;
     Color text_color;
     bool dynamic = false;
-    std::function<std::string()> update;
+    // std::function<std::string()> update;
+
+    Messages::Basic subscribed_messages;
 
     std::string ID() {
       return elem.id;
@@ -33,22 +33,25 @@ namespace UI {
       elem.transform.height = text_dims.y;
     }
 
-    void Update() {
-      if ( elem.enabled && dynamic ) {
-        if ( update ) {
-          text = update();
-        }
-        else {
-          printf( "ERROR :: Update not found for elem %s\n", elem.id.c_str() );
-        }
-      }
-    }
+    // void Update() {
+    //   if ( elem.enabled && dynamic ) {
+    //     if ( update ) {
+    //       text = update();
+    //     }
+    //     else {
+    //       printf( "ERROR :: Update not found for elem %s\n", elem.id.c_str() );
+    //     }
+    //   }
+    // }
 
-    void Update( std::string updated_text ) {
-      if ( elem.enabled ) {
-        text = updated_text;
-      }
-    }
+    // void Update( std::string updated_text ) {
+    //   if ( elem.enabled ) {
+    //     text = updated_text;
+    //   }
+    // }
+
+    void CheckSubscribedMessages() {}
+
 
     void Draw() {
       DrawRectangleV(
@@ -96,29 +99,19 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      bool dynamic
-    )
-        : elem( Element( id, background, false, {}, {} ) ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( dynamic ) {
-    }
-
-    TextLabel(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
       bool dynamic,
-      std::function<std::string()> update
+      std::vector<Messages::Basic> subscribed_messages
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( dynamic ),
-          update( update ) {}
+          subscribed_messages( subscribed_messages ) {}
   };
 
   struct TextButton : TextLabel {
     bool always_clickable = true;
     bool clickable = true;
+
+    Events::ButtonClick on_click;
 
     std::function<void()> action;
 
@@ -129,22 +122,16 @@ namespace UI {
         TextLabel::Draw();
     }
 
-    void Update() {
-      TextLabel::Update();
+    // void Update() {
+    //   TextLabel::Update();
 
-      if ( elem.enabled && !always_clickable )
-        clickable = clickable_lookup.at( elem.id )();
-    }
+    //   // if ( elem.enabled && !always_clickable )
+    //   //   clickable = clickable_lookup.at( elem.id )();
+    // }
 
-    void Update( std::string msg ) {
-      if ( elem.enabled )
-        text = msg;
-    }
-
-
-    void Action() {
-      action();
-    }
+    // void Action() {
+    //   action();
+    // }
 
     TextButton(
       std::string id,
@@ -152,21 +139,9 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      bool dynamic
-    )
-        : TextLabel( id, text, font_size, background, text_color, dynamic ) {
-      action = [id]() {
-        Events::event_emitter.publish( Events::ButtonClick{ id } );
-      };
-    }
-
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      std::function<std::string()> update
+      bool dynamic,
+      std::vector<Messages::Basic> subscribed_messages,
+      Events::ButtonClick on_click
     )
         : TextLabel(
             id,
@@ -174,55 +149,57 @@ namespace UI {
             font_size,
             background,
             text_color,
-            true,
-            update
-          ) {
-      action = [id]() {
-        Events::event_emitter.publish( Events::ButtonClick{ id } );
-      };
+            dynamic,
+            subscribed_messages
+          ),
+          on_click( on_click ) {
+      // action = [id]() {
+      //   Events::event_emitter.publish( Events::ButtonClick{ id } );
+      // };
     }
 
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic,
-      std::function<void()> action
-    )
-        : TextLabel( id, text, font_size, background, text_color, dynamic ),
-          action( action ) {}
+
+    // TextButton(
+    //   std::string id,
+    //   std::string text,
+    //   i32 font_size,
+    //   Color background,
+    //   Color text_color,
+    //   bool dynamic,
+    //   std::function<void()> action
+    // )
+    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
+    //       action( action ) {}
 
 
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic,
-      bool always_clickable
-    )
-        : TextLabel( id, text, font_size, background, text_color, dynamic ),
-          always_clickable( always_clickable ), clickable( always_clickable ) {
+    // TextButton(
+    //   std::string id,
+    //   std::string text,
+    //   i32 font_size,
+    //   Color background,
+    //   Color text_color,
+    //   bool dynamic,
+    //   bool always_clickable
+    // )
+    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
+    //       always_clickable( always_clickable ), clickable( always_clickable ) {
 
-      action = [id]() {
-        Events::event_emitter.publish( Events::ButtonClick{ id } );
-      };
-    }
+    //   action = [id]() {
+    //     Events::event_emitter.publish( Events::ButtonClick{ id } );
+    //   };
+    // }
 
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic,
-      bool always_clickable,
-      std::function<void()> action
-    )
-        : TextLabel( id, text, font_size, background, text_color, dynamic ),
-          action( action ) {}
+    // TextButton(
+    //   std::string id,
+    //   std::string text,
+    //   i32 font_size,
+    //   Color background,
+    //   Color text_color,
+    //   bool dynamic,
+    //   bool always_clickable,
+    //   std::function<void()> action
+    // )
+    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
+    //       action( action ) {}
   };
 };// namespace UI

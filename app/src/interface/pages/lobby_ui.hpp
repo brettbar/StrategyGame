@@ -28,7 +28,7 @@ namespace UI {
   }
 
   inline entt::entity
-  CreateMemberPanel( std::string id, std::string member, bool is_host ) {
+  CreateMemberPanel( u32 i, std::string id, std::string member, bool is_host ) {
     std::string label = "something wrong";
     Color color = RED;
 
@@ -39,6 +39,13 @@ namespace UI {
     else
       label = "Guest: " + member;
 
+    std::function<void()> action = [&]() {
+      Events::event_emitter.publish( Events::ButtonClick{
+        id,
+        std::to_string( i ),
+      } );
+    };
+
     entt::entity panel = Create<Panel>( {
       id,
       BLACK,
@@ -48,12 +55,13 @@ namespace UI {
       Margins{ 16, 16, 0, 0 },
       {
         Create<TextButton>( {
-          "player_select_faction",
+          id + "_faction_selection",
           "Select Faction",
           24,
           color,
           WHITE,
           false,
+          action,
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {
@@ -82,14 +90,14 @@ namespace UI {
       Align::Start,
       Align::Start,
       Margins{ 16, 16, 0, 0 },
-      { Create<TextLabel>(
-        { id + "_label",
-          "Open Slot " + std::to_string( i + 1 ),
-          24,
-          GRAY,
-          WHITE,
-          false }
-      ) },
+      { Create<TextLabel>( {
+        id + "_label",
+        "Open Slot " + std::to_string( i + 1 ),
+        24,
+        GRAY,
+        WHITE,
+        false,
+      } ) },
     } );
 
     RecursiveToggle( panel, true );
@@ -139,7 +147,7 @@ namespace UI {
                 Manager()->lookup["open_slot_" + std::to_string( i )]
               );
 
-              children[i] = CreateMemberPanel( id, members[i], i == 0 );
+              children[i] = CreateMemberPanel( i, id, members[i], i == 0 );
             }
           }
         }

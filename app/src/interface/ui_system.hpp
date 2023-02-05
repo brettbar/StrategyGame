@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../shared/messages.hpp"
 #include "pages/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
 #include "pages/lobby_browser.hpp"
@@ -61,32 +60,30 @@ namespace UI {
     }
 
     inline void CheckForMessages() {
-      Messages::message_emitter.on<Messages::FactionSelected>(
-        [&](
-          const Messages::FactionSelected msg, Messages::MessageEmitter &emitter
-        ) {
-          entt::entity element = Manager()->lookup.at( msg.dest_id );
-          if ( Has<TextLabel>( element ) ) {
-            Get<TextLabel>( element ).Update( msg.updated_value );
+      // Messages::message_emitter.on<Messages::FactionSelected>(
+      //   [&](
+      //     const Messages::FactionSelected msg, Messages::MessageEmitter &emitter
+      //   ) {
+      //     entt::entity element = Manager()->lookup.at( msg.dest_id );
+      //     if ( Has<TextLabel>( element ) ) {
+      //       Get<TextLabel>( element ).Update( msg.updated_value );
 
-            if ( msg.dest_id == "singleplayer_faction_selected" ) {
-              Get<TextLabel>( element ).elem.background = msg.color;
-            }
-          }
-          else if ( Has<TextButton>( element ) ) {
-            printf( "UPDATING with %s\n", msg.updated_value.c_str() );
+      //       if ( msg.dest_id == "singleplayer_faction_selected" ) {
+      //         Get<TextLabel>( element ).elem.background = msg.color;
+      //       }
+      //     }
+      //     else if ( Has<TextButton>( element ) ) {
+      //       Get<TextButton>( element ).text = ( msg.updated_value );
 
-            Get<TextButton>( element ).Update( msg.updated_value );
-
-            if ( msg.dest_id == "player_select_faction" ) {
-              Get<TextButton>( element ).elem.background = msg.color;
-            }
-          }
-          else {
-            printf( "WARNING: Sent message to invalid element type.\n" );
-          }
-        }
-      );
+      //       if ( msg.dest_id == "player_select_faction" ) {
+      //         Get<TextButton>( element ).elem.background = msg.color;
+      //       }
+      //     }
+      //     else {
+      //       printf( "WARNING: Sent message to invalid element type.\n" );
+      //     }
+      //   }
+      // );
     }
 
     inline void UpdateOnFrame() {
@@ -370,12 +367,12 @@ namespace UI {
         // RecursiveToggle( content, true );
         // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
       }
-      else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-        auto actor = game_reg.get<Actor::Component>( entity );
+      // else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+      //   auto actor = game_reg.get<Actor::Component>( entity );
 
-        auto context_panel = Manager()->lookup.at( "actor_context_panel" );
-        RecursiveToggle( context_panel, true );
-      }
+      //   auto context_panel = Manager()->lookup.at( "actor_context_panel" );
+      //   RecursiveToggle( context_panel, true );
+      // }
     }
 
     inline void ListenForDeselect() {

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../shared/common.hpp"
-#include "../shared/events.hpp"
-#include "../shared/messages.hpp"
+#include "../shared/signals.hpp"
 #include "../shared/utils.hpp"
 #include "components/panel.hpp"
 #include "components/text_elements.hpp"
