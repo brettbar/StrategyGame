@@ -35,6 +35,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextButton>( {
             "modal_menu_save_game",
@@ -43,6 +45,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextButton>( {
             "modal_menu_settings",
@@ -51,6 +55,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextButton>( {
             "modal_menu_save_exit_main",
@@ -59,6 +65,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextButton>( {
             "modal_menu_exit_main",
@@ -67,6 +75,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextButton>( {
             "modal_menu_exit_game",
@@ -75,6 +85,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
         },
       } ),

@@ -39,6 +39,7 @@ namespace UI {
         BLACK,
         WHITE,
         false,
+        {},
       } ),
     };
 
@@ -55,7 +56,7 @@ namespace UI {
       };
 
       text_buttons.push_back( Create<TextButton>(
-        { id, full_names[name], 32, color, WHITE, false, action }
+        { id, full_names[name], 32, color, WHITE, false, {}, {} }
       ) );
     }
 

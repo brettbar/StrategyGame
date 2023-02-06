@@ -99,6 +99,7 @@ namespace UI {
                     BLACK,
                     WHITE,
                     true,
+                    {},
                   } ),
                   Create<TextLabel>( {
                     "settlement_population",
@@ -107,6 +108,7 @@ namespace UI {
                     BLACK,
                     WHITE,
                     true,
+                    {},
                   } ),
                   Create<TextLabel>( {
                     "settlement_development",
@@ -115,6 +117,7 @@ namespace UI {
                     BLACK,
                     WHITE,
                     true,
+                    {},
                   } ),
                 },
               } ),
@@ -128,7 +131,7 @@ namespace UI {
                   Align::Start,
                   {
                     Create<TextLabel>(
-                      { "building_0", "building", 32, BLACK, WHITE, false }
+                      { "building_0", "building", 32, BLACK, WHITE, false, {} }
                     ),
                   },
                 }
@@ -175,7 +178,8 @@ namespace UI {
                 PURPLE,
                 WHITE,
                 false,
-                false,
+                {},
+                {},
                 // []() {
                 //   printf( "Spawn Settlement clicked!!\n" );
                 //   SettlementSystem::SpawnSettlement();

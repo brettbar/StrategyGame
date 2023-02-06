@@ -103,11 +103,11 @@ namespace UI {
 
   inline void UpdateElem( entt::entity entity ) {
     if ( Has<TextButton>( entity ) ) {
-      Get<TextButton>( entity ).Update();
+      // Get<TextButton>( entity ).Update();
       return;
     }
     if ( Has<TextLabel>( entity ) ) {
-      Get<TextLabel>( entity ).Update();
+      // Get<TextLabel>( entity ).Update();
       return;
     }
   }
@@ -236,7 +236,7 @@ namespace UI {
     if ( Has<TextButton>( entity ) ) {
 
       auto &button = Get<TextButton>( entity );
-      button.Action();
+      // button.Action();
     }
 
 

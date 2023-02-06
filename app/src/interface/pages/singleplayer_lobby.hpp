@@ -38,6 +38,8 @@ namespace UI {
             GREEN,
             WHITE,
             false,
+            {},
+            {},
           } ),
           Create<TextLabel>( {
             "singleplayer_faction_selected",
@@ -45,8 +47,8 @@ namespace UI {
             32,
             GRAY,
             WHITE,
-            // TODO remove dynamic as a bool
             false,
+            {},
           } ),
           Create<TextButton>( {
             "singleplayer_lobby_start_game",
@@ -55,6 +57,8 @@ namespace UI {
             BLUE,
             WHITE,
             false,
+            {},
+            {},
           } ),
         },
       } ),

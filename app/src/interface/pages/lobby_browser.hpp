@@ -43,7 +43,8 @@ namespace UI {
             GREEN,
             WHITE,
             false,
-            action,
+            {},
+            {},
           } );
 
           TextButton &button = Manager()->registry.get<TextButton>( button_e );

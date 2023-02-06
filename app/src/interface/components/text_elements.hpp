@@ -100,7 +100,7 @@ namespace UI {
       Color background,
       Color text_color,
       bool dynamic,
-      std::vector<Messages::Basic> subscribed_messages
+      Messages::Basic subscribed_messages
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( dynamic ),
@@ -140,7 +140,7 @@ namespace UI {
       Color background,
       Color text_color,
       bool dynamic,
-      std::vector<Messages::Basic> subscribed_messages,
+      Messages::Basic subscribed_messages,
       Events::ButtonClick on_click
     )
         : TextLabel(
