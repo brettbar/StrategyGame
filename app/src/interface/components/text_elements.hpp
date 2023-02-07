@@ -111,9 +111,7 @@ namespace UI {
     bool always_clickable = true;
     bool clickable = true;
 
-    Events::ButtonClick on_click;
-
-    std::function<void()> action;
+    Events::Basic on_click;
 
     void Draw() {
       if ( !clickable )
@@ -122,16 +120,9 @@ namespace UI {
         TextLabel::Draw();
     }
 
-    // void Update() {
-    //   TextLabel::Update();
-
-    //   // if ( elem.enabled && !always_clickable )
-    //   //   clickable = clickable_lookup.at( elem.id )();
-    // }
-
-    // void Action() {
-    //   action();
-    // }
+    void Action() {
+      Events::event_emitter.publish( on_click );
+    }
 
     TextButton(
       std::string id,
@@ -141,7 +132,7 @@ namespace UI {
       Color text_color,
       bool dynamic,
       Messages::Basic subscribed_messages,
-      Events::ButtonClick on_click
+      Events::Basic on_click
     )
         : TextLabel(
             id,
@@ -152,54 +143,6 @@ namespace UI {
             dynamic,
             subscribed_messages
           ),
-          on_click( on_click ) {
-      // action = [id]() {
-      //   Events::event_emitter.publish( Events::ButtonClick{ id } );
-      // };
-    }
-
-
-    // TextButton(
-    //   std::string id,
-    //   std::string text,
-    //   i32 font_size,
-    //   Color background,
-    //   Color text_color,
-    //   bool dynamic,
-    //   std::function<void()> action
-    // )
-    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
-    //       action( action ) {}
-
-
-    // TextButton(
-    //   std::string id,
-    //   std::string text,
-    //   i32 font_size,
-    //   Color background,
-    //   Color text_color,
-    //   bool dynamic,
-    //   bool always_clickable
-    // )
-    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
-    //       always_clickable( always_clickable ), clickable( always_clickable ) {
-
-    //   action = [id]() {
-    //     Events::event_emitter.publish( Events::ButtonClick{ id } );
-    //   };
-    // }
-
-    // TextButton(
-    //   std::string id,
-    //   std::string text,
-    //   i32 font_size,
-    //   Color background,
-    //   Color text_color,
-    //   bool dynamic,
-    //   bool always_clickable,
-    //   std::function<void()> action
-    // )
-    //     : TextLabel( id, text, font_size, background, text_color, dynamic ),
-    //       action( action ) {}
+          on_click( Events::Basic{ id } ) {}
   };
 };// namespace UI

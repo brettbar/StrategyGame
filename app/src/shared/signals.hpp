@@ -6,13 +6,15 @@
 
 namespace Events {
 
-  struct ButtonClick {
+  struct Basic {
     std::string origin_id;
+  };
+
+  struct ButtonClick : Basic {
     std::string msg;
   };
 
-  struct JoinLobby {
-    std::string origin_id;
+  struct JoinLobby : Basic {
     CSteamID lobby_id;
   };
 
