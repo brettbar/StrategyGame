@@ -36,7 +36,6 @@ namespace UI {
             WHITE,
             false,
             {},
-            {},
           } ),
           Create<TextButton>( {
             "main_menu_join_game",
@@ -46,7 +45,6 @@ namespace UI {
             WHITE,
             false,
             {},
-            {},
           } ),
           Create<TextButton>( {
             "main_menu_start_game",
@@ -55,7 +53,6 @@ namespace UI {
             BLUE,
             WHITE,
             false,
-            {},
             {},
           } ),
           Create<TextButton>( {
@@ -76,7 +73,6 @@ namespace UI {
             WHITE,
             false,
             {},
-            {},
           } ),
           Create<TextButton>( {
             "main_menu_exit_game",
@@ -85,7 +81,6 @@ namespace UI {
             BLUE,
             WHITE,
             false,
-            {},
             {},
           } ),
         },

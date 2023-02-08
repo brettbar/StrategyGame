@@ -15,7 +15,7 @@ namespace UI {
     bool dynamic = false;
     // std::function<std::string()> update;
 
-    Messages::Basic subscribed_messages;
+    Messages::Basic subscribed_message;
 
     std::string ID() {
       return elem.id;
@@ -100,11 +100,11 @@ namespace UI {
       Color background,
       Color text_color,
       bool dynamic,
-      Messages::Basic subscribed_messages
+      Messages::Basic subscribed_message
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( dynamic ),
-          subscribed_messages( subscribed_messages ) {}
+          subscribed_message( subscribed_message ) {}
   };
 
   struct TextButton : TextLabel {
@@ -131,7 +131,27 @@ namespace UI {
       Color background,
       Color text_color,
       bool dynamic,
-      Messages::Basic subscribed_messages,
+      Messages::Basic subscribed_message
+    )
+        : TextLabel(
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            dynamic,
+            subscribed_message
+          ),
+          on_click( Events::Basic{ id } ) {}
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      Messages::Basic subscribed_message,
       Events::Basic on_click
     )
         : TextLabel(
@@ -141,8 +161,8 @@ namespace UI {
             background,
             text_color,
             dynamic,
-            subscribed_messages
+            subscribed_message
           ),
-          on_click( Events::Basic{ id } ) {}
+          on_click( on_click ) {}
   };
 };// namespace UI

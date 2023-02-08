@@ -47,17 +47,19 @@ namespace UI {
       std::string faction = name;
       std::string id = "faction_select_" + faction;
 
-
-      std::function<void()> action = [faction]() {
-        Events::event_emitter.publish( Events::ButtonClick{
-          "faction_select",
+      text_buttons.push_back( Create<TextButton>( {
+        id,
+        full_names[name],
+        32,
+        color,
+        WHITE,
+        false,
+        {},
+        Events::ButtonClick{
+          { "faction_select" },
           faction,
-        } );
-      };
-
-      text_buttons.push_back( Create<TextButton>(
-        { id, full_names[name], 32, color, WHITE, false, {}, {} }
-      ) );
+        },
+      } ) );
     }
 
     return text_buttons;

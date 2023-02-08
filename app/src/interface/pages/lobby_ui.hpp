@@ -41,12 +41,6 @@ namespace UI {
     else
       label = "Guest: " + member;
 
-    std::function<void()> action = [&]() {
-      Events::event_emitter.publish( Events::ButtonClick{
-        id,
-        std::to_string( i ),
-      } );
-    };
 
     entt::entity panel = Create<Panel>( {
       id,
@@ -64,7 +58,10 @@ namespace UI {
           WHITE,
           false,
           {},
-          {},
+          Events::ButtonClick{
+            { id },
+            std::to_string( i ),
+          },
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {

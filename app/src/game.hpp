@@ -256,8 +256,8 @@ class IGame {
 };
 
 inline void IGame::CheckForEvents() {
-  Events::event_emitter.on<Events::ButtonClick>(
-    [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
+  Events::event_emitter.on<Events::Basic>(
+    [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
       if ( event.origin_id == "main_menu_host_game" ) {
         HostMultiplayerCampaign();
       }
@@ -298,61 +298,6 @@ inline void IGame::CheckForEvents() {
       else if ( event.origin_id == "toggle_modal_menu" ) {
         ToggleModalMenu();
       }
-      else if ( event.origin_id == "faction_select" ) {
-        // StartCampaign( event.msg );
-        if ( _single_player ) {
-          faction_str = event.msg;
-
-          Messages::message_emitter.publish( Messages::FactionSelected{
-            { "singleplayer_faction_selected", event.msg },
-            [&]() -> Color {
-              if ( event.msg == "romans" )
-                return RED;
-              if ( event.msg == "greeks" )
-                return BLUE;
-              if ( event.msg == "celts" )
-                return GREEN;
-              if ( event.msg == "punics" )
-                return PURPLE;
-              if ( event.msg == "germans" )
-                return GRAY;
-              if ( event.msg == "scythians" )
-                return PINK;
-              if ( event.msg == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
-          UI::System::SwitchPage( UI::SinglePlayerLobby );
-        }
-        else {
-          faction_str = event.msg;
-
-          Messages::message_emitter.publish( Messages::FactionSelected{
-            { "player_select_faction", event.msg },
-            [&]() -> Color {
-              if ( event.msg == "romans" )
-                return RED;
-              if ( event.msg == "greeks" )
-                return BLUE;
-              if ( event.msg == "celts" )
-                return GREEN;
-              if ( event.msg == "punics" )
-                return PURPLE;
-              if ( event.msg == "germans" )
-                return GRAY;
-              if ( event.msg == "scythians" )
-                return PINK;
-              if ( event.msg == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
-          UI::System::SwitchPage( UI::Lobby );
-        }
-      }
       else {
         printf(
           "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
@@ -369,6 +314,68 @@ inline void IGame::CheckForEvents() {
         JoinMultiplayerLobby( event.lobby_id );
       }
     }
+  );
+
+  Events::event_emitter.on<Events::ButtonClick>(
+    [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
+      // else if ( event.origin_id == "faction_select" ) {
+      //   //// StartCampaign( event.msg );
+      // }
+
+      if ( _single_player ) {
+        faction_str = event.msg;
+
+        Messages::message_emitter.publish( Messages::FactionSelected{
+          { "singleplayer_faction_selected", event.msg },
+          [&]() -> Color {
+            if ( event.msg == "romans" )
+              return RED;
+            if ( event.msg == "greeks" )
+              return BLUE;
+            if ( event.msg == "celts" )
+              return GREEN;
+            if ( event.msg == "punics" )
+              return PURPLE;
+            if ( event.msg == "germans" )
+              return GRAY;
+            if ( event.msg == "scythians" )
+              return PINK;
+            if ( event.msg == "persians" )
+              return ORANGE;
+            else
+              return BLACK;
+          }(),
+        } );
+        UI::System::SwitchPage( UI::SinglePlayerLobby );
+      }
+      else {
+        faction_str = event.msg;
+
+        Messages::message_emitter.publish( Messages::FactionSelected{
+          { "player_select_faction", event.msg },
+          [&]() -> Color {
+            if ( event.msg == "romans" )
+              return RED;
+            if ( event.msg == "greeks" )
+              return BLUE;
+            if ( event.msg == "celts" )
+              return GREEN;
+            if ( event.msg == "punics" )
+              return PURPLE;
+            if ( event.msg == "germans" )
+              return GRAY;
+            if ( event.msg == "scythians" )
+              return PINK;
+            if ( event.msg == "persians" )
+              return ORANGE;
+            else
+              return BLACK;
+          }(),
+        } );
+        UI::System::SwitchPage( UI::Lobby );
+      }
+    }
+
   );
 }
 
