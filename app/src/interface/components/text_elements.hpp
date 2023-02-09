@@ -111,7 +111,7 @@ namespace UI {
     bool always_clickable = true;
     bool clickable = true;
 
-    Events::Basic on_click;
+    Events::Basic *on_click;
 
     void Draw() {
       if ( !clickable )
@@ -121,7 +121,7 @@ namespace UI {
     }
 
     void Action() {
-      Events::event_emitter.publish( on_click );
+      Events::event_emitter.publish( *on_click );
     }
 
     TextButton(
@@ -142,27 +142,32 @@ namespace UI {
             dynamic,
             subscribed_message
           ),
-          on_click( Events::Basic{ id } ) {}
+          on_click( new Events::Basic{ id } ) {}
 
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      bool dynamic,
-      Messages::Basic subscribed_message,
-      Events::Basic on_click
-    )
-        : TextLabel(
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            dynamic,
-            subscribed_message
-          ),
-          on_click( on_click ) {}
+    ~TextButton() {
+      delete on_click;
+    }
+
+    // TextButton(
+    //   std::string id,
+    //   std::string text,
+    //   i32 font_size,
+    //   Color background,
+    //   Color text_color,
+    //   bool dynamic,
+    //   Messages::Basic subscribed_message,
+    //   Events::Basic on_click
+    // )
+    //     : TextLabel(
+    //         id,
+    //         text,
+    //         font_size,
+    //         background,
+    //         text_color,
+    //         dynamic,
+    //         subscribed_message
+    //       ) {
+    //   this->on_click = std::make_unique<Events::Basic>( on_click );
+    // }
   };
 };// namespace UI

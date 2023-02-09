@@ -39,7 +39,6 @@ namespace UI {
             WHITE,
             false,
             {},
-            {},
           } ),
           Create<TextLabel>( {
             "singleplayer_faction_selected",
@@ -57,7 +56,6 @@ namespace UI {
             BLUE,
             WHITE,
             false,
-            {},
             {},
           } ),
         },

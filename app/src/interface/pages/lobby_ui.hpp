@@ -25,7 +25,6 @@ namespace UI {
       WHITE,
       false,
       {},
-      {},
     } );
   }
 
@@ -58,10 +57,6 @@ namespace UI {
           WHITE,
           false,
           {},
-          Events::ButtonClick{
-            { id },
-            std::to_string( i ),
-          },
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {

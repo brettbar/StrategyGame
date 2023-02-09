@@ -63,6 +63,7 @@ namespace UI {
               //   []() {
               //     printf( "Settlement tab button pressed\n" );
               //     entt::entity content =
+              {},
               //       lookup.at( "settlement_context_content" );
               //     StackPanel &sp = Get<StackPanel>( content );
               //     SwitchChild( sp, 1 );
@@ -178,7 +179,6 @@ namespace UI {
                 PURPLE,
                 WHITE,
                 false,
-                {},
                 {},
                 // []() {
                 //   printf( "Spawn Settlement clicked!!\n" );

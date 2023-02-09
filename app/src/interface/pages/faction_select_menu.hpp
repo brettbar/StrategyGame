@@ -55,10 +55,6 @@ namespace UI {
         WHITE,
         false,
         {},
-        Events::ButtonClick{
-          { "faction_select" },
-          faction,
-        },
       } ) );
     }
 

@@ -63,7 +63,6 @@ namespace UI {
             WHITE,
             false,
             {},
-            {},
           } ),
           Create<TextButton>( {
             "main_menu_settings",
