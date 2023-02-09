@@ -12,12 +12,51 @@ namespace Messages {
   };
 
   struct Basic {
+    Type type;
     std::string dest_id;
-    std::string updated_value;
+    std::string msg;
+
+    virtual ~Basic() {}
+
+    Basic( std::string dest_id, std::string msg = "" )
+        : dest_id( dest_id ), type( Type::Basic ) {}
+
+    Basic( Type type, std::string dest_id, std::string msg = "" )
+        : dest_id( dest_id ), msg( msg ), type( type ) {}
   };
 
   struct FactionSelected : Basic {
     Color color;
+
+    std::shared_ptr<Messages::FactionSelected> static Create(
+      std::string id,
+      std::string msg
+    ) {
+      return std::make_shared<Messages::FactionSelected>( id, msg );
+    }
+
+    FactionSelected( std::string id, std::string faction )
+        : Basic( Type::FactionSelected, id ) {
+      // TODO replace with json stuff
+      color = [&]() -> Color {
+        if ( faction == "romans" )
+          return RED;
+        if ( faction == "greeks" )
+          return BLUE;
+        if ( faction == "celts" )
+          return GREEN;
+        if ( faction == "punics" )
+          return PURPLE;
+        if ( faction == "germans" )
+          return GRAY;
+        if ( faction == "scythians" )
+          return PINK;
+        if ( faction == "persians" )
+          return ORANGE;
+        else
+          return BLACK;
+      }();
+    }
   };
 
   struct MessageEmitter : entt::emitter<MessageEmitter> {};
@@ -44,8 +83,8 @@ namespace Events {
     Basic( std::string origin_id )
         : origin_id( origin_id ), type( Type::Basic ) {}
 
-    Basic( std::string origin_id, Type type )
-        : origin_id( origin_id ), type( type ) {}
+    Basic( Type type, std::string origin_id )
+        : type( type ), origin_id( origin_id ) {}
   };
 
   struct ButtonClick : Basic {
@@ -59,14 +98,14 @@ namespace Events {
     }
 
     ButtonClick( std::string origin_id, std::string msg )
-        : Basic( origin_id, Type::ButtonClick ), msg( msg ) {}
+        : Basic( Type::ButtonClick, origin_id ), msg( msg ) {}
   };
 
   struct JoinLobby : Basic {
     CSteamID lobby_id;
 
     JoinLobby( std::string origin_id, CSteamID lobby_id )
-        : Basic( origin_id, Type::JoinLobby ), lobby_id( lobby_id ) {}
+        : Basic( Type::JoinLobby, origin_id ), lobby_id( lobby_id ) {}
   };
 
 

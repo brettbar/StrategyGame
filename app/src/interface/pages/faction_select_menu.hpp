@@ -38,8 +38,6 @@ namespace UI {
         32,
         BLACK,
         WHITE,
-        false,
-        {},
       } ),
     };
 
@@ -53,8 +51,6 @@ namespace UI {
         32,
         color,
         WHITE,
-        false,
-        {},
         Events::ButtonClick::Create( "faction_select", faction ),
       } ) );
     }

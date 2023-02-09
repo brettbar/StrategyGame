@@ -326,25 +326,8 @@ inline void IGame::CheckForEvents() {
         faction_str = event.msg;
 
         Messages::message_emitter.publish( Messages::FactionSelected{
-          { "singleplayer_faction_selected", event.msg },
-          [&]() -> Color {
-            if ( event.msg == "romans" )
-              return RED;
-            if ( event.msg == "greeks" )
-              return BLUE;
-            if ( event.msg == "celts" )
-              return GREEN;
-            if ( event.msg == "punics" )
-              return PURPLE;
-            if ( event.msg == "germans" )
-              return GRAY;
-            if ( event.msg == "scythians" )
-              return PINK;
-            if ( event.msg == "persians" )
-              return ORANGE;
-            else
-              return BLACK;
-          }(),
+          "singleplayer_faction_selected",
+          event.msg,
         } );
         UI::System::SwitchPage( UI::SinglePlayerLobby );
       }
@@ -352,25 +335,8 @@ inline void IGame::CheckForEvents() {
         faction_str = event.msg;
 
         Messages::message_emitter.publish( Messages::FactionSelected{
-          { "player_select_faction", event.msg },
-          [&]() -> Color {
-            if ( event.msg == "romans" )
-              return RED;
-            if ( event.msg == "greeks" )
-              return BLUE;
-            if ( event.msg == "celts" )
-              return GREEN;
-            if ( event.msg == "punics" )
-              return PURPLE;
-            if ( event.msg == "germans" )
-              return GRAY;
-            if ( event.msg == "scythians" )
-              return PINK;
-            if ( event.msg == "persians" )
-              return ORANGE;
-            else
-              return BLACK;
-          }(),
+          "player_select_faction",
+          event.msg,
         } );
         UI::System::SwitchPage( UI::Lobby );
       }

@@ -15,7 +15,7 @@ namespace UI {
     bool dynamic = false;
     // std::function<std::string()> update;
 
-    Messages::Basic subscribed_message;
+    std::shared_ptr<Messages::Basic> subscribed_message;
 
     std::string ID() {
       return elem.id;
@@ -98,12 +98,22 @@ namespace UI {
       std::string text,
       i32 font_size,
       Color background,
-      Color text_color,
-      bool dynamic,
-      Messages::Basic subscribed_message
+      Color text_color
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( dynamic ),
+          font_size( font_size ), text_color( text_color ), dynamic( false ),
+          subscribed_message( {} ) {}
+
+    TextLabel(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      std::shared_ptr<Messages::Basic> subscribed_message
+    )
+        : elem( Element( id, background, false, {}, {} ) ), text( text ),
+          font_size( font_size ), text_color( text_color ), dynamic( true ),
           subscribed_message( subscribed_message ) {}
   };
 
@@ -149,8 +159,7 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      bool dynamic,
-      Messages::Basic subscribed_message
+      std::shared_ptr<Messages::Basic> subscribed_message
     )
         : TextLabel(
             id,
@@ -158,7 +167,6 @@ namespace UI {
             font_size,
             background,
             text_color,
-            dynamic,
             subscribed_message
           ),
           on_click( new Events::Basic{ id } ) {}
@@ -169,8 +177,18 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      bool dynamic,
-      Messages::Basic subscribed_message,
+      std::shared_ptr<Events::Basic> event
+    )
+        : TextLabel( id, text, font_size, background, text_color ),
+          on_click( event ) {}
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      std::shared_ptr<Messages::Basic> subscribed_message,
       std::shared_ptr<Events::Basic> event
     )
         : TextLabel(
@@ -179,11 +197,9 @@ namespace UI {
             font_size,
             background,
             text_color,
-            dynamic,
             subscribed_message
-          ) {
-      on_click = event;
-    }
+          ),
+          on_click( event ) {}
 
     ~TextButton() {
       on_click = nullptr;

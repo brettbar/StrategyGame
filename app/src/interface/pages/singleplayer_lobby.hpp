@@ -31,13 +31,14 @@ namespace UI {
           self.elem.transform.y = updated_pos.y;
         },
         {
+          // TODO(LEFTOFF) here
+          // Need to add events/messages to these
           Create<TextButton>( {
             "singleplayer_faction_label",
             "Select your faction",
             32,
             GREEN,
             WHITE,
-            false,
             {},
           } ),
           Create<TextLabel>( {
