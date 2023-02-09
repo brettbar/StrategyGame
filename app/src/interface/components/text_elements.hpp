@@ -111,7 +111,7 @@ namespace UI {
     bool always_clickable = true;
     bool clickable = true;
 
-    Events::Basic *on_click;
+    std::shared_ptr<Events::Basic> on_click;
 
     void Draw() {
       if ( !clickable )
@@ -121,7 +121,26 @@ namespace UI {
     }
 
     void Action() {
-      Events::event_emitter.publish( *on_click );
+      switch ( on_click->type ) {
+        case Events::Type::Basic: {
+          Events::event_emitter.publish( *on_click );
+        } break;
+        case Events::Type::ButtonClick: {
+          std::shared_ptr<Events::ButtonClick> button_click =
+            std::dynamic_pointer_cast<Events::ButtonClick>( on_click );
+
+          if ( button_click ) {
+            printf(
+              "Sending button click! %s %s\n",
+              button_click->origin_id.c_str(),
+              button_click->msg.c_str()
+            );
+            Events::event_emitter.publish( *button_click );
+          }
+        } break;
+        case Events::Type::JoinLobby: {
+        } break;
+      }
     }
 
     TextButton(
@@ -144,30 +163,30 @@ namespace UI {
           ),
           on_click( new Events::Basic{ id } ) {}
 
-    ~TextButton() {
-      delete on_click;
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool dynamic,
+      Messages::Basic subscribed_message,
+      std::shared_ptr<Events::Basic> event
+    )
+        : TextLabel(
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            dynamic,
+            subscribed_message
+          ) {
+      on_click = event;
     }
 
-    // TextButton(
-    //   std::string id,
-    //   std::string text,
-    //   i32 font_size,
-    //   Color background,
-    //   Color text_color,
-    //   bool dynamic,
-    //   Messages::Basic subscribed_message,
-    //   Events::Basic on_click
-    // )
-    //     : TextLabel(
-    //         id,
-    //         text,
-    //         font_size,
-    //         background,
-    //         text_color,
-    //         dynamic,
-    //         subscribed_message
-    //       ) {
-    //   this->on_click = std::make_unique<Events::Basic>( on_click );
-    // }
+    ~TextButton() {
+      on_click = nullptr;
+    }
   };
 };// namespace UI

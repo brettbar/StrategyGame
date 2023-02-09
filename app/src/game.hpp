@@ -303,24 +303,24 @@ inline void IGame::CheckForEvents() {
           "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
         );
       }
+
+      // printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
+
+      // if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
+      //   JoinMultiplayerLobby( event.lobby_id );
+      // }
     }
   );
 
-  Events::event_emitter.on<Events::JoinLobby>(
-    [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
-      printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
-
-      if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
-        JoinMultiplayerLobby( event.lobby_id );
-      }
-    }
-  );
 
   Events::event_emitter.on<Events::ButtonClick>(
     [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
       // else if ( event.origin_id == "faction_select" ) {
       //   //// StartCampaign( event.msg );
       // }
+      printf(
+        "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
+      );
 
       if ( _single_player ) {
         faction_str = event.msg;
@@ -375,7 +375,6 @@ inline void IGame::CheckForEvents() {
         UI::System::SwitchPage( UI::Lobby );
       }
     }
-
   );
 }
 

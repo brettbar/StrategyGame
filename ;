@@ -36,37 +36,18 @@ namespace Events {
   };
 
   struct Basic {
-    Type type;
     std::string origin_id;
-
-    virtual ~Basic() {}
-
-    Basic( std::string origin_id )
-        : origin_id( origin_id ), type( Type::Basic ) {}
-
-    Basic( std::string origin_id, Type type )
-        : origin_id( origin_id ), type( type ) {}
+    virtual Messages::Type type = Type::Basic;
   };
 
   struct ButtonClick : Basic {
     std::string msg;
-
-    std::shared_ptr<Events::ButtonClick> static Create(
-      std::string id,
-      std::string msg
-    ) {
-      return std::make_shared<Events::ButtonClick>( id, msg );
-    }
-
-    ButtonClick( std::string origin_id, std::string msg )
-        : Basic( origin_id, Type::ButtonClick ), msg( msg ) {}
+    // Type type = Type::ButtonClick;
   };
 
   struct JoinLobby : Basic {
     CSteamID lobby_id;
-
-    JoinLobby( std::string origin_id, CSteamID lobby_id )
-        : Basic( origin_id, Type::JoinLobby ), lobby_id( lobby_id ) {}
+    // Type type = Type::JoinLobby;
   };
 
 

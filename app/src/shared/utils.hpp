@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include <memory>
 
 inline i32 DetermineTileIdFromPosition( Vector2 );
 inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
