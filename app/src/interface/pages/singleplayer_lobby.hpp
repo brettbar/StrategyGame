@@ -39,7 +39,6 @@ namespace UI {
             32,
             GREEN,
             WHITE,
-            {},
           } ),
           Create<TextLabel>( {
             "singleplayer_faction_selected",
@@ -47,8 +46,7 @@ namespace UI {
             32,
             GRAY,
             WHITE,
-            false,
-            {},
+            Messages::FactionSelected::Create( "faction_selected", "" ),
           } ),
           Create<TextButton>( {
             "singleplayer_lobby_start_game",
@@ -56,8 +54,6 @@ namespace UI {
             32,
             BLUE,
             WHITE,
-            false,
-            {},
           } ),
         },
       } ),

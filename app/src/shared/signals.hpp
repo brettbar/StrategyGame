@@ -19,10 +19,10 @@ namespace Messages {
     virtual ~Basic() {}
 
     Basic( std::string dest_id, std::string msg = "" )
-        : dest_id( dest_id ), type( Type::Basic ) {}
+        : type( Type::Basic ), dest_id( dest_id ) {}
 
     Basic( Type type, std::string dest_id, std::string msg = "" )
-        : dest_id( dest_id ), msg( msg ), type( type ) {}
+        : type( type ), dest_id( dest_id ), msg( msg ) {}
   };
 
   struct FactionSelected : Basic {
@@ -81,7 +81,7 @@ namespace Events {
     virtual ~Basic() {}
 
     Basic( std::string origin_id )
-        : origin_id( origin_id ), type( Type::Basic ) {}
+        : type( Type::Basic ), origin_id( origin_id ) {}
 
     Basic( Type type, std::string origin_id )
         : type( type ), origin_id( origin_id ) {}

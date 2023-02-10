@@ -318,27 +318,29 @@ inline void IGame::CheckForEvents() {
       // else if ( event.origin_id == "faction_select" ) {
       //   //// StartCampaign( event.msg );
       // }
-      printf(
-        "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
-      );
+      if ( event.origin_id == "faction_select" ) {
+        printf(
+          "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
+        );
 
-      if ( _single_player ) {
-        faction_str = event.msg;
+        if ( _single_player ) {
+          faction_str = event.msg;
 
-        Messages::message_emitter.publish( Messages::FactionSelected{
-          "singleplayer_faction_selected",
-          event.msg,
-        } );
-        UI::System::SwitchPage( UI::SinglePlayerLobby );
-      }
-      else {
-        faction_str = event.msg;
+          Messages::message_emitter.publish( Messages::FactionSelected{
+            "singleplayer_faction_selected",
+            event.msg,
+          } );
+          UI::System::SwitchPage( UI::SinglePlayerLobby );
+        }
+        else {
+          faction_str = event.msg;
 
-        Messages::message_emitter.publish( Messages::FactionSelected{
-          "player_select_faction",
-          event.msg,
-        } );
-        UI::System::SwitchPage( UI::Lobby );
+          Messages::message_emitter.publish( Messages::FactionSelected{
+            "player_select_faction",
+            event.msg,
+          } );
+          UI::System::SwitchPage( UI::Lobby );
+        }
       }
     }
   );

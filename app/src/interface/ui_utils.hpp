@@ -236,7 +236,7 @@ namespace UI {
     if ( Has<TextButton>( entity ) ) {
 
       auto &button = Get<TextButton>( entity );
-      button.Action();
+      button.FireEvent();
     }
 
 

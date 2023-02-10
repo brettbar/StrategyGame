@@ -76,14 +76,15 @@ public:
         }
       }
       else if ( entity == _context.hot ) {
-        // if ( mouseWentDown && interactive )
         if ( mouseWentDown && interactive )
           _context.active = entity;
       }
 
       if ( inside ) {
-        if ( _context.active == entt::null && interactive ) {
+        // if ( _context.active == entt::null && interactive ) {
+        if ( _context.active == entt::null ) {
           _context.hot = entity;
+
           if ( mouseWentDown && interactive )
             _context.active = entity;
         }
@@ -94,18 +95,18 @@ public:
 
     // TODO(rf) this shouldnt use the selection system directly
     void DrawManagerDebugInfo() {
-      // DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
-      // std::string foo = "hot: " + EntityIdToString( _context.hot );
-      // DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
+      DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
+      std::string foo = "hot: " + EntityIdToString( _context.hot );
+      DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
 
-      // DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
-      // std::string bar = "active: " + EntityIdToString( _context.active );
-      // DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
+      DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
+      std::string bar = "active: " + EntityIdToString( _context.active );
+      DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
 
-      // DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
-      // std::string selected_ent =
-      //   "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-      // DrawText( selected_ent.c_str(), GetScreenWidth() - 300, 202, 24.0f, RED );
+      DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
+      std::string selected_ent =
+        "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+      DrawText( selected_ent.c_str(), GetScreenWidth() - 300, 202, 24.0f, RED );
     }
 
     bool MouseIsOverUI() {
@@ -123,6 +124,7 @@ public:
       registry = {};
       registry.clear();
     }
+
 
 private:
     Context _context = { entt::null, entt::null };

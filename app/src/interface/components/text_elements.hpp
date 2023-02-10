@@ -4,6 +4,7 @@
 
 // TODO this might be a circular dependency issue
 #include "../ui_manager.hpp"
+#include <memory>
 
 namespace UI {
 
@@ -12,6 +13,7 @@ namespace UI {
     std::string text;
     i32 font_size;
     Color text_color;
+    // TODO(rf) probably can remove all together
     bool dynamic = false;
     // std::function<std::string()> update;
 
@@ -49,9 +51,6 @@ namespace UI {
     //     text = updated_text;
     //   }
     // }
-
-    void CheckSubscribedMessages() {}
-
 
     void Draw() {
       DrawRectangleV(
@@ -130,7 +129,7 @@ namespace UI {
         TextLabel::Draw();
     }
 
-    void Action() {
+    void FireEvent() {
       switch ( on_click->type ) {
         case Events::Type::Basic: {
           Events::event_emitter.publish( *on_click );
@@ -152,6 +151,16 @@ namespace UI {
         } break;
       }
     }
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color
+    )
+        : TextLabel( id, text, font_size, background, text_color ),
+          on_click( new Events::Basic{ id } ) {}
 
     TextButton(
       std::string id,

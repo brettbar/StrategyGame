@@ -23,8 +23,6 @@ namespace UI {
       32,
       RED,
       WHITE,
-      false,
-      {},
     } );
   }
 
@@ -55,8 +53,6 @@ namespace UI {
           24,
           color,
           WHITE,
-          false,
-          {},
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {
@@ -65,8 +61,6 @@ namespace UI {
           24,
           color,
           WHITE,
-          false,
-          {},
         } ),
       },
     } );
@@ -92,8 +86,6 @@ namespace UI {
         24,
         GRAY,
         WHITE,
-        false,
-        {},
       } ) },
     } );
 
@@ -168,7 +160,7 @@ namespace UI {
         },
         {
           Create<TextLabel>( {
-            "lobby_title", "", 32, GREEN, WHITE, true, {},
+            "lobby_title", "", 32, GREEN, WHITE
             // []() -> std::string {
             //   return SteamMatchmaking()->GetLobbyData(
             //     Network::lobby_id, "name"
