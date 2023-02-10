@@ -330,6 +330,7 @@ inline void IGame::CheckForEvents() {
             "singleplayer_faction_selected",
             event.msg,
           } );
+
           UI::System::SwitchPage( UI::SinglePlayerLobby );
         }
         else {
@@ -339,6 +340,7 @@ inline void IGame::CheckForEvents() {
             "player_select_faction",
             event.msg,
           } );
+
           UI::System::SwitchPage( UI::Lobby );
         }
       }

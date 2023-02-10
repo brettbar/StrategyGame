@@ -19,6 +19,7 @@ namespace UI {
 
     std::shared_ptr<Messages::Basic> subscribed_message;
 
+
     std::string ID() {
       return elem.id;
     }
@@ -34,6 +35,7 @@ namespace UI {
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
     }
+
 
     // void Update() {
     //   if ( elem.enabled && dynamic ) {
