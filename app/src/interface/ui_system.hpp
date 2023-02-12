@@ -59,33 +59,6 @@ namespace UI {
       }
     }
 
-    inline void CheckForMessages() {
-      // Messages::message_emitter.on<Messages::FactionSelected>(
-      //   [&](
-      //     const Messages::FactionSelected msg, Messages::MessageEmitter &emitter
-      //   ) {
-      //     entt::entity element = Manager()->lookup.at( msg.dest_id );
-      //     if ( Has<TextLabel>( element ) ) {
-      //       Get<TextLabel>( element ).Update( msg.updated_value );
-
-      //       if ( msg.dest_id == "singleplayer_faction_selected" ) {
-      //         Get<TextLabel>( element ).elem.background = msg.color;
-      //       }
-      //     }
-      //     else if ( Has<TextButton>( element ) ) {
-      //       Get<TextButton>( element ).text = ( msg.updated_value );
-
-      //       if ( msg.dest_id == "player_select_faction" ) {
-      //         Get<TextButton>( element ).elem.background = msg.color;
-      //       }
-      //     }
-      //     else {
-      //       printf( "WARNING: Sent message to invalid element type.\n" );
-      //     }
-      //   }
-      // );
-    }
-
     inline void UpdateOnFrame() {
       vec2 mousePos = GetMousePosition();
       bool mouseWentUp = IsMouseButtonReleased( 0 );
@@ -104,6 +77,8 @@ namespace UI {
       else if ( screen_width >= 3840 ) {
         SCALE = 4.0;
       }
+
+      Messages::dispatcher.update();
 
       for ( entt::entity base: Manager()->ActivePage() ) {
         Panel &panel = Get<Panel>( base );
@@ -172,10 +147,13 @@ namespace UI {
           RecursiveLayout( Get<Panel>( single_child ) );
         }
         else if ( Has<TextLabel>( child ) ) {
-          Get<TextLabel>( child ).Resize();
+          TextLabel &label = Get<TextLabel>( child );
+          label.Resize();
         }
         else if ( Has<TextButton>( child ) ) {
-          Get<TextButton>( child ).Resize();
+
+          TextButton &button = Get<TextButton>( child );
+          button.Resize();
         }
         else if ( Has<TextureLabel>( child ) ) {
           Get<TextureLabel>( child ).Resize();

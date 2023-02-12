@@ -148,6 +148,15 @@ namespace UI {
   inline void RecursiveToggle( entt::entity entity, bool on ) {
     ToggleElem( entity, on );
 
+    if ( Has<TextLabel>( entity ) ) {
+      if ( on ) {
+        Get<TextLabel>( entity ).SubscribeToMessages();
+      }
+      else {
+        Get<TextLabel>( entity ).UnsubscribeFromMessages();
+      }
+    }
+
     if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
       return;
 

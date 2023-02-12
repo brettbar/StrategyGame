@@ -15,9 +15,26 @@ namespace UI {
     Color text_color;
     // TODO(rf) probably can remove all together
     bool dynamic = false;
-    // std::function<std::string()> update;
 
-    std::shared_ptr<Messages::Basic> subscribed_message;
+    std::vector<Messages::ID> subscribed_messages;
+
+    void ReceiveUpdateText( const Messages::UpdateText &event ) {
+      for ( Messages::ID msg_id: subscribed_messages ) {
+        if ( msg_id == event.message_id ) {
+          text = event.updated_text;
+          break;
+        }
+      }
+    }
+
+    void ReceiveUpdateBackground( const Messages::UpdateBackground &event ) {
+      for ( Messages::ID msg_id: subscribed_messages ) {
+        if ( msg_id == event.message_id ) {
+          elem.background = event.updated_background;
+          break;
+        }
+      }
+    }
 
 
     std::string ID() {
@@ -34,6 +51,22 @@ namespace UI {
 
       elem.transform.width = text_dims.x;
       elem.transform.height = text_dims.y;
+    }
+
+    void SubscribeToMessages() {
+      Messages::dispatcher.sink<Messages::UpdateText>()
+        .connect<&TextLabel::ReceiveUpdateText>( this );
+
+      Messages::dispatcher.sink<Messages::UpdateBackground>()
+        .connect<&TextLabel::ReceiveUpdateBackground>( this );
+    }
+
+    void UnsubscribeFromMessages() {
+      Messages::dispatcher.sink<Messages::UpdateText>()
+        .disconnect<&TextLabel::ReceiveUpdateText>( this );
+
+      Messages::dispatcher.sink<Messages::UpdateBackground>()
+        .disconnect<&TextLabel::ReceiveUpdateBackground>( this );
     }
 
 
@@ -103,7 +136,7 @@ namespace UI {
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( false ),
-          subscribed_message( {} ) {}
+          subscribed_messages( {} ) {}
 
     TextLabel(
       std::string id,
@@ -111,11 +144,11 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      std::shared_ptr<Messages::Basic> subscribed_message
+      std::vector<Messages::ID> subscribed_messages
     )
         : elem( Element( id, background, false, {}, {} ) ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( true ),
-          subscribed_message( subscribed_message ) {}
+          subscribed_messages( subscribed_messages ) {}
   };
 
   struct TextButton : TextLabel {
@@ -170,7 +203,7 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      std::shared_ptr<Messages::Basic> subscribed_message
+      std::vector<Messages::ID> subscribed_messages
     )
         : TextLabel(
             id,
@@ -178,7 +211,7 @@ namespace UI {
             font_size,
             background,
             text_color,
-            subscribed_message
+            subscribed_messages
           ),
           on_click( new Events::Basic{ id } ) {}
 
@@ -199,7 +232,7 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      std::shared_ptr<Messages::Basic> subscribed_message,
+      std::vector<Messages::ID> subscribed_messages,
       std::shared_ptr<Events::Basic> event
     )
         : TextLabel(
@@ -208,7 +241,7 @@ namespace UI {
             font_size,
             background,
             text_color,
-            subscribed_message
+            subscribed_messages
           ),
           on_click( event ) {}
 

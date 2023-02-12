@@ -6,63 +6,46 @@
 // Used for sending data from the Game State to the UI
 namespace Messages {
 
-  enum class Type {
-    Basic,
+  enum class ID {
     FactionSelected,
   };
 
-  struct Basic {
-    Type type;
-    std::string dest_id;
-    std::string msg;
+  struct UpdateText {
+    ID message_id;
+    std::string updated_text;
 
-    virtual ~Basic() {}
-
-    Basic( std::string dest_id, std::string msg = "" )
-        : type( Type::Basic ), dest_id( dest_id ) {}
-
-    Basic( Type type, std::string dest_id, std::string msg = "" )
-        : type( type ), dest_id( dest_id ), msg( msg ) {}
+    UpdateText( ID message_id, std::string updated_text )
+        : message_id( message_id ), updated_text( updated_text ) {}
   };
 
-  struct FactionSelected : Basic {
-    Color color;
+  struct UpdateBackground {
+    ID message_id;
+    Color updated_background;
 
-    std::shared_ptr<Messages::FactionSelected> static Create(
-      std::string id,
-      std::string msg
-    ) {
-      return std::make_shared<Messages::FactionSelected>( id, msg );
-    }
-
-    FactionSelected( std::string id, std::string faction )
-        : Basic( Type::FactionSelected, id ) {
-      // TODO replace with json stuff
-      color = [&]() -> Color {
-        if ( faction == "romans" )
-          return RED;
-        if ( faction == "greeks" )
-          return BLUE;
-        if ( faction == "celts" )
-          return GREEN;
-        if ( faction == "punics" )
-          return PURPLE;
-        if ( faction == "germans" )
-          return GRAY;
-        if ( faction == "scythians" )
-          return PINK;
-        if ( faction == "persians" )
-          return ORANGE;
-        else
-          return BLACK;
-      }();
-    }
+    UpdateBackground( ID message_id, Color updated_background )
+        : message_id( message_id ), updated_background( updated_background ) {}
   };
 
-  struct MessageEmitter : entt::emitter<MessageEmitter> {};
+  // struct FactionSelected : Basic {
+  //   Color color;
 
-  inline MessageEmitter message_emitter;
+  //   std::shared_ptr<Messages::FactionSelected> static Create(
+  //     std::string id,
+  //     std::string msg
+  //   ) {
+  //     return std::make_shared<Messages::FactionSelected>( id, msg );
+  //   }
 
+  //   FactionSelected( std::string id, std::string faction )
+  //       : Basic( Type::FactionSelected, id ) {
+  //     }();
+  //   }
+  // };
+
+  // struct MessageEmitter : entt::emitter<MessageEmitter> {};
+
+  // inline MessageEmitter message_emitter;
+  inline entt::dispatcher dispatcher{};
 };// namespace Messages
 
 // Used for sending data from the UI to the Game State

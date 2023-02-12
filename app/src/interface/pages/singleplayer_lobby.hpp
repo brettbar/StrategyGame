@@ -46,7 +46,7 @@ namespace UI {
             32,
             GRAY,
             WHITE,
-            Messages::FactionSelected::Create( "faction_selected", "" ),
+            { Messages::ID::FactionSelected },
           } ),
           Create<TextButton>( {
             "singleplayer_lobby_start_game",

@@ -29,10 +29,9 @@ class IGame {
   }
 
   void MainLoop() {
-    while ( !WindowShouldClose() && ShouldRun() ) {
-      CheckForEvents();
+    RegisterEventListeners();
 
-      UI::System::CheckForMessages();
+    while ( !WindowShouldClose() && ShouldRun() ) {
 
       HandleMessages();
 
@@ -58,7 +57,7 @@ class IGame {
   f32 _dt = 0.0f;
 
   // TODO move
-  std::string faction_str = "";
+  std::string faction = "";
 
   IGame( IGame const & ) = delete;
   void operator=( const IGame & ) = delete;
@@ -70,7 +69,7 @@ class IGame {
     return !_hit_exit;
   }
 
-  void CheckForEvents();
+  void RegisterEventListeners();
 
   /*=============================================================
                         Begin: Singleplayer
@@ -255,7 +254,7 @@ class IGame {
   }
 };
 
-inline void IGame::CheckForEvents() {
+inline void IGame::RegisterEventListeners() {
   Events::event_emitter.on<Events::Basic>(
     [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
       if ( event.origin_id == "main_menu_host_game" ) {
@@ -281,7 +280,7 @@ inline void IGame::CheckForEvents() {
         UI::System::SwitchPage( UI::FactionSelectMenu );
       }
       else if ( event.origin_id == "singleplayer_lobby_start_game" ) {
-        StartCampaign( faction_str );
+        StartCampaign( faction );
       }
       else if ( event.origin_id == "modal_menu_load_game" ) {
         LoadGame();
@@ -324,21 +323,66 @@ inline void IGame::CheckForEvents() {
         );
 
         if ( _single_player ) {
-          faction_str = event.msg;
+          faction = event.msg;
 
-          Messages::message_emitter.publish( Messages::FactionSelected{
-            "singleplayer_faction_selected",
-            event.msg,
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::FactionSelected,
+            faction,
+          } );
+          Messages::dispatcher.enqueue( Messages::UpdateBackground{
+            Messages::ID::FactionSelected,
+            // TODO replace with json stuff
+            [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
           } );
 
           UI::System::SwitchPage( UI::SinglePlayerLobby );
         }
         else {
-          faction_str = event.msg;
+          faction = event.msg;
 
-          Messages::message_emitter.publish( Messages::FactionSelected{
-            "player_select_faction",
-            event.msg,
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::FactionSelected,
+            faction,
+          } );
+
+          Messages::dispatcher.enqueue( Messages::UpdateBackground{
+            Messages::ID::FactionSelected,
+            // TODO replace with json stuff
+            [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
           } );
 
           UI::System::SwitchPage( UI::Lobby );
