@@ -72,8 +72,8 @@ namespace UI {
             ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
             ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
           };
-          self.elem.transform.x = update_pos.x;
-          self.elem.transform.y = update_pos.y;
+          self.transform.x = update_pos.x;
+          self.transform.y = update_pos.y;
         },
         CreateFactionButtons(),
       } ),

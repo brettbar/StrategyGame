@@ -36,11 +36,6 @@ namespace UI {
       }
     }
 
-    // This is needed for now
-    std::string ID() {
-      return id;
-    }
-
     void Resize() {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,

@@ -145,7 +145,7 @@ private:
   inline entt::entity Create( T element ) {
     entt::entity entity = Manager()->registry.create();
     Manager()->registry.emplace<T>( entity, element );
-    Manager()->lookup.insert_or_assign( element.ID(), entity );
+    Manager()->lookup.insert_or_assign( element.id, entity );
     return entity;
   }
 

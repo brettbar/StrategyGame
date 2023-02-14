@@ -115,15 +115,15 @@ namespace UI {
     // We make a call to draw before the panel is sized if its
     // relative
     inline void RecursiveLayout( Panel &parent_panel ) {
-      if ( !parent_panel.elem.enabled )
+      if ( !parent_panel.enabled )
         return;
 
       f32 total_height = 0;
       f32 total_width = 0;
       f32 tallest_child = 0;
       f32 widest_child = 0;
-      f32 end_of_last_x = parent_panel.elem.transform.x;
-      f32 end_of_last_y = parent_panel.elem.transform.y;
+      f32 end_of_last_x = parent_panel.transform.x;
+      f32 end_of_last_y = parent_panel.transform.y;
 
       parent_panel.Update();
 
@@ -141,8 +141,8 @@ namespace UI {
 
           assert( Has<Panel>( single_child ) );
           Panel &single_child_panel = Get<Panel>( single_child );
-          single_child_panel.elem.transform.x = child_panel.elem.transform.x;
-          single_child_panel.elem.transform.y = child_panel.elem.transform.y;
+          single_child_panel.transform.x = child_panel.transform.x;
+          single_child_panel.transform.y = child_panel.transform.y;
 
           RecursiveLayout( Get<Panel>( single_child ) );
         }
@@ -159,7 +159,7 @@ namespace UI {
           Get<TextureLabel>( child ).Resize();
         }
         else if ( Has<TextureButton>( child ) ) {
-          Get<TextureButton>( child ).label.Resize();
+          Get<TextureButton>( child ).Resize();
         }
 
         // TODO ^ these could probably be consolidated using a template
@@ -180,7 +180,7 @@ namespace UI {
           // 3. Set the child y position based on alignment style.
           switch ( parent_panel.children_vert_align ) {
             case Align::Start: {
-              transform.y = parent_panel.elem.transform.y;
+              transform.y = parent_panel.transform.y;
             } break;
           }
         }
@@ -188,7 +188,7 @@ namespace UI {
           // 2. Set the child x position based on alignment style.
           switch ( parent_panel.children_horiz_align ) {
             case Align::Start: {
-              transform.x = parent_panel.elem.transform.x;
+              transform.x = parent_panel.transform.x;
             } break;
             case Align::SpaceOut: {
             } break;
@@ -198,9 +198,9 @@ namespace UI {
           switch ( parent_panel.children_vert_align ) {
             case Align::Start: {
               transform.y = end_of_last_y;
-              // + elem.margins.top;
+              // + margins.top;
               end_of_last_y = transform.y + transform.height;
-              // + elem.margins.bottom;
+              // + margins.bottom;
             } break;
           }
         }
@@ -221,19 +221,19 @@ namespace UI {
         }
 
         if ( parent_panel.children_axis == Axis::Row ) {
-          parent_panel.elem.transform.width = total_width;
-          parent_panel.elem.transform.height = tallest_child;
+          parent_panel.transform.width = total_width;
+          parent_panel.transform.height = tallest_child;
         }
         else if ( parent_panel.children_axis == Axis::Column ) {
-          parent_panel.elem.transform.width = widest_child;
-          parent_panel.elem.transform.height = total_height;
+          parent_panel.transform.width = widest_child;
+          parent_panel.transform.height = total_height;
         }
       }
     }
 
 
     inline void RecursiveDraw( Panel &panel ) {
-      if ( !panel.elem.enabled )
+      if ( !panel.enabled )
         return;
 
       panel.Draw();
@@ -275,7 +275,7 @@ namespace UI {
       bool mouseWentDown
     ) {
 
-      if ( !panel.elem.enabled )
+      if ( !panel.enabled )
         return;
 
       for ( auto &child: panel.children ) {

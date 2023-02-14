@@ -32,10 +32,10 @@ namespace UI {
             200 * SCALE,
           };
 
-          self.elem.transform.x = updated_pos.x;
-          self.elem.transform.y = updated_pos.y;
-          self.elem.transform.width = updated_size.x;
-          self.elem.transform.height = updated_size.y;
+          self.transform.x = updated_pos.x;
+          self.transform.y = updated_pos.y;
+          self.transform.width = updated_size.x;
+          self.transform.height = updated_size.y;
         },
         {
           Create<Panel>( {
@@ -153,10 +153,10 @@ namespace UI {
             200 * SCALE,
           };
 
-          self.elem.transform.x = updated_pos.x;
-          self.elem.transform.y = updated_pos.y;
-          self.elem.transform.width = updated_size.x;
-          self.elem.transform.height = updated_size.y;
+          self.transform.x = updated_pos.x;
+          self.transform.y = updated_pos.y;
+          self.transform.width = updated_size.x;
+          self.transform.height = updated_size.y;
         },
         {
           Create<Panel>( {

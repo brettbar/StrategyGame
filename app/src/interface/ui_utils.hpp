@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-// TODO(rf) many of these should be replaced with template
+// TODO(rf) many of these should be replaced with template !!!!!!!!!!
 
 namespace UI {
 
@@ -27,11 +27,11 @@ namespace UI {
 
   inline std::string GetId( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.id;
+      return Get<Panel>( entity ).id;
     }
 
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.id;
+      return Get<StackPanel>( entity ).id;
     }
 
     if ( Has<TextButton>( entity ) ) {
@@ -43,11 +43,11 @@ namespace UI {
     }
 
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.id;
+      return Get<TextureLabel>( entity ).id;
     }
 
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.id;
+      return Get<TextureButton>( entity ).id;
     }
 
     return "INVALID_ID";
@@ -55,10 +55,10 @@ namespace UI {
 
   inline rect &GetTransform( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.transform;
+      return Get<Panel>( entity ).transform;
     }
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.transform;
+      return Get<StackPanel>( entity ).transform;
     }
     if ( Has<TextButton>( entity ) ) {
       return Get<TextButton>( entity ).transform;
@@ -67,10 +67,10 @@ namespace UI {
       return Get<TextLabel>( entity ).transform;
     }
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.transform;
+      return Get<TextureLabel>( entity ).transform;
     }
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.transform;
+      return Get<TextureButton>( entity ).transform;
     }
 
     std::cout << "GetTransform() Invalid Transform!!" << std::endl;
@@ -79,10 +79,10 @@ namespace UI {
 
   inline Margins &GetMargins( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.margins;
+      return Get<Panel>( entity ).margins;
     }
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.margins;
+      return Get<StackPanel>( entity ).margins;
     }
     if ( Has<TextButton>( entity ) ) {
       return Get<TextButton>( entity ).margins;
@@ -91,10 +91,10 @@ namespace UI {
       return Get<TextLabel>( entity ).margins;
     }
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.margins;
+      return Get<TextureLabel>( entity ).margins;
     }
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.margins;
+      return Get<TextureButton>( entity ).margins;
     }
 
     std::cout << "GetTransform() Invalid Transform!!" << std::endl;
@@ -114,12 +114,12 @@ namespace UI {
 
   inline void ToggleElem( entt::entity entity, bool on ) {
     if ( Has<Panel>( entity ) ) {
-      Get<Panel>( entity ).elem.enabled = on;
+      Get<Panel>( entity ).enabled = on;
       return;
     }
 
     if ( Has<StackPanel>( entity ) ) {
-      Get<StackPanel>( entity ).elem.enabled = on;
+      Get<StackPanel>( entity ).enabled = on;
       return;
     }
 
@@ -134,12 +134,12 @@ namespace UI {
     }
 
     if ( Has<TextureLabel>( entity ) ) {
-      Get<TextureLabel>( entity ).elem.enabled = on;
+      Get<TextureLabel>( entity ).enabled = on;
       return;
     }
 
     if ( Has<TextureButton>( entity ) ) {
-      Get<TextureButton>( entity ).label.elem.enabled = on;
+      Get<TextureButton>( entity ).enabled = on;
       return;
     }
   }
@@ -198,11 +198,11 @@ namespace UI {
 
   inline bool IsEnabled( entt::entity entity ) {
     if ( Has<Panel>( entity ) ) {
-      return Get<Panel>( entity ).elem.enabled;
+      return Get<Panel>( entity ).enabled;
     }
 
     if ( Has<StackPanel>( entity ) ) {
-      return Get<StackPanel>( entity ).elem.enabled;
+      return Get<StackPanel>( entity ).enabled;
     }
 
     if ( Has<TextButton>( entity ) ) {
@@ -214,11 +214,11 @@ namespace UI {
     }
 
     if ( Has<TextureLabel>( entity ) ) {
-      return Get<TextureLabel>( entity ).elem.enabled;
+      return Get<TextureLabel>( entity ).enabled;
     }
 
     if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity ).label.elem.enabled;
+      return Get<TextureButton>( entity ).enabled;
     }
 
     return false;

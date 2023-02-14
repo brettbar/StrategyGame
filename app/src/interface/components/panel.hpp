@@ -6,18 +6,13 @@
 
 namespace UI {
 
-  struct Panel {
-    Element elem;
+  struct Panel : Element {
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
     bool abs_size = false;
     std::function<void( Panel & )> update;
     std::vector<entt::entity> children;
-
-    std::string ID() {
-      return elem.id;
-    }
 
     void Update() {
       if ( update )
@@ -26,9 +21,9 @@ namespace UI {
 
     void Draw() {
       DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        elem.background
+        { transform.x, transform.y },
+        { transform.width, transform.height },
+        background
       );
     }
 
@@ -43,7 +38,7 @@ namespace UI {
       std::function<void( Panel & )> update,
       std::vector<entt::entity> children
     )
-        : elem( Element( id, background, false, { 0, 0, 500, 200 }, {} ) ),
+        : Element( id, background, false, { 0, 0, 500, 200 }, {} ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), abs_size( abs_size ),
@@ -58,7 +53,7 @@ namespace UI {
       Align children_vert_align,
       std::vector<entt::entity> children = {}
     )
-        : elem( Element( id, background, false, {}, {} ) ),
+        : Element( id, background, false, {}, {} ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), update( {} ),
@@ -74,7 +69,7 @@ namespace UI {
       Margins margins,
       std::vector<entt::entity> children
     )
-        : elem( Element( id, background, false, {}, margins ) ),
+        : Element( id, background, false, {}, margins ),
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), update( {} ),
@@ -82,8 +77,7 @@ namespace UI {
   };
 
   // NOTE For right now, StackPanels can only have Panels as their direct children
-  struct StackPanel {
-    Element elem;
+  struct StackPanel : Element {
     u32 curr_index = 0;
     // bool abs_pos = false;
     // bool abs_size = false;
@@ -95,14 +89,14 @@ namespace UI {
     std::vector<entt::entity> children;
 
     std::string ID() {
-      return elem.id;
+      return id;
     }
 
     void Draw() {
       DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        elem.background
+        { transform.x, transform.y },
+        { transform.width, transform.height },
+        background
       );
     }
 
@@ -112,8 +106,7 @@ namespace UI {
       Color background,
       std::vector<entt::entity> children
     )
-        : elem( Element( id, background, false, {}, {} ) ),
-          children( children ){};
+        : Element( id, background, false, {}, {} ), children( children ){};
   };
 
 };// namespace UI

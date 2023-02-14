@@ -27,8 +27,8 @@ namespace UI {
             ( (f32) GetScreenWidth() / 2 ) - ( 400 * SCALE / 2.0f ),
             ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
           };
-          self.elem.transform.x = updated_pos.x;
-          self.elem.transform.y = updated_pos.y;
+          self.transform.x = updated_pos.x;
+          self.transform.y = updated_pos.y;
         },
         {
           // TODO(LEFTOFF) here
