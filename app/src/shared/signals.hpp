@@ -10,6 +10,10 @@ namespace Messages {
     FactionSelected,
   };
 
+  struct UpdateEnabled {
+    bool on;
+  };
+
   struct UpdateText {
     ID message_id;
     std::string updated_text;

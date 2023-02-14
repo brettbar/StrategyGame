@@ -8,8 +8,8 @@
 
 namespace UI {
 
-  struct TextLabel {
-    Element elem;
+  struct TextLabel : Element {
+    // Element elem;
     std::string text;
     i32 font_size;
     Color text_color;
@@ -30,15 +30,15 @@ namespace UI {
     void ReceiveUpdateBackground( const Messages::UpdateBackground &event ) {
       for ( Messages::ID msg_id: subscribed_messages ) {
         if ( msg_id == event.message_id ) {
-          elem.background = event.updated_background;
+          background = event.updated_background;
           break;
         }
       }
     }
 
-
+    // This is needed for now
     std::string ID() {
-      return elem.id;
+      return id;
     }
 
     void Resize() {
@@ -49,8 +49,8 @@ namespace UI {
         2.0f
       );
 
-      elem.transform.width = text_dims.x;
-      elem.transform.height = text_dims.y;
+      transform.width = text_dims.x;
+      transform.height = text_dims.y;
     }
 
     void SubscribeToMessages() {
@@ -89,17 +89,17 @@ namespace UI {
 
     void Draw() {
       DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
-        elem.background
+        { transform.x, transform.y },
+        { transform.width, transform.height },
+        background
       );
 
       DrawTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
         text.c_str(),
         {
-          elem.transform.x,
-          elem.transform.y,
+          transform.x,
+          transform.y,
         },
         font_size,
         2.0,
@@ -109,8 +109,8 @@ namespace UI {
 
     void Draw( Color override_background ) {
       DrawRectangleV(
-        { elem.transform.x, elem.transform.y },
-        { elem.transform.width, elem.transform.height },
+        { transform.x, transform.y },
+        { transform.width, transform.height },
         override_background
       );
 
@@ -118,8 +118,8 @@ namespace UI {
         Global::font_cache[hstr{ "font_romulus" }]->font,
         text.c_str(),
         {
-          elem.transform.x,
-          elem.transform.y,
+          transform.x,
+          transform.y,
         },
         font_size,
         2.0,
@@ -134,7 +134,7 @@ namespace UI {
       Color background,
       Color text_color
     )
-        : elem( Element( id, background, false, {}, {} ) ), text( text ),
+        : Element( id, background, false, {}, {} ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( false ),
           subscribed_messages( {} ) {}
 
@@ -146,7 +146,7 @@ namespace UI {
       Color text_color,
       std::vector<Messages::ID> subscribed_messages
     )
-        : elem( Element( id, background, false, {}, {} ) ), text( text ),
+        : Element( id, background, false, {}, {} ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( true ),
           subscribed_messages( subscribed_messages ) {}
   };

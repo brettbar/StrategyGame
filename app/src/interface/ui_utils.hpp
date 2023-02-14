@@ -35,11 +35,11 @@ namespace UI {
     }
 
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).elem.id;
+      return Get<TextButton>( entity ).id;
     }
 
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.id;
+      return Get<TextLabel>( entity ).id;
     }
 
     if ( Has<TextureLabel>( entity ) ) {
@@ -61,10 +61,10 @@ namespace UI {
       return Get<StackPanel>( entity ).elem.transform;
     }
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).elem.transform;
+      return Get<TextButton>( entity ).transform;
     }
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.transform;
+      return Get<TextLabel>( entity ).transform;
     }
     if ( Has<TextureLabel>( entity ) ) {
       return Get<TextureLabel>( entity ).elem.transform;
@@ -85,10 +85,10 @@ namespace UI {
       return Get<StackPanel>( entity ).elem.margins;
     }
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).elem.margins;
+      return Get<TextButton>( entity ).margins;
     }
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.margins;
+      return Get<TextLabel>( entity ).margins;
     }
     if ( Has<TextureLabel>( entity ) ) {
       return Get<TextureLabel>( entity ).elem.margins;
@@ -124,12 +124,12 @@ namespace UI {
     }
 
     if ( Has<TextButton>( entity ) ) {
-      Get<TextButton>( entity ).elem.enabled = on;
+      Get<TextButton>( entity ).enabled = on;
       return;
     }
 
     if ( Has<TextLabel>( entity ) ) {
-      Get<TextLabel>( entity ).elem.enabled = on;
+      Get<TextLabel>( entity ).enabled = on;
       return;
     }
 
@@ -206,11 +206,11 @@ namespace UI {
     }
 
     if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity ).elem.enabled;
+      return Get<TextButton>( entity ).enabled;
     }
 
     if ( Has<TextLabel>( entity ) ) {
-      return Get<TextLabel>( entity ).elem.enabled;
+      return Get<TextLabel>( entity ).enabled;
     }
 
     if ( Has<TextureLabel>( entity ) ) {

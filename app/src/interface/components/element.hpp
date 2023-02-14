@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../shared/global.hpp"
+#include "../../shared/signals.hpp"
 #include "../ui_shared.hpp"
 
 namespace UI {
@@ -40,6 +41,10 @@ namespace UI {
     )
         : id( id ), background( background ), enabled( enabled ),
           transform( transform ), margins( margins ) {}
+
+    void ReceiveUpdateEnabled( const Messages::UpdateEnabled &event ) {
+      enabled = event.on;
+    }
 
     void Enable() {
       enabled = true;
