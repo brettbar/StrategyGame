@@ -13,7 +13,7 @@
 
 namespace UI {
 
-  inline std::vector<entt::entity> CreateCampaignUI() {
+  inline std::vector<ptr<Panel>> CreateCampaignUI() {
     return {
       Create<Panel>( {
         "settlement_context_panel",

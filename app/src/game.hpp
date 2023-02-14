@@ -146,7 +146,7 @@ class IGame {
     }
     else if ( _mode == ProgramMode::ModalMenu ) {
       _mode = ProgramMode::Campaign;
-      UI::System::SwitchPage( UI::Campaign );
+      UI::System::EnableCampaignUI();
     }
   }
 

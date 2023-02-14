@@ -9,7 +9,7 @@
 
 namespace UI {
 
-  inline std::vector<entt::entity> CreateFactionButtons() {
+  inline std::vector<ptr<Element>> CreateFactionButtons() {
     // TODO replace with read in from json
     std::map<std::string, Color> factions = {
       { "romans", RED },
@@ -31,7 +31,7 @@ namespace UI {
       { "germans", "Germanic Federation" },
     };
 
-    std::vector<entt::entity> text_buttons = {
+    std::vector<ptr<Element>> text_buttons = {
       Create<TextLabel>( {
         "faction_select_label",
         "Select your faction",
@@ -58,7 +58,7 @@ namespace UI {
     return text_buttons;
   }
 
-  inline std::vector<entt::entity> CreateFactionSelectMenuUI() {
+  inline std::vector<ptr<Panel>> CreateFactionSelectMenuUI() {
     return {
       Create<Panel>( {
         "facton_select_menu",

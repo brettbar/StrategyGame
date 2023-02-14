@@ -2,7 +2,6 @@
 
 #include "element.hpp"
 
-#include "../ui_manager.hpp"
 
 namespace UI {
 
@@ -12,7 +11,7 @@ namespace UI {
     Align children_vert_align;
     bool abs_size = false;
     std::function<void( Panel & )> update;
-    std::vector<entt::entity> children;
+    std::vector<std::shared_ptr<Element>> children;
 
     void Update() {
       if ( update )
@@ -36,7 +35,7 @@ namespace UI {
       Align children_vert_align,
       bool abs_size,
       std::function<void( Panel & )> update,
-      std::vector<entt::entity> children
+      std::vector<std::shared_ptr<Element>> children
     )
         : Element( id, background, false, { 0, 0, 500, 200 }, {} ),
           children_axis( children_axis ),
@@ -51,7 +50,7 @@ namespace UI {
       Axis children_axis,
       Align children_horiz_align,
       Align children_vert_align,
-      std::vector<entt::entity> children = {}
+      std::vector<std::shared_ptr<Element>> children = {}
     )
         : Element( id, background, false, {}, {} ),
           children_axis( children_axis ),
@@ -67,7 +66,7 @@ namespace UI {
       Align children_horiz_align,
       Align children_vert_align,
       Margins margins,
-      std::vector<entt::entity> children
+      std::vector<std::shared_ptr<Element>> children
     )
         : Element( id, background, false, {}, margins ),
           children_axis( children_axis ),
@@ -86,7 +85,7 @@ namespace UI {
 
     // TODO determine if this will always only be a Panel
     // as child
-    std::vector<entt::entity> children;
+    std::vector<std::shared_ptr<Element>> children;
 
     std::string ID() {
       return id;
@@ -104,7 +103,7 @@ namespace UI {
     StackPanel(
       std::string id,
       Color background,
-      std::vector<entt::entity> children
+      std::vector<std::shared_ptr<Element>> children
     )
         : Element( id, background, false, {}, {} ), children( children ){};
   };

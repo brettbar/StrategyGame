@@ -13,67 +13,66 @@
 
 
 namespace UI {
-  inline std::vector<entt::entity> CreateLobbyBrowser() {
+  // inline std::vector<ptr<Panel>> CreateLobbyBrowser() {
 
-    // TODO better way of making the id and label
-    auto update_children = []( std::vector<entt::entity> &children ) {
-      for ( CSteamID lobby_id: Network::Client()->GetLobbyList() ) {
+  //   // TODO better way of making the id and label
+  //   auto update_children = []( std::vector<ptr<Element>> &children ) {
+  //     for ( CSteamID lobby_id: Network::Client()->GetLobbyList() ) {
 
-        const char *lobby_name =
-          SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
+  //       const char *lobby_name =
+  //         SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
-        if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) ) {
-          std::cout << "Lobby Name: " << lobby_name << std::endl;
+  //       if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) ) {
+  //         std::cout << "Lobby Name: " << lobby_name << std::endl;
 
-          std::string button_id = "lobby_entry_" + std::string( lobby_name );
+  //         std::string button_id = "lobby_entry_" + std::string( lobby_name );
 
-          std::function<void()> action = [button_id, lobby_id]() {
-            Events::event_emitter.publish( Events::JoinLobby{
-              { button_id },
-              lobby_id,
-            } );
-          };
+  //         std::function<void()> action = [button_id, lobby_id]() {
+  //           Events::event_emitter.publish( Events::JoinLobby{
+  //             { button_id },
+  //             lobby_id,
+  //           } );
+  //         };
 
 
-          // TODO only clickable based on host/client checksum compat
-          entt::entity button_e = Create<TextButton>( {
-            lobby_name,
-            std::string( lobby_name ),
-            24,
-            GREEN,
-            WHITE,
-          } );
+  //         // TODO only clickable based on host/client checksum compat
+  //         ptr<TextButton> button_e = Create<TextButton>( {
+  //           lobby_name,
+  //           std::string( lobby_name ),
+  //           24,
+  //           GREEN,
+  //           WHITE,
+  //         } );
 
-          TextButton &button = Manager()->registry.get<TextButton>( button_e );
-          button.Enable();
+  //         Get<TextButton>( button_e )->Enable();
 
-          children.push_back( button_e );
-        }
-      }
+  //         children.push_back( button_e );
+  //       }
+  //     }
 
-      // TODO remove the buttons that dont have a lobby anymore
-    };
+  //     // TODO remove the buttons that dont have a lobby anymore
+  //   };
 
-    return {
-      Create<Panel>( {
-        "lobby_browser",
-        BLACK,
-        Axis::Column,
-        Align::Start,
-        Align::Start,
-        true,
-        [update_children]( Panel &self ) {
-          vec2 updated_pos = {
-            ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
-            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-          };
-          self.transform.x = updated_pos.x;
-          self.transform.y = updated_pos.y;
+  //   return {
+  //     Create<Panel>( {
+  //       "lobby_browser",
+  //       BLACK,
+  //       Axis::Column,
+  //       Align::Start,
+  //       Align::Start,
+  //       true,
+  //       [update_children]( Panel &self ) {
+  //         vec2 updated_pos = {
+  //           ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
+  //           ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
+  //         };
+  //         self.transform.x = updated_pos.x;
+  //         self.transform.y = updated_pos.y;
 
-          update_children( self.children );
-        },
-        {},
-      } ),
-    };
-  }
+  //         update_children( self.children );
+  //       },
+  //       {},
+  //     } ),
+  //   };
+  // }
 };// namespace UI

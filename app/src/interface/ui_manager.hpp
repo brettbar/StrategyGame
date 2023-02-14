@@ -31,14 +31,14 @@ namespace UI {
     Lobby,
   };
 
-  using Page = std::vector<entt::entity>;
+  using Page = std::vector<ptr<Panel>>;
 
   class IManager {
 
 public:
     // TODO(??) make private
     entt::registry registry;
-    std::map<std::string, entt::entity> lookup;
+    std::map<std::string, ptr<Element>> lookup;
     std::vector<Page> pages;
 
     Page &ActivePage() {
@@ -59,7 +59,7 @@ public:
     void operator=( const IManager & ) = delete;
 
     bool DoInteraction(
-      entt::entity entity,
+      ptr<Element> entity,
       bool inside,
       bool interactive,
       bool mouseWentUp,
@@ -67,26 +67,26 @@ public:
     ) {
       bool result = false;
 
-      if ( entity == _context.active ) {
+      if ( entity->id == _context.active ) {
         if ( mouseWentUp ) {
-          if ( entity == _context.hot )
+          if ( entity->id == _context.hot )
             result = true;// do the button action
 
-          _context.active = entt::null;
+          _context.active = "";
         }
       }
-      else if ( entity == _context.hot ) {
+      else if ( entity->id == _context.hot ) {
         if ( mouseWentDown && interactive )
-          _context.active = entity;
+          _context.active = entity->id;
       }
 
       if ( inside ) {
         // if ( _context.active == entt::null && interactive ) {
-        if ( _context.active == entt::null ) {
-          _context.hot = entity;
+        if ( _context.active == "" ) {
+          _context.hot = entity->id;
 
           if ( mouseWentDown && interactive )
-            _context.active = entity;
+            _context.active = entity->id;
         }
       }
 
@@ -96,11 +96,11 @@ public:
     // TODO(rf) this shouldnt use the selection system directly
     void DrawManagerDebugInfo() {
       DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
-      std::string foo = "hot: " + EntityIdToString( _context.hot );
+      std::string foo = "hot: " + ( _context.hot );
       DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
 
       DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
-      std::string bar = "active: " + EntityIdToString( _context.active );
+      std::string bar = "active: " + ( _context.active );
       DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
 
       DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
@@ -112,12 +112,12 @@ public:
     bool MouseIsOverUI() {
       // This is almost sufficent, but we need to account for panels too
       // not just items that can be active?
-      return _context.active != entt::null || _context.hot != entt::null;
+      return _context.active != "" || _context.hot != "";
     }
 
     void SetContextNull() {
-      _context.hot = entt::null;
-      _context.active = entt::null;
+      _context.hot = "";
+      _context.active = "";
     }
 
     void ClearRegistry() {
@@ -127,7 +127,7 @@ public:
 
 
 private:
-    Context _context = { entt::null, entt::null };
+    Context _context = { "", "" };
     u32 _active_page_i = PageType::MainMenu;
 
 
@@ -139,14 +139,11 @@ private:
     return IManager::Manager();
   }
 
-  // TODO(??) I would prefer this be in the system namespace
-  // But calling System::Create everytime feels clunky
   template<typename T>
-  inline entt::entity Create( T element ) {
-    entt::entity entity = Manager()->registry.create();
-    Manager()->registry.emplace<T>( entity, element );
-    Manager()->lookup.insert_or_assign( element.id, entity );
-    return entity;
+  inline std::shared_ptr<T> Create( T element ) {
+    auto created = std::make_shared<T>( element );
+    Manager()->lookup.insert_or_assign( element.id, created );
+    return created;
   }
 
 

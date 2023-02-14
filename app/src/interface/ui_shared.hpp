@@ -4,8 +4,8 @@
 namespace UI {
 
   struct Context {
-    entt::entity hot;
-    entt::entity active;
+    std::string hot;
+    std::string active;
   };
 
   inline f32 SCALE = 2.0f;

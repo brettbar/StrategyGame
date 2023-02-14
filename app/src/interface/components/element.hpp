@@ -32,6 +32,8 @@ namespace UI {
     rect transform;
     Margins margins;
 
+    virtual ~Element() {}
+
     Element(
       std::string id,
       Color background,
