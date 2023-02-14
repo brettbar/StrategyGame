@@ -7,18 +7,8 @@
 #include "components/text_elements.hpp"
 #include "ui_shared.hpp"
 
-//
 // TODO remove
 #include "../world/systems/selection_system.hpp"
-
-
-// #include "content/campaign_ui.hpp"
-// #include "content/faction_select_menu.hpp"
-// #include "content/lobby_browser.hpp"
-// #include "content/lobby_ui.hpp"
-// #include "content/main_menu_ui.hpp"
-// #include "content/modal_menu_ui.hpp"
-
 
 namespace UI {
   enum PageType {

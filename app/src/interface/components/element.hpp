@@ -32,6 +32,8 @@ namespace UI {
     rect transform;
     Margins margins;
 
+    std::vector<Messages::ID> subscribed_messages = {};
+
     virtual ~Element() {}
 
     Element(
@@ -42,10 +44,36 @@ namespace UI {
       Margins margins
     )
         : id( id ), background( background ), enabled( enabled ),
-          transform( transform ), margins( margins ) {}
+          transform( transform ), margins( margins ),
+          subscribed_messages( {} ) {}
+
+    Element(
+      std::string id,
+      Color background,
+      bool enabled,
+      rect transform,
+      Margins margins,
+      std::vector<Messages::ID> subscribed_messages
+    )
+        : id( id ), background( background ), enabled( enabled ),
+          transform( transform ), margins( margins ),
+          subscribed_messages( subscribed_messages ) {
+
+      Messages::dispatcher.sink<Messages::UpdateEnabled>()
+        .connect<&Element::ReceiveUpdateEnabled>( this );
+    }
 
     void ReceiveUpdateEnabled( const Messages::UpdateEnabled &event ) {
-      enabled = event.on;
+      printf( "Element::ReceiveUpdateEnabled!!!\n" );
+
+      for ( Messages::ID msg_id: subscribed_messages ) {
+        printf( "%d\n", msg_id );
+
+        if ( msg_id == event.message_id ) {
+          enabled = event.on;
+          break;
+        }
+      }
     }
 
     void Enable() {

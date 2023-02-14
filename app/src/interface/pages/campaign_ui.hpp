@@ -22,6 +22,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
+        Messages::ID::SettlementContextOn,
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -142,6 +143,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
+        Messages::ID::ActorContextOn,
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),

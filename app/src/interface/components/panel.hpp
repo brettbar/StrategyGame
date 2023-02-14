@@ -34,6 +34,23 @@ namespace UI {
       Align children_horiz_align,
       Align children_vert_align,
       bool abs_size,
+      Messages::ID message,
+      std::function<void( Panel & )> update,
+      std::vector<std::shared_ptr<Element>> children
+    )
+        : Element( id, background, false, { 0, 0, 500, 200 }, {}, { message } ),
+          children_axis( children_axis ),
+          children_horiz_align( children_horiz_align ),
+          children_vert_align( children_vert_align ), abs_size( abs_size ),
+          update( update ), children( children ) {}
+
+    Panel(
+      std::string id,
+      Color background,
+      Axis children_axis,
+      Align children_horiz_align,
+      Align children_vert_align,
+      bool abs_size,
       std::function<void( Panel & )> update,
       std::vector<std::shared_ptr<Element>> children
     )

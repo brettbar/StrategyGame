@@ -16,8 +16,6 @@ namespace UI {
     // TODO(rf) probably can remove all together
     bool dynamic = false;
 
-    std::vector<Messages::ID> subscribed_messages;
-
     void ReceiveUpdateText( const Messages::UpdateText &event ) {
       for ( Messages::ID msg_id: subscribed_messages ) {
         if ( msg_id == event.message_id ) {
@@ -130,8 +128,7 @@ namespace UI {
       Color text_color
     )
         : Element( id, background, false, {}, {} ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( false ),
-          subscribed_messages( {} ) {}
+          font_size( font_size ), text_color( text_color ), dynamic( false ) {}
 
     TextLabel(
       std::string id,
@@ -141,9 +138,9 @@ namespace UI {
       Color text_color,
       std::vector<Messages::ID> subscribed_messages
     )
-        : Element( id, background, false, {}, {} ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( true ),
-          subscribed_messages( subscribed_messages ) {}
+        : Element( id, background, false, {}, {}, subscribed_messages ),
+          text( text ), font_size( font_size ), text_color( text_color ),
+          dynamic( true ) {}
   };
 
   struct TextButton : TextLabel {

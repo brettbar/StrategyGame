@@ -12,6 +12,7 @@
 #include "interface/input.hpp"
 
 #include "campaign.hpp"
+#include "world/systems/selection_system.hpp"
 #include <raylib.h>
 
 enum class ProgramMode {
@@ -171,10 +172,7 @@ class IGame {
       Global::host_player, Global::host_player, true, player_faction
     );
 
-    Global::world.on_construct<Selected::Component>()
-      .connect<&UI::System::ListenForSelect>();
-    Global::world.on_destroy<Selected::Component>()
-      .connect<&UI::System::ListenForDeselect>();
+    SelectionSystem::Start();
 
     Game()->_mode = ProgramMode::Campaign;
   }
