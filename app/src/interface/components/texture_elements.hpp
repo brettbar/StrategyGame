@@ -10,6 +10,10 @@ namespace UI {
   struct TextureLabel : Element {
     Texture2D texture;
 
+    void Enable() override {
+      Element::Enable();
+    }
+
     void Resize() {
       transform.width = texture.width * UI::SCALE;
       transform.height = texture.height * UI::SCALE;

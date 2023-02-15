@@ -8,8 +8,8 @@ namespace Messages {
 
   enum class ID {
     FactionSelected,
-    SettlementContextOn,
-    ActorContextOn,
+    SettlementContext,
+    ActorContext,
   };
 
   struct UpdateEnabled {

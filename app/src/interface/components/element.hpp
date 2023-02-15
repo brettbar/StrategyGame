@@ -26,13 +26,15 @@ namespace UI {
   };
 
   struct Element {
+private:
+    bool enabled;
+
+public:
     std::string id;
     Color background;
-    bool enabled;
     rect transform;
     Margins margins;
 
-    std::vector<Messages::ID> subscribed_messages = {};
 
     virtual ~Element() {}
 
@@ -43,46 +45,20 @@ namespace UI {
       rect transform,
       Margins margins
     )
-        : id( id ), background( background ), enabled( enabled ),
-          transform( transform ), margins( margins ),
-          subscribed_messages( {} ) {}
+        : enabled( enabled ), id( id ), background( background ),
+          transform( transform ), margins( margins ) {}
 
-    Element(
-      std::string id,
-      Color background,
-      bool enabled,
-      rect transform,
-      Margins margins,
-      std::vector<Messages::ID> subscribed_messages
-    )
-        : id( id ), background( background ), enabled( enabled ),
-          transform( transform ), margins( margins ),
-          subscribed_messages( subscribed_messages ) {
 
-      Messages::dispatcher.sink<Messages::UpdateEnabled>()
-        .connect<&Element::ReceiveUpdateEnabled>( this );
-    }
-
-    void ReceiveUpdateEnabled( const Messages::UpdateEnabled &event ) {
-      printf( "Element::ReceiveUpdateEnabled!!!\n" );
-
-      for ( Messages::ID msg_id: subscribed_messages ) {
-        printf( "%d\n", msg_id );
-
-        if ( msg_id == event.message_id ) {
-          enabled = event.on;
-          break;
-        }
-      }
-    }
-
-    void Enable() {
+    virtual void Enable() {
       enabled = true;
     }
 
-    void Disable() {
+    virtual void Disable() {
       enabled = false;
     }
+
+    virtual void SubscribeToMessages() {}
+    virtual void UnsubscribeToMessages() {}
 
     bool IsEnabled() {
       return enabled;

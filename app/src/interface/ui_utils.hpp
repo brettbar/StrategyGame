@@ -8,14 +8,7 @@
 #include <iostream>
 
 
-// TODO(rf) many of these should be replaced with template !!!!!!!!!!
-
 namespace UI {
-
-  // template<typename T>
-  // inline bool Has( entt::entity entity ) {
-  //   return Manager()->registry.all_of<T>( entity );
-  // }
 
   template<typename T>
   inline bool Has( ptr<Element> entity ) {
@@ -29,15 +22,6 @@ namespace UI {
     assert( converted );
     return converted;
   }
-
-  // TODO Check assert
-  // template<typename T>
-  // inline T &Get( entt::entity entity ) {
-  //   assert( Has<T>( entity ) );
-  //   auto &got = Manager()->registry.get<T>( entity );
-  //   return got;
-  // }
-
 
   inline bool IsInteractive( ptr<Element> entity ) {
     return Has<TextureButton>( entity ) || Has<TextButton>( entity );
@@ -67,33 +51,33 @@ namespace UI {
   }
 
 
-  inline void RecursiveToggle( ptr<Element> entity, bool on ) {
-    if (entity)
-		entity->enabled = on;
+  // inline void RecursiveToggle( ptr<Element> entity, bool on ) {
+  //   if ( entity )
+  //     entity->enabled = on;
 
-    if ( Has<TextLabel>( entity ) ) {
-      if ( on ) {
-        Get<TextLabel>( entity )->SubscribeToMessages();
-      }
-      else {
-        Get<TextLabel>( entity )->UnsubscribeFromMessages();
-      }
-    }
+  //   if ( Has<TextLabel>( entity ) ) {
+  //     if ( on ) {
+  //       Get<TextLabel>( entity )->SubscribeToMessages();
+  //     }
+  //     else {
+  //       Get<TextLabel>( entity )->UnsubscribeFromMessages();
+  //     }
+  //   }
 
-    if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
-      return;
+  //   if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
+  //     return;
 
-    if ( Has<StackPanel>( entity ) ) {
-      std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
-      RecursiveToggle( stack_panel->children[stack_panel->curr_index], on );
-    }
-    else if ( Has<Panel>( entity ) ) {
-      for ( ptr<Element> child: Get<Panel>( entity )->children ) {
+  //   if ( Has<StackPanel>( entity ) ) {
+  //     std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
+  //     RecursiveToggle( stack_panel->children[stack_panel->curr_index], on );
+  //   }
+  //   else if ( Has<Panel>( entity ) ) {
+  //     for ( ptr<Element> child: Get<Panel>( entity )->children ) {
 
-        RecursiveToggle( child, on );
-      }
-    }
-  }
+  //       RecursiveToggle( child, on );
+  //     }
+  //   }
+  // }
 
   inline void RecursiveDelete( ptr<Element> entity ) {
     if ( Has<StackPanel>( entity ) ) {
@@ -114,9 +98,9 @@ namespace UI {
 
   // TODO maybe should be put on StackPanel struct as method?
   inline void SwitchChild( StackPanel &sp, u32 index ) {
-    RecursiveToggle( sp.children[sp.curr_index], false );
-    sp.curr_index = index;
-    RecursiveToggle( sp.children[sp.curr_index], true );
+    // RecursiveToggle( sp.children[sp.curr_index], false );
+    // sp.curr_index = index;
+    // RecursiveToggle( sp.children[sp.curr_index], true );
   }
 
 

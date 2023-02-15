@@ -22,7 +22,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
-        Messages::ID::SettlementContextOn,
+        { Messages::ID::SettlementContext },
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -83,7 +83,6 @@ namespace UI {
           } ),
 
           Create<StackPanel>( {
-
             "settlement_context_content",
             RED,
             {
@@ -143,7 +142,7 @@ namespace UI {
         Align::Start,
         Align::Start,
         true,
-        Messages::ID::ActorContextOn,
+        { Messages::ID::ActorContext },
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -169,7 +168,7 @@ namespace UI {
             Align::Start,
             {
               Create<TextButton>( {
-                "actor_spawn_settlement_button", "Spawn?", 26, PURPLE, WHITE,
+                "actor_spawn_settlement_button", "Spawn?", 26, PURPLE, WHITE
                 // []() {
                 //   printf( "Spawn Settlement clicked!!\n" );
                 //   SettlementSystem::SpawnSettlement();

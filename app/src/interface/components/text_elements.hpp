@@ -15,6 +15,18 @@ namespace UI {
     Color text_color;
     // TODO(rf) probably can remove all together
     bool dynamic = false;
+    std::vector<Messages::ID> subscribed_messages;
+
+    void Enable() override {
+      Element::Enable();
+      SubscribeToMessages();
+    }
+
+    void Disable() override {
+      Element::Disable();
+      UnsubscribeFromMessages();
+    }
+
 
     void ReceiveUpdateText( const Messages::UpdateText &event ) {
       for ( Messages::ID msg_id: subscribed_messages ) {
@@ -138,9 +150,9 @@ namespace UI {
       Color text_color,
       std::vector<Messages::ID> subscribed_messages
     )
-        : Element( id, background, false, {}, {}, subscribed_messages ),
-          text( text ), font_size( font_size ), text_color( text_color ),
-          dynamic( true ) {}
+        : Element( id, background, false, {}, {} ), text( text ),
+          font_size( font_size ), text_color( text_color ), dynamic( true ),
+          subscribed_messages( subscribed_messages ) {}
   };
 
   struct TextButton : TextLabel {

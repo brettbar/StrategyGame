@@ -132,6 +132,7 @@ private:
   template<typename T>
   inline std::shared_ptr<T> Create( T element ) {
     auto created = std::make_shared<T>( element );
+    created->SubscribeToMessages();
     Manager()->lookup.insert_or_assign( element.id, created );
     return created;
   }

@@ -48,14 +48,17 @@ namespace UI {
 
     inline void EnableContent() {
       for ( ptr<Panel> base: Manager()->ActivePage() ) {
-        RecursiveToggle( base, true );
+        // RecursiveToggle( base, true );
+        base->Enable();
       }
     }
 
     inline void DisableCurrentContent() {
       Manager()->SetContextNull();
+
       for ( ptr<Panel> base: Manager()->ActivePage() ) {
-        RecursiveToggle( base, false );
+        // RecursiveToggle( base, false );
+        base->Disable();
       }
     }
 
@@ -114,7 +117,7 @@ namespace UI {
     // We make a call to draw before the panel is sized if its
     // relative
     inline void RecursiveLayout( ptr<Panel> parent_panel ) {
-      if ( !parent_panel->enabled )
+      if ( !parent_panel->IsEnabled() )
         return;
 
       f32 total_height = 0;
@@ -232,7 +235,7 @@ namespace UI {
 
 
     inline void RecursiveDraw( ptr<Panel> panel ) {
-      if ( !panel->enabled )
+      if ( !panel->IsEnabled() )
         return;
 
       panel->Draw();
@@ -275,13 +278,13 @@ namespace UI {
       bool mouseWentDown
     ) {
 
-      if ( !panel->enabled )
+      if ( !panel->IsEnabled() )
         return;
 
       for ( ptr<Element> child: panel->children ) {
         if ( !child )
           continue;
-        if ( !child->enabled )
+        if ( !child->IsEnabled() )
           continue;
 
         if ( Has<Panel>( child ) ) {

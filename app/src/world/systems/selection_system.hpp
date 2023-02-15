@@ -4,6 +4,7 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
+#include "../components/actor.hpp"
 #include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
@@ -43,8 +44,12 @@ namespace SelectionSystem {
       // RecursiveToggle( context, true );
 
       Messages::dispatcher.enqueue( Messages::UpdateEnabled{
-        Messages::ID::SettlementContextOn,
+        Messages::ID::SettlementContext,
         true,
+      } );
+      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+        Messages::ID::ActorContext,
+        false,
       } );
 
 
@@ -60,12 +65,16 @@ namespace SelectionSystem {
       // RecursiveToggle( content, true );
       // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
     }
-    // else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-    //   auto actor = game_reg.get<Actor::Component>( entity );
-
-    //   auto context_panel = Manager()->lookup.at( "actor_context_panel" );
-    //   RecursiveToggle( context_panel, true );
-    // }
+    else if ( game_reg.all_of<Actor::Component>( entity ) ) {
+      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+        Messages::ID::SettlementContext,
+        false,
+      } );
+      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+        Messages::ID::ActorContext,
+        true,
+      } );
+    }
   }
   inline void ListenForDeselect() {
     printf( "DeSelectListener?\n" );
@@ -74,6 +83,15 @@ namespace SelectionSystem {
     // context_panel = Manager()->lookup.at( "actor_context_panel" );
     // RecursiveToggle( context_panel, false );
     // Manager()->SetContextNull();
+
+    Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+      Messages::ID::SettlementContext,
+      false,
+    } );
+    Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+      Messages::ID::ActorContext,
+      false,
+    } );
   }
 
   inline void Start() {
