@@ -46,7 +46,7 @@ namespace UI {
       }
     }
 
-    void Resize() {
+    void Resize() override {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
         text.c_str(),
@@ -58,7 +58,7 @@ namespace UI {
       transform.height = text_dims.y;
     }
 
-    void SubscribeToMessages() {
+    void SubscribeToMessages() override {
       Messages::dispatcher.sink<Messages::UpdateText>()
         .connect<&TextLabel::ReceiveUpdateText>( this );
 
@@ -66,7 +66,7 @@ namespace UI {
         .connect<&TextLabel::ReceiveUpdateBackground>( this );
     }
 
-    void UnsubscribeFromMessages() {
+    void UnsubscribeFromMessages() override {
       Messages::dispatcher.sink<Messages::UpdateText>()
         .disconnect<&TextLabel::ReceiveUpdateText>( this );
 

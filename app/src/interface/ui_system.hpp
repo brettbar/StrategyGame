@@ -152,17 +152,8 @@ namespace UI {
 
           RecursiveLayout( Get<Panel>( single_child ) );
         }
-        else if ( Has<TextLabel>( child ) ) {
-          Get<TextLabel>( child )->Resize();
-        }
-        else if ( Has<TextButton>( child ) ) {
-          Get<TextButton>( child )->Resize();
-        }
-        else if ( Has<TextureLabel>( child ) ) {
-          Get<TextureLabel>( child )->Resize();
-        }
-        else if ( Has<TextureButton>( child ) ) {
-          Get<TextureButton>( child )->Resize();
+        else {
+          child->Resize();
         }
 
         if ( parent_panel->children_axis == Axis::Row ) {

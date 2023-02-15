@@ -58,7 +58,8 @@ public:
     }
 
     virtual void SubscribeToMessages() {}
-    virtual void UnsubscribeToMessages() {}
+    virtual void UnsubscribeFromMessages() {}
+    virtual void Resize() {}
 
     bool IsEnabled() {
       return enabled;
