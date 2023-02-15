@@ -1,0 +1,78 @@
+#pragma once
+
+#include "../../shared/common.hpp"
+
+#include "../components/panel.hpp"
+#include "../components/text_elements.hpp"
+
+#include "../ui_system.hpp"
+
+#include "../../network/client.hpp"
+#include "../../network/host.hpp"
+#include "../../network/network.hpp"
+
+
+namespace UI {
+  // inline std::vector<ptr<Panel>> CreateLobbyBrowser() {
+
+  //   // TODO better way of making the id and label
+  //   auto update_children = []( std::vector<ptr<Element>> &children ) {
+  //     for ( CSteamID lobby_id: Network::Client()->GetLobbyList() ) {
+
+  //       const char *lobby_name =
+  //         SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
+
+  //       if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) ) {
+  //         std::cout << "Lobby Name: " << lobby_name << std::endl;
+
+  //         std::string button_id = "lobby_entry_" + std::string( lobby_name );
+
+  //         std::function<void()> action = [button_id, lobby_id]() {
+  //           Events::event_emitter.publish( Events::JoinLobby{
+  //             { button_id },
+  //             lobby_id,
+  //           } );
+  //         };
+
+
+  //         // TODO only clickable based on host/client checksum compat
+  //         ptr<TextButton> button_e = Create<TextButton>( {
+  //           lobby_name,
+  //           std::string( lobby_name ),
+  //           24,
+  //           GREEN,
+  //           WHITE,
+  //         } );
+
+  //         Get<TextButton>( button_e )->Enable();
+
+  //         children.push_back( button_e );
+  //       }
+  //     }
+
+  //     // TODO remove the buttons that dont have a lobby anymore
+  //   };
+
+  //   return {
+  //     Create<Panel>( {
+  //       "lobby_browser",
+  //       BLACK,
+  //       Axis::Column,
+  //       Align::Start,
+  //       Align::Start,
+  //       true,
+  //       [update_children]( Panel &self ) {
+  //         vec2 updated_pos = {
+  //           ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
+  //           ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
+  //         };
+  //         self.transform.x = updated_pos.x;
+  //         self.transform.y = updated_pos.y;
+
+  //         update_children( self.children );
+  //       },
+  //       {},
+  //     } ),
+  //   };
+  // }
+};// namespace UI

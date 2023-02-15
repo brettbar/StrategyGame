@@ -1,10 +1,10 @@
 #pragma once
 
+#include "interface/ui_manager.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
 #include "shared/common.hpp"
-#include "shared/events.hpp"
 #include "shared/save.hpp"
 
 #include "renderer/renderer.hpp"
@@ -12,16 +12,8 @@
 #include "interface/input.hpp"
 
 #include "campaign.hpp"
-
-/*
-========================================================
-  Main game loop 
-========================================================
-*/
-
-void CameraUpdate( Camera2D &, f32 );
-void RunMainMenu( f32 );
-void RunModalMenu();
+#include "world/systems/selection_system.hpp"
+#include <raylib.h>
 
 enum class ProgramMode {
   MainMenu,
@@ -30,275 +22,374 @@ enum class ProgramMode {
   Editor,
 };
 
-struct ProgramState {
-  bool creating_lobby = false;
-  bool joining_lobby = false;
-  bool pending_new_campaign = false;
-  bool pending_load_campaign = false;
-  bool hit_exit = false;
-  bool is_host = false;
-  ProgramMode mode = ProgramMode::MainMenu;
-};
+class IGame {
+  public:
+  static IGame *Game() {
+    static IGame instance;
+    return &instance;
+  }
 
-inline void CheckInput( ProgramState *pstate ) {
-  Events::event_emitter.on<Events::UIEvent>(
-    [&]( const Events::UIEvent &event, Events::EventEmitter &emitter ) {
-      if ( event.msg == "main_menu_host_game" ) {
-        pstate->creating_lobby = true;
-        // TODO make it so you can host an existing game
-        pstate->pending_new_campaign = true;
-        pstate->is_host = true;
-      }
-      else if ( event.msg == "main_menu_join_game" ) {
-        pstate->joining_lobby = true;
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "main_menu_start_game" ) {
-        // pending_new_campaign = true;
-        UI::EnableFactionSelectMenuUI();
-      }
-      else if ( event.msg == "main_menu_load_game" ) {
-        pstate->pending_load_campaign = true;
-      }
-      else if ( event.msg == "main_menu_exit_game" ) {
-        pstate->hit_exit = true;
-      }
-      else if ( event.msg == "modal_menu_load_game" ) {
-        pstate->pending_load_campaign = true;
-      }
-      else if ( event.msg == "modal_menu_save_game" ) {
-        SaveSystem::Save();
-      }
-      else if ( event.msg == "modal_menu_exit_main" ) {
-        UI::EnableMainMenuUI();
-        pstate->mode = ProgramMode::MainMenu;
-      }
-      else if ( event.msg == "toggle_modal_menu" ) {
-        if ( pstate->mode == ProgramMode::Campaign ) {
-          pstate->mode = ProgramMode::ModalMenu;
-          UI::EnableModalMenuUI();
-        }
-        else if ( pstate->mode == ProgramMode::ModalMenu ) {
-          pstate->mode = ProgramMode::Campaign;
-          UI::EnableCampaignUI();
-        }
-      }
-      // TODO refactor this to not be so repetitive
-      else if ( event.msg == "faction_select_romans" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_greeks" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_celts" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_punics" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_persians" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_scythians" ) {
-        pstate->pending_new_campaign = true;
-      }
-      else if ( event.msg == "faction_select_germans" ) {
-        pstate->pending_new_campaign = true;
-      }
-    }
-  );
-};
+  void MainLoop() {
+    RegisterEventListeners();
 
-inline void RunGameLoop() {
-  Campaign *campaign = nullptr;
-  ProgramState *pstate = new ProgramState();
+    while ( !WindowShouldClose() && ShouldRun() ) {
 
-  Network::Setup();
+      HandleMessages();
 
+      SteamAPI_RunCallbacks();
 
-  // TODO these lags might need to be moved to Campaign
-  f32 oncelag = 0.0f;
-  f32 lag = 0.0f;
-  f32 dt = 0.0f;
-
-  while ( !WindowShouldClose() && !pstate->hit_exit ) {
-    CheckInput( pstate );
-
-
-    if ( pstate->pending_new_campaign ) {
-      if ( campaign )
-        delete campaign;
-      campaign = new Campaign();
-      pstate->mode = ProgramMode::Campaign;
-      pstate->pending_new_campaign = false;
-    }
-    else if ( pstate->pending_load_campaign ) {
-      if ( campaign )
-        delete campaign;
-      campaign = new Campaign( "output.dat" );
-      pstate->mode = ProgramMode::Campaign;
-      pstate->pending_load_campaign = false;
+      RunFrame();
     }
 
-    if ( pstate->creating_lobby && pstate->is_host ) {
-      Network::Host()->Init();
-      pstate->creating_lobby = false;
-    }
+    ExitGameLoopCleanup();
+  }
 
-    if ( pstate->joining_lobby && !pstate->is_host ) {
-      Network::Client()->Init();
-      pstate->joining_lobby = false;
-    }
+  private:
+  Campaign *_campaign = nullptr;
+  bool _single_player = true;
+  // bool _creating_lobby = false;
+  // bool _looking_for_lobby = false;
+  // bool _in_lobby = false;
+  bool _hit_exit = false;
+  ProgramMode _mode = ProgramMode::MainMenu;
 
-    if ( pstate->is_host ) {
+  f32 _oncelag = 0.0f;
+  f32 _lag = 0.0f;
+  f32 _dt = 0.0f;
+
+  // TODO move
+  std::string faction = "";
+
+  IGame( IGame const & ) = delete;
+  void operator=( const IGame & ) = delete;
+
+  IGame() {}
+  ~IGame() {}
+
+  bool ShouldRun() {
+    return !_hit_exit;
+  }
+
+  void RegisterEventListeners();
+
+  /*=============================================================
+                        Begin: Singleplayer
+  =============================================================*/
+  /*=============================================================
+                        End: Singleplayer
+  =============================================================*/
+
+
+  /*=============================================================
+                        Begin: Multiplayer
+  =============================================================*/
+  void HostMultiplayerCampaign() {
+    _single_player = false;
+    Network::is_host = true;
+    Network::Host()->Init();
+    UI::System::SwitchPage( UI::Lobby );
+  }
+
+  void StartMultiplayerCampaign() {}
+
+  void LookForMultiplayerCampaign() {
+    _single_player = false;
+    Network::is_host = false;
+    Network::Client()->Init();
+    UI::System::SwitchPage( UI::LobbyBrowser );
+  }
+
+  void JoinMultiplayerLobby( CSteamID lobby_id ) {
+    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
+      printf( "Sending joined lobby event!\n" );
+      UI::System::SwitchPage( UI::Lobby );
+    }
+  }
+
+  void HandleMessages() {
+    if ( Network::is_host ) {
+      // Network::Host()->SendPing();
       Network::Host()->CheckForMessages();
+      Network::Host()->EvaluateMessages();
     }
     else {
-      Network::Client()->CheckForMessages();
+      Network::Client()->CheckForMessage();
     }
+  }
+  /*=============================================================
+                        End: Multiplayer
+  =============================================================*/
 
+  /*=============================================================
+                        Begin: Shared
+  =============================================================*/
+  void LoadGame() {
+    if ( _campaign )
+      delete _campaign;
+    _campaign = new Campaign( "output.dat" );
+    UI::System::EnableCampaignUI();
 
-    SteamAPI_RunCallbacks();
+    Game()->_mode = ProgramMode::Campaign;
+  }
 
-    switch ( pstate->mode ) {
+  void SaveGame() {
+    SaveSystem::Save();
+  }
+
+  void ExitGame() {
+    _hit_exit = true;
+  }
+
+  void ToggleModalMenu() {
+    if ( _mode == ProgramMode::Campaign ) {
+      _mode = ProgramMode::ModalMenu;
+      UI::System::SwitchPage( UI::ModalMenu );
+    }
+    else if ( _mode == ProgramMode::ModalMenu ) {
+      _mode = ProgramMode::Campaign;
+      UI::System::EnableCampaignUI();
+    }
+  }
+
+  void ReturnToMain() {
+    UI::System::SwitchPage( UI::MainMenu );
+    _mode = ProgramMode::MainMenu;
+  }
+  /*=============================================================
+                        End: Shared
+  =============================================================*/
+
+  void StartCampaign( std::string player_faction ) {
+    printf( "pending new!!\n" );
+
+    DeleteCampaignInstance();
+    _campaign = new Campaign();
+
+    UI::System::EnableCampaignUI();
+
+    Global::host_player = Global::world.create();
+    Global::world.emplace<Player::Component>(
+      Global::host_player, Global::host_player, true, player_faction
+    );
+
+    SelectionSystem::Start();
+
+    Game()->_mode = ProgramMode::Campaign;
+  }
+
+  void DeleteCampaignInstance() {
+    if ( _campaign )
+      delete _campaign;
+  }
+
+  void RunFrame() {
+    switch ( _mode ) {
       case ProgramMode::MainMenu:
-        RunMainMenu( dt );
+        RunMainMenu( _dt );
         break;
 
       case ProgramMode::ModalMenu:
         RunModalMenu();
         break;
 
-      case ProgramMode::Campaign:
-        assert( campaign );
-        campaign->Run( dt, lag, oncelag );
+      case ProgramMode::Campaign: {
+        if ( _single_player ) {
+          // Singleplayer Campaign
+          if ( _campaign )
+            _campaign->Run( _dt, _lag, _oncelag );
+        }
+        else {
+          // Multiplayer Campaign
+        }
+      } break;
+
+      case ProgramMode::Editor:
         break;
     }
   }
 
-  // TODO move this into the Exit function
-  // Delete host and client
-  // if ( host )
-  //   delete host;
+  void RunMainMenu( f32 dt ) {
+    // Input::Handle();
 
-  Network::Host()->Delete();
-  Network::Client()->Delete();
+    UI::System::UpdateOnFrame();
 
-  // if ( client )
-  //   delete client;
-
-  delete campaign;
-  delete pstate;
-}
-
-
-inline void RunMainMenu( f32 dt ) {
-  // Input::Handle();
-
-  UI::UpdateOnFrame();
-
-  CameraUpdate( Global::state.camera, dt );
-
-  BeginDrawing();
-  {
-    ClearBackground( BLACK );
-    Renderer::DrawUI();
-  }
-  EndDrawing();
-}
-
-inline void RunModalMenu() {
-  Input::CheckMenuToggle();
-
-  UI::UpdateOnFrame();
-
-  BeginDrawing();
-  {
-    Renderer::Draw( Global::texture_cache );
-    DrawRectangle(
-      0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-    );
-    Renderer::DrawUI();
-  }
-  EndDrawing();
-}
-
-// TODO A bit weird to put this here instead of in campaign
-inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
-  // 1. Update Time
-  dt = GetFrameTime();
-  lag += dt;
-  oncelag += dt;
-
-  // 2. Check for Input
-  Input::CheckMenuToggle();
-  Input::Handle();
-
-  // 3. Process all commands
-  Commands::Manager()->FireAll();
-
-  // 5. Run all Updates
-  {
-    // Update 60 times a second
-    while ( lag >= _MS_PER_UPDATE ) {
-      Update60TPS();
-      lag -= _MS_PER_UPDATE;
-    }
-
-    // Update once per second
-    while ( oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-      Update1TPS();
-      oncelag = 0.0f;
-    }
-
-    // Update once per frame
-    UpdateOnFrame();
-
-    // Update Camera
     CameraUpdate( Global::state.camera, dt );
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Renderer::DrawUI();
+    }
+    EndDrawing();
   }
 
-  // 6. Draw everything
-  BeginDrawing();
-  {
-    Renderer::Draw( Global::texture_cache );
-    Renderer::DrawUI();
+  void RunModalMenu() {
+    Input::CheckMenuToggle();
 
-    DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-    DrawFPS( GetScreenWidth() - 100, 2 );
+    UI::System::UpdateOnFrame();
+
+    BeginDrawing();
+    {
+      Renderer::Draw( Global::texture_cache );
+      DrawRectangle(
+        0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
+      );
+      Renderer::DrawUI();
+    }
+    EndDrawing();
   }
-  EndDrawing();
+
+
+  void ExitGameLoopCleanup() {
+    if ( Network::is_host )
+      Network::Host()->Delete();
+    else
+      Network::Client()->Delete();
+
+    DeleteCampaignInstance();
+
+    delete this;
+  }
+};
+
+inline void IGame::RegisterEventListeners() {
+  Events::event_emitter.on<Events::Basic>(
+    [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
+      if ( event.origin_id == "main_menu_host_game" ) {
+        HostMultiplayerCampaign();
+      }
+      else if ( event.origin_id == "main_menu_join_game" ) {
+        LookForMultiplayerCampaign();
+      }
+      else if ( event.origin_id == "main_menu_start_game" ) {
+        _single_player = true;
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin_id == "main_menu_load_game" ) {
+        LoadGame();
+      }
+      else if ( event.origin_id == "main_menu_exit_game" ) {
+        ExitGame();
+      }
+      else if ( event.origin_id == "player_select_faction" ) {
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin_id == "singleplayer_faction_label" ) {
+        UI::System::SwitchPage( UI::FactionSelectMenu );
+      }
+      else if ( event.origin_id == "singleplayer_lobby_start_game" ) {
+        StartCampaign( faction );
+      }
+      else if ( event.origin_id == "modal_menu_load_game" ) {
+        LoadGame();
+      }
+      else if ( event.origin_id == "modal_menu_save_game" ) {
+        SaveGame();
+      }
+      else if ( event.origin_id == "modal_menu_exit_main" ) {
+        ReturnToMain();
+      }
+      else if ( event.origin_id == "modal_menu_exit_game" ) {
+        ExitGame();
+      }
+      else if ( event.origin_id == "toggle_modal_menu" ) {
+        ToggleModalMenu();
+      }
+      else {
+        printf(
+          "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
+        );
+      }
+
+      // printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
+
+      // if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
+      //   JoinMultiplayerLobby( event.lobby_id );
+      // }
+    }
+  );
+
+
+  Events::event_emitter.on<Events::ButtonClick>(
+    [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
+      // else if ( event.origin_id == "faction_select" ) {
+      //   //// StartCampaign( event.msg );
+      // }
+      if ( event.origin_id == "faction_select" ) {
+        printf(
+          "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
+        );
+
+        if ( _single_player ) {
+          faction = event.msg;
+
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::FactionSelected,
+            faction,
+          } );
+          Messages::dispatcher.enqueue( Messages::UpdateBackground{
+            Messages::ID::FactionSelected,
+            // TODO replace with json stuff
+            [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
+          } );
+
+          UI::System::SwitchPage( UI::SinglePlayerLobby );
+        }
+        else {
+          faction = event.msg;
+
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::FactionSelected,
+            faction,
+          } );
+
+          Messages::dispatcher.enqueue( Messages::UpdateBackground{
+            Messages::ID::FactionSelected,
+            // TODO replace with json stuff
+            [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
+          } );
+
+          UI::System::SwitchPage( UI::Lobby );
+        }
+      }
+    }
+  );
 }
 
-inline void CameraUpdate( Camera2D &camera, f32 dt ) {
-  f32 cameraSpeed = 500.0f;
-  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
-  // PrintVec2(target);
-
-  // camera.offset = target;
-
-  if ( IsKeyDown( KEY_D ) )
-    camera.target.x += dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_A ) )
-    camera.target.x -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_W ) )
-    camera.target.y -= dt * cameraSpeed / camera.zoom;
-  if ( IsKeyDown( KEY_S ) )
-    camera.target.y += dt * cameraSpeed / camera.zoom;
-
-  if ( IsKeyDown( KEY_Z ) )
-    camera.zoom -= 0.05f;
-  if ( IsKeyDown( KEY_X ) )
-    camera.zoom += 0.05f;
-
-  f32 mouseWheelDelta = GetMouseWheelMove();
-
-  camera.zoom += ( mouseWheelDelta * 0.2f );
-  if ( camera.zoom > 8.0f )
-    camera.zoom = 8.0f;
-  else if ( camera.zoom < 0.08f )
-    camera.zoom = 0.08f;
-
-  camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
+inline IGame *Game() {
+  return IGame::Game();
 }

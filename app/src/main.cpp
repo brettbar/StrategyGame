@@ -79,13 +79,14 @@ int main( void ) {
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
-  UI::EnableMainMenuUI();
+  UI::System::Init();
 
   SetExitKey( KEY_NULL );
 
+  Network::Setup();
 
   // This call will block and run until the game exists
-  RunGameLoop();
+  Game()->MainLoop();
 
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever

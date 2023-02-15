@@ -1,64 +1,68 @@
 #pragma once
 
 #include "../../shared/global.hpp"
-#include "../ui_lookup.hpp"
+#include "../../shared/signals.hpp"
 #include "../ui_shared.hpp"
 
 namespace UI {
 
-enum class Axis {
-  Row,
-  Column,
-};
+  enum class Axis {
+    Row,
+    Column,
+  };
 
-enum class Align {
-  Start,
-  Center,
-  End,
-  SpaceOut,
-};
+  enum class Align {
+    Start,
+    Center,
+    End,
+    SpaceOut,
+  };
 
-struct Margins {
-  u32 left;
-  u32 right;
-  u32 top;
-  u32 bottom;
-};
+  struct Margins {
+    u32 left;
+    u32 right;
+    u32 top;
+    u32 bottom;
+  };
 
-struct Element {
-  std::string id;
-  Type type;
-  Color background;
-  bool enabled;
-  rect transform;
-  Margins margins;
+  struct Element {
+private:
+    bool enabled;
 
-  Element(
-    std::string id,
-    Type type,
-    Color background,
-    bool enabled,
-    rect transform,
-    Margins margins
-  )
-      : id( id ), type( type ), background( background ), enabled( enabled ),
-        transform( transform ), margins( margins ) {}
+public:
+    std::string id;
+    Color background;
+    rect transform;
+    Margins margins;
 
-  void Enable() {
-    enabled = true;
-  }
 
-  void Disable() {
-    enabled = false;
-  }
+    virtual ~Element() {}
 
-  bool IsEnabled() {
-    return enabled;
-  }
+    Element(
+      std::string id,
+      Color background,
+      bool enabled,
+      rect transform,
+      Margins margins
+    )
+        : enabled( enabled ), id( id ), background( background ),
+          transform( transform ), margins( margins ) {}
 
-  std::string GetID() {
-    return id;
-  }
-};
+
+    virtual void Enable() {
+      enabled = true;
+    }
+
+    virtual void Disable() {
+      enabled = false;
+    }
+
+    virtual void SubscribeToMessages() {}
+    virtual void UnsubscribeToMessages() {}
+
+    bool IsEnabled() {
+      return enabled;
+    }
+  };
 
 };// namespace UI

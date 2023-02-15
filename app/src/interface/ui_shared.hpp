@@ -3,22 +3,11 @@
 
 namespace UI {
 
-enum class Type {
-  INVALID_TYPE,
-  Panel,
-  StackPanel,
-  TextLabel,
-  TextureLabel,
-  TextButton,
-  TextureButton,
-};
+  struct Context {
+    std::string hot;
+    std::string active;
+  };
 
-
-struct Context {
-  entt::entity hot;
-  entt::entity active;
-};
-
-inline f32 SCALE = 2.0f;
+  inline f32 SCALE = 2.0f;
 
 };// namespace UI

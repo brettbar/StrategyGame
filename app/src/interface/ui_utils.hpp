@@ -10,220 +10,98 @@
 
 namespace UI {
 
-template<typename T>
-inline bool Has( entt::entity entity ) {
-  return Global::local.all_of<T>( entity );
-}
-
-template<typename T>
-inline T &Get( entt::entity entity ) {
-  assert( Has<T>( entity ) );
-  auto &got = Global::local.get<T>( entity );
-  return got;
-}
-
-inline Type GetType( entt::entity entity ) {
-  if ( Has<Panel>( entity ) ) {
-    return Get<Panel>( entity ).elem.type;
+  template<typename T>
+  inline bool Has( ptr<Element> entity ) {
+    ptr<T> attempt = std::dynamic_pointer_cast<T>( entity );
+    return attempt != nullptr;
   }
 
-  if ( Has<StackPanel>( entity ) ) {
-    return Get<StackPanel>( entity ).elem.type;
+  template<typename T>
+  inline std::shared_ptr<T> Get( ptr<Element> entity ) {
+    std::shared_ptr<T> converted = std::dynamic_pointer_cast<T>( entity );
+    assert( converted );
+    return converted;
   }
 
-  if ( Has<TextLabel>( entity ) ) {
-    return Get<TextLabel>( entity ).elem.type;
+  inline bool IsInteractive( ptr<Element> entity ) {
+    return Has<TextureButton>( entity ) || Has<TextButton>( entity );
   }
 
-  if ( Has<TextButton>( entity ) ) {
-    return Get<TextButton>( entity ).label.elem.type;
+  inline bool IsClickable( ptr<Element> entity ) {
+    if ( Has<TextureButton>( entity ) ) {
+      return Get<TextureButton>( entity )->clickable;
+    }
+
+    if ( Has<TextButton>( entity ) ) {
+      return Get<TextButton>( entity )->clickable;
+    }
+
+    return false;
   }
 
-  if ( Has<TextureLabel>( entity ) ) {
-    return Get<TextureLabel>( entity ).elem.type;
-  }
-
-  if ( Has<TextureButton>( entity ) ) {
-    return Get<TextureButton>( entity ).label.elem.type;
-  }
-
-  return Type::INVALID_TYPE;
-}
-
-inline rect &GetTransform( entt::entity entity ) {
-  if ( Has<Panel>( entity ) ) {
-    return Get<Panel>( entity ).elem.transform;
-  }
-  if ( Has<StackPanel>( entity ) ) {
-    return Get<StackPanel>( entity ).elem.transform;
-  }
-  if ( Has<TextLabel>( entity ) ) {
-    return Get<TextLabel>( entity ).elem.transform;
-  }
-  if ( Has<TextButton>( entity ) ) {
-    return Get<TextButton>( entity ).label.elem.transform;
-  }
-  if ( Has<TextureLabel>( entity ) ) {
-    return Get<TextureLabel>( entity ).elem.transform;
-  }
-  if ( Has<TextureButton>( entity ) ) {
-    return Get<TextureButton>( entity ).label.elem.transform;
-  }
-
-  std::cout << "GetTransform() Invalid Transform!!" << std::endl;
-  assert( false );
-}
-
-inline void UpdateElem( entt::entity entity ) {
-  if ( Has<TextLabel>( entity ) ) {
-    Get<TextLabel>( entity ).Update();
-    return;
-  }
-  if ( Has<TextButton>( entity ) ) {
-    Get<TextButton>( entity ).Update();
-    return;
-  }
-}
-
-inline void ToggleElem( entt::entity entity, bool on ) {
-  if ( Has<Panel>( entity ) ) {
-    Get<Panel>( entity ).elem.enabled = on;
-    return;
-  }
-
-  if ( Has<StackPanel>( entity ) ) {
-    Get<StackPanel>( entity ).elem.enabled = on;
-    return;
-  }
-
-  if ( Has<TextLabel>( entity ) ) {
-    Get<TextLabel>( entity ).elem.enabled = on;
-    return;
-  }
-
-  if ( Has<TextButton>( entity ) ) {
-    Get<TextButton>( entity ).label.elem.enabled = on;
-    return;
-  }
-
-  if ( Has<TextureLabel>( entity ) ) {
-    Get<TextureLabel>( entity ).elem.enabled = on;
-    return;
-  }
-
-  if ( Has<TextureButton>( entity ) ) {
-    Get<TextureButton>( entity ).label.elem.enabled = on;
-    return;
-  }
-}
+  inline void DoAction( ptr<Element> entity ) {
+    if ( Has<TextButton>( entity ) ) {
+      Get<TextButton>( entity )->FireEvent();
+    }
 
 
-inline void RecursiveToggle( entt::entity entity, bool on ) {
-  ToggleElem( entity, on );
-
-  if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
-    return;
-
-  if ( Has<StackPanel>( entity ) ) {
-    StackPanel &stack_panel = Get<StackPanel>( entity );
-    RecursiveToggle( stack_panel.children[stack_panel.curr_index], on );
-  }
-  else if ( Has<Panel>( entity ) ) {
-    for ( entt::entity child: Global::local.get<Panel>( entity ).children ) {
-      RecursiveToggle( child, on );
+    if ( Has<TextureButton>( entity ) ) {
+      Get<TextureButton>( entity )->Action();
     }
   }
-}
 
-inline void SwitchChild( StackPanel &sp, u32 index ) {
-  RecursiveToggle( sp.children[sp.curr_index], false );
-  sp.curr_index = index;
-  RecursiveToggle( sp.children[sp.curr_index], true );
-}
 
-inline bool IsEnabled( entt::entity entity ) {
-  if ( Has<Panel>( entity ) ) {
-    return Get<Panel>( entity ).elem.enabled;
-  }
-  if ( Has<StackPanel>( entity ) ) {
-    return Get<StackPanel>( entity ).elem.enabled;
-  }
+  // inline void RecursiveToggle( ptr<Element> entity, bool on ) {
+  //   if ( entity )
+  //     entity->enabled = on;
 
-  if ( Has<TextLabel>( entity ) ) {
-    return Get<TextLabel>( entity ).elem.enabled;
-  }
+  //   if ( Has<TextLabel>( entity ) ) {
+  //     if ( on ) {
+  //       Get<TextLabel>( entity )->SubscribeToMessages();
+  //     }
+  //     else {
+  //       Get<TextLabel>( entity )->UnsubscribeFromMessages();
+  //     }
+  //   }
 
-  if ( Has<TextButton>( entity ) ) {
-    return Get<TextButton>( entity ).label.elem.enabled;
-  }
+  //   if ( !Has<Panel>( entity ) && !Has<StackPanel>( entity ) )
+  //     return;
 
-  if ( Has<TextureLabel>( entity ) ) {
-    return Get<TextureLabel>( entity ).elem.enabled;
-  }
+  //   if ( Has<StackPanel>( entity ) ) {
+  //     std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
+  //     RecursiveToggle( stack_panel->children[stack_panel->curr_index], on );
+  //   }
+  //   else if ( Has<Panel>( entity ) ) {
+  //     for ( ptr<Element> child: Get<Panel>( entity )->children ) {
 
-  if ( Has<TextureButton>( entity ) ) {
-    return Get<TextureButton>( entity ).label.elem.enabled;
-  }
+  //       RecursiveToggle( child, on );
+  //     }
+  //   }
+  // }
 
-  return false;
-}
-
-inline std::string GetId( entt::entity entity ) {
-  if ( Has<Panel>( entity ) ) {
-    return Get<Panel>( entity ).elem.id;
-  }
-
-  if ( Has<StackPanel>( entity ) ) {
-    return Get<StackPanel>( entity ).elem.id;
-  }
-
-  if ( Has<TextLabel>( entity ) ) {
-    return Get<TextLabel>( entity ).elem.id;
-  }
-
-  if ( Has<TextButton>( entity ) ) {
-    return Get<TextButton>( entity ).label.elem.id;
+  inline void RecursiveDelete( ptr<Element> entity ) {
+    if ( Has<StackPanel>( entity ) ) {
+      std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
+      RecursiveDelete( stack_panel->children[stack_panel->curr_index] );
+    }
+    else if ( Has<Panel>( entity ) ) {
+      for ( ptr<Element> child: Get<Panel>( entity )->children ) {
+        RecursiveDelete( child );
+      }
+    }
+    else {
+      Manager()->lookup.erase( entity->id );
+      // Manager()->registry.destroy( entity );
+      // TODO Missing delete?
+    }
   }
 
-  if ( Has<TextureLabel>( entity ) ) {
-    return Get<TextureLabel>( entity ).elem.id;
+  // TODO maybe should be put on StackPanel struct as method?
+  inline void SwitchChild( StackPanel &sp, u32 index ) {
+    // RecursiveToggle( sp.children[sp.curr_index], false );
+    // sp.curr_index = index;
+    // RecursiveToggle( sp.children[sp.curr_index], true );
   }
 
-  if ( Has<TextureButton>( entity ) ) {
-    return Get<TextureButton>( entity ).label.elem.id;
-  }
-
-  return "INVALID_ID";
-}
-
-inline bool IsInteractive( entt::entity entity ) {
-  return Has<TextureButton>( entity ) || Has<TextButton>( entity );
-}
-
-inline bool IsClickable( entt::entity entity ) {
-  if ( Has<TextureButton>( entity ) ) {
-    return Get<TextureButton>( entity ).clickable;
-  }
-
-  if ( Has<TextButton>( entity ) ) {
-    return Get<TextButton>( entity ).clickable;
-  }
-
-  return false;
-}
-
-inline void DoAction( entt::entity entity ) {
-  if ( Has<TextButton>( entity ) ) {
-
-    auto &button = Get<TextButton>( entity );
-    button.Action();
-  }
-
-
-  if ( Has<TextureButton>( entity ) ) {
-    auto &button = Get<TextureButton>( entity );
-    button.Action();
-  }
-}
 
 };// namespace UI
