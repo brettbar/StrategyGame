@@ -2,6 +2,8 @@
 
 #include "element.hpp"
 
+#include "../ui_manager.hpp"
+
 
 namespace UI {
 
@@ -34,6 +36,30 @@ namespace UI {
       Element::Disable();
     }
 
+    void Draw() override {
+      if ( !IsEnabled() )
+        return;
+
+      DrawRectangleV(
+        { transform.x, transform.y },
+        { transform.width, transform.height },
+        background
+      );
+
+      for ( ptr<Element> child: children ) {
+        if ( child )
+          child->Draw();
+      }
+    }
+
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
+      for ( ptr<Element> child: children ) {
+        if ( child && child->IsEnabled() ) {
+          child->Interact( mouse_went_up, mouse_went_down );
+        }
+      }
+    }
+
     void SubscribeToMessages() override {
       Messages::dispatcher.sink<Messages::UpdateEnabled>()
         .connect<&Panel::ReceiveUpdateEnabled>( this );
@@ -58,13 +84,6 @@ namespace UI {
         update( *this );
     }
 
-    void Draw() {
-      DrawRectangleV(
-        { transform.x, transform.y },
-        { transform.width, transform.height },
-        background
-      );
-    }
 
     // Absolute panel
     Panel(
@@ -163,12 +182,28 @@ namespace UI {
       return id;
     }
 
-    void Draw() {
+    void Draw() override {
+      if ( !IsEnabled() )
+        return;
+
       DrawRectangleV(
         { transform.x, transform.y },
         { transform.width, transform.height },
         background
       );
+
+      if ( children[curr_index] )
+        children[curr_index]->Draw();
+    }
+
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
+      if ( children[curr_index] ) {
+        children[curr_index]->Interact( mouse_went_up, mouse_went_down );
+
+        if ( !Manager()->over_any_elem ) {
+          Manager()->SetContextNull();
+        }
+      }
     }
 
     // Relative panel

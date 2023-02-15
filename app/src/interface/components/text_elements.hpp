@@ -74,25 +74,10 @@ namespace UI {
         .disconnect<&TextLabel::ReceiveUpdateBackground>( this );
     }
 
+    void Draw() override {
+      if ( !IsEnabled() )
+        return;
 
-    // void Update() {
-    //   if ( elem.enabled && dynamic ) {
-    //     if ( update ) {
-    //       text = update();
-    //     }
-    //     else {
-    //       printf( "ERROR :: Update not found for elem %s\n", elem.id.c_str() );
-    //     }
-    //   }
-    // }
-
-    // void Update( std::string updated_text ) {
-    //   if ( elem.enabled ) {
-    //     text = updated_text;
-    //   }
-    // }
-
-    void Draw() {
       DrawRectangleV(
         { transform.x, transform.y },
         { transform.width, transform.height },
@@ -161,11 +146,29 @@ namespace UI {
 
     std::shared_ptr<Events::Basic> on_click;
 
-    void Draw() {
+    void Draw() override {
+      if ( !IsEnabled() )
+        return;
+
       if ( !clickable )
         TextLabel::Draw( Fade( BLACK, 0.5 ) );
       else
         TextLabel::Draw();
+    }
+
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
+      bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
+
+      if ( !Manager()->over_any_elem )
+        Manager()->over_any_elem = inside;
+
+      if ( Manager()->DoInteraction(
+             *this, inside, mouse_went_up, mouse_went_down
+           ) ) {
+        std::cout << "INTERACTION DETECTED!!!" << std::endl;
+
+        FireEvent();
+      }
     }
 
     void FireEvent() {

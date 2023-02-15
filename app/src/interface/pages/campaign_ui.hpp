@@ -13,7 +13,7 @@
 
 namespace UI {
 
-  inline std::vector<ptr<Panel>> CreateCampaignUI() {
+  inline std::vector<ptr<Element>> CreateCampaignUI() {
     return {
       Create<Panel>( {
         "settlement_context_panel",
@@ -168,16 +168,12 @@ namespace UI {
             Align::Start,
             {
               Create<TextButton>( {
-                "actor_spawn_settlement_button", "Spawn?", 26, PURPLE, WHITE
-                // []() {
-                //   printf( "Spawn Settlement clicked!!\n" );
-                //   SettlementSystem::SpawnSettlement();
-
-                //   // TODO handle this in main
-                //   // Events::event_emitter.publish( Events::UIEvent{
-                //   //   "actor_spawn_settlement_button",
-                //   // } );
-                // },
+                "actor_spawn_settlement_button",
+                "Spawn?",
+                26,
+                PURPLE,
+                WHITE,
+                Events::ButtonClick::Create( "actor_spawn_settlement", "test" ),
               } ),
             },
           } ),

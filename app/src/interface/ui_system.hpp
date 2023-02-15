@@ -16,8 +16,6 @@ namespace UI {
     void EnableContent();
     void DisableCurrentContent();
     void RecursiveLayout( ptr<Panel> );
-    void RecursiveInteractions( ptr<Panel>, bool &, bool, bool );
-    void RecursiveDraw( ptr<Panel> );
 
     void Draw();
 
@@ -47,7 +45,7 @@ namespace UI {
     }
 
     inline void EnableContent() {
-      for ( ptr<Panel> base: Manager()->ActivePage() ) {
+      for ( ptr<Element> base: Manager()->ActivePage() ) {
         // RecursiveToggle( base, true );
         base->Enable();
       }
@@ -56,7 +54,7 @@ namespace UI {
     inline void DisableCurrentContent() {
       Manager()->SetContextNull();
 
-      for ( ptr<Panel> base: Manager()->ActivePage() ) {
+      for ( ptr<Element> base: Manager()->ActivePage() ) {
         // RecursiveToggle( base, false );
         base->Disable();
       }
@@ -67,7 +65,6 @@ namespace UI {
       bool mouseWentUp = IsMouseButtonReleased( 0 );
       bool mouseWentDown = IsMouseButtonPressed( 0 );
       bool mouseHeldDown = IsMouseButtonDown( 0 );
-      bool over_any_elem = false;
       const f32 screen_width = GetScreenWidth();
       const f32 screen_height = GetScreenHeight();
 
@@ -83,18 +80,22 @@ namespace UI {
 
       Messages::dispatcher.update();
 
+      Manager()->over_any_elem = false;
+
       for ( ptr<Element> base: Manager()->ActivePage() ) {
         ptr<Panel> panel = Get<Panel>( base );
         RecursiveLayout( panel );
-        RecursiveInteractions(
-          panel, over_any_elem, mouseWentUp, mouseWentDown
-        );
+
+        panel->Interact( mouseWentUp, mouseWentDown );
       }
+
+      if ( !Manager()->over_any_elem )
+        Manager()->SetContextNull();
     }
 
     inline void Draw() {
-      for ( ptr<Panel> base: Manager()->ActivePage() ) {
-        RecursiveDraw( Get<Panel>( base ) );
+      for ( ptr<Element> base: Manager()->ActivePage() ) {
+        base->Draw();
       }
 
       DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
@@ -225,103 +226,25 @@ namespace UI {
     }
 
 
-    inline void RecursiveDraw( ptr<Panel> panel ) {
-      if ( !panel->IsEnabled() )
-        return;
+    // inline void RecursiveInteractions(
+    //   ptr<Panel> panel,
+    //   bool mouseWentUp,
+    //   bool mouseWentDown
+    // ) {
 
-      panel->Draw();
+    //   if ( !panel->IsEnabled() )
+    //     return;
 
-      for ( ptr<Element> child: panel->children ) {
-        if ( Has<Panel>( child ) ) {
-          RecursiveDraw( Get<Panel>( child ) );
-        }
-        else if ( Has<StackPanel>( child ) ) {
-          ptr<StackPanel> child_panel = Get<StackPanel>( child );
+    //   for ( ptr<Element> child: panel->children ) {
+    //     if ( !child )
+    //       continue;
+    //     if ( !child->IsEnabled() )
+    //       continue;
 
-          child_panel->Draw();
-
-          assert( Has<Panel>( child_panel->children[child_panel->curr_index] )
-          );
-
-          RecursiveDraw(
-            Get<Panel>( child_panel->children[child_panel->curr_index] )
-          );
-        }
-        else if ( Has<TextLabel>( child ) ) {
-          Get<TextLabel>( child )->Draw();
-        }
-        else if ( Has<TextButton>( child ) ) {
-          Get<TextButton>( child )->Draw();
-        }
-        else if ( Has<TextureLabel>( child ) ) {
-          Get<TextureLabel>( child )->Draw();
-        }
-        else if ( Has<TextureButton>( child ) ) {
-          Get<TextureButton>( child )->Draw();
-        }
-      }
-    }
-
-    inline void RecursiveInteractions(
-      ptr<Panel> panel,
-      bool &over_any_elem,
-      bool mouseWentUp,
-      bool mouseWentDown
-    ) {
-
-      if ( !panel->IsEnabled() )
-        return;
-
-      for ( ptr<Element> child: panel->children ) {
-        if ( !child )
-          continue;
-        if ( !child->IsEnabled() )
-          continue;
-
-        if ( Has<Panel>( child ) ) {
-          RecursiveInteractions(
-            Get<Panel>( child ), over_any_elem, mouseWentUp, mouseWentDown
-          );
-        }
-        else if ( Has<StackPanel>( child ) ) {
-          ptr<StackPanel> child_panel = Get<StackPanel>( child );
-
-          assert( Has<Panel>( child_panel->children[child_panel->curr_index] )
-          );
-
-          RecursiveInteractions(
-            Get<Panel>( child_panel->children[child_panel->curr_index] ),
-            over_any_elem,
-            mouseWentUp,
-            mouseWentDown
-          );
-        }
-
-        // UpdateElem( child );
-
-
-        bool inside =
-          CheckCollisionPointRec( GetMousePosition(), child->transform );
-
-        if ( !over_any_elem )
-          over_any_elem = inside;
-
-        if ( Manager()->DoInteraction(
-               child, inside, IsInteractive( child ), mouseWentUp, mouseWentDown
-             ) ) {
-          std::cout << "INTERACTION DETECTED!!!" << std::endl;
-
-          if ( IsClickable( child ) ) {
-            // action_lookup.at( GetId( child ) )();
-            DoAction( child );
-          }
-        }
-      }
-
-      if ( !over_any_elem ) {
-        Manager()->SetContextNull();
-      }
-    }
+    //     // UpdateElem( child );
+    //     child->Interact( mouseWentUp, mouseWentDown );
+    //   }
+    // }
 
 
   };// namespace System

@@ -23,32 +23,33 @@ namespace UI {
     return converted;
   }
 
-  inline bool IsInteractive( ptr<Element> entity ) {
-    return Has<TextureButton>( entity ) || Has<TextButton>( entity );
-  }
 
-  inline bool IsClickable( ptr<Element> entity ) {
-    if ( Has<TextureButton>( entity ) ) {
-      return Get<TextureButton>( entity )->clickable;
-    }
+  // inline bool IsInteractive( ptr<Element> entity ) {
+  //   return Has<TextureButton>( entity ) || Has<TextButton>( entity );
+  // }
 
-    if ( Has<TextButton>( entity ) ) {
-      return Get<TextButton>( entity )->clickable;
-    }
+  // inline bool IsClickable( ptr<Element> entity ) {
+  //   if ( Has<TextureButton>( entity ) ) {
+  //     return Get<TextureButton>( entity )->clickable;
+  //   }
 
-    return false;
-  }
+  //   if ( Has<TextButton>( entity ) ) {
+  //     return Get<TextButton>( entity )->clickable;
+  //   }
 
-  inline void DoAction( ptr<Element> entity ) {
-    if ( Has<TextButton>( entity ) ) {
-      Get<TextButton>( entity )->FireEvent();
-    }
+  //   return false;
+  // }
+
+  // inline void DoAction( ptr<Element> entity ) {
+  //   if ( Has<TextButton>( entity ) ) {
+  //     Get<TextButton>( entity )->FireEvent();
+  //   }
 
 
-    if ( Has<TextureButton>( entity ) ) {
-      Get<TextureButton>( entity )->Action();
-    }
-  }
+  //   if ( Has<TextureButton>( entity ) ) {
+  //     Get<TextureButton>( entity )->Action();
+  //   }
+  // }
 
 
   // inline void RecursiveToggle( ptr<Element> entity, bool on ) {

@@ -13,7 +13,7 @@
 #include "../../network/network.hpp"
 
 namespace UI {
-  inline std::vector<ptr<Panel>> CreateSinglePlayerLobby() {
+  inline std::vector<ptr<Element>> CreateSinglePlayerLobby() {
     return {
       Create<Panel>( {
         "singleplayer_lobby",

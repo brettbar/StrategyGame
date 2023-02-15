@@ -9,7 +9,7 @@
 
 namespace UI {
 
-  inline std::vector<ptr<Panel>> CreateMainMenuUI() {
+  inline std::vector<ptr<Element>> CreateMainMenuUI() {
     return {
       Create<Panel>( {
         "main_menu",

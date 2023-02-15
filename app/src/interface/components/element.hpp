@@ -57,9 +57,12 @@ public:
       enabled = false;
     }
 
+    virtual void Resize() {}
+    virtual void Draw() {}
     virtual void SubscribeToMessages() {}
     virtual void UnsubscribeFromMessages() {}
-    virtual void Resize() {}
+
+    virtual void Interact( bool, bool ) {}
 
     bool IsEnabled() {
       return enabled;

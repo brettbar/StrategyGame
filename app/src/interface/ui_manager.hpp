@@ -3,8 +3,7 @@
 #include "../shared/common.hpp"
 #include "../shared/signals.hpp"
 #include "../shared/utils.hpp"
-#include "components/panel.hpp"
-#include "components/text_elements.hpp"
+#include "components/element.hpp"
 #include "ui_shared.hpp"
 
 // TODO remove
@@ -21,7 +20,8 @@ namespace UI {
     Lobby,
   };
 
-  using Page = std::vector<ptr<Panel>>;
+  // Panel?
+  using Page = std::vector<ptr<Element>>;
 
   class IManager {
 
@@ -30,6 +30,8 @@ public:
     entt::registry registry;
     std::map<std::string, ptr<Element>> lookup;
     std::vector<Page> pages;
+
+    bool over_any_elem = false;
 
     Page &ActivePage() {
       return pages[_active_page_i];
@@ -49,34 +51,32 @@ public:
     void operator=( const IManager & ) = delete;
 
     bool DoInteraction(
-      ptr<Element> entity,
+      Element entity,
       bool inside,
-      bool interactive,
       bool mouseWentUp,
       bool mouseWentDown
     ) {
       bool result = false;
 
-      if ( entity->id == _context.active ) {
+      if ( entity.id == _context.active ) {
         if ( mouseWentUp ) {
-          if ( entity->id == _context.hot )
+          if ( entity.id == _context.hot )
             result = true;// do the button action
 
           _context.active = "";
         }
       }
-      else if ( entity->id == _context.hot ) {
-        if ( mouseWentDown && interactive )
-          _context.active = entity->id;
+      else if ( entity.id == _context.hot ) {
+        if ( mouseWentDown )
+          _context.active = entity.id;
       }
 
       if ( inside ) {
-        // if ( _context.active == entt::null && interactive ) {
         if ( _context.active == "" ) {
-          _context.hot = entity->id;
+          _context.hot = entity.id;
 
-          if ( mouseWentDown && interactive )
-            _context.active = entity->id;
+          if ( mouseWentDown )
+            _context.active = entity.id;
         }
       }
 

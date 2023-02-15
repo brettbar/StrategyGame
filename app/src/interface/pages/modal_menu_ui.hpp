@@ -8,7 +8,7 @@
 #include "../ui_system.hpp"
 
 namespace UI {
-  inline std::vector<ptr<Panel>> CreateModalMenuUI() {
+  inline std::vector<ptr<Element>> CreateModalMenuUI() {
     return {
       Create<Panel>( {
         "modal_menu",

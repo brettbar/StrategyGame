@@ -386,6 +386,13 @@ inline void IGame::RegisterEventListeners() {
           UI::System::SwitchPage( UI::Lobby );
         }
       }
+      else if ( event.origin_id == "actor_spawn_settlement" ) {
+        printf(
+          "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
+        );
+
+        SettlementSystem::SpawnSettlement();
+      }
     }
   );
 }

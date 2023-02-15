@@ -58,7 +58,7 @@ namespace UI {
     return text_buttons;
   }
 
-  inline std::vector<ptr<Panel>> CreateFactionSelectMenuUI() {
+  inline std::vector<ptr<Element>> CreateFactionSelectMenuUI() {
     return {
       Create<Panel>( {
         "facton_select_menu",
