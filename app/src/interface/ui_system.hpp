@@ -26,8 +26,8 @@ namespace UI {
         CreateSinglePlayerLobby(),
         CreateModalMenuUI(),
         CreateCampaignUI(),
-        // CreateLobbyBrowser(),
-        // CreateLobbyUI(),
+        CreateLobbyBrowser(),
+        CreateLobbyUI(),
       };
       Manager()->SetScene( MainMenu );
       EnableContent();

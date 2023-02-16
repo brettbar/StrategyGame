@@ -33,25 +33,6 @@ namespace Messages {
         : message_id( message_id ), updated_background( updated_background ) {}
   };
 
-  // struct FactionSelected : Basic {
-  //   Color color;
-
-  //   std::shared_ptr<Messages::FactionSelected> static Create(
-  //     std::string id,
-  //     std::string msg
-  //   ) {
-  //     return std::make_shared<Messages::FactionSelected>( id, msg );
-  //   }
-
-  //   FactionSelected( std::string id, std::string faction )
-  //       : Basic( Type::FactionSelected, id ) {
-  //     }();
-  //   }
-  // };
-
-  // struct MessageEmitter : entt::emitter<MessageEmitter> {};
-
-  // inline MessageEmitter message_emitter;
   inline entt::dispatcher dispatcher{};
 };// namespace Messages
 
@@ -96,6 +77,13 @@ namespace Events {
 
     JoinLobby( std::string origin_id, CSteamID lobby_id )
         : Basic( Type::JoinLobby, origin_id ), lobby_id( lobby_id ) {}
+
+    std::shared_ptr<Events::JoinLobby> static Create(
+      std::string id,
+      CSteamID lobby_id
+    ) {
+      return std::make_shared<Events::JoinLobby>( id, lobby_id );
+    }
   };
 
 
