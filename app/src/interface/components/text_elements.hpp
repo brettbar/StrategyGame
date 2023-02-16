@@ -190,6 +190,12 @@ namespace UI {
           }
         } break;
         case Events::Type::JoinLobby: {
+          std::shared_ptr<Events::JoinLobby> join_lobby =
+            std::dynamic_pointer_cast<Events::JoinLobby>( on_click );
+
+          if ( join_lobby ) {
+            Events::event_emitter.publish( *join_lobby );
+          }
         } break;
       }
     }

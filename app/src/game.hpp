@@ -253,6 +253,7 @@ class IGame {
 };
 
 inline void IGame::RegisterEventListeners() {
+
   Events::event_emitter.on<Events::Basic>(
     [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
       if ( event.origin_id == "main_menu_host_game" ) {
@@ -300,12 +301,6 @@ inline void IGame::RegisterEventListeners() {
           "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
         );
       }
-
-      // printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
-
-      // if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
-      //   JoinMultiplayerLobby( event.lobby_id );
-      // }
     }
   );
 
@@ -392,6 +387,16 @@ inline void IGame::RegisterEventListeners() {
         );
 
         SettlementSystem::SpawnSettlement();
+      }
+    }
+  );
+
+  Events::event_emitter.on<Events::JoinLobby>(
+    [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
+      printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
+
+      if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
+        JoinMultiplayerLobby( event.lobby_id );
       }
     }
   );
