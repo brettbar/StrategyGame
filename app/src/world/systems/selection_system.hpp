@@ -5,7 +5,6 @@
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
 #include "../components/actor.hpp"
-#include "../components/event.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"

@@ -70,8 +70,6 @@ class IGame {
     return !_hit_exit;
   }
 
-  void RegisterEventListeners();
-
   /*=============================================================
                         Begin: Singleplayer
   =============================================================*/
@@ -250,10 +248,11 @@ class IGame {
 
     delete this;
   }
+
+  void RegisterEventListeners();
 };
 
 inline void IGame::RegisterEventListeners() {
-
   Events::event_emitter.on<Events::Basic>(
     [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
       if ( event.origin_id == "main_menu_host_game" ) {
@@ -310,7 +309,7 @@ inline void IGame::RegisterEventListeners() {
       // else if ( event.origin_id == "faction_select" ) {
       //   //// StartCampaign( event.msg );
       // }
-      if ( event.origin_id == "faction_select" ) {
+      if ( event.origin_id == "faction_selected" ) {
         printf(
           "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
         );
@@ -380,6 +379,9 @@ inline void IGame::RegisterEventListeners() {
 
           UI::System::SwitchPage( UI::Lobby );
         }
+      }
+      else if ( event.origin_id == "mp_faction_select" ) {
+        UI::System::SwitchPage( UI::FactionSelectMenu );
       }
       else if ( event.origin_id == "actor_spawn_settlement" ) {
         printf(

@@ -53,8 +53,17 @@ namespace UI {
           24,
           color,
           WHITE,
+          Events::ButtonClick::Create( "mp_faction_select", id ),
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
+        Create<TextLabel>( {
+          id + "_select_faction",
+          "Selecting Faction...",
+          24,
+          color,
+          WHITE,
+          { Messages::ID::FactionSelected },
+        } ),
         Create<TextLabel>( {
           id + "_label",
           label,

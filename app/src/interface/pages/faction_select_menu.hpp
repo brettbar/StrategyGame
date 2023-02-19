@@ -51,7 +51,7 @@ namespace UI {
         32,
         color,
         WHITE,
-        Events::ButtonClick::Create( "faction_select", faction ),
+        Events::ButtonClick::Create( "faction_selected", faction ),
       } ) );
     }
 
