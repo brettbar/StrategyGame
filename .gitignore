@@ -12,3 +12,8 @@ net/target/
 x64/
 packages/
 compile_commands.json
+
+
+# Added by cargo
+
+/target

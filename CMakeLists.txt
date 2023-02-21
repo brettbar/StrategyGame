@@ -22,7 +22,6 @@ set(SOURCE_FILES
   app/src/world/components/sight.hpp
   app/src/world/components/tile.hpp
   app/src/world/components/unit.hpp
-  app/src/world/components/event.hpp
   )
 
 if (UNIX)
@@ -58,13 +57,14 @@ endif(UNIX)
    add_library(raylib STATIC IMPORTED)
    set_target_properties(
          raylib PROPERTIES
-         IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
+         IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/raylib.lib"
          INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
    )
    add_library(steam_api SHARED IMPORTED)
    set_target_properties(
            steam_api PROPERTIES
-           IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+           IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/steam_api64.dll"
+           IMPORTED_IMPLIB "${INCLUDE_DIRS}/steam/lib/steam_api64.lib"
            INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
    )
 
@@ -82,7 +82,7 @@ endif(UNIX)
      winmm
      -static
      )
-   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/target/cxxbridge/rust-gui/src)
 
  endif(WIN32)
 

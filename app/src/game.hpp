@@ -15,6 +15,9 @@
 #include "world/systems/selection_system.hpp"
 #include <raylib.h>
 
+#include "lib.rs.h"
+
+
 enum class ProgramMode {
   MainMenu,
   ModalMenu,
@@ -31,6 +34,8 @@ class IGame {
 
   void MainLoop() {
     RegisterEventListeners();
+
+    rustgui::init();
 
     while ( !WindowShouldClose() && ShouldRun() ) {
 
@@ -211,12 +216,14 @@ class IGame {
 
     UI::System::UpdateOnFrame();
 
+
     CameraUpdate( Global::state.camera, dt );
 
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Renderer::DrawUI();
+      // Renderer::DrawUI();
+      rustgui::draw_ui();
     }
     EndDrawing();
   }
