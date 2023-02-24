@@ -36,6 +36,99 @@ namespace UI {
       Element::Disable();
     }
 
+    void Resize() override {
+      if ( !IsEnabled() )
+        return;
+
+      f32 total_height = 0;
+      f32 total_width = 0;
+      f32 tallest_child = 0;
+      f32 widest_child = 0;
+      f32 end_of_last_x = transform.x;
+      f32 end_of_last_y = transform.y;
+
+      Update();
+
+      for ( ptr<Element> child: children ) {
+        // TODO not sure if this is right
+        // if ( !child )
+        //   continue;
+        if ( !child->IsEnabled() )
+          continue;
+
+        child->Resize();
+      }
+
+      if ( !abs_size ) {
+        for ( ptr<Element> child: children ) {
+          if ( !child->IsEnabled() )
+            continue;
+
+          total_width += child->transform.width;
+          total_height += child->transform.height;
+
+          if ( child->transform.width > widest_child )
+            widest_child = child->transform.width;
+
+          if ( child->transform.height > tallest_child )
+            tallest_child = child->transform.height;
+        }
+
+        if ( children_axis == Axis::Row ) {
+          transform.width = total_width;
+          transform.height = tallest_child;
+        }
+        else if ( children_axis == Axis::Column ) {
+          transform.width = widest_child;
+          transform.height = total_height;
+        }
+      }
+
+
+      for ( ptr<Element> child: children ) {
+        if ( !child->IsEnabled() )
+          continue;
+
+        if ( children_axis == Axis::Row ) {
+          // 2. Set the child x position based on alignment style.
+          switch ( children_horiz_align ) {
+            case Align::Start: {
+              child->transform.x = end_of_last_x + child->margins.left;
+              end_of_last_x = child->transform.x + child->transform.width +
+                              child->margins.right;
+            } break;
+          }
+
+          // 3. Set the child y position based on alignment style.
+          switch ( children_vert_align ) {
+            case Align::Start: {
+              child->transform.y = transform.y;
+            } break;
+          }
+        }
+        else if ( children_axis == Axis::Column ) {
+          // 2. Set the child x position based on alignment style.
+          switch ( children_horiz_align ) {
+            case Align::Start: {
+              child->transform.x = transform.x;
+            } break;
+          }
+
+          // 3. Set the child y position based on alignment style.
+          switch ( children_vert_align ) {
+            case Align::Start: {
+              child->transform.y = end_of_last_y;
+              // + margins.top;
+              end_of_last_y = child->transform.y + child->transform.height;
+              // + margins.bottom;
+            } break;
+          }
+        }
+      }
+    }
+
+    void Reposition() override {}
+
     void Draw() override {
       if ( !IsEnabled() )
         return;
@@ -180,6 +273,12 @@ namespace UI {
 
     std::string ID() {
       return id;
+    }
+
+    void Resize() override {
+      children[curr_index]->transform.x = transform.x;
+      children[curr_index]->transform.y = transform.y;
+      children[curr_index]->Resize();
     }
 
     void Draw() override {

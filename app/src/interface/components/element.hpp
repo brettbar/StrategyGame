@@ -13,9 +13,6 @@ namespace UI {
 
   enum class Align {
     Start,
-    Center,
-    End,
-    SpaceOut,
   };
 
   struct Margins {
@@ -58,6 +55,7 @@ public:
     }
 
     virtual void Resize() {}
+    virtual void Reposition() {}
     virtual void Draw() {}
     virtual void SubscribeToMessages() {}
     virtual void UnsubscribeFromMessages() {}

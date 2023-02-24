@@ -84,7 +84,10 @@ namespace UI {
 
       for ( ptr<Element> base: Manager()->ActivePage() ) {
         ptr<Panel> panel = Get<Panel>( base );
-        RecursiveLayout( panel );
+        // RecursiveLayout( panel );
+        //
+        panel->Resize();
+        panel->Reposition();
 
         panel->Interact( mouseWentUp, mouseWentDown );
       }
@@ -165,8 +168,6 @@ namespace UI {
               end_of_last_x = child->transform.x + child->transform.width +
                               child->margins.right;
             } break;
-            case Align::SpaceOut: {
-            } break;
           }
 
           // 3. Set the child y position based on alignment style.
@@ -181,8 +182,6 @@ namespace UI {
           switch ( parent_panel->children_horiz_align ) {
             case Align::Start: {
               child->transform.x = parent_panel->transform.x;
-            } break;
-            case Align::SpaceOut: {
             } break;
           }
 
