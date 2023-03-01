@@ -12,20 +12,6 @@
 #include "../../network/network.hpp"
 
 namespace UI {
-  inline ptr<Element> CreateReadyOrStart() {
-    std::function<std::string()> update = []() -> std::string {
-      return ( Network::is_host ) ? "Start Game" : "Ready Up";
-    };
-
-    return Create<TextButton>( {
-      "ready_up",
-      "Ready Up",
-      32,
-      RED,
-      WHITE,
-    } );
-  }
-
   inline ptr<Panel>
   CreateMemberPanel( u32 i, std::string id, std::string member, bool is_host ) {
     std::string label = "something wrong";
@@ -208,7 +194,21 @@ namespace UI {
               Network::MAX_PLAYERS_PER_SERVER
             ),
           } ),
-          CreateReadyOrStart(),
+          Create<TextButton>( {
+            "lobby_back_to_main",
+            "Back",
+            32,
+            RED,
+            WHITE,
+          } ),
+          Create<TextButton>( {
+            "ready_up",
+            "Ready Up",
+            32,
+            RED,
+            WHITE,
+            { Messages::ID::HostLobby, Messages::ID::JoinLobby },
+          } ),
         },
       } ),
     };

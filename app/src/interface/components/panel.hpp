@@ -20,10 +20,13 @@ namespace UI {
     // Should be recursive
     void Enable() override {
       Element::Enable();
+      Resize();
 
       for ( ptr<Element> child: children ) {
-        if ( child )
+        if ( child ) {
           child->Enable();
+          child->Resize();
+        }
       }
     }
 

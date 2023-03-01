@@ -73,6 +73,23 @@ class IGame {
   /*=============================================================
                         Begin: Singleplayer
   =============================================================*/
+  void StartCampaign( std::string player_faction ) {
+    printf( "pending new!!\n" );
+
+    DeleteCampaignInstance();
+    _campaign = new Campaign();
+
+    UI::System::EnableCampaignUI();
+
+    Global::host_player = Global::world.create();
+    Global::world.emplace<Player::Component>(
+      Global::host_player, Global::host_player, true, player_faction
+    );
+
+    SelectionSystem::Start();
+
+    Game()->_mode = ProgramMode::Campaign;
+  }
   /*=============================================================
                         End: Singleplayer
   =============================================================*/
@@ -157,23 +174,6 @@ class IGame {
                         End: Shared
   =============================================================*/
 
-  void StartCampaign( std::string player_faction ) {
-    printf( "pending new!!\n" );
-
-    DeleteCampaignInstance();
-    _campaign = new Campaign();
-
-    UI::System::EnableCampaignUI();
-
-    Global::host_player = Global::world.create();
-    Global::world.emplace<Player::Component>(
-      Global::host_player, Global::host_player, true, player_faction
-    );
-
-    SelectionSystem::Start();
-
-    Game()->_mode = ProgramMode::Campaign;
-  }
 
   void DeleteCampaignInstance() {
     if ( _campaign )
@@ -198,6 +198,8 @@ class IGame {
         }
         else {
           // Multiplayer Campaign
+          if ( _campaign )
+            _campaign->Run( _dt, _lag, _oncelag );
         }
       } break;
 
@@ -207,8 +209,6 @@ class IGame {
   }
 
   void RunMainMenu( f32 dt ) {
-    // Input::Handle();
-
     UI::System::UpdateOnFrame();
 
     CameraUpdate( Global::state.camera, dt );
@@ -255,50 +255,63 @@ class IGame {
 inline void IGame::RegisterEventListeners() {
   Events::event_emitter.on<Events::Basic>(
     [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
-      if ( event.origin_id == "main_menu_host_game" ) {
-        HostMultiplayerCampaign();
-      }
-      else if ( event.origin_id == "main_menu_join_game" ) {
-        LookForMultiplayerCampaign();
-      }
-      else if ( event.origin_id == "main_menu_start_game" ) {
-        _single_player = true;
-        UI::System::SwitchPage( UI::FactionSelectMenu );
-      }
-      else if ( event.origin_id == "main_menu_load_game" ) {
-        LoadGame();
-      }
-      else if ( event.origin_id == "main_menu_exit_game" ) {
-        ExitGame();
-      }
-      else if ( event.origin_id == "player_select_faction" ) {
-        UI::System::SwitchPage( UI::FactionSelectMenu );
-      }
-      else if ( event.origin_id == "singleplayer_faction_label" ) {
-        UI::System::SwitchPage( UI::FactionSelectMenu );
-      }
-      else if ( event.origin_id == "singleplayer_lobby_start_game" ) {
-        StartCampaign( faction );
-      }
-      else if ( event.origin_id == "modal_menu_load_game" ) {
-        LoadGame();
-      }
-      else if ( event.origin_id == "modal_menu_save_game" ) {
-        SaveGame();
-      }
-      else if ( event.origin_id == "modal_menu_exit_main" ) {
-        ReturnToMain();
-      }
-      else if ( event.origin_id == "modal_menu_exit_game" ) {
-        ExitGame();
-      }
-      else if ( event.origin_id == "toggle_modal_menu" ) {
-        ToggleModalMenu();
-      }
-      else {
-        printf(
-          "Error, unregistered UI event fired: %s\n", event.origin_id.c_str()
-        );
+      switch ( event.id ) {
+        // MainMenu
+        case Events::ID::MainMenuHostGame: {
+          HostMultiplayerCampaign();
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::HostLobby,
+            "Start Game",
+          } );
+        } break;
+        case Events::ID::MainMenuJoinGame: {
+          LookForMultiplayerCampaign();
+          Messages::dispatcher.enqueue( Messages::UpdateText{
+            Messages::ID::JoinLobby,
+            "Ready Up",
+          } );
+        } break;
+        case Events::ID::MainMenuStartGame: {
+          _single_player = true;
+          UI::System::SwitchPage( UI::FactionSelectMenu );
+        } break;
+        case Events::ID::MainMenuLoadGame:
+          LoadGame();
+          break;
+        case Events::ID::MainMenuExitGame:
+          ExitGame();
+          break;
+          // FactionSelect
+        case Events::ID::OpenFactionSelectPage:
+          UI::System::SwitchPage( UI::FactionSelectMenu );
+          break;
+        case Events::ID::SinglePlayerLobbyStartGame:
+          StartCampaign( faction );
+          break;
+        case Events::ID::ModalMenuLoadGame:
+          LoadGame();
+          break;
+        case Events::ID::ModalMenuSaveGame:
+          SaveGame();
+          break;
+        case Events::ID::ModalMenuExitMain:
+          ReturnToMain();
+          break;
+        case Events::ID::ModalMenuExitGame:
+          ExitGame();
+          break;
+        case Events::ID::ModalMenuToggle:
+          ToggleModalMenu();
+          break;
+        case Events::ID::ReturnToMain:
+          ReturnToMain();
+          break;
+        case Events::ID::ReadyUp:
+          StartCampaign( faction );
+          break;
+        default:
+          printf( "Error, unregistered UI event fired\n" );
+          break;
       }
     }
   );

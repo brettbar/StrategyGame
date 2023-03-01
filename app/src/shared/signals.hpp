@@ -10,6 +10,8 @@ namespace Messages {
     FactionSelected,
     SettlementContext,
     ActorContext,
+    JoinLobby,
+    HostLobby,
   };
 
   struct UpdateEnabled {
@@ -45,17 +47,38 @@ namespace Events {
     JoinLobby,
   };
 
+  // TODO replace with ID + string?
+  enum class ID {
+    // MainMenu
+    MainMenuHostGame,
+    MainMenuJoinGame,
+    MainMenuStartGame,
+    MainMenuLoadGame,
+    MainMenuExitGame,
+    // FactionSelect
+    OpenFactionSelectPage,
+    SinglePlayerLobbyStartGame,
+    // ModalMenu
+    ModalMenuLoadGame,
+    ModalMenuSaveGame,
+    ModalMenuExitMain,
+    ModalMenuExitGame,
+    ModalMenuToggle,
+    // ??
+    ReturnToMain,
+    ReadyUp,
+  };
+
   struct Basic {
     Type type;
-    std::string origin_id;
+    // std::string origin_id;
+    ID id;
 
     virtual ~Basic() {}
 
-    Basic( std::string origin_id )
-        : type( Type::Basic ), origin_id( origin_id ) {}
+    Basic( ID id ) : type( Type::Basic ), id( id ) {}
 
-    Basic( Type type, std::string origin_id )
-        : type( type ), origin_id( origin_id ) {}
+    Basic( Type type, ID id ) : type( type ), id( id ) {}
   };
 
   struct ButtonClick : Basic {
@@ -68,15 +91,15 @@ namespace Events {
       return std::make_shared<Events::ButtonClick>( id, msg );
     }
 
-    ButtonClick( std::string origin_id, std::string msg )
-        : Basic( Type::ButtonClick, origin_id ), msg( msg ) {}
+    ButtonClick( ID id, std::string msg )
+        : Basic( Type::ButtonClick, id ), msg( msg ) {}
   };
 
   struct JoinLobby : Basic {
     CSteamID lobby_id;
 
-    JoinLobby( std::string origin_id, CSteamID lobby_id )
-        : Basic( Type::JoinLobby, origin_id ), lobby_id( lobby_id ) {}
+    JoinLobby( ID id, CSteamID lobby_id )
+        : Basic( Type::JoinLobby, id ), lobby_id( lobby_id ) {}
 
     std::shared_ptr<Events::JoinLobby> static Create(
       std::string id,
