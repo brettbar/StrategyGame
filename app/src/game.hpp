@@ -15,24 +15,29 @@
 #include "world/systems/selection_system.hpp"
 #include <raylib.h>
 
-enum class ProgramMode {
+enum class ProgramMode
+{
   MainMenu,
   ModalMenu,
   Campaign,
   Editor,
 };
 
-class IGame {
+class IGame
+{
   public:
-  static IGame *Game() {
+  static IGame *Game()
+  {
     static IGame instance;
     return &instance;
   }
 
-  void MainLoop() {
+  void MainLoop()
+  {
     RegisterEventListeners();
 
-    while ( !WindowShouldClose() && ShouldRun() ) {
+    while ( !WindowShouldClose() && ShouldRun() )
+    {
 
       HandleMessages();
 
@@ -66,14 +71,16 @@ class IGame {
   IGame() {}
   ~IGame() {}
 
-  bool ShouldRun() {
+  bool ShouldRun()
+  {
     return !_hit_exit;
   }
 
   /*=============================================================
                         Begin: Singleplayer
   =============================================================*/
-  void StartCampaign( std::string player_faction ) {
+  void StartCampaign( std::string player_faction )
+  {
     printf( "pending new!!\n" );
 
     DeleteCampaignInstance();
@@ -98,7 +105,8 @@ class IGame {
   /*=============================================================
                         Begin: Multiplayer
   =============================================================*/
-  void HostMultiplayerCampaign() {
+  void HostMultiplayerCampaign()
+  {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
@@ -107,27 +115,33 @@ class IGame {
 
   void StartMultiplayerCampaign() {}
 
-  void LookForMultiplayerCampaign() {
+  void LookForMultiplayerCampaign()
+  {
     _single_player = false;
     Network::is_host = false;
     Network::Client()->Init();
     UI::System::SwitchPage( UI::LobbyBrowser );
   }
 
-  void JoinMultiplayerLobby( CSteamID lobby_id ) {
-    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
+  void JoinMultiplayerLobby( CSteamID lobby_id )
+  {
+    if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
+    {
       printf( "Sending joined lobby event!\n" );
       UI::System::SwitchPage( UI::Lobby );
     }
   }
 
-  void HandleMessages() {
-    if ( Network::is_host ) {
+  void HandleMessages()
+  {
+    if ( Network::is_host )
+    {
       // Network::Host()->SendPing();
       Network::Host()->CheckForMessages();
       Network::Host()->EvaluateMessages();
     }
-    else {
+    else
+    {
       Network::Client()->CheckForMessage();
     }
   }
@@ -138,7 +152,8 @@ class IGame {
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadGame() {
+  void LoadGame()
+  {
     if ( _campaign )
       delete _campaign;
     _campaign = new Campaign( "output.dat" );
@@ -147,26 +162,32 @@ class IGame {
     Game()->_mode = ProgramMode::Campaign;
   }
 
-  void SaveGame() {
+  void SaveGame()
+  {
     SaveSystem::Save();
   }
 
-  void ExitGame() {
+  void ExitGame()
+  {
     _hit_exit = true;
   }
 
-  void ToggleModalMenu() {
-    if ( _mode == ProgramMode::Campaign ) {
+  void ToggleModalMenu()
+  {
+    if ( _mode == ProgramMode::Campaign )
+    {
       _mode = ProgramMode::ModalMenu;
       UI::System::SwitchPage( UI::ModalMenu );
     }
-    else if ( _mode == ProgramMode::ModalMenu ) {
+    else if ( _mode == ProgramMode::ModalMenu )
+    {
       _mode = ProgramMode::Campaign;
       UI::System::EnableCampaignUI();
     }
   }
 
-  void ReturnToMain() {
+  void ReturnToMain()
+  {
     UI::System::SwitchPage( UI::MainMenu );
     _mode = ProgramMode::MainMenu;
   }
@@ -175,13 +196,16 @@ class IGame {
   =============================================================*/
 
 
-  void DeleteCampaignInstance() {
+  void DeleteCampaignInstance()
+  {
     if ( _campaign )
       delete _campaign;
   }
 
-  void RunFrame() {
-    switch ( _mode ) {
+  void RunFrame()
+  {
+    switch ( _mode )
+    {
       case ProgramMode::MainMenu:
         RunMainMenu( _dt );
         break;
@@ -190,25 +214,30 @@ class IGame {
         RunModalMenu();
         break;
 
-      case ProgramMode::Campaign: {
-        if ( _single_player ) {
+      case ProgramMode::Campaign:
+      {
+        if ( _single_player )
+        {
           // Singleplayer Campaign
           if ( _campaign )
             _campaign->Run( _dt, _lag, _oncelag );
         }
-        else {
+        else
+        {
           // Multiplayer Campaign
           if ( _campaign )
             _campaign->Run( _dt, _lag, _oncelag );
         }
-      } break;
+      }
+      break;
 
       case ProgramMode::Editor:
         break;
     }
   }
 
-  void RunMainMenu( f32 dt ) {
+  void RunMainMenu( f32 dt )
+  {
     UI::System::UpdateOnFrame();
 
     CameraUpdate( Global::state.camera, dt );
@@ -221,7 +250,8 @@ class IGame {
     EndDrawing();
   }
 
-  void RunModalMenu() {
+  void RunModalMenu()
+  {
     Input::CheckMenuToggle();
 
     UI::System::UpdateOnFrame();
@@ -238,7 +268,8 @@ class IGame {
   }
 
 
-  void ExitGameLoopCleanup() {
+  void ExitGameLoopCleanup()
+  {
     if ( Network::is_host )
       Network::Host()->Delete();
     else
@@ -252,30 +283,38 @@ class IGame {
   void RegisterEventListeners();
 };
 
-inline void IGame::RegisterEventListeners() {
+inline void IGame::RegisterEventListeners()
+{
   Events::event_emitter.on<Events::EventUnion>(
     [&]( const Events::EventUnion &event, Events::EventEmitter &emitter ) {
-      switch ( event.id ) {
+      switch ( event.id )
+      {
         /// BASIC
         // MainMenu
-        case Events::ID::MainMenuHostGame: {
+        case Events::ID::MainMenuHostGame:
+        {
           HostMultiplayerCampaign();
           Messages::dispatcher.enqueue( Messages::UpdateText{
             Messages::ID::HostLobby,
             "Start Game",
           } );
-        } break;
-        case Events::ID::MainMenuJoinGame: {
+        }
+        break;
+        case Events::ID::MainMenuJoinGame:
+        {
           LookForMultiplayerCampaign();
           Messages::dispatcher.enqueue( Messages::UpdateText{
             Messages::ID::JoinLobby,
             "Ready Up",
           } );
-        } break;
-        case Events::ID::MainMenuStartGame: {
+        }
+        break;
+        case Events::ID::MainMenuStartGame:
+        {
           _single_player = true;
           UI::System::SwitchPage( UI::FactionSelectMenu );
-        } break;
+        }
+        break;
         case Events::ID::MainMenuLoadGame:
           LoadGame();
           break;
@@ -311,13 +350,15 @@ inline void IGame::RegisterEventListeners() {
           StartCampaign( faction );
           break;
         case Events::ID::JoinLobby:
-          if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
+          if ( event.msg == "lobby_entry_Conquistador's lobby" )
+          {
             JoinMultiplayerLobby( event.lobby_id );
           }
           break;
 
         /// STRING
-        case Events::ID::FactionSelected: {
+        case Events::ID::FactionSelected:
+        {
           printf(
             "In listener, %s %s\n",
             Events::IDString[(u32) Events::ID::FactionSelected],
@@ -353,42 +394,17 @@ inline void IGame::RegisterEventListeners() {
             }(),
           } );
 
-          UI::System::SwitchPage( UI::SinglePlayerLobby );
 
-        } break;
-        case Events::ID::MPFactionSelected: {
-          faction = event.msg;
-
-          Messages::dispatcher.enqueue( Messages::UpdateText{
-            Messages::ID::FactionSelected,
-            faction,
-          } );
-
-          Messages::dispatcher.enqueue( Messages::UpdateBackground{
-            Messages::ID::FactionSelected,
-            // TODO replace with json stuff
-            [&]() -> Color {
-              if ( faction == "romans" )
-                return RED;
-              if ( faction == "greeks" )
-                return BLUE;
-              if ( faction == "celts" )
-                return GREEN;
-              if ( faction == "punics" )
-                return PURPLE;
-              if ( faction == "germans" )
-                return GRAY;
-              if ( faction == "scythians" )
-                return PINK;
-              if ( faction == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
-
-          UI::System::SwitchPage( UI::Lobby );
-        } break;
+          if ( _single_player )
+          {
+            UI::System::SwitchPage( UI::SinglePlayerLobby );
+          }
+          else
+          {
+            UI::System::SwitchPage( UI::Lobby );
+          }
+        }
+        break;
 
         default:
           printf( "Error, unregistered UI event fired\n" );
@@ -416,15 +432,9 @@ inline void IGame::RegisterEventListeners() {
   //     }
   //   }
   // );
-
-  // Events::event_emitter.on<Events::JoinLobby>(
-  //   [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
-  //     printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
-
-  //   }
-  // );
 }
 
-inline IGame *Game() {
+inline IGame *Game()
+{
   return IGame::Game();
 }

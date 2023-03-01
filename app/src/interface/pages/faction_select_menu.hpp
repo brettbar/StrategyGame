@@ -7,9 +7,11 @@
 
 #include "../ui_system.hpp"
 
-namespace UI {
+namespace UI
+{
 
-  inline std::vector<ptr<Element>> CreateFactionButtons() {
+  inline std::vector<ptr<Element>> CreateFactionButtons()
+  {
     // TODO replace with read in from json
     std::map<std::string, Color> factions = {
       { "romans", RED },
@@ -41,7 +43,8 @@ namespace UI {
       } ),
     };
 
-    for ( const auto &[name, color]: factions ) {
+    for ( const auto &[name, color]: factions )
+    {
       std::string faction = name;
       std::string id = "faction_select_" + faction;
 
@@ -58,7 +61,8 @@ namespace UI {
     return text_buttons;
   }
 
-  inline std::vector<ptr<Element>> CreateFactionSelectMenuUI() {
+  inline std::vector<ptr<Element>> CreateFactionSelectMenuUI()
+  {
     return {
       Create<Panel>( {
         "facton_select_menu",

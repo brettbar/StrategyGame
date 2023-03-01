@@ -71,26 +71,33 @@ public:
 
     void CheckForMessage()
     {
-      if ( _server_conn != k_HSteamNetConnection_Invalid )
+      if ( _server_conn == k_HSteamNetConnection_Invalid )
+        return;
+
+      SteamNetworkingMessage_t *msg;
+      int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
+        _server_conn, &msg, 1
+      );
+
+      assert( r == 0 || r == 1 );
+
+      if ( r == 1 )
       {
-        SteamNetworkingMessage_t *msg;
-        int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
-          _server_conn, &msg, 1
-        );
+        char *raw_message = (char *) msg->GetData();
+        nlohmann::json message = nlohmann::json::parse( raw_message );
+        MessageID message_id = message["message_id"];
+        auto body = message["body"];
 
-        assert( r == 0 || r == 1 );
-
-        if ( r == 1 )
+        switch ( message_id )
         {
-          char *message = (char *) msg->GetData();
-
-          nlohmann::json body = nlohmann::json::parse( message );
-
-          if ( body["type"] == "player_connected" )
+          case MessageID::Ping:
+            break;
+          case MessageID::PlayerConnected:
           {
-            auto player_id = body["data"]["player_id"];
+            auto data = body["data"];
+            auto player_id = data["player_id"];
             // auto name = body["data"]["steam_name"];
-            u64 steam_user_id_u64 = body["data"]["steam_user_id"];
+            u64 steam_user_id_u64 = data["steam_user_id"];
 
             if ( !_peers.contains( player_id ) )
             {
@@ -103,10 +110,16 @@ public:
               };
             }
           }
-
-          printf( "Received message: '%s'\n", message );
-          msg->Release();
+          break;
+          case MessageID::PlayerDisconnected:
+            break;
+          default:
+            printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
+            break;
         }
+
+        printf( "Received message: '%s'\n", raw_message );
+        msg->Release();
       }
     }
 
@@ -237,11 +250,13 @@ public:
   {
     switch ( cb->m_info.m_eState )
     {
-      case k_ESteamNetworkingConnectionState_Connecting: {
+      case k_ESteamNetworkingConnectionState_Connecting:
+      {
         printf( "IClient >> Connecting?...\n" );
       }
       break;
-      case k_ESteamNetworkingConnectionState_Connected: {
+      case k_ESteamNetworkingConnectionState_Connected:
+      {
         printf( "IClient >> Connected!...\n" );
         break;
       }
@@ -285,7 +300,10 @@ public:
       return;
     }
 
-    SendMessageOnConnection( _server_conn, "IClient >> Hello from IClient!!!" );
+    SendMessageOnConnection(
+      _server_conn,
+      Message{ MessageID::InitiateContact, "IClient >> Hello from IClient!!!" }
+    );
 
     // TODO make this only close when the game is started
     // SteamMatchmaking()->LeaveLobby( _lobby_id );

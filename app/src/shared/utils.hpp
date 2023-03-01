@@ -8,7 +8,8 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 );
 inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( UVector2 );
 
-inline void CameraUpdate( Camera2D &camera, f32 dt ) {
+inline void CameraUpdate( Camera2D &camera, f32 dt )
+{
   f32 cameraSpeed = 500.0f;
   // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
   // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
@@ -41,20 +42,24 @@ inline void CameraUpdate( Camera2D &camera, f32 dt ) {
   camera.offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 };
 }
 
-inline void PrintVec2( Vector2 vec ) {
+inline void PrintVec2( Vector2 vec )
+{
   printf( "(%f, %f)\n", vec.x, vec.y );
 }
-inline u32 RollN( u32 n ) {
+inline u32 RollN( u32 n )
+{
   return rand() % n + 1;
 }
 
-inline void PrintRect( Rectangle rect ) {
+inline void PrintRect( Rectangle rect )
+{
   printf(
     "(x:%f, y:%f, w:%f, h:%f)\n", rect.x, rect.y, rect.width, rect.height
   );
 }
 
-inline i32 DetermineTileIdFromPosition( Vector2 pos ) {
+inline i32 DetermineTileIdFromPosition( Vector2 pos )
+{
   std::unique_ptr<Vector2> target = DetermineTilePos( pos );
   if ( target == nullptr )
 
@@ -63,17 +68,20 @@ inline i32 DetermineTileIdFromPosition( Vector2 pos ) {
   i32 row = target->y / 48.0;
   i32 column;
 
-  if ( row % 2 == 1 ) {
+  if ( row % 2 == 1 )
+  {
     column = ( target->x - 32.0 ) / 64.0;
   }
-  else {
+  else
+  {
     column = target->x / 64.0;
   }
 
   return column + row * MAP_WIDTH;
 }
 
-inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
+inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos )
+{
   i32 x = inputPos.x;
   i32 y = inputPos.y;
   i32 gridHeight = 48;
@@ -105,13 +113,15 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   f32 m = c / halfWidth;
 
   // Work out if the point is above either of the hexagon's top edges
-  if ( relY < ( -m * relX ) + c ) {// LEFT edge
+  if ( relY < ( -m * relX ) + c )
+  {// LEFT edge
     row--;
     if ( !rowIsOdd )
 
       column--;
   }
-  else if ( relY < ( m * relX ) - c ) {// RIGHT edge
+  else if ( relY < ( m * relX ) - c )
+  {// RIGHT edge
     row--;
     if ( rowIsOdd )
 
@@ -121,13 +131,15 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 inputPos ) {
   f32 tileOrigX = ( column * 64.0 ) + 32.0;
   f32 tileOrigY = ( row * 48.0 ) + 32.0;
 
-  if ( row % 2 == 1 ) {
+  if ( row % 2 == 1 )
+  {
     tileOrigX += 32.0;
   }
   return std::make_unique<Vector2>( Vector2{ tileOrigX, tileOrigY } );
 }
 
-inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
+inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos )
+{
   i32 x = inputPos.x;
   i32 y = inputPos.y;
   i32 gridHeight = 48;
@@ -160,13 +172,15 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
   f32 m = c / halfWidth;
 
   // Work out if the point is above either of the hexagon's top edges
-  if ( relY < ( -m * relX ) + c ) {// LEFT edge
+  if ( relY < ( -m * relX ) + c )
+  {// LEFT edge
     row--;
     if ( !rowIsOdd )
 
       column--;
   }
-  else if ( relY < ( m * relX ) - c ) {// RIGHT edge
+  else if ( relY < ( m * relX ) - c )
+  {// RIGHT edge
     row--;
     if ( rowIsOdd )
 
@@ -204,7 +218,8 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos ) {
 // }
 
 
-inline static std::string EntityIdToString( entt::entity entity ) {
+inline static std::string EntityIdToString( entt::entity entity )
+{
   if ( entity == entt::null )
     return "-1";
   else

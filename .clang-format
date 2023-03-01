@@ -19,8 +19,9 @@ AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
-# BraceWrapping:
-#   AfterCaseLabel: false
+BraceWrapping:
+  # AfterCaseLabel: false
+  AfterCaseLabel: true
 #   AfterClass: false
 #   AfterControlStatement: Never
 #   AfterEnum: false

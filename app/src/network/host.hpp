@@ -19,15 +19,6 @@ namespace Network
 
   namespace
   {
-    enum class MessageType
-    {
-      Lobby,
-    };
-    struct Message
-    {
-      MessageType type;
-      std::string content;
-    };
     struct MessageQueue : entt::dispatcher
     {
       void Enqueue( const Message &msg )
@@ -110,17 +101,8 @@ private:
       assert( _socket != k_HSteamListenSocket_Invalid );
     }
 
-    // void SendPing() {
-    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
-    //     if ( !_clients[i].active )
-    //       continue;
 
-    //     const auto now = std::chrono::system_clock::now();
-    //     SendMessageOnConnection( _clients[i].conn, "ping" );
-    //   }
-    // }
-
-    void SendMessageToAllClients( const char *msg )
+    void SendMessageToAllClients( Message message )
     {
 
       // We start at 1 since host is always i=0
@@ -129,7 +111,7 @@ private:
         if ( !_clients[i].peer_data.active )
           continue;
 
-        SendMessageOnConnection( _clients[i].conn, msg );
+        SendMessageOnConnection( _clients[i].conn, message );
       }
     }
 
@@ -157,35 +139,48 @@ public:
       Network::is_host = true;
     }
 
+    // void SendPing()
+    // {
+    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+    //   {
+    //     if ( !_clients[i].peer_data.active )
+    //       continue;
+
+    //     // const auto now = std::chrono::system_clock::now();
+    //     const int random = rand();
+    //     SendMessageOnConnection(
+    //       _clients[i].conn,
+    //       MessageID::Ping,
+    //       ( "ping: " + std::to_string( random ) ).c_str()
+    //     );
+    //   }
+    // }
+
     void CheckForMessages()
     {
       for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i )
       {
-        if ( !_clients[i].peer_data.active )
+        if ( !_clients[i].peer_data.active || _clients[i].conn == k_HSteamNetConnection_Invalid )
           continue;
 
-        CheckForMessage( _clients[i].conn );
-      }
-    }
-
-    void CheckForMessage( HSteamNetConnection conn )
-    {
-      if ( conn != k_HSteamNetConnection_Invalid )
-      {
         SteamNetworkingMessage_t *msg;
         int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
-          conn, &msg, 1
+          _clients[i].conn, &msg, 1
         );
 
         assert( r == 0 || r == 1 );
 
         if ( r == 1 )
         {
-          printf( "Received message: '%s'\n", (char *) msg->GetData() );
+          // printf( "Received message: '%s'\n", (char *) msg->GetData() );
+          char *raw_message = (char *) msg->GetData();
+          nlohmann::json message = nlohmann::json::parse( raw_message );
+          MessageID message_id = message["message_id"];
+
 
           msg_queue.Enqueue( Message{
-            MessageType::Lobby,
-            std::string( (char *) msg->GetData() ),
+            message_id,
+            std::string( raw_message ),
           } );
 
           msg->Release();
@@ -200,13 +195,19 @@ public:
 
     void ProcessMessage( const Message &msg )
     {
-      switch ( msg.type )
+      switch ( msg.message_id )
       {
-        case MessageType::Lobby: {
-          printf( "Processed message: '%s'\n", msg.content.c_str() );
-
-          return;
-        }
+        case InitiateContact:
+          break;
+        case Ping:
+          break;
+        case PlayerConnected:
+          break;
+        case PlayerDisconnected:
+          break;
+        default:
+          printf( "Error :: invalid message received by host\n" );
+          break;
       }
     }
 
@@ -223,15 +224,6 @@ public:
       {
         if ( _clients[i].peer_data.active )
         {
-
-          // if ( i > 0 ) {
-          // std::cout << "player_id :: " << _clients[i].player_id << std::endl;
-          // }
-
-          // std::string text =
-          //   std::string( _clients[i].player_id ) + ": " +
-          //   SteamFriends()->GetFriendPersonaName( _clients[i].steam_user_id );
-
           clients.push_back( _clients[i].peer_data );
         }
       }
@@ -239,11 +231,6 @@ public:
       return clients;
     }
   };
-
-  inline IHost *Host()
-  {
-    return IHost::Host();
-  }
 
   inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure )
   {
@@ -357,21 +344,11 @@ public:
           return;
         }
 
-        // printf( "Annoying number: %s\n", std::to_string( i ).c_str() );
-
-        // char player_id[128];
-        // sprintf( player_id, "player_%d", i );
-        // printf( "buf result: %s\n", player_id );
-
         _clients[i].peer_data.player_id = "player_" + std::to_string( i );
         _clients[i].peer_data.steam_user_id =
           info.m_identityRemote.GetSteamID();
         _clients[i].peer_data.active = true;
         _clients[i].conn = cb->m_hConn;
-
-        // SendMessageOnConnection(
-        //   cb->m_hConn, "IHost >> Hey Client, I'll let you in"
-        // );
 
         // Tell the new client about all the current clients
         for ( auto client: _clients )
@@ -379,11 +356,8 @@ public:
           if ( !client.peer_data.active )
             continue;
 
-
-          nlohmann::json host_payload = {
-            { "type", "player_connected" },
-          };
-          host_payload["data"] = {
+          nlohmann::json body = {};
+          body["data"] = {
             { "is_host", ( client.peer_data.player_id == "player_0" ) },
             { "player_id", client.peer_data.player_id },
             {
@@ -399,16 +373,14 @@ public:
           };
 
           SendMessageOnConnection(
-            _clients[i].conn, host_payload.dump().c_str()
+            _clients[i].conn, Message{ MessageID::PlayerConnected, body }
           );
         }
 
 
         // Tell all the current clients about the new client
-        nlohmann::json payload = {
-          { "type", "player_connected" },
-        };
-        payload["data"] = {
+        nlohmann::json body = {};
+        body["data"] = {
           { "is_host", false },
           { "player_id", _clients[i].peer_data.player_id },
           {
@@ -429,7 +401,9 @@ public:
           if ( !_clients[i].peer_data.active || i == j )// we don't need to tell ourselves
             continue;
 
-          SendMessageOnConnection( _clients[j].conn, payload.dump().c_str() );
+          SendMessageOnConnection(
+            _clients[j].conn, Message{ MessageID::PlayerConnected, body }
+          );
         }
 
 
@@ -475,5 +449,11 @@ public:
       }
     }
   }
+
+  inline IHost *Host()
+  {
+    return IHost::Host();
+  }
+
 
 };// namespace Network

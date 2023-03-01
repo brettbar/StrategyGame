@@ -31,6 +31,21 @@ namespace Network
 
   inline CSteamID lobby_id;
 
+  enum MessageID : u32
+  {
+    InitiateContact,
+    Ping,
+    PlayerConnected,
+    PlayerDisconnected,
+
+    NumMessageIDs,
+  };
+  struct Message
+  {
+    MessageID message_id;
+    nlohmann::json body;
+  };
+
   struct PeerData
   {
     std::string player_id;
@@ -79,21 +94,33 @@ namespace Network
 
   inline void SendMessageOnConnection(
     HSteamNetConnection conn,
-    const char *msg
+    Message message
+    // const char *msg
   )
   {
-    printf( "Sending msg '%s'\n", msg );
+    // printf( "Sending msg '%s'\n", payload );
+
+    nlohmann::json message_payload = {
+      {
+        "message_id",
+        message.message_id,
+      },
+      { "body", message.body },
+    };
+
 
     EResult r = SteamNetworkingSockets()->SendMessageToConnection(
       conn,
-      msg,
-      (int) strlen( msg ) + 1,
+      message_payload.dump().c_str(),
+      (int) strlen( message_payload.dump().c_str() ) + 1,
       k_nSteamNetworkingSend_Reliable,
       nullptr
     );
 
     // printf( "Message Result %d\n", r );
 
+    // TODO this really should be enabled, it broke linux build
+    // for some reason
     // assert( r == k_EResultOK );
   }
 

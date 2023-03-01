@@ -4,9 +4,11 @@
 #include <steamclientpublic.h>
 
 // Used for sending data from the Game State to the UI
-namespace Messages {
+namespace Messages
+{
 
-  enum class ID {
+  enum class ID
+  {
     FactionSelected,
     SettlementContext,
     ActorContext,
@@ -14,35 +16,44 @@ namespace Messages {
     HostLobby,
   };
 
-  struct UpdateEnabled {
+  struct UpdateEnabled
+  {
     ID message_id;
     bool on;
   };
 
-  struct UpdateText {
+  struct UpdateText
+  {
     ID message_id;
     std::string updated_text;
 
     UpdateText( ID message_id, std::string updated_text )
-        : message_id( message_id ), updated_text( updated_text ) {}
+        : message_id( message_id ), updated_text( updated_text )
+    {
+    }
   };
 
-  struct UpdateBackground {
+  struct UpdateBackground
+  {
     ID message_id;
     Color updated_background;
 
     UpdateBackground( ID message_id, Color updated_background )
-        : message_id( message_id ), updated_background( updated_background ) {}
+        : message_id( message_id ), updated_background( updated_background )
+    {
+    }
   };
 
   inline entt::dispatcher dispatcher{};
 };// namespace Messages
 
 // Used for sending data from the UI to the Game State
-namespace Events {
+namespace Events
+{
 
   // TODO replace with ID + string?
-  enum ID : u32 {
+  enum ID : u32
+  {
     // BASIC
     // MainMenu
     MainMenuHostGame,
@@ -69,7 +80,6 @@ namespace Events {
 
     // STRING
     FactionSelected,
-    MPFactionSelected,
 
 
     // Context
@@ -104,13 +114,13 @@ namespace Events {
     "JoinLobby",
 
     "FactionSelected",
-    "MPFactionSelected",
 
     "ActorSpawnSettlment",
   };
 
 
-  struct EventUnion {
+  struct EventUnion
+  {
     ID id;
 
     std::string msg;
@@ -119,10 +129,14 @@ namespace Events {
     EventUnion( ID id ) : id( id ) {}
     EventUnion( ID id, std::string msg ) : id( id ), msg( msg ) {}
     EventUnion( ID id, std::string msg, CSteamID lobby_id )
-        : id( id ), msg( msg ), lobby_id( lobby_id ) {}
+        : id( id ), msg( msg ), lobby_id( lobby_id )
+    {
+    }
   };
 
-  struct EventEmitter : entt::emitter<EventEmitter> {};
+  struct EventEmitter : entt::emitter<EventEmitter>
+  {
+  };
 
   inline EventEmitter event_emitter;
 
