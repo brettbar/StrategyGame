@@ -19,7 +19,8 @@
 #include <string>
 #include <thread>
 
-namespace Network {
+namespace Network
+{
 
   inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
@@ -30,18 +31,25 @@ namespace Network {
 
   inline CSteamID lobby_id;
 
-  struct ClientConnectionData {
+  struct PeerData
+  {
     std::string player_id;
-
+    std::string faction = "";
     bool active;
     bool readied_up;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
+  };
+
+  struct ClientConnectionData
+  {
+    PeerData peer_data;
     HSteamNetConnection conn;
 
-    ClientConnectionData() {
-      player_id = "";
-      active = false;
+    ClientConnectionData()
+    {
+      peer_data.player_id = "";
+      peer_data.active = false;
       conn = 0;
     }
   };
@@ -49,11 +57,13 @@ namespace Network {
   inline void DebugOutput(
     ESteamNetworkingSocketsDebugOutputType eType,
     const char *pszMsg
-  ) {
+  )
+  {
     printf( "%s\n", pszMsg );
   }
 
-  inline void Setup() {
+  inline void Setup()
+  {
     SteamNetworkingUtils()->SetDebugOutputFunction(
       k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
     );
@@ -67,8 +77,11 @@ namespace Network {
     // );
   }
 
-  inline void
-  SendMessageOnConnection( HSteamNetConnection conn, const char *msg ) {
+  inline void SendMessageOnConnection(
+    HSteamNetConnection conn,
+    const char *msg
+  )
+  {
     printf( "Sending msg '%s'\n", msg );
 
     EResult r = SteamNetworkingSockets()->SendMessageToConnection(

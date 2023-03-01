@@ -16,6 +16,7 @@ using ECS = entt::registry;
 using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
+using u64 = unsigned long long;
 // using str = std::string;
 using hstr = entt::hashed_string;
 using vec2 = Vector2;
@@ -28,12 +29,14 @@ template<typename... T>
 using View =
   entt::basic_view<entt::get_t<entt::storage_for_t<T>...>, entt::exclude_t<>>;
 
-struct IVector2 {
+struct IVector2
+{
   i32 x;
   i32 y;
 };
 
-struct UVector2 {
+struct UVector2
+{
   u32 x;
   u32 y;
 };

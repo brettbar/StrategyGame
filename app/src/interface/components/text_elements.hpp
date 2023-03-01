@@ -218,8 +218,8 @@ namespace UI {
       i32 font_size,
       Color background,
       Color text_color,
-      std::vector<Messages::ID> subscribed_messages,
-      Events::EventUnion event
+      Events::EventUnion event,
+      std::vector<Messages::ID> subscribed_messages
     )
         : TextLabel(
             id,

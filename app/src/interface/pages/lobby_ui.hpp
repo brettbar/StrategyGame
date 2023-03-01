@@ -11,18 +11,25 @@
 #include "../../network/host.hpp"
 #include "../../network/network.hpp"
 
-namespace UI {
-  inline ptr<Panel>
-  CreateMemberPanel( u32 i, std::string id, std::string member, bool is_host ) {
+namespace UI
+{
+  inline ptr<Panel> CreateMemberPanel(
+    u32 i,
+    std::string id,
+    Network::PeerData member,
+    bool is_host
+  )
+  {
     std::string label = "something wrong";
     Color color = RED;
 
-    if ( is_host ) {
-      label = "Host: " + member;
+    if ( is_host )
+    {
+      label = "Host: " + member.player_id;
       color = ORANGE;
     }
     else
-      label = "Guest: " + member;
+      label = "Guest: " + member.player_id;
 
 
     ptr<Panel> panel = Create<Panel>( {
@@ -39,7 +46,7 @@ namespace UI {
           24,
           color,
           WHITE,
-          Events::EventUnion( Events::ID::MPFactionSelected ),
+          Events::ID::OpenFactionSelectPage,
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {
@@ -57,6 +64,14 @@ namespace UI {
           color,
           WHITE,
         } ),
+        Create<TextLabel>( {
+          id + "_steam_user_name",
+          std::string( SteamFriends()
+                         ->GetFriendPersonaName( member.steam_user_id ) ),
+          24,
+          color,
+          WHITE,
+        } ),
       },
     } );
 
@@ -65,7 +80,8 @@ namespace UI {
     return panel;
   }
 
-  inline ptr<Panel> CreateOpenSlot( u32 i ) {
+  inline ptr<Panel> CreateOpenSlot( u32 i )
+  {
     std::string id = "open_slot_" + std::to_string( i );
 
     ptr<Panel> panel = Create<Panel>( {
@@ -89,10 +105,12 @@ namespace UI {
     return panel;
   }
 
-  inline std::vector<ptr<Element>> CreateOpenSlots( u32 start, u32 end ) {
+  inline std::vector<ptr<Element>> CreateOpenSlots( u32 start, u32 end )
+  {
     std::vector<ptr<Element>> open_slots = {};
 
-    for ( u32 i = start; i < end; i++ ) {
+    for ( u32 i = start; i < end; i++ )
+    {
       open_slots.push_back( CreateOpenSlot( i ) );
     }
 
@@ -100,32 +118,40 @@ namespace UI {
   }
 
 
-  inline std::vector<ptr<Element>> CreateLobbyUI() {
+  inline std::vector<ptr<Element>> CreateLobbyUI()
+  {
 
     // TODO better way of making the id and label
     auto update_children =
       []( std::vector<ptr<Element>> &children, u32 start, u32 end ) {
-        std::vector<std::string> members = {};
+        std::vector<Network::PeerData> members = {};
 
-        if ( Network::is_host ) {
+        if ( Network::is_host )
+        {
           members = Network::Host()->GetConnectedUsers();
         }
-        else {
+        else
+        {
           members = Network::Client()->GetConnectedUsers();
         }
 
-        for ( u32 i = start; i < end; i++ ) {
+        for ( u32 i = start; i < end; i++ )
+        {
           std::string id = "lobby_member_" + std::to_string( i );
 
-          if ( i >= members.size() ) {
+          if ( i >= members.size() )
+          {
             // We know the user is disconnected
-            if ( Manager()->lookup.contains( id ) ) {
+            if ( Manager()->lookup.contains( id ) )
+            {
               RecursiveDelete( Manager()->lookup[id] );
               children[i] = CreateOpenSlot( i );
             }
           }
-          else {
-            if ( !Manager()->lookup.contains( id ) ) {
+          else
+          {
+            if ( !Manager()->lookup.contains( id ) )
+            {
               RecursiveDelete(
                 Manager()->lookup["open_slot_" + std::to_string( i )]
               );
@@ -154,12 +180,11 @@ namespace UI {
         },
         {
           Create<TextLabel>( {
-            "lobby_title", "", 32, GREEN, WHITE
-            // []() -> std::string {
-            //   return SteamMatchmaking()->GetLobbyData(
-            //     Network::lobby_id, "name"
-            //   );
-            // },
+            "lobby_title",
+            SteamMatchmaking()->GetLobbyData( Network::lobby_id, "name" ),
+            32,
+            GREEN,
+            WHITE,
           } ),
           Create<Panel>( {
             "lobby_members_1_4",
@@ -208,8 +233,8 @@ namespace UI {
             32,
             RED,
             WHITE,
-            { Messages::ID::HostLobby, Messages::ID::JoinLobby },
             Events::ID::ReadyUp,
+            { Messages::ID::HostLobby, Messages::ID::JoinLobby },
           } ),
         },
       } ),
