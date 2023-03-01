@@ -144,7 +144,7 @@ namespace UI {
     bool always_clickable = true;
     bool clickable = true;
 
-    std::shared_ptr<Events::Basic> on_click;
+    Events::EventUnion on_click;
 
     void Draw() override {
       if ( !IsEnabled() )
@@ -172,32 +172,33 @@ namespace UI {
     }
 
     void FireEvent() {
-      switch ( on_click->type ) {
-        case Events::Type::Basic: {
-          Events::event_emitter.publish( *on_click );
-        } break;
-        case Events::Type::ButtonClick: {
-          std::shared_ptr<Events::ButtonClick> button_click =
-            std::dynamic_pointer_cast<Events::ButtonClick>( on_click );
+      Events::event_emitter.publish( on_click );
+      // switch ( on_click->type ) {
+      //   case Events::Type::Basic: {
+      //     Events::event_emitter.publish( *on_click );
+      //   } break;
+      //   case Events::Type::ButtonClick: {
+      //     std::shared_ptr<Events::ButtonClick> button_click =
+      //       std::dynamic_pointer_cast<Events::ButtonClick>( on_click );
 
-          if ( button_click ) {
-            printf(
-              "Sending button click! %s %s\n",
-              button_click->origin_id.c_str(),
-              button_click->msg.c_str()
-            );
-            Events::event_emitter.publish( *button_click );
-          }
-        } break;
-        case Events::Type::JoinLobby: {
-          std::shared_ptr<Events::JoinLobby> join_lobby =
-            std::dynamic_pointer_cast<Events::JoinLobby>( on_click );
+      //     if ( button_click ) {
+      //       printf(
+      //         "Sending button click! %s %s\n",
+      //         button_click->origin_id.c_str(),
+      //         button_click->msg.c_str()
+      //       );
+      //       Events::event_emitter.publish( *button_click );
+      //     }
+      //   } break;
+      //   case Events::Type::JoinLobby: {
+      //     std::shared_ptr<Events::JoinLobby> join_lobby =
+      //       std::dynamic_pointer_cast<Events::JoinLobby>( on_click );
 
-          if ( join_lobby ) {
-            Events::event_emitter.publish( *join_lobby );
-          }
-        } break;
-      }
+      //     if ( join_lobby ) {
+      //       Events::event_emitter.publish( *join_lobby );
+      //     }
+      //   } break;
+      // }
     }
 
     TextButton(
@@ -205,36 +206,8 @@ namespace UI {
       std::string text,
       i32 font_size,
       Color background,
-      Color text_color
-    )
-        : TextLabel( id, text, font_size, background, text_color ),
-          on_click( new Events::Basic{ id } ) {}
-
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
       Color text_color,
-      std::vector<Messages::ID> subscribed_messages
-    )
-        : TextLabel(
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            subscribed_messages
-          ),
-          on_click( new Events::Basic{ id } ) {}
-
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      std::shared_ptr<Events::Basic> event
+      Events::EventUnion event
     )
         : TextLabel( id, text, font_size, background, text_color ),
           on_click( event ) {}
@@ -246,7 +219,7 @@ namespace UI {
       Color background,
       Color text_color,
       std::vector<Messages::ID> subscribed_messages,
-      std::shared_ptr<Events::Basic> event
+      Events::EventUnion event
     )
         : TextLabel(
             id,
@@ -257,9 +230,5 @@ namespace UI {
             subscribed_messages
           ),
           on_click( event ) {}
-
-    ~TextButton() {
-      on_click = nullptr;
-    }
   };
 };// namespace UI

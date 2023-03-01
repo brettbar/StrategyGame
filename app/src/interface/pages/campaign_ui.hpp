@@ -172,7 +172,7 @@ namespace UI {
                 26,
                 PURPLE,
                 WHITE,
-                Events::ButtonClick::Create( "actor_spawn_settlement", "test" ),
+                Events::EventUnion( Events::ID::ActorSpawnSettlment ),
               } ),
             },
           } ),

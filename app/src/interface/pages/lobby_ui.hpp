@@ -39,7 +39,7 @@ namespace UI {
           24,
           color,
           WHITE,
-          Events::ButtonClick::Create( "mp_faction_select", id ),
+          Events::EventUnion( Events::ID::MPFactionSelected ),
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {
@@ -200,6 +200,7 @@ namespace UI {
             32,
             RED,
             WHITE,
+            Events::ID::ReturnToMain,
           } ),
           Create<TextButton>( {
             "ready_up",
@@ -208,6 +209,7 @@ namespace UI {
             RED,
             WHITE,
             { Messages::ID::HostLobby, Messages::ID::JoinLobby },
+            Events::ID::ReadyUp,
           } ),
         },
       } ),

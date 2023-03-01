@@ -27,7 +27,9 @@ namespace Input {
 
   inline void CheckMenuToggle() {
     if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      Events::event_emitter.publish( Events::Basic{ "toggle_modal_menu" } );
+      Events::event_emitter.publish( Events::EventUnion{
+        Events::ID::ModalMenuToggle,
+      } );
     }
   }
 

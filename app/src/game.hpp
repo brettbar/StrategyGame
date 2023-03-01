@@ -253,9 +253,10 @@ class IGame {
 };
 
 inline void IGame::RegisterEventListeners() {
-  Events::event_emitter.on<Events::Basic>(
-    [&]( const Events::Basic &event, Events::EventEmitter &emitter ) {
+  Events::event_emitter.on<Events::EventUnion>(
+    [&]( const Events::EventUnion &event, Events::EventEmitter &emitter ) {
       switch ( event.id ) {
+        /// BASIC
         // MainMenu
         case Events::ID::MainMenuHostGame: {
           HostMultiplayerCampaign();
@@ -309,6 +310,82 @@ inline void IGame::RegisterEventListeners() {
         case Events::ID::ReadyUp:
           StartCampaign( faction );
           break;
+
+        /// STRING
+        case Events::ID::FactionSelected: {
+          printf(
+            "In listener, %s %s\n",
+            Events::IDString[(u32) Events::ID::FactionSelected],
+            event.msg.c_str()
+          );
+
+          if ( _single_player ) {
+            faction = event.msg;
+
+            Messages::dispatcher.enqueue( Messages::UpdateText{
+              Messages::ID::FactionSelected,
+              faction,
+            } );
+            Messages::dispatcher.enqueue( Messages::UpdateBackground{
+              Messages::ID::FactionSelected,
+              // TODO replace with json stuff
+              [&]() -> Color {
+                if ( faction == "romans" )
+                  return RED;
+                if ( faction == "greeks" )
+                  return BLUE;
+                if ( faction == "celts" )
+                  return GREEN;
+                if ( faction == "punics" )
+                  return PURPLE;
+                if ( faction == "germans" )
+                  return GRAY;
+                if ( faction == "scythians" )
+                  return PINK;
+                if ( faction == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
+
+            UI::System::SwitchPage( UI::SinglePlayerLobby );
+          }
+          else {
+            faction = event.msg;
+
+            Messages::dispatcher.enqueue( Messages::UpdateText{
+              Messages::ID::FactionSelected,
+              faction,
+            } );
+
+            Messages::dispatcher.enqueue( Messages::UpdateBackground{
+              Messages::ID::FactionSelected,
+              // TODO replace with json stuff
+              [&]() -> Color {
+                if ( faction == "romans" )
+                  return RED;
+                if ( faction == "greeks" )
+                  return BLUE;
+                if ( faction == "celts" )
+                  return GREEN;
+                if ( faction == "punics" )
+                  return PURPLE;
+                if ( faction == "germans" )
+                  return GRAY;
+                if ( faction == "scythians" )
+                  return PINK;
+                if ( faction == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
+
+            UI::System::SwitchPage( UI::Lobby );
+          }
+        } break;
+
         default:
           printf( "Error, unregistered UI event fired\n" );
           break;
@@ -317,104 +394,34 @@ inline void IGame::RegisterEventListeners() {
   );
 
 
-  Events::event_emitter.on<Events::ButtonClick>(
-    [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
-      // else if ( event.origin_id == "faction_select" ) {
-      //   //// StartCampaign( event.msg );
-      // }
-      if ( event.origin_id == "faction_selected" ) {
-        printf(
-          "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
-        );
+  // Events::event_emitter.on<Events::ButtonClick>(
+  //   [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
+  //     // else if ( event.origin_id == "faction_select" ) {
+  //     //   //// StartCampaign( event.msg );
+  //     // }
+  //     if ( event.origin_id == "faction_selected" ) {}
+  //     else if ( event.origin_id == "mp_faction_select" ) {
+  //       UI::System::SwitchPage( UI::FactionSelectMenu );
+  //     }
+  //     else if ( event.origin_id == "actor_spawn_settlement" ) {
+  //       printf(
+  //         "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
+  //       );
 
-        if ( _single_player ) {
-          faction = event.msg;
+  //       SettlementSystem::SpawnSettlement();
+  //     }
+  //   }
+  // );
 
-          Messages::dispatcher.enqueue( Messages::UpdateText{
-            Messages::ID::FactionSelected,
-            faction,
-          } );
-          Messages::dispatcher.enqueue( Messages::UpdateBackground{
-            Messages::ID::FactionSelected,
-            // TODO replace with json stuff
-            [&]() -> Color {
-              if ( faction == "romans" )
-                return RED;
-              if ( faction == "greeks" )
-                return BLUE;
-              if ( faction == "celts" )
-                return GREEN;
-              if ( faction == "punics" )
-                return PURPLE;
-              if ( faction == "germans" )
-                return GRAY;
-              if ( faction == "scythians" )
-                return PINK;
-              if ( faction == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
+  // Events::event_emitter.on<Events::JoinLobby>(
+  //   [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
+  //     printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
 
-          UI::System::SwitchPage( UI::SinglePlayerLobby );
-        }
-        else {
-          faction = event.msg;
-
-          Messages::dispatcher.enqueue( Messages::UpdateText{
-            Messages::ID::FactionSelected,
-            faction,
-          } );
-
-          Messages::dispatcher.enqueue( Messages::UpdateBackground{
-            Messages::ID::FactionSelected,
-            // TODO replace with json stuff
-            [&]() -> Color {
-              if ( faction == "romans" )
-                return RED;
-              if ( faction == "greeks" )
-                return BLUE;
-              if ( faction == "celts" )
-                return GREEN;
-              if ( faction == "punics" )
-                return PURPLE;
-              if ( faction == "germans" )
-                return GRAY;
-              if ( faction == "scythians" )
-                return PINK;
-              if ( faction == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
-
-          UI::System::SwitchPage( UI::Lobby );
-        }
-      }
-      else if ( event.origin_id == "mp_faction_select" ) {
-        UI::System::SwitchPage( UI::FactionSelectMenu );
-      }
-      else if ( event.origin_id == "actor_spawn_settlement" ) {
-        printf(
-          "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
-        );
-
-        SettlementSystem::SpawnSettlement();
-      }
-    }
-  );
-
-  Events::event_emitter.on<Events::JoinLobby>(
-    [&]( const Events::JoinLobby &event, Events::EventEmitter &emitter ) {
-      printf( "JoinLobby!!! origin %s\n", event.origin_id.c_str() );
-
-      if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
-        JoinMultiplayerLobby( event.lobby_id );
-      }
-    }
-  );
+  //     if ( event.origin_id == "lobby_entry_Conquistador's lobby" ) {
+  //       JoinMultiplayerLobby( event.lobby_id );
+  //     }
+  //   }
+  // );
 }
 
 inline IGame *Game() {

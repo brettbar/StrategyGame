@@ -39,6 +39,7 @@ namespace UI {
             32,
             GREEN,
             WHITE,
+            Events::ID::OpenFactionSelectPage,
           } ),
           Create<TextLabel>( {
             "singleplayer_faction_selected",
@@ -54,6 +55,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::SinglePlayerLobbyStartGame,
           } ),
         },
       } ),

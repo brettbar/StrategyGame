@@ -41,19 +41,15 @@ namespace Messages {
 // Used for sending data from the UI to the Game State
 namespace Events {
 
-  enum class Type {
-    Basic,
-    ButtonClick,
-    JoinLobby,
-  };
-
   // TODO replace with ID + string?
-  enum class ID {
+  enum ID : u32 {
+    // BASIC
     // MainMenu
     MainMenuHostGame,
     MainMenuJoinGame,
     MainMenuStartGame,
     MainMenuLoadGame,
+    MainMenuSettings,
     MainMenuExitGame,
     // FactionSelect
     OpenFactionSelectPage,
@@ -61,54 +57,70 @@ namespace Events {
     // ModalMenu
     ModalMenuLoadGame,
     ModalMenuSaveGame,
+    ModalMenuSettings,
+    ModalMenuSaveExitMain,
     ModalMenuExitMain,
     ModalMenuExitGame,
     ModalMenuToggle,
     // ??
     ReturnToMain,
     ReadyUp,
+    JoinLobby,
+
+    // STRING
+    FactionSelected,
+    MPFactionSelected,
+
+
+    // Context
+    ActorSpawnSettlment,
+
+
+    // NOTE: Final Enum used to get count, must be in last place
+    NumberOfEvents
+  };
+  // This needs to be in the same order as the ID enum
+  inline const char *const IDString[ID::NumberOfEvents] = {
+    "MainMenuHostGame",
+    "MainMenuJoinGame",
+    "MainMenuStartGame",
+    "MainMenuLoadGame",
+    "MainMenuSettings",
+    "MainMenuExitGame",
+
+    "OpenFactionSelectPage",
+    "SinglePlayerLobbyStartGame",
+
+    "ModalMenuLoadGame",
+    "ModalMenuSaveGame",
+    "ModalMenuSettings",
+    "ModalMenuSaveExitMain",
+    "ModalMenuExitMain",
+    "ModalMenuExitGame",
+    "ModalMenuToggle",
+
+    "ReturnToMain",
+    "ReadyUp",
+    "JoinLobby",
+
+    "FactionSelected",
+    "MPFactionSelected",
+
+    "ActorSpawnSettlment",
   };
 
-  struct Basic {
-    Type type;
-    // std::string origin_id;
+
+  struct EventUnion {
     ID id;
 
-    virtual ~Basic() {}
-
-    Basic( ID id ) : type( Type::Basic ), id( id ) {}
-
-    Basic( Type type, ID id ) : type( type ), id( id ) {}
-  };
-
-  struct ButtonClick : Basic {
     std::string msg;
-
-    std::shared_ptr<Events::ButtonClick> static Create(
-      std::string id,
-      std::string msg
-    ) {
-      return std::make_shared<Events::ButtonClick>( id, msg );
-    }
-
-    ButtonClick( ID id, std::string msg )
-        : Basic( Type::ButtonClick, id ), msg( msg ) {}
-  };
-
-  struct JoinLobby : Basic {
     CSteamID lobby_id;
 
-    JoinLobby( ID id, CSteamID lobby_id )
-        : Basic( Type::JoinLobby, id ), lobby_id( lobby_id ) {}
-
-    std::shared_ptr<Events::JoinLobby> static Create(
-      std::string id,
-      CSteamID lobby_id
-    ) {
-      return std::make_shared<Events::JoinLobby>( id, lobby_id );
-    }
+    EventUnion( ID id ) : id( id ) {}
+    EventUnion( ID id, std::string msg ) : id( id ), msg( msg ) {}
+    EventUnion( ID id, std::string msg, CSteamID lobby_id )
+        : id( id ), msg( msg ), lobby_id( lobby_id ) {}
   };
-
 
   struct EventEmitter : entt::emitter<EventEmitter> {};
 

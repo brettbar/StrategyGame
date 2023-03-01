@@ -33,6 +33,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuLoadGame,
           } ),
           Create<TextButton>( {
             "modal_menu_save_game",
@@ -40,6 +41,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuSaveGame,
           } ),
           Create<TextButton>( {
             "modal_menu_settings",
@@ -47,6 +49,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuSettings,
           } ),
           Create<TextButton>( {
             "modal_menu_save_exit_main",
@@ -54,6 +57,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuSaveExitMain,
           } ),
           Create<TextButton>( {
             "modal_menu_exit_main",
@@ -61,6 +65,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuExitMain,
           } ),
           Create<TextButton>( {
             "modal_menu_exit_game",
@@ -68,6 +73,7 @@ namespace UI {
             32,
             BLUE,
             WHITE,
+            Events::ID::ModalMenuExitGame,
           } ),
         },
       } ),
