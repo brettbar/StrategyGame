@@ -15,7 +15,7 @@ namespace UI
     Color text_color;
     // TODO(rf) probably can remove all together
     bool dynamic = false;
-    std::vector<Messages::ID> subscribed_messages;
+    std::vector<InterfaceUpdate::ID> subscribed_messages;
 
     void Enable() override
     {
@@ -30,27 +30,27 @@ namespace UI
     }
 
 
-    void ReceiveMessage( const Messages::DataUnion &msg )
+    void ReceiveMessage( const InterfaceUpdate::Data &msg )
     {
-      for ( Messages::ID msg_id: subscribed_messages )
+      for ( InterfaceUpdate::ID msg_id: subscribed_messages )
       {
         if ( msg_id == msg.message_id )
         {
           switch ( msg.type )
           {
-            case Messages::EnabledUpdate:
+            case InterfaceUpdate::EnabledUpdate:
               if ( msg.on )
                 Enable();
               else
                 Disable();
               break;
-            case Messages::TextUpdate:
+            case InterfaceUpdate::TextUpdate:
               text = msg.updated_text;
               break;
-            case Messages::BackgroundUpdate:
+            case InterfaceUpdate::BackgroundUpdate:
               background = msg.updated_background;
               break;
-            case Messages::TargetedTextUpdate:
+            case InterfaceUpdate::TargetedTextUpdate:
               printf( "TextLabel::ReceiveMessage msg type: %d\n", msg.type );
 
               printf(
@@ -62,7 +62,7 @@ namespace UI
                 text = msg.updated_text;
               }
               break;
-            case Messages::TargetedBackgroundUpdate:
+            case InterfaceUpdate::TargetedBackgroundUpdate:
               if ( msg.target == id )
               {
                 background = msg.updated_background;
@@ -93,13 +93,13 @@ namespace UI
 
     void SubscribeToMessages() override
     {
-      Messages::dispatcher.sink<Messages::DataUnion>()
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
         .connect<&TextLabel::ReceiveMessage>( this );
     }
 
     void UnsubscribeFromMessages() override
     {
-      Messages::dispatcher.sink<Messages::DataUnion>()
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
         .disconnect<&TextLabel::ReceiveMessage>( this );
     }
 
@@ -166,7 +166,7 @@ namespace UI
       i32 font_size,
       Color background,
       Color text_color,
-      std::vector<Messages::ID> subscribed_messages
+      std::vector<InterfaceUpdate::ID> subscribed_messages
     )
         : Element( id, background, false, {}, {} ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( true ),

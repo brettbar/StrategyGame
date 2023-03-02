@@ -4,7 +4,7 @@
 #include <steamclientpublic.h>
 
 // Used for sending data from the Game State to the UI
-namespace Messages
+namespace InterfaceUpdate
 {
   enum Type : u32
   {
@@ -27,7 +27,7 @@ namespace Messages
     HostLobby,
   };
 
-  struct DataUnion
+  struct Data
   {
     Type type;
     ID message_id;
@@ -38,44 +38,44 @@ namespace Messages
     std::string target;
 
     // TextUpdate
-    DataUnion( Type type, ID message_id, std::string updated_text )
+    Data( Type type, ID message_id, std::string updated_text )
         : type( type ), message_id( message_id ), updated_text( updated_text )
     {
     }
 
     // TargetedTextUpdate
-    DataUnion(
+    Data(
       Type type,
       ID message_id,
       std::string target,
       std::string updated_text
     )
-        : type( type ), message_id( message_id ), target( target ),
-          updated_text( updated_text )
+        : type( type ), message_id( message_id ), updated_text( updated_text ),
+          target( target )
     {
     }
 
     // EnabledUpdate
-    DataUnion( Type type, ID message_id, bool on )
+    Data( Type type, ID message_id, bool on )
         : type( type ), message_id( message_id ), on( on )
     {
     }
 
     // TargetedBackgroundUpdate
-    DataUnion(
+    Data(
       Type type,
       ID message_id,
       std::string target,
       Color updated_background
     )
-        : type( type ), message_id( message_id ), target( target ),
-          updated_background( updated_background )
+        : type( type ), message_id( message_id ),
+          updated_background( updated_background ), target( target )
     {
     }
 
 
     // BackgroundUpdate
-    DataUnion( Type type, ID message_id, Color updated_background )
+    Data( Type type, ID message_id, Color updated_background )
         : type( type ), message_id( message_id ),
           updated_background( updated_background )
     {
@@ -83,10 +83,10 @@ namespace Messages
   };
 
   inline entt::dispatcher dispatcher{};
-};// namespace Messages
+};// namespace InterfaceUpdate
 
 // Used for sending data from the UI to the Game State
-namespace Events
+namespace InterfaceEvent
 {
   // TODO replace with ID + string?
   enum ID : u32
@@ -156,7 +156,7 @@ namespace Events
   };
 
 
-  struct EventUnion
+  struct Data
   {
     ID id;
 
@@ -165,13 +165,13 @@ namespace Events
 
     std::string source;
 
-    EventUnion( ID id ) : id( id ) {}
-    EventUnion( ID id, std::string msg ) : id( id ), msg( msg ) {}
-    EventUnion( ID id, std::string msg, std::string source )
+    Data( ID id ) : id( id ) {}
+    Data( ID id, std::string msg ) : id( id ), msg( msg ) {}
+    Data( ID id, std::string msg, std::string source )
         : id( id ), msg( msg ), source( source )
     {
     }
-    EventUnion( ID id, std::string msg, CSteamID lobby_id )
+    Data( ID id, std::string msg, CSteamID lobby_id )
         : id( id ), msg( msg ), lobby_id( lobby_id )
     {
     }
@@ -183,4 +183,4 @@ namespace Events
 
   inline EventEmitter event_emitter;
 
-};// namespace Events
+};// namespace InterfaceEvent

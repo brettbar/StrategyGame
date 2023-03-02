@@ -47,14 +47,14 @@ namespace SelectionSystem
       // auto &context = Manager()->lookup.at( "settlement_context_panel" );
       // RecursiveToggle( context, true );
 
-      Messages::dispatcher.enqueue( Messages::DataUnion{
-        Messages::Type::EnabledUpdate,
-        Messages::ID::SettlementContext,
+      InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+        InterfaceUpdate::Type::EnabledUpdate,
+        InterfaceUpdate::ID::SettlementContext,
         true,
       } );
-      Messages::dispatcher.enqueue( Messages::DataUnion{
-        Messages::Type::EnabledUpdate,
-        Messages::ID::ActorContext,
+      InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+        InterfaceUpdate::Type::EnabledUpdate,
+        InterfaceUpdate::ID::ActorContext,
         false,
       } );
 
@@ -73,14 +73,14 @@ namespace SelectionSystem
     }
     else if ( game_reg.all_of<Actor::Component>( entity ) )
     {
-      Messages::dispatcher.enqueue( Messages::DataUnion{
-        Messages::Type::EnabledUpdate,
-        Messages::ID::SettlementContext,
+      InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+        InterfaceUpdate::Type::EnabledUpdate,
+        InterfaceUpdate::ID::SettlementContext,
         false,
       } );
-      Messages::dispatcher.enqueue( Messages::DataUnion{
-        Messages::Type::EnabledUpdate,
-        Messages::ID::ActorContext,
+      InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+        InterfaceUpdate::Type::EnabledUpdate,
+        InterfaceUpdate::ID::ActorContext,
         true,
       } );
     }
@@ -94,14 +94,14 @@ namespace SelectionSystem
     // RecursiveToggle( context_panel, false );
     // Manager()->SetContextNull();
 
-    Messages::dispatcher.enqueue( Messages::DataUnion{
-      Messages::Type::EnabledUpdate,
-      Messages::ID::SettlementContext,
+    InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+      InterfaceUpdate::Type::EnabledUpdate,
+      InterfaceUpdate::ID::SettlementContext,
       false,
     } );
-    Messages::dispatcher.enqueue( Messages::DataUnion{
-      Messages::Type::EnabledUpdate,
-      Messages::ID::ActorContext,
+    InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+      InterfaceUpdate::Type::EnabledUpdate,
+      InterfaceUpdate::ID::ActorContext,
       false,
     } );
   }

@@ -4,6 +4,7 @@
 #include "network/client.hpp"
 #include "network/host.hpp"
 
+#include "network/network.hpp"
 #include "shared/common.hpp"
 #include "shared/save.hpp"
 
@@ -288,69 +289,75 @@ class IGame
 
 inline void IGame::RegisterEventListeners()
 {
-  Events::event_emitter.on<Events::EventUnion>(
-    [&]( const Events::EventUnion &event, Events::EventEmitter &emitter ) {
+  InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
+    [&](
+      const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
+    ) {
       switch ( event.id )
       {
         /// BASIC
         // MainMenu
-        case Events::ID::MainMenuHostGame:
+        case InterfaceEvent::ID::MainMenuHostGame:
         {
           HostMultiplayerCampaign();
-          Messages::dispatcher.enqueue( Messages::DataUnion(
-            Messages::Type::TextUpdate, Messages::ID::HostLobby, "Start Game"
+          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data(
+            InterfaceUpdate::Type::TextUpdate,
+            InterfaceUpdate::ID::HostLobby,
+            "Start Game"
           ) );
         }
         break;
-        case Events::ID::MainMenuJoinGame:
+        case InterfaceEvent::ID::MainMenuJoinGame:
         {
           LookForMultiplayerCampaign();
-          Messages::dispatcher.enqueue( Messages::DataUnion(
-            Messages::Type::TextUpdate, Messages::ID::JoinLobby, "Ready Up"
+          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data(
+            InterfaceUpdate::Type::TextUpdate,
+            InterfaceUpdate::ID::JoinLobby,
+            "Ready Up"
           ) );
         }
         break;
-        case Events::ID::MainMenuStartGame:
+        case InterfaceEvent::ID::MainMenuStartGame:
         {
           _single_player = true;
           UI::System::SwitchPage( UI::FactionSelectMenu );
         }
         break;
-        case Events::ID::MainMenuLoadGame:
+        case InterfaceEvent::ID::MainMenuLoadGame:
           LoadGame();
           break;
-        case Events::ID::MainMenuExitGame:
+        case InterfaceEvent::ID::MainMenuExitGame:
           ExitGame();
           break;
           // FactionSelect
-        case Events::ID::OpenFactionSelectPage:
+        case InterfaceEvent::ID::OpenFactionSelectPage:
           UI::System::SwitchPage( UI::FactionSelectMenu );
           break;
-        case Events::ID::SinglePlayerLobbyStartGame:
+        case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
           StartCampaign( faction );
           break;
-        case Events::ID::ModalMenuLoadGame:
+        case InterfaceEvent::ID::ModalMenuLoadGame:
           LoadGame();
           break;
-        case Events::ID::ModalMenuSaveGame:
+        case InterfaceEvent::ID::ModalMenuSaveGame:
           SaveGame();
           break;
-        case Events::ID::ModalMenuExitMain:
+        case InterfaceEvent::ID::ModalMenuExitMain:
           ReturnToMain();
           break;
-        case Events::ID::ModalMenuExitGame:
+        case InterfaceEvent::ID::ModalMenuExitGame:
           ExitGame();
           break;
-        case Events::ID::ModalMenuToggle:
+        case InterfaceEvent::ID::ModalMenuToggle:
           ToggleModalMenu();
           break;
-        case Events::ID::ReturnToMain:
+        case InterfaceEvent::ID::ReturnToMain:
           ReturnToMain();
           break;
-        case Events::ID::ReadyUp:
+        case InterfaceEvent::ID::ReadyUp:
           StartCampaign( faction );
           break;
-        case Events::ID::JoinLobby:
+        case InterfaceEvent::ID::JoinLobby:
           if ( event.msg == "lobby_entry_Conquistador's lobby" )
           {
             JoinMultiplayerLobby( event.lobby_id );
@@ -358,11 +365,11 @@ inline void IGame::RegisterEventListeners()
           break;
 
         /// STRING
-        case Events::ID::FactionSelected:
+        case InterfaceEvent::ID::FactionSelected:
         {
           printf(
             "In listener, %s %s\n",
-            Events::IDString[(u32) Events::ID::FactionSelected],
+            InterfaceEvent::IDString[(u32) InterfaceEvent::ID::FactionSelected],
             event.msg.c_str()
           );
 
@@ -371,14 +378,14 @@ inline void IGame::RegisterEventListeners()
 
           if ( _single_player )
           {
-            Messages::dispatcher.enqueue( Messages::DataUnion{
-              Messages::Type::TextUpdate,
-              Messages::ID::FactionSelected,
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::TextUpdate,
+              InterfaceUpdate::ID::FactionSelected,
               faction,
             } );
-            Messages::dispatcher.enqueue( Messages::DataUnion{
-              Messages::Type::BackgroundUpdate,
-              Messages::ID::FactionSelected,
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::BackgroundUpdate,
+              InterfaceUpdate::ID::FactionSelected,
               // TODO replace with json stuff
               [&]() -> Color {
                 if ( faction == "romans" )
@@ -403,15 +410,37 @@ inline void IGame::RegisterEventListeners()
           }
           else
           {
-            Messages::dispatcher.enqueue( Messages::DataUnion{
-              Messages::Type::TargetedTextUpdate,
-              Messages::ID::FactionSelected,
+            if ( Network::is_host )
+            {
+
+              Network::Host()->SendMessageToAllClients( Network::Message{
+                Network::MessageID::PlayerFactionSelect,
+                nlohmann::json{
+                  { "player_id", player_id },
+                  { "faction", faction },
+                },
+              } );
+            }
+            else
+            {
+              Network::Client()->SendMessageToHost( Network::Message{
+                Network::MessageID::PlayerFactionSelect,
+                nlohmann::json{
+                  { "player_id", player_id },
+                  { "faction", faction },
+                },
+              } );
+            }
+
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::TargetedTextUpdate,
+              InterfaceUpdate::ID::FactionSelected,
               player_id + "_select_faction",
               faction,
             } );
-            Messages::dispatcher.enqueue( Messages::DataUnion{
-              Messages::Type::TargetedBackgroundUpdate,
-              Messages::ID::FactionSelected,
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::TargetedBackgroundUpdate,
+              InterfaceUpdate::ID::FactionSelected,
               player_id + "_select_faction",
               // TODO replace with json stuff
               [&]() -> Color {

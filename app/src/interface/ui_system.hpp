@@ -9,16 +9,19 @@
 #include "pages/singleplayer_lobby.hpp"
 #include "ui_manager.hpp"
 
-namespace UI {
+namespace UI
+{
 
-  namespace System {
+  namespace System
+  {
 
     void EnableContent();
     void DisableCurrentContent();
 
     void Draw();
 
-    inline void Init() {
+    inline void Init()
+    {
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
@@ -32,34 +35,41 @@ namespace UI {
       EnableContent();
     }
 
-    inline void SwitchPage( PageType page ) {
+    inline void SwitchPage( PageType page )
+    {
       DisableCurrentContent();
       Manager()->SetScene( page );
       EnableContent();
     }
 
-    inline void EnableCampaignUI() {
+    inline void EnableCampaignUI()
+    {
       DisableCurrentContent();
       Manager()->SetScene( Campaign );
     }
 
-    inline void EnableContent() {
-      for ( ptr<Element> base: Manager()->ActivePage() ) {
+    inline void EnableContent()
+    {
+      for ( ptr<Element> base: Manager()->ActivePage() )
+      {
         // RecursiveToggle( base, true );
         base->Enable();
       }
     }
 
-    inline void DisableCurrentContent() {
+    inline void DisableCurrentContent()
+    {
       Manager()->SetContextNull();
 
-      for ( ptr<Element> base: Manager()->ActivePage() ) {
+      for ( ptr<Element> base: Manager()->ActivePage() )
+      {
         // RecursiveToggle( base, false );
         base->Disable();
       }
     }
 
-    inline void UpdateOnFrame() {
+    inline void UpdateOnFrame()
+    {
       vec2 mousePos = GetMousePosition();
       bool mouseWentUp = IsMouseButtonReleased( 0 );
       bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -67,21 +77,25 @@ namespace UI {
       const f32 screen_width = GetScreenWidth();
       const f32 screen_height = GetScreenHeight();
 
-      if ( screen_width > 1920 ) {
+      if ( screen_width > 1920 )
+      {
         SCALE = 2.0;
       }
-      else if ( screen_width > 2560 ) {
+      else if ( screen_width > 2560 )
+      {
         SCALE = 3.0;
       }
-      else if ( screen_width >= 3840 ) {
+      else if ( screen_width >= 3840 )
+      {
         SCALE = 4.0;
       }
 
-      Messages::dispatcher.update();
+      InterfaceUpdate::dispatcher.update();
 
       Manager()->over_any_elem = false;
 
-      for ( ptr<Element> base: Manager()->ActivePage() ) {
+      for ( ptr<Element> base: Manager()->ActivePage() )
+      {
         ptr<Panel> panel = Get<Panel>( base );
         panel->Resize();
         panel->Reposition();
@@ -92,8 +106,10 @@ namespace UI {
         Manager()->SetContextNull();
     }
 
-    inline void Draw() {
-      for ( ptr<Element> base: Manager()->ActivePage() ) {
+    inline void Draw()
+    {
+      for ( ptr<Element> base: Manager()->ActivePage() )
+      {
         base->Draw();
       }
 

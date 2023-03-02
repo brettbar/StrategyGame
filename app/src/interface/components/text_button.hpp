@@ -14,7 +14,7 @@ namespace UI
     bool always_clickable = true;
     bool clickable = true;
 
-    Events::EventUnion on_click;
+    InterfaceEvent::Data on_click;
 
     void Draw() override
     {
@@ -46,14 +46,14 @@ namespace UI
 
     void FireEvent()
     {
-      Events::event_emitter.publish( on_click );
+      InterfaceEvent::event_emitter.publish( on_click );
       // switch ( on_click->type ) {
-      //   case Events::Type::Basic: {
-      //     Events::event_emitter.publish( *on_click );
+      //   case InterfaceEvent::Type::Basic: {
+      //     InterfaceEvent::event_emitter.publish( *on_click );
       //   } break;
-      //   case Events::Type::ButtonClick: {
-      //     std::shared_ptr<Events::ButtonClick> button_click =
-      //       std::dynamic_pointer_cast<Events::ButtonClick>( on_click );
+      //   case InterfaceEvent::Type::ButtonClick: {
+      //     std::shared_ptr<InterfaceEvent::ButtonClick> button_click =
+      //       std::dynamic_pointer_cast<InterfaceEvent::ButtonClick>( on_click );
 
       //     if ( button_click ) {
       //       printf(
@@ -61,15 +61,15 @@ namespace UI
       //         button_click->origin_id.c_str(),
       //         button_click->msg.c_str()
       //       );
-      //       Events::event_emitter.publish( *button_click );
+      //       InterfaceEvent::event_emitter.publish( *button_click );
       //     }
       //   } break;
-      //   case Events::Type::JoinLobby: {
-      //     std::shared_ptr<Events::JoinLobby> join_lobby =
-      //       std::dynamic_pointer_cast<Events::JoinLobby>( on_click );
+      //   case InterfaceEvent::Type::JoinLobby: {
+      //     std::shared_ptr<InterfaceEvent::JoinLobby> join_lobby =
+      //       std::dynamic_pointer_cast<InterfaceEvent::JoinLobby>( on_click );
 
       //     if ( join_lobby ) {
-      //       Events::event_emitter.publish( *join_lobby );
+      //       InterfaceEvent::event_emitter.publish( *join_lobby );
       //     }
       //   } break;
       // }
@@ -81,7 +81,7 @@ namespace UI
       i32 font_size,
       Color background,
       Color text_color,
-      Events::EventUnion event
+      InterfaceEvent::Data event
     )
         : TextLabel( id, text, font_size, background, text_color ),
           on_click( event )
@@ -94,8 +94,8 @@ namespace UI
       i32 font_size,
       Color background,
       Color text_color,
-      Events::EventUnion event,
-      std::vector<Messages::ID> subscribed_messages
+      InterfaceEvent::Data event,
+      std::vector<InterfaceUpdate::ID> subscribed_messages
     )
         : TextLabel(
             id,

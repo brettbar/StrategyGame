@@ -24,7 +24,7 @@ namespace UI
         Align::Start,
         Align::Start,
         true,
-        { Messages::ID::SettlementContext },
+        { InterfaceUpdate::ID::SettlementContext },
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -143,7 +143,7 @@ namespace UI
         Align::Start,
         Align::Start,
         true,
-        { Messages::ID::ActorContext },
+        { InterfaceUpdate::ID::ActorContext },
         []( Panel &self ) {
           vec2 updated_pos = {
             ( (f32) GetScreenWidth() / 2 ) - ( 500 * SCALE / 2.0f ),
@@ -174,7 +174,7 @@ namespace UI
                 26,
                 PURPLE,
                 WHITE,
-                Events::EventUnion( Events::ID::ActorSpawnSettlment ),
+                InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment ),
               } ),
             },
           } ),

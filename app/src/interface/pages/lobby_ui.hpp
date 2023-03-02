@@ -46,7 +46,7 @@ namespace UI
           24,
           color,
           WHITE,
-          Events::ID::OpenFactionSelectPage,
+          InterfaceEvent::ID::OpenFactionSelectPage,
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {
@@ -56,7 +56,7 @@ namespace UI
           color,
           WHITE,
           {
-            Messages::ID::FactionSelected,
+            InterfaceUpdate::ID::FactionSelected,
           },
         } ),
         Create<TextLabel>( {
@@ -227,7 +227,7 @@ namespace UI
             32,
             RED,
             WHITE,
-            Events::ID::ReturnToMain,
+            InterfaceEvent::ID::ReturnToMain,
           } ),
           Create<TextButton>( {
             "ready_up",
@@ -235,8 +235,8 @@ namespace UI
             32,
             RED,
             WHITE,
-            Events::ID::ReadyUp,
-            { Messages::ID::HostLobby, Messages::ID::JoinLobby },
+            InterfaceEvent::ID::ReadyUp,
+            { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby },
           } ),
         },
       } ),

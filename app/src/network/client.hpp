@@ -181,6 +181,11 @@ public:
 
       return false;
     }
+
+    void SendMessageToHost( Message message )
+    {
+      SendMessageOnConnection( _server_conn, message );
+    }
   };
 
   inline IClient *Client()
@@ -308,5 +313,6 @@ public:
     // TODO make this only close when the game is started
     // SteamMatchmaking()->LeaveLobby( _lobby_id );
   }
+
 
 };// namespace Network

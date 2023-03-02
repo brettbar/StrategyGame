@@ -14,6 +14,8 @@
 #include <chrono>
 #include <isteammatchmaking.h>
 
+#include "../shared/signals.hpp"
+
 namespace Network
 {
 
@@ -102,19 +104,6 @@ private:
     }
 
 
-    void SendMessageToAllClients( Message message )
-    {
-
-      // We start at 1 since host is always i=0
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( !_clients[i].peer_data.active )
-          continue;
-
-        SendMessageOnConnection( _clients[i].conn, message );
-      }
-    }
-
 public:
     MessageQueue msg_queue;
 
@@ -155,6 +144,18 @@ public:
     //     );
     //   }
     // }
+    void SendMessageToAllClients( Message message )
+    {
+
+      // We start at 1 since host is always i=0
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      {
+        if ( !_clients[i].peer_data.active )
+          continue;
+
+        SendMessageOnConnection( _clients[i].conn, message );
+      }
+    }
 
     void CheckForMessages()
     {
@@ -205,6 +206,44 @@ public:
           break;
         case PlayerDisconnected:
           break;
+        case PlayerFactionSelect:
+        {
+          std::string player_id = msg.body["player_id"];
+          std::string faction = msg.body["faction"];
+
+          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+            InterfaceUpdate::Type::TargetedTextUpdate,
+            InterfaceUpdate::ID::FactionSelected,
+            player_id + "_select_faction",
+            faction,
+          } );
+          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+            InterfaceUpdate::Type::TargetedBackgroundUpdate,
+            InterfaceUpdate::ID::FactionSelected,
+            player_id + "_select_faction",
+            // TODO replace with json stuff
+            [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }(),
+          } );
+          SendMessageToAllClients( msg );
+        }
+        break;
         default:
           printf( "Error :: invalid message received by host\n" );
           break;

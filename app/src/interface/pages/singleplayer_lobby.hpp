@@ -41,7 +41,7 @@ namespace UI
             32,
             GREEN,
             WHITE,
-            Events::ID::OpenFactionSelectPage,
+            InterfaceEvent::ID::OpenFactionSelectPage,
           } ),
           Create<TextLabel>( {
             "singleplayer_faction_selected",
@@ -49,7 +49,7 @@ namespace UI
             32,
             GRAY,
             WHITE,
-            { Messages::ID::FactionSelected },
+            { InterfaceUpdate::ID::FactionSelected },
           } ),
           Create<TextButton>( {
             "singleplayer_lobby_start_game",
@@ -57,7 +57,7 @@ namespace UI
             32,
             BLUE,
             WHITE,
-            Events::SinglePlayerLobbyStartGame,
+            InterfaceEvent::SinglePlayerLobbyStartGame,
           } ),
         },
       } ),

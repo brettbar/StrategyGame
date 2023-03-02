@@ -54,7 +54,7 @@ namespace UI
         32,
         color,
         WHITE,
-        Events::EventUnion( Events::ID::FactionSelected, faction ),
+        InterfaceEvent::Data( InterfaceEvent::ID::FactionSelected, faction ),
       } ) );
     }
 

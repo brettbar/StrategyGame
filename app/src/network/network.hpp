@@ -38,6 +38,8 @@ namespace Network
     PlayerConnected,
     PlayerDisconnected,
 
+    PlayerFactionSelect,
+
     NumMessageIDs,
   };
   struct Message

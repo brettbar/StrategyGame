@@ -37,7 +37,9 @@ namespace UI
             24,
             GREEN,
             WHITE,
-            Events::EventUnion( Events::ID::JoinLobby, button_id, lobby_id ),
+            InterfaceEvent::Data(
+              InterfaceEvent::ID::JoinLobby, button_id, lobby_id
+            ),
           } );
 
           Get<TextButton>( button_e )->Enable();

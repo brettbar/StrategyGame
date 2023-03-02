@@ -17,7 +17,7 @@ namespace UI
     std::function<void( Panel & )> update;
     std::vector<ptr<Element>> children;
 
-    std::vector<Messages::ID> subscribed_messages;
+    std::vector<InterfaceUpdate::ID> subscribed_messages;
 
     // Should be recursive
     void Enable() override
@@ -191,29 +191,29 @@ namespace UI
 
     void SubscribeToMessages() override
     {
-      Messages::dispatcher.sink<Messages::DataUnion>()
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
         .connect<&Panel::ReceivedMessage>( this );
     }
 
-    void ReceivedMessage( const Messages::DataUnion &event )
+    void ReceivedMessage( const InterfaceUpdate::Data &event )
     {
       printf( "%s\n", this->id.c_str() );
 
-      for ( Messages::ID msg_id: subscribed_messages )
+      for ( InterfaceUpdate::ID msg_id: subscribed_messages )
       {
         if ( msg_id == event.message_id )
         {
           switch ( event.type )
           {
-            case Messages::EnabledUpdate:
+            case InterfaceUpdate::EnabledUpdate:
               if ( event.on )
                 Enable();
               else
                 Disable();
               break;
-            case Messages::TextUpdate:
+            case InterfaceUpdate::TextUpdate:
               break;
-            case Messages::BackgroundUpdate:
+            case InterfaceUpdate::BackgroundUpdate:
               break;
             default:
               printf( "Error :: Panel deos not support message type\n" );
@@ -258,7 +258,7 @@ namespace UI
       Align children_horiz_align,
       Align children_vert_align,
       bool abs_size,
-      std::vector<Messages::ID> subscribed_messages,
+      std::vector<InterfaceUpdate::ID> subscribed_messages,
       std::function<void( Panel & )> update,
       std::vector<std::shared_ptr<Element>> children
     )
