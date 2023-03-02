@@ -6,9 +6,11 @@
 #include "../ui_manager.hpp"
 #include <memory>
 
-namespace UI {
+namespace UI
+{
 
-  struct TextLabel : Element {
+  struct TextLabel : Element
+  {
     // Element elem;
     std::string text;
     i32 font_size;
@@ -17,36 +19,51 @@ namespace UI {
     bool dynamic = false;
     std::vector<Messages::ID> subscribed_messages;
 
-    void Enable() override {
+    void Enable() override
+    {
       Element::Enable();
       SubscribeToMessages();
     }
 
-    void Disable() override {
+    void Disable() override
+    {
       Element::Disable();
       UnsubscribeFromMessages();
     }
 
 
-    void ReceiveUpdateText( const Messages::UpdateText &event ) {
-      for ( Messages::ID msg_id: subscribed_messages ) {
-        if ( msg_id == event.message_id ) {
-          text = event.updated_text;
+    void ReceiveMessage( const Messages::DataUnion &event )
+    {
+      for ( Messages::ID msg_id: subscribed_messages )
+      {
+        if ( msg_id == event.message_id )
+        {
+          switch ( event.type )
+          {
+            case Messages::EnabledUpdate:
+              if ( event.on )
+                Enable();
+              else
+                Disable();
+              break;
+            case Messages::TextUpdate:
+              text = event.updated_text;
+              break;
+            case Messages::BackgroundUpdate:
+              background = event.updated_background;
+              break;
+            default:
+              printf( "Error :: Panel deos not support message type\n" );
+              break;
+          }
           break;
         }
+        break;
       }
     }
 
-    void ReceiveUpdateBackground( const Messages::UpdateBackground &event ) {
-      for ( Messages::ID msg_id: subscribed_messages ) {
-        if ( msg_id == event.message_id ) {
-          background = event.updated_background;
-          break;
-        }
-      }
-    }
-
-    void Resize() override {
+    void Resize() override
+    {
       const vec2 text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
         text.c_str(),
@@ -58,23 +75,20 @@ namespace UI {
       transform.height = text_dims.y;
     }
 
-    void SubscribeToMessages() override {
-      Messages::dispatcher.sink<Messages::UpdateText>()
-        .connect<&TextLabel::ReceiveUpdateText>( this );
-
-      Messages::dispatcher.sink<Messages::UpdateBackground>()
-        .connect<&TextLabel::ReceiveUpdateBackground>( this );
+    void SubscribeToMessages() override
+    {
+      Messages::dispatcher.sink<Messages::DataUnion>()
+        .connect<&TextLabel::ReceiveMessage>( this );
     }
 
-    void UnsubscribeFromMessages() override {
-      Messages::dispatcher.sink<Messages::UpdateText>()
-        .disconnect<&TextLabel::ReceiveUpdateText>( this );
-
-      Messages::dispatcher.sink<Messages::UpdateBackground>()
-        .disconnect<&TextLabel::ReceiveUpdateBackground>( this );
+    void UnsubscribeFromMessages() override
+    {
+      Messages::dispatcher.sink<Messages::DataUnion>()
+        .disconnect<&TextLabel::ReceiveMessage>( this );
     }
 
-    void Draw() override {
+    void Draw() override
+    {
       if ( !IsEnabled() )
         return;
 
@@ -97,7 +111,8 @@ namespace UI {
       );
     }
 
-    void Draw( Color override_background ) {
+    void Draw( Color override_background )
+    {
       DrawRectangleV(
         { transform.x, transform.y },
         { transform.width, transform.height },
@@ -125,7 +140,9 @@ namespace UI {
       Color text_color
     )
         : Element( id, background, false, {}, {} ), text( text ),
-          font_size( font_size ), text_color( text_color ), dynamic( false ) {}
+          font_size( font_size ), text_color( text_color ), dynamic( false )
+    {
+    }
 
     TextLabel(
       std::string id,
@@ -137,16 +154,20 @@ namespace UI {
     )
         : Element( id, background, false, {}, {} ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( true ),
-          subscribed_messages( subscribed_messages ) {}
+          subscribed_messages( subscribed_messages )
+    {
+    }
   };
 
-  struct TextButton : TextLabel {
+  struct TextButton : TextLabel
+  {
     bool always_clickable = true;
     bool clickable = true;
 
     Events::EventUnion on_click;
 
-    void Draw() override {
+    void Draw() override
+    {
       if ( !IsEnabled() )
         return;
 
@@ -156,7 +177,8 @@ namespace UI {
         TextLabel::Draw();
     }
 
-    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override
+    {
       bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
 
       if ( !Manager()->over_any_elem )
@@ -164,14 +186,16 @@ namespace UI {
 
       if ( Manager()->DoInteraction(
              *this, inside, mouse_went_up, mouse_went_down
-           ) ) {
+           ) )
+      {
         std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
         FireEvent();
       }
     }
 
-    void FireEvent() {
+    void FireEvent()
+    {
       Events::event_emitter.publish( on_click );
       // switch ( on_click->type ) {
       //   case Events::Type::Basic: {
@@ -210,7 +234,9 @@ namespace UI {
       Events::EventUnion event
     )
         : TextLabel( id, text, font_size, background, text_color ),
-          on_click( event ) {}
+          on_click( event )
+    {
+    }
 
     TextButton(
       std::string id,
@@ -229,6 +255,8 @@ namespace UI {
             text_color,
             subscribed_messages
           ),
-          on_click( event ) {}
+          on_click( event )
+    {
+    }
   };
 };// namespace UI

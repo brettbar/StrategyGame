@@ -12,6 +12,7 @@
 #include "interface/input.hpp"
 
 #include "campaign.hpp"
+#include "shared/signals.hpp"
 #include "world/systems/selection_system.hpp"
 #include <raylib.h>
 
@@ -294,19 +295,17 @@ inline void IGame::RegisterEventListeners()
         case Events::ID::MainMenuHostGame:
         {
           HostMultiplayerCampaign();
-          Messages::dispatcher.enqueue( Messages::UpdateText{
-            Messages::ID::HostLobby,
-            "Start Game",
-          } );
+          Messages::dispatcher.enqueue( Messages::DataUnion(
+            Messages::Type::TextUpdate, Messages::ID::HostLobby, "Start Game"
+          ) );
         }
         break;
         case Events::ID::MainMenuJoinGame:
         {
           LookForMultiplayerCampaign();
-          Messages::dispatcher.enqueue( Messages::UpdateText{
-            Messages::ID::JoinLobby,
-            "Ready Up",
-          } );
+          Messages::dispatcher.enqueue( Messages::DataUnion(
+            Messages::Type::TextUpdate, Messages::ID::JoinLobby, "Ready Up"
+          ) );
         }
         break;
         case Events::ID::MainMenuStartGame:
@@ -367,11 +366,13 @@ inline void IGame::RegisterEventListeners()
 
           faction = event.msg;
 
-          Messages::dispatcher.enqueue( Messages::UpdateText{
+          Messages::dispatcher.enqueue( Messages::DataUnion{
+            Messages::Type::TextUpdate,
             Messages::ID::FactionSelected,
             faction,
           } );
-          Messages::dispatcher.enqueue( Messages::UpdateBackground{
+          Messages::dispatcher.enqueue( Messages::DataUnion{
+            Messages::Type::BackgroundUpdate,
             Messages::ID::FactionSelected,
             // TODO replace with json stuff
             [&]() -> Color {

@@ -5,9 +5,11 @@
 #include "../ui_manager.hpp"
 
 
-namespace UI {
+namespace UI
+{
 
-  struct Panel : Element {
+  struct Panel : Element
+  {
     Axis children_axis;
     Align children_horiz_align;
     Align children_vert_align;
@@ -18,20 +20,25 @@ namespace UI {
     std::vector<Messages::ID> subscribed_messages;
 
     // Should be recursive
-    void Enable() override {
+    void Enable() override
+    {
       Element::Enable();
       Resize();
 
-      for ( ptr<Element> child: children ) {
-        if ( child ) {
+      for ( ptr<Element> child: children )
+      {
+        if ( child )
+        {
           child->Enable();
           child->Resize();
         }
       }
     }
 
-    void Disable() override {
-      for ( ptr<Element> child: children ) {
+    void Disable() override
+    {
+      for ( ptr<Element> child: children )
+      {
         if ( child )
           child->Disable();
       }
@@ -39,7 +46,8 @@ namespace UI {
       Element::Disable();
     }
 
-    void Resize() override {
+    void Resize() override
+    {
       if ( !IsEnabled() )
         return;
 
@@ -52,7 +60,8 @@ namespace UI {
 
       Update();
 
-      for ( ptr<Element> child: children ) {
+      for ( ptr<Element> child: children )
+      {
         // TODO not sure if this is right
         // if ( !child )
         //   continue;
@@ -62,8 +71,10 @@ namespace UI {
         child->Resize();
       }
 
-      if ( !abs_size ) {
-        for ( ptr<Element> child: children ) {
+      if ( !abs_size )
+      {
+        for ( ptr<Element> child: children )
+        {
           if ( !child->IsEnabled() )
             continue;
 
@@ -77,54 +88,71 @@ namespace UI {
             tallest_child = child->transform.height;
         }
 
-        if ( children_axis == Axis::Row ) {
+        if ( children_axis == Axis::Row )
+        {
           transform.width = total_width;
           transform.height = tallest_child;
         }
-        else if ( children_axis == Axis::Column ) {
+        else if ( children_axis == Axis::Column )
+        {
           transform.width = widest_child;
           transform.height = total_height;
         }
       }
 
 
-      for ( ptr<Element> child: children ) {
+      for ( ptr<Element> child: children )
+      {
         if ( !child->IsEnabled() )
           continue;
 
-        if ( children_axis == Axis::Row ) {
+        if ( children_axis == Axis::Row )
+        {
           // 2. Set the child x position based on alignment style.
-          switch ( children_horiz_align ) {
-            case Align::Start: {
+          switch ( children_horiz_align )
+          {
+            case Align::Start:
+            {
               child->transform.x = end_of_last_x + child->margins.left;
               end_of_last_x = child->transform.x + child->transform.width +
                               child->margins.right;
-            } break;
+            }
+            break;
           }
 
           // 3. Set the child y position based on alignment style.
-          switch ( children_vert_align ) {
-            case Align::Start: {
+          switch ( children_vert_align )
+          {
+            case Align::Start:
+            {
               child->transform.y = transform.y;
-            } break;
+            }
+            break;
           }
         }
-        else if ( children_axis == Axis::Column ) {
+        else if ( children_axis == Axis::Column )
+        {
           // 2. Set the child x position based on alignment style.
-          switch ( children_horiz_align ) {
-            case Align::Start: {
+          switch ( children_horiz_align )
+          {
+            case Align::Start:
+            {
               child->transform.x = transform.x;
-            } break;
+            }
+            break;
           }
 
           // 3. Set the child y position based on alignment style.
-          switch ( children_vert_align ) {
-            case Align::Start: {
+          switch ( children_vert_align )
+          {
+            case Align::Start:
+            {
               child->transform.y = end_of_last_y;
               // + margins.top;
               end_of_last_y = child->transform.y + child->transform.height;
               // + margins.bottom;
-            } break;
+            }
+            break;
           }
         }
       }
@@ -132,7 +160,8 @@ namespace UI {
 
     void Reposition() override {}
 
-    void Draw() override {
+    void Draw() override
+    {
       if ( !IsEnabled() )
         return;
 
@@ -142,40 +171,61 @@ namespace UI {
         background
       );
 
-      for ( ptr<Element> child: children ) {
+      for ( ptr<Element> child: children )
+      {
         if ( child )
           child->Draw();
       }
     }
 
-    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
-      for ( ptr<Element> child: children ) {
-        if ( child && child->IsEnabled() ) {
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override
+    {
+      for ( ptr<Element> child: children )
+      {
+        if ( child && child->IsEnabled() )
+        {
           child->Interact( mouse_went_up, mouse_went_down );
         }
       }
     }
 
-    void SubscribeToMessages() override {
-      Messages::dispatcher.sink<Messages::UpdateEnabled>()
-        .connect<&Panel::ReceiveUpdateEnabled>( this );
+    void SubscribeToMessages() override
+    {
+      Messages::dispatcher.sink<Messages::DataUnion>()
+        .connect<&Panel::ReceivedMessage>( this );
     }
 
-    void ReceiveUpdateEnabled( const Messages::UpdateEnabled &event ) {
+    void ReceivedMessage( const Messages::DataUnion &event )
+    {
       printf( "%s\n", this->id.c_str() );
 
-      for ( Messages::ID msg_id: subscribed_messages ) {
-        if ( msg_id == event.message_id ) {
-          if ( event.on )
-            Enable();
-          else
-            Disable();
+      for ( Messages::ID msg_id: subscribed_messages )
+      {
+        if ( msg_id == event.message_id )
+        {
+          switch ( event.type )
+          {
+            case Messages::EnabledUpdate:
+              if ( event.on )
+                Enable();
+              else
+                Disable();
+              break;
+            case Messages::TextUpdate:
+              break;
+            case Messages::BackgroundUpdate:
+              break;
+            default:
+              printf( "Error :: Panel deos not support message type\n" );
+              break;
+          }
           break;
         }
       }
     }
 
-    void Update() {
+    void Update()
+    {
       if ( update )
         update( *this );
     }
@@ -196,7 +246,9 @@ namespace UI {
           children_axis( children_axis ),
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), abs_size( abs_size ),
-          update( update ), children( children ) {}
+          update( update ), children( children )
+    {
+    }
 
     // Absolute panel
     Panel(
@@ -215,7 +267,9 @@ namespace UI {
           children_horiz_align( children_horiz_align ),
           children_vert_align( children_vert_align ), abs_size( abs_size ),
           update( update ), children( children ),
-          subscribed_messages( subscribed_messages ) {}
+          subscribed_messages( subscribed_messages )
+    {
+    }
 
     // Relative panel
     Panel(
@@ -250,7 +304,8 @@ namespace UI {
   };
 
   // NOTE For right now, StackPanels can only have Panels as their direct children
-  struct StackPanel : Element {
+  struct StackPanel : Element
+  {
     u32 curr_index = 0;
     // bool abs_pos = false;
     // bool abs_size = false;
@@ -262,29 +317,34 @@ namespace UI {
     std::vector<std::shared_ptr<Element>> children;
 
 
-    void Enable() override {
+    void Enable() override
+    {
       Element::Enable();
 
       children[curr_index]->Enable();
     }
 
-    void Disable() override {
+    void Disable() override
+    {
       children[curr_index]->Disable();
 
       Element::Disable();
     }
 
-    std::string ID() {
+    std::string ID()
+    {
       return id;
     }
 
-    void Resize() override {
+    void Resize() override
+    {
       children[curr_index]->transform.x = transform.x;
       children[curr_index]->transform.y = transform.y;
       children[curr_index]->Resize();
     }
 
-    void Draw() override {
+    void Draw() override
+    {
       if ( !IsEnabled() )
         return;
 
@@ -298,11 +358,14 @@ namespace UI {
         children[curr_index]->Draw();
     }
 
-    void Interact( bool mouse_went_up, bool mouse_went_down ) override {
-      if ( children[curr_index] ) {
+    void Interact( bool mouse_went_up, bool mouse_went_down ) override
+    {
+      if ( children[curr_index] )
+      {
         children[curr_index]->Interact( mouse_went_up, mouse_went_down );
 
-        if ( !Manager()->over_any_elem ) {
+        if ( !Manager()->over_any_elem )
+        {
           Manager()->SetContextNull();
         }
       }

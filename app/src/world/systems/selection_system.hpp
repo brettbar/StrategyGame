@@ -12,7 +12,8 @@
 #include "../../shared/signals.hpp"
 
 
-namespace SelectionSystem {
+namespace SelectionSystem
+{
 
   inline entt::entity selected_entity = entt::null;
 
@@ -22,11 +23,13 @@ namespace SelectionSystem {
   inline void CheckSelectProvince( vec2 );
 
   template<typename T>
-  inline void ClearSelection( View<T> component_view ) {
+  inline void ClearSelection( View<T> component_view )
+  {
     // reg.clear<Selected::Component>();
     selected_entity = entt::null;
 
-    for ( entt::entity entity: component_view ) {
+    for ( entt::entity entity: component_view )
+    {
       T &component = Global::world.get<T>( entity );
       component.selected = false;
       Global::world.remove<Selected::Component>( entity );
@@ -35,18 +38,22 @@ namespace SelectionSystem {
 
 
   // TODO(rf) replace both of these with Messages, probably dont need to be in here either
-  inline void ListenForSelect( entt::registry &game_reg, entt::entity entity ) {
+  inline void ListenForSelect( entt::registry &game_reg, entt::entity entity )
+  {
     printf( "SelectListener?\n" );
-    if ( game_reg.all_of<Province::Component>( entity ) ) {
+    if ( game_reg.all_of<Province::Component>( entity ) )
+    {
       // Enabled the context panel
       // auto &context = Manager()->lookup.at( "settlement_context_panel" );
       // RecursiveToggle( context, true );
 
-      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+      Messages::dispatcher.enqueue( Messages::DataUnion{
+        Messages::Type::EnabledUpdate,
         Messages::ID::SettlementContext,
         true,
       } );
-      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+      Messages::dispatcher.enqueue( Messages::DataUnion{
+        Messages::Type::EnabledUpdate,
         Messages::ID::ActorContext,
         false,
       } );
@@ -64,18 +71,22 @@ namespace SelectionSystem {
       // RecursiveToggle( content, true );
       // UI::StackPanel content_panel = Get<UI::StackPanel>( content );
     }
-    else if ( game_reg.all_of<Actor::Component>( entity ) ) {
-      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+    else if ( game_reg.all_of<Actor::Component>( entity ) )
+    {
+      Messages::dispatcher.enqueue( Messages::DataUnion{
+        Messages::Type::EnabledUpdate,
         Messages::ID::SettlementContext,
         false,
       } );
-      Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+      Messages::dispatcher.enqueue( Messages::DataUnion{
+        Messages::Type::EnabledUpdate,
         Messages::ID::ActorContext,
         true,
       } );
     }
   }
-  inline void ListenForDeselect() {
+  inline void ListenForDeselect()
+  {
     printf( "DeSelectListener?\n" );
     // auto context_panel = Manager()->lookup.at( "settlement_context_panel" );
     // RecursiveToggle( context_panel, false );
@@ -83,24 +94,28 @@ namespace SelectionSystem {
     // RecursiveToggle( context_panel, false );
     // Manager()->SetContextNull();
 
-    Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+    Messages::dispatcher.enqueue( Messages::DataUnion{
+      Messages::Type::EnabledUpdate,
       Messages::ID::SettlementContext,
       false,
     } );
-    Messages::dispatcher.enqueue( Messages::UpdateEnabled{
+    Messages::dispatcher.enqueue( Messages::DataUnion{
+      Messages::Type::EnabledUpdate,
       Messages::ID::ActorContext,
       false,
     } );
   }
 
-  inline void Start() {
+  inline void Start()
+  {
     Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>(
     );
     Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>(
     );
   }
 
-  inline void Draw( TextureCache &cache, bool isDebug ) {
+  inline void Draw( TextureCache &cache, bool isDebug )
+  {
     auto unitsView = Global::world.view<Selected::Component, Unit::Component>();
     auto provsView =
       Global::world.view<Province::Component, Selected::Component>();
@@ -116,10 +131,12 @@ namespace SelectionSystem {
     //   }
     // }
 
-    for ( auto entity: provsView ) {
+    for ( auto entity: provsView )
+    {
       auto &prov = provsView.get<Province::Component>( entity );
 
-      if ( isDebug ) {
+      if ( isDebug )
+      {
         DrawTexture(
           cache[hstr{ "tile_outline" }]->texture,
           prov.tile->position.x,
@@ -134,7 +151,8 @@ namespace SelectionSystem {
     }
   }
 
-  inline void UpdateSelection( Vector2 click_pos ) {
+  inline void UpdateSelection( Vector2 click_pos )
+  {
     View<Unit::Component> units_view = Global::world.view<Unit::Component>();
     View<Province::Component> prov_view =
       Global::world.view<Province::Component>();
@@ -146,17 +164,20 @@ namespace SelectionSystem {
     CheckSelectProvince( click_pos );
   }
 
-  inline void CheckSelectUnits( vec2 click_pos ) {
+  inline void CheckSelectUnits( vec2 click_pos )
+  {
     auto units_view = Global::world.view<Unit::Component>();
 
     // use forward iterators and get only the components of interest
-    for ( auto &entity: units_view ) {
+    for ( auto &entity: units_view )
+    {
       if ( selected_entity != entt::null )
         return;
 
       Unit::Component &unit = units_view.get<Unit::Component>( entity );
 
-      if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) ) {
+      if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) )
+      {
         Global::world.emplace<Selected::Component>( entity, true );
 
         std::cout << EntityIdToString( entity ) << std::endl;
@@ -168,20 +189,23 @@ namespace SelectionSystem {
     }
   }
 
-  inline void CheckSelectProvince( vec2 click_pos ) {
+  inline void CheckSelectProvince( vec2 click_pos )
+  {
     i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
     auto prov_view = Global::world.view<Province::Component>();
 
     if ( tile_pos_id == -1 )
       return;
 
-    for ( auto &entity: prov_view ) {
+    for ( auto &entity: prov_view )
+    {
       if ( selected_entity != entt::null )
         return;
 
       auto &prov = prov_view.get<Province::Component>( entity );
 
-      if ( tile_pos_id == prov.tile->id ) {
+      if ( tile_pos_id == prov.tile->id )
+      {
         Global::world.emplace<Selected::Component>( entity, true );
 
         std::cout << EntityIdToString( entity ) << std::endl;

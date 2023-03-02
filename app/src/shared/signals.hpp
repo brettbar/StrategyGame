@@ -6,6 +6,14 @@
 // Used for sending data from the Game State to the UI
 namespace Messages
 {
+  enum Type : u32
+  {
+    EnabledUpdate,
+    TextUpdate,
+    BackgroundUpdate,
+
+    NumTypes,
+  };
 
   enum class ID
   {
@@ -16,30 +24,27 @@ namespace Messages
     HostLobby,
   };
 
-  struct UpdateEnabled
+  struct DataUnion
   {
+    Type type;
     ID message_id;
+
+    //
     bool on;
-  };
-
-  struct UpdateText
-  {
-    ID message_id;
     std::string updated_text;
-
-    UpdateText( ID message_id, std::string updated_text )
-        : message_id( message_id ), updated_text( updated_text )
-    {
-    }
-  };
-
-  struct UpdateBackground
-  {
-    ID message_id;
     Color updated_background;
 
-    UpdateBackground( ID message_id, Color updated_background )
-        : message_id( message_id ), updated_background( updated_background )
+    DataUnion( Type type, ID message_id, std::string updated_text )
+        : type( type ), message_id( message_id ), updated_text( updated_text )
+    {
+    }
+    DataUnion( Type type, ID message_id, bool on )
+        : type( type ), message_id( message_id ), on( on )
+    {
+    }
+    DataUnion( Type type, ID message_id, Color updated_background )
+        : type( type ), message_id( message_id ),
+          updated_background( updated_background )
     {
     }
   };
