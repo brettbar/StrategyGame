@@ -3,7 +3,7 @@
 #include "../../shared/common.hpp"
 
 #include "../components/panel.hpp"
-#include "../components/text_elements.hpp"
+#include "../components/text_button.hpp"
 
 #include "../ui_system.hpp"
 

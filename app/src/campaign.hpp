@@ -15,19 +15,23 @@
 
 #include "interface/ui_system.hpp"
 
-class Campaign {
+class Campaign
+{
 
   public:
-  Campaign() {
+  Campaign()
+  {
     Start();
   }
 
-  Campaign( const char * ) {
+  Campaign( const char * )
+  {
     // TODO make take in file path
     Load();
   }
 
-  ~Campaign() {
+  ~Campaign()
+  {
     Global::ClearRegistry();
   }
 
@@ -44,7 +48,8 @@ class Campaign {
   void Update1TPS();
 };
 
-inline void Campaign::Start() {
+inline void Campaign::Start()
+{
   MapSystem::Init();
   Player::System::Init();
   SettlementSystem::Init();
@@ -58,7 +63,8 @@ inline void Campaign::Start() {
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
 }
 
-inline void Campaign::Load() {
+inline void Campaign::Load()
+{
   SaveSystem::Load();
   MapSystem::Init();
   Renderer::Init();
@@ -75,7 +81,8 @@ inline void Campaign::Load() {
 }
 
 // Runs inside game loop
-inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
+inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag )
+{
   // 1. Update Time
   dt = GetFrameTime();
   lag += dt;
@@ -115,13 +122,15 @@ inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
   // 5. Run all Updates
   {
     // Update 60 times a second
-    while ( lag >= _MS_PER_UPDATE ) {
+    while ( lag >= _MS_PER_UPDATE )
+    {
       Update60TPS();
       lag -= _MS_PER_UPDATE;
     }
 
     // Update once per second
-    while ( oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
+    while ( oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
+    {
       Update1TPS();
       oncelag = 0.0f;
     }
@@ -146,12 +155,14 @@ inline void Campaign::Run( f32 &dt, f32 &lag, f32 &oncelag ) {
 }
 
 
-inline void Campaign::UpdateOnFrame() {
+inline void Campaign::UpdateOnFrame()
+{
   UI::System::UpdateOnFrame();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
-inline void Campaign::Update60TPS() {
+inline void Campaign::Update60TPS()
+{
   auto animated_units =
     Global::world.view<Unit::Component, Animated::Component>();
 
@@ -163,7 +174,8 @@ inline void Campaign::Update60TPS() {
   //  Terrain::UpdateFOW(reg);
 }
 
-inline void Campaign::Update1TPS() {
+inline void Campaign::Update1TPS()
+{
   auto settlements =
     Global::world.view<Province::Component, Settlement::Component>();
 
@@ -173,7 +185,8 @@ inline void Campaign::Update1TPS() {
 
   if ( Global::state.month < 12 )
     Global::state.month++;
-  else {
+  else
+  {
     Global::state.year++;
     Global::state.month = 1;
   }

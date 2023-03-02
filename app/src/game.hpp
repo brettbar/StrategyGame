@@ -65,6 +65,8 @@ class IGame
 
   // TODO move
   std::string faction = "";
+  // TODO this should be set from networking
+  std::string player_id = "player_0";
 
   IGame( IGame const & ) = delete;
   void operator=( const IGame & ) = delete;
@@ -366,42 +368,72 @@ inline void IGame::RegisterEventListeners()
 
           faction = event.msg;
 
-          Messages::dispatcher.enqueue( Messages::DataUnion{
-            Messages::Type::TextUpdate,
-            Messages::ID::FactionSelected,
-            faction,
-          } );
-          Messages::dispatcher.enqueue( Messages::DataUnion{
-            Messages::Type::BackgroundUpdate,
-            Messages::ID::FactionSelected,
-            // TODO replace with json stuff
-            [&]() -> Color {
-              if ( faction == "romans" )
-                return RED;
-              if ( faction == "greeks" )
-                return BLUE;
-              if ( faction == "celts" )
-                return GREEN;
-              if ( faction == "punics" )
-                return PURPLE;
-              if ( faction == "germans" )
-                return GRAY;
-              if ( faction == "scythians" )
-                return PINK;
-              if ( faction == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }(),
-          } );
-
 
           if ( _single_player )
           {
+            Messages::dispatcher.enqueue( Messages::DataUnion{
+              Messages::Type::TextUpdate,
+              Messages::ID::FactionSelected,
+              faction,
+            } );
+            Messages::dispatcher.enqueue( Messages::DataUnion{
+              Messages::Type::BackgroundUpdate,
+              Messages::ID::FactionSelected,
+              // TODO replace with json stuff
+              [&]() -> Color {
+                if ( faction == "romans" )
+                  return RED;
+                if ( faction == "greeks" )
+                  return BLUE;
+                if ( faction == "celts" )
+                  return GREEN;
+                if ( faction == "punics" )
+                  return PURPLE;
+                if ( faction == "germans" )
+                  return GRAY;
+                if ( faction == "scythians" )
+                  return PINK;
+                if ( faction == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
             UI::System::SwitchPage( UI::SinglePlayerLobby );
           }
           else
           {
+            Messages::dispatcher.enqueue( Messages::DataUnion{
+              Messages::Type::TargetedTextUpdate,
+              Messages::ID::FactionSelected,
+              player_id + "_select_faction",
+              faction,
+            } );
+            Messages::dispatcher.enqueue( Messages::DataUnion{
+              Messages::Type::TargetedBackgroundUpdate,
+              Messages::ID::FactionSelected,
+              player_id + "_select_faction",
+              // TODO replace with json stuff
+              [&]() -> Color {
+                if ( faction == "romans" )
+                  return RED;
+                if ( faction == "greeks" )
+                  return BLUE;
+                if ( faction == "celts" )
+                  return GREEN;
+                if ( faction == "punics" )
+                  return PURPLE;
+                if ( faction == "germans" )
+                  return GRAY;
+                if ( faction == "scythians" )
+                  return PINK;
+                if ( faction == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
+
             UI::System::SwitchPage( UI::Lobby );
           }
         }

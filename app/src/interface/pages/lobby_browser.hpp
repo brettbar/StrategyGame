@@ -3,7 +3,7 @@
 #include "../../shared/common.hpp"
 
 #include "../components/panel.hpp"
-#include "../components/text_elements.hpp"
+#include "../components/text_button.hpp"
 
 #include "../ui_system.hpp"
 
@@ -12,16 +12,20 @@
 #include "../../network/network.hpp"
 
 
-namespace UI {
-  inline std::vector<ptr<Element>> CreateLobbyBrowser() {
+namespace UI
+{
+  inline std::vector<ptr<Element>> CreateLobbyBrowser()
+  {
     // TODO better way of making the id and label
     auto update_children = []( std::vector<ptr<Element>> &children ) {
-      for ( CSteamID lobby_id: Network::Client()->GetLobbyList() ) {
+      for ( CSteamID lobby_id: Network::Client()->GetLobbyList() )
+      {
 
         const char *lobby_name =
           SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
-        if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) ) {
+        if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) )
+        {
           std::cout << "Lobby Name: " << lobby_name << std::endl;
 
           std::string button_id = "lobby_entry_" + std::string( lobby_name );

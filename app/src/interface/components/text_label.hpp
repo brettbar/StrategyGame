@@ -4,11 +4,9 @@
 
 // TODO this might be a circular dependency issue
 #include "../ui_manager.hpp"
-#include <memory>
 
 namespace UI
 {
-
   struct TextLabel : Element
   {
     // Element elem;
@@ -32,25 +30,43 @@ namespace UI
     }
 
 
-    void ReceiveMessage( const Messages::DataUnion &event )
+    void ReceiveMessage( const Messages::DataUnion &msg )
     {
       for ( Messages::ID msg_id: subscribed_messages )
       {
-        if ( msg_id == event.message_id )
+        if ( msg_id == msg.message_id )
         {
-          switch ( event.type )
+          switch ( msg.type )
           {
             case Messages::EnabledUpdate:
-              if ( event.on )
+              if ( msg.on )
                 Enable();
               else
                 Disable();
               break;
             case Messages::TextUpdate:
-              text = event.updated_text;
+              text = msg.updated_text;
               break;
             case Messages::BackgroundUpdate:
-              background = event.updated_background;
+              background = msg.updated_background;
+              break;
+            case Messages::TargetedTextUpdate:
+              printf( "TextLabel::ReceiveMessage msg type: %d\n", msg.type );
+
+              printf(
+                "msg.target %s, id %s\n", msg.target.c_str(), id.c_str()
+              );
+
+              if ( msg.target == id )
+              {
+                text = msg.updated_text;
+              }
+              break;
+            case Messages::TargetedBackgroundUpdate:
+              if ( msg.target == id )
+              {
+                background = msg.updated_background;
+              }
               break;
             default:
               printf( "Error :: Panel deos not support message type\n" );
@@ -155,107 +171,6 @@ namespace UI
         : Element( id, background, false, {}, {} ), text( text ),
           font_size( font_size ), text_color( text_color ), dynamic( true ),
           subscribed_messages( subscribed_messages )
-    {
-    }
-  };
-
-  struct TextButton : TextLabel
-  {
-    bool always_clickable = true;
-    bool clickable = true;
-
-    Events::EventUnion on_click;
-
-    void Draw() override
-    {
-      if ( !IsEnabled() )
-        return;
-
-      if ( !clickable )
-        TextLabel::Draw( Fade( BLACK, 0.5 ) );
-      else
-        TextLabel::Draw();
-    }
-
-    void Interact( bool mouse_went_up, bool mouse_went_down ) override
-    {
-      bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
-
-      if ( !Manager()->over_any_elem )
-        Manager()->over_any_elem = inside;
-
-      if ( Manager()->DoInteraction(
-             *this, inside, mouse_went_up, mouse_went_down
-           ) )
-      {
-        std::cout << "INTERACTION DETECTED!!!" << std::endl;
-
-        FireEvent();
-      }
-    }
-
-    void FireEvent()
-    {
-      Events::event_emitter.publish( on_click );
-      // switch ( on_click->type ) {
-      //   case Events::Type::Basic: {
-      //     Events::event_emitter.publish( *on_click );
-      //   } break;
-      //   case Events::Type::ButtonClick: {
-      //     std::shared_ptr<Events::ButtonClick> button_click =
-      //       std::dynamic_pointer_cast<Events::ButtonClick>( on_click );
-
-      //     if ( button_click ) {
-      //       printf(
-      //         "Sending button click! %s %s\n",
-      //         button_click->origin_id.c_str(),
-      //         button_click->msg.c_str()
-      //       );
-      //       Events::event_emitter.publish( *button_click );
-      //     }
-      //   } break;
-      //   case Events::Type::JoinLobby: {
-      //     std::shared_ptr<Events::JoinLobby> join_lobby =
-      //       std::dynamic_pointer_cast<Events::JoinLobby>( on_click );
-
-      //     if ( join_lobby ) {
-      //       Events::event_emitter.publish( *join_lobby );
-      //     }
-      //   } break;
-      // }
-    }
-
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      Events::EventUnion event
-    )
-        : TextLabel( id, text, font_size, background, text_color ),
-          on_click( event )
-    {
-    }
-
-    TextButton(
-      std::string id,
-      std::string text,
-      i32 font_size,
-      Color background,
-      Color text_color,
-      Events::EventUnion event,
-      std::vector<Messages::ID> subscribed_messages
-    )
-        : TextLabel(
-            id,
-            text,
-            font_size,
-            background,
-            text_color,
-            subscribed_messages
-          ),
-          on_click( event )
     {
     }
   };

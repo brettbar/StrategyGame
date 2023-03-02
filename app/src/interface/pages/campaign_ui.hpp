@@ -5,15 +5,17 @@
 
 #include "../components/element.hpp"
 #include "../components/panel.hpp"
-#include "../components/text_elements.hpp"
+#include "../components/text_button.hpp"
 #include "../components/texture_elements.hpp"
 
 #include "../ui_utils.hpp"
 
 
-namespace UI {
+namespace UI
+{
 
-  inline std::vector<ptr<Element>> CreateCampaignUI() {
+  inline std::vector<ptr<Element>> CreateCampaignUI()
+  {
     return {
       Create<Panel>( {
         "settlement_context_panel",

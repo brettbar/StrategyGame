@@ -3,7 +3,7 @@
 #include "../../shared/common.hpp"
 
 #include "../components/panel.hpp"
-#include "../components/text_elements.hpp"
+#include "../components/text_button.hpp"
 
 #include "../ui_system.hpp"
 
@@ -55,7 +55,9 @@ namespace UI
           24,
           color,
           WHITE,
-          { Messages::ID::FactionSelected },
+          {
+            Messages::ID::FactionSelected,
+          },
         } ),
         Create<TextLabel>( {
           id + "_label",
@@ -137,7 +139,7 @@ namespace UI
 
         for ( u32 i = start; i < end; i++ )
         {
-          std::string id = "lobby_member_" + std::to_string( i );
+          std::string id = "player_" + std::to_string( i );
 
           if ( i >= members.size() )
           {

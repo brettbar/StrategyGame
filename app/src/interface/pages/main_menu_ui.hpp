@@ -3,13 +3,15 @@
 #include "../../shared/common.hpp"
 
 #include "../components/panel.hpp"
-#include "../components/text_elements.hpp"
+#include "../components/text_button.hpp"
 
 #include "../ui_system.hpp"
 
-namespace UI {
+namespace UI
+{
 
-  inline std::vector<ptr<Element>> CreateMainMenuUI() {
+  inline std::vector<ptr<Element>> CreateMainMenuUI()
+  {
     return {
       Create<Panel>( {
         "main_menu",
