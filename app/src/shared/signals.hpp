@@ -30,7 +30,7 @@ namespace InterfaceUpdate
   struct Data
   {
     Type type;
-    ID message_id;
+    ID update_id;
     //
     bool on;
     std::string updated_text;
@@ -39,7 +39,7 @@ namespace InterfaceUpdate
 
     // TextUpdate
     Data( Type type, ID message_id, std::string updated_text )
-        : type( type ), message_id( message_id ), updated_text( updated_text )
+        : type( type ), update_id( message_id ), updated_text( updated_text )
     {
     }
 
@@ -50,14 +50,14 @@ namespace InterfaceUpdate
       std::string target,
       std::string updated_text
     )
-        : type( type ), message_id( message_id ), updated_text( updated_text ),
+        : type( type ), update_id( message_id ), updated_text( updated_text ),
           target( target )
     {
     }
 
     // EnabledUpdate
     Data( Type type, ID message_id, bool on )
-        : type( type ), message_id( message_id ), on( on )
+        : type( type ), update_id( message_id ), on( on )
     {
     }
 
@@ -68,7 +68,7 @@ namespace InterfaceUpdate
       std::string target,
       Color updated_background
     )
-        : type( type ), message_id( message_id ),
+        : type( type ), update_id( message_id ),
           updated_background( updated_background ), target( target )
     {
     }
@@ -76,7 +76,7 @@ namespace InterfaceUpdate
 
     // BackgroundUpdate
     Data( Type type, ID message_id, Color updated_background )
-        : type( type ), message_id( message_id ),
+        : type( type ), update_id( message_id ),
           updated_background( updated_background )
     {
     }
@@ -158,21 +158,21 @@ namespace InterfaceEvent
 
   struct Data
   {
-    ID id;
+    ID event_id;
 
     std::string msg;
     CSteamID lobby_id;
 
     std::string source;
 
-    Data( ID id ) : id( id ) {}
-    Data( ID id, std::string msg ) : id( id ), msg( msg ) {}
+    Data( ID id ) : event_id( id ) {}
+    Data( ID id, std::string msg ) : event_id( id ), msg( msg ) {}
     Data( ID id, std::string msg, std::string source )
-        : id( id ), msg( msg ), source( source )
+        : event_id( id ), msg( msg ), source( source )
     {
     }
     Data( ID id, std::string msg, CSteamID lobby_id )
-        : id( id ), msg( msg ), lobby_id( lobby_id )
+        : event_id( id ), msg( msg ), lobby_id( lobby_id )
     {
     }
   };

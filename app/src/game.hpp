@@ -293,7 +293,7 @@ inline void IGame::RegisterEventListeners()
     [&](
       const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
     ) {
-      switch ( event.id )
+      switch ( event.event_id )
       {
         /// BASIC
         // MainMenu

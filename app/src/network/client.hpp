@@ -11,6 +11,8 @@
 #include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
 
+#include "../shared/signals.hpp"
+
 namespace Network
 {
   class IClient
@@ -113,6 +115,43 @@ public:
           break;
           case MessageID::PlayerDisconnected:
             break;
+          case MessageID::PlayerFactionSelect:
+          {
+            std::string player_id = body["player_id"];
+            std::string faction = body["faction"];
+
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::TargetedTextUpdate,
+              InterfaceUpdate::ID::FactionSelected,
+              player_id + "_select_faction",
+              faction,
+            } );
+            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
+              InterfaceUpdate::Type::TargetedBackgroundUpdate,
+              InterfaceUpdate::ID::FactionSelected,
+              player_id + "_select_faction",
+              // TODO replace with json stuff
+              [&]() -> Color {
+                if ( faction == "romans" )
+                  return RED;
+                if ( faction == "greeks" )
+                  return BLUE;
+                if ( faction == "celts" )
+                  return GREEN;
+                if ( faction == "punics" )
+                  return PURPLE;
+                if ( faction == "germans" )
+                  return GRAY;
+                if ( faction == "scythians" )
+                  return PINK;
+                if ( faction == "persians" )
+                  return ORANGE;
+                else
+                  return BLACK;
+              }(),
+            } );
+          }
+          break;
           default:
             printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
             break;

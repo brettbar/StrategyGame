@@ -201,7 +201,7 @@ namespace UI
 
       for ( InterfaceUpdate::ID msg_id: subscribed_messages )
       {
-        if ( msg_id == event.message_id )
+        if ( msg_id == event.update_id )
         {
           switch ( event.type )
           {

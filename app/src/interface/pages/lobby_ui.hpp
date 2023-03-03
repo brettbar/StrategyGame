@@ -46,7 +46,9 @@ namespace UI
           24,
           color,
           WHITE,
+          false,
           InterfaceEvent::ID::OpenFactionSelectPage,
+          { InterfaceUpdate::ID::JoinLobby },
         } ),
         // Create<TextureLabel>( { "romans_villager_texture" } ),
         Create<TextLabel>( {

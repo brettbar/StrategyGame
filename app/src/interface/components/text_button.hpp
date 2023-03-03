@@ -11,7 +11,6 @@ namespace UI
 {
   struct TextButton : TextLabel
   {
-    bool always_clickable = true;
     bool clickable = true;
 
     InterfaceEvent::Data on_click;
@@ -85,6 +84,28 @@ namespace UI
     )
         : TextLabel( id, text, font_size, background, text_color ),
           on_click( event )
+    {
+    }
+
+    TextButton(
+      std::string id,
+      std::string text,
+      i32 font_size,
+      Color background,
+      Color text_color,
+      bool clickable,
+      InterfaceEvent::Data event,
+      std::vector<InterfaceUpdate::ID> subscribed_messages
+    )
+        : TextLabel(
+            id,
+            text,
+            font_size,
+            background,
+            text_color,
+            subscribed_messages
+          ),
+          clickable( clickable ), on_click( event )
     {
     }
 

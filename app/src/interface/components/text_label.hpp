@@ -34,7 +34,7 @@ namespace UI
     {
       for ( InterfaceUpdate::ID msg_id: subscribed_messages )
       {
-        if ( msg_id == msg.message_id )
+        if ( msg_id == msg.update_id )
         {
           switch ( msg.type )
           {
