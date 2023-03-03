@@ -6,6 +6,24 @@
 // Used for sending data from the Game State to the UI
 namespace InterfaceUpdate
 {
+
+
+  /*
+     Time to figure out this signal business.
+     For InterfaceUpdates we have 2 ideas.
+
+InterfaceUpdates:
+     1. can be intended for one to many elements
+     2. can be intended for one element only
+     3. can update enabled
+     4. can update text 
+     5. can update background
+     6. can update clickable
+
+
+ */
+
+
   enum Type : u32
   {
     EnabledUpdate,

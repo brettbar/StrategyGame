@@ -37,9 +37,12 @@ namespace UI
              *this, inside, mouse_went_up, mouse_went_down
            ) )
       {
-        std::cout << "INTERACTION DETECTED!!!" << std::endl;
+        if ( clickable )
+        {
+          std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
-        FireEvent();
+          FireEvent();
+        }
       }
     }
 
