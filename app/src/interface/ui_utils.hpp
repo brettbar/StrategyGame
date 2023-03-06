@@ -2,29 +2,26 @@
 
 #include "../shared/global.hpp"
 
-#include "components/panel.hpp"
-#include "components/text_button.hpp"
-#include "components/texture_elements.hpp"
 #include <iostream>
 
 
 namespace UI
 {
 
-  template<typename T>
-  inline bool Has( ptr<Element> entity )
-  {
-    ptr<T> attempt = std::dynamic_pointer_cast<T>( entity );
-    return attempt != nullptr;
-  }
+  // template<typename T>
+  // inline bool Has( ptr<Element> entity )
+  // {
+  //   ptr<T> attempt = std::dynamic_pointer_cast<T>( entity );
+  //   return attempt != nullptr;
+  // }
 
-  template<typename T>
-  inline std::shared_ptr<T> Get( ptr<Element> entity )
-  {
-    std::shared_ptr<T> converted = std::dynamic_pointer_cast<T>( entity );
-    assert( converted );
-    return converted;
-  }
+  // template<typename T>
+  // inline std::shared_ptr<T> Get( ptr<Element> entity )
+  // {
+  //   std::shared_ptr<T> converted = std::dynamic_pointer_cast<T>( entity );
+  //   assert( converted );
+  //   return converted;
+  // }
 
 
   // inline bool IsInteractive( ptr<Element> entity ) {
@@ -83,35 +80,35 @@ namespace UI
   //   }
   // }
 
-  inline void RecursiveDelete( ptr<Element> entity )
-  {
-    if ( Has<StackPanel>( entity ) )
-    {
-      std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
-      RecursiveDelete( stack_panel->children[stack_panel->curr_index] );
-    }
-    else if ( Has<Panel>( entity ) )
-    {
-      for ( ptr<Element> child: Get<Panel>( entity )->children )
-      {
-        RecursiveDelete( child );
-      }
-    }
-    else
-    {
-      Manager()->lookup.erase( entity->id );
-      // Manager()->registry.destroy( entity );
-      // TODO Missing delete?
-    }
-  }
+  // inline void RecursiveDelete( ptr<Element> entity )
+  // {
+  //   if ( Has<StackPanel>( entity ) )
+  //   {
+  //     std::shared_ptr<StackPanel> stack_panel = Get<StackPanel>( entity );
+  //     RecursiveDelete( stack_panel->children[stack_panel->curr_index] );
+  //   }
+  //   else if ( Has<Panel>( entity ) )
+  //   {
+  //     for ( ptr<Element> child: Get<Panel>( entity )->children )
+  //     {
+  //       RecursiveDelete( child );
+  //     }
+  //   }
+  //   else
+  //   {
+  //     Manager()->lookup.erase( entity->id );
+  //     // Manager()->registry.destroy( entity );
+  //     // TODO Missing delete?
+  //   }
+  // }
 
-  // TODO maybe should be put on StackPanel struct as method?
-  inline void SwitchChild( StackPanel &sp, u32 index )
-  {
-    // RecursiveToggle( sp.children[sp.curr_index], false );
-    // sp.curr_index = index;
-    // RecursiveToggle( sp.children[sp.curr_index], true );
-  }
+  // // TODO maybe should be put on StackPanel struct as method?
+  // inline void SwitchChild( StackPanel &sp, u32 index )
+  // {
+  //   // RecursiveToggle( sp.children[sp.curr_index], false );
+  //   // sp.curr_index = index;
+  //   // RecursiveToggle( sp.children[sp.curr_index], true );
+  // }
 
 
 };// namespace UI

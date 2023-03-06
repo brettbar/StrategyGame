@@ -2,19 +2,13 @@
 
 #include "../../shared/common.hpp"
 
-
-#include "../components/element.hpp"
-#include "../components/panel.hpp"
-#include "../components/text_button.hpp"
-#include "../components/texture_elements.hpp"
-
 #include "../ui_utils.hpp"
 
 
 namespace UI
 {
 
-  inline std::vector<ptr<Element>> CreateCampaignUI()
+  inline std::vector<Element> CreateCampaignUI()
   {
     return {
       Create<Panel>( {
