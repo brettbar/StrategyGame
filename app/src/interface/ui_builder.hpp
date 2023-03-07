@@ -13,6 +13,9 @@ protected:
 public:
     Element build()
     {
+      auto created = std::make_shared<Element>( _element );
+      created->SubscribeToMessages();
+      Manager()->lookup.insert_or_assign( _element.id, created );
       return _element;
     }
 
@@ -54,9 +57,35 @@ public:
       return *this;
     }
 
+    Panel &UpdateChildren(
+      std::function<void( std::vector<Element> & )> update_children
+    )
+    {
+      update_children( _element.children );
+      return *this;
+    }
+
+    // TODO(rf) this is clunky
+    Panel &UpdateSubsetChildren(
+      std::function<void( std::vector<Element> &, u32 start, u32 end )>
+        update_children,
+      u32 start,
+      u32 end
+    )
+    {
+      update_children( _element.children, start, end );
+      return *this;
+    }
+
     Panel &Background( Color background )
     {
       _element.background = background;
+      return *this;
+    }
+
+    Panel &Margins( Margins margins )
+    {
+      _element.margins = margins;
       return *this;
     }
   };
@@ -67,6 +96,7 @@ public:
     {
       _element.type = Type::STACK_PANEL;
       _element.id = id;
+      _element.curr_index = 0;
     }
 
     StackPanel &Background( Color background )
@@ -108,6 +138,12 @@ public:
       _element.text_color = text_color;
       return SetText( text, font_size );
     }
+
+    TextLabel &ListensFor( std::vector<InterfaceUpdate::ID> updates )
+    {
+      _element.subscribed_updates = updates;
+      return *this;
+    }
   };
 
   struct TextButton : Builder
@@ -140,7 +176,12 @@ public:
     TextButton &SetEvent( InterfaceEvent::Data event )
     {
       _element.on_click = std::make_shared<InterfaceEvent::Data>( event );
+      return *this;
+    }
 
+    TextButton &ListensFor( std::vector<InterfaceUpdate::ID> updates )
+    {
+      _element.subscribed_updates = updates;
       return *this;
     }
   };

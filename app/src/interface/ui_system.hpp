@@ -2,11 +2,11 @@
 
 #include "pages/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
-// #include "pages/lobby_browser.hpp"
-// #include "pages/lobby_ui.hpp"
+#include "pages/lobby_browser.hpp"
+#include "pages/lobby_ui.hpp"
 #include "pages/main_menu_ui.hpp"
-// #include "pages/modal_menu_ui.hpp"
-// #include "pages/singleplayer_lobby.hpp"
+#include "pages/modal_menu_ui.hpp"
+#include "pages/singleplayer_lobby.hpp"
 
 namespace UI
 {
@@ -24,11 +24,11 @@ namespace UI
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
-        // CreateSinglePlayerLobby(),
-        // CreateModalMenuUI(),
+        CreateSinglePlayerLobby(),
+        CreateModalMenuUI(),
         CreateCampaignUI(),
-        // CreateLobbyBrowser(),
-        // CreateLobbyUI(),
+        CreateLobbyBrowser(),
+        CreateLobbyUI(),
       };
       Manager()->SetScene( MainMenu );
       EnableContent();
@@ -51,7 +51,6 @@ namespace UI
     {
       for ( Element &base: Manager()->ActivePage() )
       {
-        // RecursiveToggle( base, true );
         base.Enable();
       }
     }
@@ -62,7 +61,6 @@ namespace UI
 
       for ( Element &base: Manager()->ActivePage() )
       {
-        // RecursiveToggle( base, false );
         base.Disable();
       }
     }

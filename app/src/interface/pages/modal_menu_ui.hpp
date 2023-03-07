@@ -2,83 +2,54 @@
 
 #include "../../shared/common.hpp"
 
-#include "../components/panel.hpp"
-#include "../components/text_button.hpp"
-
-#include "../ui_system.hpp"
+#include "../ui_builder.hpp"
 
 namespace UI
 {
-  inline std::vector<ptr<Element>> CreateModalMenuUI()
+  inline std::vector<Element> CreateModalMenuUI()
   {
     return {
-      Create<Panel>( {
-        "modal_menu",
-        BLACK,
-        Axis::Column,
-        Align::Start,
-        Align::Start,
-        true,
-        []( Panel &self ) {
-          vec2 updated_pos = {
-            ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
-            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-          };
+      Panel( "modal_menu" )
+        .SetAxis( Axis::Column )
+        .SetAnchor( Anchor::Centered )
+        .Children( {
+          TextButton( "modal_menu_load_game" )
+            .SetText( "Load Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuLoadGame )
+            .build(),
 
-          self.transform.x = updated_pos.x;
-          self.transform.y = updated_pos.y;
-        },
-        {
-          Create<TextButton>( {
-            "modal_menu_load_game",
-            "Load Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuLoadGame,
-          } ),
-          Create<TextButton>( {
-            "modal_menu_save_game",
-            "Save Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuSaveGame,
-          } ),
-          Create<TextButton>( {
-            "modal_menu_settings",
-            "Settings",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuSettings,
-          } ),
-          Create<TextButton>( {
-            "modal_menu_save_exit_main",
-            "Save and Exit to Main Menu",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuSaveExitMain,
-          } ),
-          Create<TextButton>( {
-            "modal_menu_exit_main",
-            "Exit to Main Menu",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuExitMain,
-          } ),
-          Create<TextButton>( {
-            "modal_menu_exit_game",
-            "Exit Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::ModalMenuExitGame,
-          } ),
-        },
-      } ),
+          TextButton( "modal_menu_save_game" )
+            .SetText( "Save Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuSaveGame )
+            .build(),
+
+          TextButton( "modal_menu_settings" )
+            .SetText( "Settings", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuSettings )
+            .build(),
+
+          TextButton( "modal_menu_save_exit_main" )
+            .SetText( "Save and Exit to Main Menu", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuSaveExitMain )
+            .build(),
+
+          TextButton( "modal_menu_exit_main" )
+            .SetText( "Exit to Main Menu", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuExitMain )
+            .build(),
+
+          TextButton( "modal_menu_exit_game" )
+            .SetText( "Exit Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::ModalMenuExitGame )
+            .build(),
+        } )
+        .build(),
     };
   }
 };// namespace UI

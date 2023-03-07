@@ -3,10 +3,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../components/panel.hpp"
-#include "../components/text_button.hpp"
-
-#include "../ui_system.hpp"
+#include "../ui_builder.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -14,53 +11,32 @@
 
 namespace UI
 {
-  inline std::vector<ptr<Element>> CreateSinglePlayerLobby()
+  inline std::vector<Element> CreateSinglePlayerLobby()
   {
     return {
-      Create<Panel>( {
-        "singleplayer_lobby",
-        BLACK,
-        Axis::Column,
-        Align::Start,
-        Align::Start,
-        true,
-        []( Panel &self ) {
-          vec2 updated_pos = {
-            ( (f32) GetScreenWidth() / 2 ) - ( 400 * SCALE / 2.0f ),
-            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-          };
-          self.transform.x = updated_pos.x;
-          self.transform.y = updated_pos.y;
-        },
-        {
-          // TODO(LEFTOFF) here
-          // Need to add events/messages to these
-          Create<TextButton>( {
-            "singleplayer_faction_label",
-            "Select your faction",
-            32,
-            GREEN,
-            WHITE,
-            InterfaceEvent::ID::OpenFactionSelectPage,
-          } ),
-          Create<TextLabel>( {
-            "singleplayer_faction_selected",
-            "Waiting to Select Faction",
-            32,
-            GRAY,
-            WHITE,
-            { InterfaceUpdate::ID::FactionSelected },
-          } ),
-          Create<TextButton>( {
-            "singleplayer_lobby_start_game",
-            "Start Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::SinglePlayerLobbyStartGame,
-          } ),
-        },
-      } ),
+      Panel( "singleplayer_lobby" )
+        .SetAnchor( Anchor::Centered )
+        .SetAxis( Axis::Column )
+        .Children( {
+          TextButton( "singleplayer_faction_label" )
+            .SetText( "Select your faction", 32 )
+            .Background( GREEN )
+            .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage )
+            .build(),
+          TextButton( "singleplayer_faction_selected" )
+            .SetText( "Waiting to Select Faction", 32 )
+            .Background( GRAY )
+            .ListensFor( { InterfaceUpdate::ID::FactionSelected } )
+            .build(),
+          TextButton( "singleplayer_lobby_started_game" )
+            .SetText( "Start Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::SinglePlayerLobbyStartGame )
+            .build(),
+        }
+
+        )
+        .build(),
     };
   }
 };// namespace UI

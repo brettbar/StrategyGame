@@ -74,8 +74,8 @@ namespace UI
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
     bool abs_size = false;
-    // std::function<void( Panel & )> update;
     std::vector<Element> children = {};
+    std::function<void( std::vector<Element> & )> update_children = {};
     std::vector<InterfaceUpdate::ID> subscribed_updates = {};
 
     // StackPanel
@@ -96,46 +96,25 @@ namespace UI
     Texture2D texture = Texture2D();
 
 
-    // Unimplemented/Invalid default constructor
-    Element() {}
-
-    // Base element TODO delete?
-    // Element( Type type, std::string id, Color background )
-    //     : type( type ), id( id ), background( background )
-    // {
-    // }
-
-
-    // Panel element
-    Element(
-      Type type,
-      std::string id,
-      Color background,
-      std::vector<InterfaceUpdate::ID> subscribed_messages,
-      Axis axis,
-      Align horiz_align,
-      Align vert_align
-    )
-        : type( type ), id( id ), background( background ),
-          children_axis( axis ), children_horiz_align( horiz_align ),
-          children_vert_align( vert_align ),
-          subscribed_updates( subscribed_messages )
-    {
-    }
-
     void Enable()
     {
       switch ( type )
       {
+        case INVALID:
+          printf( "INVALID TYPE ENABLED\n" );
+          assert( false );
+          break;
         case PANEL:
         {
           enabled = true;
           Resize();
+          Reposition();
 
           for ( Element &child: children )
           {
             child.Enable();
             child.Resize();
+            child.Reposition();
           }
         }
         break;
@@ -143,9 +122,12 @@ namespace UI
         {
           enabled = true;
           children[curr_index].Enable();
+          children[curr_index].Resize();
+          children[curr_index].Reposition();
         }
         break;
         case TEXT_LABEL:
+        case TEXT_BUTTON:
         {
           enabled = true;
           SubscribeToMessages();
@@ -178,6 +160,7 @@ namespace UI
         }
         break;
         case TEXT_LABEL:
+        case TEXT_BUTTON:
         {
           enabled = false;
           UnsubscribeFromMessages();
@@ -189,11 +172,11 @@ namespace UI
       }
     }
 
+    void Destroy();
+
+
     void Reposition()
     {
-      if ( !enabled )
-        return;
-
       switch ( type )
       {
         case STACK_PANEL:
@@ -233,6 +216,10 @@ namespace UI
 
       switch ( type )
       {
+        case INVALID:
+          printf( "INVALID TYPE IN RESIZE\n" );
+          assert( false );
+          break;
         case PANEL:
         {
           f32 total_height = 0;
@@ -488,33 +475,8 @@ namespace UI
 
     void FireEvent()
     {
-      InterfaceEvent::event_emitter.publish( *on_click );
-      // switch ( on_click->type ) {
-      //   case InterfaceEvent::Type::Basic: {
-      //     InterfaceEvent::event_emitter.publish( *on_click );
-      //   } break;
-      //   case InterfaceEvent::Type::ButtonClick: {
-      //     std::shared_ptr<InterfaceEvent::ButtonClick> button_click =
-      //       std::dynamic_pointer_cast<InterfaceEvent::ButtonClick>( on_click );
-
-      //     if ( button_click ) {
-      //       printf(
-      //         "Sending button click! %s %s\n",
-      //         button_click->origin_id.c_str(),
-      //         button_click->msg.c_str()
-      //       );
-      //       InterfaceEvent::event_emitter.publish( *button_click );
-      //     }
-      //   } break;
-      //   case InterfaceEvent::Type::JoinLobby: {
-      //     std::shared_ptr<InterfaceEvent::JoinLobby> join_lobby =
-      //       std::dynamic_pointer_cast<InterfaceEvent::JoinLobby>( on_click );
-
-      //     if ( join_lobby ) {
-      //       InterfaceEvent::event_emitter.publish( *join_lobby );
-      //     }
-      //   } break;
-      // }
+      if ( on_click )
+        InterfaceEvent::event_emitter.publish( *on_click );
     }
 
     void Interact( bool mouse_went_up, bool mouse_went_down );
@@ -522,7 +484,7 @@ namespace UI
 
     void ReceiveMessage( const InterfaceUpdate::Data &msg )
     {
-      printf( "%s\n", this->id.c_str() );
+      // printf( "%s\n", this->id.c_str() );
 
       for ( InterfaceUpdate::ID msg_id: subscribed_updates )
       {
@@ -584,7 +546,7 @@ namespace UI
   };
 
 
-  enum PageType
+  enum PageType : u32
   {
     MainMenu,
     FactionSelectMenu,
@@ -593,6 +555,7 @@ namespace UI
     Campaign,
     LobbyBrowser,
     Lobby,
+    NUM_PAGES,
   };
 
   // Panel?
@@ -604,8 +567,8 @@ namespace UI
 public:
     // TODO(??) make private
     entt::registry registry;
-    std::map<std::string, Element &> lookup;
-    std::vector<Page> pages;
+    std::map<std::string, ptr<Element>> lookup;
+    std::array<Page, NUM_PAGES> pages;
 
     bool over_any_elem = false;
 
@@ -704,19 +667,6 @@ public:
       registry.clear();
     }
 
-    // static Element Panel(
-    //   std::string id,
-    //   Color background,
-    //   Axis axis,
-    //   Align horiz_align,
-    //   Align vert_align
-    // )
-    // {
-    //   return Element(
-    //     Type::Panel, id, background, axis, horiz_align, vert_align
-    //   );
-    // }
-
 
 private:
     Context _context = { "", "" };
@@ -734,11 +684,14 @@ private:
 
   inline void Element::Interact( bool mouse_went_up, bool mouse_went_down )
   {
+    if ( !enabled )
+      return;
+
     switch ( type )
     {
       case PANEL:
       {
-        for ( Element child: children )
+        for ( Element &child: children )
         {
           if ( child.enabled )
           {
@@ -776,6 +729,33 @@ private:
         }
       }
       break;
+      default:
+        break;
+    }
+  }
+
+  inline void Element::Destroy()
+  {
+    switch ( type )
+    {
+      case PANEL:
+      {
+        for ( Element &child: children )
+        {
+          child.Destroy();
+        }
+        Manager()->lookup.erase( id );
+      }
+      break;
+      case STACK_PANEL:
+      {
+        children[curr_index].Destroy();
+        Manager()->lookup.erase( id );
+      }
+      break;
+      default:
+        Manager()->lookup.erase( id );
+        break;
     }
   }
 

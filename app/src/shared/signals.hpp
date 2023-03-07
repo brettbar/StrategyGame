@@ -106,7 +106,7 @@ InterfaceUpdates:
 // Used for sending data from the UI to the Game State
 namespace InterfaceEvent
 {
-  // TODO replace with ID + string?
+  // TODO replace with ID + string? or something categorized
   enum ID : u32
   {
     // BASIC
