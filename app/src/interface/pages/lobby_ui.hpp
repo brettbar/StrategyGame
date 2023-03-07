@@ -32,6 +32,7 @@ namespace UI
     Element panel =
       Panel( id )
         .SetAxis( Axis::Column )
+        .SetAnchor( Anchor::Centered )
         .Margins( { 16, 16, 0, 0 } )
         .Children( {
           TextButton( id + "_faction_selection" )

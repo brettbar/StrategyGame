@@ -61,7 +61,7 @@ public:
       std::function<void( std::vector<Element> & )> update_children
     )
     {
-      update_children( _element.children );
+      _element.update_children = update_children;
       return *this;
     }
 
@@ -73,6 +73,7 @@ public:
       u32 end
     )
     {
+      // WRONG
       update_children( _element.children, start, end );
       return *this;
     }

@@ -360,8 +360,20 @@ namespace UI
 
     void Update()
     {
-      // if ( update )
-      //   update( *this );
+      if ( !enabled )
+        return;
+
+      switch ( type )
+      {
+        case PANEL:
+        {
+          if ( update_children )
+            update_children( children );
+        }
+        break;
+        default:
+          break;
+      }
     }
 
     void Draw()
@@ -684,7 +696,7 @@ private:
 
   inline void Element::Interact( bool mouse_went_up, bool mouse_went_down )
   {
-    if ( !enabled )
+    if ( !this || !enabled )
       return;
 
     switch ( type )
