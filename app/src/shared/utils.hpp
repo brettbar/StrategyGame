@@ -217,6 +217,26 @@ inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 inputPos )
 //   DrawTextureRec( texture, rect, position, tint );
 // }
 
+// TODO(rf) this should be from json not hardcoded like this
+inline Color GetPrimaryFactionColor( std::string faction )
+{
+  if ( faction == "romans" )
+    return RED;
+  if ( faction == "greeks" )
+    return BLUE;
+  if ( faction == "celts" )
+    return GREEN;
+  if ( faction == "punics" )
+    return PURPLE;
+  if ( faction == "germans" )
+    return GRAY;
+  if ( faction == "scythians" )
+    return PINK;
+  if ( faction == "persians" )
+    return ORANGE;
+  else
+    return BLACK;
+}
 
 inline static std::string EntityIdToString( entt::entity entity )
 {

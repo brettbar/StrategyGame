@@ -9,7 +9,7 @@
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
 
-#include "../../shared/signals.hpp"
+#include "../../signals/updates.hpp"
 
 
 namespace SelectionSystem

@@ -65,19 +65,6 @@ public:
       return *this;
     }
 
-    // TODO(rf) this is clunky
-    Panel &UpdateSubsetChildren(
-      std::function<void( std::vector<Element> &, u32 start, u32 end )>
-        update_children,
-      u32 start,
-      u32 end
-    )
-    {
-      // WRONG
-      update_children( _element.children, start, end );
-      return *this;
-    }
-
     Panel &Background( Color background )
     {
       _element.background = background;

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../shared/global.hpp"
-#include "../shared/signals.hpp"
+#include "../signals/events.hpp"
+#include "../signals/updates.hpp"
 #include "../world/systems/selection_system.hpp"
 #include "ui_shared.hpp"
 
@@ -186,9 +187,8 @@ namespace UI
             case Anchor::Centered:
             {
               vec2 updated_pos = {
-                ( (f32) GetScreenWidth() / 2 ) -
-                  ( transform.width * SCALE / 2.0f ),
-                ( (f32) GetScreenHeight() / 2 ) - transform.height * SCALE,
+                ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
+                ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
               };
 
               transform.x = updated_pos.x;
@@ -383,6 +383,10 @@ namespace UI
 
       switch ( type )
       {
+        case INVALID:
+          printf( "INVALID TYPE IN DRAW\n" );
+          assert( false );
+          break;
         case PANEL:
         {
           DrawRectangleV(
@@ -494,44 +498,54 @@ namespace UI
     void Interact( bool mouse_went_up, bool mouse_went_down );
 
 
-    void ReceiveMessage( const InterfaceUpdate::Data &msg )
+    void ReceiveMessage( const InterfaceUpdate::Data &update )
     {
       // printf( "%s\n", this->id.c_str() );
 
       for ( InterfaceUpdate::ID msg_id: subscribed_updates )
       {
-        if ( msg_id == msg.update_id )
+        if ( msg_id == update.update_id )
         {
-          switch ( msg.type )
+          switch ( update.type )
           {
-            case InterfaceUpdate::EnabledUpdate:
-              if ( msg.on )
+            case InterfaceUpdate::Type::EnabledUpdate:
+              if ( update.on )
                 Enable();
               else
                 Disable();
               break;
-            case InterfaceUpdate::TextUpdate:
-              text = msg.updated_text;
-              break;
-            case InterfaceUpdate::BackgroundUpdate:
-              background = msg.updated_background;
-              break;
-            case InterfaceUpdate::TargetedTextUpdate:
-              printf( "TextLabel::ReceiveMessage msg type: %d\n", msg.type );
-
-              printf(
-                "msg.target %s, id %s\n", msg.target.c_str(), id.c_str()
-              );
-
-              if ( msg.target == id )
+            case InterfaceUpdate::Type::TextUpdate:
+              if ( update.targeted )
               {
-                text = msg.updated_text;
+                printf(
+                  "TextLabel::ReceiveMessage msg type: %d\n", update.type
+                );
+
+                printf(
+                  "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
+                );
+
+                if ( update.target == id )
+                {
+                  text = update.updated_text;
+                }
+              }
+              else
+              {
+                text = update.updated_text;
               }
               break;
-            case InterfaceUpdate::TargetedBackgroundUpdate:
-              if ( msg.target == id )
+            case InterfaceUpdate::Type::BackgroundUpdate:
+              if ( update.targeted )
               {
-                background = msg.updated_background;
+                if ( update.target == id )
+                {
+                  background = update.updated_background;
+                }
+              }
+              else
+              {
+                background = update.updated_background;
               }
               break;
             default:

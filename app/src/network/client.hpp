@@ -11,7 +11,7 @@
 #include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
 
-#include "../shared/signals.hpp"
+#include "../signals/updates.hpp"
 
 namespace Network
 {
@@ -119,37 +119,39 @@ public:
           {
             std::string player_id = body["player_id"];
             std::string faction = body["faction"];
+            std::string target = player_id + "_select_faction";
 
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::TargetedTextUpdate,
-              InterfaceUpdate::ID::FactionSelected,
-              player_id + "_select_faction",
-              faction,
-            } );
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::TargetedBackgroundUpdate,
-              InterfaceUpdate::ID::FactionSelected,
-              player_id + "_select_faction",
-              // TODO replace with json stuff
-              [&]() -> Color {
-                if ( faction == "romans" )
-                  return RED;
-                if ( faction == "greeks" )
-                  return BLUE;
-                if ( faction == "celts" )
-                  return GREEN;
-                if ( faction == "punics" )
-                  return PURPLE;
-                if ( faction == "germans" )
-                  return GRAY;
-                if ( faction == "scythians" )
-                  return PINK;
-                if ( faction == "persians" )
-                  return ORANGE;
-                else
-                  return BLACK;
-              }(),
-            } );
+            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+              .SetTarget( target )
+              .SetText( faction )
+              .build()
+              .send();
+
+            Color color = [&]() -> Color {
+              if ( faction == "romans" )
+                return RED;
+              if ( faction == "greeks" )
+                return BLUE;
+              if ( faction == "celts" )
+                return GREEN;
+              if ( faction == "punics" )
+                return PURPLE;
+              if ( faction == "germans" )
+                return GRAY;
+              if ( faction == "scythians" )
+                return PINK;
+              if ( faction == "persians" )
+                return ORANGE;
+              else
+                return BLACK;
+            }();
+
+            InterfaceUpdate::Background(
+              InterfaceUpdate::ID::FactionSelected, color
+            )
+              .SetTarget( target )
+              .build()
+              .send();
           }
           break;
           default:

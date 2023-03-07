@@ -13,7 +13,7 @@
 #include "interface/input.hpp"
 
 #include "campaign.hpp"
-#include "shared/signals.hpp"
+#include "signals/updates.hpp"
 #include "world/systems/selection_system.hpp"
 #include <raylib.h>
 
@@ -300,21 +300,21 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::MainMenuHostGame:
         {
           HostMultiplayerCampaign();
-          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data(
-            InterfaceUpdate::Type::TextUpdate,
-            InterfaceUpdate::ID::HostLobby,
-            "Start Game"
-          ) );
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
+            .SetText( "Start Game" )
+            .build()
+            .send();
         }
         break;
         case InterfaceEvent::ID::MainMenuJoinGame:
         {
           LookForMultiplayerCampaign();
-          InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data(
-            InterfaceUpdate::Type::TextUpdate,
-            InterfaceUpdate::ID::JoinLobby,
-            "Ready Up"
-          ) );
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+            .SetText( "Ready Up" )
+            .build()
+            .send();
         }
         break;
         case InterfaceEvent::ID::MainMenuStartGame:
@@ -378,34 +378,18 @@ inline void IGame::RegisterEventListeners()
 
           if ( _single_player )
           {
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::TextUpdate,
+            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+              .SetText( faction )
+              .build()
+              .send();
+
+            InterfaceUpdate::Background(
               InterfaceUpdate::ID::FactionSelected,
-              faction,
-            } );
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::BackgroundUpdate,
-              InterfaceUpdate::ID::FactionSelected,
-              // TODO replace with json stuff
-              [&]() -> Color {
-                if ( faction == "romans" )
-                  return RED;
-                if ( faction == "greeks" )
-                  return BLUE;
-                if ( faction == "celts" )
-                  return GREEN;
-                if ( faction == "punics" )
-                  return PURPLE;
-                if ( faction == "germans" )
-                  return GRAY;
-                if ( faction == "scythians" )
-                  return PINK;
-                if ( faction == "persians" )
-                  return ORANGE;
-                else
-                  return BLACK;
-              }(),
-            } );
+              GetPrimaryFactionColor( faction )
+            )
+              .build()
+              .send();
+
             UI::System::SwitchPage( UI::SinglePlayerLobby );
           }
           else
@@ -432,36 +416,21 @@ inline void IGame::RegisterEventListeners()
               } );
             }
 
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::TargetedTextUpdate,
+            std::string target = player_id + "_select_faction";
+
+            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+              .SetTarget( target )
+              .SetText( faction )
+              .build()
+              .send();
+
+            InterfaceUpdate::Background(
               InterfaceUpdate::ID::FactionSelected,
-              player_id + "_select_faction",
-              faction,
-            } );
-            InterfaceUpdate::dispatcher.enqueue( InterfaceUpdate::Data{
-              InterfaceUpdate::Type::TargetedBackgroundUpdate,
-              InterfaceUpdate::ID::FactionSelected,
-              player_id + "_select_faction",
-              // TODO replace with json stuff
-              [&]() -> Color {
-                if ( faction == "romans" )
-                  return RED;
-                if ( faction == "greeks" )
-                  return BLUE;
-                if ( faction == "celts" )
-                  return GREEN;
-                if ( faction == "punics" )
-                  return PURPLE;
-                if ( faction == "germans" )
-                  return GRAY;
-                if ( faction == "scythians" )
-                  return PINK;
-                if ( faction == "persians" )
-                  return ORANGE;
-                else
-                  return BLACK;
-              }(),
-            } );
+              GetPrimaryFactionColor( faction )
+            )
+              .SetTarget( target )
+              .build()
+              .send();
 
             UI::System::SwitchPage( UI::Lobby );
           }

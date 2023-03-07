@@ -31,7 +31,7 @@ namespace UI
           TextButton( "singleplayer_lobby_started_game" )
             .SetText( "Start Game", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::SinglePlayerLobbyStartGame )
+            .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame )
             .build(),
         }
 

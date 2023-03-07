@@ -32,7 +32,6 @@ namespace UI
     Element panel =
       Panel( id )
         .SetAxis( Axis::Column )
-        .SetAnchor( Anchor::Centered )
         .Margins( { 16, 16, 0, 0 } )
         .Children( {
           TextButton( id + "_faction_selection" )
@@ -98,47 +97,63 @@ namespace UI
     return open_slots;
   }
 
+  inline std::vector<Network::PeerData> GetPeers()
+  {
+    std::vector<Network::PeerData> members = {};
+
+    if ( Network::is_host )
+    {
+      members = Network::Host()->GetConnectedUsers();
+    }
+    else
+    {
+      members = Network::Client()->GetConnectedUsers();
+    }
+
+    return members;
+  };
+
+  inline void UpdateRow( std::vector<Element> &children, u32 begin, u32 end )
+  {
+    auto members = GetPeers();
+    for ( u32 i = begin; i < end; i++ )
+    {
+      std::string id = "player_" + std::to_string( i );
+
+      if ( i >= members.size() )
+      {
+        // We know the user is disconnected
+        if ( Manager()->lookup.contains( id ) )
+        {
+          Manager()->lookup[id]->Destroy();
+          children[i] = CreateOpenSlot( i );
+        }
+      }
+      else
+      {
+        if ( !Manager()->lookup.contains( id ) )
+        {
+          Manager()->lookup["open_slot_" + std::to_string( i )]->Destroy();
+          children[i] = CreateMemberPanel( i, id, members[i], i == 0 );
+        }
+      }
+    }
+  }
+
 
   inline std::vector<Element> CreateLobbyUI()
   {
+    auto update_first_row = []( std::vector<Element> &children ) {
+      UpdateRow( children, 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 ) );
+    };
 
-    // TODO better way of making the id and label
-    auto update_children =
-      []( std::vector<Element> &children, u32 start, u32 end ) {
-        std::vector<Network::PeerData> members = {};
-
-        if ( Network::is_host )
-        {
-          members = Network::Host()->GetConnectedUsers();
-        }
-        else
-        {
-          members = Network::Client()->GetConnectedUsers();
-        }
-
-        for ( u32 i = start; i < end; i++ )
-        {
-          std::string id = "player_" + std::to_string( i );
-
-          if ( i >= members.size() )
-          {
-            // We know the user is disconnected
-            if ( Manager()->lookup.contains( id ) )
-            {
-              Manager()->lookup[id]->Destroy();
-              children[i] = CreateOpenSlot( i );
-            }
-          }
-          else
-          {
-            if ( !Manager()->lookup.contains( id ) )
-            {
-              Manager()->lookup["open_slot_" + std::to_string( i )]->Destroy();
-              children[i] = CreateMemberPanel( i, id, members[i], i == 0 );
-            }
-          }
-        }
-      };
+    auto update_second_row = []( std::vector<Element> &children ) {
+      UpdateRow(
+        children,
+        ( Network::MAX_PLAYERS_PER_SERVER / 2 ),
+        Network::MAX_PLAYERS_PER_SERVER
+      );
+    };
 
     return {
       Panel( "lobby" )
@@ -155,20 +170,14 @@ namespace UI
             .Children(
               CreateOpenSlots( 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 ) )
             )
-            .UpdateSubsetChildren(
-              update_children, 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 )
-            )
+            .UpdateChildren( update_first_row )
             .build(),
           Panel( "lobby_members_5_8" )
             .Children( CreateOpenSlots(
               Network::MAX_PLAYERS_PER_SERVER / 2,
               Network::MAX_PLAYERS_PER_SERVER
             ) )
-            .UpdateSubsetChildren(
-              update_children,
-              Network::MAX_PLAYERS_PER_SERVER / 2,
-              Network::MAX_PLAYERS_PER_SERVER
-            )
+            .UpdateChildren( update_second_row )
             .build(),
           TextButton( "lobby_back_to_main" )
             .SetText( "Back", 32 )
