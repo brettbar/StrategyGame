@@ -2,84 +2,51 @@
 
 #include "../../shared/common.hpp"
 
-#include "../components/panel.hpp"
-#include "../components/text_button.hpp"
-
-#include "../ui_system.hpp"
+#include "../ui_builder.hpp"
 
 namespace UI
 {
 
-  inline std::vector<ptr<Element>> CreateMainMenuUI()
+  inline std::vector<Element> CreateMainMenuUI()
   {
     return {
-      Create<Panel>( {
-        "main_menu",
-        BLACK,
-        Axis::Column,
-        Align::Start,
-        Align::Start,
-        true,
-        []( Panel &self ) {
-          vec2 updated_pos = {
-            ( (f32) GetScreenWidth() / 2 ) - ( 200 * SCALE / 2.0f ),
-            ( (f32) GetScreenHeight() / 2 ) - 200 * SCALE,
-          };
-
-          self.transform.x = updated_pos.x;
-          self.transform.y = updated_pos.y;
-        },
-        {
-          Create<TextButton>( {
-            "main_menu_host_game",
-            "Host Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuHostGame,
-          } ),
-          Create<TextButton>( {
-            "main_menu_join_game",
-            "Join Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuJoinGame,
-          } ),
-          Create<TextButton>( {
-            "main_menu_start_game",
-            "Start Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuStartGame,
-          } ),
-          Create<TextButton>( {
-            "main_menu_load_game",
-            "Load Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuLoadGame,
-          } ),
-          Create<TextButton>( {
-            "main_menu_settings",
-            "Settings",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuSettings,
-          } ),
-          Create<TextButton>( {
-            "main_menu_exit_game",
-            "Exit Game",
-            32,
-            BLUE,
-            WHITE,
-            InterfaceEvent::ID::MainMenuExitGame,
-          } ),
-        },
-      } ),
+      Panel( "main_menu" )
+        .SetAxis( Axis::Column )
+        .SetAnchor( Anchor::Centered )
+        .Background( GREEN )
+        .Children( {
+          TextButton( "main_menu_host_game" )
+            .SetText( "Host Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuHostGame )
+            .build(),
+          TextButton( "main_menu_join_game" )
+            .SetText( "Join Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuJoinGame )
+            .build(),
+          TextButton( "main_menu_start_game" )
+            .SetText( "Start Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuStartGame )
+            .build(),
+          TextButton( "main_menu_load_game" )
+            .SetText( "Load Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuLoadGame )
+            .build(),
+          TextButton( "main_menu_settings" )
+            .SetText( "Settings", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuSettings )
+            .build(),
+          TextButton( "main_menu_exit_game" )
+            .SetText( "Exit Game", 32 )
+            .Background( BLUE )
+            .SetEvent( InterfaceEvent::ID::MainMenuExitGame )
+            .build(),
+        } )
+        .build(),
     };
   }
 };// namespace UI

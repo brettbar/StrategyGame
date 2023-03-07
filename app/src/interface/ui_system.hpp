@@ -2,12 +2,11 @@
 
 #include "pages/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
-#include "pages/lobby_browser.hpp"
-#include "pages/lobby_ui.hpp"
+// #include "pages/lobby_browser.hpp"
+// #include "pages/lobby_ui.hpp"
 #include "pages/main_menu_ui.hpp"
-#include "pages/modal_menu_ui.hpp"
-#include "pages/singleplayer_lobby.hpp"
-#include "ui_manager.hpp"
+// #include "pages/modal_menu_ui.hpp"
+// #include "pages/singleplayer_lobby.hpp"
 
 namespace UI
 {
@@ -25,11 +24,11 @@ namespace UI
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
-        CreateSinglePlayerLobby(),
-        CreateModalMenuUI(),
+        // CreateSinglePlayerLobby(),
+        // CreateModalMenuUI(),
         CreateCampaignUI(),
-        CreateLobbyBrowser(),
-        CreateLobbyUI(),
+        // CreateLobbyBrowser(),
+        // CreateLobbyUI(),
       };
       Manager()->SetScene( MainMenu );
       EnableContent();
@@ -50,10 +49,10 @@ namespace UI
 
     inline void EnableContent()
     {
-      for ( ptr<Element> base: Manager()->ActivePage() )
+      for ( Element &base: Manager()->ActivePage() )
       {
         // RecursiveToggle( base, true );
-        base->Enable();
+        base.Enable();
       }
     }
 
@@ -61,10 +60,10 @@ namespace UI
     {
       Manager()->SetContextNull();
 
-      for ( ptr<Element> base: Manager()->ActivePage() )
+      for ( Element &base: Manager()->ActivePage() )
       {
         // RecursiveToggle( base, false );
-        base->Disable();
+        base.Disable();
       }
     }
 
@@ -94,12 +93,16 @@ namespace UI
 
       Manager()->over_any_elem = false;
 
-      for ( ptr<Element> base: Manager()->ActivePage() )
+      for ( Element &base: Manager()->ActivePage() )
       {
-        ptr<Panel> panel = Get<Panel>( base );
-        panel->Resize();
-        panel->Reposition();
-        panel->Interact( mouseWentUp, mouseWentDown );
+        base.Resize();
+        base.Reposition();
+        base.Interact( mouseWentUp, mouseWentDown );
+
+        // Panel & panel = Get<Panel>( base );
+        // panel->Resize();
+        // panel->Reposition();
+        // panel->Interact( mouseWentUp, mouseWentDown );
       }
 
       if ( !Manager()->over_any_elem )
@@ -108,9 +111,9 @@ namespace UI
 
     inline void Draw()
     {
-      for ( ptr<Element> base: Manager()->ActivePage() )
+      for ( Element &base: Manager()->ActivePage() )
       {
-        base->Draw();
+        base.Draw();
       }
 
       DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );

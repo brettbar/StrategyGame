@@ -10,22 +10,39 @@ namespace UI
 
   enum Type : u32
   {
-    Panel,
-    StackPanel,
-    TextLabel,
-    TextButton,
-    TextureLabel,
-    TextureButton,
+    INVALID,
+    PANEL,
+    STACK_PANEL,
+    TEXT_LABEL,
+    TEXT_BUTTON,
+    TEXTURE_LABEL,
+    TEXTURE_BUTTON,
+  };
+
+  enum class Anchor
+  {
+    Free,
+    TopLeft,
+    TopMid,
+    TopRight,
+    MidLeft,
+    Centered,
+    MidRight,
+    BottomLeft,
+    BottomMid,
+    BottomRight,
   };
 
   enum class Axis
   {
+    INVALID,
     Row,
     Column,
   };
 
   enum class Align
   {
+    INVALID,
     Start,
   };
 
@@ -41,31 +58,33 @@ namespace UI
   void CheckOverElem( bool );
   bool CheckInteraction();
 
+
   struct Element
   {
-    Type type;
-    bool enabled;
-    std::string id;
-    Color background;
-    rect transform;
-    Margins margins;
+    Type type = Type::INVALID;
+    bool enabled = false;
+    std::string id = "INVALID";
+    Color background = BLACK;
+    rect transform = rect{ 0, 0, 0, 0 };
+    Margins margins = Margins{ 0, 0, 0, 0 };
 
     // Panel
-    Axis children_axis;
-    Align children_horiz_align;
-    Align children_vert_align;
+    Anchor anchor = Anchor::Free;// Might apply to others as well?
+    Axis children_axis = Axis::INVALID;
+    Align children_horiz_align = Align::INVALID;
+    Align children_vert_align = Align::INVALID;
     bool abs_size = false;
     // std::function<void( Panel & )> update;
-    std::vector<Element> children;
-    std::vector<InterfaceUpdate::ID> subscribed_messages;
+    std::vector<Element> children = {};
+    std::vector<InterfaceUpdate::ID> subscribed_updates = {};
 
     // StackPanel
     u32 curr_index = 0;
 
     // TextLabel
-    std::string text;
-    i32 font_size;
-    Color text_color;
+    std::string text = "INVALID";
+    i32 font_size = 14;
+    Color text_color = WHITE;
     // TODO(rf) probably can remove all together
     bool dynamic = false;
 
@@ -74,18 +93,33 @@ namespace UI
     ptr<InterfaceEvent::Data> on_click = nullptr;
 
     // TextureLabel
-    Texture2D texture;
+    Texture2D texture = Texture2D();
 
 
+    // Unimplemented/Invalid default constructor
+    Element() {}
+
+    // Base element TODO delete?
+    // Element( Type type, std::string id, Color background )
+    //     : type( type ), id( id ), background( background )
+    // {
+    // }
+
+
+    // Panel element
     Element(
+      Type type,
       std::string id,
       Color background,
-      bool enabled,
-      rect transform,
-      Margins margins
+      std::vector<InterfaceUpdate::ID> subscribed_messages,
+      Axis axis,
+      Align horiz_align,
+      Align vert_align
     )
-        : enabled( enabled ), id( id ), background( background ),
-          transform( transform ), margins( margins )
+        : type( type ), id( id ), background( background ),
+          children_axis( axis ), children_horiz_align( horiz_align ),
+          children_vert_align( vert_align ),
+          subscribed_updates( subscribed_messages )
     {
     }
 
@@ -93,7 +127,7 @@ namespace UI
     {
       switch ( type )
       {
-        case Panel:
+        case PANEL:
         {
           enabled = true;
           Resize();
@@ -105,13 +139,13 @@ namespace UI
           }
         }
         break;
-        case StackPanel:
+        case STACK_PANEL:
         {
           enabled = true;
           children[curr_index].Enable();
         }
         break;
-        case TextLabel:
+        case TEXT_LABEL:
         {
           enabled = true;
           SubscribeToMessages();
@@ -127,7 +161,7 @@ namespace UI
     {
       switch ( type )
       {
-        case Panel:
+        case PANEL:
         {
           for ( Element child: children )
           {
@@ -137,13 +171,13 @@ namespace UI
           enabled = false;
         }
         break;
-        case StackPanel:
+        case STACK_PANEL:
         {
           children[curr_index].Disable();
           enabled = false;
         }
         break;
-        case TextLabel:
+        case TEXT_LABEL:
         {
           enabled = false;
           UnsubscribeFromMessages();
@@ -155,15 +189,52 @@ namespace UI
       }
     }
 
-    void Resize()
+    void Reposition()
     {
+      if ( !enabled )
+        return;
+
       switch ( type )
       {
-        case Panel:
-        {
-          if ( enabled )
-            return;
+        case STACK_PANEL:
+        case PANEL:
+          switch ( anchor )
+          {
+            case Anchor::Centered:
+            {
+              vec2 updated_pos = {
+                ( (f32) GetScreenWidth() / 2 ) -
+                  ( transform.width * SCALE / 2.0f ),
+                ( (f32) GetScreenHeight() / 2 ) - transform.height * SCALE,
+              };
 
+              transform.x = updated_pos.x;
+              transform.y = updated_pos.y;
+            }
+            break;
+            default:
+              break;
+          }
+
+          for ( Element &child: children )
+          {
+            child.Reposition();
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    void Resize()
+    {
+      if ( !enabled )
+        return;
+
+      switch ( type )
+      {
+        case PANEL:
+        {
           f32 total_height = 0;
           f32 total_width = 0;
           f32 tallest_child = 0;
@@ -176,8 +247,6 @@ namespace UI
           for ( Element &child: children )
           {
             // TODO not sure if this is right
-            // if ( !child )
-            //   continue;
             if ( !child.enabled )
               continue;
 
@@ -271,14 +340,15 @@ namespace UI
           }
         }
         break;
-        case StackPanel:
+        case STACK_PANEL:
         {
           children[curr_index].transform.x = transform.x;
           children[curr_index].transform.y = transform.y;
           children[curr_index].Resize();
         }
         break;
-        case TextLabel:
+        case TEXT_BUTTON:
+        case TEXT_LABEL:
         {
           const vec2 text_dims = MeasureTextEx(
             Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -291,7 +361,8 @@ namespace UI
           transform.height = text_dims.y;
         }
         break;
-        case TextureLabel:
+        case TEXTURE_BUTTON:
+        case TEXTURE_LABEL:
         {
           transform.width = texture.width * UI::SCALE;
           transform.height = texture.height * UI::SCALE;
@@ -313,7 +384,7 @@ namespace UI
 
       switch ( type )
       {
-        case Panel:
+        case PANEL:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -327,7 +398,7 @@ namespace UI
           }
         }
         break;
-        case StackPanel:
+        case STACK_PANEL:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -338,7 +409,7 @@ namespace UI
           children[curr_index].Draw();
         }
         break;
-        case TextLabel:
+        case TEXT_LABEL:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -359,7 +430,7 @@ namespace UI
           );
         }
         break;
-        case TextButton:
+        case TEXT_BUTTON:
         {
           if ( !clickable )
           {
@@ -403,8 +474,8 @@ namespace UI
           }
         }
         break;
-        case TextureLabel:
-        case TextureButton:
+        case TEXTURE_LABEL:
+        case TEXTURE_BUTTON:
         {
           DrawTextureEx(
             texture, { transform.x, transform.y }, 0.0, SCALE, WHITE
@@ -417,7 +488,7 @@ namespace UI
 
     void FireEvent()
     {
-      InterfaceEvent::event_emitter.publish( on_click );
+      InterfaceEvent::event_emitter.publish( *on_click );
       // switch ( on_click->type ) {
       //   case InterfaceEvent::Type::Basic: {
       //     InterfaceEvent::event_emitter.publish( *on_click );
@@ -453,7 +524,7 @@ namespace UI
     {
       printf( "%s\n", this->id.c_str() );
 
-      for ( InterfaceUpdate::ID msg_id: subscribed_messages )
+      for ( InterfaceUpdate::ID msg_id: subscribed_updates )
       {
         if ( msg_id == msg.update_id )
         {
@@ -633,6 +704,19 @@ public:
       registry.clear();
     }
 
+    // static Element Panel(
+    //   std::string id,
+    //   Color background,
+    //   Axis axis,
+    //   Align horiz_align,
+    //   Align vert_align
+    // )
+    // {
+    //   return Element(
+    //     Type::Panel, id, background, axis, horiz_align, vert_align
+    //   );
+    // }
+
 
 private:
     Context _context = { "", "" };
@@ -648,22 +732,11 @@ private:
     return IManager::Manager();
   }
 
-  inline Element CreatePanel() {}
-
-  // template<typename T>
-  // inline Create( T element )
-  // {
-  //   auto created = std::make_shared<T>( element );
-  //   created->SubscribeToMessages();
-  //   Manager()->lookup.insert_or_assign( element.id, created );
-  //   return created;
-  // }
-
   inline void Element::Interact( bool mouse_went_up, bool mouse_went_down )
   {
     switch ( type )
     {
-      case Panel:
+      case PANEL:
       {
         for ( Element child: children )
         {
@@ -673,7 +746,7 @@ private:
           }
         }
       }
-      case StackPanel:
+      case STACK_PANEL:
       {
         children[curr_index].Interact( mouse_went_up, mouse_went_down );
 
@@ -683,7 +756,7 @@ private:
         }
       }
       break;
-      case TextButton:
+      case TEXT_BUTTON:
       {
         bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
 
