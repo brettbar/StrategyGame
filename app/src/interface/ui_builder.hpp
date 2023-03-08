@@ -32,7 +32,7 @@ public:
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
-      _element.SubscribeToUpdates();
+      // _element.SubscribeToUpdates();
     }
 
     Element build()
@@ -96,7 +96,7 @@ public:
       _element.type = Type::StackPanel;
       _element.id = id;
       _element.curr_index = 0;
-      _element.SubscribeToUpdates();
+      // _element.SubscribeToUpdates();
     }
 
     Element build()
@@ -127,7 +127,7 @@ public:
       _element = Element();
       _element.type = Type::TextLabel;
       _element.id = id;
-      _element.SubscribeToUpdates();
+      // _element.SubscribeToUpdates();
     }
 
     Element build()
@@ -171,7 +171,7 @@ public:
       _element = Element();
       _element.type = Type::TextButton;
       _element.id = id;
-      _element.SubscribeToUpdates();
+      // _element.SubscribeToUpdates();
     }
 
     Element build()

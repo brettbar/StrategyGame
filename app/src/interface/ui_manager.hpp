@@ -120,6 +120,14 @@ namespace UI
           // TextureLabel
           texture( Texture2D() )
     {
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+        .connect<&Element::ReceiveUpdate>( this );
+    }
+
+    ~Element()
+    {
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+        .disconnect<&Element::ReceiveUpdate>( this );
     }
 
 
@@ -600,13 +608,6 @@ namespace UI
           break;
         }
       }
-    }
-
-
-    void SubscribeToUpdates()
-    {
-      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-        .connect<&Element::ReceiveUpdate>( this );
     }
 
     // void UnsubscribeFromUpdates()
