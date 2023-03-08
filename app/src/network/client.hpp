@@ -11,6 +11,8 @@
 #include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
 
+#include "../shared/utils.hpp"
+
 #include "../signals/updates.hpp"
 
 namespace Network
@@ -20,7 +22,6 @@ namespace Network
 private:
     IClient( IClient const & ) = delete;
     void operator=( const IClient & ) = delete;
-
 
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
@@ -56,6 +57,9 @@ private:
     }
 
 public:
+    // TODO make private
+    std::string player_id;
+
     static IClient *Client()
     {
       static IClient instance;
@@ -94,10 +98,28 @@ public:
         {
           case MessageID::Ping:
             break;
+          case MessageID::SelfConnected:
+          {
+            player_id = body["new_player_id"];
+            InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+              .SetTarget( player_id + "_label" )
+              .SetText( player_id )
+              .build()
+              .send();
+            InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+              .SetTarget( player_id + "_faction_selection" )
+              .build()
+              .send();
+            InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
+              .SetTarget( player_id + "_faction_selection" )
+              .build()
+              .send();
+          }
+          break;
           case MessageID::PlayerConnected:
           {
             auto data = body["data"];
-            auto player_id = data["player_id"];
+            std::string player_id = data["player_id"];
             // auto name = body["data"]["steam_name"];
             u64 steam_user_id_u64 = data["steam_user_id"];
 
@@ -110,6 +132,22 @@ public:
                 .readied_up = false,
                 .steam_user_id = CSteamID( steam_user_id_u64 ),
               };
+
+              InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+                .SetTarget( player_id + "_label" )
+                .SetText( player_id )
+                .build()
+                .send();
+              InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+                .SetTarget( player_id + "_faction_selection" )
+                .build()
+                .send();
+              InterfaceUpdate::Background(
+                InterfaceUpdate::ID::JoinLobby, PURPLE
+              )
+                .SetTarget( player_id + "_faction_selection" )
+                .build()
+                .send();
             }
           }
           break;
@@ -127,27 +165,10 @@ public:
               .build()
               .send();
 
-            Color color = [&]() -> Color {
-              if ( faction == "romans" )
-                return RED;
-              if ( faction == "greeks" )
-                return BLUE;
-              if ( faction == "celts" )
-                return GREEN;
-              if ( faction == "punics" )
-                return PURPLE;
-              if ( faction == "germans" )
-                return GRAY;
-              if ( faction == "scythians" )
-                return PINK;
-              if ( faction == "persians" )
-                return ORANGE;
-              else
-                return BLACK;
-            }();
 
             InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected, color
+              InterfaceUpdate::ID::FactionSelected,
+              GetPrimaryFactionColor( faction )
             )
               .SetTarget( target )
               .build()

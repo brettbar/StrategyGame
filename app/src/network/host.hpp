@@ -40,7 +40,6 @@ private:
 
     CSteamID _server_id;
 
-
     // Used after lobby is done
     // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
     std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
@@ -106,6 +105,9 @@ private:
 
 
 public:
+    // TODO make private
+    std::string player_id = "player_0";
+
     MessageQueue msg_queue;
 
     static IHost *Host()
@@ -376,6 +378,15 @@ public:
           info.m_identityRemote.GetSteamID();
         _clients[i].peer_data.active = true;
         _clients[i].conn = cb->m_hConn;
+
+        // Tell the new client which player id they are
+
+        nlohmann::json new_player_id_body = {};
+        new_player_id_body["new_player_id"] = _clients[i].peer_data.player_id;
+        SendMessageOnConnection(
+          _clients[i].conn,
+          Message{ MessageID::SelfConnected, new_player_id_body }
+        );
 
         // Tell the new client about all the current clients
         for ( auto client: _clients )

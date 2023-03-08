@@ -14,7 +14,7 @@ public:
     Element build()
     {
       auto created = std::make_shared<Element>( _element );
-      created->SubscribeToMessages();
+      created->SubscribeToUpdates();
       Manager()->lookup.insert_or_assign( _element.id, created );
       return _element;
     }
@@ -26,7 +26,7 @@ public:
   {
     Panel( std::string id )
     {
-      _element.type = Type::PANEL;
+      _element.type = Type::Panel;
       _element.id = id;
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
@@ -82,7 +82,7 @@ public:
   {
     StackPanel( std::string id )
     {
-      _element.type = Type::STACK_PANEL;
+      _element.type = Type::StackPanel;
       _element.id = id;
       _element.curr_index = 0;
     }
@@ -104,7 +104,7 @@ public:
   {
     TextLabel( std::string id )
     {
-      _element.type = Type::TEXT_LABEL;
+      _element.type = Type::TextLabel;
       _element.id = id;
     }
 
@@ -138,7 +138,7 @@ public:
   {
     TextButton( std::string id )
     {
-      _element.type = Type::TEXT_BUTTON;
+      _element.type = Type::TextButton;
       _element.id = id;
     }
 
@@ -170,6 +170,12 @@ public:
     TextButton &ListensFor( std::vector<InterfaceUpdate::ID> updates )
     {
       _element.subscribed_updates = updates;
+      return *this;
+    }
+
+    TextButton &Clickable( bool clickable )
+    {
+      _element.clickable = clickable;
       return *this;
     }
   };

@@ -34,6 +34,7 @@ namespace Network
   enum MessageID : u32
   {
     InitiateContact,
+    SelfConnected,
     Ping,
     PlayerConnected,
     PlayerDisconnected,

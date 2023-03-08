@@ -7,6 +7,7 @@
 // Used for sending data from the Game State to the UI
 namespace InterfaceUpdate
 {
+
   /*
      Time to figure out this signal business.
      For InterfaceUpdates we have 2 ideas.
@@ -43,6 +44,7 @@ InterfaceUpdates:
     ActorContext,
     JoinLobby,
     HostLobby,
+    NumIDs,
   };
 
   struct Data
@@ -52,6 +54,7 @@ InterfaceUpdates:
     bool on = false;
     std::string updated_text = "INVALID";
     Color updated_background = BLACK;
+    bool clickable = false;
 
     bool targeted = false;
     std::string target = "INVALID";
@@ -125,6 +128,23 @@ public:
     }
 
     Background &SetTarget( std::string target_id )
+    {
+      _data.targeted = true;
+      _data.target = target_id;
+      return *this;
+    }
+  };
+
+  struct Clickable : Builder
+  {
+    Clickable( ID update_id, bool clickable )
+    {
+      _data.type = Type::ClickableUpdate;
+      _data.update_id = update_id;
+      _data.clickable = clickable;
+    }
+
+    Clickable &SetTarget( std::string target_id )
     {
       _data.targeted = true;
       _data.target = target_id;

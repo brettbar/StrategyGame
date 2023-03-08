@@ -67,7 +67,7 @@ class IGame
   // TODO move
   std::string faction = "";
   // TODO this should be set from networking
-  std::string player_id = "player_0";
+  // std::string player_id = "player_0";
 
   IGame( IGame const & ) = delete;
   void operator=( const IGame & ) = delete;
@@ -115,6 +115,24 @@ class IGame
     Network::is_host = true;
     Network::Host()->Init();
     UI::System::SwitchPage( UI::Lobby );
+
+    // InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
+    //   .SetText( "Start Game" )
+    //   .build()
+    //   .send();
+    InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
+      .SetTarget( Network::Host()->player_id + "_label" )
+      .SetText( Network::Host()->player_id )
+      .build()
+      .send();
+    InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
+      .SetTarget( Network::Host()->player_id + "_faction_selection" )
+      .build()
+      .send();
+    InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
+      .SetTarget( Network::Host()->player_id + "_faction_selection" )
+      .build()
+      .send();
   }
 
   void StartMultiplayerCampaign() {}
@@ -133,6 +151,12 @@ class IGame
     {
       printf( "Sending joined lobby event!\n" );
       UI::System::SwitchPage( UI::Lobby );
+
+
+      // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+      //   .SetText( "Ready Up" )
+      //   .build()
+      //   .send();
     }
   }
 
@@ -298,25 +322,11 @@ inline void IGame::RegisterEventListeners()
         /// BASIC
         // MainMenu
         case InterfaceEvent::ID::MainMenuHostGame:
-        {
           HostMultiplayerCampaign();
-
-          InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-            .SetText( "Start Game" )
-            .build()
-            .send();
-        }
-        break;
+          break;
         case InterfaceEvent::ID::MainMenuJoinGame:
-        {
           LookForMultiplayerCampaign();
-
-          InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-            .SetText( "Ready Up" )
-            .build()
-            .send();
-        }
-        break;
+          break;
         case InterfaceEvent::ID::MainMenuStartGame:
         {
           _single_player = true;
@@ -394,29 +404,30 @@ inline void IGame::RegisterEventListeners()
           }
           else
           {
+            std::string target = "";
+
             if ( Network::is_host )
             {
-
+              target = Network::Host()->player_id;
               Network::Host()->SendMessageToAllClients( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
-                  { "player_id", player_id },
+                  { "player_id", target },
                   { "faction", faction },
                 },
               } );
             }
             else
             {
+              target = Network::Client()->player_id;
               Network::Client()->SendMessageToHost( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
-                  { "player_id", player_id },
+                  { "player_id", target },
                   { "faction", faction },
                 },
               } );
             }
-
-            std::string target = player_id + "_select_faction";
 
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
               .SetTarget( target )

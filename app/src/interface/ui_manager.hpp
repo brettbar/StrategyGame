@@ -9,15 +9,15 @@
 namespace UI
 {
 
-  enum Type : u32
+  enum class Type : u32
   {
     INVALID,
-    PANEL,
-    STACK_PANEL,
-    TEXT_LABEL,
-    TEXT_BUTTON,
-    TEXTURE_LABEL,
-    TEXTURE_BUTTON,
+    Panel,
+    StackPanel,
+    TextLabel,
+    TextButton,
+    TextureLabel,
+    TextureButton,
   };
 
   enum class Anchor
@@ -63,8 +63,8 @@ namespace UI
   struct Element
   {
     Type type = Type::INVALID;
-    bool enabled = false;
     std::string id = "INVALID";
+    bool enabled = false;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
@@ -96,16 +96,20 @@ namespace UI
     // TextureLabel
     Texture2D texture = Texture2D();
 
+    Element() = delete;
+    // TODO left off here
+    // Need to define valid constructors so we dont get garbage data
+
 
     void Enable()
     {
       switch ( type )
       {
-        case INVALID:
+        case Type::INVALID:
           printf( "INVALID TYPE ENABLED\n" );
           assert( false );
           break;
-        case PANEL:
+        case Type::Panel:
         {
           enabled = true;
           Resize();
@@ -119,7 +123,7 @@ namespace UI
           }
         }
         break;
-        case STACK_PANEL:
+        case Type::StackPanel:
         {
           enabled = true;
           children[curr_index].Enable();
@@ -127,11 +131,10 @@ namespace UI
           children[curr_index].Reposition();
         }
         break;
-        case TEXT_LABEL:
-        case TEXT_BUTTON:
+        case Type::TextLabel:
+        case Type::TextButton:
         {
           enabled = true;
-          SubscribeToMessages();
         }
         break;
         default:
@@ -144,7 +147,7 @@ namespace UI
     {
       switch ( type )
       {
-        case PANEL:
+        case Type::Panel:
         {
           for ( Element child: children )
           {
@@ -154,17 +157,16 @@ namespace UI
           enabled = false;
         }
         break;
-        case STACK_PANEL:
+        case Type::StackPanel:
         {
           children[curr_index].Disable();
           enabled = false;
         }
         break;
-        case TEXT_LABEL:
-        case TEXT_BUTTON:
+        case Type::TextLabel:
+        case Type::TextButton:
         {
           enabled = false;
-          UnsubscribeFromMessages();
         }
         break;
         default:
@@ -180,8 +182,8 @@ namespace UI
     {
       switch ( type )
       {
-        case STACK_PANEL:
-        case PANEL:
+        case Type::StackPanel:
+        case Type::Panel:
           switch ( anchor )
           {
             case Anchor::Centered:
@@ -216,11 +218,11 @@ namespace UI
 
       switch ( type )
       {
-        case INVALID:
+        case Type::INVALID:
           printf( "INVALID TYPE IN RESIZE\n" );
           assert( false );
           break;
-        case PANEL:
+        case Type::Panel:
         {
           f32 total_height = 0;
           f32 total_width = 0;
@@ -327,15 +329,15 @@ namespace UI
           }
         }
         break;
-        case STACK_PANEL:
+        case Type::StackPanel:
         {
           children[curr_index].transform.x = transform.x;
           children[curr_index].transform.y = transform.y;
           children[curr_index].Resize();
         }
         break;
-        case TEXT_BUTTON:
-        case TEXT_LABEL:
+        case Type::TextButton:
+        case Type::TextLabel:
         {
           const vec2 text_dims = MeasureTextEx(
             Global::font_cache[hstr{ "font_romulus" }]->font,
@@ -348,8 +350,8 @@ namespace UI
           transform.height = text_dims.y;
         }
         break;
-        case TEXTURE_BUTTON:
-        case TEXTURE_LABEL:
+        case Type::TextureButton:
+        case Type::TextureLabel:
         {
           transform.width = texture.width * UI::SCALE;
           transform.height = texture.height * UI::SCALE;
@@ -365,7 +367,7 @@ namespace UI
 
       switch ( type )
       {
-        case PANEL:
+        case Type::Panel:
         {
           if ( update_children )
             update_children( children );
@@ -383,11 +385,11 @@ namespace UI
 
       switch ( type )
       {
-        case INVALID:
+        case Type::INVALID:
           printf( "INVALID TYPE IN DRAW\n" );
           assert( false );
           break;
-        case PANEL:
+        case Type::Panel:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -401,7 +403,7 @@ namespace UI
           }
         }
         break;
-        case STACK_PANEL:
+        case Type::StackPanel:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -412,7 +414,7 @@ namespace UI
           children[curr_index].Draw();
         }
         break;
-        case TEXT_LABEL:
+        case Type::TextLabel:
         {
           DrawRectangleV(
             { transform.x, transform.y },
@@ -433,7 +435,7 @@ namespace UI
           );
         }
         break;
-        case TEXT_BUTTON:
+        case Type::TextButton:
         {
           if ( !clickable )
           {
@@ -477,8 +479,8 @@ namespace UI
           }
         }
         break;
-        case TEXTURE_LABEL:
-        case TEXTURE_BUTTON:
+        case Type::TextureLabel:
+        case Type::TextureButton:
         {
           DrawTextureEx(
             texture, { transform.x, transform.y }, 0.0, SCALE, WHITE
@@ -498,14 +500,15 @@ namespace UI
     void Interact( bool mouse_went_up, bool mouse_went_down );
 
 
-    void ReceiveMessage( const InterfaceUpdate::Data &update )
+    void ReceiveUpdate( const InterfaceUpdate::Data &update )
     {
-      // printf( "%s\n", this->id.c_str() );
-
-      for ( InterfaceUpdate::ID msg_id: subscribed_updates )
+      for ( InterfaceUpdate::ID subscribed_update_id: subscribed_updates )
       {
-        if ( msg_id == update.update_id )
+        // TODO(??) we are crashing here sometimes not sure why
+        if ( subscribed_update_id == update.update_id )
         {
+          printf( "id !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.update_id );
+          printf( "type !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.type );
           switch ( update.type )
           {
             case InterfaceUpdate::Type::EnabledUpdate:
@@ -518,7 +521,7 @@ namespace UI
               if ( update.targeted )
               {
                 printf(
-                  "TextLabel::ReceiveMessage msg type: %d\n", update.type
+                  "TextLabel::ReceiveUpdate msg type: %d\n", update.type
                 );
 
                 printf(
@@ -548,6 +551,26 @@ namespace UI
                 background = update.updated_background;
               }
               break;
+            case InterfaceUpdate::Type::ClickableUpdate:
+
+              printf( "ClickableUpdate!\n" );
+
+              if ( update.targeted )
+              {
+                printf( "target! %s\n", update.target.c_str() );
+
+                if ( update.target == id )
+                {
+                  printf( "ourselves %s!\n", id.c_str() );
+
+                  clickable = update.clickable;
+                }
+              }
+              else
+              {
+                clickable = update.clickable;
+              }
+              break;
             default:
               printf( "Error :: Panel deos not support message type\n" );
               break;
@@ -558,17 +581,17 @@ namespace UI
     }
 
 
-    void SubscribeToMessages()
+    void SubscribeToUpdates()
     {
       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-        .connect<&Element::ReceiveMessage>( this );
+        .connect<&Element::ReceiveUpdate>( this );
     }
 
-    void UnsubscribeFromMessages()
-    {
-      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-        .disconnect<&Element::ReceiveMessage>( this );
-    }
+    // void UnsubscribeFromUpdates()
+    // {
+    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+    //     .disconnect<&Element::ReceiveUpdate>( this );
+    // }
   };
 
 
@@ -715,7 +738,7 @@ private:
 
     switch ( type )
     {
-      case PANEL:
+      case Type::Panel:
       {
         for ( Element &child: children )
         {
@@ -725,7 +748,7 @@ private:
           }
         }
       }
-      case STACK_PANEL:
+      case Type::StackPanel:
       {
         children[curr_index].Interact( mouse_went_up, mouse_went_down );
 
@@ -735,7 +758,7 @@ private:
         }
       }
       break;
-      case TEXT_BUTTON:
+      case Type::TextButton:
       {
         bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
 
@@ -764,7 +787,7 @@ private:
   {
     switch ( type )
     {
-      case PANEL:
+      case Type::Panel:
       {
         for ( Element &child: children )
         {
@@ -773,7 +796,7 @@ private:
         Manager()->lookup.erase( id );
       }
       break;
-      case STACK_PANEL:
+      case Type::StackPanel:
       {
         children[curr_index].Destroy();
         Manager()->lookup.erase( id );
