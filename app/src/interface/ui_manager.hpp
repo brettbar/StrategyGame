@@ -96,9 +96,31 @@ namespace UI
     // TextureLabel
     Texture2D texture = Texture2D();
 
-    Element() = delete;
+    // Element() = delete;
     // TODO left off here
     // Need to define valid constructors so we dont get garbage data
+    Element()
+        : type( Type::INVALID ), id( "INVALID" ), enabled( false ),
+          background( BLACK ), transform( rect{ 0, 0, 0, 0 } ),
+          margins( Margins{ 0, 0, 0, 0 } ),
+          // Panel
+          anchor( Anchor::Free ),// Might apply to others as well?
+          children_axis( Axis::INVALID ),
+          children_horiz_align( Align::INVALID ),
+          children_vert_align( Align::INVALID ), abs_size( false ),
+          children( {} ), update_children( {} ), subscribed_updates( {} ),
+          // StackPanel
+          curr_index( 0 ),
+          // TextLabel
+          text( "INVALID" ), font_size( 14 ), text_color( WHITE ),
+          // TODO(rf) probably can remove all together
+          dynamic( false ),
+          // TextButton
+          clickable( true ), on_click( nullptr ),
+          // TextureLabel
+          texture( Texture2D() )
+    {
+    }
 
 
     void Enable()
@@ -616,7 +638,7 @@ namespace UI
 public:
     // TODO(??) make private
     entt::registry registry;
-    std::map<std::string, ptr<Element>> lookup;
+    // std::map<std::string, ptr<Element>> lookup;
     std::array<Page, NUM_PAGES> pages;
 
     bool over_any_elem = false;
@@ -793,17 +815,17 @@ private:
         {
           child.Destroy();
         }
-        Manager()->lookup.erase( id );
+        // Manager()->lookup.erase( id );
       }
       break;
       case Type::StackPanel:
       {
         children[curr_index].Destroy();
-        Manager()->lookup.erase( id );
+        // Manager()->lookup.erase( id );
       }
       break;
       default:
-        Manager()->lookup.erase( id );
+        // Manager()->lookup.erase( id );
         break;
     }
   }

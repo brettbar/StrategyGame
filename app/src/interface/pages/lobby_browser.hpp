@@ -22,7 +22,10 @@ namespace UI
         const char *lobby_name =
           SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
-        if ( lobby_name && lobby_name[0] && !Manager()->lookup.contains( std::string( lobby_name ) ) )
+        if (
+          lobby_name && lobby_name[0]
+          // && !Manager()->lookup.contains( std::string( lobby_name ) )
+        )
         {
           std::cout << "Lobby Name: " << lobby_name << std::endl;
 

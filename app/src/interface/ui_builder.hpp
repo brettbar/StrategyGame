@@ -5,32 +5,39 @@
 
 namespace UI
 {
-  struct Builder
+  //   struct Builder
+  //   {
+  // protected:
+  // public:
+  //     Element build()
+  //     {
+  //       // auto created = std::make_shared<Element>( _element );
+  //       // Manager()->lookup.insert_or_assign( _element.id, created );
+  //       return _element;
+  //     }
+
+  //     virtual ~Builder() {}
+  //   };
+
+  class Panel
   {
-protected:
     Element _element;
 
 public:
-    Element build()
-    {
-      auto created = std::make_shared<Element>( _element );
-      created->SubscribeToUpdates();
-      Manager()->lookup.insert_or_assign( _element.id, created );
-      return _element;
-    }
-
-    virtual ~Builder() {}
-  };
-
-  struct Panel : Builder
-  {
     Panel( std::string id )
     {
+      _element = Element();
       _element.type = Type::Panel;
       _element.id = id;
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
+      _element.SubscribeToUpdates();
+    }
+
+    Element build()
+    {
+      return _element;
     }
 
     Panel &SetAnchor( Anchor anchor )
@@ -78,13 +85,23 @@ public:
     }
   };
 
-  struct StackPanel : Builder
+  class StackPanel
   {
+    Element _element;
+
+public:
     StackPanel( std::string id )
     {
+      _element = Element();
       _element.type = Type::StackPanel;
       _element.id = id;
       _element.curr_index = 0;
+      _element.SubscribeToUpdates();
+    }
+
+    Element build()
+    {
+      return _element;
     }
 
     StackPanel &Background( Color background )
@@ -100,12 +117,22 @@ public:
     }
   };
 
-  struct TextLabel : Builder
+  struct TextLabel
   {
+    Element _element;
+
+public:
     TextLabel( std::string id )
     {
+      _element = Element();
       _element.type = Type::TextLabel;
       _element.id = id;
+      _element.SubscribeToUpdates();
+    }
+
+    Element build()
+    {
+      return _element;
     }
 
     TextLabel &Background( Color background )
@@ -134,12 +161,22 @@ public:
     }
   };
 
-  struct TextButton : Builder
+  struct TextButton
   {
+    Element _element;
+
+public:
     TextButton( std::string id )
     {
+      _element = Element();
       _element.type = Type::TextButton;
       _element.id = id;
+      _element.SubscribeToUpdates();
+    }
+
+    Element build()
+    {
+      return _element;
     }
 
     TextButton &Background( Color background )
