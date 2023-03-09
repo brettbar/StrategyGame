@@ -3,7 +3,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../ui_builder.hpp"
+#include "../element.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -21,22 +21,18 @@ namespace UI
           TextButton( "singleplayer_faction_label" )
             .SetText( "Select your faction", 32 )
             .Background( GREEN )
-            .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage ),
           TextButton( "singleplayer_faction_selected" )
             .SetText( "Waiting to Select Faction", 32 )
             .Background( GRAY )
-            .ListensFor( { InterfaceUpdate::ID::FactionSelected } )
-            .build(),
+            .ListensFor( { InterfaceUpdate::ID::FactionSelected } ),
           TextButton( "singleplayer_lobby_started_game" )
             .SetText( "Start Game", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame ),
         }
 
-        )
-        .build(),
+        ),
     };
   }
 };// namespace UI

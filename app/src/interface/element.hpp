@@ -1,0 +1,844 @@
+#pragma once
+
+#include "../shared/global.hpp"
+#include "../signals/events.hpp"
+#include "../signals/updates.hpp"
+#include "ui_shared.hpp"
+
+namespace UI
+{
+  enum class Type : u32
+  {
+    INVALID,
+    Panel,
+    StackPanel,
+    TextLabel,
+    TextButton,
+    TextureLabel,
+    TextureButton,
+  };
+
+  enum class Anchor
+  {
+    Free,
+    TopLeft,
+    TopMid,
+    TopRight,
+    MidLeft,
+    Centered,
+    MidRight,
+    BottomLeft,
+    BottomMid,
+    BottomRight,
+  };
+
+  enum class Axis
+  {
+    INVALID,
+    Row,
+    Column,
+  };
+
+  enum class Align
+  {
+    INVALID,
+    Start,
+  };
+
+  struct Margins
+  {
+    u32 left;
+    u32 right;
+    u32 top;
+    u32 bottom;
+  };
+
+  class Element
+  {
+    Type type = Type::INVALID;
+    std::string _id = "INVALID";
+    bool enabled = false;
+    Color background = BLACK;
+    rect transform = rect{ 0, 0, 0, 0 };
+    Margins margins = Margins{ 0, 0, 0, 0 };
+
+    // Panel
+    Anchor anchor = Anchor::Free;// Might apply to others as well?
+    Axis children_axis = Axis::INVALID;
+    Align children_horiz_align = Align::INVALID;
+    Align children_vert_align = Align::INVALID;
+    bool abs_size = false;
+    std::vector<Element> children = {};
+    std::function<void( std::vector<Element> & )> update_children = {};
+    std::vector<InterfaceUpdate::ID> subscribed_updates = {};
+
+    // StackPanel
+    u32 curr_index = 0;
+
+    // TextLabel
+    std::string text = "INVALID";
+    i32 font_size = 14;
+    Color text_color = WHITE;
+    // TODO(rf) probably can remove all together
+    bool dynamic = false;
+
+    // TextButton
+    bool clickable = true;
+    ptr<InterfaceEvent::Data> on_click = nullptr;
+
+    // TextureLabel
+    Texture2D texture = Texture2D();
+
+
+    // TODO left off here
+    // Need to define valid constructors so we dont get garbage data
+    // Element()
+    //     : type( Type::INVALID ), id( "INVALID" ), enabled( false ),
+    //       background( BLACK ), transform( rect{ 0, 0, 0, 0 } ),
+    //       margins( Margins{ 0, 0, 0, 0 } ),
+    //       // Panel
+    //       anchor( Anchor::Free ),// Might apply to others as well?
+    //       children_axis( Axis::INVALID ),
+    //       children_horiz_align( Align::INVALID ),
+    //       children_vert_align( Align::INVALID ), abs_size( false ),
+    //       children( {} ), update_children( {} ), subscribed_updates( {} ),
+    //       // StackPanel
+    //       curr_index( 0 ),
+    //       // TextLabel
+    //       text( "INVALID" ), font_size( 14 ), text_color( WHITE ),
+    //       // TODO(rf) probably can remove all together
+    //       dynamic( false ),
+    //       // TextButton
+    //       clickable( true ), on_click( nullptr ),
+    //       // TextureLabel
+    //       texture( Texture2D() )
+    // {
+    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+    //     .connect<&Element::ReceiveUpdate>( this );
+    // }
+
+    // ~Element()
+    // {
+    //   // InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+    //   //   .disconnect<&Element::ReceiveUpdate>( this );
+    // }
+
+    // Element() = delete;
+    Element() = default;
+    Element( std::string id ){};
+
+public:
+    friend class PanelBuilder;
+    friend class StackPanelBuilder;
+    friend class TextLabelBuilder;
+    friend class TextButtonBuilder;
+
+
+    std::string ID()
+    {
+      return _id;
+    }
+
+    void Enable()
+    {
+      switch ( type )
+      {
+        case Type::INVALID:
+          printf( "INVALID TYPE ENABLED\n" );
+          assert( false );
+          break;
+        case Type::Panel:
+        {
+          enabled = true;
+          Resize();
+          Reposition();
+
+          for ( Element &child: children )
+          {
+            child.Enable();
+            child.Resize();
+            child.Reposition();
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          enabled = true;
+          children[curr_index].Enable();
+          children[curr_index].Resize();
+          children[curr_index].Reposition();
+        }
+        break;
+        case Type::TextLabel:
+        case Type::TextButton:
+        {
+          enabled = true;
+        }
+        break;
+        default:
+          enabled = true;
+          break;
+      }
+    }
+
+    void Disable()
+    {
+      switch ( type )
+      {
+        case Type::Panel:
+        {
+          for ( Element child: children )
+          {
+            child.Disable();
+          }
+
+          enabled = false;
+        }
+        break;
+        case Type::StackPanel:
+        {
+          children[curr_index].Disable();
+          enabled = false;
+        }
+        break;
+        case Type::TextLabel:
+        case Type::TextButton:
+        {
+          enabled = false;
+        }
+        break;
+        default:
+          enabled = false;
+          break;
+      }
+    }
+
+    void Destroy();
+
+
+    void Reposition()
+    {
+      switch ( type )
+      {
+        case Type::StackPanel:
+        case Type::Panel:
+          switch ( anchor )
+          {
+            case Anchor::Centered:
+            {
+              vec2 updated_pos = {
+                ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
+                ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
+              };
+
+              transform.x = updated_pos.x;
+              transform.y = updated_pos.y;
+            }
+            break;
+            default:
+              break;
+          }
+
+          for ( Element &child: children )
+          {
+            child.Reposition();
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    void Resize()
+    {
+      if ( !enabled )
+        return;
+
+      switch ( type )
+      {
+        case Type::INVALID:
+          printf( "INVALID TYPE IN RESIZE\n" );
+          assert( false );
+          break;
+        case Type::Panel:
+        {
+          f32 total_height = 0;
+          f32 total_width = 0;
+          f32 tallest_child = 0;
+          f32 widest_child = 0;
+          f32 end_of_last_x = transform.x;
+          f32 end_of_last_y = transform.y;
+
+          Update();
+
+          for ( Element &child: children )
+          {
+            // TODO not sure if this is right
+            if ( !child.enabled )
+              continue;
+
+            child.Resize();
+          }
+
+          if ( !abs_size )
+          {
+            for ( Element &child: children )
+            {
+              if ( !child.enabled )
+                continue;
+
+              total_width += child.transform.width;
+              total_height += child.transform.height;
+
+              if ( child.transform.width > widest_child )
+                widest_child = child.transform.width;
+
+              if ( child.transform.height > tallest_child )
+                tallest_child = child.transform.height;
+            }
+
+            if ( children_axis == Axis::Row )
+            {
+              transform.width = total_width;
+              transform.height = tallest_child;
+            }
+            else if ( children_axis == Axis::Column )
+            {
+              transform.width = widest_child;
+              transform.height = total_height;
+            }
+          }
+
+
+          for ( Element &child: children )
+          {
+            if ( !child.enabled )
+              continue;
+
+            if ( children_axis == Axis::Row )
+            {
+              // 2. Set the child x position based on alignment style.
+              switch ( children_horiz_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.x = end_of_last_x + child.margins.left;
+                  end_of_last_x = child.transform.x + child.transform.width +
+                                  child.margins.right;
+                }
+                break;
+              }
+
+              // 3. Set the child y position based on alignment style.
+              switch ( children_vert_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.y = transform.y;
+                }
+                break;
+              }
+            }
+            else if ( children_axis == Axis::Column )
+            {
+              // 2. Set the child x position based on alignment style.
+              switch ( children_horiz_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.x = transform.x;
+                }
+                break;
+              }
+
+              // 3. Set the child y position based on alignment style.
+              switch ( children_vert_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.y = end_of_last_y;
+                  // + margins.top;
+                  end_of_last_y = child.transform.y + child.transform.height;
+                  // + margins.bottom;
+                }
+                break;
+              }
+            }
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          children[curr_index].transform.x = transform.x;
+          children[curr_index].transform.y = transform.y;
+          children[curr_index].Resize();
+        }
+        break;
+        case Type::TextButton:
+        case Type::TextLabel:
+        {
+          const vec2 text_dims = MeasureTextEx(
+            Global::font_cache[hstr{ "font_romulus" }]->font,
+            text.c_str(),
+            font_size,
+            2.0f
+          );
+
+          transform.width = text_dims.x;
+          transform.height = text_dims.y;
+        }
+        break;
+        case Type::TextureButton:
+        case Type::TextureLabel:
+        {
+          transform.width = texture.width * UI::SCALE;
+          transform.height = texture.height * UI::SCALE;
+        }
+        break;
+      }
+    }
+
+    void Update()
+    {
+      if ( !enabled )
+        return;
+
+      switch ( type )
+      {
+        case Type::Panel:
+        {
+          if ( update_children )
+            update_children( children );
+        }
+        break;
+        default:
+          break;
+      }
+    }
+
+    void Draw()
+    {
+      if ( !enabled )
+        return;
+
+      switch ( type )
+      {
+        case Type::INVALID:
+          printf( "INVALID TYPE IN DRAW\n" );
+          assert( false );
+          break;
+        case Type::Panel:
+        {
+          DrawRectangleV(
+            { transform.x, transform.y },
+            { transform.width, transform.height },
+            background
+          );
+
+          for ( Element &child: children )
+          {
+            child.Draw();
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          DrawRectangleV(
+            { transform.x, transform.y },
+            { transform.width, transform.height },
+            background
+          );
+
+          children[curr_index].Draw();
+        }
+        break;
+        case Type::TextLabel:
+        {
+          DrawRectangleV(
+            { transform.x, transform.y },
+            { transform.width, transform.height },
+            background
+          );
+
+          DrawTextEx(
+            Global::font_cache[hstr{ "font_romulus" }]->font,
+            text.c_str(),
+            {
+              transform.x,
+              transform.y,
+            },
+            font_size,
+            2.0,
+            text_color
+          );
+        }
+        break;
+        case Type::TextButton:
+        {
+          if ( !clickable )
+          {
+            DrawRectangleV(
+              { transform.x, transform.y },
+              { transform.width, transform.height },
+              Fade( BLACK, 0.5 )
+            );
+
+            DrawTextEx(
+              Global::font_cache[hstr{ "font_romulus" }]->font,
+              text.c_str(),
+              {
+                transform.x,
+                transform.y,
+              },
+              font_size,
+              2.0,
+              text_color
+            );
+          }
+          else
+          {
+            DrawRectangleV(
+              { transform.x, transform.y },
+              { transform.width, transform.height },
+              background
+            );
+
+            DrawTextEx(
+              Global::font_cache[hstr{ "font_romulus" }]->font,
+              text.c_str(),
+              {
+                transform.x,
+                transform.y,
+              },
+              font_size,
+              2.0,
+              text_color
+            );
+          }
+        }
+        break;
+        case Type::TextureLabel:
+        case Type::TextureButton:
+        {
+          DrawTextureEx(
+            texture, { transform.x, transform.y }, 0.0, SCALE, WHITE
+          );
+        }
+        break;
+      }
+    }
+
+
+    void FireEvent()
+    {
+      if ( on_click )
+        InterfaceEvent::event_emitter.publish( *on_click );
+    }
+
+    void Interact( bool mouse_went_up, bool mouse_went_down );
+
+
+    void ReceiveUpdate( const InterfaceUpdate::Data &update )
+    {
+      printf( "ReceivedUpdate!\n" );
+      for ( InterfaceUpdate::ID subscribed_update_id: subscribed_updates )
+      {
+        // TODO(??) we are crashing here sometimes not sure why
+        if ( subscribed_update_id == update.update_id )
+        {
+          printf( "id !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.update_id );
+          printf( "type !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.type );
+          switch ( update.type )
+          {
+            case InterfaceUpdate::Type::EnabledUpdate:
+              if ( update.on )
+                Enable();
+              else
+                Disable();
+              break;
+            case InterfaceUpdate::Type::TextUpdate:
+              if ( update.targeted )
+              {
+                printf(
+                  "TextLabel::ReceiveUpdate msg type: %d\n", update.type
+                );
+
+                printf(
+                  "msg.target %s, id %s\n", update.target.c_str(), _id.c_str()
+                );
+
+                if ( update.target == _id )
+                {
+                  text = update.updated_text;
+                }
+              }
+              else
+              {
+                text = update.updated_text;
+              }
+              break;
+            case InterfaceUpdate::Type::BackgroundUpdate:
+              if ( update.targeted )
+              {
+                if ( update.target == _id )
+                {
+                  background = update.updated_background;
+                }
+              }
+              else
+              {
+                background = update.updated_background;
+              }
+              break;
+            case InterfaceUpdate::Type::ClickableUpdate:
+
+              printf( "ClickableUpdate!\n" );
+
+              if ( update.targeted )
+              {
+                printf( "target! %s\n", update.target.c_str() );
+
+                if ( update.target == _id )
+                {
+                  printf( "ourselves %s!\n", _id.c_str() );
+
+                  clickable = update.clickable;
+                }
+              }
+              else
+              {
+                clickable = update.clickable;
+              }
+              break;
+            default:
+              printf( "Error :: Panel deos not support message type\n" );
+              break;
+          }
+          break;
+        }
+      }
+    }
+
+
+    // void UnsubscribeFromUpdates()
+    // {
+    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+    //     .disconnect<&Element::ReceiveUpdate>( this );
+    // }
+  };
+
+  class AbstractBuilder
+  {
+protected:
+    Element &_element;
+    explicit AbstractBuilder( Element &element ) : _element( element ) {}
+
+public:
+    operator Element() const
+    {
+      return std::move( _element );
+    };
+  };
+
+  class PanelBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit PanelBuilder() : AbstractBuilder{ _element }
+    {
+      _element.type = Type::Panel;
+      _element.children_axis = Axis::Row;
+      _element.children_horiz_align = Align::Start;
+      _element.children_vert_align = Align::Start;
+      // _element.SubscribeToUpdates();
+    }
+
+    PanelBuilder &SetAnchor( Anchor anchor )
+    {
+      _element.anchor = anchor;
+      return *this;
+    }
+
+    PanelBuilder &SetAxis( Axis axis )
+    {
+      _element.children_axis = axis;
+      return *this;
+    }
+
+    PanelBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
+    {
+      _element.subscribed_updates = updates;
+      return *this;
+    }
+
+    PanelBuilder &Children( std::vector<Element> children )
+    {
+      _element.children = children;
+      return *this;
+    }
+
+    PanelBuilder &UpdateChildren(
+      std::function<void( std::vector<Element> & )> update_children
+    )
+    {
+      _element.update_children = update_children;
+      return *this;
+    }
+
+    PanelBuilder &Background( Color background )
+    {
+      _element.background = background;
+      return *this;
+    }
+
+    PanelBuilder &Margins( Margins margins )
+    {
+      _element.margins = margins;
+      return *this;
+    }
+  };
+
+  class StackPanelBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit StackPanelBuilder() : AbstractBuilder{ _element }
+    {
+      _element.type = Type::StackPanel;
+      _element.curr_index = 0;
+      // _element.SubscribeToUpdates();
+    }
+
+    StackPanelBuilder &Background( Color background )
+    {
+      _element.background = background;
+      return *this;
+    }
+
+    StackPanelBuilder &Children( std::vector<Element> children )
+    {
+      _element.children = children;
+      return *this;
+    }
+  };
+
+  class TextLabelBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit TextLabelBuilder() : AbstractBuilder{ _element }
+    {
+      _element.type = Type::TextLabel;
+      // _element.SubscribeToUpdates();
+    }
+
+    TextLabelBuilder &Background( Color background )
+    {
+      _element.background = background;
+      return *this;
+    }
+
+    TextLabelBuilder &SetText( std::string text, f32 font_size )
+    {
+      _element.text = text;
+      _element.font_size = font_size;
+      return *this;
+    }
+
+    TextLabelBuilder &SetText(
+      std::string text,
+      f32 font_size,
+      Color text_color
+    )
+    {
+      _element.text_color = text_color;
+      return SetText( text, font_size );
+    }
+
+    TextLabelBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
+    {
+      _element.subscribed_updates = updates;
+      return *this;
+    }
+  };
+
+  class TextButtonBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit TextButtonBuilder() : AbstractBuilder{ _element }
+    {
+      _element.type = Type::TextButton;
+      // _element.id = id;
+      // _element.SubscribeToUpdates();
+    }
+
+    TextButtonBuilder &Background( Color background )
+    {
+      _element.background = background;
+      return *this;
+    }
+
+    TextButtonBuilder &SetText( std::string text, f32 font_size )
+    {
+      _element.text = text;
+      _element.font_size = font_size;
+      return *this;
+    }
+
+    TextButtonBuilder &SetText(
+      std::string text,
+      f32 font_size,
+      Color text_color
+    )
+    {
+      _element.text_color = text_color;
+      return SetText( text, font_size );
+    }
+
+    TextButtonBuilder &SetEvent( InterfaceEvent::Data event )
+    {
+      _element.on_click = std::make_shared<InterfaceEvent::Data>( event );
+      return *this;
+    }
+
+    TextButtonBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
+    {
+      _element.subscribed_updates = updates;
+
+      return *this;
+    }
+
+    TextButtonBuilder &Clickable( bool clickable )
+    {
+      _element.clickable = clickable;
+      return *this;
+    }
+  };
+
+
+  inline PanelBuilder Panel( std::string id )
+  {
+    return PanelBuilder{};
+  }
+
+  inline StackPanelBuilder StackPanel( std::string id )
+  {
+    return StackPanelBuilder{};
+  }
+
+  inline TextLabelBuilder TextLabel( std::string id )
+  {
+    return TextLabelBuilder{};
+  }
+
+  inline TextButtonBuilder TextButton( std::string id )
+  {
+    return TextButtonBuilder{};
+  }
+
+};// namespace UI

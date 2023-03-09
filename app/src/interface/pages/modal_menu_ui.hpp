@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../ui_builder.hpp"
+#include "../element.hpp"
 
 namespace UI
 {
@@ -16,40 +16,33 @@ namespace UI
           TextButton( "modal_menu_load_game" )
             .SetText( "Load Game", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuLoadGame )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuLoadGame ),
 
           TextButton( "modal_menu_save_game" )
             .SetText( "Save Game", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuSaveGame )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuSaveGame ),
 
           TextButton( "modal_menu_settings" )
             .SetText( "Settings", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuSettings )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuSettings ),
 
           TextButton( "modal_menu_save_exit_main" )
             .SetText( "Save and Exit to Main Menu", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuSaveExitMain )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuSaveExitMain ),
 
           TextButton( "modal_menu_exit_main" )
             .SetText( "Exit to Main Menu", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuExitMain )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuExitMain ),
 
           TextButton( "modal_menu_exit_game" )
             .SetText( "Exit Game", 32 )
             .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::ModalMenuExitGame )
-            .build(),
-        } )
-        .build(),
+            .SetEvent( InterfaceEvent::ID::ModalMenuExitGame ),
+        } ),
     };
   }
 };// namespace UI

@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../ui_builder.hpp"
+#include "../element.hpp"
 #include "../ui_utils.hpp"
 
 
@@ -18,26 +18,19 @@ namespace UI
         .Children( {
           Panel( "settlement_context_tab_group" )
             .SetAxis( Axis::Column )
-            .Background( BLUE )
-            .build(),
+            .Background( BLUE ),
           StackPanel( "settlement_context_content" )
             .Background( RED )
             .Children( {
               Panel( "settlement_context_overview" )
                 .Children( {
-                  TextLabel( "settlement_name" )
-                    .SetText( "Uninhabited", 26 )
-                    .build(),
+                  TextLabel( "settlement_name" ).SetText( "Uninhabited", 26 ),
                   TextLabel( "settlement_population" )
-                    .SetText( "Uninhabited", 26 )
-                    .build(),
+                    .SetText( "Uninhabited", 26 ),
                   TextLabel( "settlement_development" )
-                    .SetText( "Uninhabited", 26 )
-                    .build(),
-                } )
-                .build(),
-            } )
-            .build(),
+                    .SetText( "Uninhabited", 26 ),
+                } ),
+            } ),
 
           Panel( "actor_context_panel" )
             .Background( Fade( BLACK, 0.5 ) )
@@ -49,15 +42,11 @@ namespace UI
                     .SetText( "Spawn?", 26 )
                     .SetEvent( InterfaceEvent::Data(
                       InterfaceEvent::ID::ActorSpawnSettlment
-                    ) )
-                    .build(),
-                } )
-                .build(),
-            } )
-            .build(),
+                    ) ),
+                } ),
+            } ),
 
-        } )
-        .build(),
+        } ),
     };
 
 

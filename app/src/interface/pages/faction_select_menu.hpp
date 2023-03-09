@@ -31,9 +31,7 @@ namespace UI
     };
 
     std::vector<Element> text_buttons = {
-      TextLabel( "faction_select_label" )
-        .SetText( "Select your faction", 32 )
-        .build(),
+      TextLabel( "faction_select_label" ).SetText( "Select your faction", 32 ),
     };
 
     for ( const auto &[name, color]: factions )
@@ -41,16 +39,12 @@ namespace UI
       std::string faction = name;
       std::string id = "faction_select_" + faction;
 
-      text_buttons.push_back(
-
-        TextButton( id )
-          .SetText( full_names[name], 32 )
-          .Background( color )
-          .SetEvent(
-            InterfaceEvent::Data( InterfaceEvent::ID::FactionSelected, faction )
-          )
-          .build()
-      );
+      text_buttons.push_back( TextButton( id )
+                                .SetText( full_names[name], 32 )
+                                .Background( color )
+                                .SetEvent( InterfaceEvent::Data(
+                                  InterfaceEvent::ID::FactionSelected, faction
+                                ) ) );
     }
 
     return text_buttons;
@@ -62,8 +56,7 @@ namespace UI
       Panel( "faction_select_menu" )
         .SetAxis( Axis::Column )
         .SetAnchor( Anchor::Centered )
-        .Children( CreateFactionButtons() )
-        .build(),
+        .Children( CreateFactionButtons() ),
     };
   }
 

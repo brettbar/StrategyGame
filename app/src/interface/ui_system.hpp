@@ -1,12 +1,13 @@
 #pragma once
 
-#include "pages/campaign_ui.hpp"
-#include "pages/faction_select_menu.hpp"
-#include "pages/lobby_browser.hpp"
-#include "pages/lobby_ui.hpp"
+// #include "pages/campaign_ui.hpp"
+// #include "pages/faction_select_menu.hpp"
+// #include "pages/lobby_browser.hpp"
+// #include "pages/lobby_ui.hpp"
 #include "pages/main_menu_ui.hpp"
-#include "pages/modal_menu_ui.hpp"
-#include "pages/singleplayer_lobby.hpp"
+// #include "pages/modal_menu_ui.hpp"
+// #include "pages/singleplayer_lobby.hpp"
+#include "ui_manager.hpp"
 
 namespace UI
 {
@@ -23,12 +24,12 @@ namespace UI
     {
       Manager()->pages = {
         CreateMainMenuUI(),
-        CreateFactionSelectMenuUI(),
-        CreateSinglePlayerLobby(),
-        CreateModalMenuUI(),
-        CreateCampaignUI(),
-        CreateLobbyBrowser(),
-        CreateLobbyUI(),
+        // CreateFactionSelectMenuUI(),
+        // CreateSinglePlayerLobby(),
+        // CreateModalMenuUI(),
+        // CreateCampaignUI(),
+        // CreateLobbyBrowser(),
+        // CreateLobbyUI(),
       };
       Manager()->SetScene( MainMenu );
       EnableContent();

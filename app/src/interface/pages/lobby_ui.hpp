@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../ui_builder.hpp"
+#include "../element.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -91,23 +91,18 @@ namespace UI
               .ListensFor( {
                 InterfaceUpdate::ID::HostLobby,
                 InterfaceUpdate::ID::JoinLobby,
-              } )
-              .build(),
+              } ),
             TextLabel( player_id + "_select_faction" )
               .SetText( "Selecting Faction...", 24 )
               .Background( GRAY )
-              .ListensFor( { InterfaceUpdate::ID::FactionSelected } )
-              .build(),
+              .ListensFor( { InterfaceUpdate::ID::FactionSelected } ),
             TextLabel( player_id + "_label" )
               .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
-              .Background( GRAY )
-              .build(),
+              .Background( GRAY ),
             TextLabel( player_id + "_steam_user_name" )
               .SetText( "", 24 )
-              .Background( GRAY )
-              .build(),
-          } )
-          .build();
+              .Background( GRAY ),
+          } );
       panel.Enable();
 
       slots.push_back( panel );
@@ -183,35 +178,29 @@ namespace UI
             .SetText(
               SteamMatchmaking()->GetLobbyData( Network::lobby_id, "name" ), 32
             )
-            .Background( GREEN )
-            .build(),
+            .Background( GREEN ),
           Panel( "lobby_members_1_4" )
             .Children( CreateSlots( 0, ( Network::MAX_PLAYERS_PER_SERVER / 2 ) )
             )
-            .UpdateChildren( update_first_row )
-            .build(),
+            .UpdateChildren( update_first_row ),
           Panel( "lobby_members_5_8" )
             .Children( CreateSlots(
               Network::MAX_PLAYERS_PER_SERVER / 2,
               Network::MAX_PLAYERS_PER_SERVER
             ) )
-            .UpdateChildren( update_second_row )
-            .build(),
+            .UpdateChildren( update_second_row ),
           TextButton( "lobby_back_to_main" )
             .SetText( "Back", 32 )
             .Background( RED )
-            .SetEvent( InterfaceEvent::ID::ReturnToMain )
-            .build(),
+            .SetEvent( InterfaceEvent::ID::ReturnToMain ),
           TextButton( "ready_up" )
             .SetText( "Ready Up", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::ReadyUp )
             .ListensFor(
               { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
-            )
-            .build(),
-        } )
-        .build(),
+            ),
+        } ),
     };
   }
 };// namespace UI

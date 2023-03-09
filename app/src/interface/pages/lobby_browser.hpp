@@ -7,7 +7,7 @@
 #include "../../network/host.hpp"
 #include "../../network/network.hpp"
 
-#include "../ui_builder.hpp"
+#include "../element.hpp"
 
 
 namespace UI
@@ -37,8 +37,7 @@ namespace UI
               .Background( GREEN )
               .SetEvent( InterfaceEvent::Data(
                 InterfaceEvent::ID::JoinLobby, button_id, lobby_id
-              ) )
-              .build();
+              ) );
 
           // TODO only clickable based on host/client checksum compat
           button_e.Enable();
@@ -54,8 +53,7 @@ namespace UI
       Panel( "lobby_browser" )
         .SetAxis( Axis::Column )
         .SetAnchor( Anchor::Centered )
-        .UpdateChildren( update_children )
-        .build(),
+        .UpdateChildren( update_children ),
     };
   }
 };// namespace UI
