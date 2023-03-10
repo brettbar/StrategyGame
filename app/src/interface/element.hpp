@@ -540,14 +540,11 @@ public:
 
     void ReceiveUpdate( const InterfaceUpdate::Data &update )
     {
-      printf( "ReceivedUpdate!\n" );
       for ( InterfaceUpdate::ID subscribed_update_id: subscribed_updates )
       {
         // TODO(??) we are crashing here sometimes not sure why
         if ( subscribed_update_id == update.update_id )
         {
-          printf( "id !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.update_id );
-          printf( "type !!!!!!!!!!!!!!%d!!!!!!!!!!!!!\n", update.type );
           switch ( update.type )
           {
             case InterfaceUpdate::Type::EnabledUpdate:
@@ -621,8 +618,30 @@ public:
 
     void SubscribeToUpdates()
     {
-      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-        .connect<&Element::ReceiveUpdate>( this );
+      switch ( type )
+      {
+        case Type::Panel:
+        {
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+            .connect<&Element::ReceiveUpdate>( this );
+          for ( auto &child: children )
+          {
+            child.SubscribeToUpdates();
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+            .connect<&Element::ReceiveUpdate>( this );
+          children[curr_index].SubscribeToUpdates();
+        }
+        break;
+        default:
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+            .connect<&Element::ReceiveUpdate>( this );
+          break;
+      }
     }
 
     void UnsubscribeFromUpdates()

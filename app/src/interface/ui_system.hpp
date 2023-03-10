@@ -53,6 +53,7 @@ namespace UI
       for ( Element &base: Manager()->ActivePage() )
       {
         base.Enable();
+        base.SubscribeToUpdates();
       }
     }
 
