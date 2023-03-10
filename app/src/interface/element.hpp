@@ -56,7 +56,7 @@ namespace UI
   class Element
   {
     Type type = Type::INVALID;
-    std::string _id = "INVALID";
+    std::string id = "INVALID";
     bool enabled = false;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
@@ -136,7 +136,7 @@ public:
 
     std::string ID()
     {
-      return _id;
+      return id;
     }
 
     void Enable()
@@ -564,10 +564,10 @@ public:
                 );
 
                 printf(
-                  "msg.target %s, id %s\n", update.target.c_str(), _id.c_str()
+                  "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
                 );
 
-                if ( update.target == _id )
+                if ( update.target == id )
                 {
                   text = update.updated_text;
                 }
@@ -580,7 +580,7 @@ public:
             case InterfaceUpdate::Type::BackgroundUpdate:
               if ( update.targeted )
               {
-                if ( update.target == _id )
+                if ( update.target == id )
                 {
                   background = update.updated_background;
                 }
@@ -598,9 +598,9 @@ public:
               {
                 printf( "target! %s\n", update.target.c_str() );
 
-                if ( update.target == _id )
+                if ( update.target == id )
                 {
-                  printf( "ourselves %s!\n", _id.c_str() );
+                  printf( "ourselves %s!\n", id.c_str() );
 
                   clickable = update.clickable;
                 }
@@ -619,12 +619,17 @@ public:
       }
     }
 
+    void SubscribeToUpdates()
+    {
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+        .connect<&Element::ReceiveUpdate>( this );
+    }
 
-    // void UnsubscribeFromUpdates()
-    // {
-    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-    //     .disconnect<&Element::ReceiveUpdate>( this );
-    // }
+    void UnsubscribeFromUpdates()
+    {
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+        .disconnect<&Element::ReceiveUpdate>( this );
+    }
   };
 
   class AbstractBuilder
@@ -645,13 +650,13 @@ public:
     Element _element;
 
 public:
-    explicit PanelBuilder() : AbstractBuilder{ _element }
+    explicit PanelBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::Panel;
+      _element.id = id;
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
-      // _element.SubscribeToUpdates();
     }
 
     PanelBuilder &SetAnchor( Anchor anchor )
@@ -704,11 +709,11 @@ public:
     Element _element;
 
 public:
-    explicit StackPanelBuilder() : AbstractBuilder{ _element }
+    explicit StackPanelBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::StackPanel;
+      _element.id = id;
       _element.curr_index = 0;
-      // _element.SubscribeToUpdates();
     }
 
     StackPanelBuilder &Background( Color background )
@@ -729,10 +734,10 @@ public:
     Element _element;
 
 public:
-    explicit TextLabelBuilder() : AbstractBuilder{ _element }
+    explicit TextLabelBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::TextLabel;
-      // _element.SubscribeToUpdates();
+      _element.id = id;
     }
 
     TextLabelBuilder &Background( Color background )
@@ -770,11 +775,10 @@ public:
     Element _element;
 
 public:
-    explicit TextButtonBuilder() : AbstractBuilder{ _element }
+    explicit TextButtonBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::TextButton;
-      // _element.id = id;
-      // _element.SubscribeToUpdates();
+      _element.id = id;
     }
 
     TextButtonBuilder &Background( Color background )
@@ -809,7 +813,6 @@ public:
     TextButtonBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
     {
       _element.subscribed_updates = updates;
-
       return *this;
     }
 
@@ -823,22 +826,22 @@ public:
 
   inline PanelBuilder Panel( std::string id )
   {
-    return PanelBuilder{};
+    return PanelBuilder{ id };
   }
 
   inline StackPanelBuilder StackPanel( std::string id )
   {
-    return StackPanelBuilder{};
+    return StackPanelBuilder{ id };
   }
 
   inline TextLabelBuilder TextLabel( std::string id )
   {
-    return TextLabelBuilder{};
+    return TextLabelBuilder{ id };
   }
 
   inline TextButtonBuilder TextButton( std::string id )
   {
-    return TextButtonBuilder{};
+    return TextButtonBuilder{ id };
   }
 
 };// namespace UI

@@ -53,7 +53,6 @@ public:
       return &instance;
     }
 
-
     IManager( IManager const & ) = delete;
     void operator=( const IManager & ) = delete;
 

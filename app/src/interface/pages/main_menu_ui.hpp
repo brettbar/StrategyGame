@@ -10,7 +10,6 @@ namespace UI
   inline std::vector<Element> CreateMainMenuUI()
   {
     return {
-
       Panel( "main_menu" )
         .SetAxis( Axis::Column )
         .SetAnchor( Anchor::Centered )
