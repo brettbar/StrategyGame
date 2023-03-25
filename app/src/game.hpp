@@ -430,7 +430,7 @@ inline void IGame::RegisterEventListeners()
             }
 
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetTarget( target )
+              .SetTarget( target + "_select_faction" )
               .SetText( faction )
               .build()
               .send();
@@ -439,7 +439,7 @@ inline void IGame::RegisterEventListeners()
               InterfaceUpdate::ID::FactionSelected,
               GetPrimaryFactionColor( faction )
             )
-              .SetTarget( target )
+              .SetTarget( target + "_select_faction" )
               .build()
               .send();
 
