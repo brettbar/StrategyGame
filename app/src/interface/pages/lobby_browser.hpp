@@ -9,6 +9,7 @@
 
 #include "../element.hpp"
 
+#include "../ui_manager.hpp"
 
 namespace UI
 {
@@ -16,14 +17,21 @@ namespace UI
   {
     // TODO better way of making the id and label
     auto update_children = []( std::vector<Element> &children ) {
+      std::map<std::string, bool> existing_ids;
+
+      for ( auto &child: children )
+      {
+        existing_ids.at( child.ID() ) = true;
+      }
+
       for ( CSteamID lobby_id: Network::Client()->GetLobbyList() )
       {
-
         const char *lobby_name =
           SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
         if (
-          lobby_name && lobby_name[0]
+          lobby_name && lobby_name[0] &&
+          !existing_ids.contains( std::string( lobby_name ) )
           // && !Manager()->lookup.contains( std::string( lobby_name ) )
         )
         {
@@ -38,6 +46,7 @@ namespace UI
               .SetEvent( InterfaceEvent::Data(
                 InterfaceEvent::ID::JoinLobby, button_id, lobby_id
               ) );
+
 
           // TODO only clickable based on host/client checksum compat
           button_e.Enable();
