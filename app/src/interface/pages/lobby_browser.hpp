@@ -17,11 +17,11 @@ namespace UI
   {
     // TODO better way of making the id and label
     auto update_children = []( std::vector<Element> &children ) {
-      std::map<std::string, bool> existing_ids;
+      std::map<std::string, bool> existing_ids = {};
 
       for ( auto &child: children )
       {
-        existing_ids.at( child.ID() ) = true;
+        existing_ids.emplace( child.ID(), true );
       }
 
       for ( CSteamID lobby_id: Network::Client()->GetLobbyList() )
@@ -29,11 +29,7 @@ namespace UI
         const char *lobby_name =
           SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
-        if (
-          lobby_name && lobby_name[0] &&
-          !existing_ids.contains( std::string( lobby_name ) )
-          // && !Manager()->lookup.contains( std::string( lobby_name ) )
-        )
+        if ( lobby_name && lobby_name[0] && !existing_ids.contains( std::string( lobby_name ) ) )
         {
           std::cout << "Lobby Name: " << lobby_name << std::endl;
 
