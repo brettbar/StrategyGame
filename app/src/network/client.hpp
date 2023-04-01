@@ -26,7 +26,8 @@ private:
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
 
-    std::map<std::string, PeerData> _peers = {};
+    // std::map<std::string, PeerData> _peers = {};
+    std::array<PeerData, Network::MAX_PLAYERS_PER_SERVER> _peers;
 
     void OnLobbyMatchList( LobbyMatchList_t *, bool );
     CCallResult<IClient, LobbyMatchList_t> result_lobby_match_list;
@@ -44,7 +45,10 @@ private:
 
     void InitiateServerConnection( CSteamID );
 
-    IClient() {}
+    IClient()
+    {
+      _peers = {};
+    }
     ~IClient()
     {
       printf( "~IClient()\n" );
@@ -120,34 +124,38 @@ public:
           {
             auto data = body["data"];
             std::string player_id = data["player_id"];
-            // auto name = body["data"]["steam_name"];
             u64 steam_user_id_u64 = data["steam_user_id"];
 
-            if ( !_peers.contains( player_id ) )
+            for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
             {
-              _peers[player_id] = PeerData{
-                .player_id = player_id,
-                .faction = "",
-                .active = true,
-                .readied_up = false,
-                .steam_user_id = CSteamID( steam_user_id_u64 ),
-              };
+              if ( "player_" + std::to_string( i ) == player_id )
+              {
+                _peers[i] = PeerData{
+                  .player_id = player_id,
+                  .faction = "",
+                  .active = true,
+                  .readied_up = false,
+                  .steam_user_id = CSteamID( steam_user_id_u64 ),
+                };
 
-              InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-                .SetTarget( player_id + "_label" )
-                .SetText( player_id )
-                .build()
-                .send();
-              InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-                .SetTarget( player_id + "_faction_selection" )
-                .build()
-                .send();
-              InterfaceUpdate::Background(
-                InterfaceUpdate::ID::JoinLobby, PURPLE
-              )
-                .SetTarget( player_id + "_faction_selection" )
-                .build()
-                .send();
+                InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+                  .SetTarget( player_id + "_label" )
+                  .SetText( player_id )
+                  .build()
+                  .send();
+                InterfaceUpdate::Clickable(
+                  InterfaceUpdate::ID::JoinLobby, true
+                )
+                  .SetTarget( player_id + "_faction_selection" )
+                  .build()
+                  .send();
+                InterfaceUpdate::Background(
+                  InterfaceUpdate::ID::JoinLobby, PURPLE
+                )
+                  .SetTarget( player_id + "_faction_selection" )
+                  .build()
+                  .send();
+              }
             }
           }
           break;
@@ -207,9 +215,9 @@ public:
     {
       std::vector<PeerData> list = {};
 
-      for ( auto &[key, val]: _peers )
+      for ( auto &peer: _peers )
       {
-        list.push_back( val );
+        list.push_back( peer );
       }
 
       return list;

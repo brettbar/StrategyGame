@@ -63,12 +63,15 @@ namespace Network
   {
     PeerData peer_data;
     HSteamNetConnection conn;
+    long latest_timestamp;
 
     ClientConnectionData()
     {
       peer_data.player_id = "";
       peer_data.active = false;
       conn = 0;
+      latest_timestamp =
+        std::chrono::system_clock::now().time_since_epoch().count();
     }
   };
 

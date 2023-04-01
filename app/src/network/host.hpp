@@ -126,27 +126,30 @@ public:
 
       msg_queue = {};
 
-      msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
+      // msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
 
       Network::is_host = true;
     }
 
-    // void SendPing()
-    // {
-    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-    //   {
-    //     if ( !_clients[i].peer_data.active )
-    //       continue;
+    void PingAllActiveClients()
+    {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      {
+        if ( !_clients[i].peer_data.active )
+          continue;
 
-    //     // const auto now = std::chrono::system_clock::now();
-    //     const int random = rand();
-    //     SendMessageOnConnection(
-    //       _clients[i].conn,
-    //       MessageID::Ping,
-    //       ( "ping: " + std::to_string( random ) ).c_str()
-    //     );
-    //   }
-    // }
+        // const auto now = std::chrono::system_clock::now();
+        const int random = rand();
+        SendMessageOnConnection(
+          _clients[i].conn,
+          Message{
+            MessageID::Ping,
+            ( "ping: " + std::to_string( random ) ).c_str(),
+          }
+        );
+      }
+    }
+
     void SendMessageToAllClients( Message message )
     {
 
@@ -197,64 +200,6 @@ public:
       msg_queue.update();
     }
 
-    void ProcessMessage( const Message &msg )
-    {
-      switch ( msg.message_id )
-      {
-        case InitiateContact:
-          break;
-        case Ping:
-          break;
-        case PlayerConnected:
-        {
-          auto data = msg.body["data"];
-          std::string player_id = data["player_id"];
-          u64 steam_user_id_u64 = data["steam_user_id"];
-
-          for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-          {
-            if ( ( "player_" + std::to_string( i ) ) == player_id )
-            {
-              _clients[i].peer_data = PeerData
-              {
-                player_id, "",
-              }
-            }
-          }
-        }
-        break;
-        case PlayerDisconnected:
-          break;
-        case PlayerFactionSelect:
-        {
-          std::string player_id = msg.body["player_id"];
-          std::string faction = msg.body["faction"];
-
-          InterfaceUpdate::ID update_id = InterfaceUpdate::ID::FactionSelected;
-          std::string target = player_id + "_select_faction";
-
-          InterfaceUpdate::Text( update_id )
-            .SetTarget( target )
-            .SetText( faction )
-            .build()
-            .send();
-
-          InterfaceUpdate::Background(
-            update_id, GetPrimaryFactionColor( faction )
-          )
-            .SetTarget( target )
-            .build()
-            .send();
-
-
-          SendMessageToAllClients( msg );
-        }
-        break;
-        default:
-          printf( "Error :: invalid message received by host\n" );
-          break;
-      }
-    }
 
     void Delete()
     {
@@ -389,6 +334,8 @@ public:
           return;
         }
 
+        // We found a slot, accepted the connection,
+        // and are ready to set data for the client
         _clients[i].peer_data.player_id = "player_" + std::to_string( i );
         _clients[i].peer_data.steam_user_id =
           info.m_identityRemote.GetSteamID();
@@ -396,7 +343,6 @@ public:
         _clients[i].conn = cb->m_hConn;
 
         // Tell the new client which player id they are
-
         nlohmann::json new_player_id_body = {};
         new_player_id_body["new_player_id"] = _clients[i].peer_data.player_id;
         SendMessageOnConnection(

@@ -164,7 +164,7 @@ class IGame
   {
     if ( Network::is_host )
     {
-      // Network::Host()->SendPing();
+      Network::Host()->PingAllActiveClients();
       Network::Host()->CheckForMessages();
       Network::Host()->EvaluateMessages();
     }
