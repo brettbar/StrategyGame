@@ -206,7 +206,23 @@ public:
         case Ping:
           break;
         case PlayerConnected:
-          break;
+        {
+          auto data = msg.body["data"];
+          std::string player_id = data["player_id"];
+          u64 steam_user_id_u64 = data["steam_user_id"];
+
+          for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
+          {
+            if ( ( "player_" + std::to_string( i ) ) == player_id )
+            {
+              _clients[i].peer_data = PeerData
+              {
+                player_id, "",
+              }
+            }
+          }
+        }
+        break;
         case PlayerDisconnected:
           break;
         case PlayerFactionSelect:
