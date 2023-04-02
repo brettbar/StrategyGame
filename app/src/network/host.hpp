@@ -22,6 +22,22 @@ namespace Network
 
   namespace
   {
+    struct ClientConnectionData
+    {
+      PeerData peer_data;
+      HSteamNetConnection conn;
+      long latest_timestamp;
+
+      ClientConnectionData()
+      {
+        peer_data.player_id = "";
+        peer_data.active = false;
+        conn = 0;
+        latest_timestamp =
+          std::chrono::system_clock::now().time_since_epoch().count();
+      }
+    };
+
     struct MessageQueue : entt::dispatcher
     {
       void Enqueue( const Message &msg )
@@ -129,6 +145,13 @@ public:
       // msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
 
       Network::is_host = true;
+    }
+
+    void Update()
+    {
+      PingAllActiveClients();
+      CheckForMessages();
+      EvaluateMessages();
     }
 
     void PingAllActiveClients()
@@ -249,13 +272,11 @@ public:
       );
       printf( "Hosting lobby %s\n", rgchLobbyName );
 
+      // Initialize ourself as player_0 since we are the host
       _clients[0].peer_data.player_id = "player_0";
       _clients[0].peer_data.active = true;
       _clients[0].peer_data.steam_user_id =
         SteamMatchmaking()->GetLobbyOwner( Network::lobby_id );
-
-
-      // TODO Move to after a player is found
     }
     else
     {
@@ -347,7 +368,7 @@ public:
         new_player_id_body["new_player_id"] = _clients[i].peer_data.player_id;
         SendMessageOnConnection(
           _clients[i].conn,
-          Message{ MessageID::SelfConnected, new_player_id_body }
+          Message{ MessageID::AssignedPlayerId, new_player_id_body }
         );
 
         // Tell the new client about all the current clients

@@ -41,7 +41,14 @@ class IGame
     while ( !WindowShouldClose() && ShouldRun() )
     {
 
-      HandleMessages();
+      if ( Network::is_host )
+      {
+        Network::Host()->Update();
+      }
+      else
+      {
+        Network::Client()->Update();
+      }
 
       SteamAPI_RunCallbacks();
 
@@ -160,19 +167,6 @@ class IGame
     }
   }
 
-  void HandleMessages()
-  {
-    if ( Network::is_host )
-    {
-      Network::Host()->PingAllActiveClients();
-      Network::Host()->CheckForMessages();
-      Network::Host()->EvaluateMessages();
-    }
-    else
-    {
-      Network::Client()->CheckForMessage();
-    }
-  }
   /*=============================================================
                         End: Multiplayer
   =============================================================*/

@@ -34,7 +34,7 @@ namespace Network
   enum MessageID : u32
   {
     InitiateContact,
-    SelfConnected,
+    AssignedPlayerId,
     Ping,
     PlayerConnected,
     PlayerDisconnected,
@@ -59,21 +59,6 @@ namespace Network
     // uint64 tick_count_last_data;
   };
 
-  struct ClientConnectionData
-  {
-    PeerData peer_data;
-    HSteamNetConnection conn;
-    long latest_timestamp;
-
-    ClientConnectionData()
-    {
-      peer_data.player_id = "";
-      peer_data.active = false;
-      conn = 0;
-      latest_timestamp =
-        std::chrono::system_clock::now().time_since_epoch().count();
-    }
-  };
 
   inline void DebugOutput(
     ESteamNetworkingSocketsDebugOutputType eType,

@@ -79,7 +79,7 @@ public:
       Network::is_host = false;
     }
 
-    void CheckForMessage()
+    void Update()
     {
       if ( _server_conn == k_HSteamNetConnection_Invalid )
         return;
@@ -98,98 +98,104 @@ public:
         MessageID message_id = message["message_id"];
         auto body = message["body"];
 
-        switch ( message_id )
-        {
-          case MessageID::Ping:
-            break;
-          case MessageID::SelfConnected:
-          {
-            player_id = body["new_player_id"];
-            InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-              .SetTarget( player_id + "_label" )
-              .SetText( player_id )
-              .build()
-              .send();
-            InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-              .SetTarget( player_id + "_faction_selection" )
-              .build()
-              .send();
-            InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
-              .SetTarget( player_id + "_faction_selection" )
-              .build()
-              .send();
-          }
-          break;
-          case MessageID::PlayerConnected:
-          {
-            auto data = body["data"];
-            std::string player_id = data["player_id"];
-            u64 steam_user_id_u64 = data["steam_user_id"];
-
-            for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-            {
-              if ( "player_" + std::to_string( i ) == player_id )
-              {
-                _peers[i] = PeerData{
-                  .player_id = player_id,
-                  .faction = "",
-                  .active = true,
-                  .readied_up = false,
-                  .steam_user_id = CSteamID( steam_user_id_u64 ),
-                };
-
-                InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-                  .SetTarget( player_id + "_label" )
-                  .SetText( player_id )
-                  .build()
-                  .send();
-                InterfaceUpdate::Clickable(
-                  InterfaceUpdate::ID::JoinLobby, true
-                )
-                  .SetTarget( player_id + "_faction_selection" )
-                  .build()
-                  .send();
-                InterfaceUpdate::Background(
-                  InterfaceUpdate::ID::JoinLobby, PURPLE
-                )
-                  .SetTarget( player_id + "_faction_selection" )
-                  .build()
-                  .send();
-              }
-            }
-          }
-          break;
-          case MessageID::PlayerDisconnected:
-            break;
-          case MessageID::PlayerFactionSelect:
-          {
-            std::string player_id = body["player_id"];
-            std::string faction = body["faction"];
-            std::string target = player_id + "_select_faction";
-
-            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetTarget( target )
-              .SetText( faction )
-              .build()
-              .send();
-
-
-            InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected,
-              GetPrimaryFactionColor( faction )
-            )
-              .SetTarget( target )
-              .build()
-              .send();
-          }
-          break;
-          default:
-            printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
-            break;
-        }
+        HandleMessageSwitch( message_id, body );
 
         printf( "Received message: '%s'\n", raw_message );
         msg->Release();
+      }
+    }
+
+    void HandleMessageSwitch(
+      MessageID message_id,
+      nlohmann::basic_json<> body
+    )
+    {
+      switch ( message_id )
+      {
+        case MessageID::Ping:
+          break;
+        case MessageID::AssignedPlayerId:
+        {
+          player_id = body["new_player_id"];
+          InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+            .SetTarget( player_id + "_label" )
+            .SetText( player_id )
+            .build()
+            .send();
+          InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+            .SetTarget( player_id + "_faction_selection" )
+            .build()
+            .send();
+          InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
+            .SetTarget( player_id + "_faction_selection" )
+            .build()
+            .send();
+        }
+        break;
+        case MessageID::PlayerConnected:
+        {
+          auto data = body["data"];
+          std::string player_id = data["player_id"];
+          u64 steam_user_id_u64 = data["steam_user_id"];
+
+          for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
+          {
+            if ( "player_" + std::to_string( i ) == player_id )
+            {
+              _peers[i] = PeerData{
+                .player_id = player_id,
+                .faction = "",
+                .active = true,
+                .readied_up = false,
+                .steam_user_id = CSteamID( steam_user_id_u64 ),
+              };
+
+              InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+                .SetTarget( player_id + "_label" )
+                .SetText( player_id )
+                .build()
+                .send();
+              InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+                .SetTarget( player_id + "_faction_selection" )
+                .build()
+                .send();
+              InterfaceUpdate::Background(
+                InterfaceUpdate::ID::JoinLobby, PURPLE
+              )
+                .SetTarget( player_id + "_faction_selection" )
+                .build()
+                .send();
+            }
+          }
+        }
+        break;
+        case MessageID::PlayerDisconnected:
+          break;
+        case MessageID::PlayerFactionSelect:
+        {
+          std::string player_id = body["player_id"];
+          std::string faction = body["faction"];
+          std::string target = player_id + "_select_faction";
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+            .SetTarget( target )
+            .SetText( faction )
+            .build()
+            .send();
+
+
+          InterfaceUpdate::Background(
+            InterfaceUpdate::ID::FactionSelected,
+            GetPrimaryFactionColor( faction )
+          )
+            .SetTarget( target )
+            .build()
+            .send();
+        }
+        break;
+        default:
+          printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
+          break;
       }
     }
 
