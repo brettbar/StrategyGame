@@ -149,41 +149,9 @@ public:
 
     void Update()
     {
-      PingAllActiveClients();
       CheckForMessages();
       EvaluateMessages();
-    }
-
-    void PingAllActiveClients()
-    {
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( !_clients[i].peer_data.active )
-          continue;
-
-        // const auto now = std::chrono::system_clock::now();
-        const int random = rand();
-        SendMessageOnConnection(
-          _clients[i].conn,
-          Message{
-            MessageID::Ping,
-            ( "ping: " + std::to_string( random ) ).c_str(),
-          }
-        );
-      }
-    }
-
-    void SendMessageToAllClients( Message message )
-    {
-
-      // We start at 1 since host is always i=0
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( !_clients[i].peer_data.active )
-          continue;
-
-        SendMessageOnConnection( _clients[i].conn, message );
-      }
+      PingAllActiveClients();
     }
 
     void CheckForMessages()
@@ -221,6 +189,43 @@ public:
     void EvaluateMessages()
     {
       msg_queue.update();
+    }
+
+    void PingAllActiveClients()
+    {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      {
+        if ( !_clients[i].peer_data.active )
+          continue;
+
+        PingConnection( _clients[i].conn );
+      }
+    }
+
+    void PingConnection( HSteamNetConnection conn )
+    {
+      // const auto now = std::chrono::system_clock::now();
+      const int random = rand();
+      SendMessageOnConnection(
+        conn,
+        Message{
+          MessageID::Ping,
+          ( "ping: " + std::to_string( random ) ).c_str(),
+        }
+      );
+    }
+
+    void SendMessageToAllClients( Message message )
+    {
+
+      // We start at 1 since host is always i=0
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      {
+        if ( !_clients[i].peer_data.active )
+          continue;
+
+        SendMessageOnConnection( _clients[i].conn, message );
+      }
     }
 
 

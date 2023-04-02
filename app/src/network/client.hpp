@@ -81,6 +81,11 @@ public:
 
     void Update()
     {
+      CheckForMessages();
+    }
+
+    void CheckForMessages()
+    {
       if ( _server_conn == k_HSteamNetConnection_Invalid )
         return;
 

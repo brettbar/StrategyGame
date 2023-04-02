@@ -70,6 +70,8 @@ class IGame
   f32 _oncelag = 0.0f;
   f32 _lag = 0.0f;
   f32 _dt = 0.0f;
+  const f32 _MS_PER_UPDATE = 1 / 60.0;
+  const f32 _ONCE_A_SECOND = 1;
 
   // TODO move
   std::string faction = "";
@@ -94,7 +96,9 @@ class IGame
   {
     printf( "pending new!!\n" );
 
-    DeleteCampaignInstance();
+    if ( _campaign )
+      delete _campaign;
+
     _campaign = new Campaign();
 
     UI::System::EnableCampaignUI();
@@ -218,23 +222,42 @@ class IGame
   =============================================================*/
 
 
-  void DeleteCampaignInstance()
-  {
-    if ( _campaign )
-      delete _campaign;
-  }
-
-  void RunFrame()
+  void UpdateOnFrame()
   {
     switch ( _mode )
     {
       case ProgramMode::MainMenu:
-        RunMainMenu( _dt );
-        break;
+      {
+        UI::System::UpdateOnFrame();
+
+        CameraUpdate( Global::state.camera, _dt );
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Renderer::DrawUI();
+        }
+        EndDrawing();
+      }
+      break;
 
       case ProgramMode::ModalMenu:
-        RunModalMenu();
-        break;
+      {
+        Input::CheckMenuToggle();
+
+        UI::System::UpdateOnFrame();
+
+        BeginDrawing();
+        {
+          Renderer::Draw( Global::texture_cache );
+          DrawRectangle(
+            0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
+          );
+          Renderer::DrawUI();
+        }
+        EndDrawing();
+      }
+      break;
 
       case ProgramMode::Campaign:
       {
@@ -242,14 +265,25 @@ class IGame
         {
           // Singleplayer Campaign
           if ( _campaign )
-            _campaign->Run( _dt, _lag, _oncelag );
+            _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
         }
         else
         {
           // Multiplayer Campaign
           if ( _campaign )
-            _campaign->Run( _dt, _lag, _oncelag );
+            _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
         }
+
+        // 6. Draw everything
+        BeginDrawing();
+        {
+          Renderer::Draw( Global::texture_cache );
+          Renderer::DrawUI();
+
+          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+          DrawFPS( GetScreenWidth() - 100, 2 );
+        }
+        EndDrawing();
       }
       break;
 
@@ -258,35 +292,51 @@ class IGame
     }
   }
 
-  void RunMainMenu( f32 dt )
+  void Update60TPS()
   {
-    UI::System::UpdateOnFrame();
-
-    CameraUpdate( Global::state.camera, dt );
-
-    BeginDrawing();
+    if ( _campaign )
     {
-      ClearBackground( BLACK );
-      Renderer::DrawUI();
+      _campaign->Update60TPS();
     }
-    EndDrawing();
+  }
+  void Update1TPS()
+  {
+
+    if ( _campaign )
+    {
+      _campaign->Update1TPS();
+    }
   }
 
-  void RunModalMenu()
+  void RunFrame()
   {
-    Input::CheckMenuToggle();
+    // 1. Update Time
+    _dt = GetFrameTime();
+    _lag += _dt;
+    _oncelag += _dt;
 
-    UI::System::UpdateOnFrame();
-
-    BeginDrawing();
+    // 5. Run all Updates
     {
-      Renderer::Draw( Global::texture_cache );
-      DrawRectangle(
-        0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-      );
-      Renderer::DrawUI();
+      // Update 60 times a second
+      while ( _lag >= _MS_PER_UPDATE )
+      {
+        Update60TPS();
+        _lag -= _MS_PER_UPDATE;
+      }
+
+      // Update once per second
+      while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
+      {
+        Update1TPS();
+        _oncelag = 0.0f;
+      }
+
+      // Update once per frame
+      UpdateOnFrame();
+
+      // Update Camera
+      CameraUpdate( Global::state.camera, _dt );
     }
-    EndDrawing();
   }
 
 
@@ -297,7 +347,8 @@ class IGame
     else
       Network::Client()->Delete();
 
-    DeleteCampaignInstance();
+    if ( _campaign )
+      delete _campaign;
 
     delete this;
   }
