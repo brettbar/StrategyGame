@@ -117,8 +117,20 @@ public:
     {
       switch ( message_id )
       {
-        case MessageID::Ping:
-          break;
+        case MessageID::HostPingRequest:
+        {
+          SendMessageOnConnection(
+            _server_conn,
+            Message{
+              MessageID::ClientPingResponse,
+              nlohmann::json{
+                { "player_id", player_id },
+                { "timestamp", body },
+              },
+            }
+          );
+        }
+        break;
         case MessageID::AssignedPlayerId:
         {
           player_id = body["new_player_id"];

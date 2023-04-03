@@ -40,19 +40,50 @@ class IGame
 
     while ( !WindowShouldClose() && ShouldRun() )
     {
-
-      if ( Network::is_host )
-      {
-        Network::Host()->Update();
-      }
-      else
-      {
-        Network::Client()->Update();
-      }
-
       SteamAPI_RunCallbacks();
 
-      RunFrame();
+      // 1. Update Time
+      _dt = GetFrameTime();
+      _lag += _dt;
+      _oncelag += _dt;
+
+      // 5. Run all Updates
+      {
+        // Update 60 times a second
+        while ( _lag >= _MS_PER_UPDATE )
+        {
+          Update60TPS();
+          _lag -= _MS_PER_UPDATE;
+        }
+
+        // Update once per second
+        while ( _oncelag >= _ONCE_A_SECOND )
+        {
+          if ( Network::is_host )
+          {
+            Network::Host()->PingAllActiveClients();
+          }
+          _oncelag = 0.0f;
+        }
+
+        // Update once per second but modified by timeScale
+        // TODO? Do we want to fold this timescale business into campaign itself
+        // Since we dont care about timescale in other program_modes
+        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
+        {
+          if ( _campaign )
+          {
+            _campaign->Update1TPS();
+          }
+          _oncelag = 0.0f;
+        }
+
+        // Update once per frame
+        UpdateOnFrame();
+
+        // Update Camera
+        CameraUpdate( Global::state.camera, _dt );
+      }
     }
 
     ExitGameLoopCleanup();
@@ -90,6 +121,7 @@ class IGame
   }
 
   /*=============================================================
+
                         Begin: Singleplayer
   =============================================================*/
   void StartCampaign( std::string player_faction )
@@ -224,6 +256,15 @@ class IGame
 
   void UpdateOnFrame()
   {
+    if ( Network::is_host )
+    {
+      Network::Host()->Update();
+    }
+    else
+    {
+      Network::Client()->Update();
+    }
+
     switch ( _mode )
     {
       case ProgramMode::MainMenu:
@@ -297,45 +338,6 @@ class IGame
     if ( _campaign )
     {
       _campaign->Update60TPS();
-    }
-  }
-  void Update1TPS()
-  {
-
-    if ( _campaign )
-    {
-      _campaign->Update1TPS();
-    }
-  }
-
-  void RunFrame()
-  {
-    // 1. Update Time
-    _dt = GetFrameTime();
-    _lag += _dt;
-    _oncelag += _dt;
-
-    // 5. Run all Updates
-    {
-      // Update 60 times a second
-      while ( _lag >= _MS_PER_UPDATE )
-      {
-        Update60TPS();
-        _lag -= _MS_PER_UPDATE;
-      }
-
-      // Update once per second
-      while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
-      {
-        Update1TPS();
-        _oncelag = 0.0f;
-      }
-
-      // Update once per frame
-      UpdateOnFrame();
-
-      // Update Camera
-      CameraUpdate( Global::state.camera, _dt );
     }
   }
 

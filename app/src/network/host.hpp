@@ -27,14 +27,15 @@ namespace Network
       PeerData peer_data;
       HSteamNetConnection conn;
       long latest_timestamp;
+      u32 ping_ms;
 
       ClientConnectionData()
       {
         peer_data.player_id = "";
         peer_data.active = false;
         conn = 0;
-        latest_timestamp =
-          std::chrono::system_clock::now().time_since_epoch().count();
+        latest_timestamp = TimestampMS();
+        ping_ms = 1000;
       }
     };
 
@@ -134,6 +135,8 @@ public:
 
     void Init()
     {
+      Network::is_host = true;
+
       SteamAPICall_t steam_api_call = SteamMatchmaking()->CreateLobby(
         k_ELobbyTypePublic, MAX_PLAYERS_PER_SERVER
       );
@@ -142,16 +145,15 @@ public:
 
       msg_queue = {};
 
-      // msg_queue.sink<Message>().connect<&IHost::ProcessMessage>( this );
-
-      Network::is_host = true;
+      msg_queue.sink<Message>().connect<&IHost::ProcessQueuedMessageSwitch>(
+        this
+      );
     }
 
     void Update()
     {
       CheckForMessages();
       EvaluateMessages();
-      PingAllActiveClients();
     }
 
     void CheckForMessages()
@@ -174,11 +176,12 @@ public:
           char *raw_message = (char *) msg->GetData();
           nlohmann::json message = nlohmann::json::parse( raw_message );
           MessageID message_id = message["message_id"];
+          auto body = message["body"];
 
 
           msg_queue.Enqueue( Message{
             message_id,
-            std::string( raw_message ),
+            body,
           } );
 
           msg->Release();
@@ -191,6 +194,32 @@ public:
       msg_queue.update();
     }
 
+    void ProcessQueuedMessageSwitch( const Message msg )
+    {
+      switch ( msg.message_id )
+      {
+        case ClientPingResponse:
+        {
+          printf(
+            "Got ping response from client! %s\n", msg.body.dump().c_str()
+          );
+          auto player_id = msg.body["player_id"];
+          u32 index = player_id_index[player_id];
+
+          auto newest_timestamp = TimestampMS();
+
+          long latency = newest_timestamp - _clients[index].latest_timestamp;
+          printf( "latency: %ldms\n", latency );
+
+          // TODO some condition on latency or if its been too long since last resp
+          _clients[index].latest_timestamp = newest_timestamp;
+        }
+        break;
+        default:
+          break;
+      }
+    }
+
     void PingAllActiveClients()
     {
       for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
@@ -198,21 +227,17 @@ public:
         if ( !_clients[i].peer_data.active )
           continue;
 
-        PingConnection( _clients[i].conn );
-      }
-    }
+        auto timestamp =
+          std::chrono::system_clock::now().time_since_epoch().count();
 
-    void PingConnection( HSteamNetConnection conn )
-    {
-      // const auto now = std::chrono::system_clock::now();
-      const int random = rand();
-      SendMessageOnConnection(
-        conn,
-        Message{
-          MessageID::Ping,
-          ( "ping: " + std::to_string( random ) ).c_str(),
-        }
-      );
+        SendMessageOnConnection(
+          _clients[i].conn,
+          Message{
+            MessageID::HostPingRequest,
+            std::to_string( timestamp ).c_str(),
+          }
+        );
+      }
     }
 
     void SendMessageToAllClients( Message message )

@@ -31,11 +31,24 @@ namespace Network
 
   inline CSteamID lobby_id;
 
+  // Peak programming right here
+  inline std::map<std::string, u32> player_id_index = {
+    { "player_0", 0 },
+    { "player_1", 1 },
+    { "player_2", 2 },
+    { "player_3", 3 },
+    { "player_4", 4 },
+    { "player_5", 5 },
+    { "player_6", 6 },
+    { "player_7", 7 },
+  };
+
   enum MessageID : u32
   {
     InitiateContact,
     AssignedPlayerId,
-    Ping,
+    HostPingRequest,
+    ClientPingResponse,
     PlayerConnected,
     PlayerDisconnected,
 

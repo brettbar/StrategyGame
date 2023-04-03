@@ -8,6 +8,14 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 inline std::unique_ptr<UVector2> DetermineTileCoords( Vector2 );
 inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( UVector2 );
 
+inline long TimestampMS()
+{
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::system_clock::now().time_since_epoch()
+  )
+    .count();
+}
+
 inline void CameraUpdate( Camera2D &camera, f32 dt )
 {
   f32 cameraSpeed = 500.0f;
