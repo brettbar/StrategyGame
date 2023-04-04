@@ -556,9 +556,9 @@ public:
             case InterfaceUpdate::Type::TextUpdate:
               if ( update.targeted )
               {
-                printf(
-                  "TextLabel::ReceiveUpdate msg type: %d\n", update.type
-                );
+                // printf(
+                //   "TextLabel::ReceiveUpdate msg type: %d\n", update.type
+                // );
 
                 printf(
                   "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
@@ -588,17 +588,10 @@ public:
               }
               break;
             case InterfaceUpdate::Type::ClickableUpdate:
-
-              printf( "ClickableUpdate!\n" );
-
               if ( update.targeted )
               {
-                printf( "target! %s\n", update.target.c_str() );
-
                 if ( update.target == id )
                 {
-                  printf( "ourselves %s!\n", id.c_str() );
-
                   clickable = update.clickable;
                 }
               }

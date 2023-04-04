@@ -123,9 +123,9 @@ private:
 
 public:
     // TODO make private
-    std::string player_id = "player_0";
+    std::string _player_id = "player_0";
 
-    MessageQueue msg_queue;
+    MessageQueue _msg_queue;
 
     static IHost *Host()
     {
@@ -143,9 +143,9 @@ public:
 
       result_lobby_created.Set( steam_api_call, this, &IHost::OnLobbyCreated );
 
-      msg_queue = {};
+      _msg_queue = {};
 
-      msg_queue.sink<Message>().connect<&IHost::ProcessQueuedMessageSwitch>(
+      _msg_queue.sink<Message>().connect<&IHost::ProcessQueuedMessageSwitch>(
         this
       );
     }
@@ -179,7 +179,7 @@ public:
           auto body = message["body"];
 
 
-          msg_queue.Enqueue( Message{
+          _msg_queue.Enqueue( Message{
             message_id,
             body,
           } );
@@ -191,7 +191,7 @@ public:
 
     void EvaluateMessages()
     {
-      msg_queue.update();
+      _msg_queue.update();
     }
 
     void ProcessQueuedMessageSwitch( const Message msg )
@@ -200,16 +200,21 @@ public:
       {
         case ClientPingResponse:
         {
-          printf(
-            "Got ping response from client! %s\n", msg.body.dump().c_str()
-          );
+          // printf(
+          //   "Got ping response from client! %s\n", msg.body.dump().c_str()
+          // );
           auto player_id = msg.body["player_id"];
           u32 index = player_id_index[player_id];
 
           auto newest_timestamp = TimestampMS();
 
-          long latency = newest_timestamp - _clients[index].latest_timestamp;
-          printf( "latency: %ldms\n", latency );
+          long latency = newest_timestamp - _clients[index].latest_timestamp -
+                         1000;// take out the 1 second of delay we baked in
+
+          if ( latency < 0 )
+            latency = 0;
+
+          // printf( "latency: %ldms\n", latency );
 
           // TODO some condition on latency or if its been too long since last resp
           _clients[index].latest_timestamp = newest_timestamp;
@@ -401,8 +406,23 @@ public:
           Message{ MessageID::AssignedPlayerId, new_player_id_body }
         );
 
+        auto player_id = _clients[i].peer_data.player_id;
+        InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+          .SetTarget( player_id + "_label" )
+          .SetText( player_id )
+          .build()
+          .send();
+        InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+          .SetTarget( player_id + "_faction_selection" )
+          .build()
+          .send();
+        InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
+          .SetTarget( player_id + "_faction_selection" )
+          .build()
+          .send();
+
         // Tell the new client about all the current clients
-        for ( auto client: _clients )
+        for ( auto &client: _clients )
         {
           if ( !client.peer_data.active )
             continue;
@@ -411,6 +431,7 @@ public:
           body["data"] = {
             { "is_host", ( client.peer_data.player_id == "player_0" ) },
             { "player_id", client.peer_data.player_id },
+            { "faction", client.peer_data.faction },
             {
               "steam_name",
               std::string( SteamFriends()->GetFriendPersonaName(

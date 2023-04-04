@@ -61,7 +61,7 @@ class IGame
         {
           if ( Network::is_host )
           {
-            Network::Host()->PingAllActiveClients();
+            // Network::Host()->PingAllActiveClients();
           }
           _oncelag = 0.0f;
         }
@@ -164,16 +164,16 @@ class IGame
     //   .build()
     //   .send();
     InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-      .SetTarget( Network::Host()->player_id + "_label" )
-      .SetText( Network::Host()->player_id )
+      .SetTarget( Network::Host()->_player_id + "_label" )
+      .SetText( Network::Host()->_player_id )
       .build()
       .send();
     InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
-      .SetTarget( Network::Host()->player_id + "_faction_selection" )
+      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
       .build()
       .send();
     InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
-      .SetTarget( Network::Host()->player_id + "_faction_selection" )
+      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
       .build()
       .send();
   }
@@ -455,7 +455,7 @@ inline void IGame::RegisterEventListeners()
 
             if ( Network::is_host )
             {
-              target = Network::Host()->player_id;
+              target = Network::Host()->_player_id;
               Network::Host()->SendMessageToAllClients( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
@@ -466,7 +466,7 @@ inline void IGame::RegisterEventListeners()
             }
             else
             {
-              target = Network::Client()->player_id;
+              target = Network::Client()->_player_id;
               Network::Client()->SendMessageToHost( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
