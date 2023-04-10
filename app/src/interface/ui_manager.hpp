@@ -10,6 +10,7 @@ namespace UI
   void ClearContext();
   void CheckOverElem( bool );
   bool CheckInteraction();
+  inline Element CreateDebugInfo();
 
   enum PageType : u32
   {
@@ -32,8 +33,8 @@ namespace UI
 public:
     // TODO(??) make private
     entt::registry registry;
-    // std::map<std::string, ptr<Element>> lookup;
     std::array<Page, NUM_PAGES> pages;
+    Element debug;
 
     bool over_any_elem = false;
 
@@ -96,21 +97,21 @@ public:
     }
 
     // TODO(rf) this shouldnt use the selection system directly
-    void DrawManagerDebugInfo()
-    {
-      DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
-      std::string foo = "hot: " + ( _context.hot );
-      DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
+    // void DrawManagerDebugInfo()
+    // {
+    //   DrawRectangle( GetScreenWidth() - 300, 102, 200, 24.0f, BLACK );
+    //   std::string foo = "hot: " + ( _context.hot );
+    //   DrawText( foo.c_str(), GetScreenWidth() - 300, 102, 24.0f, RED );
 
-      DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
-      std::string bar = "active: " + ( _context.active );
-      DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
+    //   DrawRectangle( GetScreenWidth() - 300, 152, 200, 24.0f, BLACK );
+    //   std::string bar = "active: " + ( _context.active );
+    //   DrawText( bar.c_str(), GetScreenWidth() - 300, 152, 24.0f, RED );
 
-      DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
-      std::string selected_ent =
-        "entity: " + EntityIdToString( SelectionSystem::selected_entity );
-      DrawText( selected_ent.c_str(), GetScreenWidth() - 300, 202, 24.0f, RED );
-    }
+    //   DrawRectangle( GetScreenWidth() - 300, 202, 200, 24.0f, BLACK );
+    //   std::string selected_ent =
+    //     "entity: " + EntityIdToString( SelectionSystem::selected_entity );
+    //   DrawText( selected_ent.c_str(), GetScreenWidth() - 300, 202, 24.0f, RED );
+    // }
 
     bool MouseIsOverUI()
     {
@@ -131,19 +132,71 @@ public:
       registry.clear();
     }
 
+    std::string Hot()
+    {
+      return _context.hot;
+    }
+    std::string Active()
+    {
+      return _context.active;
+    }
+
 
 private:
     Context _context = { "", "" };
     u32 _active_page_i = PageType::MainMenu;
 
 
-    IManager() {}
+    IManager() : debug( CreateDebugInfo() ) {}
     ~IManager() {}
   };
+
 
   inline IManager *Manager()
   {
     return IManager::Manager();
+  }
+
+  inline Element CreateDebugInfo()
+  {
+    auto update_debug_info = []( std::vector<Element> &children ) {
+      for ( auto &child: children )
+      {
+
+        if ( child.ID() == "fps" )
+        {
+          child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
+        }
+        else if ( child.ID() == "hot" )
+        {
+          child.UpdateText( "hot: " + ( Manager()->Hot() ) );
+        }
+        else if ( child.ID() == "active" )
+        {
+          child.UpdateText( "active: " + ( Manager()->Active() ) );
+        }
+        else if ( child.ID() == "selected" )
+        {
+          child.UpdateText(
+            "entity: " + EntityIdToString( SelectionSystem::selected_entity )
+          );
+        }
+      }
+    };
+
+    return Panel( "debug_info" )
+      .SetAxis( Axis::Column )
+      .SetAnchor( Anchor::TopRight )
+      .UpdateChildren( update_debug_info )
+      .Background( BLUE )
+      .Children( {
+        TextLabel( "fps" ).Background( BLACK ).SetText( "fps: ", 18.0f, GREEN ),
+        TextLabel( "hot" ).Background( BLACK ).SetText( "hot: ", 18.0f ),
+        TextLabel( "active" ).Background( BLACK ).SetText( "active: ", 18.0f ),
+        TextLabel( "selected" )
+          .SetText( "entity: ", 18.0f )
+          .Background( BLACK ),
+      } );
   }
 
   inline void Element::Interact( bool mouse_went_up, bool mouse_went_down )

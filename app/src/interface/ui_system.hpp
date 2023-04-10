@@ -14,7 +14,6 @@ namespace UI
 
   namespace System
   {
-
     void EnableContent();
     void DisableCurrentContent();
 
@@ -31,6 +30,7 @@ namespace UI
         CreateLobbyBrowser(),
         CreateLobbyUI(),
       };
+      Manager()->debug.Enable();
       Manager()->SetScene( MainMenu );
       EnableContent();
     }
@@ -105,6 +105,11 @@ namespace UI
         // panel->Interact( mouseWentUp, mouseWentDown );
       }
 
+
+      Manager()->debug.Resize();
+      Manager()->debug.Reposition();
+      Manager()->debug.Update();
+
       if ( !Manager()->over_any_elem )
         Manager()->SetContextNull();
     }
@@ -116,10 +121,11 @@ namespace UI
         base.Draw();
       }
 
-      DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-      DrawFPS( GetScreenWidth() - 100, 2 );
+      // DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+      // DrawFPS( GetScreenWidth() - 100, 2 );
 
-      Manager()->DrawManagerDebugInfo();
+      // Manager()->DrawManagerDebugInfo();
+      Manager()->debug.Draw();
 
       DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
       DrawText(

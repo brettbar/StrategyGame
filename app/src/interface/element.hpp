@@ -89,43 +89,15 @@ namespace UI
     // TextureLabel
     Texture2D texture = Texture2D();
 
-
-    // TODO left off here
-    // Need to define valid constructors so we dont get garbage data
-    // Element()
-    //     : type( Type::INVALID ), id( "INVALID" ), enabled( false ),
-    //       background( BLACK ), transform( rect{ 0, 0, 0, 0 } ),
-    //       margins( Margins{ 0, 0, 0, 0 } ),
-    //       // Panel
-    //       anchor( Anchor::Free ),// Might apply to others as well?
-    //       children_axis( Axis::INVALID ),
-    //       children_horiz_align( Align::INVALID ),
-    //       children_vert_align( Align::INVALID ), abs_size( false ),
-    //       children( {} ), update_children( {} ), subscribed_updates( {} ),
-    //       // StackPanel
-    //       curr_index( 0 ),
-    //       // TextLabel
-    //       text( "INVALID" ), font_size( 14 ), text_color( WHITE ),
-    //       // TODO(rf) probably can remove all together
-    //       dynamic( false ),
-    //       // TextButton
-    //       clickable( true ), on_click( nullptr ),
-    //       // TextureLabel
-    //       texture( Texture2D() )
-    // {
-    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-    //     .connect<&Element::ReceiveUpdate>( this );
-    // }
-
-    // ~Element()
-    // {
-    //   // InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
-    //   //   .disconnect<&Element::ReceiveUpdate>( this );
-    // }
-
     // Element() = delete;
     Element() = default;
-    Element( std::string id ){};
+    Element( std::string id )
+    {
+      UI::lookup.emplace( id, ptr<Element>( this ) );
+    };
+    // ~Element() {
+    //   // TODO Remove id from lookup
+    // }
 
 public:
     friend class PanelBuilder;
@@ -235,6 +207,14 @@ public:
               transform.y = updated_pos.y;
             }
             break;
+            case Anchor::TopRight:
+            {
+              vec2 updated_pos = {
+                ( (f32) GetScreenWidth() ) - ( transform.width ), 0 };
+
+              transform.x = updated_pos.x;
+              transform.y = updated_pos.y;
+            }
             default:
               break;
           }
@@ -396,6 +376,11 @@ public:
         }
         break;
       }
+    }
+
+    void UpdateText( std::string new_text )
+    {
+      text = new_text;
     }
 
     void Update()
