@@ -107,11 +107,6 @@ namespace UI
         base.Resize();
         base.Reposition();
         base.Interact( mouseWentUp, mouseWentDown );
-
-        // Panel & panel = Get<Panel>( base );
-        // panel->Resize();
-        // panel->Reposition();
-        // panel->Interact( mouseWentUp, mouseWentDown );
       }
 
 
@@ -130,10 +125,6 @@ namespace UI
         base.Draw();
       }
 
-      // DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-      // DrawFPS( GetScreenWidth() - 100, 2 );
-
-      // Manager()->DrawManagerDebugInfo();
       Manager()->debug.Draw();
 
       DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );

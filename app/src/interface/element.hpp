@@ -493,27 +493,30 @@ public:
         break;
         case Type::TextButton:
         {
-          if ( !clickable )
-          {
-            DrawRectangleV(
-              { transform.x, transform.y },
-              { transform.width, transform.height },
-              Fade( BLACK, 0.5 )
-            );
+          // TODO - do we really want this to black out like that
+          // Caused me to lose my sanity for a month
+          // Bruh
+          // if ( !clickable )
+          // {
+          //   DrawRectangleV(
+          //     { transform.x, transform.y },
+          //     { transform.width, transform.height },
+          //     Fade( BLACK, 0.5 )
+          //   );
 
-            DrawTextEx(
-              Global::font_cache[hstr{ "font_romulus" }]->font,
-              text.c_str(),
-              {
-                transform.x,
-                transform.y,
-              },
-              font_size,
-              2.0,
-              text_color
-            );
-          }
-          else
+          //   DrawTextEx(
+          //     Global::font_cache[hstr{ "font_romulus" }]->font,
+          //     text.c_str(),
+          //     {
+          //       transform.x,
+          //       transform.y,
+          //     },
+          //     font_size,
+          //     2.0,
+          //     text_color
+          //   );
+          // }
+          // else
           {
             DrawRectangleV(
               { transform.x, transform.y },

@@ -51,21 +51,21 @@ namespace UI
     return slots;
   }
 
-  inline std::vector<Network::PeerData> GetPeers()
-  {
-    std::vector<Network::PeerData> members = {};
+  // inline std::vector<Network::PeerData> GetPeers()
+  // {
+  //   std::vector<Network::PeerData> members = {};
 
-    if ( Network::is_host )
-    {
-      members = Network::Host()->GetConnectedUsers();
-    }
-    else
-    {
-      members = Network::Client()->GetConnectedUsers();
-    }
+  //   if ( Network::is_host )
+  //   {
+  //     members = Network::Host()->GetConnectedUsers();
+  //   }
+  //   else
+  //   {
+  //     members = Network::Client()->GetConnectedUsers();
+  //   }
 
-    return members;
-  };
+  //   return members;
+  // };
 
 
   inline std::vector<Element> CreateLobbyUI()
