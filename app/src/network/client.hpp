@@ -135,26 +135,14 @@ public:
         break;
         case MessageID::AssignedPlayerId:
         {
+          printf( "MessagedID::AssignedPlayerId\n" );
           _player_id = body["new_player_id"];
           printf( "We were assigned %s as player_id\n", _player_id.c_str() );
-
-          InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-            .SetTarget( _player_id + "_label" )
-            .SetText( _player_id )
-            .build()
-            .send();
-          InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-            .SetTarget( _player_id + "_faction_selection" )
-            .build()
-            .send();
-          InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
-            .SetTarget( _player_id + "_faction_selection" )
-            .build()
-            .send();
         }
         break;
         case MessageID::PlayerConnected:
         {
+          printf( "MessagedID::PlayerConnected\n" );
           auto data = body["data"];
           u64 steam_user_id_u64 = data["steam_user_id"];
           std::string player_id = data["player_id"];

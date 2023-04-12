@@ -36,7 +36,7 @@ InterfaceUpdates:
     NumTypes,
   };
 
-  enum class ID
+  enum ID
   {
     INVALID,
     FactionSelected,

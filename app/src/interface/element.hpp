@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../shared/global.hpp"
+#include "../shared/utils.hpp"
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 #include "ui_shared.hpp"
@@ -541,16 +542,12 @@ public:
             case InterfaceUpdate::Type::TextUpdate:
               if ( update.targeted )
               {
-                // printf(
-                //   "TextLabel::ReceiveUpdate msg type: %d\n", update.type
-                // );
-
-                printf(
-                  "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
-                );
-
                 if ( update.target == id )
                 {
+                  printf(
+                    "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
+                  );
+
                   text = update.updated_text;
                 }
               }
@@ -560,18 +557,36 @@ public:
               }
               break;
             case InterfaceUpdate::Type::BackgroundUpdate:
+            {
               if ( update.targeted )
               {
                 if ( update.target == id )
                 {
+                  std::cout << "InterfaceUpdate::Type::BackgroundUpdate"
+                            << " target: " << update.target << " us: " << id
+                            << '\n';
+
+                  std::cout << "We got: ";
+                  PrintRGB( update.updated_background );
+                  std::cout << '\n';
+
+                  std::cout << "before: ";
+                  PrintRGB( background );
+                  std::cout << '\n';
+
                   background = update.updated_background;
+
+                  std::cout << "after: ";
+                  PrintRGB( background );
+                  std::cout << '\n';
                 }
               }
               else
               {
                 background = update.updated_background;
               }
-              break;
+            }
+            break;
             case InterfaceUpdate::Type::ClickableUpdate:
               if ( update.targeted )
               {
