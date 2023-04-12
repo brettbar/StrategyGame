@@ -150,6 +150,14 @@ public:
       );
     }
 
+    // TODO(rf) this is a bit clunky
+    // This is for the case where the host selected his faction
+    // before any players connected
+    inline void SetHostFaction( std::string faction )
+    {
+      _clients[0].peer_data.faction = faction;
+    }
+
     void Update()
     {
       CheckForMessages();
@@ -455,6 +463,7 @@ public:
         body["data"] = {
           { "is_host", false },
           { "player_id", _clients[i].peer_data.player_id },
+          { "faction", _clients[i].peer_data.faction },
           {
             "steam_name",
             std::string( SteamFriends()->GetFriendPersonaName(
@@ -521,6 +530,7 @@ public:
       }
     }
   }
+
 
   inline IHost *Host()
   {

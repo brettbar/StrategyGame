@@ -62,7 +62,7 @@ private:
 
 public:
     // TODO make private
-    std::string _player_id;
+    std::string _local_player_id;
 
     static IClient *Client()
     {
@@ -78,7 +78,7 @@ public:
       );
 
       Network::is_host = false;
-      _player_id = "INVALID_ID";
+      _local_player_id = "INVALID_ID";
     }
 
     void Update()
@@ -126,7 +126,7 @@ public:
             Message{
               MessageID::ClientPingResponse,
               nlohmann::json{
-                { "player_id", _player_id },
+                { "player_id", _local_player_id },
                 { "timestamp", body },
               },
             }
@@ -136,8 +136,10 @@ public:
         case MessageID::AssignedPlayerId:
         {
           printf( "MessagedID::AssignedPlayerId\n" );
-          _player_id = body["new_player_id"];
-          printf( "We were assigned %s as player_id\n", _player_id.c_str() );
+          _local_player_id = body["new_player_id"];
+          printf(
+            "We were assigned %s as player_id\n", _local_player_id.c_str()
+          );
         }
         break;
         case MessageID::PlayerConnected:
@@ -145,14 +147,15 @@ public:
           printf( "MessagedID::PlayerConnected\n" );
           auto data = body["data"];
           u64 steam_user_id_u64 = data["steam_user_id"];
-          std::string player_id = data["player_id"];
+          std::string new_player_id = data["player_id"];
+          std::string faction = data["faction"];
 
-          std::cout << "PLAYER_ID: " << player_id << '\n';
+          std::cout << "PLAYER_ID: " << new_player_id << '\n';
 
-          u32 index = player_id_index[player_id];
+          u32 index = player_id_index[new_player_id];
 
           _peers[index] = PeerData{
-            .player_id = data["player_id"],
+            .player_id = new_player_id,
             .faction = data["faction"],
             .active = true,
             .readied_up = false,
@@ -160,20 +163,20 @@ public:
           };
 
           InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-            .SetTarget( player_id + "_label" )
-            .SetText( player_id )
+            .SetTarget( new_player_id + "_label" )
+            .SetText( new_player_id )
             .build()
             .send();
 
           // If its ourselves
-          if ( player_id == _player_id )
+          if ( new_player_id == _local_player_id )
           {
             InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-              .SetTarget( _player_id + "_faction_selection" )
+              .SetTarget( _local_player_id + "_faction_selection" )
               .build()
               .send();
             InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
-              .SetTarget( _player_id + "_faction_selection" )
+              .SetTarget( _local_player_id + "_faction_selection" )
               .build()
               .send();
           }
@@ -182,9 +185,26 @@ public:
             InterfaceUpdate::Background(
               InterfaceUpdate::ID::JoinLobby, PURPLE
             )
-              .SetTarget( player_id + "_faction_selection" )
+              .SetTarget( new_player_id + "_faction_selection" )
               .build()
               .send();
+
+            if ( faction != "" )
+            {
+              InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+                .SetTarget( new_player_id + "_select_faction" )
+                .SetText( faction )
+                .build()
+                .send();
+
+              InterfaceUpdate::Background(
+                InterfaceUpdate::ID::FactionSelected,
+                GetPrimaryFactionColor( faction )
+              )
+                .SetTarget( new_player_id + "_select_faction" )
+                .build()
+                .send();
+            }
           }
         }
         break;
@@ -201,7 +221,6 @@ public:
             .SetText( faction )
             .build()
             .send();
-
 
           InterfaceUpdate::Background(
             InterfaceUpdate::ID::FactionSelected,

@@ -66,30 +66,30 @@ public:
     {
       bool result = false;
 
-      if ( entity.ID() == _context.active )
+      if ( entity.id == _context.active )
       {
         if ( mouseWentUp )
         {
-          if ( entity.ID() == _context.hot )
+          if ( entity.id == _context.hot )
             result = true;// do the button action
 
           _context.active = "";
         }
       }
-      else if ( entity.ID() == _context.hot )
+      else if ( entity.id == _context.hot )
       {
         if ( mouseWentDown )
-          _context.active = entity.ID();
+          _context.active = entity.id;
       }
 
       if ( inside )
       {
         if ( _context.active == "" )
         {
-          _context.hot = entity.ID();
+          _context.hot = entity.id;
 
           if ( mouseWentDown )
-            _context.active = entity.ID();
+            _context.active = entity.id;
         }
       }
 
@@ -163,19 +163,19 @@ private:
       for ( auto &child: children )
       {
 
-        if ( child.ID() == "fps" )
+        if ( child.id == "fps" )
         {
           child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
         }
-        else if ( child.ID() == "hot" )
+        else if ( child.id == "hot" )
         {
           child.UpdateText( "hot: " + ( Manager()->Hot() ) );
         }
-        else if ( child.ID() == "active" )
+        else if ( child.id == "active" )
         {
           child.UpdateText( "active: " + ( Manager()->Active() ) );
         }
-        else if ( child.ID() == "element.background" )
+        else if ( child.id == "element.background" )
         {
           if ( lookup.contains( Manager()->Hot() ) )
           {
@@ -186,7 +186,7 @@ private:
 
             child.UpdateText(
               "element.background: " +
-              FormatRGB( lookup.at( Manager()->Hot() )->Background() )
+              FormatRGB( lookup.at( Manager()->Hot() )->background )
             );
           }
           else
@@ -195,7 +195,7 @@ private:
           }
         }
 
-        else if ( child.ID() == "selected" )
+        else if ( child.id == "selected" )
         {
           child.UpdateText(
             "entity: " + EntityIdToString( SelectionSystem::selected_entity )
@@ -222,26 +222,37 @@ private:
       } );
   }
 
-  inline void Element::Interact( bool mouse_went_up, bool mouse_went_down )
+  inline void Interact(
+    Element element,
+    bool mouse_went_up,
+    bool mouse_went_down
+  )
   {
-    if ( !this || !enabled )
+    // TODO(rf) this is ridiculously cludgy
+    // We have to check !this I think because this is define when Manager isnt ready or something
+    // I dont really know but we could start by seeing if we could decouple some dependencies and get this outta here
+    // if ( !this || !enabled )
+    //   return;
+
+    if ( !element.enabled )
       return;
 
-    switch ( type )
+
+    switch ( element.type )
     {
       case Type::Panel:
       {
-        for ( Element &child: children )
+        for ( Element &child: element.children )
         {
-          if ( child.enabled )
-          {
-            child.Interact( mouse_went_up, mouse_went_down );
-          }
+          Interact( child, mouse_went_up, mouse_went_down );
         }
       }
+      break;
       case Type::StackPanel:
       {
-        children[curr_index].Interact( mouse_went_up, mouse_went_down );
+        Interact(
+          element.children[element.curr_index], mouse_went_up, mouse_went_down
+        );
 
         if ( !Manager()->over_any_elem )
         {
@@ -251,20 +262,21 @@ private:
       break;
       case Type::TextButton:
       {
-        bool inside = CheckCollisionPointRec( GetMousePosition(), transform );
+        bool inside =
+          CheckCollisionPointRec( GetMousePosition(), element.transform );
 
         if ( !Manager()->over_any_elem )
           Manager()->over_any_elem = inside;
 
         if ( Manager()->DoInteraction(
-               *this, inside, mouse_went_up, mouse_went_down
+               element, inside, mouse_went_up, mouse_went_down
              ) )
         {
-          if ( clickable )
+          if ( element.clickable )
           {
             std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
-            FireEvent();
+            element.FireEvent();
           }
         }
       }

@@ -432,7 +432,6 @@ inline void IGame::RegisterEventListeners()
 
           faction = event.msg;
 
-
           if ( _single_player )
           {
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
@@ -456,6 +455,7 @@ inline void IGame::RegisterEventListeners()
             if ( Network::is_host )
             {
               target = Network::Host()->_player_id;
+              Network::Host()->SetHostFaction( faction );
               Network::Host()->SendMessageToAllClients( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
@@ -466,7 +466,7 @@ inline void IGame::RegisterEventListeners()
             }
             else
             {
-              target = Network::Client()->_player_id;
+              target = Network::Client()->_local_player_id;
               Network::Client()->SendMessageToHost( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{

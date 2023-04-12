@@ -56,6 +56,20 @@ namespace UI
 
   class Element
   {
+
+    // Element() = delete;
+    Element() = default;
+    Element( std::string id ) : id( id ){};
+    // ~Element() {
+    //   // TODO Remove id from lookup
+    // }
+
+public:
+    friend class PanelBuilder;
+    friend class StackPanelBuilder;
+    friend class TextLabelBuilder;
+    friend class TextButtonBuilder;
+
     Type type = Type::INVALID;
     std::string id = "INVALID";
     bool enabled = false;
@@ -90,29 +104,6 @@ namespace UI
     // TextureLabel
     Texture2D texture = Texture2D();
 
-    // Element() = delete;
-    Element() = default;
-    Element( std::string id ) : id( id ){};
-    // ~Element() {
-    //   // TODO Remove id from lookup
-    // }
-
-public:
-    friend class PanelBuilder;
-    friend class StackPanelBuilder;
-    friend class TextLabelBuilder;
-    friend class TextButtonBuilder;
-
-    Color Background()
-    {
-      return background;
-    }
-
-
-    std::string ID()
-    {
-      return id;
-    }
 
     void Enable()
     {
@@ -555,9 +546,6 @@ public:
       if ( on_click )
         InterfaceEvent::event_emitter.publish( *on_click );
     }
-
-    void Interact( bool mouse_went_up, bool mouse_went_down );
-
 
     void ReceiveUpdate( const InterfaceUpdate::Data &update )
     {

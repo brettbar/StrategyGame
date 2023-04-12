@@ -21,7 +21,7 @@ namespace UI
 
       for ( auto &child: children )
       {
-        existing_ids.emplace( child.ID(), true );
+        existing_ids.emplace( child.id, true );
       }
 
       for ( CSteamID lobby_id: Network::Client()->GetLobbyList() )

@@ -106,7 +106,7 @@ namespace UI
       {
         base.Resize();
         base.Reposition();
-        base.Interact( mouseWentUp, mouseWentDown );
+        Interact( base, mouseWentUp, mouseWentDown );
       }
 
 
