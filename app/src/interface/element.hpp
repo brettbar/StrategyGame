@@ -92,10 +92,7 @@ namespace UI
 
     // Element() = delete;
     Element() = default;
-    Element( std::string id )
-    {
-      UI::lookup.emplace( id, ptr<Element>( this ) );
-    };
+    Element( std::string id ) : id( id ){};
     // ~Element() {
     //   // TODO Remove id from lookup
     // }
@@ -105,6 +102,11 @@ public:
     friend class StackPanelBuilder;
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
+
+    Color Background()
+    {
+      return background;
+    }
 
 
     std::string ID()
@@ -150,6 +152,36 @@ public:
         break;
         default:
           enabled = true;
+          break;
+      }
+    }
+
+    void Register()
+    {
+      switch ( type )
+      {
+        case Type::INVALID:
+          printf( "INVALID TYPE ENABLED\n" );
+          assert( false );
+          break;
+        case Type::Panel:
+        {
+          lookup.emplace( id, std::make_shared<Element>( *this ) );
+
+          for ( Element &child: children )
+          {
+            child.Register();
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          lookup.emplace( id, std::make_shared<Element>( *this ) );
+          children[curr_index].Register();
+        }
+        break;
+        default:
+          lookup.emplace( id, std::make_shared<Element>( *this ) );
           break;
       }
     }
@@ -566,19 +598,15 @@ public:
                             << " target: " << update.target << " us: " << id
                             << '\n';
 
-                  std::cout << "We got: ";
-                  PrintRGB( update.updated_background );
-                  std::cout << '\n';
+                  std::cout
+                    << "We got: " << FormatRGB( update.updated_background )
+                    << '\n';
 
-                  std::cout << "before: ";
-                  PrintRGB( background );
-                  std::cout << '\n';
+                  std::cout << "before: " << FormatRGB( background ) << '\n';
 
                   background = update.updated_background;
 
-                  std::cout << "after: ";
-                  PrintRGB( background );
-                  std::cout << '\n';
+                  std::cout << "after: " << FormatRGB( background ) << '\n';
                 }
               }
               else

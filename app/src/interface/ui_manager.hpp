@@ -175,6 +175,26 @@ private:
         {
           child.UpdateText( "active: " + ( Manager()->Active() ) );
         }
+        else if ( child.ID() == "element.background" )
+        {
+          if ( lookup.contains( Manager()->Hot() ) )
+          {
+            // std::cout << "Updating color with "
+            //           << FormatRGB( lookup.at( Manager()->Hot() )->Background()
+            //              )
+            //           << '\n';
+
+            child.UpdateText(
+              "element.background: " +
+              FormatRGB( lookup.at( Manager()->Hot() )->Background() )
+            );
+          }
+          else
+          {
+            child.UpdateText( "element.background: " );
+          }
+        }
+
         else if ( child.ID() == "selected" )
         {
           child.UpdateText(
@@ -193,6 +213,9 @@ private:
         TextLabel( "fps" ).Background( BLACK ).SetText( "fps: ", 18.0f, GREEN ),
         TextLabel( "hot" ).Background( BLACK ).SetText( "hot: ", 18.0f ),
         TextLabel( "active" ).Background( BLACK ).SetText( "active: ", 18.0f ),
+        TextLabel( "element.background" )
+          .Background( BLACK )
+          .SetText( "element.background: ", 18.0f ),
         TextLabel( "selected" )
           .SetText( "entity: ", 18.0f )
           .Background( BLACK ),

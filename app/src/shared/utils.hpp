@@ -246,11 +246,11 @@ inline Color GetPrimaryFactionColor( std::string faction )
     return BLACK;
 }
 
-inline void PrintRGB( Color color )
+inline std::string FormatRGB( Color color )
 {
-  std::cout << "r: " << std::to_string( color.r )
-            << " g: " << std::to_string( color.g )
-            << " b: " << std::to_string( color.b ) << '\n';
+  return "r: " + std::to_string( color.r ) +
+         " g: " + std::to_string( color.g ) +
+         " b: " + std::to_string( color.b );
 }
 
 inline static std::string EntityIdToString( entt::entity entity )

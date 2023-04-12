@@ -30,6 +30,15 @@ namespace UI
         CreateLobbyBrowser(),
         CreateLobbyUI(),
       };
+
+      for ( Page &page: Manager()->pages )
+      {
+        for ( Element &panel: page )
+        {
+          panel.Register();
+        }
+      }
+
       Manager()->debug.Enable();
       Manager()->SetScene( MainMenu );
       EnableContent();
