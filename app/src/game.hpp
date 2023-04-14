@@ -450,34 +450,34 @@ inline void IGame::RegisterEventListeners()
           }
           else
           {
-            std::string target = "";
+            std::string player_id = "";
 
             if ( Network::is_host )
             {
-              target = Network::Host()->_player_id;
+              player_id = Network::Host()->_player_id;
               Network::Host()->SetHostFaction( faction );
               Network::Host()->SendMessageToAllClients( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
-                  { "player_id", target },
+                  { "player_id", player_id },
                   { "faction", faction },
                 },
               } );
             }
             else
             {
-              target = Network::Client()->_local_player_id;
+              player_id = Network::Client()->_local_player_id;
               Network::Client()->SendMessageToHost( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
-                  { "player_id", target },
+                  { "player_id", player_id },
                   { "faction", faction },
                 },
               } );
             }
 
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetTarget( target + "_select_faction" )
+              .SetTarget( player_id + "_select_faction" )
               .SetText( faction )
               .build()
               .send();
@@ -486,7 +486,7 @@ inline void IGame::RegisterEventListeners()
               InterfaceUpdate::ID::FactionSelected,
               GetPrimaryFactionColor( faction )
             )
-              .SetTarget( target + "_select_faction" )
+              .SetTarget( player_id + "_select_faction" )
               .build()
               .send();
 

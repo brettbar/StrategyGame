@@ -228,15 +228,8 @@ private:
     bool mouse_went_down
   )
   {
-    // TODO(rf) this is ridiculously cludgy
-    // We have to check !this I think because this is define when Manager isnt ready or something
-    // I dont really know but we could start by seeing if we could decouple some dependencies and get this outta here
-    // if ( !this || !enabled )
-    //   return;
-
     if ( !element.enabled )
       return;
-
 
     switch ( element.type )
     {

@@ -228,6 +228,46 @@ public:
           _clients[index].latest_timestamp = newest_timestamp;
         }
         break;
+        case PlayerFactionSelect:
+        {
+          std::string player_id = msg.body["player_id"];
+          std::string faction = msg.body["faction"];
+          std::string target = player_id + "_select_faction";
+
+          u32 index = player_id_index[player_id];
+          _clients[index].peer_data.faction = faction;
+
+          // Tell all the other clients about it
+          for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+          {
+            if ( !_clients[i].peer_data.active )
+              continue;
+
+            SendMessageOnConnection(
+              _clients[i].conn,
+              Message{
+                MessageID::PlayerFactionSelect,
+                nlohmann::json{
+                  { "player_id", player_id },
+                  { "faction", faction },
+                } }
+            );
+          }
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+            .SetTarget( target )
+            .SetText( faction )
+            .build()
+            .send();
+
+          InterfaceUpdate::Background(
+            InterfaceUpdate::ID::FactionSelected,
+            GetPrimaryFactionColor( faction )
+          )
+            .SetTarget( target )
+            .build()
+            .send();
+        }
         default:
           break;
       }
@@ -418,10 +458,6 @@ public:
         InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
           .SetTarget( player_id + "_label" )
           .SetText( player_id )
-          .build()
-          .send();
-        InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-          .SetTarget( player_id + "_faction_selection" )
           .build()
           .send();
         InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )

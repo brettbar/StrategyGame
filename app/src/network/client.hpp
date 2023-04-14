@@ -216,6 +216,9 @@ public:
           std::string faction = body["faction"];
           std::string target = player_id + "_select_faction";
 
+          u32 index = player_id_index[player_id];
+          _peers[index].faction = faction;
+
           InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
             .SetTarget( target )
             .SetText( faction )
