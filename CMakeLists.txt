@@ -22,7 +22,6 @@ set(SOURCE_FILES
   app/src/world/components/sight.hpp
   app/src/world/components/tile.hpp
   app/src/world/components/unit.hpp
-  app/src/world/components/event.hpp
   )
 
 if (UNIX)

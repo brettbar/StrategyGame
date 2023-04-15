@@ -1,8 +1,8 @@
 Clear-Host
-cmake -S . -B .\build\ -G "MinGW Makefiles"
-# cmake -S . -B .\build\ -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=RELEASE
-# cmake -S . -B .\build\ -G "MSYS Makefiles"
-make -C .\build\
-.\build\game.exe
+# cmake -S . -B .\build\ -G "MinGW Makefiles"
+# # cmake -S . -B .\build\ -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=RELEASE
+# # cmake -S . -B .\build\ -G "MSYS Makefiles"
+# make -C .\build\
+# .\build\game.exe
 
-
+devenv .\FieldsOfMars.sln /Build && .\x64\Debug\FieldsOfMars.exe

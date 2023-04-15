@@ -19,7 +19,8 @@
 #include <string>
 #include <thread>
 
-namespace Network {
+namespace Network
+{
 
   inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
@@ -30,30 +31,58 @@ namespace Network {
 
   inline CSteamID lobby_id;
 
-  struct ClientConnectionData {
-    std::string player_id;
+  // Peak programming right here
+  inline std::map<std::string, u32> player_id_index = {
+    { "player_0", 0 },
+    { "player_1", 1 },
+    { "player_2", 2 },
+    { "player_3", 3 },
+    { "player_4", 4 },
+    { "player_5", 5 },
+    { "player_6", 6 },
+    { "player_7", 7 },
+  };
 
+  enum MessageID : u32
+  {
+    InitiateContact,
+    AssignedPlayerId,
+    HostPingRequest,
+    ClientPingResponse,
+    PlayerConnected,
+    PlayerDisconnected,
+
+    PlayerFactionSelect,
+
+    NumMessageIDs,
+  };
+  struct Message
+  {
+    MessageID message_id;
+    nlohmann::json body;
+  };
+
+  struct PeerData
+  {
+    std::string player_id;
+    std::string faction = "";
     bool active;
     bool readied_up;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
-    HSteamNetConnection conn;
-
-    ClientConnectionData() {
-      player_id = "";
-      active = false;
-      conn = 0;
-    }
   };
+
 
   inline void DebugOutput(
     ESteamNetworkingSocketsDebugOutputType eType,
     const char *pszMsg
-  ) {
+  )
+  {
     printf( "%s\n", pszMsg );
   }
 
-  inline void Setup() {
+  inline void Setup()
+  {
     SteamNetworkingUtils()->SetDebugOutputFunction(
       k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
     );
@@ -67,20 +96,35 @@ namespace Network {
     // );
   }
 
-  inline void
-  SendMessageOnConnection( HSteamNetConnection conn, const char *msg ) {
-    printf( "Sending msg '%s'\n", msg );
+  inline void SendMessageOnConnection(
+    HSteamNetConnection conn,
+    Message message
+    // const char *msg
+  )
+  {
+    // printf( "Sending msg '%s'\n", payload );
+
+    nlohmann::json message_payload = {
+      {
+        "message_id",
+        message.message_id,
+      },
+      { "body", message.body },
+    };
+
 
     EResult r = SteamNetworkingSockets()->SendMessageToConnection(
       conn,
-      msg,
-      (int) strlen( msg ) + 1,
+      message_payload.dump().c_str(),
+      (int) strlen( message_payload.dump().c_str() ) + 1,
       k_nSteamNetworkingSend_Reliable,
       nullptr
     );
 
     // printf( "Message Result %d\n", r );
 
+    // TODO this really should be enabled, it broke linux build
+    // for some reason
     // assert( r == k_EResultOK );
   }
 
