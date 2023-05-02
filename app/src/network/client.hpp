@@ -17,7 +17,7 @@
 
 namespace Network
 {
-  class IClient : INetwork
+  class IClient
   {
 private:
     IClient( IClient const & ) = delete;
@@ -105,14 +105,14 @@ public:
         MessageID message_id = message["message_id"];
         auto body = message["body"];
 
-        HandleMessageSwitch( message_id, body );
+        ProcessMessageSwitch( message_id, body );
 
         // printf( "Received message: '%s'\n", raw_message );
         msg->Release();
       }
     }
 
-    void HandleMessageSwitch(
+    void ProcessMessageSwitch(
       MessageID message_id,
       nlohmann::basic_json<> body
     )

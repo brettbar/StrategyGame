@@ -69,17 +69,10 @@ namespace Network
   {
     std::string player_id;
     std::string faction = "";
-    bool active;
-    bool readied_up;
+    bool active = false;
+    bool readied_up = false;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
-  };
-
-  class INetwork
-  {
-protected:
-    INetwork( INetwork const & ) = delete;
-    void operator=( const INetwork & ) = delete;
   };
 
 

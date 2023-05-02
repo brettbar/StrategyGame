@@ -31,8 +31,6 @@ namespace Network
 
       ClientConnectionData()
       {
-        peer_data.player_id = "";
-        peer_data.active = false;
         conn = 0;
         latest_timestamp = TimestampMS();
         ping_ms = 1000;
@@ -49,7 +47,7 @@ namespace Network
   };// namespace
 
 
-  class IHost : INetwork
+  class IHost
   {
 private:
     IHost( IHost const & ) = delete;
@@ -268,6 +266,7 @@ public:
             .build()
             .send();
         }
+        break;
         case PlayerToggledReady:
         {
           std::string player_id = msg.body["player_id"];
@@ -300,10 +299,13 @@ public:
 
     void ToggleReady()
     {
+      std::cout << "Host()->ToggleReady!!!" << '\n';
+
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
 
       InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
         .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
+        .SetTarget( "player_0_readied" )
         .build()
         .send();
 
@@ -311,6 +313,7 @@ public:
         InterfaceUpdate::ID::PlayerToggledReady,
         _clients[0].peer_data.readied_up ? GREEN : RED
       )
+        .SetTarget( "player_0_readied" )
         .build()
         .send();
 

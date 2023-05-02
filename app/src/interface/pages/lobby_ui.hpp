@@ -41,7 +41,8 @@ namespace UI
               .Background( GRAY ),
             TextLabel( player_id + "_readied" )
               .SetText( "Not Ready", 24 )
-              .Background( RED ),
+              .Background( RED )
+              .ListensFor( { InterfaceUpdate::ID::PlayerToggledReady } ),
             TextLabel( player_id + "_steam_user_name" )
               .SetText( "", 24 )
               .Background( GRAY ),
