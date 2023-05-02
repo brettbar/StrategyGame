@@ -41,7 +41,8 @@ namespace fs = std::filesystem;
 void LoadResources();
 
 
-void SteamAPIDebugTextHook( int severity, const char *msg ) {
+void SteamAPIDebugTextHook( int severity, const char *msg )
+{
   printf( "S::%d", severity );
   printf( "%s\n", msg );
 }
@@ -51,22 +52,27 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
   Main application entrypoint
 ========================================================
 */
-int main( void ) {
-  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
+int main()
+{
+  if ( SteamAPI_RestartAppIfNecessary( 480 ) )
+  {
     return EXIT_FAILURE;
   }
 
-  if ( !SteamAPI_Init() ) {
+  if ( !SteamAPI_Init() )
+  {
     printf( "SteamAPI_Init() failed!\n" );
     return EXIT_FAILURE;
   }
 
-  if ( !SteamUser()->BLoggedOn() ) {
+  if ( !SteamUser()->BLoggedOn() )
+  {
     printf( "Steam user is not logged in\n" );
     return EXIT_FAILURE;
   }
 
-  if ( !SteamInput()->Init( false ) ) {
+  if ( !SteamInput()->Init( false ) )
+  {
     printf( "SteamInput()->Init failed.\n" );
     return EXIT_FAILURE;
   }
@@ -91,7 +97,8 @@ int main( void ) {
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever
   UnloadShader( Renderer::shader );
-  for ( auto resource: Global::texture_cache ) {
+  for ( auto resource: Global::texture_cache )
+  {
     UnloadTexture( resource.second->texture );
   }
   Global::texture_cache.clear();
@@ -101,7 +108,8 @@ int main( void ) {
   return EXIT_SUCCESS;
 }
 
-Image InitTileOutline() {
+Image InitTileOutline()
+{
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
@@ -120,7 +128,8 @@ Image InitTileOutline() {
   return base;
 }
 
-void LoadResources() {
+void LoadResources()
+{
   std::string asset_folder = "app/assets/";
 
   LoadResource(
@@ -282,7 +291,8 @@ void LoadResources() {
   );
 
   std::string path = asset_folder + "/images/resources";
-  for ( const auto &entry: fs::directory_iterator( path ) ) {
+  for ( const auto &entry: fs::directory_iterator( path ) )
+  {
     std::cout << entry.path().filename() << std::endl;
 
     std::string filename = entry.path().filename().generic_string();

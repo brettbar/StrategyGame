@@ -39,10 +39,14 @@ namespace UI
             TextLabel( player_id + "_label" )
               .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
               .Background( GRAY ),
+            TextLabel( player_id + "_readied" )
+              .SetText( "Not Ready", 24 )
+              .Background( RED ),
             TextLabel( player_id + "_steam_user_name" )
               .SetText( "", 24 )
               .Background( GRAY ),
           } );
+
       panel.Enable();
 
       slots.push_back( panel );
@@ -50,23 +54,6 @@ namespace UI
 
     return slots;
   }
-
-  // inline std::vector<Network::PeerData> GetPeers()
-  // {
-  //   std::vector<Network::PeerData> members = {};
-
-  //   if ( Network::is_host )
-  //   {
-  //     members = Network::Host()->GetConnectedUsers();
-  //   }
-  //   else
-  //   {
-  //     members = Network::Client()->GetConnectedUsers();
-  //   }
-
-  //   return members;
-  // };
-
 
   inline std::vector<Element> CreateLobbyUI()
   {
@@ -95,7 +82,7 @@ namespace UI
           TextButton( "ready_up" )
             .SetText( "Ready Up", 32 )
             .Background( RED )
-            .SetEvent( InterfaceEvent::ID::ReadyUp )
+            .SetEvent( InterfaceEvent::ID::PlayerToggledReady )
             .ListensFor(
               { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
             ),

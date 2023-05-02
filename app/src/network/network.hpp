@@ -52,10 +52,13 @@ namespace Network
     PlayerConnected,
     PlayerDisconnected,
 
+    PlayerToggledReady,
+
     PlayerFactionSelect,
 
     NumMessageIDs,
   };
+
   struct Message
   {
     MessageID message_id;
@@ -70,6 +73,13 @@ namespace Network
     bool readied_up;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
+  };
+
+  class INetwork
+  {
+protected:
+    INetwork( INetwork const & ) = delete;
+    void operator=( const INetwork & ) = delete;
   };
 
 

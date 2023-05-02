@@ -17,7 +17,7 @@
 
 namespace Network
 {
-  class IClient
+  class IClient : INetwork
   {
 private:
     IClient( IClient const & ) = delete;
@@ -234,6 +234,35 @@ public:
             .send();
         }
         break;
+        case MessageID::PlayerToggledReady:
+        {
+
+          std::string player_id = body["player_id"];
+          bool ready = body["ready"];
+
+          if ( player_id == _local_player_id )
+          {
+            // If the player who toggled is ourselves,
+            // we already know that
+            break;
+          }
+
+          u32 index = player_id_index[player_id];
+          _peers[index].readied_up = ready;
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+            .SetText( _peers[index].readied_up ? "Ready " : "Not Ready" )
+            .build()
+            .send();
+
+          InterfaceUpdate::Background(
+            InterfaceUpdate::ID::PlayerToggledReady,
+            _peers[index].readied_up ? GREEN : RED
+          )
+            .build()
+            .send();
+        }
+        break;
         default:
           printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
           break;
@@ -258,17 +287,17 @@ public:
     }
 
 
-    std::vector<PeerData> GetConnectedUsers()
-    {
-      std::vector<PeerData> list = {};
+    // std::vector<PeerData> GetConnectedUsers()
+    // {
+    //   std::vector<PeerData> list = {};
 
-      for ( auto &peer: _peers )
-      {
-        list.push_back( peer );
-      }
+    //   for ( auto &peer: _peers )
+    //   {
+    //     list.push_back( peer );
+    //   }
 
-      return list;
-    }
+    //   return list;
+    // }
 
     bool AttemptJoinLobby( CSteamID lobby_id )
     {
@@ -297,6 +326,21 @@ public:
       }
 
       return false;
+    }
+
+    void ToggleReady()
+    {
+      _peers[player_id_index[_local_player_id]].readied_up =
+        !_peers[player_id_index[_local_player_id]].readied_up;
+
+      bool readied = _peers[player_id_index[_local_player_id]].readied_up;
+
+
+      SendMessageToHost( Message{
+        MessageID::PlayerToggledReady,
+        nlohmann::json{
+          { "player_id", _local_player_id }, { "ready", readied } },
+      } );
     }
 
     void SendMessageToHost( Message message )

@@ -45,6 +45,7 @@ InterfaceUpdates:
     JoinLobby,
     HostLobby,
     NumIDs,
+    PlayerToggledReady,
   };
 
   struct Data

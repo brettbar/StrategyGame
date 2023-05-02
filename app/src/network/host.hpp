@@ -49,7 +49,7 @@ namespace Network
   };// namespace
 
 
-  class IHost
+  class IHost : INetwork
   {
 private:
     IHost( IHost const & ) = delete;
@@ -268,8 +268,66 @@ public:
             .build()
             .send();
         }
+        case PlayerToggledReady:
+        {
+          std::string player_id = msg.body["player_id"];
+          bool ready = msg.body["ready"];
+
+          u32 index = player_id_index[player_id];
+          _clients[index].peer_data.readied_up = ready;
+
+          for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+          {
+            if ( !_clients[i].peer_data.active )
+              continue;
+
+            SendMessageOnConnection(
+              _clients[i].conn,
+              Message{
+                MessageID::PlayerToggledReady,
+                nlohmann::json{
+                  { "player_id", player_id },
+                  { "ready", ready },
+                } }
+            );
+          }
+        }
+        break;
         default:
           break;
+      }
+    }
+
+    void ToggleReady()
+    {
+      _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
+
+      InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+        .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
+        .build()
+        .send();
+
+      InterfaceUpdate::Background(
+        InterfaceUpdate::ID::PlayerToggledReady,
+        _clients[0].peer_data.readied_up ? GREEN : RED
+      )
+        .build()
+        .send();
+
+      for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      {
+        if ( !_clients[i].peer_data.active )
+          continue;
+
+        SendMessageOnConnection(
+          _clients[i].conn,
+          Message{
+            MessageID::PlayerToggledReady,
+            nlohmann::json{
+              { "player_id", _clients[0].peer_data.player_id },
+              { "ready", _clients[0].peer_data.readied_up } },
+          }
+        );
       }
     }
 
@@ -312,20 +370,20 @@ public:
       delete this;
     }
 
-    std::vector<Network::PeerData> GetConnectedUsers()
-    {
-      std::vector<PeerData> clients = {};
+    // std::vector<Network::PeerData> GetConnectedUsers()
+    // {
+    //   std::vector<PeerData> clients = {};
 
-      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( _clients[i].peer_data.active )
-        {
-          clients.push_back( _clients[i].peer_data );
-        }
-      }
+    //   for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
+    //   {
+    //     if ( _clients[i].peer_data.active )
+    //     {
+    //       clients.push_back( _clients[i].peer_data );
+    //     }
+    //   }
 
-      return clients;
-    }
+    //   return clients;
+    // }
   };
 
   inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure )

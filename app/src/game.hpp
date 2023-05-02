@@ -411,9 +411,23 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::ReturnToMain:
           ReturnToMain();
           break;
-        case InterfaceEvent::ID::ReadyUp:
+        case InterfaceEvent::ID::PlayerToggledReady:
+        {
+          if ( Network::is_host )
+          {
+            Network::Host()->ToggleReady();
+          }
+          else
+          {
+            Network::Client()->ToggleReady();
+          }
+        }
+        break;
+        case InterfaceEvent::ID::HostStartGame:
+        {
           StartCampaign( faction );
-          break;
+        }
+        break;
         case InterfaceEvent::ID::JoinLobby:
           if ( event.msg == "lobby_entry_Conquistador's lobby" )
           {
