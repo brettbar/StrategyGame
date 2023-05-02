@@ -23,7 +23,10 @@ InterfaceUpdates:
      4. can update clickable
  */
 
-  inline entt::dispatcher dispatcher{};
+  namespace
+  {
+    inline entt::dispatcher dispatcher{};
+  };
 
   enum class Type : u32
   {
@@ -48,8 +51,15 @@ InterfaceUpdates:
     PlayerToggledReady,
   };
 
-  struct Data
+  class Data
   {
+    friend struct Builder;
+    friend struct EnabledUpdate;
+    friend struct Text;
+    friend struct Background;
+    friend struct Clickable;
+
+public:
     Type type = Type::INVALID;
     ID update_id = ID::INVALID;
     bool on = false;
@@ -59,13 +69,6 @@ InterfaceUpdates:
 
     bool targeted = false;
     std::string target = "INVALID";
-
-    void send()
-    {
-      // TODO(??)
-      // dispatcher.enqueue( this );
-      dispatcher.enqueue( *this );
-    }
   };
 
   struct Builder
@@ -74,10 +77,12 @@ protected:
     Data _data;
 
 public:
-    Data build()
+    void send()
     {
-      return _data;
-    };
+      // TODO(??)
+      // dispatcher.enqueue( this );
+      dispatcher.enqueue( _data );
+    }
   };
 
   struct EnabledUpdate : Builder

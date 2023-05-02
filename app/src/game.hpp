@@ -166,15 +166,13 @@ class IGame
     InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
       .SetTarget( Network::Host()->_player_id + "_label" )
       .SetText( Network::Host()->_player_id )
-      .build()
       .send();
+
     InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
       .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .build()
       .send();
     InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
       .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .build()
       .send();
   }
 
@@ -450,14 +448,12 @@ inline void IGame::RegisterEventListeners()
           {
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
               .SetText( faction )
-              .build()
               .send();
 
             InterfaceUpdate::Background(
               InterfaceUpdate::ID::FactionSelected,
               GetPrimaryFactionColor( faction )
             )
-              .build()
               .send();
 
             UI::System::SwitchPage( UI::SinglePlayerLobby );
@@ -493,7 +489,6 @@ inline void IGame::RegisterEventListeners()
             InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
               .SetTarget( player_id + "_select_faction" )
               .SetText( faction )
-              .build()
               .send();
 
             InterfaceUpdate::Background(
@@ -501,7 +496,6 @@ inline void IGame::RegisterEventListeners()
               GetPrimaryFactionColor( faction )
             )
               .SetTarget( player_id + "_select_faction" )
-              .build()
               .send();
 
             UI::System::SwitchPage( UI::Lobby );

@@ -165,7 +165,6 @@ public:
           InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
             .SetTarget( new_player_id + "_label" )
             .SetText( new_player_id )
-            .build()
             .send();
 
           // If its ourselves
@@ -173,11 +172,9 @@ public:
           {
             InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
               .SetTarget( _local_player_id + "_faction_selection" )
-              .build()
               .send();
             InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
               .SetTarget( _local_player_id + "_faction_selection" )
-              .build()
               .send();
           }
           else
@@ -186,7 +183,6 @@ public:
               InterfaceUpdate::ID::JoinLobby, PURPLE
             )
               .SetTarget( new_player_id + "_faction_selection" )
-              .build()
               .send();
 
             if ( faction != "" )
@@ -194,7 +190,6 @@ public:
               InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
                 .SetTarget( new_player_id + "_select_faction" )
                 .SetText( faction )
-                .build()
                 .send();
 
               InterfaceUpdate::Background(
@@ -202,7 +197,6 @@ public:
                 GetPrimaryFactionColor( faction )
               )
                 .SetTarget( new_player_id + "_select_faction" )
-                .build()
                 .send();
             }
           }
@@ -222,7 +216,6 @@ public:
           InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
             .SetTarget( target )
             .SetText( faction )
-            .build()
             .send();
 
           InterfaceUpdate::Background(
@@ -230,7 +223,6 @@ public:
             GetPrimaryFactionColor( faction )
           )
             .SetTarget( target )
-            .build()
             .send();
         }
         break;
@@ -252,14 +244,14 @@ public:
 
           InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
             .SetText( _peers[index].readied_up ? "Ready " : "Not Ready" )
-            .build()
+            .SetTarget( player_id + "_readied" )
             .send();
 
           InterfaceUpdate::Background(
             InterfaceUpdate::ID::PlayerToggledReady,
             _peers[index].readied_up ? GREEN : RED
           )
-            .build()
+            .SetTarget( player_id + "_readied" )
             .send();
         }
         break;
@@ -335,6 +327,20 @@ public:
 
       bool readied = _peers[player_id_index[_local_player_id]].readied_up;
 
+      InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+        .SetText(
+          _peers[player_id_index[_local_player_id]].readied_up ? "Ready "
+                                                               : "Not Ready"
+        )
+        .SetTarget( _local_player_id + "_readied" )
+        .send();
+
+      InterfaceUpdate::Background(
+        InterfaceUpdate::ID::PlayerToggledReady,
+        _peers[player_id_index[_local_player_id]].readied_up ? GREEN : RED
+      )
+        .SetTarget( _local_player_id + "_readied" )
+        .send();
 
       SendMessageToHost( Message{
         MessageID::PlayerToggledReady,

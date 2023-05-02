@@ -255,7 +255,6 @@ public:
           InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
             .SetTarget( target )
             .SetText( faction )
-            .build()
             .send();
 
           InterfaceUpdate::Background(
@@ -263,7 +262,6 @@ public:
             GetPrimaryFactionColor( faction )
           )
             .SetTarget( target )
-            .build()
             .send();
         }
         break;
@@ -274,6 +272,20 @@ public:
 
           u32 index = player_id_index[player_id];
           _clients[index].peer_data.readied_up = ready;
+
+          InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+            .SetText(
+              _clients[index].peer_data.readied_up ? "Ready " : "Not Ready"
+            )
+            .SetTarget( player_id + "_readied" )
+            .send();
+
+          InterfaceUpdate::Background(
+            InterfaceUpdate::ID::PlayerToggledReady,
+            _clients[index].peer_data.readied_up ? GREEN : RED
+          )
+            .SetTarget( player_id + "_readied" )
+            .send();
 
           for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
           {
@@ -306,7 +318,6 @@ public:
       InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
         .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
         .SetTarget( "player_0_readied" )
-        .build()
         .send();
 
       InterfaceUpdate::Background(
@@ -314,7 +325,6 @@ public:
         _clients[0].peer_data.readied_up ? GREEN : RED
       )
         .SetTarget( "player_0_readied" )
-        .build()
         .send();
 
       for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
@@ -519,11 +529,9 @@ public:
         InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
           .SetTarget( player_id + "_label" )
           .SetText( player_id )
-          .build()
           .send();
         InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
           .SetTarget( player_id + "_faction_selection" )
-          .build()
           .send();
 
         // Tell the new client about all the current clients

@@ -69,13 +69,6 @@ namespace InterfaceEvent
 
   struct Data
   {
-    ID event_id;
-
-    std::string msg;
-    CSteamID lobby_id;
-
-    std::string source;
-
     Data( ID id ) : event_id( id ) {}
     Data( ID id, std::string msg ) : event_id( id ), msg( msg ) {}
     Data( ID id, std::string msg, std::string source )
@@ -86,18 +79,12 @@ namespace InterfaceEvent
         : event_id( id ), msg( msg ), lobby_id( lobby_id )
     {
     }
-  };
-
-  struct Builder
-  {
-protected:
-    Data _data;
 
 public:
-    Data build()
-    {
-      return _data;
-    }
+    ID event_id;
+    std::string msg;
+    CSteamID lobby_id;
+    std::string source;
   };
 
   struct EventEmitter : entt::emitter<EventEmitter>
