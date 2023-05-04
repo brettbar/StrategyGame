@@ -83,7 +83,12 @@ namespace UI
           TextButton( "ready_up" )
             .SetText( "Ready Up", 32 )
             .Background( RED )
-            .SetEvent( InterfaceEvent::ID::PlayerToggledReady )
+            .SetEvent( InterfaceEvent::ID::PlayerToggledReady ),
+          TextButton( "start_game" )
+            .StartDisabled()
+            .SetText( "Start Game", 32 )
+            .Background( RED )
+            .SetEvent( InterfaceEvent::ID::HostStartGame )
             .ListensFor(
               { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
             ),

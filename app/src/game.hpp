@@ -159,10 +159,10 @@ class IGame
     Network::Host()->Init();
     UI::System::SwitchPage( UI::Lobby );
 
-    // InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-    //   .SetText( "Start Game" )
-    //   .build()
-    //   .send();
+    InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::HostLobby, true )
+      .SetTarget( "start_game" )
+      .send();
+
     InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
       .SetTarget( Network::Host()->_player_id + "_label" )
       .SetText( Network::Host()->_player_id )
@@ -188,16 +188,14 @@ class IGame
 
   void JoinMultiplayerLobby( CSteamID lobby_id )
   {
+    InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::JoinLobby, false )
+      .SetTarget( "start_game" )
+      .send();
+
     if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
     {
       printf( "Sending joined lobby event!\n" );
       UI::System::SwitchPage( UI::Lobby );
-
-
-      // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-      //   .SetText( "Ready Up" )
-      //   .build()
-      //   .send();
     }
   }
 

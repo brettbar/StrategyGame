@@ -73,6 +73,7 @@ public:
     Type type = Type::INVALID;
     std::string id = "INVALID";
     bool enabled = false;
+    bool starts_disabled = false;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
@@ -104,6 +105,50 @@ public:
     // TextureLabel
     Texture2D texture = Texture2D();
 
+    void InitialEnable()
+    {
+      if ( starts_disabled )
+        return;
+
+      switch ( type )
+      {
+        case Type::INVALID:
+          printf( "INVALID TYPE ENABLED\n" );
+          assert( false );
+          break;
+        case Type::Panel:
+        {
+          enabled = true;
+          Resize();
+          Reposition();
+
+          for ( Element &child: children )
+          {
+            child.InitialEnable();
+            child.Resize();
+            child.Reposition();
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          enabled = true;
+          children[curr_index].InitialEnable();
+          children[curr_index].Resize();
+          children[curr_index].Reposition();
+        }
+        break;
+        case Type::TextLabel:
+        case Type::TextButton:
+        {
+          enabled = true;
+        }
+        break;
+        default:
+          enabled = true;
+          break;
+      }
+    }
 
     void Enable()
     {
@@ -810,6 +855,12 @@ public:
     {
       _element.type = Type::TextButton;
       _element.id = id;
+    }
+
+    TextButtonBuilder &StartDisabled()
+    {
+      _element.starts_disabled = true;
+      return *this;
     }
 
     TextButtonBuilder &Background( Color background )
