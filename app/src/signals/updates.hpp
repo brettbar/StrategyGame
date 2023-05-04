@@ -51,112 +51,124 @@ InterfaceUpdates:
     PlayerToggledReady,
   };
 
-  class Data
+  struct Update
   {
-    friend struct Builder;
-    friend struct EnabledUpdate;
-    friend struct Text;
-    friend struct Background;
-    friend struct Clickable;
-
-public:
-    Type type = Type::INVALID;
-    ID update_id = ID::INVALID;
-    bool on = false;
-    std::string updated_text = "INVALID";
-    Color updated_background = BLACK;
-    bool clickable = false;
-
-    bool targeted = false;
-    std::string target = "INVALID";
+    ID update_id;
   };
 
-  struct Builder
+  // TODO we will create overloads of this to pass in relevant
+  // parameters like updated strings or whatnot
+  inline void Send( InterfaceUpdate::ID update_id )
   {
-protected:
-    Data _data;
+    dispatcher.enqueue( Update{ update_id } );
+  }
 
-public:
-    void send()
-    {
-      // TODO(??)
-      // dispatcher.enqueue( this );
-      dispatcher.enqueue( _data );
-    }
-  };
+  //   class Data
+  //   {
+  //     friend struct Builder;
+  //     friend struct EnabledUpdate;
+  //     friend struct Text;
+  //     friend struct Background;
+  //     friend struct Clickable;
 
-  struct EnabledUpdate : Builder
-  {
-    EnabledUpdate( ID update_id, bool on )
-    {
-      _data.type = Type::EnabledUpdate;
-      _data.update_id = update_id;
-      _data.on = on;
-    }
+  // public:
+  //     Type type = Type::INVALID;
+  //     ID update_id = ID::INVALID;
+  //     bool on = false;
+  //     std::string updated_text = "INVALID";
+  //     Color updated_background = BLACK;
+  //     bool clickable = false;
 
-    EnabledUpdate &SetTarget( std::string target_id )
-    {
-      _data.targeted = true;
-      _data.target = target_id;
-      return *this;
-    }
-  };
+  //     bool targeted = false;
+  //     std::string target = "INVALID";
+  //   };
 
-  struct Text : Builder
-  {
-    Text( ID update_id )
-    {
-      _data.type = Type::TextUpdate;
-      _data.update_id = update_id;
-    }
+  //   struct Builder
+  //   {
+  // protected:
+  //     Data _data;
 
-    Text &SetText( std::string updated_text )
-    {
-      _data.updated_text = updated_text;
-      return *this;
-    }
+  // public:
+  //     void send()
+  //     {
+  //       // TODO(??)
+  //       // dispatcher.enqueue( this );
+  //       dispatcher.enqueue( _data );
+  //     }
+  //   };
 
-    Text &SetTarget( std::string target_id )
-    {
-      _data.targeted = true;
-      _data.target = target_id;
-      return *this;
-    }
-  };
+  //   struct EnabledUpdate : Builder
+  //   {
+  //     EnabledUpdate( ID update_id, bool on )
+  //     {
+  //       _data.type = Type::EnabledUpdate;
+  //       _data.update_id = update_id;
+  //       _data.on = on;
+  //     }
 
-  struct Background : Builder
-  {
-    Background( ID update_id, Color updated_background )
-    {
-      _data.type = Type::BackgroundUpdate;
-      _data.update_id = update_id;
-      _data.updated_background = updated_background;
-    }
+  //     EnabledUpdate &SetTarget( std::string target_id )
+  //     {
+  //       _data.targeted = true;
+  //       _data.target = target_id;
+  //       return *this;
+  //     }
+  //   };
 
-    Background &SetTarget( std::string target_id )
-    {
-      _data.targeted = true;
-      _data.target = target_id;
-      return *this;
-    }
-  };
+  //   struct Text : Builder
+  //   {
+  //     Text( ID update_id )
+  //     {
+  //       _data.type = Type::TextUpdate;
+  //       _data.update_id = update_id;
+  //     }
 
-  struct Clickable : Builder
-  {
-    Clickable( ID update_id, bool clickable )
-    {
-      _data.type = Type::ClickableUpdate;
-      _data.update_id = update_id;
-      _data.clickable = clickable;
-    }
+  //     Text &SetText( std::string updated_text )
+  //     {
+  //       _data.updated_text = updated_text;
+  //       return *this;
+  //     }
 
-    Clickable &SetTarget( std::string target_id )
-    {
-      _data.targeted = true;
-      _data.target = target_id;
-      return *this;
-    }
-  };
+  //     Text &SetTarget( std::string target_id )
+  //     {
+  //       _data.targeted = true;
+  //       _data.target = target_id;
+  //       return *this;
+  //     }
+  //   };
+
+  //   struct Background : Builder
+  //   {
+  //     Background( ID update_id, Color updated_background )
+  //     {
+  //       _data.type = Type::BackgroundUpdate;
+  //       _data.update_id = update_id;
+  //       _data.updated_background = updated_background;
+  //     }
+
+  //     Background &SetTarget( std::string target_id )
+  //     {
+  //       _data.targeted = true;
+  //       _data.target = target_id;
+  //       return *this;
+  //     }
+  //   };
+
+  //   struct Clickable : Builder
+  //   {
+  //     Clickable( ID update_id, bool clickable )
+  //     {
+  //       _data.type = Type::ClickableUpdate;
+  //       _data.update_id = update_id;
+  //       _data.clickable = clickable;
+  //     }
+
+  //     Clickable &SetTarget( std::string target_id )
+  //     {
+  //       _data.targeted = true;
+  //       _data.target = target_id;
+  //       return *this;
+  //     }
+  //   };
 
 
 };// namespace InterfaceUpdate

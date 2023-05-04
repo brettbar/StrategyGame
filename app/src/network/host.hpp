@@ -252,17 +252,17 @@ public:
             );
           }
 
-          InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-            .SetTarget( target )
-            .SetText( faction )
-            .send();
+          // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+          //   .SetTarget( target )
+          //   .SetText( faction )
+          //   .send();
 
-          InterfaceUpdate::Background(
-            InterfaceUpdate::ID::FactionSelected,
-            GetPrimaryFactionColor( faction )
-          )
-            .SetTarget( target )
-            .send();
+          // InterfaceUpdate::Background(
+          //   InterfaceUpdate::ID::FactionSelected,
+          //   GetPrimaryFactionColor( faction )
+          // )
+          //   .SetTarget( target )
+          //   .send();
         }
         break;
         case PlayerToggledReady:
@@ -273,19 +273,19 @@ public:
           u32 index = player_id_index[player_id];
           _clients[index].peer_data.readied_up = ready;
 
-          InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
-            .SetText(
-              _clients[index].peer_data.readied_up ? "Ready " : "Not Ready"
-            )
-            .SetTarget( player_id + "_readied" )
-            .send();
+          // InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+          //   .SetText(
+          //     _clients[index].peer_data.readied_up ? "Ready " : "Not Ready"
+          //   )
+          //   .SetTarget( player_id + "_readied" )
+          //   .send();
 
-          InterfaceUpdate::Background(
-            InterfaceUpdate::ID::PlayerToggledReady,
-            _clients[index].peer_data.readied_up ? GREEN : RED
-          )
-            .SetTarget( player_id + "_readied" )
-            .send();
+          // InterfaceUpdate::Background(
+          //   InterfaceUpdate::ID::PlayerToggledReady,
+          //   _clients[index].peer_data.readied_up ? GREEN : RED
+          // )
+          //   .SetTarget( player_id + "_readied" )
+          //   .send();
 
           for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
           {
@@ -315,17 +315,17 @@ public:
 
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
 
-      InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
-        .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
-        .SetTarget( "player_0_readied" )
-        .send();
+      // InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
+      //   .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
+      //   .SetTarget( "player_0_readied" )
+      //   .send();
 
-      InterfaceUpdate::Background(
-        InterfaceUpdate::ID::PlayerToggledReady,
-        _clients[0].peer_data.readied_up ? GREEN : RED
-      )
-        .SetTarget( "player_0_readied" )
-        .send();
+      // InterfaceUpdate::Background(
+      //   InterfaceUpdate::ID::PlayerToggledReady,
+      //   _clients[0].peer_data.readied_up ? GREEN : RED
+      // )
+      //   .SetTarget( "player_0_readied" )
+      //   .send();
 
       for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
       {
@@ -526,13 +526,13 @@ public:
         );
 
         auto player_id = _clients[i].peer_data.player_id;
-        InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-          .SetTarget( player_id + "_label" )
-          .SetText( player_id )
-          .send();
-        InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
-          .SetTarget( player_id + "_faction_selection" )
-          .send();
+        // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
+        //   .SetTarget( player_id + "_label" )
+        //   .SetText( player_id )
+        //   .send();
+        // InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
+        //   .SetTarget( player_id + "_faction_selection" )
+        //   .send();
 
         // Tell the new client about all the current clients
         for ( auto &client: _clients )

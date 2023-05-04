@@ -43,36 +43,36 @@ namespace SelectionSystem
     printf( "SelectListener?\n" );
     if ( game_reg.all_of<Province::Component>( entity ) )
     {
-      InterfaceUpdate::EnabledUpdate(
-        InterfaceUpdate::ID::SettlementContext, true
-      )
-        .send();
+      // InterfaceUpdate::EnabledUpdate(
+      //   InterfaceUpdate::ID::SettlementContext, true
+      // )
+      //   .send();
 
-      InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
-        .send();
+      // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
+      //   .send();
     }
     else if ( game_reg.all_of<Actor::Component>( entity ) )
     {
-      InterfaceUpdate::EnabledUpdate(
-        InterfaceUpdate::ID::SettlementContext, false
-      )
-        .send();
+      // InterfaceUpdate::EnabledUpdate(
+      //   InterfaceUpdate::ID::SettlementContext, false
+      // )
+      //   .send();
 
-      InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, true )
-        .send();
+      // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, true )
+      //   .send();
     }
   }
   inline void ListenForDeselect()
   {
     printf( "DeSelectListener?\n" );
 
-    InterfaceUpdate::EnabledUpdate(
-      InterfaceUpdate::ID::SettlementContext, false
-    )
-      .send();
+    // InterfaceUpdate::EnabledUpdate(
+    //   InterfaceUpdate::ID::SettlementContext, false
+    // )
+    //   .send();
 
-    InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
-      .send();
+    // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
+    //   .send();
   }
 
   inline void Start()

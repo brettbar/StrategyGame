@@ -88,6 +88,11 @@ public:
     std::function<void( std::vector<Element> & )> update_children = {};
     std::vector<InterfaceUpdate::ID> subscribed_updates = {};
 
+    std::map<
+      InterfaceUpdate::ID,
+      std::function<void( Element &, InterfaceUpdate::Update )>>
+      updates = {};
+
     // StackPanel
     u32 curr_index = 0;
 
@@ -592,84 +597,91 @@ public:
         InterfaceEvent::event_emitter.publish( *on_click );
     }
 
-    void ReceiveUpdate( const InterfaceUpdate::Data &update )
+    // void ReceiveUpdate( const InterfaceUpdate::Data &update )
+    // {
+    //   for ( InterfaceUpdate::ID subscribed_update_id: subscribed_updates )
+    //   {
+    //     // TODO(??) we are crashing here sometimes not sure why
+    //     if ( subscribed_update_id == update.update_id )
+    //     {
+    //       switch ( update.type )
+    //       {
+    //         case InterfaceUpdate::Type::Enabled:
+    //           if ( update.on )
+    //             Enable();
+    //           else
+    //             Disable();
+    //           break;
+    //         case InterfaceUpdate::Type::Text:
+    //           if ( update.targeted )
+    //           {
+    //             if ( update.target == id )
+    //             {
+    //               printf(
+    //                 "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
+    //               );
+
+    //               text = update.updated_text;
+    //             }
+    //           }
+    //           else
+    //           {
+    //             text = update.updated_text;
+    //           }
+    //           break;
+    //         case InterfaceUpdate::Type::Background:
+    //         {
+    //           if ( update.targeted )
+    //           {
+    //             if ( update.target == id )
+    //             {
+    //               std::cout << "InterfaceUpdate::Type::BackgroundUpdate"
+    //                         << " target: " << update.target << " us: " << id
+    //                         << '\n';
+
+    //               std::cout
+    //                 << "We got: " << FormatRGB( update.updated_background )
+    //                 << '\n';
+
+    //               std::cout << "before: " << FormatRGB( background ) << '\n';
+
+    //               background = update.updated_background;
+
+    //               std::cout << "after: " << FormatRGB( background ) << '\n';
+    //             }
+    //           }
+    //           else
+    //           {
+    //             background = update.updated_background;
+    //           }
+    //         }
+    //         break;
+    //         case InterfaceUpdate::Type::Clickable:
+    //           if ( update.targeted )
+    //           {
+    //             if ( update.target == id )
+    //             {
+    //               clickable = update.clickable;
+    //             }
+    //           }
+    //           else
+    //           {
+    //             clickable = update.clickable;
+    //           }
+    //           break;
+    //         default:
+    //           printf( "Error :: Panel deos not support message type\n" );
+    //           break;
+    //       }
+    //       break;
+    //     }
+    //   }
+    // }
+    void ReceiveUpdate( const InterfaceUpdate::Update &update )
     {
-      for ( InterfaceUpdate::ID subscribed_update_id: subscribed_updates )
+      if ( updates.contains( update.update_id ) )
       {
-        // TODO(??) we are crashing here sometimes not sure why
-        if ( subscribed_update_id == update.update_id )
-        {
-          switch ( update.type )
-          {
-            case InterfaceUpdate::Type::EnabledUpdate:
-              if ( update.on )
-                Enable();
-              else
-                Disable();
-              break;
-            case InterfaceUpdate::Type::TextUpdate:
-              if ( update.targeted )
-              {
-                if ( update.target == id )
-                {
-                  printf(
-                    "msg.target %s, id %s\n", update.target.c_str(), id.c_str()
-                  );
-
-                  text = update.updated_text;
-                }
-              }
-              else
-              {
-                text = update.updated_text;
-              }
-              break;
-            case InterfaceUpdate::Type::BackgroundUpdate:
-            {
-              if ( update.targeted )
-              {
-                if ( update.target == id )
-                {
-                  std::cout << "InterfaceUpdate::Type::BackgroundUpdate"
-                            << " target: " << update.target << " us: " << id
-                            << '\n';
-
-                  std::cout
-                    << "We got: " << FormatRGB( update.updated_background )
-                    << '\n';
-
-                  std::cout << "before: " << FormatRGB( background ) << '\n';
-
-                  background = update.updated_background;
-
-                  std::cout << "after: " << FormatRGB( background ) << '\n';
-                }
-              }
-              else
-              {
-                background = update.updated_background;
-              }
-            }
-            break;
-            case InterfaceUpdate::Type::ClickableUpdate:
-              if ( update.targeted )
-              {
-                if ( update.target == id )
-                {
-                  clickable = update.clickable;
-                }
-              }
-              else
-              {
-                clickable = update.clickable;
-              }
-              break;
-            default:
-              printf( "Error :: Panel deos not support message type\n" );
-              break;
-          }
-          break;
-        }
+        updates[update.update_id]( *this, update );
       }
     }
 
@@ -679,7 +691,7 @@ public:
       {
         case Type::Panel:
         {
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
             .connect<&Element::ReceiveUpdate>( this );
           for ( auto &child: children )
           {
@@ -689,13 +701,13 @@ public:
         break;
         case Type::StackPanel:
         {
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
             .connect<&Element::ReceiveUpdate>( this );
           children[curr_index].SubscribeToUpdates();
         }
         break;
         default:
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
             .connect<&Element::ReceiveUpdate>( this );
           break;
       }
@@ -703,7 +715,7 @@ public:
 
     void UnsubscribeFromUpdates()
     {
-      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Data>()
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
         .disconnect<&Element::ReceiveUpdate>( this );
     }
   };
@@ -855,6 +867,16 @@ public:
     {
       _element.type = Type::TextButton;
       _element.id = id;
+    }
+
+    TextButtonBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      _element.updates.emplace( update_id, update_fn );
+      return *this;
     }
 
     TextButtonBuilder &StartDisabled()

@@ -159,21 +159,21 @@ class IGame
     Network::Host()->Init();
     UI::System::SwitchPage( UI::Lobby );
 
-    InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::HostLobby, true )
-      .SetTarget( "start_game" )
-      .send();
+    InterfaceUpdate::Send( InterfaceUpdate::ID::HostLobby );
 
-    InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-      .SetTarget( Network::Host()->_player_id + "_label" )
-      .SetText( Network::Host()->_player_id )
-      .send();
-
-    InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
-      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .send();
-    InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
-      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .send();
+    // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::HostLobby, true )
+    //   .SetTarget( "start_game" )
+    //   .send();
+    // InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
+    //   .SetTarget( Network::Host()->_player_id + "_label" )
+    //   .SetText( Network::Host()->_player_id )
+    //   .send();
+    // InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
+    //   .SetTarget( Network::Host()->_player_id + "_faction_selection" )
+    //   .send();
+    // InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
+    //   .SetTarget( Network::Host()->_player_id + "_faction_selection" )
+    //   .send();
   }
 
   void StartMultiplayerCampaign() {}
@@ -188,9 +188,10 @@ class IGame
 
   void JoinMultiplayerLobby( CSteamID lobby_id )
   {
-    InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::JoinLobby, false )
-      .SetTarget( "start_game" )
-      .send();
+    InterfaceUpdate::Send( InterfaceUpdate::ID::JoinLobby );
+    // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::JoinLobby, false )
+    //   .SetTarget( "start_game" )
+    //   .send();
 
     if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
     {
@@ -444,15 +445,15 @@ inline void IGame::RegisterEventListeners()
 
           if ( _single_player )
           {
-            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetText( faction )
-              .send();
+            // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+            //   .SetText( faction )
+            //   .send();
 
-            InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected,
-              GetPrimaryFactionColor( faction )
-            )
-              .send();
+            // InterfaceUpdate::Background(
+            //   InterfaceUpdate::ID::FactionSelected,
+            //   GetPrimaryFactionColor( faction )
+            // )
+            //   .send();
 
             UI::System::SwitchPage( UI::SinglePlayerLobby );
           }
@@ -484,17 +485,17 @@ inline void IGame::RegisterEventListeners()
               } );
             }
 
-            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetTarget( player_id + "_select_faction" )
-              .SetText( faction )
-              .send();
+            // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+            //   .SetTarget( player_id + "_select_faction" )
+            //   .SetText( faction )
+            //   .send();
 
-            InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected,
-              GetPrimaryFactionColor( faction )
-            )
-              .SetTarget( player_id + "_select_faction" )
-              .send();
+            // InterfaceUpdate::Background(
+            //   InterfaceUpdate::ID::FactionSelected,
+            //   GetPrimaryFactionColor( faction )
+            // )
+            //   .SetTarget( player_id + "_select_faction" )
+            //   .send();
 
             UI::System::SwitchPage( UI::Lobby );
           }

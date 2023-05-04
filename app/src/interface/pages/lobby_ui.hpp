@@ -89,9 +89,23 @@ namespace UI
             .SetText( "Start Game", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::HostStartGame )
-            .ListensFor(
-              { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
-            ),
+            .On(
+              InterfaceUpdate::ID::HostLobby,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                std::cout << "HostLobby Lambda!!!!!\n";
+                self.Enable();
+              }
+            )
+            .On(
+              InterfaceUpdate::ID::JoinLobby,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                std::cout << "JoinLobby Lambda!!!!!\n";
+                self.Disable();
+              }
+            )
+          // .ListensFor(
+          //   { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
+          // ),
         } ),
     };
   }
