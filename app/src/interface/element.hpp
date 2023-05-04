@@ -457,6 +457,18 @@ public:
       text = new_text;
     }
 
+    void UpdateBackground( Color new_color )
+    {
+      background = new_color;
+    }
+
+    void UpdateClickable( bool new_clickable )
+    {
+      clickable = new_clickable;
+    }
+
+
+    // TODO rename or remove
     void Update()
     {
       if ( !enabled )
@@ -759,11 +771,6 @@ public:
       return *this;
     }
 
-    PanelBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
-    {
-      _element.subscribed_updates = updates;
-      return *this;
-    }
 
     PanelBuilder &Children( std::vector<Element> children )
     {
@@ -828,6 +835,16 @@ public:
       _element.id = id;
     }
 
+    TextLabelBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      _element.updates.emplace( update_id, update_fn );
+      return *this;
+    }
+
     TextLabelBuilder &Background( Color background )
     {
       _element.background = background;
@@ -849,12 +866,6 @@ public:
     {
       _element.text_color = text_color;
       return SetText( text, font_size );
-    }
-
-    TextLabelBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
-    {
-      _element.subscribed_updates = updates;
-      return *this;
     }
   };
 
@@ -914,11 +925,6 @@ public:
       return *this;
     }
 
-    TextButtonBuilder &ListensFor( std::vector<InterfaceUpdate::ID> updates )
-    {
-      _element.subscribed_updates = updates;
-      return *this;
-    }
 
     TextButtonBuilder &Clickable( bool clickable )
     {

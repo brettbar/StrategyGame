@@ -14,7 +14,7 @@ namespace UI
     return {
       Panel( "settlement_context_panel" )
         .Background( Fade( BLACK, 0.5 ) )
-        .ListensFor( { InterfaceUpdate::ID::SettlementContext } )
+        // .ListensFor( { InterfaceUpdate::ID::SettlementContext } )
         .Children( {
           Panel( "settlement_context_tab_group" )
             .SetAxis( Axis::Column )
@@ -34,7 +34,7 @@ namespace UI
 
           Panel( "actor_context_panel" )
             .Background( Fade( BLACK, 0.5 ) )
-            .ListensFor( { InterfaceUpdate::ID::ActorContext } )
+            // .ListensFor( { InterfaceUpdate::ID::ActorContext } )
             .Children( {
               Panel( "actor_actions_panel" )
                 .Children( {

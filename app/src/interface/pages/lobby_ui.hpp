@@ -28,21 +28,63 @@ namespace UI
               .Background( GRAY )
               .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage )
               .Clickable( false )
-              .ListensFor( {
+              .On(
                 InterfaceUpdate::ID::HostLobby,
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  if ( self.id == update.updated_txt + "_faction_selection" )
+                  {
+                    self.UpdateClickable( true );
+                    self.UpdateBackground( GREEN );
+                  }
+                }
+              )
+              .On(
                 InterfaceUpdate::ID::JoinLobby,
-              } ),
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  self.UpdateText( update.updated_txt );
+                }
+              ),
             TextLabel( player_id + "_select_faction" )
               .SetText( "Selecting Faction...", 24 )
               .Background( GRAY )
-              .ListensFor( { InterfaceUpdate::ID::FactionSelected } ),
+              .On(
+                InterfaceUpdate::ID::PlayerSelectedFaction,
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  if ( self.id == update.player_id + "_select_faction" )
+                  {
+                    self.UpdateText( update.updated_txt );
+                    self.UpdateBackground(
+                      GetPrimaryFactionColor( update.updated_txt )
+                    );
+                  }
+                }
+              ),
+
             TextLabel( player_id + "_label" )
               .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
-              .Background( GRAY ),
+              .Background( GRAY )
+              .On(
+                InterfaceUpdate::HostLobby,
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  if ( self.id == update.updated_txt + "_label" )
+                  {
+                    self.UpdateText( update.updated_txt );
+                  }
+                }
+              ),
             TextLabel( player_id + "_readied" )
               .SetText( "Not Ready", 24 )
               .Background( RED )
-              .ListensFor( { InterfaceUpdate::ID::PlayerToggledReady } ),
+              .On(
+                InterfaceUpdate::ID::PlayerToggledReady,
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  if ( self.id == update.player_id + "_readied" )
+                  {
+                    // TODO account for RED
+                    self.UpdateBackground( GREEN );
+                  }
+                }
+              ),
             TextLabel( player_id + "_steam_user_name" )
               .SetText( "", 24 )
               .Background( GRAY ),
@@ -92,20 +134,15 @@ namespace UI
             .On(
               InterfaceUpdate::ID::HostLobby,
               []( Element &self, InterfaceUpdate::Update update ) {
-                std::cout << "HostLobby Lambda!!!!!\n";
                 self.Enable();
               }
             )
             .On(
               InterfaceUpdate::ID::JoinLobby,
               []( Element &self, InterfaceUpdate::Update update ) {
-                std::cout << "JoinLobby Lambda!!!!!\n";
                 self.Disable();
               }
-            )
-          // .ListensFor(
-          //   { InterfaceUpdate::ID::HostLobby, InterfaceUpdate::ID::JoinLobby }
-          // ),
+            ),
         } ),
     };
   }

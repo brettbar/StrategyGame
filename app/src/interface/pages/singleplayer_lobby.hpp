@@ -25,7 +25,18 @@ namespace UI
           TextButton( "singleplayer_faction_selected" )
             .SetText( "Waiting to Select Faction", 32 )
             .Background( GRAY )
-            .ListensFor( { InterfaceUpdate::ID::FactionSelected } ),
+            .On(
+              InterfaceUpdate::ID::PlayerSelectedFaction,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                if ( self.id == update.player_id + "_select_faction" )
+                {
+                  self.UpdateText( update.updated_txt );
+                  self.UpdateBackground(
+                    GetPrimaryFactionColor( update.updated_txt )
+                  );
+                }
+              }
+            ),
           TextButton( "singleplayer_lobby_started_game" )
             .SetText( "Start Game", 32 )
             .Background( BLUE )

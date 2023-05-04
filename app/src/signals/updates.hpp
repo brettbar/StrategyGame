@@ -42,7 +42,7 @@ InterfaceUpdates:
   enum ID
   {
     INVALID,
-    FactionSelected,
+    PlayerSelectedFaction,
     SettlementContext,
     ActorContext,
     JoinLobby,
@@ -53,7 +53,10 @@ InterfaceUpdates:
 
   struct Update
   {
-    ID update_id;
+    ID update_id = INVALID;
+
+    std::string updated_txt = "";
+    std::string player_id = "";
   };
 
   // TODO we will create overloads of this to pass in relevant
@@ -62,6 +65,21 @@ InterfaceUpdates:
   {
     dispatcher.enqueue( Update{ update_id } );
   }
+
+  inline void Send( InterfaceUpdate::ID update_id, std::string updated_txt )
+  {
+    dispatcher.enqueue( Update{ update_id, updated_txt } );
+  }
+
+  inline void Send(
+    InterfaceUpdate::ID update_id,
+    std::string updated_txt,
+    std::string player_id
+  )
+  {
+    dispatcher.enqueue( Update{ update_id, updated_txt, player_id } );
+  }
+
 
   //   class Data
   //   {
