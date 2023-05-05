@@ -275,37 +275,15 @@ public:
           }
             .Send();
 
-          u32 num_active = 0;
-          u32 num_ready = 0;
+          SendMessageToAllActiveClients( Message{
+            MessageID::PlayerToggledReady,
+            nlohmann::json{
+              { "player_id", player_id },
+              { "ready", ready },
+            },
+          } );
 
-          for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-          {
-            if ( !_clients[i].peer_data.active )
-              continue;
-
-            num_active++;
-            if ( _clients[i].peer_data.readied_up )
-              num_ready++;
-
-
-            SendMessageOnConnection(
-              _clients[i].conn,
-              Message{
-                MessageID::PlayerToggledReady,
-                nlohmann::json{
-                  { "player_id", player_id },
-                  { "ready", ready },
-                } }
-            );
-          }
-
-
-          // Update if all players are ready or not
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::AllPlayersReady,
-            .condition = num_active > 0 && ( num_active == num_ready ),
-          }
-            .Send();
+          CheckIfAllPlayersReady();
         }
         break;
         default:
@@ -326,46 +304,68 @@ public:
       }
         .Send();
 
-      for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      SendMessageToAllActiveClients( Message{
+        MessageID::PlayerToggledReady,
+        nlohmann::json{
+          { "player_id", _clients[0].peer_data.player_id },
+          { "ready", _clients[0].peer_data.readied_up } },
+      } );
+
+      CheckIfAllPlayersReady();
+    }
+
+    void CheckIfAllPlayersReady()
+    {
+      u32 num_active = 0;
+      u32 num_ready = 0;
+      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
       {
         if ( !_clients[i].peer_data.active )
           continue;
 
-        SendMessageOnConnection(
-          _clients[i].conn,
-          Message{
-            MessageID::PlayerToggledReady,
-            nlohmann::json{
-              { "player_id", _clients[0].peer_data.player_id },
-              { "ready", _clients[0].peer_data.readied_up } },
-          }
-        );
+        num_active++;
+        if ( _clients[i].peer_data.readied_up )
+          num_ready++;
       }
+
+      // Update if all players are ready or not
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::AllPlayersReady,
+        .condition = num_active > 1// at least 2 players
+                     && ( num_active == num_ready ),
+      }
+        .Send();
     }
 
-    void PingAllActiveClients()
+    void StartHostedCampaign()
     {
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( !_clients[i].peer_data.active )
-          continue;
-
-        auto timestamp =
-          std::chrono::system_clock::now().time_since_epoch().count();
-
-        SendMessageOnConnection(
-          _clients[i].conn,
-          Message{
-            MessageID::HostPingRequest,
-            std::to_string( timestamp ).c_str(),
-          }
-        );
-      }
+      SendMessageToAllActiveClients( Message{
+        MessageID::HostStartedCampaign,
+      } );
     }
 
-    void SendMessageToAllClients( Message message )
-    {
+    // void PingAllActiveClients()
+    // {
+    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+    //   {
+    //     if ( !_clients[i].peer_data.active )
+    //       continue;
 
+    //     auto timestamp =
+    //       std::chrono::system_clock::now().time_since_epoch().count();
+
+    //     SendMessageOnConnection(
+    //       _clients[i].conn,
+    //       Message
+    //         MessageID::HostPingRequest,
+    //         std::to_string( timestamp ).c_str(),
+    //       }
+    //     );
+    //   }
+    // }
+
+    void SendMessageToAllActiveClients( Message message )
+    {
       // We start at 1 since host is always i=0
       for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
       {
@@ -375,7 +375,6 @@ public:
         SendMessageOnConnection( _clients[i].conn, message );
       }
     }
-
 
     void Delete()
     {

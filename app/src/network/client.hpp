@@ -13,6 +13,7 @@
 
 #include "../shared/utils.hpp"
 
+#include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 
 namespace Network
@@ -26,8 +27,6 @@ private:
     HSteamNetConnection _server_conn;
     u32 _lobby_list_arr;
 
-    // std::map<std::string, PeerData> _peers = {};
-    std::array<PeerData, Network::MAX_PLAYERS_PER_SERVER> _peers;
 
     void OnLobbyMatchList( LobbyMatchList_t *, bool );
     CCallResult<IClient, LobbyMatchList_t> result_lobby_match_list;
@@ -63,6 +62,8 @@ private:
 public:
     // TODO make private
     std::string _local_player_id;
+    // std::map<std::string, PeerData> _peers = {};
+    std::array<PeerData, Network::MAX_PLAYERS_PER_SERVER> _peers;
 
     static IClient *Client()
     {
@@ -225,6 +226,13 @@ public:
             .condition = ready,
           }
             .Send();
+        }
+        break;
+        case MessageID::HostStartedCampaign:
+        {
+          // TODO maybe a different event emitter?
+          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+            InterfaceEvent::ID::JoinHostedCampaign } );
         }
         break;
         default:

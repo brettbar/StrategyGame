@@ -48,6 +48,7 @@ namespace Network
     InitiateContact,
     AssignedPlayerId,
     HostPingRequest,
+    HostStartedCampaign,
     ClientPingResponse,
     PlayerConnected,
     PlayerDisconnected,

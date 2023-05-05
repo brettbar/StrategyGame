@@ -4,7 +4,8 @@
 #include "../../shared/global.hpp"
 #include "../components/ai.hpp"
 
-namespace Player {
+namespace Player
+{
   inline std::map<std::string, Color> color_map = {
     { "red", RED },
     { "gold", GOLD },
@@ -17,7 +18,8 @@ namespace Player {
     { "grey", GRAY },
   };
 
-  struct Faction {
+  struct Faction
+  {
     std::string id;
     std::string primary_color;
     std::string secondary_color;
@@ -25,37 +27,43 @@ namespace Player {
     std::string denonym;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
+    void serialize( Archive &ar )
+    {
       ar( id, primary_color, secondary_color, adjectival, denonym );
     }
   };
 
   inline std::map<std::string, Faction> factions = {};
 
-  struct Component {
+  struct Component
+  {
     entt::entity id;
     bool is_human;
     Faction faction;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
+    void serialize( Archive &ar )
+    {
       ar( id, is_human, faction );
     }
   };
 
-  inline Texture2D DetermineTextureFromFaction( entt::entity owner ) {
+  inline Texture2D DetermineTextureFromFaction( entt::entity owner )
+  {
     std::string faction_id = Global::world.get<Component>( owner ).faction.id;
     return Global::texture_cache[hstr{ ( faction_id + "_villager_texture" )
                                          .c_str() }]
       ->texture;
   }
 
-  namespace System {
+  namespace System
+  {
 
     inline void HumanUpdate( Player::Component & );
     inline void AIUpdate( AI::Component &, Player::Component & );
 
-    inline void Init() {
+    inline void Init()
+    {
 
       std::filesystem::path cwd = std::filesystem::current_path();
 
@@ -70,7 +78,8 @@ namespace Player {
         std::cout << js << std::endl;
         // std::cout << js["romans"] << std::endl;
         // std::cout << js["romans"]["adjectival"] << std::endl;
-        for ( auto &element: js.items() ) {
+        for ( auto &element: js.items() )
+        {
           std::cout << element.key() << std::endl;
           std::cout << element.value() << std::endl;
 
@@ -96,19 +105,23 @@ namespace Player {
       // );
     }
 
-    inline void Update( View<Player::Component> players ) {
+    inline void Update( View<Player::Component> players )
+    {
       // Change to exclude AI
-      for ( auto entity: players ) {
+      for ( auto entity: players )
+      {
         Player::Component &player =
           Global::world.get<Player::Component>( entity );
 
-        if ( player.is_human ) {
+        if ( player.is_human )
+        {
           HumanUpdate( player );
         }
       }
 
       for ( auto entity:
-            Global::world.view<Player::Component, AI::Component>() ) {
+            Global::world.view<Player::Component, AI::Component>() )
+      {
         Player::Component &player =
           Global::world.get<Player::Component>( entity );
         AI::Component &ai = Global::world.get<AI::Component>( entity );
@@ -119,15 +132,22 @@ namespace Player {
 
     inline void HumanUpdate( Player::Component &player ) {}
 
-    inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
-      switch ( ai.current_goal ) {
-        case AI::Goal::DevelopSettlements: {
-          if ( !ai.has_colonist ) {
+    inline void AIUpdate( AI::Component &ai, Player::Component &player )
+    {
+      switch ( ai.current_goal )
+      {
+        case AI::Goal::DevelopSettlements:
+        {
+          if ( !ai.has_colonist )
+          {
             // ActorSystem::SpawnColonist( player.id );
             ai.has_colonist = true;
           }
-          else if ( ai.has_colonist && !ai.has_settlement ) {}
-        } break;
+          else if ( ai.has_colonist && !ai.has_settlement )
+          {
+          }
+        }
+        break;
       }
     }
 

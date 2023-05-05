@@ -9,18 +9,14 @@ namespace InterfaceEvent
   // TODO replace with ID + string? or something categorized
   enum class ID : u32
   {
-    // BASIC
-    // MainMenu
     MainMenuHostGame,
     MainMenuJoinGame,
     MainMenuStartGame,
     MainMenuLoadGame,
     MainMenuSettings,
     MainMenuExitGame,
-    // FactionSelect
     OpenFactionSelectPage,
     SinglePlayerLobbyStartGame,
-    // ModalMenu
     ModalMenuLoadGame,
     ModalMenuSaveGame,
     ModalMenuSettings,
@@ -28,19 +24,15 @@ namespace InterfaceEvent
     ModalMenuExitMain,
     ModalMenuExitGame,
     ModalMenuToggle,
-    // ??
     ReturnToMain,
     PlayerToggledReady,
     HostStartGame,
     JoinLobby,
-
-    // STRING
+    JoinHostedCampaign,
     FactionSelected,
 
 
-    // Context
     ActorSpawnSettlment,
-
 
     // NOTE: Final Enum used to get count, must be in last place
     NumberOfEvents
@@ -64,9 +56,12 @@ namespace InterfaceEvent
     "ReturnToMain",          "PlayerToggledReadyUp",
     "HostStartGame",         "JoinLobby",
 
+    "JoinHostedCampaign",
+
     "FactionSelected",
 
     "ActorSpawnSettlment",
+    //
   };
 
 

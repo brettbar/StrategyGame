@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interface/ui_manager.hpp"
+#include "interface/ui_system.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -125,7 +126,7 @@ class IGame
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartCampaign( std::string player_faction )
+  void StartSingleplayerCampaign( std::string player_faction )
   {
     printf( "pending new!!\n" );
 
@@ -136,6 +137,7 @@ class IGame
 
     UI::System::EnableCampaignUI();
 
+    // TODO(??) I dont know if we want this weird global shit
     Global::host_player = Global::world.create();
     Global::world.emplace<Player::Component>(
       Global::host_player, Global::host_player, true, player_faction
@@ -167,9 +169,32 @@ class IGame
       .Send();
   }
 
-  void StartMultiplayerCampaign() {}
+  void StartMultiplayerCampaign()
+  {
+    if ( _campaign )
+      delete _campaign;
 
-  void LookForMultiplayerCampaign()
+    _campaign = new Campaign();
+
+    UI::System::EnableCampaignUI();
+
+    for ( auto peer: Network::Client()->_peers )
+    {
+      if ( !peer.active )
+        continue;
+
+      auto player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        player, player, true, peer.faction
+      );
+    }
+
+    SelectionSystem::Start();
+
+    Game()->_mode = ProgramMode::Campaign;
+  }
+
+  void LookForMultiplayerLobby()
   {
     _single_player = false;
     Network::is_host = false;
@@ -361,7 +386,7 @@ inline void IGame::RegisterEventListeners()
           HostMultiplayerCampaign();
           break;
         case InterfaceEvent::ID::MainMenuJoinGame:
-          LookForMultiplayerCampaign();
+          LookForMultiplayerLobby();
           break;
         case InterfaceEvent::ID::MainMenuStartGame:
         {
@@ -380,7 +405,7 @@ inline void IGame::RegisterEventListeners()
           UI::System::SwitchPage( UI::FactionSelectMenu );
           break;
         case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
-          StartCampaign( faction );
+          StartSingleplayerCampaign( faction );
           break;
         case InterfaceEvent::ID::ModalMenuLoadGame:
           LoadGame();
@@ -414,17 +439,23 @@ inline void IGame::RegisterEventListeners()
         break;
         case InterfaceEvent::ID::HostStartGame:
         {
-          StartCampaign( faction );
+          Network::Host()->StartHostedCampaign();
+          StartSingleplayerCampaign( faction );
+        }
+        break;
+        case InterfaceEvent::ID::JoinHostedCampaign:
+        {
+          StartMultiplayerCampaign();
         }
         break;
         case InterfaceEvent::ID::JoinLobby:
+        {
           if ( event.msg == "lobby_entry_Conquistador's lobby" )
           {
             JoinMultiplayerLobby( event.lobby_id );
           }
-          break;
-
-        /// STRING
+        }
+        break;
         case InterfaceEvent::ID::FactionSelected:
         {
           printf(
@@ -454,7 +485,7 @@ inline void IGame::RegisterEventListeners()
             {
               player_id = Network::Host()->_player_id;
               Network::Host()->SetHostFaction( faction );
-              Network::Host()->SendMessageToAllClients( Network::Message{
+              Network::Host()->SendMessageToAllActiveClients( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
                 nlohmann::json{
                   { "player_id", player_id },
