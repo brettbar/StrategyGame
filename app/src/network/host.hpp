@@ -252,6 +252,13 @@ public:
             );
           }
 
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+            .update_txt = faction,
+            .player_id = player_id,
+          }
+            .Send();
+
           // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
           //   .SetTarget( target )
           //   .SetText( faction )
@@ -382,21 +389,6 @@ public:
     {
       delete this;
     }
-
-    // std::vector<Network::PeerData> GetConnectedUsers()
-    // {
-    //   std::vector<PeerData> clients = {};
-
-    //   for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-    //   {
-    //     if ( _clients[i].peer_data.active )
-    //     {
-    //       clients.push_back( _clients[i].peer_data );
-    //     }
-    //   }
-
-    //   return clients;
-    // }
   };
 
   inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure )
@@ -525,14 +517,11 @@ public:
           Message{ MessageID::AssignedPlayerId, new_player_id_body }
         );
 
-        auto player_id = _clients[i].peer_data.player_id;
-        // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-        //   .SetTarget( player_id + "_label" )
-        //   .SetText( player_id )
-        //   .send();
-        // InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
-        //   .SetTarget( player_id + "_faction_selection" )
-        //   .send();
+        InterfaceUpdate::Update{
+          .id = InterfaceUpdate::ID::PlayerJoinedLobby,
+          .player_id = _clients[i].peer_data.player_id,
+        }
+          .Send();
 
         // Tell the new client about all the current clients
         for ( auto &client: _clients )

@@ -162,44 +162,67 @@ public:
             .steam_user_id = CSteamID( steam_user_id_u64 ),
           };
 
-          // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-          //   .SetTarget( new_player_id + "_label" )
-          //   .SetText( new_player_id )
-          //   .send();
-
-          // If its ourselves
           if ( new_player_id == _local_player_id )
           {
-            // InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-            //   .SetTarget( _local_player_id + "_faction_selection" )
-            //   .send();
-            // InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
-            //   .SetTarget( _local_player_id + "_faction_selection" )
-            //   .send();
+            InterfaceUpdate::Update{
+              .id = InterfaceUpdate::ID::JoinLobby,
+              .player_id = new_player_id,
+            }
+              .Send();
           }
           else
           {
-            // InterfaceUpdate::Background(
-            //   InterfaceUpdate::ID::JoinLobby, PURPLE
-            // )
-            //   .SetTarget( new_player_id + "_faction_selection" )
-            //   .send();
+            InterfaceUpdate::Update{
+              .id = InterfaceUpdate::PlayerJoinedLobby,
+              .player_id = new_player_id,
+            }
+              .Send();
 
             if ( faction != "" )
             {
-              // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              //   .SetTarget( new_player_id + "_select_faction" )
-              //   .SetText( faction )
-              //   .send();
-
-              // InterfaceUpdate::Background(
-              //   InterfaceUpdate::ID::FactionSelected,
-              //   GetPrimaryFactionColor( faction )
-              // )
-              //   .SetTarget( new_player_id + "_select_faction" )
-              //   .send();
+              InterfaceUpdate::Update{
+                .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+                .update_txt = faction,
+                .player_id = new_player_id,
+              }
+                .Send();
             }
           }
+
+
+          // If its ourselves
+          // if ( new_player_id == _local_player_id )
+          // {
+          //   // InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
+          //   //   .SetTarget( _local_player_id + "_faction_selection" )
+          //   //   .send();
+          //   // InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
+          //   //   .SetTarget( _local_player_id + "_faction_selection" )
+          //   //   .send();
+          // }
+          // else
+          // {
+          //   // InterfaceUpdate::Background(
+          //   //   InterfaceUpdate::ID::JoinLobby, PURPLE
+          //   // )
+          //   //   .SetTarget( new_player_id + "_faction_selection" )
+          //   //   .send();
+
+          //   if ( faction != "" )
+          //   {
+          //     // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
+          //     //   .SetTarget( new_player_id + "_select_faction" )
+          //     //   .SetText( faction )
+          //     //   .send();
+
+          //     // InterfaceUpdate::Background(
+          //     //   InterfaceUpdate::ID::FactionSelected,
+          //     //   GetPrimaryFactionColor( faction )
+          //     // )
+          //     //   .SetTarget( new_player_id + "_select_faction" )
+          //     //   .send();
+          //   }
+          // }
         }
         break;
         case MessageID::PlayerDisconnected:

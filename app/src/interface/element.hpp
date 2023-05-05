@@ -691,9 +691,9 @@ public:
     // }
     void ReceiveUpdate( const InterfaceUpdate::Update &update )
     {
-      if ( updates.contains( update.update_id ) )
+      if ( updates.contains( update.id ) )
       {
-        updates[update.update_id]( *this, update );
+        updates[update.id]( *this, update );
       }
     }
 

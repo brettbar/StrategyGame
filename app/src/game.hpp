@@ -159,9 +159,11 @@ class IGame
     Network::Host()->Init();
     UI::System::SwitchPage( UI::Lobby );
 
-    InterfaceUpdate::Send(
-      InterfaceUpdate::ID::HostLobby, Network::Host()->_player_id
-    );
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::HostLobby,
+      .player_id = Network::Host()->_player_id,
+    }
+      .Send();
   }
 
   void StartMultiplayerCampaign() {}
@@ -176,7 +178,11 @@ class IGame
 
   void JoinMultiplayerLobby( CSteamID lobby_id )
   {
-    InterfaceUpdate::Send( InterfaceUpdate::ID::JoinLobby );
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::JoinLobby,
+      .player_id = "player_0",
+    }
+      .Send();
 
     if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
     {
@@ -430,9 +436,12 @@ inline void IGame::RegisterEventListeners()
 
           if ( _single_player )
           {
-            InterfaceUpdate::Send(
-              InterfaceUpdate::ID::PlayerSelectedFaction, faction, "player_0"
-            );
+            InterfaceUpdate::Update{
+              .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+              .update_txt = faction,
+              .player_id = "player_0",
+            }
+              .Send();
 
             UI::System::SwitchPage( UI::SinglePlayerLobby );
           }
@@ -464,9 +473,12 @@ inline void IGame::RegisterEventListeners()
               } );
             }
 
-            InterfaceUpdate::Send(
-              InterfaceUpdate::ID::PlayerSelectedFaction, faction, player_id
-            );
+            InterfaceUpdate::Update{
+              .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+              .update_txt = faction,
+              .player_id = player_id,
+            }
+              .Send();
 
             UI::System::SwitchPage( UI::Lobby );
           }

@@ -30,9 +30,9 @@ namespace UI
               []( Element &self, InterfaceUpdate::Update update ) {
                 if ( self.id == update.player_id + "_select_faction" )
                 {
-                  self.UpdateText( update.updated_txt );
+                  self.UpdateText( update.update_txt );
                   self.UpdateBackground(
-                    GetPrimaryFactionColor( update.updated_txt )
+                    GetPrimaryFactionColor( update.update_txt )
                   );
                 }
               }

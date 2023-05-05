@@ -23,7 +23,7 @@ namespace UI
           .SetAxis( Axis::Column )
           .Margins( { 16, 16, 0, 0 } )
           .Children( {
-            TextButton( player_id + "_faction_selection" )
+            TextButton( player_id + "_select_faction_btn" )
               .SetText( "Select Faction", 24 )
               .Background( GRAY )
               .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage )
@@ -31,7 +31,7 @@ namespace UI
               .On(
                 InterfaceUpdate::ID::HostLobby,
                 []( Element &self, InterfaceUpdate::Update update ) {
-                  if ( self.id == update.updated_txt + "_faction_selection" )
+                  if ( self.id == update.player_id + "_select_faction_btn" )
                   {
                     self.UpdateClickable( true );
                     self.UpdateBackground( GREEN );
@@ -41,37 +41,51 @@ namespace UI
               .On(
                 InterfaceUpdate::ID::JoinLobby,
                 []( Element &self, InterfaceUpdate::Update update ) {
-                  self.UpdateText( update.updated_txt );
+                  if ( self.id == update.player_id + "_select_faction_btn" )
+                  {
+                    self.UpdateClickable( true );
+                    self.UpdateBackground( GREEN );
+                  }
+                }
+              )
+              .On(
+                InterfaceUpdate::ID::PlayerJoinedLobby,
+                []( Element &self, InterfaceUpdate::Update update ) {
+                  printf( "PlayerJoinedLobby!!!!!!!!\n" );
+                  if ( self.id == update.player_id + "_select_faction_btn" )
+                  {
+                    self.UpdateBackground( PURPLE );
+                  }
                 }
               ),
-            TextLabel( player_id + "_select_faction" )
+            TextLabel( player_id + "_selected_faction_lbl" )
               .SetText( "Selecting Faction...", 24 )
               .Background( GRAY )
               .On(
                 InterfaceUpdate::ID::PlayerSelectedFaction,
                 []( Element &self, InterfaceUpdate::Update update ) {
-                  if ( self.id == update.player_id + "_select_faction" )
+                  if ( self.id == update.player_id + "_selected_faction_lbl" )
                   {
-                    self.UpdateText( update.updated_txt );
+                    self.UpdateText( update.update_txt );
                     self.UpdateBackground(
-                      GetPrimaryFactionColor( update.updated_txt )
+                      GetPrimaryFactionColor( update.update_txt )
                     );
                   }
                 }
               ),
 
-            TextLabel( player_id + "_label" )
-              .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
-              .Background( GRAY )
-              .On(
-                InterfaceUpdate::HostLobby,
-                []( Element &self, InterfaceUpdate::Update update ) {
-                  if ( self.id == update.updated_txt + "_label" )
-                  {
-                    self.UpdateText( update.updated_txt );
-                  }
-                }
-              ),
+            // TextLabel( player_id + "_player_id" )
+            //   .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
+            //   .Background( GRAY )
+            //   .On(
+            //     InterfaceUpdate::HostLobby,
+            //     []( Element &self, InterfaceUpdate::Update update ) {
+            //       if ( self.id == update.update_txt + "_player_id" )
+            //       {
+            //         self.UpdateText( update.update_txt );
+            //       }
+            //     }
+            //   ),
             TextLabel( player_id + "_readied" )
               .SetText( "Not Ready", 24 )
               .Background( RED )

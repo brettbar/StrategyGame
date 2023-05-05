@@ -43,6 +43,7 @@ InterfaceUpdates:
   {
     INVALID,
     PlayerSelectedFaction,
+    PlayerJoinedLobby,
     SettlementContext,
     ActorContext,
     JoinLobby,
@@ -53,33 +54,15 @@ InterfaceUpdates:
 
   struct Update
   {
-    ID update_id = INVALID;
+    ID id = ID::INVALID;
+    std::string update_txt = "INVALID";
+    std::string player_id = "INVALID";
 
-    std::string updated_txt = "";
-    std::string player_id = "";
+    void Send()
+    {
+      dispatcher.enqueue( *this );
+    }
   };
-
-  // TODO we will create overloads of this to pass in relevant
-  // parameters like updated strings or whatnot
-  inline void Send( InterfaceUpdate::ID update_id )
-  {
-    dispatcher.enqueue( Update{ update_id } );
-  }
-
-  inline void Send( InterfaceUpdate::ID update_id, std::string updated_txt )
-  {
-    dispatcher.enqueue( Update{ update_id, updated_txt } );
-  }
-
-  inline void Send(
-    InterfaceUpdate::ID update_id,
-    std::string updated_txt,
-    std::string player_id
-  )
-  {
-    dispatcher.enqueue( Update{ update_id, updated_txt, player_id } );
-  }
-
 
   //   class Data
   //   {
