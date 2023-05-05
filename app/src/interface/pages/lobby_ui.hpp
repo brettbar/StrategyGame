@@ -77,19 +77,6 @@ namespace UI
                   }
                 }
               ),
-
-            // TextLabel( player_id + "_player_id" )
-            //   .SetText( "Open Slot " + std::to_string( i + 1 ), 24 )
-            //   .Background( GRAY )
-            //   .On(
-            //     InterfaceUpdate::HostLobby,
-            //     []( Element &self, InterfaceUpdate::Update update ) {
-            //       if ( self.id == update.update_txt + "_player_id" )
-            //       {
-            //         self.UpdateText( update.update_txt );
-            //       }
-            //     }
-            //   ),
             TextLabel( player_id + "_readied" )
               .SetText( "Not Ready", 24 )
               .Background( RED )
@@ -98,8 +85,16 @@ namespace UI
                 []( Element &self, InterfaceUpdate::Update update ) {
                   if ( self.id == update.player_id + "_readied" )
                   {
-                    // TODO account for RED
-                    self.UpdateBackground( GREEN );
+                    if ( update.condition )
+                    {
+                      self.UpdateBackground( GREEN );
+                      self.UpdateText( "Ready" );
+                    }
+                    else
+                    {
+                      self.UpdateBackground( RED );
+                      self.UpdateText( "Not Ready" );
+                    }
                   }
                 }
               ),
@@ -146,6 +141,7 @@ namespace UI
             .SetEvent( InterfaceEvent::ID::PlayerToggledReady ),
           TextButton( "start_game" )
             .StartDisabled()
+            .Clickable( false )
             .SetText( "Start Game", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::HostStartGame )
@@ -159,6 +155,16 @@ namespace UI
               InterfaceUpdate::ID::JoinLobby,
               []( Element &self, InterfaceUpdate::Update update ) {
                 self.Disable();
+              }
+            )
+            .On(
+              InterfaceUpdate::ID::AllPlayersReady,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                self.UpdateClickable( update.condition );
+                if ( update.condition )
+                  self.UpdateBackground( GREEN );
+                else
+                  self.UpdateBackground( RED );
               }
             ),
         } ),

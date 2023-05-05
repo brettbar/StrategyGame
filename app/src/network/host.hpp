@@ -258,18 +258,6 @@ public:
             .player_id = player_id,
           }
             .Send();
-
-          // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-          //   .SetTarget( target )
-          //   .SetText( faction )
-          //   .send();
-
-          // InterfaceUpdate::Background(
-          //   InterfaceUpdate::ID::FactionSelected,
-          //   GetPrimaryFactionColor( faction )
-          // )
-          //   .SetTarget( target )
-          //   .send();
         }
         break;
         case PlayerToggledReady:
@@ -280,24 +268,25 @@ public:
           u32 index = player_id_index[player_id];
           _clients[index].peer_data.readied_up = ready;
 
-          // InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
-          //   .SetText(
-          //     _clients[index].peer_data.readied_up ? "Ready " : "Not Ready"
-          //   )
-          //   .SetTarget( player_id + "_readied" )
-          //   .send();
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerToggledReady,
+            .player_id = player_id,
+            .condition = ready,
+          }
+            .Send();
 
-          // InterfaceUpdate::Background(
-          //   InterfaceUpdate::ID::PlayerToggledReady,
-          //   _clients[index].peer_data.readied_up ? GREEN : RED
-          // )
-          //   .SetTarget( player_id + "_readied" )
-          //   .send();
+          u32 num_active = 0;
+          u32 num_ready = 0;
 
           for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
           {
             if ( !_clients[i].peer_data.active )
               continue;
+
+            num_active++;
+            if ( _clients[i].peer_data.readied_up )
+              num_ready++;
+
 
             SendMessageOnConnection(
               _clients[i].conn,
@@ -309,6 +298,14 @@ public:
                 } }
             );
           }
+
+
+          // Update if all players are ready or not
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::AllPlayersReady,
+            .condition = num_active > 0 && ( num_active == num_ready ),
+          }
+            .Send();
         }
         break;
         default:
@@ -322,17 +319,12 @@ public:
 
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
 
-      // InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
-      //   .SetText( _clients[0].peer_data.readied_up ? "Ready " : "Not Ready" )
-      //   .SetTarget( "player_0_readied" )
-      //   .send();
-
-      // InterfaceUpdate::Background(
-      //   InterfaceUpdate::ID::PlayerToggledReady,
-      //   _clients[0].peer_data.readied_up ? GREEN : RED
-      // )
-      //   .SetTarget( "player_0_readied" )
-      //   .send();
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::PlayerToggledReady,
+        .player_id = "player_0",
+        .condition = _clients[0].peer_data.readied_up,
+      }
+        .Send();
 
       for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
       {

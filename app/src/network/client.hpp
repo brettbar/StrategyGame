@@ -207,18 +207,6 @@ public:
             .player_id = player_id,
           }
             .Send();
-
-          // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-          //   .SetTarget( target )
-          //   .SetText( faction )
-          //   .send();
-
-          // InterfaceUpdate::Background(
-          //   InterfaceUpdate::ID::FactionSelected,
-          //   GetPrimaryFactionColor( faction )
-          // )
-          //   .SetTarget( target )
-          //   .send();
         }
         break;
         case MessageID::PlayerToggledReady:
@@ -227,27 +215,16 @@ public:
           std::string player_id = body["player_id"];
           bool ready = body["ready"];
 
-          if ( player_id == _local_player_id )
-          {
-            // If the player who toggled is ourselves,
-            // we already know that
-            break;
-          }
 
           u32 index = player_id_index[player_id];
           _peers[index].readied_up = ready;
 
-          // InterfaceUpdate::Text( InterfaceUpdate::ID::PlayerToggledReady )
-          //   .SetText( _peers[index].readied_up ? "Ready " : "Not Ready" )
-          //   .SetTarget( player_id + "_readied" )
-          //   .send();
-
-          // InterfaceUpdate::Background(
-          //   InterfaceUpdate::ID::PlayerToggledReady,
-          //   _peers[index].readied_up ? GREEN : RED
-          // )
-          //   .SetTarget( player_id + "_readied" )
-          //   .send();
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerToggledReady,
+            .player_id = player_id,
+            .condition = ready,
+          }
+            .Send();
         }
         break;
         default:
@@ -272,19 +249,6 @@ public:
       }
       return lobby_list;
     }
-
-
-    // std::vector<PeerData> GetConnectedUsers()
-    // {
-    //   std::vector<PeerData> list = {};
-
-    //   for ( auto &peer: _peers )
-    //   {
-    //     list.push_back( peer );
-    //   }
-
-    //   return list;
-    // }
 
     bool AttemptJoinLobby( CSteamID lobby_id )
     {

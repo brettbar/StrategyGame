@@ -61,6 +61,7 @@ class IGame
         {
           if ( Network::is_host )
           {
+
             // Network::Host()->PingAllActiveClients();
           }
           _oncelag = 0.0f;
