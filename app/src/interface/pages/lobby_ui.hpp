@@ -46,6 +46,10 @@ namespace UI
                     self.UpdateClickable( true );
                     self.UpdateBackground( GREEN );
                   }
+                  else
+                  {
+                    self.UpdateClickable( false );
+                  }
                 }
               )
               .On(

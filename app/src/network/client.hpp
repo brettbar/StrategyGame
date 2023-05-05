@@ -188,41 +188,6 @@ public:
                 .Send();
             }
           }
-
-
-          // If its ourselves
-          // if ( new_player_id == _local_player_id )
-          // {
-          //   // InterfaceUpdate::Clickable( InterfaceUpdate::ID::JoinLobby, true )
-          //   //   .SetTarget( _local_player_id + "_faction_selection" )
-          //   //   .send();
-          //   // InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, GREEN )
-          //   //   .SetTarget( _local_player_id + "_faction_selection" )
-          //   //   .send();
-          // }
-          // else
-          // {
-          //   // InterfaceUpdate::Background(
-          //   //   InterfaceUpdate::ID::JoinLobby, PURPLE
-          //   // )
-          //   //   .SetTarget( new_player_id + "_faction_selection" )
-          //   //   .send();
-
-          //   if ( faction != "" )
-          //   {
-          //     // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-          //     //   .SetTarget( new_player_id + "_select_faction" )
-          //     //   .SetText( faction )
-          //     //   .send();
-
-          //     // InterfaceUpdate::Background(
-          //     //   InterfaceUpdate::ID::FactionSelected,
-          //     //   GetPrimaryFactionColor( faction )
-          //     // )
-          //     //   .SetTarget( new_player_id + "_select_faction" )
-          //     //   .send();
-          //   }
-          // }
         }
         break;
         case MessageID::PlayerDisconnected:
@@ -235,6 +200,13 @@ public:
 
           u32 index = player_id_index[player_id];
           _peers[index].faction = faction;
+
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+            .update_txt = faction,
+            .player_id = player_id,
+          }
+            .Send();
 
           // InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
           //   .SetTarget( target )
