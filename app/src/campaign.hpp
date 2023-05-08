@@ -16,9 +16,10 @@
 #include "world/managers/commands.hpp"
 
 #include "world/systems/animation_system.hpp"
+#include "world/systems/faction_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
-#include "world/systems/player.hpp"
+#include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
 #include "world/systems/settlement_system.hpp"
 
@@ -60,7 +61,7 @@ class Campaign
 inline void Campaign::Start()
 {
   MapSystem::Init();
-  Player::System::Init();
+  FactionSystem::Init();
   SettlementSystem::Init();
   ProvinceSystem::Init();
   Renderer::Init();
@@ -112,7 +113,7 @@ inline void Campaign::Update60TPS()
 
   MovementSystem::Update( animated_units, Global::state.timeScale );
   AnimationSystem::Update( animated_units, Global::state.timeScale );
-  Player::System::Update( players );
+  PlayerSystem::Update( players );
   //  Terrain::UpdateFOW(reg);
 }
 

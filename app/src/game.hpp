@@ -140,7 +140,10 @@ class IGame
     // TODO(??) I dont know if we want this weird global shit
     Global::host_player = Global::world.create();
     Global::world.emplace<Player::Component>(
-      Global::host_player, Global::host_player, true, player_faction
+      Global::host_player, Global::host_player, true
+    );
+    Global::world.emplace<Faction::Component>(
+      Global::host_player, player_faction
     );
 
     SelectionSystem::Start();
@@ -178,16 +181,16 @@ class IGame
 
     UI::System::EnableCampaignUI();
 
-    for ( auto peer: Network::Client()->_peers )
-    {
-      if ( !peer.active )
-        continue;
+    // for ( auto peer: Network::Client()->_peers )
+    // {
+    //   if ( !peer.active )
+    //     continue;
 
-      auto player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        player, player, true, peer.faction
-      );
-    }
+    //   auto player = Global::world.create();
+    //   Global::world.emplace<Player::Component>(
+    //     player, player, true, peer.faction
+    //   );
+    // }
 
     SelectionSystem::Start();
 
