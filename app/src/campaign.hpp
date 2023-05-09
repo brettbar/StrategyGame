@@ -14,6 +14,7 @@
 #pragma once
 
 
+#include "network/network.hpp"
 #include "shared/save.hpp"
 
 #include "world/systems/actor_system.hpp"
@@ -28,7 +29,6 @@
 #include "renderer/renderer.hpp"
 
 #include "interface/ui_system.hpp"
-
 
 enum class CommandType
 {
@@ -237,7 +237,29 @@ inline void Campaign::CheckForInput()
 
 inline void Campaign::PostCommand( Command cmd )
 {
-  _command_queue.enqueue( cmd );
+  if ( _is_singleplayer )
+  {
+    _command_queue.enqueue( cmd );
+  }
+  else
+  {
+    if ( Network::is_host )
+    {
+      Network::Host()->SendMessageToAllActiveClients( Network::Message{
+        Network::MessageID::Command,
+        nlohmann::json{
+          { "cmd_player", "player_0" },
+          { "cmd_type", cmd.type },
+          { "cmd_msg", cmd.msg },
+          { "cmd_pos.x", cmd.click_pos.x },
+          { "cmd_pos.y", cmd.click_pos.y },
+        },
+      } );
+    }
+    else
+    {
+    }
+  }
 }
 
 inline void Campaign::Receive( const Command &cmd )

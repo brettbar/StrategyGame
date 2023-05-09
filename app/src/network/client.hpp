@@ -232,7 +232,12 @@ public:
         {
           // TODO maybe a different event emitter?
           InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-            InterfaceEvent::ID::JoinHostedCampaign } );
+            InterfaceEvent::ID::JoinHostedCampaign,
+          } );
+        }
+        break;
+        case MessageID::Command:
+        {
         }
         break;
         default:

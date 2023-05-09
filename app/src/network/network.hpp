@@ -57,6 +57,8 @@ namespace Network
 
     PlayerFactionSelect,
 
+    Command,
+
     NumMessageIDs,
   };
 
