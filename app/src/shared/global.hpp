@@ -7,7 +7,8 @@
 #include "textures.hpp"
 
 
-namespace Global {
+namespace Global
+{
 
   inline State state = {
     .mapWidth = 128,
@@ -25,9 +26,10 @@ namespace Global {
   inline entt::registry world;
 
   // TODO temporary
-  inline entt::entity host_player;
+  // inline entt::entity host_player;
 
-  inline void ClearRegistry() {
+  inline void ClearRegistry()
+  {
     Global::world = {};
     Global::world.clear();
   }

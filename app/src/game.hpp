@@ -136,18 +136,16 @@ class IGame
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new class Campaign();
+    _campaign = new class Campaign( true );
 
     UI::System::EnableCampaignUI();
 
-    // TODO(??) I dont know if we want this weird global shit
-    Global::host_player = Global::world.create();
+    auto player = Global::world.create();
     Global::world.emplace<Player::Component>(
-      Global::host_player, Global::host_player, true
+      player, player, "player_0", true
     );
-    Global::world.emplace<Faction::Component>(
-      Global::host_player, player_faction
-    );
+    Global::world.emplace<Player::LocalTag>( player );
+    Global::world.emplace<Faction::Component>( player, player_faction );
 
     SelectionSystem::Start();
 
@@ -161,7 +159,7 @@ class IGame
   /*=============================================================
                         Begin: Multiplayer
   =============================================================*/
-  void HostMultiplayerCampaign()
+  void HostMultiplayerLobby()
   {
     _single_player = false;
     Network::is_host = true;
@@ -175,25 +173,66 @@ class IGame
       .Send();
   }
 
-  void StartMultiplayerCampaign()
+  void HostStartMultiplayerCampaign()
   {
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new class Campaign();
+    _campaign = new class Campaign( false );
 
     UI::System::EnableCampaignUI();
 
-    // for ( auto peer: Network::Client()->_peers )
-    // {
-    //   if ( !peer.active )
-    //     continue;
+    for ( auto client: Network::Host()->_clients )
+    {
+      if ( !client.peer_data.active )
+        continue;
 
-    //   auto player = Global::world.create();
-    //   Global::world.emplace<Player::Component>(
-    //     player, player, true, peer.faction
-    //   );
-    // }
+      auto player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        player, player, client.peer_data.player_id, true
+      );
+
+      if ( client.peer_data.player_id == "player_0" )
+        Global::world.emplace<Player::LocalTag>( player );
+      else
+        Global::world.emplace<Player::RemoteTag>( player );
+
+      Global::world.emplace<Faction::Component>(
+        player, client.peer_data.faction
+      );
+    }
+
+    SelectionSystem::Start();
+
+    Game()->_mode = ProgramMode::Campaign;
+  }
+
+  void ClientStartMultiplayerCampaign()
+  {
+    if ( _campaign )
+      delete _campaign;
+
+    _campaign = new class Campaign( false );
+
+    UI::System::EnableCampaignUI();
+
+    for ( auto peer: Network::Client()->_peers )
+    {
+      if ( !peer.active )
+        continue;
+
+      auto player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        player, player, peer.player_id, true
+      );
+
+      if ( Network::Client()->_local_player_id == peer.player_id )
+        Global::world.emplace<Player::LocalTag>( player );
+      else
+        Global::world.emplace<Player::RemoteTag>( player );
+
+      Global::world.emplace<Faction::Component>( player, peer.faction );
+    }
 
     SelectionSystem::Start();
 
@@ -402,7 +441,7 @@ inline void IGame::RegisterEventListeners()
         /// BASIC
         // MainMenu
         case InterfaceEvent::ID::MainMenuHostGame:
-          HostMultiplayerCampaign();
+          HostMultiplayerLobby();
           break;
         case InterfaceEvent::ID::MainMenuJoinGame:
           LookForMultiplayerLobby();
@@ -459,12 +498,12 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::HostStartGame:
         {
           Network::Host()->StartHostedCampaign();
-          StartSingleplayerCampaign( faction );
+          HostStartMultiplayerCampaign();
         }
         break;
         case InterfaceEvent::ID::JoinHostedCampaign:
         {
-          StartMultiplayerCampaign();
+          ClientStartMultiplayerCampaign();
         }
         break;
         case InterfaceEvent::ID::JoinLobby:

@@ -55,9 +55,6 @@ private:
 
     CSteamID _server_id;
 
-    // Used after lobby is done
-    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
-    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
     HSteamListenSocket _socket;
     // HSteamNetPollGroup _poll_grp;
@@ -122,6 +119,9 @@ private:
 public:
     // TODO make private
     std::string _player_id = "player_0";
+    // Used after lobby is done
+    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
     MessageQueue _msg_queue;
 

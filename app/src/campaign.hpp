@@ -41,6 +41,7 @@ enum class CommandType
 struct Command
 {
   CommandType type;
+  entt::entity player_e;
 
   std::string msg;
   Vector2 click_pos;
@@ -50,13 +51,16 @@ class Campaign
 {
 
   public:
-  Campaign()
+  Campaign( bool is_singleplayer )
   {
+    _is_singleplayer = is_singleplayer;
     Start();
   }
 
-  Campaign( const char * )
+  Campaign( bool is_singleplayer, const char * )
   {
+    _is_singleplayer = is_singleplayer;
+
     // TODO make take in file path
     Load();
   }
@@ -80,6 +84,7 @@ class Campaign
 
   private:
   entt::dispatcher _command_queue;
+  bool _is_singleplayer = true;
 
   void Start();
   void Load();
@@ -163,41 +168,60 @@ inline void Campaign::CheckForInput()
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
+  auto player_e =
+    Global::world.view<Player::Component, Player::LocalTag>().front();
+
+  if ( player_e == entt::null )
+  {
+    std::cout << "ERROR"
+              << " no local player was found" << '\n';
+    return;
+  }
+
   if ( IsKeyPressed( KEY_SPACE ) )
   {
-    PostCommand( { CommandType::TimeChange, "Player request Pause" } );
+    PostCommand( { CommandType::TimeChange, player_e, "Player request Pause" }
+    );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) )
   {
-    PostCommand( { CommandType::TimeChange, "Player request Slower" } );
+    PostCommand( { CommandType::TimeChange, player_e, "Player request Slower" }
+    );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) )
   {
-    PostCommand( { CommandType::TimeChange, "Player request Faster" } );
+    PostCommand( { CommandType::TimeChange, player_e, "Player request Faster" }
+    );
   }
 
   if ( IsKeyPressed( KEY_V ) )
   {
-    PostCommand( { CommandType::Spawn, "Player spawn Villager", click_pos } );
+    PostCommand(
+      { CommandType::Spawn, player_e, "Player spawn Villager", click_pos }
+    );
   }
 
   if ( IsKeyPressed( KEY_C ) )
   {
-    PostCommand( { CommandType::Spawn, "Player spawn City", click_pos } );
+    PostCommand(
+      { CommandType::Spawn, player_e, "Player spawn City", click_pos }
+    );
   }
 
   if ( IsMouseButtonPressed( 0 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { CommandType::Selection, "Player select", click_pos } );
+      PostCommand(
+        { CommandType::Selection, player_e, "Player select", click_pos }
+      );
   }
 
   if ( IsMouseButtonPressed( 1 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { CommandType::Move, "Player move" } );
+      PostCommand( { CommandType::Move, player_e, "Player move" } );
   }
 
   if ( IsKeyPressed( KEY_P ) )
@@ -293,12 +317,12 @@ inline void Campaign::HandleSpawnRequest( const Command &cmd )
 
   if ( cmd.msg == "Player spawn Villager" )
   {
-    ActorSystem::SpawnColonist( Global::host_player, cmd.click_pos );
+    ActorSystem::SpawnColonist( cmd.player_e, cmd.click_pos );
     return;
   }
 
   if ( cmd.msg == "Player spawn City" )
   {
-    ProvinceSystem::AssignProvince( Global::host_player, cmd.click_pos );
+    ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
   }
 };
