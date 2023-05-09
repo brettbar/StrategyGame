@@ -113,10 +113,7 @@ public:
       }
     }
 
-    void ProcessMessageSwitch(
-      MessageID message_id,
-      nlohmann::basic_json<> body
-    )
+    void ProcessMessageSwitch( MessageID message_id, nlohmann::json body )
     {
       switch ( message_id )
       {
@@ -238,6 +235,11 @@ public:
         break;
         case MessageID::Command:
         {
+
+          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+            InterfaceEvent::ID::ClientReceivedCommand,
+            body.dump(),
+          } );
         }
         break;
         default:

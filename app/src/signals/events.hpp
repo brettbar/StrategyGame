@@ -30,6 +30,7 @@ namespace InterfaceEvent
     JoinLobby,
     JoinHostedCampaign,
     FactionSelected,
+    ClientReceivedCommand,
 
 
     ActorSpawnSettlment,
@@ -58,7 +59,7 @@ namespace InterfaceEvent
 
     "JoinHostedCampaign",
 
-    "FactionSelected",
+    "FactionSelected",       "ClientReceivedCommand",
 
     "ActorSpawnSettlment",
     //
@@ -78,7 +79,7 @@ namespace InterfaceEvent
     {
     }
 
-public:
+
     ID event_id;
     std::string msg;
     CSteamID lobby_id;

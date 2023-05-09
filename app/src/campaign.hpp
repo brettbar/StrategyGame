@@ -81,6 +81,8 @@ class Campaign
   void HandleSpawnRequest( const Command & );
   void HandleTimeChangeRequest( const Command & );
 
+  void ConvertCommandRequest( std::string );
+
 
   private:
   entt::dispatcher _command_queue;
@@ -235,6 +237,37 @@ inline void Campaign::CheckForInput()
   }
 }
 
+inline void Campaign::ConvertCommandRequest( std::string str )
+{
+  nlohmann::json body = nlohmann::json::parse( str );
+
+  std::cout << "BODY" << body << '\n';
+
+  std::string cmd_player_id = body["cmd_player"];
+  CommandType cmd_type = body["cmd_type"];
+  std::string cmd_msg = body["cmd_msg"];
+  f32 cmd_click_pos_x = body["cmd_pos.x"];
+  f32 cmd_click_pos_y = body["cmd_pos.y"];
+
+  auto players = Global::world.view<Player::Component, Player::RemoteTag>();
+
+  for ( entt::entity player: players )
+  {
+    Player::Component pc = Global::world.get<Player::Component>( player );
+
+    if ( pc.player_id == cmd_player_id )
+    {
+      _command_queue.enqueue( Command{
+        .type = cmd_type,
+        .player_e = player,
+        .msg = cmd_msg,
+        .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
+      } );
+    }
+  }
+}
+
+
 inline void Campaign::PostCommand( Command cmd )
 {
   if ( _is_singleplayer )
@@ -255,12 +288,11 @@ inline void Campaign::PostCommand( Command cmd )
           { "cmd_pos.y", cmd.click_pos.y },
         },
       } );
-    }
-    else
-    {
+      _command_queue.enqueue( cmd );
     }
   }
 }
+
 
 inline void Campaign::Receive( const Command &cmd )
 {

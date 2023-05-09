@@ -575,6 +575,13 @@ inline void IGame::RegisterEventListeners()
         }
         break;
 
+        case InterfaceEvent::ID::ClientReceivedCommand:
+        {
+          if ( _campaign )
+            _campaign->ConvertCommandRequest( event.msg );
+        }
+        break;
+
         default:
           printf( "Error, unregistered UI event fired\n" );
           break;
