@@ -16,8 +16,7 @@
 
 #include "shared/save.hpp"
 
-#include "world/managers/commands.hpp"
-
+#include "world/systems/actor_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/faction_system.hpp"
 #include "world/systems/map_system.hpp"
@@ -29,6 +28,23 @@
 #include "renderer/renderer.hpp"
 
 #include "interface/ui_system.hpp"
+
+
+enum class CommandType
+{
+  TimeChange,
+  Spawn,
+  Selection,
+  Move,
+};
+
+struct Command
+{
+  CommandType type;
+
+  std::string msg;
+  Vector2 click_pos;
+};
 
 class Campaign
 {
@@ -48,17 +64,22 @@ class Campaign
   ~Campaign()
   {
     Global::ClearRegistry();
-    delete _command_queue;
+    // delete _command_queue;
   }
 
   void CheckForInput();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
   void Update1TPS();
-  void PostCommand( Commands::Command );
+  void PostCommand( Command );
+
+  void Receive( const Command & );
+  void HandleSpawnRequest( const Command & );
+  void HandleTimeChangeRequest( const Command & );
+
 
   private:
-  Commands::Queue *_command_queue;
+  entt::dispatcher _command_queue;
 
   void Start();
   void Load();
@@ -72,11 +93,8 @@ inline void Campaign::Start()
   ProvinceSystem::Init();
   Renderer::Init();
 
-  // Make sure the singleton is initialized
-  _command_queue = new Commands::Queue();
-
-  // Commands::Listen();
-  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
+  _command_queue = entt::dispatcher{};
+  _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
 }
 
 inline void Campaign::Load()
@@ -92,8 +110,8 @@ inline void Campaign::Load()
     }
   );
 
-  _command_queue = new Commands::Queue();
-  // std::cout << EntityIdToString( Global::host_player ) << std::endl;
+  _command_queue = entt::dispatcher{};
+  _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
 }
 
 // Runs inside game loop
@@ -103,7 +121,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag )
   CheckForInput();
 
   // 3. Process all commands
-  _command_queue->FireAll();
+  _command_queue.update();
   UI::System::UpdateOnFrame();
 }
 
@@ -139,6 +157,7 @@ inline void Campaign::Update1TPS()
     Global::state.month = 1;
   }
 }
+
 inline void Campaign::CheckForInput()
 {
   Vector2 click_pos =
@@ -146,40 +165,39 @@ inline void Campaign::CheckForInput()
 
   if ( IsKeyPressed( KEY_SPACE ) )
   {
-    PostCommand( { Commands::Type::TimeChange, "Player request Pause" } );
+    PostCommand( { CommandType::TimeChange, "Player request Pause" } );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) )
   {
-    PostCommand( { Commands::Type::TimeChange, "Player request Slower" } );
+    PostCommand( { CommandType::TimeChange, "Player request Slower" } );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) )
   {
-    PostCommand( { Commands::Type::TimeChange, "Player request Faster" } );
+    PostCommand( { CommandType::TimeChange, "Player request Faster" } );
   }
 
   if ( IsKeyPressed( KEY_V ) )
   {
-    PostCommand( { Commands::Type::Spawn, "Player spawn Villager", click_pos }
-    );
+    PostCommand( { CommandType::Spawn, "Player spawn Villager", click_pos } );
   }
 
   if ( IsKeyPressed( KEY_C ) )
   {
-    PostCommand( { Commands::Type::Spawn, "Player spawn City", click_pos } );
+    PostCommand( { CommandType::Spawn, "Player spawn City", click_pos } );
   }
 
   if ( IsMouseButtonPressed( 0 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { Commands::Type::Selection, "Player select", click_pos } );
+      PostCommand( { CommandType::Selection, "Player select", click_pos } );
   }
 
   if ( IsMouseButtonPressed( 1 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { Commands::Type::Move, "Player move" } );
+      PostCommand( { CommandType::Move, "Player move" } );
   }
 
   if ( IsKeyPressed( KEY_P ) )
@@ -193,7 +211,94 @@ inline void Campaign::CheckForInput()
   }
 }
 
-inline void Campaign::PostCommand( Commands::Command cmd )
+inline void Campaign::PostCommand( Command cmd )
 {
-  _command_queue->Enqueue( cmd );
+  _command_queue.enqueue( cmd );
 }
+
+inline void Campaign::Receive( const Command &cmd )
+{
+  switch ( cmd.type )
+  {
+    case CommandType::TimeChange:
+    {
+      HandleTimeChangeRequest( cmd );
+      return;
+    }
+    case CommandType::Spawn:
+    {
+      HandleSpawnRequest( cmd );
+      return;
+    }
+    case CommandType::Selection:
+    {
+      SelectionSystem::UpdateSelection( cmd.click_pos );
+      return;
+    }
+    case CommandType::Move:
+    {
+      MovementSystem::SetDestinations( Global::state.camera );
+      return;
+    }
+  }
+}
+
+
+inline void Campaign::HandleTimeChangeRequest( const Command &cmd )
+{
+  if ( cmd.msg == "Player request Pause" )
+  {
+    std::cout << cmd.msg << std::endl;
+
+    if ( Global::state.timeScale > 0.0f )
+    {
+      Global::state.prevTimeScale = Global::state.timeScale;
+      Global::state.timeScale = 0.0f;
+    }
+    else if ( Global::state.timeScale == 0.0f )
+    {
+      Global::state.timeScale = Global::state.prevTimeScale;
+    }
+
+    return;
+  }
+
+  if ( cmd.msg == "Player request Slower" )
+  {
+    Global::state.timeScale -= 0.5f;
+    if ( Global::state.timeScale < 0.0f )
+      Global::state.timeScale = 0.0f;
+
+    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f )
+    {
+      Global::state.prevTimeScale -= 0.5f;
+      Global::state.timeScale = Global::state.prevTimeScale;
+    }
+
+    return;
+  }
+
+  if ( cmd.msg == "Player request Faster" )
+  {
+    Global::state.timeScale += 0.5f;
+    if ( Global::state.timeScale > 1.5f )
+      Global::state.timeScale = 1.5f;
+
+    return;
+  }
+}
+
+inline void Campaign::HandleSpawnRequest( const Command &cmd )
+{
+
+  if ( cmd.msg == "Player spawn Villager" )
+  {
+    ActorSystem::SpawnColonist( Global::host_player, cmd.click_pos );
+    return;
+  }
+
+  if ( cmd.msg == "Player spawn City" )
+  {
+    ProvinceSystem::AssignProvince( Global::host_player, cmd.click_pos );
+  }
+};
