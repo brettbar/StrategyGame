@@ -11,8 +11,6 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/input.hpp"
-
 #include "campaign.hpp"
 #include "signals/updates.hpp"
 #include "world/systems/selection_system.hpp"
@@ -33,6 +31,11 @@ class IGame
   {
     static IGame instance;
     return &instance;
+  }
+
+  Campaign *Campaign()
+  {
+    return _campaign;
   }
 
   void MainLoop()
@@ -92,7 +95,7 @@ class IGame
   }
 
   private:
-  Campaign *_campaign = nullptr;
+  class Campaign *_campaign = nullptr;
   bool _single_player = true;
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
@@ -133,7 +136,7 @@ class IGame
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new Campaign();
+    _campaign = new class Campaign();
 
     UI::System::EnableCampaignUI();
 
@@ -177,7 +180,7 @@ class IGame
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new Campaign();
+    _campaign = new class Campaign();
 
     UI::System::EnableCampaignUI();
 
@@ -231,7 +234,7 @@ class IGame
   {
     if ( _campaign )
       delete _campaign;
-    _campaign = new Campaign( "output.dat" );
+    _campaign = new class Campaign( "output.dat" );
     UI::System::EnableCampaignUI();
 
     Game()->_mode = ProgramMode::Campaign;
@@ -265,6 +268,17 @@ class IGame
   {
     UI::System::SwitchPage( UI::MainMenu );
     _mode = ProgramMode::MainMenu;
+  }
+
+
+  inline void CheckMenuToggle()
+  {
+    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) )
+    {
+      InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+        InterfaceEvent::ID::ModalMenuToggle,
+      } );
+    }
   }
   /*=============================================================
                         End: Shared
@@ -301,7 +315,7 @@ class IGame
 
       case ProgramMode::ModalMenu:
       {
-        Input::CheckMenuToggle();
+        CheckMenuToggle();
 
         UI::System::UpdateOnFrame();
 
@@ -319,6 +333,8 @@ class IGame
 
       case ProgramMode::Campaign:
       {
+        CheckMenuToggle();
+
         if ( _single_player )
         {
           // Singleplayer Campaign

@@ -13,6 +13,9 @@
 
 #pragma once
 
+
+#include "shared/save.hpp"
+
 #include "world/managers/commands.hpp"
 
 #include "world/systems/animation_system.hpp"
@@ -24,8 +27,6 @@
 #include "world/systems/settlement_system.hpp"
 
 #include "renderer/renderer.hpp"
-
-#include "interface/input.hpp"
 
 #include "interface/ui_system.hpp"
 
@@ -47,13 +48,18 @@ class Campaign
   ~Campaign()
   {
     Global::ClearRegistry();
+    delete _command_queue;
   }
 
+  void CheckForInput();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
   void Update1TPS();
+  void PostCommand( Commands::Command );
 
   private:
+  Commands::Queue *_command_queue;
+
   void Start();
   void Load();
 };
@@ -67,7 +73,7 @@ inline void Campaign::Start()
   Renderer::Init();
 
   // Make sure the singleton is initialized
-  Commands::Manager();
+  _command_queue = new Commands::Queue();
 
   // Commands::Listen();
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
@@ -86,7 +92,7 @@ inline void Campaign::Load()
     }
   );
 
-  Commands::Manager();
+  _command_queue = new Commands::Queue();
   // std::cout << EntityIdToString( Global::host_player ) << std::endl;
 }
 
@@ -94,11 +100,10 @@ inline void Campaign::Load()
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag )
 {
   // 2. Check for Input
-  Input::CheckMenuToggle();
-  Input::Handle();
+  CheckForInput();
 
   // 3. Process all commands
-  Commands::Manager()->FireAll();
+  _command_queue->FireAll();
   UI::System::UpdateOnFrame();
 }
 
@@ -133,4 +138,62 @@ inline void Campaign::Update1TPS()
     Global::state.year++;
     Global::state.month = 1;
   }
+}
+inline void Campaign::CheckForInput()
+{
+  Vector2 click_pos =
+    GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
+
+  if ( IsKeyPressed( KEY_SPACE ) )
+  {
+    PostCommand( { Commands::Type::TimeChange, "Player request Pause" } );
+  }
+
+  if ( IsKeyPressed( KEY_MINUS ) )
+  {
+    PostCommand( { Commands::Type::TimeChange, "Player request Slower" } );
+  }
+
+  if ( IsKeyPressed( KEY_EQUAL ) )
+  {
+    PostCommand( { Commands::Type::TimeChange, "Player request Faster" } );
+  }
+
+  if ( IsKeyPressed( KEY_V ) )
+  {
+    PostCommand( { Commands::Type::Spawn, "Player spawn Villager", click_pos }
+    );
+  }
+
+  if ( IsKeyPressed( KEY_C ) )
+  {
+    PostCommand( { Commands::Type::Spawn, "Player spawn City", click_pos } );
+  }
+
+  if ( IsMouseButtonPressed( 0 ) )
+  {
+    if ( !UI::Manager()->MouseIsOverUI() )
+      PostCommand( { Commands::Type::Selection, "Player select", click_pos } );
+  }
+
+  if ( IsMouseButtonPressed( 1 ) )
+  {
+    if ( !UI::Manager()->MouseIsOverUI() )
+      PostCommand( { Commands::Type::Move, "Player move" } );
+  }
+
+  if ( IsKeyPressed( KEY_P ) )
+  {
+    MapSystem::mode = MapSystem::Mode::Political;
+  }
+
+  if ( IsKeyPressed( KEY_T ) )
+  {
+    MapSystem::mode = MapSystem::Mode::Terrain;
+  }
+}
+
+inline void Campaign::PostCommand( Commands::Command cmd )
+{
+  _command_queue->Enqueue( cmd );
 }
