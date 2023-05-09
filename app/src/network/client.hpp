@@ -235,7 +235,6 @@ public:
         break;
         case MessageID::Command:
         {
-
           InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
             InterfaceEvent::ID::ClientReceivedCommand,
             body.dump(),

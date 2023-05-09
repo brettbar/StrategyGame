@@ -249,11 +249,14 @@ inline void Campaign::ConvertCommandRequest( std::string str )
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
 
-  auto players = Global::world.view<Player::Component, Player::RemoteTag>();
+  auto players = Global::world.view<Player::Component>();
 
   for ( entt::entity player: players )
   {
     Player::Component pc = Global::world.get<Player::Component>( player );
+
+    std::cout << "pc.player_id: " << pc.player_id << '\n';
+    std::cout << "cmd_player_id: " << cmd_player_id << '\n';
 
     if ( pc.player_id == cmd_player_id )
     {
@@ -289,6 +292,19 @@ inline void Campaign::PostCommand( Command cmd )
         },
       } );
       _command_queue.enqueue( cmd );
+    }
+    else
+    {
+      Network::Client()->SendMessageToHost( Network::Message{
+        Network::MessageID::Command,
+        nlohmann::json{
+          { "cmd_player", Network::Client()->_local_player_id },
+          { "cmd_type", cmd.type },
+          { "cmd_msg", cmd.msg },
+          { "cmd_pos.x", cmd.click_pos.x },
+          { "cmd_pos.y", cmd.click_pos.y },
+        },
+      } );
     }
   }
 }

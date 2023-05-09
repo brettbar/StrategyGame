@@ -15,6 +15,7 @@
 #include <chrono>
 #include <isteammatchmaking.h>
 
+#include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 
 namespace Network
@@ -286,6 +287,25 @@ public:
           CheckIfAllPlayersReady();
         }
         break;
+        case Command:
+        {
+
+          for ( auto &client: _clients )
+          {
+            if ( !client.peer_data.active )
+              continue;
+
+            if ( client.peer_data.player_id == "player_0" )
+              continue;
+
+            SendMessageOnConnection( client.conn, msg );
+          }
+
+          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+            InterfaceEvent::ID::ClientReceivedCommand,
+            msg.body.dump(),
+          } );
+        };
         default:
           break;
       }

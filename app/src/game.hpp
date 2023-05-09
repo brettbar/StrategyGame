@@ -202,6 +202,26 @@ class IGame
       );
     }
 
+    for ( auto player_e:
+          Global::world.view<Player::Component, Faction::Component>() )
+    {
+      Player::Component player =
+        Global::world.get<Player::Component>( player_e );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( player_e );
+
+      std::cout << "Initialized Player: " << player.player_id << '\n';
+      std::cout << "Faction: " << faction.id << '\n';
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) )
+      {
+        std::cout << "with LocalTag!" << '\n';
+      }
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) )
+      {
+        std::cout << "with RemoteTag!" << '\n';
+      }
+    }
+
     SelectionSystem::Start();
 
     Game()->_mode = ProgramMode::Campaign;
@@ -232,6 +252,26 @@ class IGame
         Global::world.emplace<Player::RemoteTag>( player );
 
       Global::world.emplace<Faction::Component>( player, peer.faction );
+    }
+
+    for ( auto player_e:
+          Global::world.view<Player::Component, Faction::Component>() )
+    {
+      Player::Component player =
+        Global::world.get<Player::Component>( player_e );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( player_e );
+
+      std::cout << "Initialized Player: " << player.player_id << '\n';
+      std::cout << "Faction: " << faction.id << '\n';
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) )
+      {
+        std::cout << "with LocalTag!" << '\n';
+      }
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) )
+      {
+        std::cout << "with RemoteTag!" << '\n';
+      }
     }
 
     SelectionSystem::Start();
