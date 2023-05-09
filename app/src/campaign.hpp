@@ -223,7 +223,7 @@ inline void Campaign::CheckForInput()
   if ( IsMouseButtonPressed( 1 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { CommandType::Move, player_e, "Player move" } );
+      PostCommand( { CommandType::Move, player_e, "Player move", click_pos } );
   }
 
   if ( IsKeyPressed( KEY_P ) )
@@ -315,7 +315,7 @@ inline void Campaign::Receive( const Command &cmd )
     }
     case CommandType::Move:
     {
-      MovementSystem::SetDestinations( Global::state.camera );
+      MovementSystem::SetDestinations( cmd.click_pos );
       return;
     }
   }
