@@ -34,7 +34,6 @@ enum class CommandType
 {
   TimeChange,
   Spawn,
-  Selection,
   Move,
 };
 
@@ -215,9 +214,9 @@ inline void Campaign::CheckForInput()
   if ( IsMouseButtonPressed( 0 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand(
-        { CommandType::Selection, player_e, "Player select", click_pos }
-      );
+    {
+      SelectionSystem::UpdateSelection( click_pos, "player_0" );
+    }
   }
 
   if ( IsMouseButtonPressed( 1 ) )
@@ -321,12 +320,16 @@ inline void Campaign::Receive( const Command &cmd )
     }
     case CommandType::Spawn:
     {
-      HandleSpawnRequest( cmd );
-      return;
-    }
-    case CommandType::Selection:
-    {
-      SelectionSystem::UpdateSelection( cmd.click_pos );
+      if ( cmd.msg == "Player spawn Villager" )
+      {
+        ActorSystem::SpawnColonist( cmd.player_e, cmd.click_pos );
+        return;
+      }
+
+      if ( cmd.msg == "Player spawn City" )
+      {
+        ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
+      }
       return;
     }
     case CommandType::Move:
@@ -381,18 +384,3 @@ inline void Campaign::HandleTimeChangeRequest( const Command &cmd )
     return;
   }
 }
-
-inline void Campaign::HandleSpawnRequest( const Command &cmd )
-{
-
-  if ( cmd.msg == "Player spawn Villager" )
-  {
-    ActorSystem::SpawnColonist( cmd.player_e, cmd.click_pos );
-    return;
-  }
-
-  if ( cmd.msg == "Player spawn City" )
-  {
-    ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
-  }
-};

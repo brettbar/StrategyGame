@@ -5,6 +5,7 @@
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
 #include "../components/actor.hpp"
+#include "../components/player.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
 #include "../components/unit.hpp"
@@ -19,8 +20,6 @@ namespace SelectionSystem
 
   template<typename T>
   inline void ClearSelection( View<T> );
-  inline void CheckSelectUnits( vec2 );
-  inline void CheckSelectProvince( vec2 );
 
   template<typename T>
   inline void ClearSelection( View<T> component_view )
@@ -120,22 +119,24 @@ namespace SelectionSystem
     }
   }
 
-  inline void UpdateSelection( Vector2 click_pos )
-  {
-    View<Unit::Component> units_view = Global::world.view<Unit::Component>();
-    View<Province::Component> prov_view =
-      Global::world.view<Province::Component>();
 
-    ClearSelection<Unit::Component>( units_view );
-    ClearSelection<Province::Component>( prov_view );
-
-    CheckSelectUnits( click_pos );
-    CheckSelectProvince( click_pos );
-  }
-
-  inline void CheckSelectUnits( vec2 click_pos )
+  inline void CheckSelectUnits( vec2 click_pos, std::string player_id )
   {
     auto units_view = Global::world.view<Unit::Component>();
+    auto player_view = Global::world.view<Player::Component>();
+
+    entt::entity owner_e = entt::null;
+
+    for ( auto player_e: player_view )
+    {
+      Player::Component player_c =
+        player_view.get<Player::Component>( player_e );
+
+      if ( player_id == player_c.player_id )
+      {
+        owner_e = player_e;
+      }
+    }
 
     // use forward iterators and get only the components of interest
     for ( auto &entity: units_view )
@@ -145,9 +146,12 @@ namespace SelectionSystem
 
       Unit::Component &unit = units_view.get<Unit::Component>( entity );
 
+      if ( unit.owner != owner_e )
+        continue;
+
       if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) )
       {
-        Global::world.emplace<Selected::Component>( entity, true );
+        Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
         std::cout << EntityIdToString( unit.owner ) << std::endl;
@@ -158,7 +162,7 @@ namespace SelectionSystem
     }
   }
 
-  inline void CheckSelectProvince( vec2 click_pos )
+  inline void CheckSelectProvince( vec2 click_pos, std::string player_id )
   {
     i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
     auto prov_view = Global::world.view<Province::Component>();
@@ -175,7 +179,7 @@ namespace SelectionSystem
 
       if ( tile_pos_id == prov.tile->id )
       {
-        Global::world.emplace<Selected::Component>( entity, true );
+        Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
         std::cout << EntityIdToString( prov.owner ) << std::endl;
@@ -194,6 +198,19 @@ namespace SelectionSystem
       //   alreadyFoundOne = true;
       // }
     }
+  }
+
+  inline void UpdateSelection( Vector2 click_pos, std::string player_id )
+  {
+    View<Unit::Component> units_view = Global::world.view<Unit::Component>();
+    View<Province::Component> prov_view =
+      Global::world.view<Province::Component>();
+
+    ClearSelection<Unit::Component>( units_view );
+    ClearSelection<Province::Component>( prov_view );
+
+    CheckSelectUnits( click_pos, player_id );
+    CheckSelectProvince( click_pos, player_id );
   }
 
 

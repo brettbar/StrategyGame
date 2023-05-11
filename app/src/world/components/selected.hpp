@@ -2,10 +2,12 @@
 
 #include "../../shared/common.hpp"
 
-namespace Selected {
+namespace Selected
+{
 
-struct Component {
-  bool isSelected;
-};
+  struct Component
+  {
+    std::string selected_by_player_id;
+  };
 
 }// namespace Selected
