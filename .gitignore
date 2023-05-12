@@ -11,4 +11,3 @@ cmake-build-debug/
 net/target/
 x64/
 packages/
-compile_commands.json

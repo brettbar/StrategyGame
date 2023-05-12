@@ -25,7 +25,7 @@ namespace Network
   inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
   // TODO this should have a better system later, but for now it will do
-  inline const bool LOCAL = true;
+  inline const bool LOCAL = false;
 
   inline bool is_host = false;
 
