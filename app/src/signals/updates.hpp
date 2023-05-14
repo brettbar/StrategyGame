@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../shared/common.hpp"
-#include <steamclientpublic.h>
+#include <steam/steamclientpublic.h>
 
 
 // Used for sending data from the Game State to the UI

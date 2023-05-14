@@ -11,10 +11,10 @@
 
 #include "renderer/renderer.hpp"
 
-#include "campaign.hpp"
 #include "signals/updates.hpp"
 #include "world/systems/selection_system.hpp"
-#include <raylib.h>
+
+#include "campaign.hpp"
 
 enum class ProgramMode
 {
@@ -31,11 +31,6 @@ class IGame
   {
     static IGame instance;
     return &instance;
-  }
-
-  Campaign *Campaign()
-  {
-    return _campaign;
   }
 
   void MainLoop()
@@ -94,8 +89,13 @@ class IGame
     ExitGameLoopCleanup();
   }
 
+  Campaign *GetCampaign()
+  {
+    return _campaign;
+  }
+
   private:
-  class Campaign *_campaign = nullptr;
+  Campaign *_campaign;
   bool _single_player = true;
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
@@ -118,7 +118,10 @@ class IGame
   void operator=( const IGame & ) = delete;
 
   IGame() {}
-  ~IGame() {}
+  ~IGame()
+  {
+    delete _campaign;
+  }
 
   bool ShouldRun()
   {
@@ -178,7 +181,7 @@ class IGame
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new class Campaign( false );
+    _campaign = new Campaign( false );
 
     UI::System::EnableCampaignUI();
 
