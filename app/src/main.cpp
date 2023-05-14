@@ -178,7 +178,7 @@ void LoadResources()
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "blueOverlay" },
+    hstr{ "cyanOverlay" },
     LoadImage( ( asset_folder + "/images/overlays/Blue.png" ).c_str() ),
     Global::texture_cache
   );

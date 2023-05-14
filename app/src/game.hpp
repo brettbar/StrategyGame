@@ -145,7 +145,9 @@ class IGame
       player, player, "player_0", true
     );
     Global::world.emplace<Player::LocalTag>( player );
-    Global::world.emplace<Faction::Component>( player, player_faction );
+    Global::world.emplace<Faction::Component>(
+      player, FactionSystem::factions.at( player_faction )
+    );
 
     Game()->_mode = ProgramMode::Campaign;
   }
@@ -196,7 +198,7 @@ class IGame
         Global::world.emplace<Player::RemoteTag>( player );
 
       Global::world.emplace<Faction::Component>(
-        player, client.peer_data.faction
+        player, FactionSystem::factions.at( client.peer_data.faction )
       );
     }
 
