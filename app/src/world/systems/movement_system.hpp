@@ -11,30 +11,31 @@ namespace MovementSystem
 {
 
   // REFACTOR
-  inline void SetDestinations( Vector2 click_pos )
+  inline void SetDestinations( entt::entity entity, Vector2 click_pos )
   {
-    entt::basic_view view =
-      Global::world
-        .view<Unit::Component, Animated::Component, Selected::Component>();
+    // entt::basic_view view =
+    //   Global::world
+    //     .view<Unit::Component, Animated::Component, Selected::Component>();
 
-    for ( auto entity: view )
+    // for ( auto entity: view )
+    // {
+    Unit::Component &unit = Global::world.get<Unit::Component>( entity );
+    Animated::Component &anim =
+      Global::world.get<Animated::Component>( entity );
+
+
+    std::unique_ptr<Vector2> dest_tile = DetermineTilePos( click_pos );
+
+    if ( dest_tile != nullptr )
     {
-      Unit::Component &unit = view.get<Unit::Component>( entity );
-      Animated::Component &anim = view.get<Animated::Component>( entity );
+      unit.destination = *dest_tile;
 
-
-      std::unique_ptr<Vector2> dest_tile = DetermineTilePos( click_pos );
-
-      if ( dest_tile != nullptr )
-      {
-        unit.destination = *dest_tile;
-
-        if ( unit.destination.x > unit.position.x )
-          anim.direction = Animated::IDLE_DR;
-        else if ( unit.destination.x < unit.position.x )
-          anim.direction = Animated::IDLE_DL;
-      }
+      if ( unit.destination.x > unit.position.x )
+        anim.direction = Animated::IDLE_DR;
+      else if ( unit.destination.x < unit.position.x )
+        anim.direction = Animated::IDLE_DL;
     }
+    // }
   }
 
   inline void Update(

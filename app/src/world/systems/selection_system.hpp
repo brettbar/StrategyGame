@@ -35,53 +35,6 @@ namespace SelectionSystem
     }
   }
 
-
-  // TODO(rf) replace both of these with Messages, probably dont need to be in here either
-  inline void ListenForSelect( entt::registry &game_reg, entt::entity entity )
-  {
-    printf( "SelectListener?\n" );
-    if ( game_reg.all_of<Province::Component>( entity ) )
-    {
-      // InterfaceUpdate::EnabledUpdate(
-      //   InterfaceUpdate::ID::SettlementContext, true
-      // )
-      //   .send();
-
-      // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
-      //   .send();
-    }
-    else if ( game_reg.all_of<Actor::Component>( entity ) )
-    {
-      // InterfaceUpdate::EnabledUpdate(
-      //   InterfaceUpdate::ID::SettlementContext, false
-      // )
-      //   .send();
-
-      // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, true )
-      //   .send();
-    }
-  }
-  inline void ListenForDeselect()
-  {
-    printf( "DeSelectListener?\n" );
-
-    // InterfaceUpdate::EnabledUpdate(
-    //   InterfaceUpdate::ID::SettlementContext, false
-    // )
-    //   .send();
-
-    // InterfaceUpdate::EnabledUpdate( InterfaceUpdate::ID::ActorContext, false )
-    //   .send();
-  }
-
-  inline void Start()
-  {
-    Global::world.on_construct<Selected::Component>().connect<&ListenForSelect>(
-    );
-    Global::world.on_destroy<Selected::Component>().connect<&ListenForDeselect>(
-    );
-  }
-
   inline void Draw( TextureCache &cache, bool isDebug )
   {
     auto unitsView = Global::world.view<Selected::Component, Unit::Component>();

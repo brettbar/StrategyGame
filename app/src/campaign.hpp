@@ -44,6 +44,7 @@ struct Command
 
   std::string msg;
   Vector2 click_pos;
+  entt::entity entity;
 };
 
 class Campaign
@@ -215,14 +216,43 @@ inline void Campaign::CheckForInput()
   {
     if ( !UI::Manager()->MouseIsOverUI() )
     {
-      SelectionSystem::UpdateSelection( click_pos, "player_0" );
+      if ( _is_singleplayer )
+        SelectionSystem::UpdateSelection( click_pos, "player_0" );
+      else if ( Network::is_host )
+      {
+        SelectionSystem::UpdateSelection( click_pos, "player_0" );
+      }
+      else
+      {
+        SelectionSystem::UpdateSelection(
+          click_pos, Network::Client()->_local_player_id
+        );
+      }
     }
   }
 
   if ( IsMouseButtonPressed( 1 ) )
   {
     if ( !UI::Manager()->MouseIsOverUI() )
-      PostCommand( { CommandType::Move, player_e, "Player move", click_pos } );
+    {
+      auto selected_e =
+        Global::world
+          .view<Unit::Component, Animated::Component, Selected::Component>()
+          .front();
+
+      if ( selected_e != entt::null )
+      {
+        std::cout << "Moving entity: " << EntityIdToString( selected_e )
+                  << '\n';
+        PostCommand( {
+          CommandType::Move,
+          player_e,
+          "Player move",
+          click_pos,
+          selected_e,
+        } );
+      }
+    }
   }
 
   if ( IsKeyPressed( KEY_P ) )
@@ -247,6 +277,7 @@ inline void Campaign::ConvertCommandRequest( std::string str )
   std::string cmd_msg = body["cmd_msg"];
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
+  entt::entity entity = body["entity"];
 
   auto players = Global::world.view<Player::Component>();
 
@@ -264,6 +295,7 @@ inline void Campaign::ConvertCommandRequest( std::string str )
         .player_e = player,
         .msg = cmd_msg,
         .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
+        .entity = entity,
       } );
     }
   }
@@ -288,6 +320,7 @@ inline void Campaign::PostCommand( Command cmd )
           { "cmd_msg", cmd.msg },
           { "cmd_pos.x", cmd.click_pos.x },
           { "cmd_pos.y", cmd.click_pos.y },
+          { "entity", cmd.entity },
         },
       } );
       _command_queue.enqueue( cmd );
@@ -302,6 +335,7 @@ inline void Campaign::PostCommand( Command cmd )
           { "cmd_msg", cmd.msg },
           { "cmd_pos.x", cmd.click_pos.x },
           { "cmd_pos.y", cmd.click_pos.y },
+          { "entity", cmd.entity },
         },
       } );
     }
@@ -334,7 +368,7 @@ inline void Campaign::Receive( const Command &cmd )
     }
     case CommandType::Move:
     {
-      MovementSystem::SetDestinations( cmd.click_pos );
+      MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }
   }

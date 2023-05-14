@@ -147,8 +147,6 @@ class IGame
     Global::world.emplace<Player::LocalTag>( player );
     Global::world.emplace<Faction::Component>( player, player_faction );
 
-    SelectionSystem::Start();
-
     Game()->_mode = ProgramMode::Campaign;
   }
   /*=============================================================
@@ -222,7 +220,6 @@ class IGame
       }
     }
 
-    SelectionSystem::Start();
 
     Game()->_mode = ProgramMode::Campaign;
   }
@@ -273,8 +270,6 @@ class IGame
         std::cout << "with RemoteTag!" << '\n';
       }
     }
-
-    SelectionSystem::Start();
 
     Game()->_mode = ProgramMode::Campaign;
   }
