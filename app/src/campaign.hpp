@@ -71,6 +71,8 @@ class Campaign
     // delete _command_queue;
   }
 
+  std::string GetLocalPlayerID();
+
   void CheckForInput();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
@@ -91,6 +93,18 @@ class Campaign
   void Start();
   void Load();
 };
+
+inline std::string Campaign::GetLocalPlayerID()
+{
+  if ( _is_singleplayer || Network::is_host )
+  {
+    return "player_0";
+  }
+  else
+  {
+    return Network::Client()->_local_player_id;
+  }
+}
 
 inline void Campaign::Start()
 {
@@ -216,18 +230,7 @@ inline void Campaign::CheckForInput()
   {
     if ( !UI::Manager()->MouseIsOverUI() )
     {
-      if ( _is_singleplayer )
-        SelectionSystem::UpdateSelection( click_pos, "player_0" );
-      else if ( Network::is_host )
-      {
-        SelectionSystem::UpdateSelection( click_pos, "player_0" );
-      }
-      else
-      {
-        SelectionSystem::UpdateSelection(
-          click_pos, Network::Client()->_local_player_id
-        );
-      }
+      SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
@@ -310,18 +313,20 @@ inline void Campaign::PostCommand( Command cmd )
   }
   else
   {
+    auto body = nlohmann::json{
+      { "cmd_player", GetLocalPlayerID() },
+      { "cmd_type", cmd.type },
+      { "cmd_msg", cmd.msg },
+      { "cmd_pos.x", cmd.click_pos.x },
+      { "cmd_pos.y", cmd.click_pos.y },
+      { "entity", cmd.entity },
+    };
+
     if ( Network::is_host )
     {
       Network::Host()->SendMessageToAllActiveClients( Network::Message{
         Network::MessageID::Command,
-        nlohmann::json{
-          { "cmd_player", "player_0" },
-          { "cmd_type", cmd.type },
-          { "cmd_msg", cmd.msg },
-          { "cmd_pos.x", cmd.click_pos.x },
-          { "cmd_pos.y", cmd.click_pos.y },
-          { "entity", cmd.entity },
-        },
+        body,
       } );
       _command_queue.enqueue( cmd );
     }
@@ -329,14 +334,7 @@ inline void Campaign::PostCommand( Command cmd )
     {
       Network::Client()->SendMessageToHost( Network::Message{
         Network::MessageID::Command,
-        nlohmann::json{
-          { "cmd_player", Network::Client()->_local_player_id },
-          { "cmd_type", cmd.type },
-          { "cmd_msg", cmd.msg },
-          { "cmd_pos.x", cmd.click_pos.x },
-          { "cmd_pos.y", cmd.click_pos.y },
-          { "entity", cmd.entity },
-        },
+        body,
       } );
     }
   }
