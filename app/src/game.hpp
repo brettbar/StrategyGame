@@ -250,7 +250,9 @@ class IGame
       else
         Global::world.emplace<Player::RemoteTag>( player );
 
-      Global::world.emplace<Faction::Component>( player, peer.faction );
+      Global::world.emplace<Faction::Component>(
+        player, FactionSystem::factions.at( peer.faction )
+      );
     }
 
     for ( auto player_e:
