@@ -13,6 +13,7 @@ namespace UI
   {
     return {
       Panel( "settlement_context_panel" )
+        .SetAnchor( Anchor::BottomMid )
         .Background( Fade( BLACK, 0.5 ) )
         .On(
           InterfaceUpdate::ID::SettlementContext,
@@ -24,23 +25,23 @@ namespace UI
               self.Disable();
           }
         )
-      // .Children( {
-      //   Panel( "settlement_context_tab_group" )
-      //     .SetAxis( Axis::Column )
-      //     .Background( BLUE ),
-      //   StackPanel( "settlement_context_content" )
-      //     .Background( RED )
-      //     .Children( {
-      //       Panel( "settlement_context_overview" )
-      //         .Children( {
-      //           TextLabel( "settlement_name" ).SetText( "Uninhabited", 26 ),
-      //           TextLabel( "settlement_population" )
-      //             .SetText( "Uninhabited", 26 ),
-      //           TextLabel( "settlement_development" )
-      //             .SetText( "Uninhabited", 26 ),
-      //         } ),
-      //     } ),
-      // } ),
+        .Children( {
+          Panel( "settlement_context_tab_group" )
+            .SetAxis( Axis::Column )
+            .Background( BLUE ),
+          StackPanel( "settlement_context_content" )
+            .Background( RED )
+            .Children( {
+              Panel( "settlement_context_overview" )
+                .Children( {
+                  TextLabel( "settlement_name" ).SetText( "Uninhabited", 26 ),
+                  TextLabel( "settlement_population" )
+                    .SetText( "Uninhabited", 26 ),
+                  TextLabel( "settlement_development" )
+                    .SetText( "Uninhabited", 26 ),
+                } ),
+            } ),
+        } ),
       //
       //
       //

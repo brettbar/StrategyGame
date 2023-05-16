@@ -289,6 +289,18 @@ public:
               transform.x = updated_pos.x;
               transform.y = updated_pos.y;
             }
+            break;
+            case Anchor::BottomMid:
+            {
+              vec2 updated_pos = {
+                ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
+                ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
+              };
+
+              transform.x = updated_pos.x;
+              transform.y = updated_pos.y;
+            }
+            break;
             default:
               break;
           }
