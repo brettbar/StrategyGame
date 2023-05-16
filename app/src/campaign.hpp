@@ -49,7 +49,6 @@ struct Command
 
 class Campaign
 {
-
   public:
   Campaign( bool is_singleplayer )
   {

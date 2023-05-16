@@ -13,7 +13,7 @@
 #include "../shared/utils.hpp"
 #include "network.hpp"
 #include <chrono>
-#include <isteammatchmaking.h>
+#include <steam/isteammatchmaking.h>
 
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
