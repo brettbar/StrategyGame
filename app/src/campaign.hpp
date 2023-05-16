@@ -82,6 +82,7 @@ class Campaign
   void HandleSpawnRequest( const Command & );
   void HandleTimeChangeRequest( const Command & );
 
+  void ForwardEvent( const InterfaceEvent::Data & );
   void ConvertCommandRequest( std::string );
 
 
@@ -151,12 +152,12 @@ inline void Campaign::Update60TPS()
 {
   auto animated_units =
     Global::world.view<Unit::Component, Animated::Component>();
-
   auto players = Global::world.view<Player::Component>();
 
   MovementSystem::Update( animated_units, Global::state.timeScale );
   AnimationSystem::Update( animated_units, Global::state.timeScale );
   PlayerSystem::Update( players );
+  ActorSystem::EvaluateActorActions();
   //  Terrain::UpdateFOW(reg);
 }
 
@@ -176,6 +177,29 @@ inline void Campaign::Update1TPS()
     Global::state.year++;
     Global::state.month = 1;
   }
+}
+
+inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
+{
+  Vector2 click_pos =
+    GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
+
+  auto player_e =
+    Global::world.view<Player::Component, Player::LocalTag>().front();
+
+  if ( player_e == entt::null )
+  {
+    std::cout << "ERROR"
+              << " no local player was found" << '\n';
+    return;
+  }
+
+  PostCommand( Command{
+    .type = CommandType::Spawn,
+    .player_e = player_e,
+    .msg = "Player spawn Settlement",
+    .click_pos = click_pos,
+  } );
 }
 
 inline void Campaign::CheckForInput()
@@ -220,8 +244,12 @@ inline void Campaign::CheckForInput()
 
   if ( IsKeyPressed( KEY_C ) )
   {
+    // TODO rename to took ownership
     PostCommand(
-      { CommandType::Spawn, player_e, "Player spawn City", click_pos }
+      { CommandType::Spawn,
+        player_e,
+        "Player taking ownership of Province",
+        click_pos }
     );
   }
 
@@ -357,10 +385,17 @@ inline void Campaign::Receive( const Command &cmd )
         return;
       }
 
-      if ( cmd.msg == "Player spawn City" )
+      if ( cmd.msg == "Player taking ownership of Province" )
       {
         ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
       }
+
+      if ( cmd.msg == "Player spawn Settlement" )
+      {
+        SettlementSystem::SpawnSettlement();
+      }
+
+
       return;
     }
     case CommandType::Move:

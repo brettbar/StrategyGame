@@ -624,6 +624,13 @@ inline void IGame::RegisterEventListeners()
         }
         break;
 
+        case InterfaceEvent::ID::ActorSpawnSettlment:
+        {
+          if ( _campaign )
+            _campaign->ForwardEvent( event );
+        }
+        break;
+
         default:
           printf( "Error, unregistered UI event fired\n" );
           break;

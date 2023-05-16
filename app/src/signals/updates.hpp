@@ -19,6 +19,7 @@ namespace InterfaceUpdate
     PlayerJoinedLobby,
     SettlementContext,
     ActorContext,
+    ActorCanSpawnSettlement,
     JoinLobby,
     HostLobby,
     PlayerToggledReady,

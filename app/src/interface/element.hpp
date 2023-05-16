@@ -69,6 +69,7 @@ public:
     friend class StackPanelBuilder;
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
+    friend class TextureButtonBuilder;
 
     Type type = Type::INVALID;
     std::string id = "INVALID";
@@ -83,7 +84,6 @@ public:
     Axis children_axis = Axis::INVALID;
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
-    bool abs_size = false;
     std::vector<Element> children = {};
     std::function<void( std::vector<Element> & )> update_children = {};
     std::vector<InterfaceUpdate::ID> subscribed_updates = {};
@@ -294,7 +294,7 @@ public:
             {
               vec2 updated_pos = {
                 ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
-                ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
+                ( (f32) GetScreenHeight() ) - ( transform.height ),
               };
 
               transform.x = updated_pos.x;
@@ -335,7 +335,7 @@ public:
           f32 end_of_last_x = transform.x;
           f32 end_of_last_y = transform.y;
 
-          Update();
+          AddRemoveChildren();
 
           for ( Element &child: children )
           {
@@ -346,33 +346,30 @@ public:
             child.Resize();
           }
 
-          if ( !abs_size )
+          for ( Element &child: children )
           {
-            for ( Element &child: children )
-            {
-              if ( !child.enabled )
-                continue;
+            if ( !child.enabled )
+              continue;
 
-              total_width += child.transform.width;
-              total_height += child.transform.height;
+            total_width += child.transform.width;
+            total_height += child.transform.height;
 
-              if ( child.transform.width > widest_child )
-                widest_child = child.transform.width;
+            if ( child.transform.width > widest_child )
+              widest_child = child.transform.width;
 
-              if ( child.transform.height > tallest_child )
-                tallest_child = child.transform.height;
-            }
+            if ( child.transform.height > tallest_child )
+              tallest_child = child.transform.height;
+          }
 
-            if ( children_axis == Axis::Row )
-            {
-              transform.width = total_width;
-              transform.height = tallest_child;
-            }
-            else if ( children_axis == Axis::Column )
-            {
-              transform.width = widest_child;
-              transform.height = total_height;
-            }
+          if ( children_axis == Axis::Row )
+          {
+            transform.width = total_width;
+            transform.height = tallest_child;
+          }
+          else
+          {
+            transform.width = widest_child;
+            transform.height = total_height;
           }
 
 
@@ -438,6 +435,8 @@ public:
           children[curr_index].transform.x = transform.x;
           children[curr_index].transform.y = transform.y;
           children[curr_index].Resize();
+          transform.width = children[curr_index].transform.width;
+          transform.height = children[curr_index].transform.height;
         }
         break;
         case Type::TextButton:
@@ -510,9 +509,8 @@ public:
       }
     }
 
-    // TODO rename or remove
-    // probably to add_remove_children?
-    void Update()
+    // TODO do we really need this?
+    void AddRemoveChildren()
     {
       if ( !enabled )
         return;
@@ -651,50 +649,6 @@ public:
       if ( on_click )
         InterfaceEvent::event_emitter.publish( *on_click );
     }
-
-    // void ReceiveUpdate( const InterfaceUpdate::Update &update )
-    // {
-    //   std::cout << "Update Received " << update.id << '\n';
-    //   if ( updates.contains( update.id ) )
-    //   {
-    //     std::cout << "Update Contains" << update.id << '\n';
-    //     updates[update.id]( *this, update );
-    //   }
-    // }
-
-    // void SubscribeToUpdates()
-    // {
-    //   switch ( type )
-    //   {
-    //     case Type::Panel:
-    //     {
-    //       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-    //         .connect<&Element::ReceiveUpdate>( this );
-
-    //       for ( auto &child: children )
-    //       {
-    //         child.SubscribeToUpdates();
-    //       }
-    //     }
-    //     break;
-    //     case Type::StackPanel:
-    //     {
-    //       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-    //         .connect<&Element::ReceiveUpdate>( this );
-
-    //       children[curr_index].SubscribeToUpdates();
-    //     }
-    //     break;
-    //     default:
-    //       break;
-    //   }
-    // }
-
-    // void UnsubscribeFromUpdates()
-    // {
-    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-    //     .disconnect<&Element::ReceiveUpdate>( this );
-    // }
   };
 
   class AbstractBuilder
@@ -914,6 +868,20 @@ public:
     }
   };
 
+  class TextureButtonBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit TextureButtonBuilder( std::string id )
+        : AbstractBuilder{ _element }
+    {
+      _element.type = Type::TextureButton;
+      _element.id = id;
+      _element.texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
+    }
+  };
+
 
   inline PanelBuilder Panel( std::string id )
   {
@@ -933,6 +901,11 @@ public:
   inline TextButtonBuilder TextButton( std::string id )
   {
     return TextButtonBuilder{ id };
+  }
+
+  inline TextureButtonBuilder TextureButton( std::string id )
+  {
+    return TextureButtonBuilder{ id };
   }
 
 };// namespace UI

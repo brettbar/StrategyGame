@@ -15,7 +15,7 @@
 
 namespace SelectionSystem
 {
-
+  // TODO rf this
   inline entt::entity selected_entity = entt::null;
 
   template<typename T>
@@ -33,11 +33,21 @@ namespace SelectionSystem
       component.selected = false;
       Global::world.remove<Selected::Component>( entity );
     }
+
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::SettlementContext,
+      .condition = false,
+    }
+      .Send();
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::ActorContext,
+      .condition = false,
+    }
+      .Send();
   }
 
   inline void Draw( TextureCache &cache, bool isDebug )
   {
-    auto unitsView = Global::world.view<Selected::Component, Unit::Component>();
     auto provsView =
       Global::world.view<Province::Component, Selected::Component>();
 
@@ -111,6 +121,14 @@ namespace SelectionSystem
 
         unit.selected = true;
         selected_entity = entity;
+
+        InterfaceUpdate::Update{
+          .id = InterfaceUpdate::ID::ActorContext,
+          .condition = true,
+        }
+          .Send();
+
+        return;
       }
     }
   }
@@ -138,8 +156,6 @@ namespace SelectionSystem
         std::cout << EntityIdToString( prov.owner ) << std::endl;
 
         selected_entity = entity;
-
-        std::cout << "Selected Province !!!!!!" << '\n';
 
         InterfaceUpdate::Update{
           .id = InterfaceUpdate::ID::SettlementContext,

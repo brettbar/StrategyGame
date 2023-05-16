@@ -57,6 +57,25 @@ namespace ActorSystem
     return false;
   }
 
+  inline void EvaluateActorActions()
+  {
+    if ( ColonistCanPlaceSettlement() )
+    {
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ActorCanSpawnSettlement,
+        .condition = true,
+      }
+        .Send();
+    }
+    else
+    {
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ActorCanSpawnSettlement,
+        .condition = false,
+      }
+        .Send();
+    }
+  }
 
   inline void CreateColonist( entt::entity owner, Vector2 spawn )
   {

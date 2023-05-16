@@ -136,7 +136,7 @@ namespace UI
 
       Manager()->debug.Resize();
       Manager()->debug.Reposition();
-      Manager()->debug.Update();
+      Manager()->debug.AddRemoveChildren();
 
       if ( !Manager()->over_any_elem )
         Manager()->SetContextNull();
