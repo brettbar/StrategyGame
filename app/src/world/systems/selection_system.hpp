@@ -138,6 +138,16 @@ namespace SelectionSystem
         std::cout << EntityIdToString( prov.owner ) << std::endl;
 
         selected_entity = entity;
+
+        std::cout << "Selected Province !!!!!!" << '\n';
+
+        InterfaceUpdate::Update{
+          .id = InterfaceUpdate::ID::SettlementContext,
+          .condition = true,
+        }
+          .Send();
+
+        return;
       }
 
       // if ( CheckCollisionPointCircle(

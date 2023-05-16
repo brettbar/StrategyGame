@@ -467,8 +467,39 @@ public:
       clickable = new_clickable;
     }
 
+    // TODO rename
+    void RealUpdate( const InterfaceUpdate::Update &update )
+    {
+      switch ( type )
+      {
+        case Type::Panel:
+        {
+          if ( updates.contains( update.id ) )
+            updates[update.id]( *this, update );
+
+          for ( auto &child: children )
+          {
+            child.RealUpdate( update );
+          }
+        }
+        break;
+        case Type::StackPanel:
+        {
+          if ( updates.contains( update.id ) )
+            updates[update.id]( *this, update );
+
+          children[curr_index].RealUpdate( update );
+        }
+        break;
+        default:
+          if ( updates.contains( update.id ) )
+            updates[update.id]( *this, update );
+          break;
+      }
+    }
 
     // TODO rename or remove
+    // probably to add_remove_children?
     void Update()
     {
       if ( !enabled )
@@ -609,47 +640,49 @@ public:
         InterfaceEvent::event_emitter.publish( *on_click );
     }
 
-    void ReceiveUpdate( const InterfaceUpdate::Update &update )
-    {
-      if ( updates.contains( update.id ) )
-      {
-        updates[update.id]( *this, update );
-      }
-    }
+    // void ReceiveUpdate( const InterfaceUpdate::Update &update )
+    // {
+    //   std::cout << "Update Received " << update.id << '\n';
+    //   if ( updates.contains( update.id ) )
+    //   {
+    //     std::cout << "Update Contains" << update.id << '\n';
+    //     updates[update.id]( *this, update );
+    //   }
+    // }
 
-    void SubscribeToUpdates()
-    {
-      switch ( type )
-      {
-        case Type::Panel:
-        {
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-            .connect<&Element::ReceiveUpdate>( this );
-          for ( auto &child: children )
-          {
-            child.SubscribeToUpdates();
-          }
-        }
-        break;
-        case Type::StackPanel:
-        {
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-            .connect<&Element::ReceiveUpdate>( this );
-          children[curr_index].SubscribeToUpdates();
-        }
-        break;
-        default:
-          InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-            .connect<&Element::ReceiveUpdate>( this );
-          break;
-      }
-    }
+    // void SubscribeToUpdates()
+    // {
+    //   switch ( type )
+    //   {
+    //     case Type::Panel:
+    //     {
+    //       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
+    //         .connect<&Element::ReceiveUpdate>( this );
 
-    void UnsubscribeFromUpdates()
-    {
-      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
-        .disconnect<&Element::ReceiveUpdate>( this );
-    }
+    //       for ( auto &child: children )
+    //       {
+    //         child.SubscribeToUpdates();
+    //       }
+    //     }
+    //     break;
+    //     case Type::StackPanel:
+    //     {
+    //       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
+    //         .connect<&Element::ReceiveUpdate>( this );
+
+    //       children[curr_index].SubscribeToUpdates();
+    //     }
+    //     break;
+    //     default:
+    //       break;
+    //   }
+    // }
+
+    // void UnsubscribeFromUpdates()
+    // {
+    //   InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
+    //     .disconnect<&Element::ReceiveUpdate>( this );
+    // }
   };
 
   class AbstractBuilder
@@ -677,6 +710,22 @@ public:
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
+    }
+
+    PanelBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      _element.updates.emplace( update_id, update_fn );
+      return *this;
+    }
+
+    PanelBuilder &StartDisabled()
+    {
+      _element.starts_disabled = true;
+      return *this;
     }
 
     PanelBuilder &SetAnchor( Anchor anchor )

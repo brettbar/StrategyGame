@@ -14,39 +14,52 @@ namespace UI
     return {
       Panel( "settlement_context_panel" )
         .Background( Fade( BLACK, 0.5 ) )
-        // .ListensFor( { InterfaceUpdate::ID::SettlementContext } )
-        .Children( {
-          Panel( "settlement_context_tab_group" )
-            .SetAxis( Axis::Column )
-            .Background( BLUE ),
-          StackPanel( "settlement_context_content" )
-            .Background( RED )
-            .Children( {
-              Panel( "settlement_context_overview" )
-                .Children( {
-                  TextLabel( "settlement_name" ).SetText( "Uninhabited", 26 ),
-                  TextLabel( "settlement_population" )
-                    .SetText( "Uninhabited", 26 ),
-                  TextLabel( "settlement_development" )
-                    .SetText( "Uninhabited", 26 ),
-                } ),
-            } ),
-
-          Panel( "actor_context_panel" )
-            .Background( Fade( BLACK, 0.5 ) )
-            // .ListensFor( { InterfaceUpdate::ID::ActorContext } )
-            .Children( {
-              Panel( "actor_actions_panel" )
-                .Children( {
-                  TextButton( "actor_spawn_settlement_button" )
-                    .SetText( "Spawn?", 26 )
-                    .SetEvent( InterfaceEvent::Data(
-                      InterfaceEvent::ID::ActorSpawnSettlment
-                    ) ),
-                } ),
-            } ),
-
-        } ),
+        .On(
+          InterfaceUpdate::ID::SettlementContext,
+          []( Element &self, InterfaceUpdate::Update update ) {
+            std::cout << "InterfaceUpdate::ID::SettlementContext" << '\n';
+            if ( update.condition )
+              self.Enable();
+            else
+              self.Disable();
+          }
+        )
+      // .Children( {
+      //   Panel( "settlement_context_tab_group" )
+      //     .SetAxis( Axis::Column )
+      //     .Background( BLUE ),
+      //   StackPanel( "settlement_context_content" )
+      //     .Background( RED )
+      //     .Children( {
+      //       Panel( "settlement_context_overview" )
+      //         .Children( {
+      //           TextLabel( "settlement_name" ).SetText( "Uninhabited", 26 ),
+      //           TextLabel( "settlement_population" )
+      //             .SetText( "Uninhabited", 26 ),
+      //           TextLabel( "settlement_development" )
+      //             .SetText( "Uninhabited", 26 ),
+      //         } ),
+      //     } ),
+      // } ),
+      //
+      //
+      //
+      //
+      //
+      //
+      // Panel( "actor_context_panel" )
+      //   .Background( Fade( BLACK, 0.5 ) )
+      //   // .ListensFor( { InterfaceUpdate::ID::ActorContext } )
+      //   .Children( {
+      //     Panel( "actor_actions_panel" )
+      //       .Children( {
+      //         TextButton( "actor_spawn_settlement_button" )
+      //           .SetText( "Spawn?", 26 )
+      //           .SetEvent( InterfaceEvent::Data(
+      //             InterfaceEvent::ID::ActorSpawnSettlment
+      //           ) ),
+      //       } ),
+      //   } ),
     };
 
 

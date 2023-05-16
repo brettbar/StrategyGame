@@ -4,12 +4,15 @@
 #include "../components/selected.hpp"
 #include "map_system.hpp"
 
-namespace ProvinceSystem {
+namespace ProvinceSystem
+{
 
   inline void SetProvinceOwner( u32 owner );
 
-  inline void Init() {
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+  inline void Init()
+  {
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ )
+    {
       entt::entity prov_entity = Global::world.create();
 
       Province::Component prov = {
@@ -19,19 +22,24 @@ namespace ProvinceSystem {
         .resources = {},
       };
 
-      switch ( prov.tile->biome ) {
-        case Biome::Plains: {
+      switch ( prov.tile->biome )
+      {
+        case Biome::Plains:
+        {
           prov.resources.push_back( Resources::Natural::Trees );
-        } break;
+        }
+        break;
       }
 
       Global::world.emplace<Province::Component>( prov_entity, prov );
     }
   }
 
-  inline void Draw( Camera2D &camera ) {
+  inline void Draw( Camera2D &camera )
+  {
     Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
-    for ( auto entity: Global::world.view<Province::Component>() ) {
+    for ( auto entity: Global::world.view<Province::Component>() )
+    {
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
@@ -43,12 +51,15 @@ namespace ProvinceSystem {
       prov.tile->position.y - TILE_WIDTH >
         camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
       prov.tile->position.y + TILE_WIDTH <
-        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
+        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 )
+      {
         continue;
       }
 
-      switch ( prov.tile->biome ) {
-        case Biome::Plains: {
+      switch ( prov.tile->biome )
+      {
+        case Biome::Plains:
+        {
           // std::cout << "Foo!!!" << '\n';
           // std::cout << "Bar!!!" << '\n';
           DrawTextureV(
@@ -57,18 +68,21 @@ namespace ProvinceSystem {
             WHITE
           );
           // std::cout << "Baz!!!" << '\n';
-        } break;
+        }
+        break;
       }
     }
   }
 
-  inline void AssignProvince( entt::entity owner, Vector2 pos ) {
+  inline void AssignProvince( entt::entity owner, Vector2 pos )
+  {
     i32 prov_id = DetermineTileIdFromPosition( pos );
     assert( prov_id >= 0 );
 
     auto provinces = Global::world.view<Province::Component>();
 
-    for ( auto entity: provinces ) {
+    for ( auto entity: provinces )
+    {
       auto &prov = provinces.get<Province::Component>( entity );
 
       if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
@@ -127,12 +141,14 @@ namespace ProvinceSystem {
     }
   }
 
-  inline void SetProvinceOwner( entt::entity owner ) {
+  inline void SetProvinceOwner( entt::entity owner )
+  {
     auto selectedView =
       Global::world.view<Selected::Component, Unit::Component>();
     auto selectedEntity = selectedView.front();
 
-    if ( selectedEntity == entt::null ) {
+    if ( selectedEntity == entt::null )
+    {
       printf( "No selected entity, cancelling\n" );
       return;
     }

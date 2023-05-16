@@ -11,6 +11,25 @@
 
 namespace UI
 {
+  struct UpdateListener
+  {
+    void ReceiveUpdate( const InterfaceUpdate::Update &update )
+    {
+      for ( auto &panel: Manager()->ActivePage() )
+      {
+        // TODO probably add a check that if the element is disabled we dont want to fire updates,
+        // UNLESS the update is dealing with enabled, in which case a disabled element should
+        // still be able to know if it got re-enabled
+        panel.RealUpdate( update );
+      }
+    }
+
+    void Listen()
+    {
+      InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
+        .connect<&UpdateListener::ReceiveUpdate>( this );
+    }
+  };
 
   namespace System
   {
@@ -39,6 +58,10 @@ namespace UI
         }
       }
 
+      UpdateListener listener{};
+
+      listener.Listen();
+
       Manager()->debug.Enable();
       Manager()->SetScene( MainMenu );
       EnableContent();
@@ -63,7 +86,7 @@ namespace UI
       {
         // base.Enable();
         base.InitialEnable();
-        base.SubscribeToUpdates();
+        // base.SubscribeToUpdates();
       }
     }
 

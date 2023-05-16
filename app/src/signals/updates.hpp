@@ -12,17 +12,6 @@ namespace InterfaceUpdate
     inline entt::dispatcher dispatcher{};
   };
 
-  enum class Type : u32
-  {
-    INVALID,
-    EnabledUpdate,
-    TextUpdate,
-    BackgroundUpdate,
-    ClickableUpdate,
-
-    NumTypes,
-  };
-
   enum ID
   {
     INVALID,
