@@ -23,18 +23,17 @@ namespace ActorSystem
   // 3. The province does not already contain a settlement
   inline bool ColonistCanPlaceSettlement()
   {
+    entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
     // 0. if the colonist isnt selected, bail
-    if ( SelectionSystem::selected_entity == entt::null || !Global::world.all_of<Unit::Component>( SelectionSystem::selected_entity ) )
+    if ( selected_entity == entt::null || !Global::world.all_of<Unit::Component>( selected_entity ) )
       return false;
-
 
     // 1. if the colonist is moving, bail
-    if ( MovementSystem::UnitIsMoving( SelectionSystem::selected_entity ) )
+    if ( MovementSystem::UnitIsMoving( selected_entity ) )
       return false;
 
-
     Unit::Component unit =
-      Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
+      Global::world.get<Unit::Component>( selected_entity );
 
     i32 closest_tile = DetermineTileIdFromPosition( unit.position );
 

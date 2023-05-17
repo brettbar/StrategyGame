@@ -76,8 +76,8 @@ namespace SettlementSystem
   inline void SpawnSettlement()
   {
     Unit::Component unit =
-      Global::world.get<Unit::Component>( SelectionSystem::selected_entity );
-    entt::entity unit_entity = SelectionSystem::selected_entity;
+      Global::world.get<Unit::Component>( SelectionSystem::GetSelectedEntity()
+      );
 
     vec2 pos = unit.position;
     i32 closest_tile = DetermineTileIdFromPosition( pos );
@@ -116,8 +116,7 @@ namespace SettlementSystem
 
             Global::world.emplace<Settlement::Component>( entity, settlement );
 
-            SelectionSystem::selected_entity = entt::null;
-            Global::world.destroy( unit_entity );
+            Global::world.destroy( SelectionSystem::GetSelectedEntity() );
             return;
           }
         }

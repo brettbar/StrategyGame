@@ -8,6 +8,7 @@
 #include "../components/player.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
+#include "../components/settlement.hpp"
 #include "../components/unit.hpp"
 
 #include "../../signals/updates.hpp"
@@ -15,18 +16,12 @@
 
 namespace SelectionSystem
 {
-  // TODO rf this
-  inline entt::entity selected_entity = entt::null;
-
   template<typename T>
   inline void ClearSelection( View<T> );
 
   template<typename T>
   inline void ClearSelection( View<T> component_view )
   {
-    // reg.clear<Selected::Component>();
-    selected_entity = entt::null;
-
     for ( entt::entity entity: component_view )
     {
       T &component = Global::world.get<T>( entity );
@@ -46,21 +41,15 @@ namespace SelectionSystem
       .Send();
   }
 
+  inline entt::entity GetSelectedEntity()
+  {
+    return Global::world.view<Selected::Component>().front();
+  }
+
   inline void Draw( TextureCache &cache, bool isDebug )
   {
     auto provsView =
       Global::world.view<Province::Component, Selected::Component>();
-
-    // for ( auto entity: unitsView ) {
-    //   Unit::Component &unit = unitsView.get<Unit::Component>( entity );
-    //   if ( isDebug ) {
-
-    //     // DrawRectangleLinesEx(
-    //     //   { unit.position.x - 32, unit.position.y - 32, 64, 64 },
-    //     //   2,
-    //     //   YELLOW );
-    //   }
-    // }
 
     for ( auto entity: provsView )
     {
@@ -74,10 +63,6 @@ namespace SelectionSystem
           prov.tile->position.y,
           WHITE
         );
-        // DrawRectangleLinesEx(
-        //   { prov.tile->position.x + 32, prov.tile->position.y + 32, 64, 64 },
-        //   2,
-        //   YELLOW );
       }
     }
   }
@@ -87,6 +72,7 @@ namespace SelectionSystem
   {
     auto units_view = Global::world.view<Unit::Component>();
     auto player_view = Global::world.view<Player::Component>();
+    auto selected_entity = Global::world.view<Selected::Component>().front();
 
     entt::entity owner_e = entt::null;
 
@@ -137,6 +123,7 @@ namespace SelectionSystem
   {
     i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
     auto prov_view = Global::world.view<Province::Component>();
+    auto selected_entity = Global::world.view<Selected::Component>().front();
 
     if ( tile_pos_id == -1 )
       return;
@@ -157,25 +144,42 @@ namespace SelectionSystem
 
         selected_entity = entity;
 
-        InterfaceUpdate::Update{
-          .id = InterfaceUpdate::ID::SettlementContext,
-          .condition = true,
+        if ( Global::world.all_of<Settlement::Component>( selected_entity ) )
+        {
+          Settlement::Component settlement =
+            Global::world.get<Settlement::Component>( selected_entity );
+
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::SettlementContext,
+            .condition = true,
+            .json =
+              {
+                { "name", settlement.name },
+                { "population",
+                  std::to_string( settlement.population.current ) },
+                { "development",
+                  Settlement::dev_names.at( settlement.development ) },
+              },
+          }
+            .Send();
         }
-          .Send();
+        else
+        {
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::SettlementContext,
+            .condition = true,
+            .json =
+              {
+                { "name", "Uninhabited" },
+                { "population", "Uninhabited" },
+                { "development", "Uninhabited" },
+              },
+          }
+            .Send();
+        }
 
         return;
       }
-
-      // if ( CheckCollisionPointCircle(
-      //        Vector2{ prov.tile->position.x + 32, prov.tile->position.y + 32 },
-      //        clickPos,
-      //        64 ) ) {
-
-
-      //   reg.emplace<Selected::Component>( entity, true );
-
-      //   alreadyFoundOne = true;
-      // }
     }
   }
 
@@ -191,6 +195,4 @@ namespace SelectionSystem
     CheckSelectUnits( click_pos, player_id );
     CheckSelectProvince( click_pos, player_id );
   }
-
-
 };// namespace SelectionSystem

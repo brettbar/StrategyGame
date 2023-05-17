@@ -18,6 +18,7 @@ namespace InterfaceUpdate
     PlayerSelectedFaction,
     PlayerJoinedLobby,
     SettlementContext,
+    SettlementPopUpdated,
     ActorContext,
     ActorCanSpawnSettlement,
     JoinLobby,
@@ -33,6 +34,8 @@ namespace InterfaceUpdate
     std::string update_txt = "INVALID";
     std::string player_id = "INVALID";
     bool condition = false;
+
+    nlohmann::json json;
 
     void Send()
     {

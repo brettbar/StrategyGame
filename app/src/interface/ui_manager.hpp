@@ -198,7 +198,8 @@ private:
         else if ( child.id == "selected" )
         {
           child.UpdateText(
-            "entity: " + EntityIdToString( SelectionSystem::selected_entity )
+            "entity: " +
+            EntityIdToString( SelectionSystem::GetSelectedEntity() )
           );
         }
       }
