@@ -624,7 +624,11 @@ inline void IGame::RegisterEventListeners()
         }
         break;
 
+        // TODO(??) maybe we just need a separate queue or something
+        // for the campaign
         case InterfaceEvent::ID::ActorSpawnSettlment:
+        case InterfaceEvent::ID::SettlementContextPopulationTab:
+        case InterfaceEvent::ID::SettlementContextResourcesTab:
         {
           if ( _campaign )
             _campaign->ForwardEvent( event );

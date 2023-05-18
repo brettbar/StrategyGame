@@ -17,8 +17,12 @@ namespace InterfaceUpdate
     INVALID,
     PlayerSelectedFaction,
     PlayerJoinedLobby,
+
     SettlementContext,
     SettlementPopUpdated,
+    SettlementContextPopulationTab,
+    SettlementContextResourcesTab,
+
     ActorContext,
     ActorCanSpawnSettlement,
     JoinLobby,

@@ -254,6 +254,7 @@ private:
         }
       }
       break;
+      case Type::TextureButton:
       case Type::TextButton:
       {
         bool inside =

@@ -32,6 +32,8 @@ namespace InterfaceEvent
     FactionSelected,
     ClientReceivedCommand,
 
+    SettlementContextPopulationTab,
+    SettlementContextResourcesTab,
 
     ActorSpawnSettlment,
 

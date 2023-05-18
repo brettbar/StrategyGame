@@ -14,6 +14,7 @@ namespace UI
     return {
       Panel( "settlement_context_panel" )
         .SetAnchor( Anchor::BottomMid )
+        .FixedSize( 800, 350 )
         .Background( Fade( BLACK, 0.5 ) )
         .On(
           InterfaceUpdate::ID::SettlementContext,
@@ -29,8 +30,10 @@ namespace UI
             .SetAxis( Axis::Column )
             .Background( BLUE )
             .Children( {
-              TextureButton( "settlement_context_tab_population" ),
-              TextureButton( "settlement_context_tab_resources" ),
+              TextureButton( "settlement_context_tab_population" )
+                .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab ),
+              TextureButton( "settlement_context_tab_resources" )
+                .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab ),
               TextureButton( "settlement_context_tab_culture" ),
               TextureButton( "settlement_context_tab_religion" ),
               TextureButton( "settlement_context_tab_construction" ),
@@ -38,6 +41,18 @@ namespace UI
             } ),
           StackPanel( "settlement_context_content" )
             .Background( RED )
+            .On(
+              InterfaceUpdate::ID::SettlementContextPopulationTab,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                self.SwitchChild( 0 );
+              }
+            )
+            .On(
+              InterfaceUpdate::ID::SettlementContextResourcesTab,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                self.SwitchChild( 1 );
+              }
+            )
             .Children( {
               Panel( "settlement_context_overview" )
                 .Children( {
@@ -75,11 +90,17 @@ namespace UI
                       }
                     ),
                 } ),
+              Panel( "settlement_context_resources" )
+                .Children( {
+                  TextLabel( "settlement_resource_list" )
+                    .SetText( "Resource List", 26 ),
+                } ),
             } ),
         } ),
       Panel( "actor_context_panel" )
         .SetAnchor( Anchor::BottomMid )
         .Background( Fade( BLACK, 0.5 ) )
+        .FixedSize( 800, 350 )
         .On(
           InterfaceUpdate::ID::ActorContext,
           []( Element &self, InterfaceUpdate::Update update ) {

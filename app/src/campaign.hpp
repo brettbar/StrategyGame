@@ -194,12 +194,38 @@ inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
     return;
   }
 
-  PostCommand( Command{
-    .type = CommandType::Spawn,
-    .player_e = player_e,
-    .msg = "Player spawn Settlement",
-    .click_pos = click_pos,
-  } );
+  switch ( event.event_id )
+  {
+    case InterfaceEvent::ID::SettlementContextPopulationTab:
+    {
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::SettlementContextPopulationTab,
+      }
+        .Send();
+    };
+    break;
+    case InterfaceEvent::ID::SettlementContextResourcesTab:
+    {
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::SettlementContextResourcesTab,
+      }
+        .Send();
+    };
+    break;
+    case InterfaceEvent::ID::ActorSpawnSettlment:
+    {
+      PostCommand( Command{
+        .type = CommandType::Spawn,
+        .player_e = player_e,
+        .msg = "Player spawn Settlement",
+        .click_pos = click_pos,
+      } );
+    };
+    break;
+    default:
+      std::cout << "Unknown event in Campaign::ForwardEvent" << '\n';
+      break;
+  };
 }
 
 inline void Campaign::CheckForInput()

@@ -75,6 +75,7 @@ public:
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
+    bool fixed_size = false;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
@@ -94,6 +95,7 @@ public:
       updates = {};
 
     // StackPanel
+    // TODO this should probably be made private
     u32 curr_index = 0;
 
     // TextLabel
@@ -261,6 +263,22 @@ public:
 
     void Destroy();
 
+    void SwitchChild( u32 index )
+    {
+      if ( index > children.size() )
+      {
+        std::cout << "ERROR :: "
+                  << "StackPanel tried to switch to index greater than its "
+                     "number of children."
+                  << "\n";
+        return;
+      }
+      assert( type == Type::StackPanel );
+      children[curr_index].Disable();
+      curr_index = index;
+      children[curr_index].Enable();
+    }
+
 
     void Reposition()
     {
@@ -361,15 +379,18 @@ public:
               tallest_child = child.transform.height;
           }
 
-          if ( children_axis == Axis::Row )
+          if ( !fixed_size )
           {
-            transform.width = total_width;
-            transform.height = tallest_child;
-          }
-          else
-          {
-            transform.width = widest_child;
-            transform.height = total_height;
+            if ( children_axis == Axis::Row )
+            {
+              transform.width = total_width;
+              transform.height = tallest_child;
+            }
+            else
+            {
+              transform.width = widest_child;
+              transform.height = total_height;
+            }
           }
 
 
@@ -694,6 +715,14 @@ public:
       return *this;
     }
 
+    PanelBuilder &FixedSize( u32 width, u32 height )
+    {
+      _element.fixed_size = true;
+      _element.transform.width = width;
+      _element.transform.height = height;
+      return *this;
+    }
+
     PanelBuilder &SetAnchor( Anchor anchor )
     {
       _element.anchor = anchor;
@@ -745,6 +774,17 @@ public:
       _element.id = id;
       _element.curr_index = 0;
     }
+
+    StackPanelBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      _element.updates.emplace( update_id, update_fn );
+      return *this;
+    }
+
 
     StackPanelBuilder &Background( Color background )
     {
@@ -879,6 +919,12 @@ public:
       _element.type = Type::TextureButton;
       _element.id = id;
       _element.texture = Global::texture_cache[hstr{ id.c_str() }]->texture;
+    }
+
+    TextureButtonBuilder &SetEvent( InterfaceEvent::Data event )
+    {
+      _element.on_click = std::make_shared<InterfaceEvent::Data>( event );
+      return *this;
     }
   };
 
