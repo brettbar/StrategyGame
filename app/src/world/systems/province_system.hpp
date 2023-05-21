@@ -22,14 +22,14 @@ namespace ProvinceSystem
         .resources = {},
       };
 
-      switch ( prov.tile->biome )
-      {
-        case Biome::Plains:
-        {
-          prov.resources.push_back( Resources::Natural::Trees );
-        }
-        break;
-      }
+      // switch ( prov.tile->biome )
+      // {
+      //   case Biome::Plains:
+      //   {
+      //     prov.resources.push_back( Resources::Natural::Trees );
+      //   }
+      //   break;
+      // }
 
       Global::world.emplace<Province::Component>( prov_entity, prov );
     }
@@ -37,7 +37,7 @@ namespace ProvinceSystem
 
   inline void Draw( Camera2D &camera )
   {
-    Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
+    // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
     for ( auto entity: Global::world.view<Province::Component>() )
     {
 
@@ -62,11 +62,11 @@ namespace ProvinceSystem
         {
           // std::cout << "Foo!!!" << '\n';
           // std::cout << "Bar!!!" << '\n';
-          DrawTextureV(
-            tex,
-            { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
-            WHITE
-          );
+          // DrawTextureV(
+          //   tex,
+          //   { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
+          //   WHITE
+          // );
           // std::cout << "Baz!!!" << '\n';
         }
         break;

@@ -22,6 +22,8 @@ namespace InterfaceUpdate
     SettlementPopUpdated,
     SettlementContextPopulationTab,
     SettlementContextResourcesTab,
+    SettlementContextConstructionTab,
+    SettlementContextConstructBuilding,
 
     ActorContext,
     ActorCanSpawnSettlement,

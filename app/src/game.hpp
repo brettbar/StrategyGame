@@ -629,6 +629,8 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::ActorSpawnSettlment:
         case InterfaceEvent::ID::SettlementContextPopulationTab:
         case InterfaceEvent::ID::SettlementContextResourcesTab:
+        case InterfaceEvent::ID::SettlementContextConstructionTab:
+        case InterfaceEvent::ID::SettlementContextConstructBuilding:
         {
           if ( _campaign )
             _campaign->ForwardEvent( event );

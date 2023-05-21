@@ -35,58 +35,53 @@
 //   Tailor,
 // };
 
-namespace Buildings {
+namespace Buildings
+{
 
-enum class Type {
-  Gathering,
-  Processing,
-  Producton,
-};
+  enum class Type
+  {
+    Gathering,
+    Processing,
+    Producton,
+  };
 
-using Recipe = std::map<std::string, std::vector<std::string>>;
+  using Recipe = std::map<std::string, std::vector<std::string>>;
 
-inline std::vector<std::string> gathering{
-  "wood_cutter",
-  "farm",
-  "fisherman",
-  "quarry",
-  "shepherd",
-  "tanner",
-  "mine",
-};
+  inline std::vector<std::string> gathering{
+    "wood_cutter",
+    "farm",
+    "fisherman",
+    "quarry",
+    "shepherd",
+    "tanner",
+    "mine",
+  };
 
-inline std::vector<std::string> refining{
-  "sawmill",
-  "mill",
-  "kiln",
-  "stonemason",
-  "spinner",
-  "tanner",
-  "smith",
-};
+  inline std::vector<std::string> refining{
+    "sawmill",
+    "mill",
+    "kiln",
+    "stonemason",
+    "spinner",
+    "tanner",
+    "smith",
+  };
 
-inline std::vector<std::string> production{
-  "olive_press",
-  "sword_smith",
-  "poleturner",
-  "armourer",
-  "jeweler",
-  "tailor",
-};
+  inline std::vector<std::string> production{
+    "olive_press",
+    "sword_smith",
+    "poleturner",
+    "armourer",
+    "jeweler",
+    "tailor",
+  };
 
-inline std::map<Settlement::Development, std::vector<std::string>>
-  available_buildings = {
+  struct Building
+  {
+    std::string name;
+    Type type;
 
-};
-
-
-struct Building {
-  std::string name;
-  Type type;
-
-  std::string curr_output;
-
-  std::vector<Recipe> recipes;
-};
+    std::vector<Recipe> recipes;
+  };
 
 };// namespace Buildings

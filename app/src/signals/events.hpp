@@ -34,6 +34,8 @@ namespace InterfaceEvent
 
     SettlementContextPopulationTab,
     SettlementContextResourcesTab,
+    SettlementContextConstructionTab,
+    SettlementContextConstructBuilding,
 
     ActorSpawnSettlment,
 
@@ -45,23 +47,38 @@ namespace InterfaceEvent
   //
   // This needs to be in the same order as the ID enum
   inline const char *const IDString[(u32) ID::NumberOfEvents] = {
-    "MainMenuHostGame",      "MainMenuJoinGame",
-    "MainMenuStartGame",     "MainMenuLoadGame",
-    "MainMenuSettings",      "MainMenuExitGame",
+    "MainMenuHostGame",
+    "MainMenuJoinGame",
+    "MainMenuStartGame",
+    "MainMenuLoadGame",
+    "MainMenuSettings",
+    "MainMenuExitGame",
 
-    "OpenFactionSelectPage", "SinglePlayerLobbyStartGame",
+    "OpenFactionSelectPage",
+    "SinglePlayerLobbyStartGame",
 
-    "ModalMenuLoadGame",     "ModalMenuSaveGame",
-    "ModalMenuSettings",     "ModalMenuSaveExitMain",
-    "ModalMenuExitMain",     "ModalMenuExitGame",
+    "ModalMenuLoadGame",
+    "ModalMenuSaveGame",
+    "ModalMenuSettings",
+    "ModalMenuSaveExitMain",
+    "ModalMenuExitMain",
+    "ModalMenuExitGame",
     "ModalMenuToggle",
 
-    "ReturnToMain",          "PlayerToggledReadyUp",
-    "HostStartGame",         "JoinLobby",
+    "ReturnToMain",
+    "PlayerToggledReadyUp",
+    "HostStartGame",
+    "JoinLobby",
 
     "JoinHostedCampaign",
 
-    "FactionSelected",       "ClientReceivedCommand",
+    "FactionSelected",
+    "ClientReceivedCommand",
+
+    "SettlementContextPopulationTab",
+    "SettlementContextResourcesTab",
+    "SettlementContextConstructionTab",
+    "SettlementContextConstructBuilding",
 
     "ActorSpawnSettlment",
     //

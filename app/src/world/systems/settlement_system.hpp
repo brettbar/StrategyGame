@@ -124,6 +124,18 @@ namespace SettlementSystem
     }
   }
 
+  inline void ConstructBuilding( std::string building_name )
+  {
+    Settlement::Component settlement = Global::world.get<Settlement::Component>(
+      SelectionSystem::GetSelectedEntity()
+    );
+
+    settlement.buildings.push_back( Buildings::Building{
+      .name = building_name,
+      .type = Buildings::Type::Gathering,
+    } );
+  }
+
   inline void UpdateSettlement( Settlement::Component &settlement )
   {
     bool needs_sprawl_update = UpdatePopulation( settlement );

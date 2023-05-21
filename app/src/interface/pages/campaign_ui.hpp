@@ -34,9 +34,11 @@ namespace UI
                 .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab ),
               TextureButton( "settlement_context_tab_resources" )
                 .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab ),
+              TextureButton( "settlement_context_tab_construction" )
+                .SetEvent( InterfaceEvent::ID::SettlementContextConstructionTab
+                ),
               TextureButton( "settlement_context_tab_culture" ),
               TextureButton( "settlement_context_tab_religion" ),
-              TextureButton( "settlement_context_tab_construction" ),
               TextureButton( "settlement_context_tab_garrison" ),
             } ),
           StackPanel( "settlement_context_content" )
@@ -51,6 +53,12 @@ namespace UI
               InterfaceUpdate::ID::SettlementContextResourcesTab,
               []( Element &self, InterfaceUpdate::Update update ) {
                 self.SwitchChild( 1 );
+              }
+            )
+            .On(
+              InterfaceUpdate::ID::SettlementContextConstructionTab,
+              []( Element &self, InterfaceUpdate::Update update ) {
+                self.SwitchChild( 2 );
               }
             )
             .Children( {
@@ -94,6 +102,32 @@ namespace UI
                 .Children( {
                   TextLabel( "settlement_resource_list" )
                     .SetText( "Resource List", 26 ),
+                } ),
+              Panel( "settlement_context_construction" )
+                .SetAxis( Axis::Column )
+                .Children( {
+                  TextLabel( "buildings_label" ).SetText( "Buildings", 26 ),
+                  TextButton( "build_farm" )
+                    .SetText( "Build Farm", 26 )
+                    .SetEvent( InterfaceEvent::Data{
+                      InterfaceEvent::ID::SettlementContextConstructBuilding,
+                      "build_farm",
+                    } )
+                    .Background( BLUE ),
+                  Panel( "settlement_context_building_list" )
+                    .SetAxis( Axis::Column )
+                    .On(
+                      InterfaceUpdate::ID::SettlementContextConstructBuilding,
+                      []( Element &self, InterfaceUpdate::Update update ) {
+                        self.children.push_back(
+                          TextLabel( "farm" )
+                            .SetText( update.update_txt, 24 )
+                            .Background( GREEN )
+                        );
+
+                        self.children[self.children.size() - 1].Enable();
+                      }
+                    ),
                 } ),
             } ),
         } ),
