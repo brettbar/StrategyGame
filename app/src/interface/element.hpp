@@ -842,6 +842,12 @@ public:
       _element.text_color = text_color;
       return SetText( text, font_size );
     }
+
+    TextLabelBuilder &Margins( Margins margins )
+    {
+      _element.margins = margins;
+      return *this;
+    }
   };
 
   class TextButtonBuilder : public AbstractBuilder

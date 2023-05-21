@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pages/campaign_ui.hpp"
+#include "pages/campaign/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
 #include "pages/lobby_browser.hpp"
 #include "pages/lobby_ui.hpp"
