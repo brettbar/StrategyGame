@@ -132,7 +132,8 @@ namespace SettlementSystem
       );
 
     settlement.buildings.push_back( Buildings::Building{
-      .name = building_name,
+      .name =
+        building_name + "_" + std::to_string( settlement.buildings.size() ),
       .type = Buildings::Type::Gathering,
       .recipes = {},
     } );

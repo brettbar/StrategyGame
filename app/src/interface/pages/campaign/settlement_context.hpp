@@ -106,7 +106,7 @@ namespace UI
                   .SetText( "Build Farm", 26 )
                   .SetEvent( InterfaceEvent::Data{
                     InterfaceEvent::ID::SettlementContextConstructBuilding,
-                    "Farm",
+                    "farm",
                   } )
                   .Background( BLUE ),
                 Panel( "settlement_context_building_labels" )
@@ -137,9 +137,12 @@ namespace UI
                       // TODO left off here
                       if ( !existing_ids.contains( building ) )
                       {
-                        Element label = TextLabel( "farm" )
-                                          .SetText( "Farm", 24 )
-                                          .Background( GREEN );
+                        Element label =
+                          TextLabel(
+                            "farm_" + std::to_string( children.size() )
+                          )
+                            .SetText( "Farm", 24 )
+                            .Background( GREEN );
                         label.Enable();
 
                         children.push_back( label );
