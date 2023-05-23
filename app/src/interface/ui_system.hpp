@@ -133,10 +133,9 @@ namespace UI
         Interact( base, mouseWentUp, mouseWentDown );
       }
 
-
       Manager()->debug.Resize();
       Manager()->debug.Reposition();
-      Manager()->debug.AddRemoveChildren();
+      Manager()->debug.UpdateChildren();
 
       if ( !Manager()->over_any_elem )
         Manager()->SetContextNull();

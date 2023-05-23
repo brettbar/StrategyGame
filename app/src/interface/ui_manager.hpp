@@ -159,7 +159,10 @@ private:
 
   inline Element CreateDebugInfo()
   {
-    auto update_debug_info = []( std::vector<Element> &children ) {
+    auto update_debug_info = [](
+                               std::map<std::string, bool> &,
+                               std::vector<Element> &children
+                             ) {
       for ( auto &child: children )
       {
 

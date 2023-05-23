@@ -126,13 +126,15 @@ namespace SettlementSystem
 
   inline void ConstructBuilding( std::string building_name )
   {
-    Settlement::Component settlement = Global::world.get<Settlement::Component>(
-      SelectionSystem::GetSelectedEntity()
-    );
+    Settlement::Component &settlement =
+      Global::world.get<Settlement::Component>(
+        SelectionSystem::GetSelectedEntity()
+      );
 
     settlement.buildings.push_back( Buildings::Building{
       .name = building_name,
       .type = Buildings::Type::Gathering,
+      .recipes = {},
     } );
   }
 
@@ -165,6 +167,22 @@ namespace SettlementSystem
     // TODO maybe expensive?
     settlement.texture =
       LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
+  }
+
+  inline std::vector<std::string> SelectedSettlementBuildingList()
+  {
+    Settlement::Component settlement = Global::world.get<Settlement::Component>(
+      SelectionSystem::GetSelectedEntity()
+    );
+
+    std::vector<std::string> buildings = {};
+
+    for ( Buildings::Building building: settlement.buildings )
+    {
+      buildings.push_back( building.name );
+    }
+
+    return buildings;
   }
 
   inline bool UpdatePopulation( Settlement::Component &settlement )

@@ -16,14 +16,10 @@ namespace UI
   inline std::vector<Element> CreateLobbyBrowser()
   {
     // TODO better way of making the id and label
-    auto update_children = []( std::vector<Element> &children ) {
-      std::map<std::string, bool> existing_ids = {};
-
-      for ( auto &child: children )
-      {
-        existing_ids.emplace( child.id, true );
-      }
-
+    auto update_children = [](
+                             std::map<std::string, bool> existing_ids,
+                             std::vector<Element> &children
+                           ) {
       for ( CSteamID lobby_id: Network::Client()->GetLobbyList() )
       {
         const char *lobby_name =

@@ -86,7 +86,12 @@ public:
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
     std::vector<Element> children = {};
-    std::function<void( std::vector<Element> & )> update_children = {};
+
+
+    std::function<void( std::map<std::string, bool> &, std::vector<Element> & )>
+      update_children = {};
+
+
     std::vector<InterfaceUpdate::ID> subscribed_updates = {};
 
     std::map<
@@ -353,7 +358,7 @@ public:
           f32 end_of_last_x = transform.x;
           f32 end_of_last_y = transform.y;
 
-          AddRemoveChildren();
+          UpdateChildren();
 
           for ( Element &child: children )
           {
@@ -530,8 +535,7 @@ public:
       }
     }
 
-    // TODO do we really need this?
-    void AddRemoveChildren()
+    void UpdateChildren()
     {
       if ( !enabled )
         return;
@@ -541,7 +545,16 @@ public:
         case Type::Panel:
         {
           if ( update_children )
-            update_children( children );
+          {
+            std::map<std::string, bool> existing_ids = {};
+
+            for ( auto &child: children )
+            {
+              existing_ids.emplace( child.id, true );
+            }
+
+            update_children( existing_ids, children );
+          }
         }
         break;
         default:
@@ -743,7 +756,9 @@ public:
     }
 
     PanelBuilder &UpdateChildren(
-      std::function<void( std::vector<Element> & )> update_children
+      std::function<
+        void( std::map<std::string, bool> &, std::vector<Element> & )>
+        update_children
     )
     {
       _element.update_children = update_children;

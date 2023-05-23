@@ -2,6 +2,8 @@
 #include "../../element.hpp"
 #include "../../ui_utils.hpp"
 
+#include "../../../world/systems/settlement_system.hpp"
+
 namespace UI
 {
   inline Element CreateSettlementContextPanel()
@@ -123,21 +125,42 @@ namespace UI
                 Panel( "settlement_context_building_list" )
                   .SetAxis( Axis::Column )
                   .Children( {} )
-                  .On(
-                    InterfaceUpdate::ID::SettlementContextConstructBuilding,
-                    []( Element &self, InterfaceUpdate::Update update ) {
-                      // TODO(rf) this aint gonna work. For updating children we should be doing something where
-                      // we check the ecs idk
-                      // But this aint gonna work
-                      self.children.push_back(
-                        TextLabel( "farm" )
-                          .SetText( update.update_txt, 24 )
-                          .Background( GREEN )
-                      );
+                  .UpdateChildren( [](
+                                     std::map<std::string, bool> &existing_ids,
+                                     std::vector<Element> &children
+                                   ) {
+                    std::vector<std::string> buildings =
+                      SettlementSystem::SelectedSettlementBuildingList();
 
-                      self.children[self.children.size() - 1].Enable();
+                    for ( std::string building: buildings )
+                    {
+                      // TODO left off here
+                      if ( !existing_ids.contains( building ) )
+                      {
+                        Element label = TextLabel( "farm" )
+                                          .SetText( "Farm", 24 )
+                                          .Background( GREEN );
+                        label.Enable();
+
+                        children.push_back( label );
+                      }
                     }
-                  ),
+                  } ),
+                // .On(
+                //   InterfaceUpdate::ID::SettlementContextConstructBuilding,
+                //   []( Element &self, InterfaceUpdate::Update update ) {
+                //     // TODO(rf) this aint gonna work. For updating children we should be doing something where
+                //     // we check the ecs idk
+                //     // But this aint gonna work
+                //     self.children.push_back(
+                //       TextLabel( "farm" )
+                //         .SetText( update.update_txt, 24 )
+                //         .Background( GREEN )
+                //     );
+
+                //     self.children[self.children.size() - 1].Enable();
+                //   }
+                // ),
               } ),
           } ),
       } );

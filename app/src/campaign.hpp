@@ -225,12 +225,6 @@ inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
       std::cout << "Added building" << std::endl;
 
       SettlementSystem::ConstructBuilding( event.msg );
-
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::SettlementContextConstructBuilding,
-        .update_txt = event.msg,
-      }
-        .Send();
     };
     break;
     case InterfaceEvent::ID::ActorSpawnSettlment:
