@@ -95,8 +95,42 @@ namespace UI
               } ),
             Panel( "settlement_context_resources" )
               .Children( {
-                TextLabel( "settlement_resource_list" )
+                TextLabel( "settlement_resource_list_label" )
                   .SetText( "Resource List", 26 ),
+                Panel( "settlement_resource_list" )
+                  .UpdateChildren( [](
+                                     std::map<std::string, bool> &existing_ids,
+                                     std::vector<Element> &children
+                                   ) {
+                    Settlement::Component selected_settlement =
+                      SettlementSystem::ReadSelectedComponent();
+
+                    for ( auto [resource, count]:
+                          selected_settlement.raw_materials )
+                    {
+                      for ( auto &child: children )
+                      {
+                        if ( !existing_ids.contains(
+                               Resources::GetRawMaterialName( resource )
+                             ) )
+                        {
+                          Element resource_panel =
+                            Panel( Resources::GetRawMaterialName( resource ) )
+                              .Children( {
+                                TextLabel(
+                                  "label_" +
+                                  Resources::GetRawMaterialName( resource )
+                                )
+                                  .SetText( GetRawMaterialName( resource ), 24 )
+                                  .Background( YELLOW ),
+                              } );
+
+                          resource_panel.Enable();
+                          children.push_back( resource_panel );
+                        }
+                      }
+                    }
+                  } ),
               } ),
             Panel( "settlement_context_construction" )
               .SetAxis( Axis::Column )
@@ -149,21 +183,6 @@ namespace UI
                       }
                     }
                   } ),
-                // .On(
-                //   InterfaceUpdate::ID::SettlementContextConstructBuilding,
-                //   []( Element &self, InterfaceUpdate::Update update ) {
-                //     // TODO(rf) this aint gonna work. For updating children we should be doing something where
-                //     // we check the ecs idk
-                //     // But this aint gonna work
-                //     self.children.push_back(
-                //       TextLabel( "farm" )
-                //         .SetText( update.update_txt, 24 )
-                //         .Background( GREEN )
-                //     );
-
-                //     self.children[self.children.size() - 1].Enable();
-                //   }
-                // ),
               } ),
           } ),
       } );

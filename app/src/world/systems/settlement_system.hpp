@@ -12,6 +12,7 @@ namespace SettlementSystem
 
   inline void Update( State & );
   inline void UpdateSettlement( Settlement::Component & );
+  inline void UpdateResources( Settlement::Component & );
   inline bool UpdatePopulation( Settlement::Component & );
   inline void UpdateSprawl( Settlement::Component & );
   inline void Draw( TextureCache &, bool );
@@ -57,6 +58,7 @@ namespace SettlementSystem
         auto &settlement = Global::world.get<Settlement::Component>( entity );
 
         UpdateSettlement( settlement );
+        UpdateResources( settlement );
       }
     }
   }
@@ -168,6 +170,33 @@ namespace SettlementSystem
     // TODO maybe expensive?
     settlement.texture =
       LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
+  }
+
+  inline Settlement::Component ReadSelectedComponent()
+  {
+    return Global::world.get<Settlement::Component>(
+      SelectionSystem::GetSelectedEntity()
+    );
+  }
+
+  inline void UpdateResources( Settlement::Component &settlement )
+  {
+    for ( auto building: settlement.buildings )
+    {
+      switch ( building.type )
+      {
+        case Buildings::Type::Gathering:
+        {
+          if ( building.name == "farm" )
+          {
+            settlement.raw_materials[Resources::RawMaterial::Wheat] = 1;
+          }
+        }
+        break;
+        default:
+          break;
+      }
+    }
   }
 
   inline std::vector<std::string> SelectedSettlementBuildingList()
