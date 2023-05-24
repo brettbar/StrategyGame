@@ -158,7 +158,6 @@ namespace UI
                   } ),
                 Panel( "settlement_context_building_list" )
                   .SetAxis( Axis::Column )
-                  .Children( {} )
                   .UpdateChildren( [](
                                      std::map<std::string, bool> &existing_ids,
                                      std::vector<Element> &children

@@ -59,6 +59,7 @@ public:
 
     bool DoInteraction(
       Element entity,
+      bool clickable,
       bool inside,
       bool mouseWentUp,
       bool mouseWentDown
@@ -76,7 +77,7 @@ public:
           _context.active = "";
         }
       }
-      else if ( entity.id == _context.hot )
+      else if ( entity.id == _context.hot && clickable )
       {
         if ( mouseWentDown )
           _context.active = entity.id;
@@ -117,7 +118,8 @@ public:
     {
       // This is almost sufficent, but we need to account for panels too
       // not just items that can be active?
-      return _context.active != "" || _context.hot != "";
+      return _context.active != "" || _context.hot != "" ||
+             Manager()->over_any_elem;
     }
 
     void SetContextNull()
@@ -267,7 +269,11 @@ private:
           Manager()->over_any_elem = inside;
 
         if ( Manager()->DoInteraction(
-               element, inside, mouse_went_up, mouse_went_down
+               element,
+               element.clickable,
+               inside,
+               mouse_went_up,
+               mouse_went_down
              ) )
         {
           if ( element.clickable )
@@ -276,6 +282,22 @@ private:
 
             element.FireEvent();
           }
+        }
+      }
+      break;
+      case Type::TextureLabel:
+      case Type::TextLabel:
+      {
+        bool inside =
+          CheckCollisionPointRec( GetMousePosition(), element.transform );
+
+        if ( !Manager()->over_any_elem )
+          Manager()->over_any_elem = inside;
+
+        if ( Manager()->DoInteraction(
+               element, false, inside, mouse_went_up, mouse_went_down
+             ) )
+        {
         }
       }
       break;
