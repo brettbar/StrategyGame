@@ -6,34 +6,6 @@
 #include <map>
 #include <string>
 #include <vector>
-// enum class GatheringBuildingName {
-//   WoodCutter,// nc
-//   Farm,
-//   Fisherman,// nc
-//   Quarry,
-//   Shepherd,
-//   Tanner,
-//   Mine,
-// };
-
-// enum class ProcessingBuildingName {
-//   Sawmill,
-//   Mill,
-//   Kiln,// nc
-//   Stonemason,
-//   Spinner,
-//   Tanner,
-//   Smith,
-// };
-
-// enum class ProductionBuildingName {
-//   OlivePress,
-//   SwordSmith,//nc?
-//   Poleturner,
-//   Armourer,
-//   Jeweler,
-//   Tailor,
-// };
 
 namespace Buildings
 {
@@ -47,41 +19,69 @@ namespace Buildings
 
   using Recipe = std::map<std::string, std::vector<std::string>>;
 
-  inline std::vector<std::string> gathering{
-    "wood_cutter",
-    "farm",
-    "fisherman",
-    "quarry",
-    "shepherd",
-    "tanner",
-    "mine",
-  };
+  enum class BuildingName
+  {
+    // Gathering
+    WoodCutter,// nc
+    Farm,
+    Fisherman,// nc
+    Quarry,
+    Shepherd,
+    Mine,
 
-  inline std::vector<std::string> refining{
-    "sawmill",
-    "mill",
-    "kiln",
-    "stonemason",
-    "spinner",
-    "tanner",
-    "smith",
-  };
+    // Refinement
+    Sawmill,
+    Mill,
+    Kiln,// nc
+    Stonemason,
+    Spinner,
+    Tanner,
+    Smith,
 
-  inline std::vector<std::string> production{
-    "olive_press",
-    "sword_smith",
-    "poleturner",
-    "armourer",
-    "jeweler",
-    "tailor",
+    // Production
+    OlivePress,
+    SwordSmith,//nc?
+    Poleturner,
+    Armourer,
+    Jeweler,
+    Tailor,
   };
+  //
+  // inline std::vector<std::string> gathering{
+  //   "wood_cutter",
+  //   "farm",
+  //   "fisherman",
+  //   "quarry",
+  //   "shepherd",
+  //   "tanner",
+  //   "mine",
+  // };
+
+  // inline std::vector<std::string> refining{
+  //   "sawmill",
+  //   "mill",
+  //   "kiln",
+  //   "stonemason",
+  //   "spinner",
+  //   "tanner",
+  //   "smith",
+  // };
+
+  // inline std::vector<std::string> production{
+  //   "olive_press",
+  //   "sword_smith",
+  //   "poleturner",
+  //   "armourer",
+  //   "jeweler",
+  //   "tailor",
+  // };
 
   struct Building
   {
-    std::string name;
+    BuildingName name;
     Type type;
-
-    std::vector<Recipe> recipes;
+    // farm_0, farm_1
+    std::string id;
   };
 
 };// namespace Buildings

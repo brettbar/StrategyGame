@@ -51,20 +51,23 @@ class IGame
         // Update 60 times a second
         while ( _lag >= _MS_PER_UPDATE )
         {
-          Update60TPS();
+          if ( _campaign )
+            _campaign->Update60TPS();
           _lag -= _MS_PER_UPDATE;
         }
 
-        // Update once per second
-        while ( _oncelag >= _ONCE_A_SECOND )
-        {
-          if ( Network::is_host )
-          {
+        // Update once per second no timeScale
+        // while ( _oncelag >= _ONCE_A_SECOND )
+        // {
+        //   std::cout << "What the fuck???" << '\n';
 
-            // Network::Host()->PingAllActiveClients();
-          }
-          _oncelag = 0.0f;
-        }
+        //   if ( Network::is_host )
+        //   {
+
+        //     // Network::Host()->PingAllActiveClients();
+        //   }
+        //   _oncelag = 0.0f;
+        // }
 
         // Update once per second but modified by timeScale
         // TODO? Do we want to fold this timescale business into campaign itself
@@ -72,9 +75,7 @@ class IGame
         while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
         {
           if ( _campaign )
-          {
             _campaign->Update1TPS();
-          }
           _oncelag = 0.0f;
         }
 
@@ -446,15 +447,6 @@ class IGame
         break;
     }
   }
-
-  void Update60TPS()
-  {
-    if ( _campaign )
-    {
-      _campaign->Update60TPS();
-    }
-  }
-
 
   void ExitGameLoopCleanup()
   {

@@ -12,6 +12,7 @@ namespace UI
   {
     INVALID,
     Panel,
+    DataPanel,
     StackPanel,
     TextLabel,
     TextButton,
@@ -66,6 +67,7 @@ namespace UI
 
 public:
     friend class PanelBuilder;
+    friend class DataPanelBuilder;
     friend class StackPanelBuilder;
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
@@ -85,7 +87,12 @@ public:
     Axis children_axis = Axis::INVALID;
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
+
     std::vector<Element> children = {};
+
+    //DataPanel
+    std::map<std::string, Element> data_points = {};
+    std::function<void( std::map<std::string, Element> & )> update_data = {};
 
 
     std::function<void( std::map<std::string, bool> &, std::vector<Element> & )>
@@ -142,6 +149,22 @@ public:
           }
         }
         break;
+        case Type::DataPanel:
+        {
+          enabled = true;
+          Resize();
+          Reposition();
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+
+            child.InitialEnable();
+            child.Resize();
+            child.Reposition();
+          }
+        }
+        break;
         case Type::StackPanel:
         {
           enabled = true;
@@ -152,13 +175,12 @@ public:
         break;
         case Type::TextLabel:
         case Type::TextButton:
+        case Type::TextureLabel:
+        case Type::TextureButton:
         {
           enabled = true;
         }
         break;
-        default:
-          enabled = true;
-          break;
       }
     }
 
@@ -184,6 +206,21 @@ public:
           }
         }
         break;
+        case Type::DataPanel:
+        {
+          enabled = true;
+          Resize();
+          Reposition();
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Enable();
+            child.Resize();
+            child.Reposition();
+          }
+        }
+        break;
         case Type::StackPanel:
         {
           enabled = true;
@@ -194,13 +231,12 @@ public:
         break;
         case Type::TextLabel:
         case Type::TextButton:
+        case Type::TextureLabel:
+        case Type::TextureButton:
         {
           enabled = true;
         }
         break;
-        default:
-          enabled = true;
-          break;
       }
     }
 
@@ -222,6 +258,17 @@ public:
           }
         }
         break;
+        case Type::DataPanel:
+        {
+          lookup.emplace( id, std::make_shared<Element>( *this ) );
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Register();
+          }
+        }
+        break;
         case Type::StackPanel:
         {
           lookup.emplace( id, std::make_shared<Element>( *this ) );
@@ -238,10 +285,27 @@ public:
     {
       switch ( type )
       {
+        case Type::INVALID:
+        {
+          std::cout << "ERROR :: "
+                    << "Invalid element type found in Disable()" << '\n';
+        }
+        break;
         case Type::Panel:
         {
-          for ( Element child: children )
+          for ( Element &child: children )
           {
+            child.Disable();
+          }
+
+          enabled = false;
+        }
+        break;
+        case Type::DataPanel:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
             child.Disable();
           }
 
@@ -256,13 +320,12 @@ public:
         break;
         case Type::TextLabel:
         case Type::TextButton:
+        case Type::TextureLabel:
+        case Type::TextureButton:
         {
           enabled = false;
         }
         break;
-        default:
-          enabled = false;
-          break;
       }
     }
 
@@ -287,52 +350,74 @@ public:
 
     void Reposition()
     {
+
+      bool is_panel = type == Type::Panel || type == Type::DataPanel ||
+                      type == Type::StackPanel;
+
+      if ( !is_panel )
+        return;
+
+      switch ( anchor )
+      {
+        case Anchor::Centered:
+        {
+          vec2 updated_pos = {
+            ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
+            ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
+          };
+
+          transform.x = updated_pos.x;
+          transform.y = updated_pos.y;
+        }
+        break;
+        case Anchor::TopRight:
+        {
+          vec2 updated_pos = {
+            ( (f32) GetScreenWidth() ) - ( transform.width ), 0 };
+
+          transform.x = updated_pos.x;
+          transform.y = updated_pos.y;
+        }
+        break;
+        case Anchor::BottomMid:
+        {
+          vec2 updated_pos = {
+            ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
+            ( (f32) GetScreenHeight() ) - ( transform.height ),
+          };
+
+          transform.x = updated_pos.x;
+          transform.y = updated_pos.y;
+        }
+        break;
+        default:
+          break;
+      }
+
       switch ( type )
       {
-        case Type::StackPanel:
         case Type::Panel:
-          switch ( anchor )
-          {
-            case Anchor::Centered:
-            {
-              vec2 updated_pos = {
-                ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
-                ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
-              };
-
-              transform.x = updated_pos.x;
-              transform.y = updated_pos.y;
-            }
-            break;
-            case Anchor::TopRight:
-            {
-              vec2 updated_pos = {
-                ( (f32) GetScreenWidth() ) - ( transform.width ), 0 };
-
-              transform.x = updated_pos.x;
-              transform.y = updated_pos.y;
-            }
-            break;
-            case Anchor::BottomMid:
-            {
-              vec2 updated_pos = {
-                ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
-                ( (f32) GetScreenHeight() ) - ( transform.height ),
-              };
-
-              transform.x = updated_pos.x;
-              transform.y = updated_pos.y;
-            }
-            break;
-            default:
-              break;
-          }
-
+        {
           for ( Element &child: children )
           {
             child.Reposition();
           }
-          break;
+        }
+        break;
+        case Type::StackPanel:
+        {
+          children[curr_index].Reposition();
+        }
+        break;
+        case Type::DataPanel:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+          }
+        }
+        break;
         default:
           break;
       }
@@ -456,6 +541,116 @@ public:
           }
         }
         break;
+        case Type::DataPanel:
+        {
+          f32 total_height = 0;
+          f32 total_width = 0;
+          f32 tallest_child = 0;
+          f32 widest_child = 0;
+          f32 end_of_last_x = transform.x;
+          f32 end_of_last_y = transform.y;
+
+          UpdateChildren();
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            // TODO not sure if this is right
+            if ( !child.enabled )
+              continue;
+
+            child.Resize();
+          }
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            if ( !child.enabled )
+              continue;
+
+            total_width += child.transform.width;
+            total_height += child.transform.height;
+
+            if ( child.transform.width > widest_child )
+              widest_child = child.transform.width;
+
+            if ( child.transform.height > tallest_child )
+              tallest_child = child.transform.height;
+          }
+
+          if ( !fixed_size )
+          {
+            if ( children_axis == Axis::Row )
+            {
+              transform.width = total_width;
+              transform.height = tallest_child;
+            }
+            else
+            {
+              transform.width = widest_child;
+              transform.height = total_height;
+            }
+          }
+
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            if ( !child.enabled )
+              continue;
+
+            if ( children_axis == Axis::Row )
+            {
+              // 2. Set the child x position based on alignment style.
+              switch ( children_horiz_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.x = end_of_last_x + child.margins.left;
+                  end_of_last_x = child.transform.x + child.transform.width +
+                                  child.margins.right;
+                }
+                break;
+              }
+
+              // 3. Set the child y position based on alignment style.
+              switch ( children_vert_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.y = transform.y;
+                }
+                break;
+              }
+            }
+            else if ( children_axis == Axis::Column )
+            {
+              // 2. Set the child x position based on alignment style.
+              switch ( children_horiz_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.x = transform.x;
+                }
+                break;
+              }
+
+              // 3. Set the child y position based on alignment style.
+              switch ( children_vert_align )
+              {
+                case Align::Start:
+                {
+                  child.transform.y = end_of_last_y;
+                  // + margins.top;
+                  end_of_last_y = child.transform.y + child.transform.height;
+                  // + margins.bottom;
+                }
+                break;
+              }
+            }
+          }
+        }
+        break;
         case Type::StackPanel:
         {
           children[curr_index].transform.x = transform.x;
@@ -504,8 +699,7 @@ public:
       clickable = new_clickable;
     }
 
-    // TODO rename
-    void RealUpdate( const InterfaceUpdate::Update &update )
+    void ExecuteInterfaceUpdate( const InterfaceUpdate::Update &update )
     {
       switch ( type )
       {
@@ -516,7 +710,19 @@ public:
 
           for ( auto &child: children )
           {
-            child.RealUpdate( update );
+            child.ExecuteInterfaceUpdate( update );
+          }
+        }
+        break;
+        case Type::DataPanel:
+        {
+          if ( updates.contains( update.id ) )
+            updates[update.id]( *this, update );
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.ExecuteInterfaceUpdate( update );
           }
         }
         break;
@@ -525,7 +731,7 @@ public:
           if ( updates.contains( update.id ) )
             updates[update.id]( *this, update );
 
-          children[curr_index].RealUpdate( update );
+          children[curr_index].ExecuteInterfaceUpdate( update );
         }
         break;
         default:
@@ -544,6 +750,7 @@ public:
       {
         case Type::Panel:
         {
+          // TODO rf this should be removed now that we have data panels
           if ( update_children )
           {
             std::map<std::string, bool> existing_ids = {};
@@ -554,6 +761,14 @@ public:
             }
 
             update_children( existing_ids, children );
+          }
+        }
+        break;
+        case Type::DataPanel:
+        {
+          if ( update_data )
+          {
+            update_data( data_points );
           }
         }
         break;
@@ -583,6 +798,21 @@ public:
 
           for ( Element &child: children )
           {
+            child.Draw();
+          }
+        }
+        break;
+        case Type::DataPanel:
+        {
+          DrawRectangleV(
+            { transform.x, transform.y },
+            { transform.width, transform.height },
+            background
+          );
+
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
             child.Draw();
           }
         }
@@ -778,6 +1008,33 @@ public:
     }
   };
 
+  class DataPanelBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit DataPanelBuilder( std::string id ) : AbstractBuilder{ _element }
+    {
+      _element.type = Type::DataPanel;
+      _element.id = id;
+      _element.curr_index = 0;
+    }
+
+    DataPanelBuilder &DataPoints( std::map<std::string, Element> data_points )
+    {
+      _element.data_points = data_points;
+      return *this;
+    }
+
+    DataPanelBuilder &UpdateData(
+      std::function<void( std::map<std::string, Element> & )> update_data
+    )
+    {
+      _element.update_data = update_data;
+      return *this;
+    }
+  };
+
   class StackPanelBuilder : public AbstractBuilder
   {
     Element _element;
@@ -953,6 +1210,11 @@ public:
   inline PanelBuilder Panel( std::string id )
   {
     return PanelBuilder{ id };
+  }
+
+  inline DataPanelBuilder DataPanel( std::string id )
+  {
+    return DataPanelBuilder{ id };
   }
 
   inline StackPanelBuilder StackPanel( std::string id )

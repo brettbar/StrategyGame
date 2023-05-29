@@ -27,7 +27,7 @@ namespace UI
           .Children( {
             TextButton( "actor_spawn_settlement_button" )
               .Clickable( false )
-              .Background( GREEN )
+              .Background( RED )
               .SetText( "Spawn?", 26 )
               .SetEvent(
                 InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment )
@@ -36,6 +36,7 @@ namespace UI
                 InterfaceUpdate::ID::ActorCanSpawnSettlement,
                 []( Element &self, InterfaceUpdate::Update update ) {
                   self.UpdateClickable( update.condition );
+
                   if ( update.condition )
                     self.UpdateBackground( GREEN );
                   else

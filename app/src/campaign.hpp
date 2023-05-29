@@ -154,6 +154,7 @@ inline void Campaign::Update60TPS()
     Global::world.view<Unit::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
+
   MovementSystem::Update( animated_units, Global::state.timeScale );
   AnimationSystem::Update( animated_units, Global::state.timeScale );
   PlayerSystem::Update( players );
@@ -163,10 +164,9 @@ inline void Campaign::Update60TPS()
 
 inline void Campaign::Update1TPS()
 {
-  auto settlements =
-    Global::world.view<Province::Component, Settlement::Component>();
-
-  SettlementSystem::Update( settlements, Global::state );
+  SettlementSystem::Update(
+    Global::world.view<Province::Component, Settlement::Component>()
+  );
 
   Global::state.day++;
 
@@ -222,8 +222,6 @@ inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
     break;
     case InterfaceEvent::ID::SettlementContextConstructBuilding:
     {
-      std::cout << "Added building" << std::endl;
-
       SettlementSystem::ConstructBuilding( event.msg );
     };
     break;

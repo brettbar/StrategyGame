@@ -97,37 +97,49 @@ namespace UI
               .Children( {
                 TextLabel( "settlement_resource_list_label" )
                   .SetText( "Resource List", 26 ),
-                Panel( "settlement_resource_list" )
-                  .UpdateChildren( [](
-                                     std::map<std::string, bool> &existing_ids,
-                                     std::vector<Element> &children
-                                   ) {
+                DataPanel( "settlement_resource_list" )
+                  .UpdateData( []( std::map<std::string, Element> &existing_ids
+                               ) {
                     Settlement::Component selected_settlement =
                       SettlementSystem::ReadSelectedComponent();
 
                     for ( auto [resource, count]:
                           selected_settlement.raw_materials )
                     {
-                      for ( auto &child: children )
+                      if ( !existing_ids.contains(
+                             Resources::GetRawMaterialName( resource ) +
+                             "_data_point_label"
+                           ) )
                       {
-                        if ( !existing_ids.contains(
-                               Resources::GetRawMaterialName( resource )
-                             ) )
-                        {
-                          Element resource_panel =
-                            Panel( Resources::GetRawMaterialName( resource ) )
-                              .Children( {
-                                TextLabel(
-                                  "label_" +
-                                  Resources::GetRawMaterialName( resource )
-                                )
-                                  .SetText( GetRawMaterialName( resource ), 24 )
-                                  .Background( YELLOW ),
-                              } );
+                        Element resource_panel =
+                          Panel( Resources::GetRawMaterialName( resource ) )
+                            .Children( {
+                              TextLabel(
+                                Resources::GetRawMaterialName( resource ) +
+                                "_data_point_label"
+                              )
+                                .SetText( GetRawMaterialName( resource ), 24 )
+                                .Background( YELLOW ),
+                              TextLabel(
+                                Resources::GetRawMaterialName( resource ) +
+                                "_data_point_value"
+                              )
+                                .SetText( std::to_string( count ), 24 )
+                                .Background( BLACK ),
+                            } );
 
-                          resource_panel.Enable();
-                          children.push_back( resource_panel );
-                        }
+                        existing_ids.insert_or_assign(
+                          Resources::GetRawMaterialName( resource ) +
+                            "_data_point_label",
+                          resource_panel
+                        );
+
+                        existing_ids
+                          .at(
+                            Resources::GetRawMaterialName( resource ) +
+                            "_data_point_label"
+                          )
+                          .Enable();
                       }
                     }
                   } ),

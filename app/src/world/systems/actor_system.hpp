@@ -60,6 +60,7 @@ namespace ActorSystem
   {
     if ( ColonistCanPlaceSettlement() )
     {
+      // std::cout << "ColonistCanPlace true" << '\n';
       InterfaceUpdate::Update{
         .id = InterfaceUpdate::ActorCanSpawnSettlement,
         .condition = true,
@@ -68,6 +69,7 @@ namespace ActorSystem
     }
     else
     {
+      // std::cout << "ColonistCanPlace false" << '\n';
       InterfaceUpdate::Update{
         .id = InterfaceUpdate::ActorCanSpawnSettlement,
         .condition = false,

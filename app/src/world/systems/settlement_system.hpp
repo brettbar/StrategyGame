@@ -45,21 +45,15 @@ namespace SettlementSystem
   }
 
   inline void Update(
-    View<Province::Component, Settlement::Component> settlements,
-    State &state
+    View<Province::Component, Settlement::Component> settlements
   )
   {
-    for ( auto entity: settlements )
+    for ( entt::entity entity: settlements )
     {
-      auto &prov = settlements.get<Province::Component>( entity );
+      auto &settlement = Global::world.get<Settlement::Component>( entity );
 
-      if ( prov.owner != entt::null )
-      {
-        auto &settlement = Global::world.get<Settlement::Component>( entity );
-
-        UpdateSettlement( settlement );
-        UpdateResources( settlement );
-      }
+      UpdateSettlement( settlement );
+      UpdateResources( settlement );
     }
   }
 
@@ -134,10 +128,9 @@ namespace SettlementSystem
       );
 
     settlement.buildings.push_back( Buildings::Building{
-      .name =
-        building_name + "_" + std::to_string( settlement.buildings.size() ),
+      .name = Buildings::BuildingName::Farm,
       .type = Buildings::Type::Gathering,
-      .recipes = {},
+      .id = building_name + "_" + std::to_string( settlement.buildings.size() ),
     } );
   }
 
@@ -181,13 +174,13 @@ namespace SettlementSystem
 
   inline void UpdateResources( Settlement::Component &settlement )
   {
-    for ( auto building: settlement.buildings )
+    for ( Buildings::Building &building: settlement.buildings )
     {
       switch ( building.type )
       {
         case Buildings::Type::Gathering:
         {
-          if ( building.name == "farm" )
+          if ( building.name == Buildings::BuildingName::Farm )
           {
             settlement.raw_materials[Resources::RawMaterial::Wheat] = 1;
           }
@@ -201,15 +194,21 @@ namespace SettlementSystem
 
   inline std::vector<std::string> SelectedSettlementBuildingList()
   {
-    Settlement::Component settlement = Global::world.get<Settlement::Component>(
-      SelectionSystem::GetSelectedEntity()
-    );
+    Settlement::Component *settlement =
+      Global::world.try_get<Settlement::Component>(
+        SelectionSystem::GetSelectedEntity()
+      );
+
+    if ( settlement == nullptr )
+    {
+      return {};
+    }
 
     std::vector<std::string> buildings = {};
 
-    for ( Buildings::Building building: settlement.buildings )
+    for ( Buildings::Building building: settlement->buildings )
     {
-      buildings.push_back( building.name );
+      buildings.push_back( building.id );
     }
 
     return buildings;
