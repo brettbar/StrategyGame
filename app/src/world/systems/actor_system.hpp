@@ -56,6 +56,12 @@ namespace ActorSystem
     return false;
   }
 
+  // TODO(rf)
+  // This probably has totally shit performance since we are basically spamming true false
+  // interface updates.
+  //
+  // What would be better is to check the conditions every frame first and only toggle clickability
+  // If there is a change
   inline void EvaluateActorActions()
   {
     if ( ColonistCanPlaceSettlement() )
