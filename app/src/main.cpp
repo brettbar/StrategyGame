@@ -297,6 +297,8 @@ void LoadResources()
 
     std::string filename = entry.path().filename().generic_string();
 
+    std::cout << filename << '\n';
+
     LoadResource(
       hstr{ filename.c_str() },
       LoadImage( ( path + "/" + filename ).c_str() ),

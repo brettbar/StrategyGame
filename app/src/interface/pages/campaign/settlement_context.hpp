@@ -113,33 +113,34 @@ namespace UI
                              "_data_point"
                            ) )
                       {
-                        // Element resource_panel =
-                        //   Panel(
-                        //     Resources::GetRawMaterialName( resource ) +
-                        //     "_data_point"
-                        //   )
-                        //     .Children( {
-                        //       TextLabel(
-                        //         Resources::GetRawMaterialName( resource ) +
-                        //         "_data_point_label"
-                        //       )
-                        //         .SetText( GetRawMaterialName( resource ), 24 )
-                        //         .Background( YELLOW ),
-                        //       TextLabel(
-                        //         Resources::GetRawMaterialName( resource ) +
-                        //         "_data_point_value"
-                        //       )
-                        //         .SetText( std::to_string( count ), 24 )
-                        //         .Background( BLACK ),
-                        //     } );
-
                         Element resource_panel =
-                          TextLabel(
+                          Panel(
                             Resources::GetRawMaterialName( resource ) +
                             "_data_point"
                           )
-                            .SetText( "test", 24 )
-                            .Background( YELLOW );
+                            .Children( {
+                              TextureLabel(
+                                Resources::GetRawMaterialName( resource ) +
+                                "_data_point_label"
+                              )
+                                .SetTexture(
+                                  GetRawMaterialName( resource ) + ".png"
+                                ),
+                              TextLabel(
+                                Resources::GetRawMaterialName( resource ) +
+                                "_data_point_value"
+                              )
+                                .SetText( std::to_string( count ), 24 )
+                                .Background( BLACK ),
+                            } );
+
+                        // Element resource_panel =
+                        //   TextLabel(
+                        //     Resources::GetRawMaterialName( resource ) +
+                        //     "_data_point"
+                        //   )
+                        //     .SetText( "test", 24 )
+                        //     .Background( YELLOW );
 
                         existing_ids.insert_or_assign(
                           Resources::GetRawMaterialName( resource ) +

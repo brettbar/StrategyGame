@@ -71,6 +71,7 @@ public:
     friend class StackPanelBuilder;
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
+    friend class TextureLabelBuilder;
     friend class TextureButtonBuilder;
 
     Type type = Type::INVALID;
@@ -425,6 +426,7 @@ public:
 
     // TODO why are we Repositioning panel children in this function?
     // Shouldnt it be in Reposition fn?
+    // TODO should we take in to account ui scale
     void Resize()
     {
       if ( !enabled )
@@ -1198,6 +1200,25 @@ public:
     }
   };
 
+  class TextureLabelBuilder : public AbstractBuilder
+  {
+    Element _element;
+
+public:
+    explicit TextureLabelBuilder( std::string id ) : AbstractBuilder{ _element }
+    {
+      _element.type = Type::TextureButton;
+      _element.id = id;
+    }
+
+    TextureLabelBuilder &SetTexture( std::string texture_id )
+    {
+      _element.texture =
+        Global::texture_cache[hstr{ texture_id.c_str() }]->texture;
+      return *this;
+    }
+  };
+
   class TextureButtonBuilder : public AbstractBuilder
   {
     Element _element;
@@ -1242,6 +1263,11 @@ public:
   inline TextButtonBuilder TextButton( std::string id )
   {
     return TextButtonBuilder{ id };
+  }
+
+  inline TextureLabelBuilder TextureLabel( std::string id )
+  {
+    return TextureLabelBuilder{ id };
   }
 
   inline TextureButtonBuilder TextureButton( std::string id )
