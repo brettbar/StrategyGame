@@ -404,11 +404,6 @@ public:
           }
         }
         break;
-        case Type::StackPanel:
-        {
-          children[curr_index].Reposition();
-        }
-        break;
         case Type::DataPanel:
         {
           for ( auto &pair: data_points )
@@ -418,11 +413,18 @@ public:
           }
         }
         break;
+        case Type::StackPanel:
+        {
+          children[curr_index].Reposition();
+        }
+        break;
         default:
           break;
       }
     }
 
+    // TODO why are we Repositioning panel children in this function?
+    // Shouldnt it be in Reposition fn?
     void Resize()
     {
       if ( !enabled )
@@ -596,6 +598,7 @@ public:
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
+
             if ( !child.enabled )
               continue;
 
@@ -1018,6 +1021,9 @@ public:
       _element.type = Type::DataPanel;
       _element.id = id;
       _element.curr_index = 0;
+      _element.children_axis = Axis::Row;
+      _element.children_horiz_align = Align::Start;
+      _element.children_vert_align = Align::Start;
     }
 
     DataPanelBuilder &DataPoints( std::map<std::string, Element> data_points )
@@ -1031,6 +1037,12 @@ public:
     )
     {
       _element.update_data = update_data;
+      return *this;
+    }
+
+    DataPanelBuilder &SetAxis( Axis axis )
+    {
+      _element.children_axis = axis;
       return *this;
     }
   };

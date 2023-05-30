@@ -94,10 +94,12 @@ namespace UI
                   ),
               } ),
             Panel( "settlement_context_resources" )
+              .SetAxis( Axis::Column )
               .Children( {
                 TextLabel( "settlement_resource_list_label" )
                   .SetText( "Resource List", 26 ),
                 DataPanel( "settlement_resource_list" )
+                  .SetAxis( Axis::Column )
                   .UpdateData( []( std::map<std::string, Element> &existing_ids
                                ) {
                     Settlement::Component selected_settlement =
@@ -108,36 +110,54 @@ namespace UI
                     {
                       if ( !existing_ids.contains(
                              Resources::GetRawMaterialName( resource ) +
-                             "_data_point_label"
+                             "_data_point"
                            ) )
                       {
+                        // Element resource_panel =
+                        //   Panel(
+                        //     Resources::GetRawMaterialName( resource ) +
+                        //     "_data_point"
+                        //   )
+                        //     .Children( {
+                        //       TextLabel(
+                        //         Resources::GetRawMaterialName( resource ) +
+                        //         "_data_point_label"
+                        //       )
+                        //         .SetText( GetRawMaterialName( resource ), 24 )
+                        //         .Background( YELLOW ),
+                        //       TextLabel(
+                        //         Resources::GetRawMaterialName( resource ) +
+                        //         "_data_point_value"
+                        //       )
+                        //         .SetText( std::to_string( count ), 24 )
+                        //         .Background( BLACK ),
+                        //     } );
+
                         Element resource_panel =
-                          Panel( Resources::GetRawMaterialName( resource ) )
-                            .Children( {
-                              TextLabel(
-                                Resources::GetRawMaterialName( resource ) +
-                                "_data_point_label"
-                              )
-                                .SetText( GetRawMaterialName( resource ), 24 )
-                                .Background( YELLOW ),
-                              TextLabel(
-                                Resources::GetRawMaterialName( resource ) +
-                                "_data_point_value"
-                              )
-                                .SetText( std::to_string( count ), 24 )
-                                .Background( BLACK ),
-                            } );
+                          TextLabel(
+                            Resources::GetRawMaterialName( resource ) +
+                            "_data_point"
+                          )
+                            .SetText( "test", 24 )
+                            .Background( YELLOW );
 
                         existing_ids.insert_or_assign(
                           Resources::GetRawMaterialName( resource ) +
-                            "_data_point_label",
+                            "_data_point",
                           resource_panel
                         );
 
                         existing_ids
                           .at(
                             Resources::GetRawMaterialName( resource ) +
-                            "_data_point_label"
+                            "_data_point"
+                          )
+                          .Register();
+
+                        existing_ids
+                          .at(
+                            Resources::GetRawMaterialName( resource ) +
+                            "_data_point"
                           )
                           .Enable();
                       }
