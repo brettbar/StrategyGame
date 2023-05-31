@@ -109,17 +109,17 @@ namespace UI
       const f32 screen_width = GetScreenWidth();
       const f32 screen_height = GetScreenHeight();
 
-      if ( screen_width > 1920 )
+      if ( screen_width >= 3840 )
       {
-        SCALE = 2.0;
+        SCALE = 1.5;
       }
-      else if ( screen_width > 2560 )
+      else if ( screen_width >= 2560 )
       {
-        SCALE = 3.0;
+        SCALE = 1.25;
       }
-      else if ( screen_width >= 3840 )
+      else
       {
-        SCALE = 4.0;
+        SCALE = 1.0;
       }
 
       InterfaceUpdate::dispatcher.update();
