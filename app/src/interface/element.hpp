@@ -682,8 +682,8 @@ public:
         case Type::TextureButton:
         case Type::TextureLabel:
         {
-          transform.width = texture.width * UI::SCALE;
-          transform.height = texture.height * UI::SCALE;
+          transform.width = texture.width * UI::SCALE * 2;
+          transform.height = texture.height * UI::SCALE * 2;
         }
         break;
       }
@@ -905,7 +905,7 @@ public:
         case Type::TextureButton:
         {
           DrawTextureEx(
-            texture, { transform.x, transform.y }, 0.0, SCALE, WHITE
+            texture, { transform.x, transform.y }, 0.0, SCALE * 2, WHITE
           );
         }
         break;
