@@ -4,6 +4,8 @@
 
 #include "../../../world/systems/settlement_system.hpp"
 
+#include "../../builders.hpp"
+
 namespace UI
 {
   inline Element BuildingTab()
@@ -32,27 +34,40 @@ namespace UI
               .SetText( "Outputs", 24 )
               .Background( PURPLE ),
           } ),
-        Panel( "settlement_context_building_list" )
+        DataPanel( "settlement_context_building_list" )
           .SetAxis( Axis::Column )
-          .UpdateChildren( [](
-                             std::map<std::string, bool> &existing_ids,
-                             std::vector<Element> &children
-                           ) {
-            std::vector<std::string> buildings =
+          .UpdateData( []( std::map<std::string, Element> &data_points ) {
+            std::vector<Buildings::Building> buildings =
               SettlementSystem::SelectedSettlementBuildingList();
 
-            for ( std::string building: buildings )
+            for ( auto building: buildings )
             {
               // TODO left off here
-              if ( !existing_ids.contains( building ) )
+              if ( !data_points.contains(
+                     "building_list_item_" + building.name_str
+                   ) )
               {
-                Element label =
-                  TextLabel( "farm_" + std::to_string( children.size() ) )
-                    .SetText( "Farm", 24 )
-                    .Background( GREEN );
-                label.Enable();
+                Element panel =
+                  Panel( "building_list_item_" + building.name_str )
+                    .Children( {
+                      TextLabel( building.name_str )
+                        .SetText( "Farm", 24 )
+                        .Background( GREEN ),
+                      TextLabel( building.name_str + "_count" )
+                        .SetText( "0", 24 )
+                        .Background( BLACK ),
+                      TextButton( "open_production_menu_" + building.name_str )
+                        .SetText( "+", 24 ),
+                      Panel( "building_producing_list" ),
+                      Panel( "building_using_list" ),
 
-                children.push_back( label );
+                    } );
+
+                panel.Enable();
+
+                data_points.insert_or_assign(
+                  "building_list_item_" + building.name_str, panel
+                );
               }
             }
           } ),

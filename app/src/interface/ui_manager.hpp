@@ -3,6 +3,7 @@
 #include "../shared/global.hpp"
 #include "../world/systems/selection_system.hpp"
 
+#include "builders.hpp"
 #include "element.hpp"
 
 namespace UI

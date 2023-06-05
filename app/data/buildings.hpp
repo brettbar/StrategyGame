@@ -80,8 +80,7 @@ namespace Buildings
   {
     BuildingName name;
     Type type;
-    // farm_0, farm_1
-    std::string id;
+    std::string name_str;
   };
 
 };// namespace Buildings

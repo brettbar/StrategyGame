@@ -2,6 +2,7 @@
 
 #include "../../../shared/common.hpp"
 
+#include "../../builders.hpp"
 #include "../../element.hpp"
 #include "../../ui_utils.hpp"
 

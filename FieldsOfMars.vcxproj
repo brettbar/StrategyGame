@@ -14,7 +14,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="app\src\interface\element.cpp" />
     <ClCompile Include="app\src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="app\src\interface\element.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

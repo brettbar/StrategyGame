@@ -130,7 +130,7 @@ namespace SettlementSystem
     settlement.buildings.push_back( Buildings::Building{
       .name = Buildings::BuildingName::Farm,
       .type = Buildings::Type::Gathering,
-      .id = building_name + "_" + std::to_string( settlement.buildings.size() ),
+      .name_str = building_name,
     } );
   }
 
@@ -192,7 +192,7 @@ namespace SettlementSystem
     }
   }
 
-  inline std::vector<std::string> SelectedSettlementBuildingList()
+  inline std::vector<Buildings::Building> SelectedSettlementBuildingList()
   {
     Settlement::Component *settlement =
       Global::world.try_get<Settlement::Component>(
@@ -204,11 +204,11 @@ namespace SettlementSystem
       return {};
     }
 
-    std::vector<std::string> buildings = {};
+    std::vector<Buildings::Building> buildings = {};
 
     for ( Buildings::Building building: settlement->buildings )
     {
-      buildings.push_back( building.id );
+      buildings.push_back( building );
     }
 
     return buildings;
