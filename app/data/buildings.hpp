@@ -2,6 +2,7 @@
 // be in json
 #pragma once
 
+#include "resources.hpp"
 #include "settlement.hpp"
 #include <map>
 #include <string>
@@ -46,41 +47,15 @@ namespace Buildings
     Jeweler,
     Tailor,
   };
-  //
-  // inline std::vector<std::string> gathering{
-  //   "wood_cutter",
-  //   "farm",
-  //   "fisherman",
-  //   "quarry",
-  //   "shepherd",
-  //   "tanner",
-  //   "mine",
-  // };
-
-  // inline std::vector<std::string> refining{
-  //   "sawmill",
-  //   "mill",
-  //   "kiln",
-  //   "stonemason",
-  //   "spinner",
-  //   "tanner",
-  //   "smith",
-  // };
-
-  // inline std::vector<std::string> production{
-  //   "olive_press",
-  //   "sword_smith",
-  //   "poleturner",
-  //   "armourer",
-  //   "jeweler",
-  //   "tailor",
-  // };
 
   struct Building
   {
     BuildingName name;
     Type type;
     std::string name_str;
+
+    std::vector<Resources::RawMaterial> producing;
+    std::vector<Resources::Natural> consuming;
   };
 
 };// namespace Buildings

@@ -9,6 +9,7 @@ set(SOURCE_FILES
   app/src/main.cpp
   app/src/shared/common.hpp
   app/src/renderer/renderer.hpp
+  app/src/interface/element.cpp
   app/src/world/systems/map_system.hpp
   app/src/world/systems/province_system.hpp
   app/src/world/systems/movement_system.hpp

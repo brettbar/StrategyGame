@@ -26,12 +26,12 @@ namespace UI
             TextLabel( "building_name" )
               .SetText( "Building", 24 )
               .Background( PURPLE ),
-            TextLabel( "inputs" )
-              .SetText( "Inputs", 24 )
+            TextLabel( "producing" )
+              .SetText( "Producing", 24 )
               .Background( PURPLE )
               .Margins( { Margins{ 4, 4, 0, 0 } } ),
-            TextLabel( "outputs" )
-              .SetText( "Outputs", 24 )
+            TextLabel( "consuming" )
+              .SetText( "Consuming", 24 )
               .Background( PURPLE ),
           } ),
         DataPanel( "settlement_context_building_list" )
@@ -42,10 +42,12 @@ namespace UI
 
             for ( auto building: buildings )
             {
+
+              std::string building_name =
+                "building_list_item_" + building.name_str;
+
               // TODO left off here
-              if ( !data_points.contains(
-                     "building_list_item_" + building.name_str
-                   ) )
+              if ( !data_points.contains( building_name ) )
               {
                 Element panel =
                   Panel( "building_list_item_" + building.name_str )
@@ -60,14 +62,17 @@ namespace UI
                         .SetText( "+", 24 ),
                       Panel( "building_producing_list" ),
                       Panel( "building_using_list" ),
-
                     } );
 
                 panel.Enable();
 
-                data_points.insert_or_assign(
-                  "building_list_item_" + building.name_str, panel
-                );
+                data_points.insert_or_assign( building_name, panel );
+              }
+              else
+              {
+                data_points.at( building_name )
+                  .children[2]
+                  .UpdateText( std::to_string( buildings.size() ) );
               }
             }
           } ),
