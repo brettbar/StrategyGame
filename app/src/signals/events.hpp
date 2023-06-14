@@ -37,7 +37,7 @@ namespace InterfaceEvent
     SettlementContextResourcesTab,
     SettlementContextConstructionTab,
     SettlementContextConstructBuilding,
-    SettlementContextTrainUnit,
+    SettlementContextTrainHastati,
 
     ActorSpawnSettlment,
 

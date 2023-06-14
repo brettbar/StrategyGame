@@ -233,6 +233,11 @@ inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
       SettlementSystem::ConstructBuilding( event.msg );
     };
     break;
+    case InterfaceEvent::ID::SettlementContextTrainHastati:
+    {
+      SettlementSystem::TrainRegiment( UnitType::Hastati );
+    };
+    break;
     case InterfaceEvent::ID::ActorSpawnSettlment:
     {
       PostCommand( Command{

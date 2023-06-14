@@ -624,6 +624,7 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::SettlementContextResourcesTab:
         case InterfaceEvent::ID::SettlementContextConstructionTab:
         case InterfaceEvent::ID::SettlementContextConstructBuilding:
+        case InterfaceEvent::ID::SettlementContextTrainHastati:
         {
           if ( _campaign )
             _campaign->ForwardEvent( event );

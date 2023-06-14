@@ -16,19 +16,34 @@ namespace UI
         TextButton( "train_hastati" )
           .SetText( "Train", 24 )
           .Background( GREEN )
-          .SetEvent( InterfaceEvent::ID::SettlementContextTrainUnit ),
+          .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati ),
         DataPanel( "settlement_garrison" )
           .UpdateData( []( std::map<std::string, Element> &data_points ) {
-            std::vector<std::string> troops =
+            std::vector<Regiment> regiments =
               SettlementSystem::SelectedSettlementGarrisonList();
 
-            for ( auto troop: troops )
+            for ( auto regiment: regiments )
             {
-              // Create troop tile
+              std::string panel_id =
+                "regiment_" + std::to_string( regiment.id );
+
+              if ( !data_points.contains( panel_id ) )
+              {
+
+                Element panel =
+                  Panel( panel_id )
+                    .Children(
+                      { TextLabel( panel_id + "_unit_type" )
+                          .SetText( "Hastati", 24 ),
+                        TextLabel( panel_id + "_unit_count" )
+                          .SetText( std::to_string( regiment.number ), 24 ) }
+                    );
+
+                panel.Enable();
+
+                data_points.insert_or_assign( panel_id, panel );
+              }
             }
-          } )
-          .DataPoints( {
-            { "unit_1", TextLabel( "unit_1" ).SetText( "Unit 1", 24 ) },
           } ),
       } );
   }

@@ -4,6 +4,7 @@
 #include "../../../data/buildings.hpp"
 #include "../../../data/resources.hpp"
 #include "../../../data/settlement.hpp"
+#include "regiment.hpp"
 
 #include <cereal/types/common.hpp>
 
@@ -25,8 +26,7 @@ namespace Settlement
     // Building
     std::vector<Buildings::Building> buildings = {};
 
-    std::vector<std::string> garrison = {};
-
+    std::vector<Regiment> garrison = {};
 
     // TOOD might need separate save/load functions for this one
     template<class Archive>

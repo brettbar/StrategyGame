@@ -120,6 +120,20 @@ namespace SettlementSystem
     }
   }
 
+  inline void TrainRegiment( UnitType type )
+  {
+    Settlement::Component &settlement =
+      Global::world.get<Settlement::Component>(
+        SelectionSystem::GetSelectedEntity()
+      );
+
+    settlement.garrison.push_back( Regiment{
+      (u32) settlement.garrison.size(),
+      Hastati,
+      100,
+    } );
+  }
+
   inline void ConstructBuilding( std::string building_name )
   {
     Settlement::Component &settlement =
@@ -204,17 +218,10 @@ namespace SettlementSystem
       return {};
     }
 
-    std::vector<Buildings::Building> buildings = {};
-
-    for ( Buildings::Building building: settlement->buildings )
-    {
-      buildings.push_back( building );
-    }
-
-    return buildings;
+    return settlement->buildings;
   }
 
-  inline std::vector<std::string> SelectedSettlementGarrisonList()
+  inline std::vector<Regiment> SelectedSettlementGarrisonList()
   {
     Settlement::Component *settlement =
       Global::world.try_get<Settlement::Component>(
@@ -226,9 +233,7 @@ namespace SettlementSystem
       return {};
     }
 
-    std::vector<std::string> troops = {};
-
-    return troops;
+    return settlement->garrison;
   }
 
   inline bool UpdatePopulation( Settlement::Component &settlement )
