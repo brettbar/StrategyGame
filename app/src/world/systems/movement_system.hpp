@@ -3,9 +3,9 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
+#include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/selected.hpp"
-#include "../components/unit.hpp"
 
 namespace MovementSystem
 {
@@ -15,11 +15,11 @@ namespace MovementSystem
   {
     // entt::basic_view view =
     //   Global::world
-    //     .view<Unit::Component, Animated::Component, Selected::Component>();
+    //     .view<Actor::Component, Animated::Component, Selected::Component>();
 
     // for ( auto entity: view )
     // {
-    Unit::Component &unit = Global::world.get<Unit::Component>( entity );
+    Actor::Component &actor = Global::world.get<Actor::Component>( entity );
     Animated::Component &anim =
       Global::world.get<Animated::Component>( entity );
 
@@ -28,67 +28,67 @@ namespace MovementSystem
 
     if ( dest_tile != nullptr )
     {
-      unit.destination = *dest_tile;
+      actor.destination = *dest_tile;
 
-      if ( unit.destination.x > unit.position.x )
+      if ( actor.destination.x > actor.position.x )
         anim.direction = Animated::IDLE_DR;
-      else if ( unit.destination.x < unit.position.x )
+      else if ( actor.destination.x < actor.position.x )
         anim.direction = Animated::IDLE_DL;
     }
     // }
   }
 
   inline void Update(
-    View<Unit::Component, Animated::Component> units,
+    View<Actor::Component, Animated::Component> actors,
     f32 timeScale
   )
   {
-    for ( auto &entity: units )
+    for ( auto &entity: actors )
     {
-      Unit::Component &unit = units.get<Unit::Component>( entity );
-      Animated::Component &anim = units.get<Animated::Component>( entity );
+      Actor::Component &actor = actors.get<Actor::Component>( entity );
+      Animated::Component &anim = actors.get<Animated::Component>( entity );
 
-      if ( Vector2Distance( unit.destination, unit.position ) > 0.7f )
+      if ( Vector2Distance( actor.destination, actor.position ) > 0.7f )
       {
-        Vector2 unitVec = Vector2Normalize( {
-          unit.destination.x - unit.position.x,
-          unit.destination.y - unit.position.y,
+        Vector2 actorVec = Vector2Normalize( {
+          actor.destination.x - actor.position.x,
+          actor.destination.y - actor.position.y,
         } );
 
-        unit.position.x += unitVec.x * unit.speed * timeScale;
-        unit.position.y += unitVec.y * unit.speed * timeScale;
+        actor.position.x += actorVec.x * actor.speed * timeScale;
+        actor.position.y += actorVec.y * actor.speed * timeScale;
 
         // TODO maybe these 2 ifs could be consolidated
-        if ( unit.destination.x > unit.position.x )
+        if ( actor.destination.x > actor.position.x )
         {
           anim.state = Animated::WALK_DR;
-          unit.moving = true;
+          actor.moving = true;
         }
-        else if ( unit.destination.x < unit.position.x )
+        else if ( actor.destination.x < actor.position.x )
         {
           anim.state = Animated::WALK_DL;
-          unit.moving = true;
+          actor.moving = true;
         }
-        if ( unit.destination.x == unit.position.x )
+        if ( actor.destination.x == actor.position.x )
         {
           if ( anim.state == Animated::IDLE_DR )
           {
             anim.state = Animated::WALK_DR;
-            unit.moving = true;
+            actor.moving = true;
           }
           else if ( anim.state == Animated::IDLE_DL )
           {
 
             anim.state = Animated::WALK_DL;
-            unit.moving = true;
+            actor.moving = true;
           }
         }
 
 
-        if ( Vector2Distance( unit.destination, unit.position ) <= 0.7f )
+        if ( Vector2Distance( actor.destination, actor.position ) <= 0.7f )
         {
-          unit.position = unit.destination;
-          unit.moving = false;
+          actor.position = actor.destination;
+          actor.moving = false;
 
           if ( anim.direction == 0 )
             anim.state = Animated::IDLE_DR;
@@ -99,11 +99,11 @@ namespace MovementSystem
     }
   }
 
-  inline bool UnitIsMoving( entt::entity entity )
+  inline bool ActorIsMoving( entt::entity entity )
   {
-    if ( Global::world.all_of<Unit::Component>( entity ) )
+    if ( Global::world.all_of<Actor::Component>( entity ) )
     {
-      return Global::world.get<Unit::Component>( entity ).moving;
+      return Global::world.get<Actor::Component>( entity ).moving;
     }
     return false;
   }

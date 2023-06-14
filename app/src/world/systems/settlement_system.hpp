@@ -71,8 +71,8 @@ namespace SettlementSystem
 
   inline void SpawnSettlement()
   {
-    Unit::Component unit =
-      Global::world.get<Unit::Component>( SelectionSystem::GetSelectedEntity()
+    Actor::Component unit =
+      Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
       );
 
     vec2 pos = unit.position;
@@ -212,6 +212,23 @@ namespace SettlementSystem
     }
 
     return buildings;
+  }
+
+  inline std::vector<std::string> SelectedSettlementGarrisonList()
+  {
+    Settlement::Component *settlement =
+      Global::world.try_get<Settlement::Component>(
+        SelectionSystem::GetSelectedEntity()
+      );
+
+    if ( settlement == nullptr )
+    {
+      return {};
+    }
+
+    std::vector<std::string> troops = {};
+
+    return troops;
   }
 
   inline bool UpdatePopulation( Settlement::Component &settlement )

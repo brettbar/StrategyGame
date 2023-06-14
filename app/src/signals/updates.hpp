@@ -20,6 +20,7 @@ namespace InterfaceUpdate
 
     SettlementContext,
     SettlementPopUpdated,
+    SettlementContextMilitaryTab,
     SettlementContextPopulationTab,
     SettlementContextResourcesTab,
     SettlementContextConstructionTab,

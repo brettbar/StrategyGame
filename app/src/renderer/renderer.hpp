@@ -12,7 +12,8 @@
 
 #include <raylib.h>
 
-namespace Renderer {
+namespace Renderer
+{
 
   inline Shader shader;
   inline Shader outline_shader;
@@ -20,7 +21,8 @@ namespace Renderer {
   inline void DrawActors( bool debug );
 
 
-  inline void Init() {
+  inline void Init()
+  {
     shader = LoadShader(
       "app/assets/shaders/pixel.vs", "app/assets/shaders/pixel.fs"
     );
@@ -52,7 +54,8 @@ namespace Renderer {
   }
 
 
-  inline void Draw( TextureCache &texture_cache ) {
+  inline void Draw( TextureCache &texture_cache )
+  {
 
 
     ClearBackground( DARKGRAY );
@@ -84,13 +87,18 @@ namespace Renderer {
 
       BeginShaderMode( shader );
       {
-        switch ( MapSystem::mode ) {
-          case MapSystem::Mode::Terrain: {
+        switch ( MapSystem::mode )
+        {
+          case MapSystem::Mode::Terrain:
+          {
             SettlementSystem::Draw( texture_cache, false );
-          } break;
-          case MapSystem::Mode::Political: {
+          }
+          break;
+          case MapSystem::Mode::Political:
+          {
             SettlementSystem::Draw( texture_cache, false );
-          } break;
+          }
+          break;
         }
 
         // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
@@ -107,7 +115,8 @@ namespace Renderer {
     EndMode2D();
   }
 
-  inline void DrawUI() {
+  inline void DrawUI()
+  {
     // TODO right now alpha issues are cropping up with the shader
     // BeginShaderMode( shader );
 
@@ -115,39 +124,42 @@ namespace Renderer {
     // EndShaderMode();
   }
 
-  inline void DrawActors( bool debug ) {
+  inline void DrawActors( bool debug )
+  {
     entt::basic_view actors =
-      Global::world.view<Unit::Component, Animated::Component>();
+      Global::world.view<Actor::Component, Animated::Component>();
 
-    Global::world.sort<Unit::Component>(
-      []( const Unit::Component &lhs, const Unit::Component &rhs ) {
+    Global::world.sort<Actor::Component>(
+      []( const Actor::Component &lhs, const Actor::Component &rhs ) {
         return rhs.position.y > lhs.position.y;
       }
     );
 
-    actors.each( [debug]( Unit::Component &unit, Animated::Component &anim ) {
+    actors.each( [debug]( Actor::Component &actor, Animated::Component &anim ) {
       //    DrawTextureV(
-      //        unit.sprite,
-      //        {unit.position.x - 64.0f, unit.position.y - 64.0f},
+      //        actor.sprite,
+      //        {actor.position.x - 64.0f, actor.position.y - 64.0f},
       //        WHITE);
 
 
-      if ( unit.selected ) {
+      if ( actor.selected )
+      {
         BeginShaderMode( outline_shader );
         DrawTextureRec(
           anim.sprite,
           anim.frameRec,
-          { unit.position.x - 64.0f, unit.position.y - 64.0f },
+          { actor.position.x - 64.0f, actor.position.y - 64.0f },
           WHITE
         );
         EndShaderMode();
       }
-      else {
+      else
+      {
         BeginShaderMode( shader );
         DrawTextureRec(
           anim.sprite,
           anim.frameRec,
-          { unit.position.x - 64.0f, unit.position.y - 64.0f },
+          { actor.position.x - 64.0f, actor.position.y - 64.0f },
           WHITE
         );
         EndShaderMode();
@@ -156,18 +168,19 @@ namespace Renderer {
       // DrawPerfectTexture(
       //   anim.sprite,
       //   anim.frameRec,
-      //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+      //   { actor.position.x - 64.0f, actor.position.y - 64.0f },
       //   WHITE );
 
 
       // DrawTextureRec(
       //   anim.sprite,
       //   anim.frameRec,
-      //   { unit.position.x - 64.0f, unit.position.y - 64.0f },
+      //   { actor.position.x - 64.0f, actor.position.y - 64.0f },
       //   WHITE );
 
-      if ( debug && Vector2Distance( unit.position, unit.destination ) > 0.5f ) {
-        DrawLineEx( unit.position, unit.destination, 2, MAGENTA );
+      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f )
+      {
+        DrawLineEx( actor.position, actor.destination, 2, MAGENTA );
       }
     } );
   }

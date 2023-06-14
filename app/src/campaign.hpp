@@ -150,13 +150,13 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag )
 // TODO: look at all of these and see if any belong in UpdateOnFrame
 inline void Campaign::Update60TPS()
 {
-  auto animated_units =
-    Global::world.view<Unit::Component, Animated::Component>();
+  auto animated_actors =
+    Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
 
-  MovementSystem::Update( animated_units, Global::state.timeScale );
-  AnimationSystem::Update( animated_units, Global::state.timeScale );
+  MovementSystem::Update( animated_actors, Global::state.timeScale );
+  AnimationSystem::Update( animated_actors, Global::state.timeScale );
   PlayerSystem::Update( players );
   ActorSystem::EvaluateActorActions();
   //  Terrain::UpdateFOW(reg);
@@ -196,6 +196,14 @@ inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
 
   switch ( event.event_id )
   {
+    case InterfaceEvent::ID::SettlementContextMilitaryTab:
+    {
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::SettlementContextMilitaryTab,
+      }
+        .Send();
+    };
+    break;
     case InterfaceEvent::ID::SettlementContextPopulationTab:
     {
       InterfaceUpdate::Update{
@@ -306,7 +314,7 @@ inline void Campaign::CheckForInput()
     {
       auto selected_e =
         Global::world
-          .view<Unit::Component, Animated::Component, Selected::Component>()
+          .view<Actor::Component, Animated::Component, Selected::Component>()
           .front();
 
       if ( selected_e != entt::null )

@@ -32,10 +32,12 @@ namespace InterfaceEvent
     FactionSelected,
     ClientReceivedCommand,
 
+    SettlementContextMilitaryTab,
     SettlementContextPopulationTab,
     SettlementContextResourcesTab,
     SettlementContextConstructionTab,
     SettlementContextConstructBuilding,
+    SettlementContextTrainUnit,
 
     ActorSpawnSettlment,
 

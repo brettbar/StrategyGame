@@ -8,6 +8,31 @@
 
 namespace UI
 {
+  inline Element MilitaryTab()
+  {
+    return Panel( "settlement_context_military" )
+      .SetAxis( Axis::Column )
+      .Children( {
+        TextButton( "train_hastati" )
+          .SetText( "Train", 24 )
+          .Background( GREEN )
+          .SetEvent( InterfaceEvent::ID::SettlementContextTrainUnit ),
+        DataPanel( "settlement_garrison" )
+          .UpdateData( []( std::map<std::string, Element> &data_points ) {
+            std::vector<std::string> troops =
+              SettlementSystem::SelectedSettlementGarrisonList();
+
+            for ( auto troop: troops )
+            {
+              // Create troop tile
+            }
+          } )
+          .DataPoints( {
+            { "unit_1", TextLabel( "unit_1" ).SetText( "Unit 1", 24 ) },
+          } ),
+      } );
+  }
+
   inline Element BuildingTab()
   {
     return Panel( "settlement_context_construction" )
@@ -166,6 +191,8 @@ namespace UI
           .SetAxis( Axis::Column )
           .Background( BLUE )
           .Children( {
+            TextureButton( "settlement_context_tab_garrison" )
+              .SetEvent( InterfaceEvent::ID::SettlementContextMilitaryTab ),
             TextureButton( "settlement_context_tab_resources" )
               .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab ),
             TextureButton( "settlement_context_tab_construction" )
@@ -174,29 +201,35 @@ namespace UI
               .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab ),
             TextureButton( "settlement_context_tab_culture" ),
             TextureButton( "settlement_context_tab_religion" ),
-            TextureButton( "settlement_context_tab_garrison" ),
           } ),
         StackPanel( "settlement_context_content" )
           .Background( RED )
           .On(
-            InterfaceUpdate::ID::SettlementContextPopulationTab,
-            []( Element &self, InterfaceUpdate::Update update ) {
-              self.SwitchChild( 2 );
-            }
-          )
-          .On(
-            InterfaceUpdate::ID::SettlementContextResourcesTab,
+            InterfaceUpdate::ID::SettlementContextMilitaryTab,
             []( Element &self, InterfaceUpdate::Update update ) {
               self.SwitchChild( 0 );
             }
           )
           .On(
-            InterfaceUpdate::ID::SettlementContextConstructionTab,
+            InterfaceUpdate::ID::SettlementContextPopulationTab,
+            []( Element &self, InterfaceUpdate::Update update ) {
+              self.SwitchChild( 3 );
+            }
+          )
+          .On(
+            InterfaceUpdate::ID::SettlementContextResourcesTab,
             []( Element &self, InterfaceUpdate::Update update ) {
               self.SwitchChild( 1 );
             }
           )
+          .On(
+            InterfaceUpdate::ID::SettlementContextConstructionTab,
+            []( Element &self, InterfaceUpdate::Update update ) {
+              self.SwitchChild( 2 );
+            }
+          )
           .Children( {
+            MilitaryTab(),
             ResourceTab(),
             BuildingTab(),
             Panel( "settlement_context_overview" )

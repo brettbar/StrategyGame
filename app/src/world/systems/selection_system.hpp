@@ -9,7 +9,6 @@
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
 #include "../components/settlement.hpp"
-#include "../components/unit.hpp"
 
 #include "../../signals/updates.hpp"
 
@@ -68,9 +67,9 @@ namespace SelectionSystem
   }
 
 
-  inline void CheckSelectUnits( vec2 click_pos, std::string player_id )
+  inline void CheckSelectActors( vec2 click_pos, std::string player_id )
   {
-    auto units_view = Global::world.view<Unit::Component>();
+    auto actors_view = Global::world.view<Actor::Component>();
     auto player_view = Global::world.view<Player::Component>();
     auto selected_entity = Global::world.view<Selected::Component>().front();
 
@@ -88,24 +87,24 @@ namespace SelectionSystem
     }
 
     // use forward iterators and get only the components of interest
-    for ( auto &entity: units_view )
+    for ( auto &entity: actors_view )
     {
       if ( selected_entity != entt::null )
         return;
 
-      Unit::Component &unit = units_view.get<Unit::Component>( entity );
+      Actor::Component &actor = actors_view.get<Actor::Component>( entity );
 
-      if ( unit.owner != owner_e )
+      if ( actor.owner != owner_e )
         continue;
 
-      if ( CheckCollisionPointCircle( unit.position, click_pos, 32 ) )
+      if ( CheckCollisionPointCircle( actor.position, click_pos, 32 ) )
       {
         Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
-        std::cout << EntityIdToString( unit.owner ) << std::endl;
+        std::cout << EntityIdToString( actor.owner ) << std::endl;
 
-        unit.selected = true;
+        actor.selected = true;
         selected_entity = entity;
 
         InterfaceUpdate::Update{
@@ -185,14 +184,14 @@ namespace SelectionSystem
 
   inline void UpdateSelection( Vector2 click_pos, std::string player_id )
   {
-    View<Unit::Component> units_view = Global::world.view<Unit::Component>();
+    View<Actor::Component> actors_view = Global::world.view<Actor::Component>();
     View<Province::Component> prov_view =
       Global::world.view<Province::Component>();
 
-    ClearSelection<Unit::Component>( units_view );
+    ClearSelection<Actor::Component>( actors_view );
     ClearSelection<Province::Component>( prov_view );
 
-    CheckSelectUnits( click_pos, player_id );
+    CheckSelectActors( click_pos, player_id );
     CheckSelectProvince( click_pos, player_id );
   }
 };// namespace SelectionSystem

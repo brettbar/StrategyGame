@@ -144,7 +144,7 @@ namespace ProvinceSystem
   inline void SetProvinceOwner( entt::entity owner )
   {
     auto selectedView =
-      Global::world.view<Selected::Component, Unit::Component>();
+      Global::world.view<Selected::Component, Actor::Component>();
     auto selectedEntity = selectedView.front();
 
     if ( selectedEntity == entt::null )
@@ -153,9 +153,10 @@ namespace ProvinceSystem
       return;
     }
 
-    Unit::Component &unit = selectedView.get<Unit::Component>( selectedEntity );
+    Actor::Component &actor =
+      selectedView.get<Actor::Component>( selectedEntity );
 
-    AssignProvince( owner, unit.position );
+    AssignProvince( owner, actor.position );
   }
 };// namespace ProvinceSystem
 

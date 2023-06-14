@@ -7,7 +7,6 @@
 #include "../world/components/province.hpp"
 #include "../world/components/settlement.hpp"
 #include "../world/components/sight.hpp"
-#include "../world/components/unit.hpp"
 #include "global.hpp"
 
 #include <cereal/archives/binary.hpp>
@@ -36,7 +35,6 @@ namespace SaveSystem
           Province::Component,
           Settlement::Component,
           Actor::Component,
-          Unit::Component,
           Animated::Component,
           Sight::Component>( output );
 
@@ -63,7 +61,6 @@ namespace SaveSystem
           Province::Component,
           Settlement::Component,
           Actor::Component,
-          Unit::Component,
           Animated::Component,
           Sight::Component>( input );
 

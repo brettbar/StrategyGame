@@ -619,6 +619,7 @@ inline void IGame::RegisterEventListeners()
         // TODO(??) maybe we just need a separate queue or something
         // for the campaign
         case InterfaceEvent::ID::ActorSpawnSettlment:
+        case InterfaceEvent::ID::SettlementContextMilitaryTab:
         case InterfaceEvent::ID::SettlementContextPopulationTab:
         case InterfaceEvent::ID::SettlementContextResourcesTab:
         case InterfaceEvent::ID::SettlementContextConstructionTab:

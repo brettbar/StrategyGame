@@ -25,6 +25,8 @@ namespace Settlement
     // Building
     std::vector<Buildings::Building> buildings = {};
 
+    std::vector<std::string> garrison = {};
+
 
     // TOOD might need separate save/load functions for this one
     template<class Archive>

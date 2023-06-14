@@ -25,17 +25,17 @@ namespace ActorSystem
   {
     entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
     // 0. if the colonist isnt selected, bail
-    if ( selected_entity == entt::null || !Global::world.all_of<Unit::Component>( selected_entity ) )
+    if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
       return false;
 
     // 1. if the colonist is moving, bail
-    if ( MovementSystem::UnitIsMoving( selected_entity ) )
+    if ( MovementSystem::ActorIsMoving( selected_entity ) )
       return false;
 
-    Unit::Component unit =
-      Global::world.get<Unit::Component>( selected_entity );
+    Actor::Component actor =
+      Global::world.get<Actor::Component>( selected_entity );
 
-    i32 closest_tile = DetermineTileIdFromPosition( unit.position );
+    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
 
     // 2. if they aren't in a tile, bail
     if ( closest_tile == -1 )
@@ -46,7 +46,7 @@ namespace ActorSystem
       auto &prov = Global::world.get<Province::Component>( entity );
 
       // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
-      if ( prov.tile->id == closest_tile && prov.owner == unit.owner && !Global::world.any_of<Settlement::Component>( entity ) )
+      if ( prov.tile->id == closest_tile && prov.owner == actor.owner && !Global::world.any_of<Settlement::Component>( entity ) )
       {
         return true;
       }
@@ -91,9 +91,6 @@ namespace ActorSystem
     Actor::Component actor = {
       .name = "Marcus Priscus",
       .type = Actor::Type::Colonist,
-    };
-
-    Unit::Component unit = {
       .owner = owner,
       .position = spawn,
       .destination = spawn,
@@ -123,7 +120,6 @@ namespace ActorSystem
     };
 
     Global::world.emplace<Actor::Component>( entity, actor );
-    Global::world.emplace<Unit::Component>( entity, unit );
     Global::world.emplace<Animated::Component>( entity, animated );
     Global::world.emplace<Sight::Component>( entity, sight );
   }
@@ -148,7 +144,7 @@ namespace ActorSystem
   inline void DeleteSelected()
   {
     auto selectedView =
-      Global::world.view<Selected::Component, Unit::Component>();
+      Global::world.view<Selected::Component, Actor::Component>();
     auto selectedEntity = selectedView.front();
 
     if ( selectedEntity == entt::null )
