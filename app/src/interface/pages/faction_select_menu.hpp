@@ -54,7 +54,7 @@ namespace UI
   {
     return {
       Panel( "faction_select_menu" )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .SetAnchor( Anchor::Centered )
         .Children( CreateFactionButtons() ),
     };

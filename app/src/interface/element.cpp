@@ -7,59 +7,7 @@ namespace UI
     if ( starts_disabled )
       return;
 
-    switch ( type )
-    {
-      case Type::INVALID:
-        printf( "INVALID TYPE ENABLED\n" );
-        assert( false );
-        break;
-      case Type::Panel:
-      {
-        enabled = true;
-        Resize();
-        Reposition();
-
-        for ( Element &child: children )
-        {
-          child.InitialEnable();
-          child.Resize();
-          child.Reposition();
-        }
-      }
-      break;
-      case Type::DataPanel:
-      {
-        enabled = true;
-        Resize();
-        Reposition();
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-
-          child.InitialEnable();
-          child.Resize();
-          child.Reposition();
-        }
-      }
-      break;
-      case Type::StackPanel:
-      {
-        enabled = true;
-        children[curr_index].InitialEnable();
-        children[curr_index].Resize();
-        children[curr_index].Reposition();
-      }
-      break;
-      case Type::TextLabel:
-      case Type::TextButton:
-      case Type::TextureLabel:
-      case Type::TextureButton:
-      {
-        enabled = true;
-      }
-      break;
-    }
+    Enable();
   }
 
   void Element::Enable()
@@ -642,14 +590,26 @@ namespace UI
       break;
       case Type::DataPanel:
       {
-        if ( update_data )
+        if ( update )
         {
-          update_data( data_points );
+          update( *this );
         }
       }
       break;
       default:
         break;
+    }
+  }
+
+  void Element::CreateElementForDatapoints( Element element )
+  {
+    if ( !data_points.contains( element.id ) )
+    {
+      element.Enable();
+      data_points.insert_or_assign( element.id, element );
+    }
+    else
+    {
     }
   }
 

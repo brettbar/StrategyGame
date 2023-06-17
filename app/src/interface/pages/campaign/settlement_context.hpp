@@ -11,47 +11,38 @@ namespace UI
   inline Element MilitaryTab()
   {
     return Panel( "settlement_context_military" )
-      .SetAxis( Axis::Column )
+      .Axis( Axis::Column )
       .Children( {
         TextButton( "train_hastati" )
           .SetText( "Train", 24 )
           .Background( GREEN )
           .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati ),
-        DataPanel( "settlement_garrison" )
-          .UpdateData( []( std::map<std::string, Element> &data_points ) {
-            std::vector<Regiment> regiments =
-              SettlementSystem::SelectedSettlementGarrisonList();
+        DataPanel( "settlement_garrison" ).Update( []( Element &self ) {
+          std::vector<Regiment> regiments =
+            SettlementSystem::SelectedSettlementGarrisonList();
 
-            for ( auto regiment: regiments )
-            {
-              std::string panel_id =
-                "regiment_" + std::to_string( regiment.id );
+          for ( auto regiment: regiments )
+          {
+            std::string panel_id = "regiment_" + std::to_string( regiment.id );
 
-              if ( !data_points.contains( panel_id ) )
-              {
-
-                Element panel =
-                  Panel( panel_id )
-                    .Children(
-                      { TextLabel( panel_id + "_unit_type" )
-                          .SetText( "Hastati", 24 ),
-                        TextLabel( panel_id + "_unit_count" )
-                          .SetText( std::to_string( regiment.number ), 24 ) }
-                    );
-
-                panel.Enable();
-
-                data_points.insert_or_assign( panel_id, panel );
-              }
-            }
-          } ),
+            self.CreateElementForDatapoints(
+              Panel( panel_id )
+                .Children(
+                  { TextLabel( panel_id + "_unit_type" )
+                      .SetText( "Hastati", 24 ),
+                    TextLabel( panel_id + "_unit_count" )
+                      .SetText( std::to_string( regiment.number ), 24 ) }
+                )
+            );
+          }
+        } ),
       } );
   }
 
   inline Element BuildingTab()
   {
     return Panel( "settlement_context_construction" )
-      .SetAxis( Axis::Column )
+      .Axis( Axis::Column )
       .Children( {
         TextLabel( "buildings_label" ).SetText( "Buildings", 26 ),
         TextButton( "build_farm" )
@@ -76,7 +67,7 @@ namespace UI
           } ),
         DataPanel( "settlement_context_building_list" )
           .SetAxis( Axis::Column )
-          .UpdateData( []( std::map<std::string, Element> &data_points ) {
+          .Update( []( Element &self ) {
             std::vector<Buildings::Building> buildings =
               SettlementSystem::SelectedSettlementBuildingList();
 
@@ -86,34 +77,21 @@ namespace UI
               std::string building_name =
                 "building_list_item_" + building.name_str;
 
-              // TODO left off here
-              if ( !data_points.contains( building_name ) )
-              {
-                Element panel =
-                  Panel( "building_list_item_" + building.name_str )
-                    .Children( {
-                      TextLabel( building.name_str )
-                        .SetText( "Farm", 24 )
-                        .Background( GREEN ),
-                      TextLabel( building.name_str + "_count" )
-                        .SetText( "0", 24 )
-                        .Background( BLACK ),
-                      TextButton( "open_production_menu_" + building.name_str )
-                        .SetText( "+", 24 ),
-                      Panel( "building_producing_list" ),
-                      Panel( "building_using_list" ),
-                    } );
-
-                panel.Enable();
-
-                data_points.insert_or_assign( building_name, panel );
-              }
-              else
-              {
-                data_points.at( building_name )
-                  .children[2]
-                  .UpdateText( std::to_string( buildings.size() ) );
-              }
+              self.CreateElementForDatapoints(
+                Panel( "building_list_item_" + building.name_str )
+                  .Children( {
+                    TextLabel( building.name_str )
+                      .SetText( "Farm", 24 )
+                      .Background( GREEN ),
+                    TextLabel( building.name_str + "_count" )
+                      .SetText( "0", 24 )
+                      .Background( BLACK ),
+                    TextButton( "open_production_menu_" + building.name_str )
+                      .SetText( "+", 24 ),
+                    Panel( "building_producing_list" ),
+                    Panel( "building_using_list" ),
+                  } )
+              );
             }
           } ),
       } );
@@ -122,65 +100,41 @@ namespace UI
   inline Element ResourceTab()
   {
     return Panel( "settlement_context_resources" )
-      .SetAxis( Axis::Column )
+      .Axis( Axis::Column )
       .Children( {
         TextLabel( "settlement_resource_list_label" )
           .SetText( "Resource List", 26 ),
         DataPanel( "settlement_resource_list" )
           .SetAxis( Axis::Column )
-          .UpdateData( []( std::map<std::string, Element> &existing_ids ) {
+          .Update( []( Element &self ) {
             Settlement::Component selected_settlement =
               SettlementSystem::ReadSelectedComponent();
 
+
             for ( auto [resource, count]: selected_settlement.raw_materials )
             {
-              if ( !existing_ids.contains(
-                     Resources::GetRawMaterialName( resource ) + "_data_point"
-                   ) )
-              {
-                Element resource_panel =
-                  Panel(
-                    Resources::GetRawMaterialName( resource ) + "_data_point"
-                  )
-                    .Children( {
-                      TextureLabel(
-                        Resources::GetRawMaterialName( resource ) +
-                        "_data_point_label"
-                      )
-                        .SetTexture( GetRawMaterialName( resource ) + ".png" ),
-                      TextLabel(
-                        Resources::GetRawMaterialName( resource ) +
-                        "_data_point_value"
-                      )
-                        .SetText( std::to_string( count ), 24 )
-                        .Background( BLACK ),
-                    } );
+              auto id =
+                Resources::GetRawMaterialName( resource ) + "_data_point";
 
-                // Element resource_panel =
-                //   TextLabel(
-                //     Resources::GetRawMaterialName( resource ) +
-                //     "_data_point"
-                //   )
-                //     .SetText( "test", 24 )
-                //     .Background( YELLOW );
+              self.CreateElementForDatapoints(
 
-                existing_ids.insert_or_assign(
-                  Resources::GetRawMaterialName( resource ) + "_data_point",
-                  resource_panel
-                );
-
-                existing_ids
-                  .at(
-                    Resources::GetRawMaterialName( resource ) + "_data_point"
-                  )
-                  .Register();
-
-                existing_ids
-                  .at(
-                    Resources::GetRawMaterialName( resource ) + "_data_point"
-                  )
-                  .Enable();
-              }
+                Panel(
+                  Resources::GetRawMaterialName( resource ) + "_data_point"
+                )
+                  .Children( {
+                    TextureLabel(
+                      Resources::GetRawMaterialName( resource ) +
+                      "_data_point_label"
+                    )
+                      .SetTexture( GetRawMaterialName( resource ) + ".png" ),
+                    TextLabel(
+                      Resources::GetRawMaterialName( resource ) +
+                      "_data_point_value"
+                    )
+                      .SetText( std::to_string( count ), 24 )
+                      .Background( BLACK ),
+                  } )
+              );
             }
           } ),
       } );
@@ -203,7 +157,7 @@ namespace UI
       )
       .Children( {
         Panel( "settlement_context_tab_group" )
-          .SetAxis( Axis::Column )
+          .Axis( Axis::Column )
           .Background( BLUE )
           .Children( {
             TextureButton( "settlement_context_tab_garrison" )

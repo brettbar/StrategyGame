@@ -212,7 +212,7 @@ private:
     };
 
     return Panel( "debug_info" )
-      .SetAxis( Axis::Column )
+      .Axis( Axis::Column )
       .SetAnchor( Anchor::TopRight )
       .UpdateChildren( update_debug_info )
       .Background( BLUE )

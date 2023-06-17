@@ -16,7 +16,7 @@ namespace UI
     return {
       Panel( "singleplayer_lobby" )
         .SetAnchor( Anchor::Centered )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .Children( {
           TextButton( "singleplayer_faction_label" )
             .SetText( "Select your faction", 32 )

@@ -93,7 +93,7 @@ public:
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
-    std::function<void( std::map<std::string, Element> & )> update_data = {};
+    std::function<void( Element & )> update = {};
 
 
     std::function<void( std::map<std::string, bool> &, std::vector<Element> & )>
@@ -143,6 +143,8 @@ public:
     void UpdateChildren();
     void Draw();
     void FireEvent();
+
+    void CreateElementForDatapoints( Element );
   };
 
 

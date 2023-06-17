@@ -10,7 +10,7 @@ namespace UI
   {
     return {
       Panel( "modal_menu" )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .SetAnchor( Anchor::Centered )
         .Children( {
           TextButton( "modal_menu_load_game" )

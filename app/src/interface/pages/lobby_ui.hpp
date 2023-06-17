@@ -20,7 +20,7 @@ namespace UI
 
       Element panel =
         Panel( player_id + "_slot" )
-          .SetAxis( Axis::Column )
+          .Axis( Axis::Column )
           .Margins( { 16, 16, 0, 0 } )
           .Children( {
             TextButton( player_id + "_select_faction_btn" )
@@ -115,7 +115,7 @@ namespace UI
   {
     return {
       Panel( "lobby" )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .SetAnchor( Anchor::Centered )
         .Children( {
           TextLabel( "lobby_title" )

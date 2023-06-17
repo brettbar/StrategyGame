@@ -62,7 +62,7 @@ public:
       return *this;
     }
 
-    PanelBuilder &SetAxis( Axis axis )
+    PanelBuilder &Axis( Axis axis )
     {
       _element.children_axis = axis;
       return *this;
@@ -119,11 +119,9 @@ public:
       return *this;
     }
 
-    DataPanelBuilder &UpdateData(
-      std::function<void( std::map<std::string, Element> & )> update_data
-    )
+    DataPanelBuilder &Update( std::function<void( Element & )> update )
     {
-      _element.update_data = update_data;
+      _element.update = update;
       return *this;
     }
 

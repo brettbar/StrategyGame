@@ -11,7 +11,7 @@ namespace UI
   {
     return {
       Panel( "main_menu" )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .SetAnchor( Anchor::Centered )
         .Background( GREEN )
         .Children( {

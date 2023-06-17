@@ -52,7 +52,7 @@ namespace UI
 
     return {
       Panel( "lobby_browser" )
-        .SetAxis( Axis::Column )
+        .Axis( Axis::Column )
         .SetAnchor( Anchor::Centered )
         .UpdateChildren( update_children ),
     };
