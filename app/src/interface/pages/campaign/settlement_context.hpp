@@ -25,10 +25,13 @@ namespace UI
           {
             std::string panel_id = "regiment_" + std::to_string( regiment.id );
 
+
             self.CreateElementForDatapoints(
               Panel( panel_id )
+                .Axis( Axis::Column )
                 .Children( {
-                  TextLabel( panel_id + "_unit_type" ).Text( "Hastati", 24 ),
+                  TextureLabel( panel_id + "_unit_type" )
+                    .Texture( "romans_hastati_texture" ),
                   TextLabel( panel_id + "_unit_count" )
                     .Text( std::to_string( regiment.number ), 24 ),
                 } )
@@ -125,7 +128,7 @@ namespace UI
                       Resources::GetRawMaterialName( resource ) +
                       "_data_point_label"
                     )
-                      .SetTexture( GetRawMaterialName( resource ) + ".png" ),
+                      .Texture( GetRawMaterialName( resource ) + ".png" ),
                     TextLabel(
                       Resources::GetRawMaterialName( resource ) +
                       "_data_point_value"

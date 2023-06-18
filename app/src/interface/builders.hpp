@@ -292,7 +292,7 @@ public:
       _element.id = id;
     }
 
-    TextureLabelBuilder &SetTexture( std::string texture_id )
+    TextureLabelBuilder &Texture( std::string texture_id )
     {
       _element.texture =
         Global::texture_cache[hstr{ texture_id.c_str() }]->texture;
