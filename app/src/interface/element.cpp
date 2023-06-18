@@ -266,7 +266,7 @@ namespace UI
         f32 end_of_last_x = transform.x;
         f32 end_of_last_y = transform.y;
 
-        UpdateChildren();
+        Update();
 
         for ( Element &child: children )
         {
@@ -373,7 +373,7 @@ namespace UI
         f32 end_of_last_x = transform.x;
         f32 end_of_last_y = transform.y;
 
-        UpdateChildren();
+        Update();
 
         for ( auto &pair: data_points )
         {
@@ -565,34 +565,18 @@ namespace UI
     }
   }
 
-  void Element::UpdateChildren()
+  void Element::Update()
   {
     if ( !enabled )
       return;
 
     switch ( type )
     {
-      case Type::Panel:
-      {
-        // TODO rf this should be removed now that we have data panels
-        if ( update_children )
-        {
-          std::map<std::string, bool> existing_ids = {};
-
-          for ( auto &child: children )
-          {
-            existing_ids.emplace( child.id, true );
-          }
-
-          update_children( existing_ids, children );
-        }
-      }
-      break;
       case Type::DataPanel:
       {
-        if ( update )
+        if ( self_update )
         {
-          update( *this );
+          self_update( *this );
         }
       }
       break;

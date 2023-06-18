@@ -14,7 +14,7 @@ namespace UI
       .Axis( Axis::Column )
       .Children( {
         TextButton( "train_hastati" )
-          .SetText( "Train", 24 )
+          .Text( "Train", 24 )
           .Background( GREEN )
           .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati ),
         DataPanel( "settlement_garrison" ).Update( []( Element &self ) {
@@ -27,12 +27,11 @@ namespace UI
 
             self.CreateElementForDatapoints(
               Panel( panel_id )
-                .Children(
-                  { TextLabel( panel_id + "_unit_type" )
-                      .SetText( "Hastati", 24 ),
-                    TextLabel( panel_id + "_unit_count" )
-                      .SetText( std::to_string( regiment.number ), 24 ) }
-                )
+                .Children( {
+                  TextLabel( panel_id + "_unit_type" ).Text( "Hastati", 24 ),
+                  TextLabel( panel_id + "_unit_count" )
+                    .Text( std::to_string( regiment.number ), 24 ),
+                } )
             );
           }
         } ),
@@ -44,9 +43,9 @@ namespace UI
     return Panel( "settlement_context_construction" )
       .Axis( Axis::Column )
       .Children( {
-        TextLabel( "buildings_label" ).SetText( "Buildings", 26 ),
+        TextLabel( "buildings_label" ).Text( "Buildings", 26 ),
         TextButton( "build_farm" )
-          .SetText( "Build Farm", 26 )
+          .Text( "Build Farm", 26 )
           .SetEvent( InterfaceEvent::Data{
             InterfaceEvent::ID::SettlementContextConstructBuilding,
             "farm",
@@ -55,18 +54,18 @@ namespace UI
         Panel( "settlement_context_building_labels" )
           .Children( {
             TextLabel( "building_name" )
-              .SetText( "Building", 24 )
+              .Text( "Building", 24 )
               .Background( PURPLE ),
             TextLabel( "producing" )
-              .SetText( "Producing", 24 )
+              .Text( "Producing", 24 )
               .Background( PURPLE )
               .Margins( { Margins{ 4, 4, 0, 0 } } ),
             TextLabel( "consuming" )
-              .SetText( "Consuming", 24 )
+              .Text( "Consuming", 24 )
               .Background( PURPLE ),
           } ),
         DataPanel( "settlement_context_building_list" )
-          .SetAxis( Axis::Column )
+          .Axis( Axis::Column )
           .Update( []( Element &self ) {
             std::vector<Buildings::Building> buildings =
               SettlementSystem::SelectedSettlementBuildingList();
@@ -81,13 +80,13 @@ namespace UI
                 Panel( "building_list_item_" + building.name_str )
                   .Children( {
                     TextLabel( building.name_str )
-                      .SetText( "Farm", 24 )
+                      .Text( "Farm", 24 )
                       .Background( GREEN ),
                     TextLabel( building.name_str + "_count" )
-                      .SetText( "0", 24 )
+                      .Text( "0", 24 )
                       .Background( BLACK ),
                     TextButton( "open_production_menu_" + building.name_str )
-                      .SetText( "+", 24 ),
+                      .Text( "+", 24 ),
                     Panel( "building_producing_list" ),
                     Panel( "building_using_list" ),
                   } )
@@ -103,9 +102,9 @@ namespace UI
       .Axis( Axis::Column )
       .Children( {
         TextLabel( "settlement_resource_list_label" )
-          .SetText( "Resource List", 26 ),
+          .Text( "Resource List", 26 ),
         DataPanel( "settlement_resource_list" )
-          .SetAxis( Axis::Column )
+          .Axis( Axis::Column )
           .Update( []( Element &self ) {
             Settlement::Component selected_settlement =
               SettlementSystem::ReadSelectedComponent();
@@ -131,7 +130,7 @@ namespace UI
                       Resources::GetRawMaterialName( resource ) +
                       "_data_point_value"
                     )
-                      .SetText( std::to_string( count ), 24 )
+                      .Text( std::to_string( count ), 24 )
                       .Background( BLACK ),
                   } )
               );
@@ -143,7 +142,7 @@ namespace UI
   inline Element CreateSettlementContextPanel()
   {
     return Panel( "settlement_context_panel" )
-      .SetAnchor( Anchor::BottomMid )
+      .Anchor( Anchor::BottomMid )
       .FixedSize( 800, 350 )
       .Background( Fade( BLACK, 0.5 ) )
       .On(
@@ -204,7 +203,7 @@ namespace UI
             Panel( "settlement_context_overview" )
               .Children( {
                 TextLabel( "settlement_name" )
-                  .SetText( "Uninhabited", 26 )
+                  .Text( "Uninhabited", 26 )
                   .On(
                     InterfaceUpdate::ID::SettlementContext,
                     []( Element &self, InterfaceUpdate::Update update ) {
@@ -215,7 +214,7 @@ namespace UI
                     }
                   ),
                 TextLabel( "settlement_population" )
-                  .SetText( "Uninhabited", 26 )
+                  .Text( "Uninhabited", 26 )
                   .On(
                     InterfaceUpdate::ID::SettlementContext,
                     []( Element &self, InterfaceUpdate::Update update ) {
@@ -226,7 +225,7 @@ namespace UI
                     }
                   ),
                 TextLabel( "settlement_development" )
-                  .SetText( "Uninhabited", 26 )
+                  .Text( "Uninhabited", 26 )
                   .On(
                     InterfaceUpdate::ID::SettlementContext,
                     []( Element &self, InterfaceUpdate::Update update ) {

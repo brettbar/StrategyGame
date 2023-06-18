@@ -213,19 +213,17 @@ private:
 
     return Panel( "debug_info" )
       .Axis( Axis::Column )
-      .SetAnchor( Anchor::TopRight )
+      .Anchor( Anchor::TopRight )
       .UpdateChildren( update_debug_info )
       .Background( BLUE )
       .Children( {
-        TextLabel( "fps" ).Background( BLACK ).SetText( "fps: ", 18.0f, GREEN ),
-        TextLabel( "hot" ).Background( BLACK ).SetText( "hot: ", 18.0f ),
-        TextLabel( "active" ).Background( BLACK ).SetText( "active: ", 18.0f ),
+        TextLabel( "fps" ).Background( BLACK ).Text( "fps: ", 18.0f, GREEN ),
+        TextLabel( "hot" ).Background( BLACK ).Text( "hot: ", 18.0f ),
+        TextLabel( "active" ).Background( BLACK ).Text( "active: ", 18.0f ),
         TextLabel( "element.background" )
           .Background( BLACK )
-          .SetText( "element.background: ", 18.0f ),
-        TextLabel( "selected" )
-          .SetText( "entity: ", 18.0f )
-          .Background( BLACK ),
+          .Text( "element.background: ", 18.0f ),
+        TextLabel( "selected" ).Text( "entity: ", 18.0f ).Background( BLACK ),
       } );
   }
 

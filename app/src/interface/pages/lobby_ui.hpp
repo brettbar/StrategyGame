@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../element.hpp"
+#include "../builders.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -24,7 +24,7 @@ namespace UI
           .Margins( { 16, 16, 0, 0 } )
           .Children( {
             TextButton( player_id + "_select_faction_btn" )
-              .SetText( "Select Faction", 24 )
+              .Text( "Select Faction", 24 )
               .Background( GRAY )
               .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage )
               .Clickable( false )
@@ -63,7 +63,7 @@ namespace UI
                 }
               ),
             TextLabel( player_id + "_selected_faction_lbl" )
-              .SetText( "Selecting Faction...", 24 )
+              .Text( "Selecting Faction...", 24 )
               .Background( GRAY )
               .On(
                 InterfaceUpdate::ID::PlayerSelectedFaction,
@@ -78,7 +78,7 @@ namespace UI
                 }
               ),
             TextLabel( player_id + "_readied" )
-              .SetText( "Not Ready", 24 )
+              .Text( "Not Ready", 24 )
               .Background( RED )
               .On(
                 InterfaceUpdate::ID::PlayerToggledReady,
@@ -99,7 +99,7 @@ namespace UI
                 }
               ),
             TextLabel( player_id + "_steam_user_name" )
-              .SetText( "", 24 )
+              .Text( "", 24 )
               .Background( GRAY ),
           } );
 
@@ -116,10 +116,10 @@ namespace UI
     return {
       Panel( "lobby" )
         .Axis( Axis::Column )
-        .SetAnchor( Anchor::Centered )
+        .Anchor( Anchor::Centered )
         .Children( {
           TextLabel( "lobby_title" )
-            .SetText(
+            .Text(
               SteamMatchmaking()->GetLobbyData( Network::lobby_id, "name" ), 32
             )
             .Background( GREEN ),
@@ -132,17 +132,17 @@ namespace UI
               Network::MAX_PLAYERS_PER_SERVER
             ) ),
           TextButton( "lobby_back_to_main" )
-            .SetText( "Back", 32 )
+            .Text( "Back", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::ReturnToMain ),
           TextButton( "ready_up" )
-            .SetText( "Ready Up", 32 )
+            .Text( "Ready Up", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::PlayerToggledReady ),
           TextButton( "start_game" )
             .StartDisabled()
             .Clickable( false )
-            .SetText( "Start Game", 32 )
+            .Text( "Start Game", 32 )
             .Background( RED )
             .SetEvent( InterfaceEvent::ID::HostStartGame )
             .On(

@@ -15,15 +15,15 @@ namespace UI
   {
     return {
       Panel( "singleplayer_lobby" )
-        .SetAnchor( Anchor::Centered )
+        .Anchor( Anchor::Centered )
         .Axis( Axis::Column )
         .Children( {
           TextButton( "singleplayer_faction_label" )
-            .SetText( "Select your faction", 32 )
+            .Text( "Select your faction", 32 )
             .Background( GREEN )
             .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage ),
           TextButton( "singleplayer_faction_selected" )
-            .SetText( "Waiting to Select Faction", 32 )
+            .Text( "Waiting to Select Faction", 32 )
             .Background( GRAY )
             .On(
               InterfaceUpdate::ID::PlayerSelectedFaction,
@@ -38,7 +38,7 @@ namespace UI
               }
             ),
           TextButton( "singleplayer_lobby_started_game" )
-            .SetText( "Start Game", 32 )
+            .Text( "Start Game", 32 )
             .Background( BLUE )
             .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame ),
         }

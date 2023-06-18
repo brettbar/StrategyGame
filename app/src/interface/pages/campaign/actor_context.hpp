@@ -11,7 +11,7 @@ namespace UI
   inline Element CreateActorContextPanel()
   {
     return Panel( "actor_context_panel" )
-      .SetAnchor( Anchor::BottomMid )
+      .Anchor( Anchor::BottomMid )
       .Background( Fade( BLACK, 0.5 ) )
       .FixedSize( 800, 350 )
       .On(
@@ -29,7 +29,7 @@ namespace UI
             TextButton( "actor_spawn_settlement_button" )
               .Clickable( false )
               .Background( RED )
-              .SetText( "Spawn?", 26 )
+              .Text( "Spawn?", 26 )
               .SetEvent(
                 InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment )
               )

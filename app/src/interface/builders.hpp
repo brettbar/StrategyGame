@@ -56,7 +56,7 @@ public:
       return *this;
     }
 
-    PanelBuilder &SetAnchor( Anchor anchor )
+    PanelBuilder &Anchor( Anchor anchor )
     {
       _element.anchor = anchor;
       return *this;
@@ -81,7 +81,7 @@ public:
         update_children
     )
     {
-      _element.update_children = update_children;
+      // _element.update_children = update_children;
       return *this;
     }
 
@@ -121,13 +121,19 @@ public:
 
     DataPanelBuilder &Update( std::function<void( Element & )> update )
     {
-      _element.update = update;
+      _element.self_update = update;
       return *this;
     }
 
-    DataPanelBuilder &SetAxis( Axis axis )
+    DataPanelBuilder &Axis( Axis axis )
     {
       _element.children_axis = axis;
+      return *this;
+    }
+
+    DataPanelBuilder &Anchor( Anchor anchor )
+    {
+      _element.anchor = anchor;
       return *this;
     }
   };
@@ -195,21 +201,17 @@ public:
       return *this;
     }
 
-    TextLabelBuilder &SetText( std::string text, f32 font_size )
+    TextLabelBuilder &Text( std::string text, f32 font_size )
     {
       _element.text = text;
       _element.font_size = font_size;
       return *this;
     }
 
-    TextLabelBuilder &SetText(
-      std::string text,
-      f32 font_size,
-      Color text_color
-    )
+    TextLabelBuilder &Text( std::string text, f32 font_size, Color text_color )
     {
       _element.text_color = text_color;
-      return SetText( text, font_size );
+      return Text( text, font_size );
     }
 
     TextLabelBuilder &Margins( Margins margins )
@@ -252,21 +254,17 @@ public:
       return *this;
     }
 
-    TextButtonBuilder &SetText( std::string text, f32 font_size )
+    TextButtonBuilder &Text( std::string text, f32 font_size )
     {
       _element.text = text;
       _element.font_size = font_size;
       return *this;
     }
 
-    TextButtonBuilder &SetText(
-      std::string text,
-      f32 font_size,
-      Color text_color
-    )
+    TextButtonBuilder &Text( std::string text, f32 font_size, Color text_color )
     {
       _element.text_color = text_color;
-      return SetText( text, font_size );
+      return Text( text, font_size );
     }
 
     TextButtonBuilder &SetEvent( InterfaceEvent::Data event )

@@ -88,20 +88,13 @@ public:
     Axis children_axis = Axis::INVALID;
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
-
     std::vector<Element> children = {};
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
-    std::function<void( Element & )> update = {};
-
-
-    std::function<void( std::map<std::string, bool> &, std::vector<Element> & )>
-      update_children = {};
-
+    std::function<void( Element & )> self_update = {};
 
     std::vector<InterfaceUpdate::ID> subscribed_updates = {};
-
     std::map<
       InterfaceUpdate::ID,
       std::function<void( Element &, InterfaceUpdate::Update )>>
@@ -140,7 +133,8 @@ public:
     void UpdateBackground( Color );
     void UpdateClickable( bool new_clickable );
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
-    void UpdateChildren();
+    void Update();
+
     void Draw();
     void FireEvent();
 

@@ -437,6 +437,8 @@ inline void Campaign::Receive( const Command &cmd )
         return;
       }
 
+      // TODO(nick) if (cmd.msg = "Player spawn Army")
+
       if ( cmd.msg == "Player taking ownership of Province" )
       {
         ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
