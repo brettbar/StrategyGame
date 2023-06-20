@@ -31,7 +31,7 @@ namespace UI
                 .Axis( Axis::Column )
                 .Children( {
                   TextureLabel( panel_id + "_unit_type" )
-                    .Texture( "romans_hastati_texture" ),
+                    .Texture( "romans_hastati_texture_overview" ),
                   TextLabel( panel_id + "_unit_count" )
                     .Text( std::to_string( regiment.number ), 24 ),
                 } )

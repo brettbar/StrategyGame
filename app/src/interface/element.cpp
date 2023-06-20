@@ -720,7 +720,7 @@ namespace UI
       case Type::TextureButton:
       {
         DrawTextureEx(
-          texture, { transform.x, transform.y }, 0.0, SCALE * 2, WHITE
+          texture, { transform.x, transform.y }, 0.0, 1.0, WHITE
         );
       }
       break;

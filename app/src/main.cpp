@@ -209,12 +209,18 @@ void LoadResources()
     LoadImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str() ),
     Global::texture_cache
   );
-  // LEFT OFF. We should have a texture copy that is just the first idle frame
+
   LoadResource(
     hstr{ "romans_hastati_texture" },
     LoadImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
     Global::texture_cache
   );
+  LoadTexturePointFilter(
+    hstr{ "romans_hastati_texture_overview" },
+    CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
+    Global::texture_cache
+  );
+
   LoadResource(
     hstr{ "greeks_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/GreekVillager.png" ).c_str() ),
