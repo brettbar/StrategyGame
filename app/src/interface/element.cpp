@@ -501,8 +501,8 @@ namespace UI
       case Type::TextureButton:
       case Type::TextureLabel:
       {
-        transform.width = texture.width * UI::SCALE * 2;
-        transform.height = texture.height * UI::SCALE * 2;
+        transform.width = texture.width;
+        transform.height = texture.height;
       }
       break;
     }
@@ -720,7 +720,7 @@ namespace UI
       case Type::TextureButton:
       {
         DrawTextureEx(
-          texture, { transform.x, transform.y }, 0.0, 1.0, WHITE
+          texture, { transform.x, transform.y }, 0.0, 1, WHITE
         );
       }
       break;

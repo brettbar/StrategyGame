@@ -19,7 +19,6 @@ using TextureCache = entt::resource_cache<TextureResource, TextureLoader>;
 inline void LoadResource( hstr id, Image image, TextureCache &cache ) {
   ImageAlphaPremultiply( &image );
   Texture2D tex = LoadTextureFromImage( image );
-
   SetTextureFilter( tex, TEXTURE_FILTER_BILINEAR );
   cache.load( id, tex );
 }
@@ -29,7 +28,6 @@ inline void
 LoadTexturePointFilter( hstr id, Image image, TextureCache &cache ) {
   ImageAlphaPremultiply( &image );
   Texture2D tex = LoadTextureFromImage( image );
-
   // SetTextureFilter( tex, TEXTURE_FILTER_BILINEAR );
   cache.load( id, tex );
 }
