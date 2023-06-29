@@ -312,55 +312,7 @@ namespace UI
           if ( !child.enabled )
             continue;
 
-          if ( children_axis == Axis::Row )
-          {
-            // 2. Set the child x position based on alignment style.
-            switch ( children_horiz_align )
-            {
-              case Align::Start:
-              {
-                child.transform.x = end_of_last_x + child.margins.left;
-                end_of_last_x = child.transform.x + child.transform.width +
-                                child.margins.right;
-              }
-              break;
-            }
-
-            // 3. Set the child y position based on alignment style.
-            switch ( children_vert_align )
-            {
-              case Align::Start:
-              {
-                child.transform.y = transform.y;
-              }
-              break;
-            }
-          }
-          else if ( children_axis == Axis::Column )
-          {
-            // 2. Set the child x position based on alignment style.
-            switch ( children_horiz_align )
-            {
-              case Align::Start:
-              {
-                child.transform.x = transform.x;
-              }
-              break;
-            }
-
-            // 3. Set the child y position based on alignment style.
-            switch ( children_vert_align )
-            {
-              case Align::Start:
-              {
-                child.transform.y = end_of_last_y;
-                // + margins.top;
-                end_of_last_y = child.transform.y + child.transform.height;
-                // + margins.bottom;
-              }
-              break;
-            }
-          }
+          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
         }
       }
       break;
@@ -423,55 +375,7 @@ namespace UI
           if ( !child.enabled )
             continue;
 
-          if ( children_axis == Axis::Row )
-          {
-            // 2. Set the child x position based on alignment style.
-            switch ( children_horiz_align )
-            {
-              case Align::Start:
-              {
-                child.transform.x = end_of_last_x + child.margins.left;
-                end_of_last_x = child.transform.x + child.transform.width +
-                                child.margins.right;
-              }
-              break;
-            }
-
-            // 3. Set the child y position based on alignment style.
-            switch ( children_vert_align )
-            {
-              case Align::Start:
-              {
-                child.transform.y = transform.y;
-              }
-              break;
-            }
-          }
-          else if ( children_axis == Axis::Column )
-          {
-            // 2. Set the child x position based on alignment style.
-            switch ( children_horiz_align )
-            {
-              case Align::Start:
-              {
-                child.transform.x = transform.x;
-              }
-              break;
-            }
-
-            // 3. Set the child y position based on alignment style.
-            switch ( children_vert_align )
-            {
-              case Align::Start:
-              {
-                child.transform.y = end_of_last_y;
-                // + margins.top;
-                end_of_last_y = child.transform.y + child.transform.height;
-                // + margins.bottom;
-              }
-              break;
-            }
-          }
+          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
         }
       }
       break;
@@ -505,6 +409,74 @@ namespace UI
         transform.height = texture.height;
       }
       break;
+    }
+  }
+
+  void Element::LayoutChild(
+    Element &child,
+    f32 total_children_width,
+    f32 &end_of_last_x,
+    f32 &end_of_last_y
+  )
+  {
+    if ( children_axis == Axis::Row )
+    {
+      // 2. Set the child x position based on alignment style.
+      switch ( children_horiz_align )
+      {
+        case Align::Start:
+        {
+          child.transform.x = end_of_last_x + child.margins.left;
+          end_of_last_x =
+            child.transform.x + child.transform.width + child.margins.right;
+        }
+        break;
+        case Align::SpaceBetween:
+        {
+          f32 gap_width = ( this->transform.width - total_children_width ) /
+                          ( children.size() - 1 );
+
+          child.transform.x = end_of_last_x + child.margins.left;
+          end_of_last_x = child.transform.x + child.transform.width +
+                          child.margins.right + gap_width;
+        }
+        break;
+      }
+
+      // 3. Set the child y position based on alignment style.
+      switch ( children_vert_align )
+      {
+        case Align::Start:
+        {
+          child.transform.y = transform.y;
+        }
+        break;
+      }
+    }
+    else if ( children_axis == Axis::Column )
+    {
+      // 2. Set the child x position based on alignment style.
+      switch ( children_horiz_align )
+      {
+        case Align::Start:
+        {
+          child.transform.x = transform.x;
+        }
+        break;
+      }
+
+      // 3. Set the child y position based on alignment style.
+      switch ( children_vert_align )
+      {
+        case Align::Start:
+        {
+          child.transform.y = end_of_last_y;
+          // + margins.top;
+          end_of_last_y = child.transform.y + child.transform.height;
+          // + margins.bottom;
+        }
+        break;
+      }
     }
   }
 
@@ -719,9 +691,7 @@ namespace UI
       case Type::TextureLabel:
       case Type::TextureButton:
       {
-        DrawTextureEx(
-          texture, { transform.x, transform.y }, 0.0, 1, WHITE
-        );
+        DrawTextureEx( texture, { transform.x, transform.y }, 0.0, 1, WHITE );
       }
       break;
     }

@@ -45,6 +45,7 @@ namespace UI
   {
     INVALID,
     Start,
+    SpaceBetween,
   };
 
   struct Margins
@@ -129,6 +130,7 @@ public:
     // Shouldnt it be in Reposition fn?
     // TODO should we take in to account ui scale
     void Resize();
+    void LayoutChild( Element &, f32, f32 &, f32 & );
     void UpdateText( std::string );
     void UpdateBackground( Color );
     void UpdateClickable( bool new_clickable );

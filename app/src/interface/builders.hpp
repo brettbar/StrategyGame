@@ -96,6 +96,12 @@ public:
       _element.margins = margins;
       return *this;
     }
+
+    PanelBuilder &AlignHoriz( Align align )
+    {
+      _element.children_horiz_align = align;
+      return *this;
+    }
   };
 
   class DataPanelBuilder : public AbstractBuilder
