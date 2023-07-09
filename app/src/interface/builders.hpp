@@ -68,7 +68,6 @@ public:
       return *this;
     }
 
-
     PanelBuilder &Children( std::vector<Element> children )
     {
       _element.children = children;

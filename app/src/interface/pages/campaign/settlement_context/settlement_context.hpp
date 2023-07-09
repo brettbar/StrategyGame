@@ -1,20 +1,14 @@
 #pragma once
-#include "../../../element.hpp"
-#include "../../../ui_utils.hpp"
-
-#include "../../../../world/systems/settlement_system.hpp"
-
-#include "../../../builders.hpp"
+#include "military_tab.hpp"
 
 namespace UI
 {
-
   inline Element CreateSettlementContextPanel()
   {
     return Panel( "settlement_context" )
       .Axis( Axis::Column )
       .Anchor( Anchor::BottomMid )
-      .FixedSize( 800, 350 )
+      .FixedSize( 1200, 285 )
       .Background( Fade( BLACK, 0.5 ) )
       .On(
         InterfaceUpdate::ID::SettlementContext,
@@ -27,48 +21,35 @@ namespace UI
       )
       .Children( {
         Panel( "settlement_title" )
-          .AlignHoriz( Align::SpaceBetween )
-          .FixedSize( 800, 24 )
+          .FixedSize( 1200, 24 )
           .Children( {
-            TextLabel( "settlement_title_name" ).Text( "Unnamed", 24 ),
-            TextLabel( "settlement_title_dev" ).Text( "Uninhabited", 24 ),
-            TextLabel( "settlement_title_pop" ).Text( "0", 24 ),
+            Panel( "settlement_context_tab_group" )
+              .Axis( Axis::Column )
+              .Background( BLUE )
+              .Children( {
+                TextureButton( "settlement_context_tab_population" )
+                  .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab
+                  ),
+                TextureButton( "settlement_context_tab_construction" )
+                  .SetEvent(
+                    InterfaceEvent::ID::SettlementContextConstructionTab
+                  ),
+                TextureButton( "settlement_context_tab_resources" )
+                  .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab
+                  ),
+                TextureButton( "settlement_context_tab_garrison" )
+                  .SetEvent( InterfaceEvent::ID::SettlementContextMilitaryTab ),
+                TextureButton( "settlement_context_tab_culture" ),
+              } ),
+            StackPanel( "settlement_context_content" )
+              .Background( RED )
+              .Children( {
+                MilitaryTab(),
+              } ),
           } ),
       } );
   }
 
-  // inline Element MilitaryTab()
-  // {
-  //   return Panel( "settlement_context_military" )
-  //     .Axis( Axis::Column )
-  //     .Children( {
-  //       TextButton( "train_hastati" )
-  //         .Text( "Train", 24 )
-  //         .Background( GREEN )
-  //         .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati ),
-  //       DataPanel( "settlement_garrison" ).Update( []( Element &self ) {
-  //         std::vector<Regiment> regiments =
-  //           SettlementSystem::SelectedSettlementGarrisonList();
-
-  //         for ( auto regiment: regiments )
-  //         {
-  //           std::string panel_id = "regiment_" + std::to_string( regiment.id );
-
-
-  //           self.CreateElementForDatapoints(
-  //             Panel( panel_id )
-  //               .Axis( Axis::Column )
-  //               .Children( {
-  //                 TextureLabel( panel_id + "_unit_type" )
-  //                   .Texture( "romans_hastati_texture_overview" ),
-  //                 TextLabel( panel_id + "_unit_count" )
-  //                   .Text( std::to_string( regiment.number ), 24 ),
-  //               } )
-  //           );
-  //         }
-  //       } ),
-  //     } );
-  // }
 
   // inline Element BuildingTab()
   // {
