@@ -42,6 +42,7 @@ namespace UI
                 TextureButton( "settlement_context_tab_culture" ),
               } ),
             StackPanel( "settlement_context_content" )
+              .FixedSize( 1200, 24 )
               .Background( RED )
               .Children( {
                 MilitaryTab(),

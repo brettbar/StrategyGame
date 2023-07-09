@@ -27,6 +27,7 @@ public:
     {
       _element.type = Type::Panel;
       _element.id = id;
+      _element.sized = Size::ChildrenDetermined;
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
@@ -50,7 +51,7 @@ public:
 
     PanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.fixed_size = true;
+      _element.sized = Size::Fixed;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;
@@ -111,11 +112,20 @@ public:
     explicit DataPanelBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::DataPanel;
+      _element.sized = Size::ChildrenDetermined;
       _element.id = id;
       _element.curr_index = 0;
       _element.children_axis = Axis::Row;
       _element.children_horiz_align = Align::Start;
       _element.children_vert_align = Align::Start;
+    }
+
+    DataPanelBuilder &FixedSize( u32 width, u32 height )
+    {
+      _element.sized = Size::Fixed;
+      _element.transform.width = width;
+      _element.transform.height = height;
+      return *this;
     }
 
     DataPanelBuilder &DataPoints( std::map<std::string, Element> data_points )
@@ -151,8 +161,17 @@ public:
     explicit StackPanelBuilder( std::string id ) : AbstractBuilder{ _element }
     {
       _element.type = Type::StackPanel;
+      _element.sized = Size::ChildrenDetermined;
       _element.id = id;
       _element.curr_index = 0;
+    }
+
+    StackPanelBuilder &FixedSize( u32 width, u32 height )
+    {
+      _element.sized = Size::Fixed;
+      _element.transform.width = width;
+      _element.transform.height = height;
+      return *this;
     }
 
     StackPanelBuilder &On(

@@ -50,6 +50,9 @@ namespace UI
       case Type::StackPanel:
       {
         enabled = true;
+        Resize();
+        Reposition();
+
         children[curr_index].Enable();
         children[curr_index].Resize();
         children[curr_index].Reposition();
@@ -173,7 +176,6 @@ namespace UI
 
   void Element::Reposition()
   {
-
     bool is_panel = type == Type::Panel || type == Type::DataPanel ||
                     type == Type::StackPanel;
 
@@ -217,34 +219,53 @@ namespace UI
         break;
     }
 
+
     switch ( type )
     {
       case Type::Panel:
       {
+        f32 total_height = 0;
+        f32 total_width = 0;
+        f32 tallest_child = 0;
+        f32 widest_child = 0;
+        f32 end_of_last_x = transform.x;
+        f32 end_of_last_y = transform.y;
+
         for ( Element &child: children )
         {
           child.Reposition();
+          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
         }
       }
       break;
       case Type::DataPanel:
       {
+        f32 total_height = 0;
+        f32 total_width = 0;
+        f32 tallest_child = 0;
+        f32 widest_child = 0;
+        f32 end_of_last_x = transform.x;
+        f32 end_of_last_y = transform.y;
+
         for ( auto &pair: data_points )
         {
           Element &child = pair.second;
           child.Reposition();
+          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
         }
       }
       break;
       case Type::StackPanel:
       {
         children[curr_index].Reposition();
+        // LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
       }
       break;
       default:
         break;
     }
   }
+
 
   void Element::Resize()
   {
@@ -263,8 +284,6 @@ namespace UI
         f32 total_width = 0;
         f32 tallest_child = 0;
         f32 widest_child = 0;
-        f32 end_of_last_x = transform.x;
-        f32 end_of_last_y = transform.y;
 
         Update();
 
@@ -292,27 +311,34 @@ namespace UI
             tallest_child = child.transform.height;
         }
 
-        if ( !fixed_size )
+        switch ( sized )
         {
-          if ( children_axis == Axis::Row )
+          case Size::Fixed:
           {
-            transform.width = total_width;
-            transform.height = tallest_child;
           }
-          else
+          break;
+          case Size::SelfDetermined:
           {
-            transform.width = widest_child;
-            transform.height = total_height;
           }
-        }
-
-
-        for ( Element &child: children )
-        {
-          if ( !child.enabled )
-            continue;
-
-          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
+          break;
+          case Size::Fill:
+          {
+          }
+          break;
+          case Size::ChildrenDetermined:
+          {
+            if ( children_axis == Axis::Row )
+            {
+              transform.width = total_width;
+              transform.height = tallest_child;
+            }
+            else
+            {
+              transform.width = widest_child;
+              transform.height = total_height;
+            }
+          }
+          break;
         }
       }
       break;
@@ -353,20 +379,35 @@ namespace UI
             tallest_child = child.transform.height;
         }
 
-        if ( !fixed_size )
+        switch ( sized )
         {
-          if ( children_axis == Axis::Row )
+          case Size::Fixed:
           {
-            transform.width = total_width;
-            transform.height = tallest_child;
           }
-          else
+          break;
+          case Size::SelfDetermined:
           {
-            transform.width = widest_child;
-            transform.height = total_height;
           }
+          break;
+          case Size::Fill:
+          {
+          }
+          break;
+          case Size::ChildrenDetermined:
+          {
+            if ( children_axis == Axis::Row )
+            {
+              transform.width = total_width;
+              transform.height = tallest_child;
+            }
+            else
+            {
+              transform.width = widest_child;
+              transform.height = total_height;
+            }
+          }
+          break;
         }
-
 
         for ( auto &pair: data_points )
         {

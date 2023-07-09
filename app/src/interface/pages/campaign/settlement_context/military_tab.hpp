@@ -56,6 +56,7 @@ namespace UI
   inline Element MilitaryTab()
   {
     return Panel( "settlement_context_military" )
+      .FixedSize( 1200, 24 )
       .AlignHoriz( Align::SpaceBetween )
       .Children( {
         RecruitmentWindow(),

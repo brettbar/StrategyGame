@@ -48,6 +48,14 @@ namespace UI
     SpaceBetween,
   };
 
+  enum class Size
+  {
+    Fixed,             // The element is always a fixed size that wont change
+    SelfDetermined,    // The element has its own logic for resizing
+    Fill,              // The element's parent will inform it how to resize
+    ChildrenDetermined,// The element's children will inform it how to resize
+  };
+
   struct Margins
   {
     u32 left;
@@ -79,7 +87,7 @@ public:
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
-    bool fixed_size = false;
+    Size sized = Size::Fixed;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
@@ -126,8 +134,6 @@ public:
     void Destroy();
     void SwitchChild( u32 );
     void Reposition();
-    // TODO why are we Repositioning panel children in this function?
-    // Shouldnt it be in Reposition fn?
     // TODO should we take in to account ui scale
     void Resize();
     void LayoutChild( Element &, f32, f32 &, f32 & );
