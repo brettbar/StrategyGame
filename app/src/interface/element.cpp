@@ -2,14 +2,6 @@
 
 namespace UI
 {
-  void Element::InitialEnable()
-  {
-    if ( starts_disabled )
-      return;
-
-    Enable();
-  }
-
   void Element::Enable()
   {
     switch ( type )

@@ -36,7 +36,6 @@ namespace UI
 
   enum class Axis
   {
-    INVALID,
     Row,
     Column,
   };
@@ -60,7 +59,6 @@ namespace UI
 
   class Element
   {
-
     // Element() = delete;
     Element() = default;
     Element( std::string id ) : id( id ){};
@@ -88,7 +86,7 @@ public:
 
     // Panel
     Anchor anchor = Anchor::Free;// Might apply to others as well?
-    Axis children_axis = Axis::INVALID;
+    Axis children_axis = Axis::Row;
     Align children_horiz_align = Align::INVALID;
     Align children_vert_align = Align::INVALID;
     std::vector<Element> children = {};
@@ -121,7 +119,6 @@ public:
     // TextureLabel
     Texture2D texture = Texture2D();
 
-    void InitialEnable();
     void Enable();
     void Register();
     void Disable();
@@ -142,6 +139,5 @@ public:
 
     void CreateElementForDatapoints( Element );
   };
-
 
 };// namespace UI
