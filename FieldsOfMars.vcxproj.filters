@@ -24,6 +24,15 @@
     <ClCompile Include="app\src\interface\element.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="app\src\interface\elements\data_panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="app\src\interface\elements\panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="app\src\interface\elements\stack_panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\src\interface\element.hpp">

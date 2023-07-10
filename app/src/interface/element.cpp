@@ -6,58 +6,18 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::INVALID:
-        printf( "INVALID TYPE ENABLED\n" );
-        assert( false );
-        break;
       case Type::Panel:
-      {
-        enabled = true;
-        Resize();
-        Reposition();
-
-        for ( Element &child: children )
-        {
-          child.Enable();
-          child.Resize();
-          child.Reposition();
-        }
-      }
-      break;
+        PanelEnable();
+        break;
       case Type::DataPanel:
-      {
-        enabled = true;
-        Resize();
-        Reposition();
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.Enable();
-          child.Resize();
-          child.Reposition();
-        }
-      }
-      break;
+        DataPanelEnable();
+        break;
       case Type::StackPanel:
-      {
+        StackPanelEnable();
+        break;
+      default:
         enabled = true;
-        Resize();
-        Reposition();
-
-        children[curr_index].Enable();
-        children[curr_index].Resize();
-        children[curr_index].Reposition();
-      }
-      break;
-      case Type::TextLabel:
-      case Type::TextButton:
-      case Type::TextureLabel:
-      case Type::TextureButton:
-      {
-        enabled = true;
-      }
-      break;
+        break;
     }
   }
 
@@ -65,37 +25,15 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::INVALID:
-        printf( "INVALID TYPE ENABLED\n" );
-        assert( false );
-        break;
       case Type::Panel:
-      {
-        lookup.emplace( id, std::make_shared<Element>( *this ) );
-
-        for ( Element &child: children )
-        {
-          child.Register();
-        }
-      }
-      break;
+        PanelRegister();
+        break;
       case Type::DataPanel:
-      {
-        lookup.emplace( id, std::make_shared<Element>( *this ) );
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.Register();
-        }
-      }
-      break;
+        DataPanelRegister();
+        break;
       case Type::StackPanel:
-      {
-        lookup.emplace( id, std::make_shared<Element>( *this ) );
-        children[curr_index].Register();
-      }
-      break;
+        StackPanelRegister();
+        break;
       default:
         lookup.emplace( id, std::make_shared<Element>( *this ) );
         break;
@@ -106,65 +44,21 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::INVALID:
-      {
-        std::cout << "ERROR :: "
-                  << "Invalid element type found in Disable()" << '\n';
-      }
-      break;
       case Type::Panel:
-      {
-        for ( Element &child: children )
-        {
-          child.Disable();
-        }
-
-        enabled = false;
-      }
-      break;
+        PanelDisable();
+        break;
       case Type::DataPanel:
-      {
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.Disable();
-        }
-
-        enabled = false;
-      }
-      break;
+        DataPanelDisable();
+        break;
       case Type::StackPanel:
-      {
-        children[curr_index].Disable();
+        StackPanelDisable();
+        break;
+      default:
         enabled = false;
-      }
-      break;
-      case Type::TextLabel:
-      case Type::TextButton:
-      case Type::TextureLabel:
-      case Type::TextureButton:
-      {
-        enabled = false;
-      }
-      break;
+        break;
     }
   }
 
-  void Element::SwitchChild( u32 index )
-  {
-    if ( index > children.size() )
-    {
-      std::cout << "ERROR :: "
-                << "StackPanel tried to switch to index greater than its "
-                   "number of children."
-                << "\n";
-      return;
-    }
-    assert( type == Type::StackPanel );
-    children[curr_index].Disable();
-    curr_index = index;
-    children[curr_index].Enable();
-  }
 
   void Element::Reposition()
   {
@@ -267,10 +161,6 @@ namespace UI
 
     switch ( type )
     {
-      case Type::INVALID:
-        printf( "INVALID TYPE IN RESIZE\n" );
-        assert( false );
-        break;
       case Type::Panel:
       {
         f32 total_height = 0;
@@ -564,10 +454,6 @@ namespace UI
 
     switch ( type )
     {
-      case Type::INVALID:
-        printf( "INVALID TYPE IN DRAW\n" );
-        assert( false );
-        break;
       case Type::Panel:
       {
         DrawRectangleV(

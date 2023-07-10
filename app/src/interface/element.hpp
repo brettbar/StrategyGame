@@ -10,7 +10,6 @@ namespace UI
 {
   enum class Type : u32
   {
-    INVALID,
     Panel,
     DataPanel,
     StackPanel,
@@ -42,7 +41,6 @@ namespace UI
 
   enum class Align
   {
-    INVALID,
     Start,
     SpaceBetween,
     Stretch,
@@ -67,15 +65,7 @@ namespace UI
     // }
 
 public:
-    friend class PanelBuilder;
-    friend class DataPanelBuilder;
-    friend class StackPanelBuilder;
-    friend class TextLabelBuilder;
-    friend class TextButtonBuilder;
-    friend class TextureLabelBuilder;
-    friend class TextureButtonBuilder;
-
-    Type type = Type::INVALID;
+    Type type;
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
@@ -87,8 +77,8 @@ public:
     // Panel
     Anchor anchor = Anchor::Free;// Might apply to others as well?
     Axis children_axis = Axis::Row;
-    Align children_horiz_align = Align::INVALID;
-    Align children_vert_align = Align::INVALID;
+    Align children_horiz_align;
+    Align children_vert_align;
     std::vector<Element> children = {};
 
     //DataPanel
@@ -123,7 +113,6 @@ public:
     void Register();
     void Disable();
     void Destroy();
-    void SwitchChild( u32 );
     // TODO should we take in to account ui scale
     void Resize();
     void Reposition();
@@ -133,6 +122,27 @@ public:
     void UpdateClickable( bool new_clickable );
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
     void Update();
+
+    friend class PanelBuilder;
+    void PanelEnable();
+    void PanelRegister();
+    void PanelDisable();
+
+    friend class DataPanelBuilder;
+    void DataPanelEnable();
+    void DataPanelRegister();
+    void DataPanelDisable();
+
+    friend class StackPanelBuilder;
+    void StackPanelEnable();
+    void StackPanelRegister();
+    void StackPanelDisable();
+    void StackPanelSwitchChild( u32 );
+
+    friend class TextLabelBuilder;
+    friend class TextButtonBuilder;
+    friend class TextureLabelBuilder;
+    friend class TextureButtonBuilder;
 
     void Draw();
     void FireEvent();
