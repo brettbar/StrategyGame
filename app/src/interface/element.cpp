@@ -257,8 +257,9 @@ namespace UI
       break;
       case Type::StackPanel:
       {
+        children[curr_index].transform.x = transform.x;
+        children[curr_index].transform.y = transform.y;
         children[curr_index].Reposition();
-        // LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
       }
       break;
       default:
@@ -311,34 +312,18 @@ namespace UI
             tallest_child = child.transform.height;
         }
 
-        switch ( sized )
+        if ( !fixed_size )
         {
-          case Size::Fixed:
+          if ( children_axis == Axis::Row )
           {
+            transform.width = total_width;
+            transform.height = tallest_child;
           }
-          break;
-          case Size::SelfDetermined:
+          else
           {
+            transform.width = widest_child;
+            transform.height = total_height;
           }
-          break;
-          case Size::Fill:
-          {
-          }
-          break;
-          case Size::ChildrenDetermined:
-          {
-            if ( children_axis == Axis::Row )
-            {
-              transform.width = total_width;
-              transform.height = tallest_child;
-            }
-            else
-            {
-              transform.width = widest_child;
-              transform.height = total_height;
-            }
-          }
-          break;
         }
       }
       break;
@@ -348,8 +333,6 @@ namespace UI
         f32 total_width = 0;
         f32 tallest_child = 0;
         f32 widest_child = 0;
-        f32 end_of_last_x = transform.x;
-        f32 end_of_last_y = transform.y;
 
         Update();
 
@@ -379,51 +362,23 @@ namespace UI
             tallest_child = child.transform.height;
         }
 
-        switch ( sized )
+        if ( !fixed_size )
         {
-          case Size::Fixed:
+          if ( children_axis == Axis::Row )
           {
+            transform.width = total_width;
+            transform.height = tallest_child;
           }
-          break;
-          case Size::SelfDetermined:
+          else
           {
+            transform.width = widest_child;
+            transform.height = total_height;
           }
-          break;
-          case Size::Fill:
-          {
-          }
-          break;
-          case Size::ChildrenDetermined:
-          {
-            if ( children_axis == Axis::Row )
-            {
-              transform.width = total_width;
-              transform.height = tallest_child;
-            }
-            else
-            {
-              transform.width = widest_child;
-              transform.height = total_height;
-            }
-          }
-          break;
-        }
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-
-          if ( !child.enabled )
-            continue;
-
-          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
         }
       }
       break;
       case Type::StackPanel:
       {
-        children[curr_index].transform.x = transform.x;
-        children[curr_index].transform.y = transform.y;
         children[curr_index].Resize();
         transform.width = children[curr_index].transform.width;
         transform.height = children[curr_index].transform.height;

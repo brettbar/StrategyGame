@@ -46,15 +46,9 @@ namespace UI
     INVALID,
     Start,
     SpaceBetween,
+    Stretch,
   };
 
-  enum class Size
-  {
-    Fixed,             // The element is always a fixed size that wont change
-    SelfDetermined,    // The element has its own logic for resizing
-    Fill,              // The element's parent will inform it how to resize
-    ChildrenDetermined,// The element's children will inform it how to resize
-  };
 
   struct Margins
   {
@@ -87,7 +81,7 @@ public:
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
-    Size sized = Size::Fixed;
+    bool fixed_size = false;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
@@ -133,9 +127,9 @@ public:
     void Disable();
     void Destroy();
     void SwitchChild( u32 );
-    void Reposition();
     // TODO should we take in to account ui scale
     void Resize();
+    void Reposition();
     void LayoutChild( Element &, f32, f32 &, f32 & );
     void UpdateText( std::string );
     void UpdateBackground( Color );
