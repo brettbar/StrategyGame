@@ -109,45 +109,14 @@ namespace UI
     switch ( type )
     {
       case Type::Panel:
-      {
-        f32 total_height = 0;
-        f32 total_width = 0;
-        f32 tallest_child = 0;
-        f32 widest_child = 0;
-        f32 end_of_last_x = transform.x;
-        f32 end_of_last_y = transform.y;
-
-        for ( Element &child: children )
-        {
-          child.Reposition();
-          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
-        }
-      }
-      break;
+        PanelReposition();
+        break;
       case Type::DataPanel:
-      {
-        f32 total_height = 0;
-        f32 total_width = 0;
-        f32 tallest_child = 0;
-        f32 widest_child = 0;
-        f32 end_of_last_x = transform.x;
-        f32 end_of_last_y = transform.y;
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.Reposition();
-          LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
-        }
-      }
-      break;
+        DataPanelReposition();
+        break;
       case Type::StackPanel:
-      {
-        children[curr_index].transform.x = transform.x;
-        children[curr_index].transform.y = transform.y;
-        children[curr_index].Reposition();
-      }
-      break;
+        StackPanelReposition();
+        break;
       default:
         break;
     }
@@ -282,36 +251,14 @@ namespace UI
     switch ( type )
     {
       case Type::Panel:
-      {
-        if ( updates.contains( update.id ) )
-          updates[update.id]( *this, update );
-
-        for ( auto &child: children )
-        {
-          child.ExecuteInterfaceUpdate( update );
-        }
-      }
-      break;
+        PanelExecuteInterfaceUpdate( update );
+        break;
       case Type::DataPanel:
-      {
-        if ( updates.contains( update.id ) )
-          updates[update.id]( *this, update );
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.ExecuteInterfaceUpdate( update );
-        }
-      }
-      break;
+        DataPanelExecuteInterfaceUpdate( update );
+        break;
       case Type::StackPanel:
-      {
-        if ( updates.contains( update.id ) )
-          updates[update.id]( *this, update );
-
-        children[curr_index].ExecuteInterfaceUpdate( update );
-      }
-      break;
+        StackPanelExecuteInterfaceUpdate( update );
+        break;
       default:
         if ( updates.contains( update.id ) )
           updates[update.id]( *this, update );
@@ -339,17 +286,6 @@ namespace UI
     }
   }
 
-  void Element::CreateElementForDatapoints( Element element )
-  {
-    if ( !data_points.contains( element.id ) )
-    {
-      element.Enable();
-      data_points.insert_or_assign( element.id, element );
-    }
-    else
-    {
-    }
-  }
 
   void Element::Draw()
   {
@@ -359,45 +295,14 @@ namespace UI
     switch ( type )
     {
       case Type::Panel:
-      {
-        DrawRectangleV(
-          { transform.x, transform.y },
-          { transform.width, transform.height },
-          background
-        );
-
-        for ( Element &child: children )
-        {
-          child.Draw();
-        }
-      }
-      break;
+        PanelDraw();
+        break;
       case Type::DataPanel:
-      {
-        DrawRectangleV(
-          { transform.x, transform.y },
-          { transform.width, transform.height },
-          background
-        );
-
-        for ( auto &pair: data_points )
-        {
-          Element &child = pair.second;
-          child.Draw();
-        }
-      }
-      break;
+        DataPanelDraw();
+        break;
       case Type::StackPanel:
-      {
-        DrawRectangleV(
-          { transform.x, transform.y },
-          { transform.width, transform.height },
-          background
-        );
-
-        children[curr_index].Draw();
-      }
-      break;
+        StackPanelDraw();
+        break;
       case Type::TextLabel:
       {
         DrawRectangleV(

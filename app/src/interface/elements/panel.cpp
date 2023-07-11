@@ -46,7 +46,6 @@ namespace UI
   {
     assert( type == Type::Panel );
 
-
     f32 total_height = 0;
     f32 total_width = 0;
     f32 tallest_child = 0;
@@ -90,6 +89,55 @@ namespace UI
         transform.width = widest_child;
         transform.height = total_height;
       }
+    }
+  }
+
+  void Element::PanelReposition()
+  {
+    assert( type == Type::Panel );
+    f32 total_height = 0;
+    f32 total_width = 0;
+    f32 tallest_child = 0;
+    f32 widest_child = 0;
+    f32 end_of_last_x = transform.x;
+    f32 end_of_last_y = transform.y;
+
+    for ( Element &child: children )
+    {
+      child.Reposition();
+      LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
+    }
+  }
+
+
+  void Element::PanelDraw()
+  {
+    assert( type == Type::Panel );
+
+    DrawRectangleV(
+      { transform.x, transform.y },
+      { transform.width, transform.height },
+      background
+    );
+
+    for ( Element &child: children )
+    {
+      child.Draw();
+    }
+  }
+
+
+  void Element::PanelExecuteInterfaceUpdate(
+    const InterfaceUpdate::Update &update
+  )
+  {
+    assert( type == Type::Panel );
+    if ( updates.contains( update.id ) )
+      updates[update.id]( *this, update );
+
+    for ( auto &child: children )
+    {
+      child.ExecuteInterfaceUpdate( update );
     }
   }
 

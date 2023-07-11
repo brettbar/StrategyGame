@@ -128,12 +128,19 @@ public:
     void PanelRegister();
     void PanelDisable();
     void PanelResize();
+    void PanelReposition();
+    void PanelDraw();
+    void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     friend class DataPanelBuilder;
     void DataPanelEnable();
     void DataPanelRegister();
     void DataPanelDisable();
     void DataPanelResize();
+    void DataPanelReposition();
+    void DataPanelDraw();
+    void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    void CreateElementForDatapoints( Element );
 
     friend class StackPanelBuilder;
     void StackPanelEnable();
@@ -141,6 +148,9 @@ public:
     void StackPanelDisable();
     void StackPanelSwitchChild( u32 );
     void StackPanelResize();
+    void StackPanelReposition();
+    void StackPanelDraw();
+    void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
@@ -149,8 +159,6 @@ public:
 
     void Draw();
     void FireEvent();
-
-    void CreateElementForDatapoints( Element );
   };
 
 };// namespace UI

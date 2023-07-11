@@ -47,6 +47,7 @@ namespace UI
     enabled = false;
   }
 
+
   void Element::DataPanelResize()
   {
     assert( type == Type::DataPanel );
@@ -96,6 +97,70 @@ namespace UI
         transform.width = widest_child;
         transform.height = total_height;
       }
+    }
+  }
+
+  void Element::DataPanelReposition()
+  {
+    assert( type == Type::DataPanel );
+
+    f32 total_height = 0;
+    f32 total_width = 0;
+    f32 tallest_child = 0;
+    f32 widest_child = 0;
+    f32 end_of_last_x = transform.x;
+    f32 end_of_last_y = transform.y;
+
+    for ( auto &pair: data_points )
+    {
+      Element &child = pair.second;
+      child.Reposition();
+      LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
+    }
+  }
+
+  void Element::DataPanelDraw()
+  {
+    assert( type == Type::DataPanel );
+
+    DrawRectangleV(
+      { transform.x, transform.y },
+      { transform.width, transform.height },
+      background
+    );
+
+    for ( auto &pair: data_points )
+    {
+      Element &child = pair.second;
+      child.Draw();
+    }
+  }
+
+  void Element::DataPanelExecuteInterfaceUpdate(
+    const InterfaceUpdate::Update &update
+  )
+  {
+    assert( type == Type::DataPanel );
+
+    if ( updates.contains( update.id ) )
+      updates[update.id]( *this, update );
+
+    for ( auto &pair: data_points )
+    {
+      Element &child = pair.second;
+      child.ExecuteInterfaceUpdate( update );
+    }
+  }
+
+  void Element::CreateElementForDatapoints( Element element )
+  {
+    if ( !data_points.contains( element.id ) )
+    {
+      element.Enable();
+      data_points.insert_or_assign( element.id, element );
+    }
+    else
+    {
     }
   }
 };// namespace UI

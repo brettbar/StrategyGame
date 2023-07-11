@@ -56,4 +56,35 @@ namespace UI
     transform.width = children[curr_index].transform.width;
     transform.height = children[curr_index].transform.height;
   }
+
+  void Element::StackPanelReposition()
+  {
+    assert( type == Type::StackPanel );
+    children[curr_index].transform.x = transform.x;
+    children[curr_index].transform.y = transform.y;
+    children[curr_index].Reposition();
+  }
+
+  void Element::StackPanelDraw()
+  {
+    DrawRectangleV(
+      { transform.x, transform.y },
+      { transform.width, transform.height },
+      background
+    );
+
+    children[curr_index].Draw();
+  }
+
+  void Element::StackPanelExecuteInterfaceUpdate(
+    const InterfaceUpdate::Update &update
+  )
+  {
+    assert( type == Type::StackPanel );
+
+    if ( updates.contains( update.id ) )
+      updates[update.id]( *this, update );
+
+    children[curr_index].ExecuteInterfaceUpdate( update );
+  }
 };// namespace UI
