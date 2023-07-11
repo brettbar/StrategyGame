@@ -217,7 +217,8 @@ void LoadResources()
   );
   LoadTexturePointFilter(
     hstr{ "romans_hastati_texture_overview" },
-    CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
+    CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str()
+    ),
     Global::texture_cache
   );
 

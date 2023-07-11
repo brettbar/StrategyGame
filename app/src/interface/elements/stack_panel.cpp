@@ -47,4 +47,13 @@ namespace UI
     curr_index = index;
     children[curr_index].Enable();
   }
+
+  void Element::StackPanelResize()
+  {
+    assert( type == Type::StackPanel );
+
+    children[curr_index].Resize();
+    transform.width = children[curr_index].transform.width;
+    transform.height = children[curr_index].transform.height;
+  }
 };// namespace UI

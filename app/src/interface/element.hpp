@@ -127,17 +127,20 @@ public:
     void PanelEnable();
     void PanelRegister();
     void PanelDisable();
+    void PanelResize();
 
     friend class DataPanelBuilder;
     void DataPanelEnable();
     void DataPanelRegister();
     void DataPanelDisable();
+    void DataPanelResize();
 
     friend class StackPanelBuilder;
     void StackPanelEnable();
     void StackPanelRegister();
     void StackPanelDisable();
     void StackPanelSwitchChild( u32 );
+    void StackPanelResize();
 
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;
