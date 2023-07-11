@@ -111,11 +111,88 @@ namespace UI
     f32 end_of_last_x = transform.x;
     f32 end_of_last_y = transform.y;
 
-    for ( auto &pair: data_points )
+    if ( children_axis == Axis::Row )
     {
-      Element &child = pair.second;
-      child.Reposition();
-      LayoutChild( child, total_width, end_of_last_x, end_of_last_y );
+      switch ( children_horiz_align )
+      {
+        case Align::Start:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+
+            child.transform.x = end_of_last_x + child.margins.left;
+            end_of_last_x =
+              child.transform.x + child.transform.width + child.margins.right;
+          }
+        }
+        break;
+        case Align::SpaceBetween:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+            f32 gap_width =
+              ( this->transform.width - total_width ) / ( children.size() - 1 );
+
+            child.transform.x = end_of_last_x + child.margins.left;
+            end_of_last_x = child.transform.x + child.transform.width +
+                            child.margins.right + gap_width;
+          }
+        }
+        break;
+      }
+
+      switch ( children_vert_align )
+      {
+        case Align::Start:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+            child.transform.y = transform.y;
+          }
+        }
+        break;
+      }
+    }
+    else
+    {// Axis::Column
+      // 2. Set the child x position based on alignment style.
+      switch ( children_horiz_align )
+      {
+        case Align::Start:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+            child.transform.x = transform.x;
+          }
+        }
+        break;
+      }
+
+      // 3. Set the child y position based on alignment style.
+      switch ( children_vert_align )
+      {
+        case Align::Start:
+        {
+          for ( auto &pair: data_points )
+          {
+            Element &child = pair.second;
+            child.Reposition();
+            child.transform.y = end_of_last_y;
+            // + margins.top;
+            end_of_last_y = child.transform.y + child.transform.height;
+            // + margins.bottom;
+          }
+        }
+        break;
+      }
     }
   }
 

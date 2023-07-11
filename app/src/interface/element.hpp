@@ -109,6 +109,7 @@ public:
     // TextureLabel
     Texture2D texture = Texture2D();
 
+    // High Level
     void Enable();
     void Register();
     void Disable();
@@ -116,12 +117,13 @@ public:
     // TODO should we take in to account ui scale
     void Resize();
     void Reposition();
-    void LayoutChild( Element &, f32, f32 &, f32 & );
+    void Draw();
     void UpdateText( std::string );
     void UpdateBackground( Color );
     void UpdateClickable( bool new_clickable );
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
     void Update();
+    void FireEvent();
 
     friend class PanelBuilder;
     void PanelEnable();
@@ -156,9 +158,6 @@ public:
     friend class TextButtonBuilder;
     friend class TextureLabelBuilder;
     friend class TextureButtonBuilder;
-
-    void Draw();
-    void FireEvent();
   };
 
 };// namespace UI
