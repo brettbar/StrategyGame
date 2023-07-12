@@ -85,7 +85,7 @@ namespace UI
         tallest_child = child.transform.height;
     }
 
-    if ( !fixed_size )
+    if ( size == Size::Minimum )
     {
       if ( children_axis == Axis::Row )
       {

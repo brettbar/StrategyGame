@@ -51,8 +51,6 @@ namespace UI
     f32 tallest_child = 0;
     f32 widest_child = 0;
 
-    Update();
-
     for ( Element &child: children )
     {
       // TODO not sure if this is right
@@ -77,7 +75,7 @@ namespace UI
         tallest_child = child.transform.height;
     }
 
-    if ( !fixed_size )
+    if ( size == Size::Minimum )
     {
       if ( children_axis == Axis::Row )
       {
@@ -213,5 +211,4 @@ namespace UI
       child.ExecuteInterfaceUpdate( update );
     }
   }
-
 };// namespace UI

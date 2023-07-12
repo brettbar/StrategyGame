@@ -50,9 +50,21 @@ public:
 
     PanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.fixed_size = true;
+      _element.size = Size::Fixed;
       _element.transform.width = width;
       _element.transform.height = height;
+      return *this;
+    }
+
+    PanelBuilder &MinimumSize()
+    {
+      _element.size = Size::Minimum;
+      return *this;
+    }
+
+    PanelBuilder &MaximumSize()
+    {
+      _element.size = Size::Maximum;
       return *this;
     }
 
@@ -120,7 +132,7 @@ public:
 
     DataPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.fixed_size = true;
+      _element.size = Size::Fixed;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;
@@ -165,7 +177,7 @@ public:
 
     StackPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.fixed_size = true;
+      _element.size = Size::Fixed;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;

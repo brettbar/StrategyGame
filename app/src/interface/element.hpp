@@ -43,9 +43,14 @@ namespace UI
   {
     Start,
     SpaceBetween,
-    Stretch,
   };
 
+  enum class Size
+  {
+    Fixed,  // Set manually in pixels
+    Minimum,// Smallest possible to fit content
+    Maximum,// As large as parent will allow
+  };
 
   struct Margins
   {
@@ -69,7 +74,7 @@ public:
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
-    bool fixed_size = false;
+    Size size = Size::Minimum;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
