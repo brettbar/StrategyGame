@@ -75,18 +75,31 @@ namespace UI
         tallest_child = child.transform.height;
     }
 
-    if ( size == Size::Minimum )
+    switch ( size )
     {
-      if ( children_axis == Axis::Row )
+      case Size::Minimum:
       {
-        transform.width = total_width;
-        transform.height = tallest_child;
-      }
-      else
-      {
-        transform.width = widest_child;
-        transform.height = total_height;
-      }
+        if ( children_axis == Axis::Row )
+        {
+          transform.width = total_width;
+          transform.height = tallest_child;
+        }
+        else
+        {
+          transform.width = widest_child;
+          transform.height = total_height;
+        }
+      };
+      break;
+        // case Size::Maximum:
+        // {
+        //   f32 width_left = parent_width - final_sibling_width_total;
+        //   f32 height_left = parent_height - final_sibling_height_total;
+
+        //   transform.width = width_left / num_final_siblings;
+        //   transform.height = width_height / num_final_siblings;
+        // }
+        // break;
     }
   }
 
