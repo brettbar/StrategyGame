@@ -120,8 +120,8 @@ public:
     void Disable();
     void Destroy();
     // TODO should we take in to account ui scale
-    void Resize();
-    void Reposition();
+    void ResizeRecursive();
+    void RepositionRecursive();
     void Draw();
     void UpdateText( std::string );
     void UpdateBackground( Color );

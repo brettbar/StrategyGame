@@ -8,14 +8,14 @@ namespace UI
   {
     assert( type == Type::Panel );
     enabled = true;
-    Resize();
-    Reposition();
+    PanelResize();
+    RepositionRecursive();
 
     for ( Element &child: children )
     {
       child.Enable();
-      child.Resize();
-      child.Reposition();
+      child.ResizeRecursive();
+      child.RepositionRecursive();
     }
   }
 
@@ -53,17 +53,43 @@ namespace UI
 
     for ( Element &child: children )
     {
-      // TODO not sure if this is right
       if ( !child.enabled )
         continue;
 
-      child.Resize();
-    }
+      // First, do all the Fixed and Minimal Resizing
+      switch ( child.type )
+      {
+        case Type::Panel:
+          child.PanelResize();
+          break;
+        case Type::DataPanel:
+          child.DataPanelResize();
+          break;
+        case Type::StackPanel:
+          child.StackPanelResize();
+          break;
+        case Type::TextButton:
+        case Type::TextLabel:
+        {
+          const vec2 text_dims = MeasureTextEx(
+            Global::font_cache[hstr{ "font_romulus" }]->font,
+            child.text.c_str(),
+            child.font_size,
+            2.0f
+          );
 
-    for ( Element &child: children )
-    {
-      if ( !child.enabled )
-        continue;
+          child.transform.width = text_dims.x;
+          child.transform.height = text_dims.y;
+        }
+        break;
+        case Type::TextureButton:
+        case Type::TextureLabel:
+        {
+          child.transform.width = child.texture.width;
+          child.transform.height = child.texture.height;
+        }
+        break;
+      }
 
       total_width += child.transform.width;
       total_height += child.transform.height;
@@ -75,32 +101,58 @@ namespace UI
         tallest_child = child.transform.height;
     }
 
-    switch ( size )
-    {
-      case Size::Minimum:
-      {
-        if ( children_axis == Axis::Row )
-        {
-          transform.width = total_width;
-          transform.height = tallest_child;
-        }
-        else
-        {
-          transform.width = widest_child;
-          transform.height = total_height;
-        }
-      };
-      break;
-        // case Size::Maximum:
-        // {
-        //   f32 width_left = parent_width - final_sibling_width_total;
-        //   f32 height_left = parent_height - final_sibling_height_total;
+    f32 total_fixed_or_min_width = 0;
+    f32 total_fixed_or_min_height = 0;
 
-        //   transform.width = width_left / num_final_siblings;
-        //   transform.height = width_height / num_final_siblings;
-        // }
-        // break;
+    // Once we know the fixed and minimals, do the maximums
+    for ( Element &child: children )
+    {
+      if ( !child.enabled )
+        continue;
+
+      if ( child.size == Size::Minimum || child.size == Size::Fixed )
+      {
+        total_fixed_or_min_width +=
+          child.transform.width + child.margins.left + child.margins.right;
+        total_fixed_or_min_height +=
+          child.transform.height + child.margins.bottom + child.margins.top;
+      }
     }
+
+    for ( Element &child: children )
+    {
+      if ( !child.enabled )
+        continue;
+
+      if ( child.size == Size::Maximum )
+      {
+        child.transform.width = total_fixed_or_min_width / children.size();
+        child.transform.height = total_fixed_or_min_height / children.size();
+      }
+    }
+
+    if ( size == Size::Minimum )
+    {
+      if ( children_axis == Axis::Row )
+      {
+        transform.width = total_width;
+        transform.height = tallest_child;
+      }
+      else
+      {
+        transform.width = widest_child;
+        transform.height = total_height;
+      }
+    };
+    // case Size::Maximum:
+    // {
+    //   f32 width_left = parent_width - final_sibling_width_total;
+    //   f32 height_left = parent_height - final_sibling_height_total;
+
+    //   transform.width = width_left / num_final_siblings;
+    //   transform.height = width_height / num_final_siblings;
+    // }
+    // break;
   }
 
   void Element::PanelReposition()
@@ -121,7 +173,7 @@ namespace UI
         {
           for ( Element &child: children )
           {
-            child.Reposition();
+            child.RepositionRecursive();
 
             child.transform.x = end_of_last_x + child.margins.left;
             end_of_last_x =
@@ -133,7 +185,8 @@ namespace UI
         {
           for ( Element &child: children )
           {
-            child.Reposition();
+            child.RepositionRecursive();
+
             f32 gap_width =
               ( this->transform.width - total_width ) / ( children.size() - 1 );
 
@@ -151,7 +204,7 @@ namespace UI
         {
           for ( Element &child: children )
           {
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.y = transform.y;
           }
         }
@@ -167,7 +220,7 @@ namespace UI
         {
           for ( Element &child: children )
           {
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.x = transform.x;
           }
         }
@@ -181,7 +234,7 @@ namespace UI
         {
           for ( Element &child: children )
           {
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.y = end_of_last_y;
             // + margins.top;
             end_of_last_y = child.transform.y + child.transform.height;

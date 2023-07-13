@@ -59,8 +59,34 @@ namespace UI
     }
   }
 
+  // TODO This should only be called for Panels
+  void Element::ResizeRecursive()
+  {
+    bool is_panel = type == Type::Panel || type == Type::DataPanel ||
+                    type == Type::StackPanel;
 
-  void Element::Reposition()
+    if ( !is_panel )
+      return;
+
+    switch ( type )
+    {
+      case Type::Panel:
+        PanelResize();
+        break;
+      case Type::DataPanel:
+        DataPanelResize();
+        break;
+      case Type::StackPanel:
+        StackPanelResize();
+        break;
+      default:
+        break;
+    }
+  }
+
+
+  // TODO This should only be called for Panels
+  void Element::RepositionRecursive()
   {
     bool is_panel = type == Type::Panel || type == Type::DataPanel ||
                     type == Type::StackPanel;
@@ -119,47 +145,6 @@ namespace UI
         break;
       default:
         break;
-    }
-  }
-
-
-  void Element::Resize()
-  {
-    if ( !enabled )
-      return;
-
-    switch ( type )
-    {
-      case Type::Panel:
-        PanelResize();
-        break;
-      case Type::DataPanel:
-        DataPanelResize();
-        break;
-      case Type::StackPanel:
-        StackPanelResize();
-        break;
-      case Type::TextButton:
-      case Type::TextLabel:
-      {
-        const vec2 text_dims = MeasureTextEx(
-          Global::font_cache[hstr{ "font_romulus" }]->font,
-          text.c_str(),
-          font_size,
-          2.0f
-        );
-
-        transform.width = text_dims.x;
-        transform.height = text_dims.y;
-      }
-      break;
-      case Type::TextureButton:
-      case Type::TextureLabel:
-      {
-        transform.width = texture.width;
-        transform.height = texture.height;
-      }
-      break;
     }
   }
 

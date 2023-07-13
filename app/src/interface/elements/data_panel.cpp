@@ -9,15 +9,15 @@ namespace UI
     assert( type == Type::DataPanel );
 
     enabled = true;
-    Resize();
-    Reposition();
+    ResizeRecursive();
+    RepositionRecursive();
 
     for ( auto &pair: data_points )
     {
       Element &child = pair.second;
       child.Enable();
-      child.Resize();
-      child.Reposition();
+      child.ResizeRecursive();
+      child.RepositionRecursive();
     }
   }
 
@@ -66,7 +66,7 @@ namespace UI
       if ( !child.enabled )
         continue;
 
-      child.Resize();
+      child.ResizeRecursive();
     }
 
     for ( auto &pair: data_points )
@@ -120,7 +120,7 @@ namespace UI
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
-            child.Reposition();
+            child.RepositionRecursive();
 
             child.transform.x = end_of_last_x + child.margins.left;
             end_of_last_x =
@@ -133,7 +133,7 @@ namespace UI
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
-            child.Reposition();
+            child.RepositionRecursive();
             f32 gap_width =
               ( this->transform.width - total_width ) / ( children.size() - 1 );
 
@@ -152,7 +152,7 @@ namespace UI
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.y = transform.y;
           }
         }
@@ -169,7 +169,7 @@ namespace UI
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.x = transform.x;
           }
         }
@@ -184,7 +184,7 @@ namespace UI
           for ( auto &pair: data_points )
           {
             Element &child = pair.second;
-            child.Reposition();
+            child.RepositionRecursive();
             child.transform.y = end_of_last_y;
             // + margins.top;
             end_of_last_y = child.transform.y + child.transform.height;

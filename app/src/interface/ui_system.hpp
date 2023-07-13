@@ -129,13 +129,13 @@ namespace UI
 
       for ( Element &base: Manager()->ActivePage() )
       {
-        base.Resize();
-        base.Reposition();
+        base.ResizeRecursive();
+        base.RepositionRecursive();
         Interact( base, mouseWentUp, mouseWentDown );
       }
 
-      Manager()->debug.Resize();
-      Manager()->debug.Reposition();
+      Manager()->debug.ResizeRecursive();
+      Manager()->debug.RepositionRecursive();
       Manager()->debug.Update();
 
       if ( !Manager()->over_any_elem )

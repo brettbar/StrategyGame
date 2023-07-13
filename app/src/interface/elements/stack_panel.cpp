@@ -7,12 +7,12 @@ namespace UI
     assert( type == Type::StackPanel );
 
     enabled = true;
-    Resize();
-    Reposition();
+    ResizeRecursive();
+    RepositionRecursive();
 
     children[curr_index].Enable();
-    children[curr_index].Resize();
-    children[curr_index].Reposition();
+    children[curr_index].ResizeRecursive();
+    children[curr_index].RepositionRecursive();
   }
 
   void Element::StackPanelRegister()
@@ -52,7 +52,7 @@ namespace UI
   {
     assert( type == Type::StackPanel );
 
-    children[curr_index].Resize();
+    children[curr_index].ResizeRecursive();
     transform.width = children[curr_index].transform.width;
     transform.height = children[curr_index].transform.height;
   }
@@ -62,7 +62,7 @@ namespace UI
     assert( type == Type::StackPanel );
     children[curr_index].transform.x = transform.x;
     children[curr_index].transform.y = transform.y;
-    children[curr_index].Reposition();
+    children[curr_index].RepositionRecursive();
   }
 
   void Element::StackPanelDraw()
