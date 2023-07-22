@@ -10,7 +10,7 @@ namespace AnimationSystem
 {
 
   inline void Draw(
-    View<Actor::Component, Animated::Component> animated_actors,
+    view<Actor::Component, Animated::Component> animated_actors,
     bool debug
   )
   {
@@ -40,7 +40,7 @@ namespace AnimationSystem
   }
 
   inline void Update(
-    View<Actor::Component, Animated::Component> animated_actors,
+    view<Actor::Component, Animated::Component> animated_actors,
     f32 timeScale
   )
   {

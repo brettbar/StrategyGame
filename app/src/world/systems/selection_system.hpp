@@ -16,10 +16,10 @@
 namespace SelectionSystem
 {
   template<typename T>
-  inline void ClearSelection( View<T> );
+  inline void ClearSelection( view<T> );
 
   template<typename T>
-  inline void ClearSelection( View<T> component_view )
+  inline void ClearSelection( view<T> component_view )
   {
     for ( entt::entity entity: component_view )
     {
@@ -184,8 +184,8 @@ namespace SelectionSystem
 
   inline void UpdateSelection( Vector2 click_pos, std::string player_id )
   {
-    View<Actor::Component> actors_view = Global::world.view<Actor::Component>();
-    View<Province::Component> prov_view =
+    view<Actor::Component> actors_view = Global::world.view<Actor::Component>();
+    view<Province::Component> prov_view =
       Global::world.view<Province::Component>();
 
     ClearSelection<Actor::Component>( actors_view );

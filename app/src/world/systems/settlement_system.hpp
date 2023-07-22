@@ -45,7 +45,7 @@ namespace SettlementSystem
   }
 
   inline void Update(
-    View<Province::Component, Settlement::Component> settlements
+    view<Province::Component, Settlement::Component> settlements
   )
   {
     for ( entt::entity entity: settlements )

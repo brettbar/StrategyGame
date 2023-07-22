@@ -39,7 +39,7 @@ namespace MovementSystem
   }
 
   inline void Update(
-    View<Actor::Component, Animated::Component> actors,
+    view<Actor::Component, Animated::Component> actors,
     f32 timeScale
   )
   {

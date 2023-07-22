@@ -13,6 +13,6 @@ namespace UI
   inline f32 SCALE = 1.0f;
 
   class Element;
-  inline std::map<std::string, ptr<Element>> lookup;
+  inline std::map<std::string, sptr<Element>> lookup;
 
 };// namespace UI

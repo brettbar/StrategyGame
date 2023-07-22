@@ -109,7 +109,7 @@ public:
 
     // TextButton
     bool clickable = true;
-    ptr<InterfaceEvent::Data> on_click = nullptr;
+    sptr<InterfaceEvent::Data> on_click = nullptr;
 
     // TextureLabel
     Texture2D texture = Texture2D();

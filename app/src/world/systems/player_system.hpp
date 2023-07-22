@@ -11,7 +11,7 @@ namespace PlayerSystem
   inline void HumanUpdate( Player::Component & );
   inline void AIUpdate( AI::Component &, Player::Component & );
 
-  inline void Update( View<Player::Component> players )
+  inline void Update( view<Player::Component> players )
   {
     // Change to exclude AI
     for ( auto entity: players )
