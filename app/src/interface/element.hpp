@@ -48,6 +48,7 @@ namespace UI
     bool fixed_size = false;
     u32 num_cols = 0;
     u32 num_rows = 0;
+    list<rect> grid = {};
     std::vector<Element> children = {};
 
     //DataPanel

@@ -30,6 +30,10 @@ public:
       _element.id = id;
       _element.num_cols = num_cols;
       _element.num_rows = num_rows;
+      for ( u32 i = 0; i < num_cols * num_rows; i++ )
+      {
+        _element.grid.push_back( { 0, 0, 0, 0 } );
+      }
     }
 
     GridPanelBuilder &On(

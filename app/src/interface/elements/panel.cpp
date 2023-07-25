@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../element.hpp"
+#include <raylib.h>
 
 namespace UI
 {
@@ -44,63 +45,83 @@ namespace UI
 
   void Element::PanelResize()
   {
-    assert( type == Type::GridPanel );
+    u32 slot_width = transform.width / num_cols;
+    u32 slot_height = transform.height / num_rows;
 
-    f32 total_height = 0;
-    f32 total_width = 0;
-    f32 tallest_child = 0;
-    f32 widest_child = 0;
-
-    for ( Element &child: children )
+    // resize grid
+    for ( u32 c = 0; c < num_cols; c++ )
     {
-      if ( !child.enabled )
-        continue;
-
-      // First, do all the Fixed and Minimal Resizing
-      switch ( child.type )
+      for ( u32 r = 0; r < num_rows; r++ )
       {
-        case Type::GridPanel:
-          child.PanelResize();
-          break;
-        case Type::DataPanel:
-          child.DataPanelResize();
-          break;
-        case Type::StackPanel:
-          child.StackPanelResize();
-          break;
-        case Type::TextButton:
-        case Type::TextLabel:
-        {
-          const vec2 text_dims = MeasureTextEx(
-            Global::font_cache[hstr{ "font_romulus" }]->font,
-            child.text.c_str(),
-            child.font_size,
-            2.0f
-          );
-
-          child.transform.width = text_dims.x;
-          child.transform.height = text_dims.y;
-        }
-        break;
-        case Type::TextureButton:
-        case Type::TextureLabel:
-        {
-          child.transform.width = child.texture.width;
-          child.transform.height = child.texture.height;
-        }
-        break;
+        grid[c + num_cols * r] = {
+          transform.x + (f32) ( c * slot_width ),
+          transform.y + (f32) ( r * slot_height ),
+          (f32) slot_width,
+          (f32) slot_height,
+        };
       }
-
-      total_width += child.transform.width;
-      total_height += child.transform.height;
-
-      if ( child.transform.width > widest_child )
-        widest_child = child.transform.width;
-
-      if ( child.transform.height > tallest_child )
-        tallest_child = child.transform.height;
     }
   }
+
+  // void Element::OldPanelResize()
+  // {
+  //   assert( type == Type::GridPanel );
+
+  //   f32 total_height = 0;
+  //   f32 total_width = 0;
+  //   f32 tallest_child = 0;
+  //   f32 widest_child = 0;
+
+  //   for ( Element &child: children )
+  //   {
+  //     if ( !child.enabled )
+  //       continue;
+
+  //     // First, do all the Fixed and Minimal Resizing
+  //     switch ( child.type )
+  //     {
+  //       case Type::GridPanel:
+  //         child.PanelResize();
+  //         break;
+  //       case Type::DataPanel:
+  //         child.DataPanelResize();
+  //         break;
+  //       case Type::StackPanel:
+  //         child.StackPanelResize();
+  //         break;
+  //       case Type::TextButton:
+  //       case Type::TextLabel:
+  //       {
+  //         const vec2 text_dims = MeasureTextEx(
+  //           Global::font_cache[hstr{ "font_romulus" }]->font,
+  //           child.text.c_str(),
+  //           child.font_size,
+  //           2.0f
+  //         );
+
+  //         child.transform.width = text_dims.x;
+  //         child.transform.height = text_dims.y;
+  //       }
+  //       break;
+  //       case Type::TextureButton:
+  //       case Type::TextureLabel:
+  //       {
+  //         child.transform.width = child.texture.width;
+  //         child.transform.height = child.texture.height;
+  //       }
+  //       break;
+  //     }
+
+  //     total_width += child.transform.width;
+  //     total_height += child.transform.height;
+
+  //     if ( child.transform.width > widest_child )
+  //       widest_child = child.transform.width;
+
+  //     if ( child.transform.height > tallest_child )
+  //       tallest_child = child.transform.height;
+  //   }
+  // }
 
   void Element::PanelReposition()
   {
@@ -203,6 +224,11 @@ namespace UI
       { transform.width, transform.height },
       background
     );
+
+    for ( rect slot: grid )
+    {
+      DrawRectangleRec( slot, GRAY );
+    }
 
     for ( Element &child: children )
     {
