@@ -42,12 +42,12 @@ namespace UI
     {
       Manager()->pages = {
         CreateMainMenuUI(),
-        CreateFactionSelectMenuUI(),
-        CreateSinglePlayerLobby(),
-        CreateModalMenuUI(),
-        CreateCampaignUI(),
-        CreateLobbyBrowser(),
-        CreateLobbyUI(),
+        // CreateFactionSelectMenuUI(),
+        // CreateSinglePlayerLobby(),
+        // CreateModalMenuUI(),
+        // CreateCampaignUI(),
+        // CreateLobbyBrowser(),
+        // CreateLobbyUI(),
       };
 
       for ( Page &page: Manager()->pages )

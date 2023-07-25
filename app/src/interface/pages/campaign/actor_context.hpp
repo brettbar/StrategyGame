@@ -8,43 +8,43 @@
 
 namespace UI
 {
-  inline Element CreateActorContextPanel()
-  {
-    return Panel( "actor_context_panel" )
-      .Anchor( Anchor::BottomMid )
-      .Background( Fade( BLACK, 0.5 ) )
-      .FixedSize( 800, 350 )
-      .On(
-        InterfaceUpdate::ID::ActorContext,
-        []( Element &self, InterfaceUpdate::Update update ) {
-          if ( update.condition )
-            self.Enable();
-          else
-            self.Disable();
-        }
-      )
-      .Children( {
-        Panel( "actor_actions_panel" )
-          .Children( {
-            TextButton( "actor_spawn_settlement_button" )
-              .Clickable( false )
-              .Background( RED )
-              .Text( "Spawn?", 26 )
-              .SetEvent(
-                InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment )
-              )
-              .On(
-                InterfaceUpdate::ID::ActorCanSpawnSettlement,
-                []( Element &self, InterfaceUpdate::Update update ) {
-                  self.UpdateClickable( update.condition );
+  // inline Element CreateActorContextPanel()
+  // {
+  //   return Panel( "actor_context_panel" )
+  //     .Anchor( Anchor::BottomMid )
+  //     .Background( Fade( BLACK, 0.5 ) )
+  //     .FixedSize( 800, 350 )
+  //     .On(
+  //       InterfaceUpdate::ID::ActorContext,
+  //       []( Element &self, InterfaceUpdate::Update update ) {
+  //         if ( update.condition )
+  //           self.Enable();
+  //         else
+  //           self.Disable();
+  //       }
+  //     )
+  //     .Children( {
+  //       Panel( "actor_actions_panel" )
+  //         .Children( {
+  //           TextButton( "actor_spawn_settlement_button" )
+  //             .Clickable( false )
+  //             .Background( RED )
+  //             .Text( "Spawn?", 26 )
+  //             .SetEvent(
+  //               InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment )
+  //             )
+  //             .On(
+  //               InterfaceUpdate::ID::ActorCanSpawnSettlement,
+  //               []( Element &self, InterfaceUpdate::Update update ) {
+  //                 self.UpdateClickable( update.condition );
 
-                  if ( update.condition )
-                    self.UpdateBackground( GREEN );
-                  else
-                    self.UpdateBackground( RED );
-                }
-              ),
-          } ),
-      } );
-  }
+  //                 if ( update.condition )
+  //                   self.UpdateBackground( GREEN );
+  //                 else
+  //                   self.UpdateBackground( RED );
+  //               }
+  //             ),
+  //         } ),
+  //     } );
+  // }
 }// namespace UI

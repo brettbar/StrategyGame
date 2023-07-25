@@ -6,7 +6,7 @@ namespace UI
 {
   void Element::PanelEnable()
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
     enabled = true;
     PanelResize();
     RepositionRecursive();
@@ -21,7 +21,7 @@ namespace UI
 
   void Element::PanelRegister()
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
     lookup.emplace( id, std::make_shared<Element>( *this ) );
 
     for ( Element &child: children )
@@ -32,7 +32,7 @@ namespace UI
 
   void Element::PanelDisable()
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
 
     for ( Element &child: children )
     {
@@ -44,7 +44,7 @@ namespace UI
 
   void Element::PanelResize()
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
 
     f32 total_height = 0;
     f32 total_width = 0;
@@ -59,7 +59,7 @@ namespace UI
       // First, do all the Fixed and Minimal Resizing
       switch ( child.type )
       {
-        case Type::Panel:
+        case Type::GridPanel:
           child.PanelResize();
           break;
         case Type::DataPanel:
@@ -100,156 +100,103 @@ namespace UI
       if ( child.transform.height > tallest_child )
         tallest_child = child.transform.height;
     }
-
-    f32 total_fixed_or_min_width = 0;
-    f32 total_fixed_or_min_height = 0;
-
-    // Once we know the fixed and minimals, do the maximums
-    for ( Element &child: children )
-    {
-      if ( !child.enabled )
-        continue;
-
-      if ( child.size == Size::Minimum || child.size == Size::Fixed )
-      {
-        total_fixed_or_min_width +=
-          child.transform.width + child.margins.left + child.margins.right;
-        total_fixed_or_min_height +=
-          child.transform.height + child.margins.bottom + child.margins.top;
-      }
-    }
-
-    for ( Element &child: children )
-    {
-      if ( !child.enabled )
-        continue;
-
-      if ( child.size == Size::Maximum )
-      {
-        child.transform.width = total_fixed_or_min_width / children.size();
-        child.transform.height = total_fixed_or_min_height / children.size();
-      }
-    }
-
-    if ( size == Size::Minimum )
-    {
-      if ( children_axis == Axis::Row )
-      {
-        transform.width = total_width;
-        transform.height = tallest_child;
-      }
-      else
-      {
-        transform.width = widest_child;
-        transform.height = total_height;
-      }
-    };
-    // case Size::Maximum:
-    // {
-    //   f32 width_left = parent_width - final_sibling_width_total;
-    //   f32 height_left = parent_height - final_sibling_height_total;
-
-    //   transform.width = width_left / num_final_siblings;
-    //   transform.height = width_height / num_final_siblings;
-    // }
-    // break;
   }
 
   void Element::PanelReposition()
   {
-    assert( type == Type::Panel );
-    f32 total_height = 0;
-    f32 total_width = 0;
-    f32 tallest_child = 0;
-    f32 widest_child = 0;
-    f32 end_of_last_x = transform.x;
-    f32 end_of_last_y = transform.y;
+    // assert( type == Type::Panel );
+    // f32 total_height = 0;
+    // f32 total_width = 0;
+    // f32 tallest_child = 0;
+    // f32 widest_child = 0;
+    // f32 end_of_last_x = transform.x;
+    // f32 end_of_last_y = transform.y;
 
-    if ( children_axis == Axis::Row )
-    {
-      switch ( children_horiz_align )
-      {
-        case Align::Start:
-        {
-          for ( Element &child: children )
-          {
-            child.RepositionRecursive();
+    // if ( children_axis == Axis::Row )
+    // {
+    //   switch ( children_horiz_align )
+    //   {
+    //     case Align::Start:
+    //     {
+    //       for ( Element &child: children )
+    //       {
+    //         child.RepositionRecursive();
 
-            child.transform.x = end_of_last_x + child.margins.left;
-            end_of_last_x =
-              child.transform.x + child.transform.width + child.margins.right;
-          }
-        }
-        break;
-        case Align::SpaceBetween:
-        {
-          for ( Element &child: children )
-          {
-            child.RepositionRecursive();
+    //         child.transform.x = end_of_last_x + child.margins.left;
+    //         end_of_last_x =
+    //           child.transform.x + child.transform.width + child.margins.right;
+    //       }
+    //     }
+    //     break;
+    //     case Align::SpaceBetween:
+    //     {
+    //       for ( Element &child: children )
+    //       {
+    //         child.RepositionRecursive();
 
-            f32 gap_width =
-              ( this->transform.width - total_width ) / ( children.size() - 1 );
+    //         f32 gap_width =
+    //           ( this->transform.width - total_width ) / ( children.size() - 1 );
 
-            child.transform.x = end_of_last_x + child.margins.left;
-            end_of_last_x = child.transform.x + child.transform.width +
-                            child.margins.right + gap_width;
-          }
-        }
-        break;
-      }
+    //         child.transform.x = end_of_last_x + child.margins.left;
+    //         end_of_last_x = child.transform.x + child.transform.width +
+    //                         child.margins.right + gap_width;
+    //       }
+    //     }
+    //     break;
+    //   }
 
-      switch ( children_vert_align )
-      {
-        case Align::Start:
-        {
-          for ( Element &child: children )
-          {
-            child.RepositionRecursive();
-            child.transform.y = transform.y;
-          }
-        }
-        break;
-      }
-    }
-    else
-    {// Axis::Column
-      // 2. Set the child x position based on alignment style.
-      switch ( children_horiz_align )
-      {
-        case Align::Start:
-        {
-          for ( Element &child: children )
-          {
-            child.RepositionRecursive();
-            child.transform.x = transform.x;
-          }
-        }
-        break;
-      }
+    //   switch ( children_vert_align )
+    //   {
+    //     case Align::Start:
+    //     {
+    //       for ( Element &child: children )
+    //       {
+    //         child.RepositionRecursive();
+    //         child.transform.y = transform.y;
+    //       }
+    //     }
+    //     break;
+    //   }
+    // }
+    // else
+    // {// Axis::Column
+    //   // 2. Set the child x position based on alignment style.
+    //   switch ( children_horiz_align )
+    //   {
+    //     case Align::Start:
+    //     {
+    //       for ( Element &child: children )
+    //       {
+    //         child.RepositionRecursive();
+    //         child.transform.x = transform.x;
+    //       }
+    //     }
+    //     break;
+    //   }
 
-      // 3. Set the child y position based on alignment style.
-      switch ( children_vert_align )
-      {
-        case Align::Start:
-        {
-          for ( Element &child: children )
-          {
-            child.RepositionRecursive();
-            child.transform.y = end_of_last_y;
-            // + margins.top;
-            end_of_last_y = child.transform.y + child.transform.height;
-            // + margins.bottom;
-          }
-        }
-        break;
-      }
-    }
+    //   // 3. Set the child y position based on alignment style.
+    //   switch ( children_vert_align )
+    //   {
+    //     case Align::Start:
+    //     {
+    //       for ( Element &child: children )
+    //       {
+    //         child.RepositionRecursive();
+    //         child.transform.y = end_of_last_y;
+    //         // + margins.top;
+    //         end_of_last_y = child.transform.y + child.transform.height;
+    //         // + margins.bottom;
+    //       }
+    //     }
+    //     break;
+    //   }
+    // }
   }
 
 
   void Element::PanelDraw()
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
 
     DrawRectangleV(
       { transform.x, transform.y },
@@ -268,7 +215,7 @@ namespace UI
     const InterfaceUpdate::Update &update
   )
   {
-    assert( type == Type::Panel );
+    assert( type == Type::GridPanel );
     if ( updates.contains( update.id ) )
       updates[update.id]( *this, update );
 

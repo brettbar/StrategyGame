@@ -162,69 +162,70 @@ private:
 
   inline Element CreateDebugInfo()
   {
-    auto update_debug_info = [](
-                               std::map<std::string, bool> &,
-                               std::vector<Element> &children
-                             ) {
-      for ( auto &child: children )
-      {
+    // auto update_debug_info = [](
+    //                            std::map<std::string, bool> &,
+    //                            std::vector<Element> &children
+    //                          ) {
+    //   for ( auto &child: children )
+    //   {
 
-        if ( child.id == "fps" )
-        {
-          child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
-        }
-        else if ( child.id == "hot" )
-        {
-          child.UpdateText( "hot: " + ( Manager()->Hot() ) );
-        }
-        else if ( child.id == "active" )
-        {
-          child.UpdateText( "active: " + ( Manager()->Active() ) );
-        }
-        else if ( child.id == "element.background" )
-        {
-          if ( lookup.contains( Manager()->Hot() ) )
-          {
-            // std::cout << "Updating color with "
-            //           << FormatRGB( lookup.at( Manager()->Hot() )->Background()
-            //              )
-            //           << '\n';
+    //     if ( child.id == "fps" )
+    //     {
+    //       child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
+    //     }
+    //     else if ( child.id == "hot" )
+    //     {
+    //       child.UpdateText( "hot: " + ( Manager()->Hot() ) );
+    //     }
+    //     else if ( child.id == "active" )
+    //     {
+    //       child.UpdateText( "active: " + ( Manager()->Active() ) );
+    //     }
+    //     else if ( child.id == "element.background" )
+    //     {
+    //       if ( lookup.contains( Manager()->Hot() ) )
+    //       {
+    //         // std::cout << "Updating color with "
+    //         //           << FormatRGB( lookup.at( Manager()->Hot() )->Background()
+    //         //              )
+    //         //           << '\n';
 
-            child.UpdateText(
-              "element.background: " +
-              FormatRGB( lookup.at( Manager()->Hot() )->background )
-            );
-          }
-          else
-          {
-            child.UpdateText( "element.background: " );
-          }
-        }
+    //         child.UpdateText(
+    //           "element.background: " +
+    //           FormatRGB( lookup.at( Manager()->Hot() )->background )
+    //         );
+    //       }
+    //       else
+    //       {
+    //         child.UpdateText( "element.background: " );
+    //       }
+    //     }
 
-        else if ( child.id == "selected" )
-        {
-          child.UpdateText(
-            "entity: " +
-            EntityIdToString( SelectionSystem::GetSelectedEntity() )
-          );
-        }
-      }
-    };
+    //     else if ( child.id == "selected" )
+    //     {
+    //       child.UpdateText(
+    //         "entity: " +
+    //         EntityIdToString( SelectionSystem::GetSelectedEntity() )
+    //       );
+    //     }
+    //   }
+    // };
 
-    return Panel( "debug_info" )
-      .Axis( Axis::Column )
-      .Anchor( Anchor::TopRight )
-      .UpdateChildren( update_debug_info )
-      .Background( BLUE )
-      .Children( {
-        TextLabel( "fps" ).Background( BLACK ).Text( "fps: ", 18.0f, GREEN ),
-        TextLabel( "hot" ).Background( BLACK ).Text( "hot: ", 18.0f ),
-        TextLabel( "active" ).Background( BLACK ).Text( "active: ", 18.0f ),
-        TextLabel( "element.background" )
-          .Background( BLACK )
-          .Text( "element.background: ", 18.0f ),
-        TextLabel( "selected" ).Text( "entity: ", 18.0f ).Background( BLACK ),
-      } );
+    // return Panel( "debug_info" )
+    //   .Axis( Axis::Column )
+    //   .Anchor( Anchor::TopRight )
+    //   .UpdateChildren( update_debug_info )
+    //   .Background( BLUE )
+    //   .Children( {
+    //     TextLabel( "fps" ).Background( BLACK ).Text( "fps: ", 18.0f, GREEN ),
+    //     TextLabel( "hot" ).Background( BLACK ).Text( "hot: ", 18.0f ),
+    //     TextLabel( "active" ).Background( BLACK ).Text( "active: ", 18.0f ),
+    //     TextLabel( "element.background" )
+    //       .Background( BLACK )
+    //       .Text( "element.background: ", 18.0f ),
+    //     TextLabel( "selected" ).Text( "entity: ", 18.0f ).Background( BLACK ),
+    //   } );
+    return Element{};
   }
 
   inline void Interact(
@@ -238,7 +239,7 @@ private:
 
     switch ( element.type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
       {
         for ( Element &child: element.children )
         {
@@ -309,7 +310,7 @@ private:
   {
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
       {
         for ( Element &child: children )
         {

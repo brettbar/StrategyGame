@@ -10,46 +10,13 @@ namespace UI
 {
   enum class Type : u32
   {
-    Panel,
+    GridPanel,
     DataPanel,
     StackPanel,
     TextLabel,
     TextButton,
     TextureLabel,
     TextureButton,
-  };
-
-  enum class Anchor
-  {
-    Free,
-    TopLeft,
-    TopMid,
-    TopRight,
-    MidLeft,
-    Centered,
-    MidRight,
-    BottomLeft,
-    BottomMid,
-    BottomRight,
-  };
-
-  enum class Axis
-  {
-    Row,
-    Column,
-  };
-
-  enum class Align
-  {
-    Start,
-    SpaceBetween,
-  };
-
-  enum class Size
-  {
-    Fixed,  // Set manually in pixels
-    Minimum,// Smallest possible to fit content
-    Maximum,// As large as parent will allow
   };
 
   struct Margins
@@ -60,7 +27,7 @@ namespace UI
     u32 bottom;
   };
 
-  class Element
+  struct Element
   {
     // Element() = delete;
     Element() = default;
@@ -69,21 +36,18 @@ namespace UI
     //   // TODO Remove id from lookup
     // }
 
-public:
     Type type;
     std::string id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
-    Size size = Size::Minimum;
     Color background = BLACK;
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
 
     // Panel
-    Anchor anchor = Anchor::Free;// Might apply to others as well?
-    Axis children_axis = Axis::Row;
-    Align children_horiz_align;
-    Align children_vert_align;
+    bool fixed_size = false;
+    u32 num_cols = 0;
+    u32 num_rows = 0;
     std::vector<Element> children = {};
 
     //DataPanel

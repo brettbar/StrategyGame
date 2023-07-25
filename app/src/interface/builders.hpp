@@ -18,21 +18,21 @@ public:
     };
   };
 
-  class PanelBuilder : public AbstractBuilder
+  class GridPanelBuilder : public AbstractBuilder
   {
     Element _element;
 
 public:
-    explicit PanelBuilder( std::string id ) : AbstractBuilder{ _element }
+    explicit GridPanelBuilder( std::string id, u32 num_cols, u32 num_rows )
+        : AbstractBuilder{ _element }
     {
-      _element.type = Type::Panel;
+      _element.type = Type::GridPanel;
       _element.id = id;
-      _element.children_axis = Axis::Row;
-      _element.children_horiz_align = Align::Start;
-      _element.children_vert_align = Align::Start;
+      _element.num_cols = num_cols;
+      _element.num_rows = num_rows;
     }
 
-    PanelBuilder &On(
+    GridPanelBuilder &On(
       InterfaceUpdate::ID update_id,
       std::function<void( Element &self, InterfaceUpdate::Update update )>
         update_fn
@@ -42,51 +42,27 @@ public:
       return *this;
     }
 
-    PanelBuilder &StartDisabled()
+    GridPanelBuilder &StartDisabled()
     {
       _element.starts_disabled = true;
       return *this;
     }
 
-    PanelBuilder &FixedSize( u32 width, u32 height )
+    GridPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.size = Size::Fixed;
+      _element.fixed_size = true;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;
     }
 
-    PanelBuilder &MinimumSize()
-    {
-      _element.size = Size::Minimum;
-      return *this;
-    }
-
-    PanelBuilder &MaximumSize()
-    {
-      _element.size = Size::Maximum;
-      return *this;
-    }
-
-    PanelBuilder &Anchor( Anchor anchor )
-    {
-      _element.anchor = anchor;
-      return *this;
-    }
-
-    PanelBuilder &Axis( Axis axis )
-    {
-      _element.children_axis = axis;
-      return *this;
-    }
-
-    PanelBuilder &Children( std::vector<Element> children )
+    GridPanelBuilder &Children( std::vector<Element> children )
     {
       _element.children = children;
       return *this;
     }
 
-    PanelBuilder &UpdateChildren(
+    GridPanelBuilder &UpdateChildren(
       std::function<
         void( std::map<std::string, bool> &, std::vector<Element> & )>
         update_children
@@ -96,21 +72,15 @@ public:
       return *this;
     }
 
-    PanelBuilder &Background( Color background )
+    GridPanelBuilder &Background( Color background )
     {
       _element.background = background;
       return *this;
     }
 
-    PanelBuilder &Margins( Margins margins )
+    GridPanelBuilder &Margins( Margins margins )
     {
       _element.margins = margins;
-      return *this;
-    }
-
-    PanelBuilder &AlignHoriz( Align align )
-    {
-      _element.children_horiz_align = align;
       return *this;
     }
   };
@@ -125,14 +95,11 @@ public:
       _element.type = Type::DataPanel;
       _element.id = id;
       _element.curr_index = 0;
-      _element.children_axis = Axis::Row;
-      _element.children_horiz_align = Align::Start;
-      _element.children_vert_align = Align::Start;
     }
 
     DataPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.size = Size::Fixed;
+      _element.fixed_size = true;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;
@@ -147,18 +114,6 @@ public:
     DataPanelBuilder &Update( std::function<void( Element & )> update )
     {
       _element.self_update = update;
-      return *this;
-    }
-
-    DataPanelBuilder &Axis( Axis axis )
-    {
-      _element.children_axis = axis;
-      return *this;
-    }
-
-    DataPanelBuilder &Anchor( Anchor anchor )
-    {
-      _element.anchor = anchor;
       return *this;
     }
   };
@@ -177,7 +132,7 @@ public:
 
     StackPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      _element.size = Size::Fixed;
+      _element.fixed_size = true;
       _element.transform.width = width;
       _element.transform.height = height;
       return *this;
@@ -354,9 +309,13 @@ public:
   };
 
 
-  inline PanelBuilder Panel( std::string id )
+  inline GridPanelBuilder GridPanel(
+    std::string id,
+    u32 num_cols,
+    u32 num_rows
+  )
   {
-    return PanelBuilder{ id };
+    return GridPanelBuilder{ id, num_cols, num_rows };
   }
 
   inline DataPanelBuilder DataPanel( std::string id )

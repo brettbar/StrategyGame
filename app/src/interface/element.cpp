@@ -6,7 +6,7 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelEnable();
         break;
       case Type::DataPanel:
@@ -25,7 +25,7 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelRegister();
         break;
       case Type::DataPanel:
@@ -44,7 +44,7 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelDisable();
         break;
       case Type::DataPanel:
@@ -62,7 +62,7 @@ namespace UI
   // TODO This should only be called for Panels
   void Element::ResizeRecursive()
   {
-    bool is_panel = type == Type::Panel || type == Type::DataPanel ||
+    bool is_panel = type == Type::GridPanel || type == Type::DataPanel ||
                     type == Type::StackPanel;
 
     if ( !is_panel )
@@ -70,7 +70,7 @@ namespace UI
 
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelResize();
         break;
       case Type::DataPanel:
@@ -88,53 +88,16 @@ namespace UI
   // TODO This should only be called for Panels
   void Element::RepositionRecursive()
   {
-    bool is_panel = type == Type::Panel || type == Type::DataPanel ||
+    bool is_panel = type == Type::GridPanel || type == Type::DataPanel ||
                     type == Type::StackPanel;
 
     if ( !is_panel )
       return;
 
-    switch ( anchor )
-    {
-      case Anchor::Centered:
-      {
-        vec2 updated_pos = {
-          ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
-          ( (f32) GetScreenHeight() / 2 ) - ( transform.height / 2 ),
-        };
-
-        transform.x = updated_pos.x;
-        transform.y = updated_pos.y;
-      }
-      break;
-      case Anchor::TopRight:
-      {
-        vec2 updated_pos = {
-          ( (f32) GetScreenWidth() ) - ( transform.width ), 0 };
-
-        transform.x = updated_pos.x;
-        transform.y = updated_pos.y;
-      }
-      break;
-      case Anchor::BottomMid:
-      {
-        vec2 updated_pos = {
-          ( (f32) GetScreenWidth() / 2 ) - ( transform.width / 2 ),
-          ( (f32) GetScreenHeight() ) - ( transform.height ),
-        };
-
-        transform.x = updated_pos.x;
-        transform.y = updated_pos.y;
-      }
-      break;
-      default:
-        break;
-    }
-
 
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelReposition();
         break;
       case Type::DataPanel:
@@ -167,7 +130,7 @@ namespace UI
   {
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelExecuteInterfaceUpdate( update );
         break;
       case Type::DataPanel:
@@ -211,7 +174,7 @@ namespace UI
 
     switch ( type )
     {
-      case Type::Panel:
+      case Type::GridPanel:
         PanelDraw();
         break;
       case Type::DataPanel:

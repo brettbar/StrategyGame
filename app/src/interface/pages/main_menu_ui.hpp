@@ -2,6 +2,7 @@
 
 #include "../../shared/common.hpp"
 
+#include "../builders.hpp"
 #include "../element.hpp"
 
 namespace UI
@@ -10,9 +11,7 @@ namespace UI
   inline std::vector<Element> CreateMainMenuUI()
   {
     return {
-      Panel( "main_menu" )
-        .Axis( Axis::Column )
-        .Anchor( Anchor::Centered )
+      GridPanel( "main_menu", 1, 3 )
         .Background( GREEN )
         .Children( {
           TextButton( "main_menu_host_game" )

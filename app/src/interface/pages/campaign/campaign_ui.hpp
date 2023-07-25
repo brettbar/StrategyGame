@@ -11,12 +11,12 @@
 
 namespace UI
 {
-  inline std::vector<Element> CreateCampaignUI()
-  {
-    return {
-      CreateSettlementContextPanel(),
-      CreateActorContextPanel(),
-    };
-  }
+  // inline std::vector<Element> CreateCampaignUI()
+  // {
+  //   return {
+  //     CreateSettlementContextPanel(),
+  //     CreateActorContextPanel(),
+  //   };
+  // }
 
 };// namespace UI
