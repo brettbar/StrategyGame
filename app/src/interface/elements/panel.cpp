@@ -219,16 +219,12 @@ namespace UI
   {
     assert( type == Type::GridPanel );
 
-    DrawRectangleV(
-      { transform.x, transform.y },
-      { transform.width, transform.height },
-      background
-    );
-
     for ( rect slot: grid )
     {
       DrawRectangleRec( slot, GRAY );
     }
+
+    DrawRectangleRec( transform, background );
 
     for ( Element &child: children )
     {
