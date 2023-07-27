@@ -26,7 +26,7 @@ namespace UI
   };
 
   // Panel?
-  using Page = std::vector<Element>;
+  using Page = list<Element *>;
 
   class IManager
   {
@@ -239,26 +239,26 @@ private:
 
     switch ( element.type )
     {
-      case Type::GridPanel:
-      {
-        for ( Element &child: element.children )
-        {
-          Interact( child, mouse_went_up, mouse_went_down );
-        }
-      }
-      break;
-      case Type::StackPanel:
-      {
-        Interact(
-          element.children[element.curr_index], mouse_went_up, mouse_went_down
-        );
+      // case Type::GridPanel:
+      // {
+      //   for ( Element &child: element.children )
+      //   {
+      //     Interact( child, mouse_went_up, mouse_went_down );
+      //   }
+      // }
+      // break;
+      // case Type::StackPanel:
+      // {
+      //   Interact(
+      //     element.children[element.curr_index], mouse_went_up, mouse_went_down
+      //   );
 
-        if ( !Manager()->over_any_elem )
-        {
-          Manager()->SetContextNull();
-        }
-      }
-      break;
+      //   if ( !Manager()->over_any_elem )
+      //   {
+      //     Manager()->SetContextNull();
+      //   }
+      // }
+      // break;
       case Type::TextureButton:
       case Type::TextButton:
       {
@@ -310,21 +310,21 @@ private:
   {
     switch ( type )
     {
-      case Type::GridPanel:
-      {
-        for ( Element &child: children )
-        {
-          child.Destroy();
-        }
-        // Manager()->lookup.erase( id );
-      }
-      break;
-      case Type::StackPanel:
-      {
-        children[curr_index].Destroy();
-        // Manager()->lookup.erase( id );
-      }
-      break;
+      // case Type::GridPanel:
+      // {
+      //   for ( Element &child: children )
+      //   {
+      //     child.Destroy();
+      //   }
+      //   // Manager()->lookup.erase( id );
+      // }
+      // break;
+      // case Type::StackPanel:
+      // {
+      //   children[curr_index].Destroy();
+      //   // Manager()->lookup.erase( id );
+      // }
+      // break;
       default:
         // Manager()->lookup.erase( id );
         break;

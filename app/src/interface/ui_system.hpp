@@ -15,12 +15,12 @@ namespace UI
   {
     void ReceiveUpdate( const InterfaceUpdate::Update &update )
     {
-      for ( auto &panel: Manager()->ActivePage() )
+      for ( Element *panel: Manager()->ActivePage() )
       {
         // TODO probably add a check that if the element is disabled we dont want to fire updates,
         // UNLESS the update is dealing with enabled, in which case a disabled element should
         // still be able to know if it got re-enabled
-        panel.ExecuteInterfaceUpdate( update );
+        panel->ExecuteInterfaceUpdate( update );
       }
     }
 
@@ -52,9 +52,9 @@ namespace UI
 
       for ( Page &page: Manager()->pages )
       {
-        for ( Element &panel: page )
+        for ( Element *panel: page )
         {
-          panel.Register();
+          panel->Register();
         }
       }
 
@@ -82,12 +82,12 @@ namespace UI
 
     inline void EnableContent()
     {
-      for ( Element &base: Manager()->ActivePage() )
+      for ( Element *base: Manager()->ActivePage() )
       {
-        if ( base.starts_disabled )
+        if ( base->starts_disabled )
           return;
 
-        base.Enable();
+        base->Enable();
       }
     }
 
@@ -95,9 +95,9 @@ namespace UI
     {
       Manager()->SetContextNull();
 
-      for ( Element &base: Manager()->ActivePage() )
+      for ( Element *base: Manager()->ActivePage() )
       {
-        base.Disable();
+        base->Disable();
       }
     }
 
@@ -127,11 +127,11 @@ namespace UI
 
       Manager()->over_any_elem = false;
 
-      for ( Element &base: Manager()->ActivePage() )
+      for ( Element *base: Manager()->ActivePage() )
       {
-        base.ResizeRecursive();
-        base.RepositionRecursive();
-        Interact( base, mouseWentUp, mouseWentDown );
+        base->ResizeRecursive();
+        base->RepositionRecursive();
+        Interact( *base, mouseWentUp, mouseWentDown );
       }
 
       Manager()->debug.ResizeRecursive();
@@ -144,9 +144,9 @@ namespace UI
 
     inline void Draw()
     {
-      for ( Element &base: Manager()->ActivePage() )
+      for ( Element *base: Manager()->ActivePage() )
       {
-        base.Draw();
+        base->Draw();
       }
 
       Manager()->debug.Draw();

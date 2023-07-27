@@ -9,7 +9,7 @@
 namespace UI
 {
 
-  inline std::vector<Element> CreateMainMenuUI()
+  inline list<Element *> CreateMainMenuUI()
   {
     return {
       GridPanel( "main_menu_root", 3, 3 )

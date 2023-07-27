@@ -26,6 +26,27 @@ namespace UI
     u32 top;
     u32 bottom;
   };
+  struct Element;
+
+  struct Panel
+  {
+    bool fixed_size = false;
+    u32 num_cols = 0;
+    u32 num_rows = 0;
+    list<rect> grid = {};
+    list<Element *> children = {};
+
+    Panel( u32 cols, u32 rows ) : num_cols( cols ), num_rows( rows ) {}
+
+    void PanelEnable( Element & );
+    void PanelRegister();
+    void PanelDisable();
+    void PanelResize( const Element & );
+    void PanelReposition();
+    void PanelDraw( const Element & );
+    void
+    PanelExecuteInterfaceUpdate( const Element &, const InterfaceUpdate::Update & );
+  };
 
   struct Element
   {
@@ -45,11 +66,7 @@ namespace UI
     Margins margins = Margins{ 0, 0, 0, 0 };
 
     // Panel
-    bool fixed_size = false;
-    u32 num_cols = 0;
-    u32 num_rows = 0;
-    list<rect> grid = {};
-    std::vector<Element> children = {};
+    Panel *panel = nullptr;
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
@@ -96,33 +113,26 @@ namespace UI
     void FireEvent();
 
     friend class PanelBuilder;
-    void PanelEnable();
-    void PanelRegister();
-    void PanelDisable();
-    void PanelResize();
-    void PanelReposition();
-    void PanelDraw();
-    void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     friend class DataPanelBuilder;
-    void DataPanelEnable();
-    void DataPanelRegister();
-    void DataPanelDisable();
-    void DataPanelResize();
-    void DataPanelReposition();
-    void DataPanelDraw();
-    void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
-    void CreateElementForDatapoints( Element );
+    // void DataPanelEnable();
+    // void DataPanelRegister();
+    // void DataPanelDisable();
+    // void DataPanelResize();
+    // void DataPanelReposition();
+    // void DataPanelDraw();
+    // void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    // void CreateElementForDatapoints( Element );
 
     friend class StackPanelBuilder;
-    void StackPanelEnable();
-    void StackPanelRegister();
-    void StackPanelDisable();
-    void StackPanelSwitchChild( u32 );
-    void StackPanelResize();
-    void StackPanelReposition();
-    void StackPanelDraw();
-    void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    // void StackPanelEnable();
+    // void StackPanelRegister();
+    // void StackPanelDisable();
+    // void StackPanelSwitchChild( u32 );
+    // void StackPanelResize();
+    // void StackPanelReposition();
+    // void StackPanelDraw();
+    // void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     friend class TextLabelBuilder;
     friend class TextButtonBuilder;

@@ -5,48 +5,40 @@
 
 namespace UI
 {
-  void Element::PanelEnable()
+  void Panel::PanelEnable( Element &self )
   {
-    assert( type == Type::GridPanel );
-    enabled = true;
-    PanelResize();
-    RepositionRecursive();
+    self.enabled = true;
+    PanelResize( self );
+    // RepositionRecursive();
 
-    for ( Element &child: children )
+    for ( Element *child: children )
     {
-      child.Enable();
-      child.ResizeRecursive();
-      child.RepositionRecursive();
+      child->Enable();
+      child->ResizeRecursive();
+      child->RepositionRecursive();
     }
   }
 
-  void Element::PanelRegister()
+  void Panel::PanelRegister()
   {
-    assert( type == Type::GridPanel );
-    lookup.emplace( id, std::make_shared<Element>( *this ) );
-
-    for ( Element &child: children )
+    for ( Element *child: children )
     {
-      child.Register();
+      child->Register();
     }
   }
 
-  void Element::PanelDisable()
+  void Panel::PanelDisable()
   {
-    assert( type == Type::GridPanel );
-
-    for ( Element &child: children )
+    for ( Element *child: children )
     {
-      child.Disable();
+      child->Disable();
     }
-
-    enabled = false;
   }
 
-  void Element::PanelResize()
+  void Panel::PanelResize( const Element &self )
   {
-    u32 slot_width = transform.width / num_cols;
-    u32 slot_height = transform.height / num_rows;
+    u32 slot_width = self.transform.width / num_cols;
+    u32 slot_height = self.transform.height / num_rows;
 
     // resize grid
     for ( u32 c = 0; c < num_cols; c++ )
@@ -54,8 +46,8 @@ namespace UI
       for ( u32 r = 0; r < num_rows; r++ )
       {
         grid[c + num_cols * r] = {
-          transform.x + (f32) ( c * slot_width ),
-          transform.y + (f32) ( r * slot_height ),
+          self.transform.x + (f32) ( c * slot_width ),
+          self.transform.y + (f32) ( r * slot_height ),
           (f32) slot_width,
           (f32) slot_height,
         };
@@ -123,7 +115,7 @@ namespace UI
   //   }
   // }
 
-  void Element::PanelReposition()
+  void Panel::PanelReposition()
   {
     // assert( type == Type::Panel );
     // f32 total_height = 0;
@@ -215,35 +207,33 @@ namespace UI
   }
 
 
-  void Element::PanelDraw()
+  void Panel::PanelDraw( const Element &self )
   {
-    assert( type == Type::GridPanel );
-
     for ( rect slot: grid )
     {
       DrawRectangleRec( slot, GRAY );
     }
 
-    DrawRectangleRec( transform, background );
+    DrawRectangleRec( self.transform, self.background );
 
-    for ( Element &child: children )
+    for ( Element *child: children )
     {
-      child.Draw();
+      child->Draw();
     }
   }
 
 
-  void Element::PanelExecuteInterfaceUpdate(
+  void Panel::PanelExecuteInterfaceUpdate(
+    const Element &self,
     const InterfaceUpdate::Update &update
   )
   {
-    assert( type == Type::GridPanel );
-    if ( updates.contains( update.id ) )
-      updates[update.id]( *this, update );
+    // if ( self.updates.contains( update.id ) )
+    //   self.updates[update.id]( self, update );
 
-    for ( auto &child: children )
-    {
-      child.ExecuteInterfaceUpdate( update );
-    }
+    // for ( auto &child: children )
+    // {
+    //   child.ExecuteInterfaceUpdate( update );
+    // }
   }
 };// namespace UI
