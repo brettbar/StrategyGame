@@ -51,6 +51,8 @@ namespace UI
     list<rect> grid = {};
     list<sptr<Element>> children = {};
 
+    u32 GridIndex( u32, u32 );
+
     //DataPanel
     std::map<std::string, Element> data_points = {};
     std::function<void( Element & )> self_update = {};

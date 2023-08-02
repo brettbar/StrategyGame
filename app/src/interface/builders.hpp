@@ -55,8 +55,16 @@ public:
       return *this;
     }
 
-    GridPanelBuilder &SetColumn( u32, sptr<Element> child )
+    GridPanelBuilder &SetChild(
+      list<u32> cols,
+      list<u32> rows,
+      sptr<Element> child
+    )
     {
+      // TODO LEFT OFF HERE.
+      // Need to have some way to assocaited a child with the grid slots
+      // So that when we go to reposition/resize the child we know
+      // where to put it
       element->children.push_back( child );
       return *this;
     }

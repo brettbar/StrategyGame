@@ -14,10 +14,12 @@ namespace UI
     return GridPanel( "main_menu_root", 3, 3 )
       .FixedSize( GetScreenWidth(), GetScreenHeight() )
       .Background( BLACK )
-      .SetColumn(
-        1,
-        GridPanel( "main_menu", 1, 3 ).FixedSize( 200, 600 ).Background( GREEN )
-      );
+      // .SetChild(
+      //   { 1 },
+      //   { 1 },
+      //   GridPanel( "main_menu", 1, 3 ).FixedSize( 200, 600 ).Background( GREEN )
+      // )
+      ;
   }
 };// namespace UI
 

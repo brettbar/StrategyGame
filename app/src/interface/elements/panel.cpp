@@ -5,6 +5,12 @@
 
 namespace UI
 {
+  u32 Element::GridIndex( u32 col, u32 row )
+  {
+    return col + (num_cols) *row;
+  }
+
+
   void Element::PanelEnable()
   {
     assert( type == Type::GridPanel );
@@ -53,7 +59,7 @@ namespace UI
     {
       for ( u32 r = 0; r < num_rows; r++ )
       {
-        grid[c + num_cols * r] = {
+        grid[GridIndex( c, r )] = {
           transform.x + (f32) ( c * slot_width ),
           transform.y + (f32) ( r * slot_height ),
           (f32) slot_width,
@@ -219,12 +225,13 @@ namespace UI
   {
     assert( type == Type::GridPanel );
 
-    for ( rect slot: grid )
+    DrawRectangleRec( transform, background );
+
+
+    for ( rect &slot: grid )
     {
       DrawRectangleRec( slot, GRAY );
     }
-
-    DrawRectangleRec( transform, background );
 
     for ( sptr<Element> &child: children )
     {
