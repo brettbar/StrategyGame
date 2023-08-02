@@ -5,7 +5,7 @@
 
 namespace UI
 {
-  u32 Element::GridIndex( u32 col, u32 row )
+  u32 GridPanelElement::GridIndex( u32 col, u32 row )
   {
     return col + (num_cols) *row;
   }
@@ -18,7 +18,7 @@ namespace UI
     PanelResize();
     RepositionRecursive();
 
-    for ( sptr<Element> &child: children )
+    for ( sptr<Element> &child: grid_panel->children )
     {
       child->Enable();
       child->ResizeRecursive();
@@ -31,7 +31,7 @@ namespace UI
     assert( type == Type::GridPanel );
     lookup.emplace( id, std::make_shared<Element>( *this ) );
 
-    for ( sptr<Element> &child: children )
+    for ( sptr<Element> &child: grid_panel->children )
     {
       child->Register();
     }
@@ -41,7 +41,7 @@ namespace UI
   {
     assert( type == Type::GridPanel );
 
-    for ( sptr<Element> &child: children )
+    for ( sptr<Element> &child: grid_panel->children )
     {
       child->Disable();
     }
@@ -51,15 +51,15 @@ namespace UI
 
   void Element::PanelResize()
   {
-    u32 slot_width = transform.width / num_cols;
-    u32 slot_height = transform.height / num_rows;
+    u32 slot_width = transform.width / grid_panel->num_cols;
+    u32 slot_height = transform.height / grid_panel->num_rows;
 
     // resize grid
-    for ( u32 c = 0; c < num_cols; c++ )
+    for ( u32 c = 0; c < grid_panel->num_cols; c++ )
     {
-      for ( u32 r = 0; r < num_rows; r++ )
+      for ( u32 r = 0; r < grid_panel->num_rows; r++ )
       {
-        grid[GridIndex( c, r )] = {
+        grid_panel->grid[grid_panel->GridIndex( c, r )] = {
           transform.x + (f32) ( c * slot_width ),
           transform.y + (f32) ( r * slot_height ),
           (f32) slot_width,
@@ -228,12 +228,12 @@ namespace UI
     DrawRectangleRec( transform, background );
 
 
-    for ( rect &slot: grid )
+    for ( rect &slot: grid_panel->grid )
     {
       DrawRectangleRec( slot, GRAY );
     }
 
-    for ( sptr<Element> &child: children )
+    for ( sptr<Element> &child: grid_panel->children )
     {
       child->Draw();
     }
@@ -248,7 +248,7 @@ namespace UI
     if ( updates.contains( update.id ) )
       updates[update.id]( *this, update );
 
-    for ( auto &child: children )
+    for ( auto &child: grid_panel->children )
     {
       child->ExecuteInterfaceUpdate( update );
     }

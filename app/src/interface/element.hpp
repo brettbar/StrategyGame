@@ -27,14 +27,37 @@ namespace UI
     u32 bottom;
   };
 
+  struct Element;
+
+  struct GridPanelElement
+  {
+    // Panel
+    bool fixed_size = false;
+    u32 num_cols = 0;
+    u32 num_rows = 0;
+    list<rect> grid = {};
+    list<sptr<Element>> children = {};
+
+    u32 GridIndex( u32, u32 );
+
+    GridPanelElement() = delete;
+    GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
+  };
+
   struct Element
   {
-    // Element() = delete;
-    // Element() = default;
-    // ~Element() {
-    //   // TODO Remove id from lookup
-    // }
-    Element( Type type, str id ) : type( type ), id( id ) {}
+    Element() = delete;
+
+    // GridPanel
+    Element( str id, u32 cols, u32 rows )
+        : type( Type::GridPanel ), id( id ),
+          grid_panel( std::make_shared<GridPanelElement>( cols, rows ) )
+    {
+      for ( u32 i = 0; i < cols * rows; i++ )
+      {
+        grid_panel->grid.push_back( { 0, 0, 0, 0 } );
+      }
+    }
 
     Type type;
     str id = "INVALID";
@@ -44,14 +67,7 @@ namespace UI
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
 
-    // Panel
-    bool fixed_size = false;
-    u32 num_cols = 0;
-    u32 num_rows = 0;
-    list<rect> grid = {};
-    list<sptr<Element>> children = {};
-
-    u32 GridIndex( u32, u32 );
+    sptr<GridPanelElement> grid_panel = nullptr;
 
     //DataPanel
     std::map<std::string, Element> data_points = {};

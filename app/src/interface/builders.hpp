@@ -24,16 +24,8 @@ namespace UI
 
 public:
     GridPanelBuilder( str id, u32 cols, u32 rows )
-        : element{ std::make_shared<Element>( Element{ Type::GridPanel, id } ) }
+        : element{ std::make_shared<Element>( Element{ id, cols, rows } ) }
     {
-      element->type = Type::GridPanel;
-      element->id = id;
-      element->num_cols = cols;
-      element->num_rows = rows;
-      for ( u32 i = 0; i < element->num_cols * element->num_rows; i++ )
-      {
-        element->grid.push_back( { 0, 0, 0, 0 } );
-      }
     }
 
     operator sptr<Element>() const
@@ -43,7 +35,7 @@ public:
 
     GridPanelBuilder &FixedSize( u32 width, u32 height )
     {
-      element->fixed_size = true;
+      element->grid_panel->fixed_size = true;
       element->transform.width = width;
       element->transform.height = height;
       return *this;
@@ -62,10 +54,10 @@ public:
     )
     {
       // TODO LEFT OFF HERE.
-      // Need to have some way to assocaited a child with the grid slots
+      // Need to have some way to associate a child with the grid slots
       // So that when we go to reposition/resize the child we know
       // where to put it
-      element->children.push_back( child );
+      element->grid_panel->children.push_back( child );
       return *this;
     }
   };

@@ -240,7 +240,7 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( auto &child: element->children )
+        for ( auto &child: element->grid_panel->children )
         {
           Interact( child, mouse_went_up, mouse_went_down );
         }
@@ -249,7 +249,9 @@ private:
       case Type::StackPanel:
       {
         Interact(
-          element->children[element->curr_index], mouse_went_up, mouse_went_down
+          element->grid_panel->children[element->curr_index],
+          mouse_went_up,
+          mouse_went_down
         );
 
         if ( !Manager()->over_any_elem )
@@ -311,7 +313,7 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( auto &child: children )
+        for ( auto &child: grid_panel->children )
         {
           child->Destroy();
         }
@@ -320,7 +322,7 @@ private:
       break;
       case Type::StackPanel:
       {
-        children[curr_index]->Destroy();
+        grid_panel->children[curr_index]->Destroy();
         // Manager()->lookup.erase( id );
       }
       break;
