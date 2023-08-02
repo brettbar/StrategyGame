@@ -25,8 +25,6 @@ namespace UI
     NUM_PAGES,
   };
 
-  // Panel?
-  using Page = std::vector<Element>;
 
   class IManager
   {
@@ -34,12 +32,12 @@ namespace UI
 public:
     // TODO(??) make private
     entt::registry registry;
-    std::array<Page, NUM_PAGES> pages;
-    Element debug;
+    std::array<sptr<Element>, NUM_PAGES> pages;
+    // Element debug;
 
     bool over_any_elem = false;
 
-    Page &ActivePage()
+    sptr<Element> &ActivePage()
     {
       return pages[_active_page_i];
     }
@@ -59,7 +57,7 @@ public:
     void operator=( const IManager & ) = delete;
 
     bool DoInteraction(
-      Element entity,
+      sptr<Element> &entity,
       bool clickable,
       bool inside,
       bool mouseWentUp,
@@ -68,30 +66,30 @@ public:
     {
       bool result = false;
 
-      if ( entity.id == _context.active )
+      if ( entity->id == _context.active )
       {
         if ( mouseWentUp )
         {
-          if ( entity.id == _context.hot )
+          if ( entity->id == _context.hot )
             result = true;// do the button action
 
           _context.active = "";
         }
       }
-      else if ( entity.id == _context.hot && clickable )
+      else if ( entity->id == _context.hot && clickable )
       {
         if ( mouseWentDown )
-          _context.active = entity.id;
+          _context.active = entity->id;
       }
 
       if ( inside )
       {
         if ( _context.active == "" )
         {
-          _context.hot = entity.id;
+          _context.hot = entity->id;
 
           if ( mouseWentDown )
-            _context.active = entity.id;
+            _context.active = entity->id;
         }
       }
 
@@ -150,7 +148,8 @@ private:
     u32 _active_page_i = PageType::MainMenu;
 
 
-    IManager() : debug( CreateDebugInfo() ) {}
+    // IManager() : debug( CreateDebugInfo() ) {}
+    IManager() {}
     ~IManager() {}
   };
 
@@ -160,88 +159,88 @@ private:
     return IManager::Manager();
   }
 
-  inline Element CreateDebugInfo()
-  {
-    // auto update_debug_info = [](
-    //                            std::map<std::string, bool> &,
-    //                            std::vector<Element> &children
-    //                          ) {
-    //   for ( auto &child: children )
-    //   {
+  // inline Element CreateDebugInfo()
+  // {
+  //   // auto update_debug_info = [](
+  //   //                            std::map<std::string, bool> &,
+  //   //                            std::vector<Element> &children
+  //   //                          ) {
+  //   //   for ( auto &child: children )
+  //   //   {
 
-    //     if ( child.id == "fps" )
-    //     {
-    //       child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
-    //     }
-    //     else if ( child.id == "hot" )
-    //     {
-    //       child.UpdateText( "hot: " + ( Manager()->Hot() ) );
-    //     }
-    //     else if ( child.id == "active" )
-    //     {
-    //       child.UpdateText( "active: " + ( Manager()->Active() ) );
-    //     }
-    //     else if ( child.id == "element.background" )
-    //     {
-    //       if ( lookup.contains( Manager()->Hot() ) )
-    //       {
-    //         // std::cout << "Updating color with "
-    //         //           << FormatRGB( lookup.at( Manager()->Hot() )->Background()
-    //         //              )
-    //         //           << '\n';
+  //   //     if ( child.id == "fps" )
+  //   //     {
+  //   //       child.UpdateText( "fps: " + std::to_string( GetFPS() ) );
+  //   //     }
+  //   //     else if ( child.id == "hot" )
+  //   //     {
+  //   //       child.UpdateText( "hot: " + ( Manager()->Hot() ) );
+  //   //     }
+  //   //     else if ( child.id == "active" )
+  //   //     {
+  //   //       child.UpdateText( "active: " + ( Manager()->Active() ) );
+  //   //     }
+  //   //     else if ( child.id == "element.background" )
+  //   //     {
+  //   //       if ( lookup.contains( Manager()->Hot() ) )
+  //   //       {
+  //   //         // std::cout << "Updating color with "
+  //   //         //           << FormatRGB( lookup.at( Manager()->Hot() )->Background()
+  //   //         //              )
+  //   //         //           << '\n';
 
-    //         child.UpdateText(
-    //           "element.background: " +
-    //           FormatRGB( lookup.at( Manager()->Hot() )->background )
-    //         );
-    //       }
-    //       else
-    //       {
-    //         child.UpdateText( "element.background: " );
-    //       }
-    //     }
+  //   //         child.UpdateText(
+  //   //           "element.background: " +
+  //   //           FormatRGB( lookup.at( Manager()->Hot() )->background )
+  //   //         );
+  //   //       }
+  //   //       else
+  //   //       {
+  //   //         child.UpdateText( "element.background: " );
+  //   //       }
+  //   //     }
 
-    //     else if ( child.id == "selected" )
-    //     {
-    //       child.UpdateText(
-    //         "entity: " +
-    //         EntityIdToString( SelectionSystem::GetSelectedEntity() )
-    //       );
-    //     }
-    //   }
-    // };
+  //   //     else if ( child.id == "selected" )
+  //   //     {
+  //   //       child.UpdateText(
+  //   //         "entity: " +
+  //   //         EntityIdToString( SelectionSystem::GetSelectedEntity() )
+  //   //       );
+  //   //     }
+  //   //   }
+  //   // };
 
-    // return Panel( "debug_info" )
-    //   .Axis( Axis::Column )
-    //   .Anchor( Anchor::TopRight )
-    //   .UpdateChildren( update_debug_info )
-    //   .Background( BLUE )
-    //   .Children( {
-    //     TextLabel( "fps" ).Background( BLACK ).Text( "fps: ", 18.0f, GREEN ),
-    //     TextLabel( "hot" ).Background( BLACK ).Text( "hot: ", 18.0f ),
-    //     TextLabel( "active" ).Background( BLACK ).Text( "active: ", 18.0f ),
-    //     TextLabel( "element.background" )
-    //       .Background( BLACK )
-    //       .Text( "element.background: ", 18.0f ),
-    //     TextLabel( "selected" ).Text( "entity: ", 18.0f ).Background( BLACK ),
-    //   } );
-    return Element{};
-  }
+  //   // return Panel( "debug_info" )
+  //   //   .Axis( Axis::Column )
+  //   //   .Anchor( Anchor::TopRight )
+  //   //   .UpdateChildren( update_debug_info )
+  //   //   .Background( BLUE )
+  //   //   .Children( {
+  //   //     TextLabel( "fps" ).Background( BLACK ).Text( "fps: ", 18.0f, GREEN ),
+  //   //     TextLabel( "hot" ).Background( BLACK ).Text( "hot: ", 18.0f ),
+  //   //     TextLabel( "active" ).Background( BLACK ).Text( "active: ", 18.0f ),
+  //   //     TextLabel( "element.background" )
+  //   //       .Background( BLACK )
+  //   //       .Text( "element.background: ", 18.0f ),
+  //   //     TextLabel( "selected" ).Text( "entity: ", 18.0f ).Background( BLACK ),
+  //   //   } );
+  //   return Element{};
+  // }
 
   inline void Interact(
-    Element element,
+    sptr<Element> &element,
     bool mouse_went_up,
     bool mouse_went_down
   )
   {
-    if ( !element.enabled )
+    if ( !element->enabled )
       return;
 
-    switch ( element.type )
+    switch ( element->type )
     {
       case Type::GridPanel:
       {
-        for ( Element &child: element.children )
+        for ( auto &child: element->children )
         {
           Interact( child, mouse_went_up, mouse_went_down );
         }
@@ -250,7 +249,7 @@ private:
       case Type::StackPanel:
       {
         Interact(
-          element.children[element.curr_index], mouse_went_up, mouse_went_down
+          element->children[element->curr_index], mouse_went_up, mouse_went_down
         );
 
         if ( !Manager()->over_any_elem )
@@ -263,24 +262,24 @@ private:
       case Type::TextButton:
       {
         bool inside =
-          CheckCollisionPointRec( GetMousePosition(), element.transform );
+          CheckCollisionPointRec( GetMousePosition(), element->transform );
 
         if ( !Manager()->over_any_elem )
           Manager()->over_any_elem = inside;
 
         if ( Manager()->DoInteraction(
                element,
-               element.clickable,
+               element->clickable,
                inside,
                mouse_went_up,
                mouse_went_down
              ) )
         {
-          if ( element.clickable )
+          if ( element->clickable )
           {
             std::cout << "INTERACTION DETECTED!!!" << std::endl;
 
-            element.FireEvent();
+            element->FireEvent();
           }
         }
       }
@@ -289,7 +288,7 @@ private:
       case Type::TextLabel:
       {
         bool inside =
-          CheckCollisionPointRec( GetMousePosition(), element.transform );
+          CheckCollisionPointRec( GetMousePosition(), element->transform );
 
         if ( !Manager()->over_any_elem )
           Manager()->over_any_elem = inside;
@@ -312,16 +311,16 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( Element &child: children )
+        for ( auto &child: children )
         {
-          child.Destroy();
+          child->Destroy();
         }
         // Manager()->lookup.erase( id );
       }
       break;
       case Type::StackPanel:
       {
-        children[curr_index].Destroy();
+        children[curr_index]->Destroy();
         // Manager()->lookup.erase( id );
       }
       break;

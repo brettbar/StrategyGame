@@ -10,10 +10,10 @@ namespace UI
         PanelEnable();
         break;
       case Type::DataPanel:
-        DataPanelEnable();
+        // DataPanelEnable();
         break;
       case Type::StackPanel:
-        StackPanelEnable();
+        // StackPanelEnable();
         break;
       default:
         enabled = true;
@@ -29,10 +29,10 @@ namespace UI
         PanelRegister();
         break;
       case Type::DataPanel:
-        DataPanelRegister();
+        // DataPanelRegister();
         break;
       case Type::StackPanel:
-        StackPanelRegister();
+        // StackPanelRegister();
         break;
       default:
         lookup.emplace( id, std::make_shared<Element>( *this ) );
@@ -48,10 +48,10 @@ namespace UI
         PanelDisable();
         break;
       case Type::DataPanel:
-        DataPanelDisable();
+        // DataPanelDisable();
         break;
       case Type::StackPanel:
-        StackPanelDisable();
+        // StackPanelDisable();
         break;
       default:
         enabled = false;
@@ -74,10 +74,10 @@ namespace UI
         PanelResize();
         break;
       case Type::DataPanel:
-        DataPanelResize();
+        // DataPanelResize();
         break;
       case Type::StackPanel:
-        StackPanelResize();
+        // StackPanelResize();
         break;
       default:
         break;
@@ -101,10 +101,10 @@ namespace UI
         PanelReposition();
         break;
       case Type::DataPanel:
-        DataPanelReposition();
+        // DataPanelReposition();
         break;
       case Type::StackPanel:
-        StackPanelReposition();
+        // StackPanelReposition();
         break;
       default:
         break;
@@ -134,10 +134,10 @@ namespace UI
         PanelExecuteInterfaceUpdate( update );
         break;
       case Type::DataPanel:
-        DataPanelExecuteInterfaceUpdate( update );
+        // DataPanelExecuteInterfaceUpdate( update );
         break;
       case Type::StackPanel:
-        StackPanelExecuteInterfaceUpdate( update );
+        // StackPanelExecuteInterfaceUpdate( update );
         break;
       default:
         if ( updates.contains( update.id ) )
@@ -178,10 +178,10 @@ namespace UI
         PanelDraw();
         break;
       case Type::DataPanel:
-        DataPanelDraw();
+        // DataPanelDraw();
         break;
       case Type::StackPanel:
-        StackPanelDraw();
+        // StackPanelDraw();
         break;
       case Type::TextLabel:
       {

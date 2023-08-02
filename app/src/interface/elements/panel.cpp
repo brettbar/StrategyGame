@@ -12,11 +12,11 @@ namespace UI
     PanelResize();
     RepositionRecursive();
 
-    for ( Element &child: children )
+    for ( sptr<Element> &child: children )
     {
-      child.Enable();
-      child.ResizeRecursive();
-      child.RepositionRecursive();
+      child->Enable();
+      child->ResizeRecursive();
+      child->RepositionRecursive();
     }
   }
 
@@ -25,9 +25,9 @@ namespace UI
     assert( type == Type::GridPanel );
     lookup.emplace( id, std::make_shared<Element>( *this ) );
 
-    for ( Element &child: children )
+    for ( sptr<Element> &child: children )
     {
-      child.Register();
+      child->Register();
     }
   }
 
@@ -35,9 +35,9 @@ namespace UI
   {
     assert( type == Type::GridPanel );
 
-    for ( Element &child: children )
+    for ( sptr<Element> &child: children )
     {
-      child.Disable();
+      child->Disable();
     }
 
     enabled = false;
@@ -226,9 +226,9 @@ namespace UI
 
     DrawRectangleRec( transform, background );
 
-    for ( Element &child: children )
+    for ( sptr<Element> &child: children )
     {
-      child.Draw();
+      child->Draw();
     }
   }
 
@@ -243,7 +243,7 @@ namespace UI
 
     for ( auto &child: children )
     {
-      child.ExecuteInterfaceUpdate( update );
+      child->ExecuteInterfaceUpdate( update );
     }
   }
 };// namespace UI

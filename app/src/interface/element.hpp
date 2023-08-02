@@ -30,14 +30,14 @@ namespace UI
   struct Element
   {
     // Element() = delete;
-    Element() = default;
-    Element( std::string id ) : id( id ){};
+    // Element() = default;
     // ~Element() {
     //   // TODO Remove id from lookup
     // }
+    Element( Type type, str id ) : type( type ), id( id ) {}
 
     Type type;
-    std::string id = "INVALID";
+    str id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
     Color background = BLACK;
@@ -49,13 +49,13 @@ namespace UI
     u32 num_cols = 0;
     u32 num_rows = 0;
     list<rect> grid = {};
-    std::vector<Element> children = {};
+    list<sptr<Element>> children = {};
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
     std::function<void( Element & )> self_update = {};
 
-    std::vector<InterfaceUpdate::ID> subscribed_updates = {};
+    list<InterfaceUpdate::ID> subscribed_updates = {};
     std::map<
       InterfaceUpdate::ID,
       std::function<void( Element &, InterfaceUpdate::Update )>>
@@ -95,7 +95,7 @@ namespace UI
     void Update();
     void FireEvent();
 
-    friend class PanelBuilder;
+    friend class GridPanelBuilder;
     void PanelEnable();
     void PanelRegister();
     void PanelDisable();
@@ -104,30 +104,30 @@ namespace UI
     void PanelDraw();
     void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
-    friend class DataPanelBuilder;
-    void DataPanelEnable();
-    void DataPanelRegister();
-    void DataPanelDisable();
-    void DataPanelResize();
-    void DataPanelReposition();
-    void DataPanelDraw();
-    void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
-    void CreateElementForDatapoints( Element );
+    // friend class DataPanelBuilder;
+    // void DataPanelEnable();
+    // void DataPanelRegister();
+    // void DataPanelDisable();
+    // void DataPanelResize();
+    // void DataPanelReposition();
+    // void DataPanelDraw();
+    // void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    // void CreateElementForDatapoints( Element );
 
-    friend class StackPanelBuilder;
-    void StackPanelEnable();
-    void StackPanelRegister();
-    void StackPanelDisable();
-    void StackPanelSwitchChild( u32 );
-    void StackPanelResize();
-    void StackPanelReposition();
-    void StackPanelDraw();
-    void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    // friend class StackPanelBuilder;
+    // void StackPanelEnable();
+    // void StackPanelRegister();
+    // void StackPanelDisable();
+    // void StackPanelSwitchChild( u32 );
+    // void StackPanelResize();
+    // void StackPanelReposition();
+    // void StackPanelDraw();
+    // void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
-    friend class TextLabelBuilder;
-    friend class TextButtonBuilder;
-    friend class TextureLabelBuilder;
-    friend class TextureButtonBuilder;
+    // friend class TextLabelBuilder;
+    // friend class TextButtonBuilder;
+    // friend class TextureLabelBuilder;
+    // friend class TextureButtonBuilder;
   };
 
 };// namespace UI

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "element.hpp"
 #include "pages/campaign/campaign_ui.hpp"
 #include "pages/faction_select_menu.hpp"
 #include "pages/lobby_browser.hpp"
@@ -15,13 +16,15 @@ namespace UI
   {
     void ReceiveUpdate( const InterfaceUpdate::Update &update )
     {
-      for ( auto &panel: Manager()->ActivePage() )
-      {
-        // TODO probably add a check that if the element is disabled we dont want to fire updates,
-        // UNLESS the update is dealing with enabled, in which case a disabled element should
-        // still be able to know if it got re-enabled
-        panel.ExecuteInterfaceUpdate( update );
-      }
+      // for ( auto &panel: )
+      // {
+      //   // TODO probably add a check that if the element is disabled we dont want to fire updates,
+      //   // UNLESS the update is dealing with enabled, in which case a disabled element should
+      //   // still be able to know if it got re-enabled
+      //   panel->ExecuteInterfaceUpdate( update );
+      // }
+
+      Manager()->ActivePage()->ExecuteInterfaceUpdate( update );
     }
 
     void Listen()
@@ -50,22 +53,20 @@ namespace UI
         // CreateLobbyUI(),
       };
 
-      for ( Page &page: Manager()->pages )
-      {
-        for ( Element &panel: page )
-        {
-          panel.Register();
-        }
-      }
+      // THIS iS causing a crash ??
+      // for ( sptr<Element> page: Manager()->pages )
+      // {
+      //   page->Register();
+      // }
 
       UpdateListener listener{};
 
       listener.Listen();
 
-      Manager()->debug.Enable();
+      // Manager()->debug.Enable();
       Manager()->SetScene( MainMenu );
       EnableContent();
-    }
+    }// namespace System
 
     inline void SwitchPage( PageType page )
     {
@@ -82,23 +83,16 @@ namespace UI
 
     inline void EnableContent()
     {
-      for ( Element &base: Manager()->ActivePage() )
-      {
-        if ( base.starts_disabled )
-          return;
+      if ( Manager()->ActivePage()->starts_disabled )
+        return;
 
-        base.Enable();
-      }
+      Manager()->ActivePage()->Enable();
     }
 
     inline void DisableCurrentContent()
     {
       Manager()->SetContextNull();
-
-      for ( Element &base: Manager()->ActivePage() )
-      {
-        base.Disable();
-      }
+      Manager()->ActivePage()->Disable();
     }
 
     inline void UpdateOnFrame()
@@ -127,16 +121,13 @@ namespace UI
 
       Manager()->over_any_elem = false;
 
-      for ( Element &base: Manager()->ActivePage() )
-      {
-        base.ResizeRecursive();
-        base.RepositionRecursive();
-        Interact( base, mouseWentUp, mouseWentDown );
-      }
+      Manager()->ActivePage()->ResizeRecursive();
+      Manager()->ActivePage()->RepositionRecursive();
+      Interact( Manager()->ActivePage(), mouseWentUp, mouseWentDown );
 
-      Manager()->debug.ResizeRecursive();
-      Manager()->debug.RepositionRecursive();
-      Manager()->debug.Update();
+      // Manager()->debug.ResizeRecursive();
+      // Manager()->debug.RepositionRecursive();
+      // Manager()->debug.Update();
 
       if ( !Manager()->over_any_elem )
         Manager()->SetContextNull();
@@ -144,12 +135,9 @@ namespace UI
 
     inline void Draw()
     {
-      for ( Element &base: Manager()->ActivePage() )
-      {
-        base.Draw();
-      }
+      Manager()->ActivePage()->Draw();
 
-      Manager()->debug.Draw();
+      // Manager()->debug.Draw();
 
       DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
       DrawText(
@@ -162,5 +150,4 @@ namespace UI
     }
 
   };// namespace System
-
-};// namespace UI
+};  // namespace UI
