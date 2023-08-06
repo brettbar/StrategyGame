@@ -14,7 +14,7 @@ fn draw() {
     }
 }
 
-#[cxx::bridge(namespace = "rustgui")]
+#[cxx::bridge(namespace = "irongui")]
 mod ffi {
     extern "Rust" {
         fn draw();

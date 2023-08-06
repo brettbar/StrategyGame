@@ -151,6 +151,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
+name = "irongui"
+version = "0.1.0"
+dependencies = [
+ "cxx",
+ "cxx-build",
+ "raylib-ffi",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -302,15 +311,6 @@ name = "regex-syntax"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5ea92a5b6195c6ef2a0295ea818b312502c6fc94dde986c5553242e18fd4ce2"
-
-[[package]]
-name = "rust-gui"
-version = "0.1.0"
-dependencies = [
- "cxx",
- "cxx-build",
- "raylib-ffi",
-]
 
 [[package]]
 name = "rustc-hash"

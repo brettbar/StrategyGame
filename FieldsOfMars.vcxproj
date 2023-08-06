@@ -86,7 +86,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\raylib;$(SolutionDir)include\steam;C:\Projects\game\target\cxxbridge\rust-gui\src;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\raylib;$(SolutionDir)include\steam;C:\Projects\game\irongui\target\cxxbridge\irongui\src;$(SolutionDir)include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -98,11 +98,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\raylib\lib;C:\Projects\game\target\debug;$(SolutionDir)include\steam\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>rust_gui.lib;steam_api64.lib;raylib.lib;opengl32.lib;winmm.lib;Ws2_32.lib;bcrypt.lib;userenv.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\raylib\lib;C:\Projects\game\irongui\target\debug;$(SolutionDir)include\steam\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>irongui.lib;steam_api64.lib;raylib.lib;opengl32.lib;winmm.lib;Ws2_32.lib;bcrypt.lib;userenv.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cargo build</Command>
+      <Command>cd $(SolutionDir)irongui
+cargo build
+cd $(SolutionDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy /y /d "$(SolutionDir)include\steam\lib\steam_api64.dll" "$(OutDir)";

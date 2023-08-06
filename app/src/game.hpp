@@ -16,7 +16,7 @@
 
 #include "campaign.hpp"
 
-#include "lib.rs.h"
+#include "../../irongui/target/cxxbridge/irongui/src/lib.rs.h"
 
 enum class ProgramMode
 {
@@ -392,7 +392,7 @@ class IGame
         {
           ClearBackground( BLACK );
           // Renderer::DrawUI();
-          rustgui::draw();
+          irongui::draw();
         }
         EndDrawing();
       }
