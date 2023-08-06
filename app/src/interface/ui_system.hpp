@@ -135,7 +135,10 @@ namespace UI
 
     inline void Draw()
     {
-      Manager()->ActivePage()->Draw();
+      // Manager()->ActivePage()->Draw();
+
+      draw();
+
 
       // Manager()->debug.Draw();
 

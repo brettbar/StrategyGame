@@ -5,6 +5,7 @@
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 #include "ui_shared.hpp"
+#include <raylib.h>
 
 namespace UI
 {
