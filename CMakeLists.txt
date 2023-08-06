@@ -84,7 +84,7 @@ endif(UNIX)
      winmm
      -static
      )
-   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/target/cxxbridge/irongui/src)
 
  endif(WIN32)
 

@@ -16,6 +16,8 @@
 
 #include "campaign.hpp"
 
+#include "lib.rs.h"
+
 enum class ProgramMode
 {
   MainMenu,
@@ -389,7 +391,8 @@ class IGame
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          Renderer::DrawUI();
+          // Renderer::DrawUI();
+          irongui::rustdraw();
         }
         EndDrawing();
       }
