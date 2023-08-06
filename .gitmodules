@@ -1,0 +1,6 @@
+[submodule "zig/src/raylib"]
+	path = zig/src/raylib
+	url = https://github.com/ryupold/raylib.zig
+[submodule "iron/src/raylib"]
+	path = iron/src/raylib
+	url = https://github.com/ryupold/raylib.zig

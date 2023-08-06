@@ -23,7 +23,7 @@
   <ItemGroup>
     <ClInclude Include="app\src\interface\element.hpp" />
     <ClInclude Include="app\src\interface\pages\main_menu_ui.hpp" />
-    <ClInclude Include="app\src\zig\iron.hpp" />
+    <ClInclude Include="iron\iron.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\raylib;$(SolutionDir)include\steam;$(SolutionDir)app\src\zig;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\raylib;$(SolutionDir)include\steam;$(SolutionDir)iron;$(SolutionDir)include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -99,17 +99,18 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)include\raylib\lib;$(SolutionDir)include\steam\lib;$(SolutionDir)app\src\zig\zig-out\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>zig.lib;ntdll.lib;steam_api64.lib;raylib.lib;opengl32.lib;winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)include\raylib\lib;$(SolutionDir)include\steam\lib;$(SolutionDir)iron\zig-out\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>iron.lib;ntdll.lib;steam_api64.lib;raylib.lib;opengl32.lib;winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd $(SolutionDir)iron
+zig build
+cd $(SolutionDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy /y /d "$(SolutionDir)include\steam\lib\steam_api64.dll" "$(OutDir)";
 copy /y /d "$(SolutionDir)include\raylib\lib\raylib.lib" "$(OutDir)";
-copy /y /d "$(SolutionDir)app\src\zig\zig-out\lib\zig.dll" "$(OutDir)";
+copy /y /d "$(SolutionDir)iron\zig-out\lib\iron.dll" "$(OutDir)";
 </Command>
     </PostBuildEvent>
     <CustomBuildStep>

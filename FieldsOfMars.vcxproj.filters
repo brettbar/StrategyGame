@@ -41,7 +41,7 @@
     <ClInclude Include="app\src\interface\pages\main_menu_ui.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="app\src\zig\iron.hpp">
+    <ClInclude Include="iron\iron.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

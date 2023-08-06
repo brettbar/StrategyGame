@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../../zig/iron.hpp"
+#include "../iron/iron.hpp"
 
 #include "../builders.hpp"
 #include "../element.hpp"
@@ -12,8 +12,6 @@ namespace UI
 
   inline sptr<Element> CreateMainMenuUI()
   {
-    std::cout << add( 5, 4 ) << '\n';
-
     return GridPanel( "main_menu_root", 3, 3 )
       .FixedSize( GetScreenWidth(), GetScreenHeight() )
       .Background( BLACK )

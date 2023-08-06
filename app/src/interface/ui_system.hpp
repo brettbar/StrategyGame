@@ -137,19 +137,16 @@ namespace UI
     {
       // Manager()->ActivePage()->Draw();
 
-      draw();
-
-
       // Manager()->debug.Draw();
 
-      DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
-      DrawText(
-        std::to_string( Global::state.timeScale ).c_str(),
-        GetScreenWidth() - 600,
-        252,
-        24.0f,
-        WHITE
-      );
+      // DrawRectangle( GetScreenWidth() - 600, 252, 200, 24.0f, BLACK );
+      // DrawText(
+      //   std::to_string( Global::state.timeScale ).c_str(),
+      //   GetScreenWidth() - 600,
+      //   252,
+      //   24.0f,
+      //   WHITE
+      // );
     }
 
   };// namespace System

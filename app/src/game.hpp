@@ -388,8 +388,12 @@ class IGame
 
         BeginDrawing();
         {
-          ClearBackground( BLACK );
-          Renderer::DrawUI();
+          // ClearBackground( BLACK );
+          // Renderer::DrawUI();
+          auto foo = zig_draw();
+          DrawRectangleRec(
+            { (f32) foo.x, (f32) foo.y, (f32) foo.w, (f32) foo.h }, foo.c
+          );
         }
         EndDrawing();
       }
