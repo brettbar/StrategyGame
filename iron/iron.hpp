@@ -1,15 +1,14 @@
 #include "../app/src/shared/common.hpp"
+#include <raylib.h>
 
-struct Rect
+struct DrawCall
 {
-  u32 x;
-  u32 y;
-  u32 w;
-  u32 h;
-  Color c;
+  u32 tag;
+  Rectangle rect;
+  Color bg;
 };
 
 extern "C"
 {
-  Rect zig_draw();
+  DrawCall zig_draw();
 }
