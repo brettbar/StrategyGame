@@ -1,4 +1,3 @@
-use pages::main_menu;
 mod components;
 mod pages;
 
@@ -6,7 +5,7 @@ static mut CONTENT: Vec<Box<dyn components::element::Draw>> = vec![];
 
 fn init() {
     unsafe {
-        CONTENT.push(main_menu::create());
+        CONTENT.push(pages::main_menu::create());
         CONTENT[0].enable();
     }
 }
