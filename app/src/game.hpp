@@ -392,7 +392,7 @@ class IGame
         {
           ClearBackground( BLACK );
           // Renderer::DrawUI();
-          irongui::draw();
+          irongui::draw_ui();
         }
         EndDrawing();
       }
