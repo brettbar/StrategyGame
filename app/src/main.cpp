@@ -86,6 +86,7 @@ int main()
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
   UI::System::Init();
+  irongui::init();
 
   SetExitKey( KEY_NULL );
 

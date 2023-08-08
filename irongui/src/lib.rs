@@ -1,56 +1,112 @@
 use raylib_ffi::*;
 use std::ffi::CString;
 
+trait Draw {
+    fn draw(&self);
+}
+
+struct Child {
+    element: Element,
+    // start_col: u32,
+    // end_col: u32,
+    // start_row: u32,
+    // end_row: u32,
+}
+
 enum Element {
     Grid {
-        // rect: Rectangle,
+        rect: Rectangle,
         background: Color,
         cols: u32,
         rows: u32,
+        children: Vec<Child>,
     },
-    TextLabel,
+    TextLabel(Vector2, &'static str),
 }
 
-fn draw(element: Element) {
-    match element {
-        Element::Grid {
-            background,
-            cols,
-            rows,
-        } => {
-            println!("Its a grid!");
-        }
-        Element::TextLabel => {
-            println!("Its a text label!");
+static mut ROOT: Vec<Element> = vec![];
+
+impl Element {
+    fn draw(&self) {
+        match self {
+            Element::Grid {
+                rect,
+                background,
+                cols,
+                rows,
+                children,
+            } => unsafe {
+                DrawRectangleRec(rect.to_owned(), background.to_owned());
+
+                let child_width = rect.width / (cols.to_owned() as f32);
+                let child_height = rect.height / (rows.to_owned() as f32);
+
+                println!("w{}, h{}", child_width, child_height);
+
+                // Draw the Grid
+                for n in 0..(cols * rows) {
+                    let x = n / cols;
+                    let y = n % cols;
+
+                    DrawRectangleRec(
+                        Rectangle {
+                            x: rect.x + (child_width * x as f32),
+                            y: rect.y + (child_height * y as f32),
+                            width: child_width,
+                            height: child_height,
+                        },
+                        colors::GRAY,
+                    );
+                }
+
+                for child in children.iter() {
+                    child.element.draw();
+                }
+            },
+            Element::TextLabel(vec2, txt) => unsafe {
+                DrawText(
+                    CString::new(txt.to_owned()).unwrap().into_raw(),
+                    vec2.to_owned().x as i32,
+                    vec2.to_owned().y as i32,
+                    32,
+                    colors::ORANGE,
+                );
+            },
         }
     }
 }
 
-static mut CONTENT: Vec<Box<Element>> = vec![];
-
 fn init() {
-    let foo = Element::Grid {
-        background: colors::RED,
-        cols: 1,
-        rows: 6,
-    };
+    unsafe {
+        ROOT.push(Element::Grid {
+            rect: Rectangle {
+                x: 150.,
+                y: 150.,
+                width: 300.,
+                height: 600.,
+            },
+            background: colors::RED,
+            cols: 1,
+            rows: 6,
+            children: vec![Child {
+                element: Element::TextLabel(Vector2 { x: 150., y: 150. }, "Hello from Rust!!!"),
+            }],
+        });
+    }
 }
 
 fn draw_ui() {
     unsafe {
-        DrawText(
-            CString::new("Hello From Rust!!").unwrap().into_raw(),
-            150,
-            150,
-            32,
-            colors::ORANGE,
-        );
+        for panel in ROOT.iter() {
+            panel.draw();
+        }
     }
 }
 
 #[cxx::bridge(namespace = "irongui")]
 mod ffi {
     extern "Rust" {
+        fn init();
         fn draw_ui();
     }
 }
