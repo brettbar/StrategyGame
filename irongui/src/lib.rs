@@ -41,22 +41,19 @@ impl Element {
                 let child_width = rect.width / (cols.to_owned() as f32);
                 let child_height = rect.height / (rows.to_owned() as f32);
 
-                println!("w{}, h{}", child_width, child_height);
-
                 // Draw the Grid
-                for n in 0..(cols * rows) {
-                    let x = n / cols;
-                    let y = n % cols;
-
-                    DrawRectangleRec(
-                        Rectangle {
-                            x: rect.x + (child_width * x as f32),
-                            y: rect.y + (child_height * y as f32),
-                            width: child_width,
-                            height: child_height,
-                        },
-                        colors::GRAY,
-                    );
+                for c in 0..cols.to_owned() {
+                    for r in 0..rows.to_owned() {
+                        DrawRectangleRec(
+                            Rectangle {
+                                x: rect.x + (child_width * c as f32),
+                                y: rect.y + (child_height * r as f32),
+                                width: child_width,
+                                height: child_height,
+                            },
+                            colors::GRAY,
+                        );
+                    }
                 }
 
                 for child in children.iter() {

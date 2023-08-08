@@ -42,10 +42,18 @@ if (UNIX)
        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
      )
 
+     add_library(irongui STATIC IMPORTED)
+     set_target_properties(
+       irongui PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/irongui/target/debug/libirongui.a"
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/irongui/target/cxxbridge/irongui/src"
+     )
+  
+
      # For compiler errors/warnings
      # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-     target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api)
-     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+     target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api irongui)
+     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/irongui/target/cxxbridge/irongui/src)
 endif(UNIX)
 
 
