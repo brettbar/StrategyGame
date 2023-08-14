@@ -2,7 +2,6 @@
 
 #include "../../shared/common.hpp"
 
-#include "../builders.hpp"
 #include "../element.hpp"
 #include <raylib.h>
 
@@ -13,13 +12,20 @@ namespace UI
   {
     return GridPanel( "main_menu_root", 3, 3 )
       .FixedSize( GetScreenWidth(), GetScreenHeight() )
-      .Background( BLACK )
-      // .SetChild(
-      //   { 1 },
-      //   { 1 },
-      //   GridPanel( "main_menu", 1, 3 ).FixedSize( 200, 600 ).Background( GREEN )
-      // )
-      ;
+      .Background( GRAY )
+      .SetChildren( {
+        GridPanelElement::Slot{
+          { 1, 1, 1, 1 },
+          GridPanel( "main_menu", 1, 6 )
+            .Background( GREEN )
+            .SetChildren( {
+              GridPanelElement::Slot{
+                { 0, 0, 0, 1 },
+                TextLabel( "main_menu_host_game", "Host Game", 32 ),
+              },
+            } ),
+        },
+      } );
   }
 };// namespace UI
 

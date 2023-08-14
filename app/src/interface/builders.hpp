@@ -18,49 +18,6 @@ namespace UI
   //     };
   //   };
 
-  class GridPanelBuilder
-  {
-    sptr<Element> element;
-
-public:
-    GridPanelBuilder( str id, u32 cols, u32 rows )
-        : element{ std::make_shared<Element>( Element{ id, cols, rows } ) }
-    {
-    }
-
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    GridPanelBuilder &FixedSize( u32 width, u32 height )
-    {
-      element->grid_panel->fixed_size = true;
-      element->transform.width = width;
-      element->transform.height = height;
-      return *this;
-    }
-
-    GridPanelBuilder &Background( Color background )
-    {
-      element->background = background;
-      return *this;
-    }
-
-    GridPanelBuilder &SetChild(
-      list<u32> cols,
-      list<u32> rows,
-      sptr<Element> child
-    )
-    {
-      // TODO LEFT OFF HERE.
-      // Need to have some way to associate a child with the grid slots
-      // So that when we go to reposition/resize the child we know
-      // where to put it
-      element->grid_panel->children.push_back( child );
-      return *this;
-    }
-  };
 
   //   class GridPanelBuilder : public AbstractBuilder
   //   {
@@ -192,52 +149,6 @@ public:
   //     }
   //   };
 
-  //   class TextLabelBuilder : public AbstractBuilder
-  //   {
-  //     Element _element;
-
-  // public:
-  //     explicit TextLabelBuilder( std::string id ) : AbstractBuilder{ _element }
-  //     {
-  //       _element.type = Type::TextLabel;
-  //       _element.id = id;
-  //     }
-
-  //     TextLabelBuilder &On(
-  //       InterfaceUpdate::ID update_id,
-  //       std::function<void( Element &self, InterfaceUpdate::Update update )>
-  //         update_fn
-  //     )
-  //     {
-  //       _element.updates.emplace( update_id, update_fn );
-  //       return *this;
-  //     }
-
-  //     TextLabelBuilder &Background( Color background )
-  //     {
-  //       _element.background = background;
-  //       return *this;
-  //     }
-
-  //     TextLabelBuilder &Text( std::string text, f32 font_size )
-  //     {
-  //       _element.text = text;
-  //       _element.font_size = font_size;
-  //       return *this;
-  //     }
-
-  //     TextLabelBuilder &Text( std::string text, f32 font_size, Color text_color )
-  //     {
-  //       _element.text_color = text_color;
-  //       return Text( text, font_size );
-  //     }
-
-  //     TextLabelBuilder &Margins( Margins margins )
-  //     {
-  //       _element.margins = margins;
-  //       return *this;
-  //     }
-  //   };
 
   //   class TextButtonBuilder : public AbstractBuilder
   //   {
@@ -339,15 +250,6 @@ public:
   //   };
 
 
-  inline GridPanelBuilder GridPanel(
-    std::string id,
-    u32 num_cols,
-    u32 num_rows
-  )
-  {
-    return GridPanelBuilder{ id, num_cols, num_rows };
-  }
-
   // inline DataPanelBuilder DataPanel( std::string id )
   // {
   //   return DataPanelBuilder{ id };
@@ -358,10 +260,6 @@ public:
   //   return StackPanelBuilder{ id };
   // }
 
-  // inline TextLabelBuilder TextLabel( std::string id )
-  // {
-  //   return TextLabelBuilder{ id };
-  // }
 
   // inline TextButtonBuilder TextButton( std::string id )
   // {

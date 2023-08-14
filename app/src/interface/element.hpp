@@ -29,19 +29,41 @@ namespace UI
 
   struct Element;
 
+
   struct GridPanelElement
   {
+    struct Slot
+    {
+      struct Dimensions
+      {
+        u32 start_col;
+        u32 end_col;
+        u32 start_row;
+        u32 end_row;
+      };
+
+      Dimensions dims;
+      sptr<Element> child;
+    };
+
     // Panel
-    bool fixed_size = false;
+    bool abs_size = false;
     u32 num_cols = 0;
     u32 num_rows = 0;
-    list<rect> grid = {};
-    list<sptr<Element>> children = {};
+    list<Slot> children = {};
 
     u32 GridIndex( u32, u32 );
 
     GridPanelElement() = delete;
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
+  };
+
+  struct TextLabelElement
+  {
+    str txt;
+
+    TextLabelElement() = delete;
+    TextLabelElement( str txt ) : txt( txt ) {}
   };
 
   struct Element
@@ -53,10 +75,12 @@ namespace UI
         : type( Type::GridPanel ), id( id ),
           grid_panel( std::make_shared<GridPanelElement>( cols, rows ) )
     {
-      for ( u32 i = 0; i < cols * rows; i++ )
-      {
-        grid_panel->grid.push_back( { 0, 0, 0, 0 } );
-      }
+    }
+
+    Element( str id, str txt, u32 font_size )
+        : type( Type::TextLabel ), id( id ),
+          text_label( std::make_shared<TextLabelElement>( txt ) )
+    {
     }
 
     Type type;
@@ -68,6 +92,7 @@ namespace UI
     Margins margins = Margins{ 0, 0, 0, 0 };
 
     sptr<GridPanelElement> grid_panel = nullptr;
+    sptr<TextLabelElement> text_label = nullptr;
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
@@ -142,10 +167,115 @@ namespace UI
     // void StackPanelDraw();
     // void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
-    // friend class TextLabelBuilder;
+    friend class TextLabelBuilder;
     // friend class TextButtonBuilder;
     // friend class TextureLabelBuilder;
     // friend class TextureButtonBuilder;
   };
+
+  class GridPanelBuilder
+  {
+    sptr<Element> element;
+
+public:
+    GridPanelBuilder( str id, u32 cols, u32 rows )
+        : element{ std::make_shared<Element>( Element{ id, cols, rows } ) }
+    {
+    }
+
+    operator sptr<Element>() const
+    {
+      return std::move( element );
+    }
+
+    GridPanelBuilder &FixedSize( u32 width, u32 height )
+    {
+      element->grid_panel->abs_size = true;
+      element->transform.width = width;
+      element->transform.height = height;
+      return *this;
+    }
+
+    GridPanelBuilder &Background( Color background )
+    {
+      element->background = background;
+      return *this;
+    }
+
+    GridPanelBuilder &SetChildren( list<GridPanelElement::Slot> children )
+    {
+      element->grid_panel->children = children;
+      return *this;
+    }
+  };
+
+  inline GridPanelBuilder GridPanel(
+    std::string id,
+    u32 num_cols,
+    u32 num_rows
+  )
+  {
+    return GridPanelBuilder{ id, num_cols, num_rows };
+  }
+
+
+  class TextLabelBuilder
+  {
+    sptr<Element> element;
+
+public:
+    operator sptr<Element>() const
+    {
+      return std::move( element );
+    }
+
+    explicit TextLabelBuilder( str id, str txt, u32 font_size )
+        : element{ std::make_shared<Element>( Element{ id, txt, font_size } ) }
+    {
+      element->type = Type::TextLabel;
+      element->id = id;
+    }
+
+    TextLabelBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      element->updates.emplace( update_id, update_fn );
+      return *this;
+    }
+
+    TextLabelBuilder &Background( Color background )
+    {
+      element->background = background;
+      return *this;
+    }
+
+    TextLabelBuilder &Text( std::string text, f32 font_size )
+    {
+      element->text = text;
+      element->font_size = font_size;
+      return *this;
+    }
+
+    TextLabelBuilder &Text( std::string text, f32 font_size, Color text_color )
+    {
+      element->text_color = text_color;
+      return Text( text, font_size );
+    }
+
+    TextLabelBuilder &Margins( Margins margins )
+    {
+      element->margins = margins;
+      return *this;
+    }
+  };
+
+  inline TextLabelBuilder TextLabel( str id, str txt, u32 font_size )
+  {
+    return TextLabelBuilder{ id, txt, font_size };
+  }
+
 
 };// namespace UI

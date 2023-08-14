@@ -240,24 +240,24 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( auto &child: element->grid_panel->children )
+        for ( GridPanelElement::Slot &slot: element->grid_panel->children )
         {
-          Interact( child, mouse_went_up, mouse_went_down );
+          Interact( slot.child, mouse_went_up, mouse_went_down );
         }
       }
       break;
       case Type::StackPanel:
       {
-        Interact(
-          element->grid_panel->children[element->curr_index],
-          mouse_went_up,
-          mouse_went_down
-        );
+        // Interact(
+        //   element->grid_panel->children[element->curr_index],
+        //   mouse_went_up,
+        //   mouse_went_down
+        // );
 
-        if ( !Manager()->over_any_elem )
-        {
-          Manager()->SetContextNull();
-        }
+        // if ( !Manager()->over_any_elem )
+        // {
+        //   Manager()->SetContextNull();
+        // }
       }
       break;
       case Type::TextureButton:
@@ -313,17 +313,17 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( auto &child: grid_panel->children )
+        for ( GridPanelElement::Slot &slot: grid_panel->children )
         {
-          child->Destroy();
+          slot.child->Destroy();
         }
         // Manager()->lookup.erase( id );
       }
       break;
       case Type::StackPanel:
       {
-        grid_panel->children[curr_index]->Destroy();
-        // Manager()->lookup.erase( id );
+        // grid_panel->children[curr_index]->Destroy();
+        // // Manager()->lookup.erase( id );
       }
       break;
       default:
