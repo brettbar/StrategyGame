@@ -20,7 +20,7 @@ namespace UI
             .Background( GREEN )
             .SetChildren( {
               GridPanelElement::Slot{
-                { 0, 0, 0, 1 },
+                { 0, 0, 0, 0 },
                 TextLabel( "main_menu_host_game", "Host Game", 32 ),
               },
             } ),

@@ -113,7 +113,7 @@ namespace UI
 
   void Element::UpdateText( std::string new_text )
   {
-    text = new_text;
+    text_label->text = new_text;
   }
 
   void Element::UpdateBackground( Color new_color )
@@ -184,26 +184,8 @@ namespace UI
         // StackPanelDraw();
         break;
       case Type::TextLabel:
-      {
-        DrawRectangleV(
-          { transform.x, transform.y },
-          { transform.width, transform.height },
-          background
-        );
-
-        DrawTextEx(
-          Global::font_cache[hstr{ "font_romulus" }]->font,
-          text.c_str(),
-          {
-            transform.x,
-            transform.y,
-          },
-          font_size,
-          2.0,
-          text_color
-        );
-      }
-      break;
+        text_label->Draw( background, transform );
+        break;
       case Type::TextButton:
       {
         // TODO - do we really want this to black out like that
@@ -230,25 +212,26 @@ namespace UI
         //   );
         // }
         // else
-        {
-          DrawRectangleV(
-            { transform.x, transform.y },
-            { transform.width, transform.height },
-            background
-          );
 
-          DrawTextEx(
-            Global::font_cache[hstr{ "font_romulus" }]->font,
-            text.c_str(),
-            {
-              transform.x,
-              transform.y,
-            },
-            font_size,
-            2.0,
-            text_color
-          );
-        }
+        // {
+        //   DrawRectangleV(
+        //     { transform.x, transform.y },
+        //     { transform.width, transform.height },
+        //     background
+        //   );
+
+        //   DrawTextEx(
+        //     Global::font_cache[hstr{ "font_romulus" }]->font,
+        //     text.c_str(),
+        //     {
+        //       transform.x,
+        //       transform.y,
+        //     },
+        //     font_size,
+        //     2.0,
+        //     text_color
+        //   );
+        // }
       }
       break;
       case Type::TextureLabel:

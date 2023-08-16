@@ -60,10 +60,45 @@ namespace UI
 
   struct TextLabelElement
   {
-    str txt;
+    str text = "INVALID";
+    u32 font_size = 14;
+    Color text_color = WHITE;
+
+    // TODO(rf) probably can remove all together
+    bool dynamic = false;
 
     TextLabelElement() = delete;
-    TextLabelElement( str txt ) : txt( txt ) {}
+    TextLabelElement( str text, u32 font_size )
+        : text( text ), font_size( font_size )
+    {
+    }
+
+    inline void Draw( Color background, rect transform )
+    {
+      // Doesnt everything do this?
+      DrawRectangleV(
+        { transform.x, transform.y },
+        { transform.width, transform.height },
+        background
+      );
+
+      DrawTextEx(
+        Global::font_cache[hstr{ "font_romulus" }]->font,
+        text.c_str(),
+        {
+          transform.x,
+          transform.y,
+        },
+        font_size,
+        2.0,
+        text_color
+      );
+    }
+  };
+
+  struct TextButtonElement
+  {
+    sptr<TextLabelElement> label;
   };
 
   struct Element
@@ -79,7 +114,7 @@ namespace UI
 
     Element( str id, str txt, u32 font_size )
         : type( Type::TextLabel ), id( id ),
-          text_label( std::make_shared<TextLabelElement>( txt ) )
+          text_label( std::make_shared<TextLabelElement>( txt, font_size ) )
     {
     }
 
@@ -108,12 +143,6 @@ namespace UI
     // TODO this should probably be made private
     u32 curr_index = 0;
 
-    // TextLabel
-    std::string text = "INVALID";
-    i32 font_size = 14;
-    Color text_color = WHITE;
-    // TODO(rf) probably can remove all together
-    bool dynamic = false;
 
     // TextButton
     bool clickable = true;
@@ -252,19 +281,6 @@ public:
       return *this;
     }
 
-    TextLabelBuilder &Text( std::string text, f32 font_size )
-    {
-      element->text = text;
-      element->font_size = font_size;
-      return *this;
-    }
-
-    TextLabelBuilder &Text( std::string text, f32 font_size, Color text_color )
-    {
-      element->text_color = text_color;
-      return Text( text, font_size );
-    }
-
     TextLabelBuilder &Margins( Margins margins )
     {
       element->margins = margins;
@@ -277,5 +293,62 @@ public:
     return TextLabelBuilder{ id, txt, font_size };
   }
 
+  class TextButtonBuilder
+  {
+    sptr<Element> element;
+
+public:
+    operator sptr<Element>() const
+    {
+      return std::move( element );
+    }
+
+    explicit TextButtonBuilder( std::string id, str txt, u32 font_size )
+        : element{ std::make_shared<Element>( Element{ id, txt, font_size } ) }
+    {
+      element->type = Type::TextButton;
+      element->id = id;
+    }
+
+    TextButtonBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      element->updates.emplace( update_id, update_fn );
+      return *this;
+    }
+
+    TextButtonBuilder &StartDisabled()
+    {
+      element->starts_disabled = true;
+      return *this;
+    }
+
+    TextButtonBuilder &Background( Color background )
+    {
+      element->background = background;
+      return *this;
+    }
+
+    TextButtonBuilder &SetEvent( InterfaceEvent::Data event )
+    {
+      element->on_click = std::make_shared<InterfaceEvent::Data>( event );
+      return *this;
+    }
+
+
+    TextButtonBuilder &Clickable( bool clickable )
+    {
+      element->clickable = clickable;
+      return *this;
+    }
+  };
+
+  inline TextButtonBuilder TextButton( str id, str txt, u32 font_size )
+  {
+    return TextButtonBuilder{ id, txt, font_size };
+  }
 
 };// namespace UI
