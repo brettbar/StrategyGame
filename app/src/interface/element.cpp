@@ -212,26 +212,7 @@ namespace UI
         //   );
         // }
         // else
-
-        // {
-        //   DrawRectangleV(
-        //     { transform.x, transform.y },
-        //     { transform.width, transform.height },
-        //     background
-        //   );
-
-        //   DrawTextEx(
-        //     Global::font_cache[hstr{ "font_romulus" }]->font,
-        //     text.c_str(),
-        //     {
-        //       transform.x,
-        //       transform.y,
-        //     },
-        //     font_size,
-        //     2.0,
-        //     text_color
-        //   );
-        // }
+        text_button->Draw( background, transform );
       }
       break;
       case Type::TextureLabel:

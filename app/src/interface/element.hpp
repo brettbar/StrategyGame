@@ -73,32 +73,20 @@ namespace UI
     {
     }
 
-    inline void Draw( Color background, rect transform )
-    {
-      // Doesnt everything do this?
-      DrawRectangleV(
-        { transform.x, transform.y },
-        { transform.width, transform.height },
-        background
-      );
-
-      DrawTextEx(
-        Global::font_cache[hstr{ "font_romulus" }]->font,
-        text.c_str(),
-        {
-          transform.x,
-          transform.y,
-        },
-        font_size,
-        2.0,
-        text_color
-      );
-    }
+    void Draw( Color, rect );
   };
 
   struct TextButtonElement
   {
     sptr<TextLabelElement> label;
+
+    TextButtonElement() = delete;
+    TextButtonElement( sptr<TextLabelElement> label ) : label( label ) {}
+
+    inline void Draw( Color background, rect transform )
+    {
+      label->Draw( background, transform );
+    }
   };
 
   struct Element
@@ -106,15 +94,21 @@ namespace UI
     Element() = delete;
 
     // GridPanel
-    Element( str id, u32 cols, u32 rows )
-        : type( Type::GridPanel ), id( id ),
-          grid_panel( std::make_shared<GridPanelElement>( cols, rows ) )
+    Element( str id, sptr<GridPanelElement> grid_panel )
+        : type( Type::GridPanel ), id( id ), grid_panel( grid_panel )
     {
     }
 
-    Element( str id, str txt, u32 font_size )
-        : type( Type::TextLabel ), id( id ),
-          text_label( std::make_shared<TextLabelElement>( txt, font_size ) )
+    // TextLabel
+    Element( str id, sptr<TextLabelElement> text_label )
+        : type( Type::TextLabel ), id( id ), text_label( text_label )
+
+    {
+    }
+
+    // TextButton
+    Element( str id, sptr<TextButtonElement> text_button )
+        : type( Type::TextButton ), id( id ), text_button( text_button )
     {
     }
 
@@ -128,6 +122,7 @@ namespace UI
 
     sptr<GridPanelElement> grid_panel = nullptr;
     sptr<TextLabelElement> text_label = nullptr;
+    sptr<TextButtonElement> text_button = nullptr;
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
@@ -208,7 +203,9 @@ namespace UI
 
 public:
     GridPanelBuilder( str id, u32 cols, u32 rows )
-        : element{ std::make_shared<Element>( Element{ id, cols, rows } ) }
+        : element{ std::make_shared<Element>(
+            Element{ id, std::make_shared<GridPanelElement>( cols, rows ) }
+          ) }
     {
     }
 
@@ -259,10 +256,11 @@ public:
     }
 
     explicit TextLabelBuilder( str id, str txt, u32 font_size )
-        : element{ std::make_shared<Element>( Element{ id, txt, font_size } ) }
+        : element{ std::make_shared<Element>(
+            id,
+            std::make_shared<TextLabelElement>( txt, font_size )
+          ) }
     {
-      element->type = Type::TextLabel;
-      element->id = id;
     }
 
     TextLabelBuilder &On(
@@ -304,10 +302,13 @@ public:
     }
 
     explicit TextButtonBuilder( std::string id, str txt, u32 font_size )
-        : element{ std::make_shared<Element>( Element{ id, txt, font_size } ) }
+        : element{ std::make_shared<Element>(
+            id,
+            std::make_shared<TextButtonElement>(
+              std::make_shared<TextLabelElement>( txt, font_size )
+            )
+          ) }
     {
-      element->type = Type::TextButton;
-      element->id = id;
     }
 
     TextButtonBuilder &On(

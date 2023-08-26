@@ -27,10 +27,13 @@
     <ClCompile Include="app\src\interface\elements\data_panel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="app\src\interface\elements\panel.cpp">
+    <ClCompile Include="app\src\interface\elements\stack_panel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="app\src\interface\elements\stack_panel.cpp">
+    <ClCompile Include="app\src\interface\elements\labels_buttons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="app\src\interface\elements\grid_panel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

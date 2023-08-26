@@ -21,7 +21,33 @@ namespace UI
             .SetChildren( {
               GridPanelElement::Slot{
                 { 0, 0, 0, 0 },
-                TextLabel( "main_menu_host_game", "Host Game", 32 ),
+                TextButton( "main_menu_host_game", "Host Game", 32 )
+                  .Background( BLUE ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 1, 1 },
+                TextButton( "main_menu_join_game", "Join Game", 32 )
+                  .Background( BLUE ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 2, 2 },
+                TextButton( "main_menu_start_game", "Start Game", 32 )
+                  .Background( BLUE ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 3, 3 },
+                TextButton( "main_menu_load_game", "Load Game", 32 )
+                  .Background( BLUE ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 4, 4 },
+                TextButton( "main_menu_settings", "Settings", 32 )
+                  .Background( BLUE ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 5, 5 },
+                TextButton( "main_menu_exit_game", "Exit Game", 32 )
+                  .Background( BLUE ),
               },
             } ),
         },

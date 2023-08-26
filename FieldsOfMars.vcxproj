@@ -16,7 +16,8 @@
   <ItemGroup>
     <ClCompile Include="app\src\interface\element.cpp" />
     <ClCompile Include="app\src\interface\elements\data_panel.cpp" />
-    <ClCompile Include="app\src\interface\elements\panel.cpp" />
+    <ClCompile Include="app\src\interface\elements\grid_panel.cpp" />
+    <ClCompile Include="app\src\interface\elements\labels_buttons.cpp" />
     <ClCompile Include="app\src\interface\elements\stack_panel.cpp" />
     <ClCompile Include="app\src\main.cpp" />
   </ItemGroup>
