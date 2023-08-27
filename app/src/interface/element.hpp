@@ -78,10 +78,14 @@ namespace UI
 
   struct TextButtonElement
   {
+    InterfaceEvent::ID event;
     sptr<TextLabelElement> label;
 
     TextButtonElement() = delete;
-    TextButtonElement( sptr<TextLabelElement> label ) : label( label ) {}
+    TextButtonElement( InterfaceEvent::ID event, sptr<TextLabelElement> label )
+        : event( event ), label( label )
+    {
+    }
 
     inline void Draw( Color background, rect transform )
     {
@@ -301,10 +305,16 @@ public:
       return std::move( element );
     }
 
-    explicit TextButtonBuilder( std::string id, str txt, u32 font_size )
+    explicit TextButtonBuilder(
+      str id,
+      str txt,
+      u32 font_size,
+      InterfaceEvent::ID event
+    )
         : element{ std::make_shared<Element>(
             id,
             std::make_shared<TextButtonElement>(
+              event,
               std::make_shared<TextLabelElement>( txt, font_size )
             )
           ) }
@@ -347,9 +357,14 @@ public:
     }
   };
 
-  inline TextButtonBuilder TextButton( str id, str txt, u32 font_size )
+  inline TextButtonBuilder TextButton(
+    str id,
+    str txt,
+    u32 font_size,
+    InterfaceEvent::ID event
+  )
   {
-    return TextButtonBuilder{ id, txt, font_size };
+    return TextButtonBuilder{ id, txt, font_size, event };
   }
 
 };// namespace UI
