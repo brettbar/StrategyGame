@@ -44,8 +44,7 @@ namespace UI
     inline void Init()
     {
       Manager()->pages = {
-        CreateMainMenuUI(),
-        // CreateFactionSelectMenuUI(),
+        CreateMainMenuUI(), CreateFactionSelectMenuUI(),
         // CreateSinglePlayerLobby(),
         // CreateModalMenuUI(),
         // CreateCampaignUI(),

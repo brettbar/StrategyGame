@@ -2,31 +2,14 @@
 
 namespace UI
 {
-  void Element::Enable()
-  {
-    switch ( type )
-    {
-      case Type::GridPanel:
-        PanelEnable();
-        break;
-      case Type::DataPanel:
-        // DataPanelEnable();
-        break;
-      case Type::StackPanel:
-        // StackPanelEnable();
-        break;
-      default:
-        enabled = true;
-        break;
-    }
-  }
-
   void Element::Register()
   {
+    lookup.emplace( id, std::make_shared<Element>( *this ) );
+
     switch ( type )
     {
       case Type::GridPanel:
-        PanelRegister();
+        grid_panel->PanelRegister();
         break;
       case Type::DataPanel:
         // DataPanelRegister();
@@ -34,8 +17,22 @@ namespace UI
       case Type::StackPanel:
         // StackPanelRegister();
         break;
-      default:
-        lookup.emplace( id, std::make_shared<Element>( *this ) );
+    }
+  }
+
+  void Element::Enable()
+  {
+    enabled = true;
+    switch ( type )
+    {
+      case Type::GridPanel:
+        grid_panel->PanelEnable( transform );
+        break;
+      case Type::DataPanel:
+        // DataPanelEnable();
+        break;
+      case Type::StackPanel:
+        // StackPanelEnable();
         break;
     }
   }
@@ -45,7 +42,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        PanelDisable();
+        grid_panel->PanelDisable();
         break;
       case Type::DataPanel:
         // DataPanelDisable();
@@ -53,10 +50,8 @@ namespace UI
       case Type::StackPanel:
         // StackPanelDisable();
         break;
-      default:
-        enabled = false;
-        break;
     }
+    enabled = false;
   }
 
   // TODO This should only be called for Panels
@@ -71,15 +66,13 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        PanelResize();
+        grid_panel->PanelResize( transform );
         break;
       case Type::DataPanel:
         // DataPanelResize();
         break;
       case Type::StackPanel:
         // StackPanelResize();
-        break;
-      default:
         break;
     }
   }
@@ -98,15 +91,13 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        PanelReposition();
+        grid_panel->PanelReposition( transform );
         break;
       case Type::DataPanel:
         // DataPanelReposition();
         break;
       case Type::StackPanel:
         // StackPanelReposition();
-        break;
-      default:
         break;
     }
   }
@@ -128,20 +119,19 @@ namespace UI
 
   void Element::ExecuteInterfaceUpdate( const InterfaceUpdate::Update &update )
   {
+    if ( updates.contains( update.id ) )
+      updates[update.id]( *this, update );
+
     switch ( type )
     {
       case Type::GridPanel:
-        PanelExecuteInterfaceUpdate( update );
+        grid_panel->PanelExecuteInterfaceUpdate( update );
         break;
       case Type::DataPanel:
         // DataPanelExecuteInterfaceUpdate( update );
         break;
       case Type::StackPanel:
         // StackPanelExecuteInterfaceUpdate( update );
-        break;
-      default:
-        if ( updates.contains( update.id ) )
-          updates[update.id]( *this, update );
         break;
     }
   }
@@ -161,8 +151,6 @@ namespace UI
         }
       }
       break;
-      default:
-        break;
     }
   }
 
@@ -172,10 +160,12 @@ namespace UI
     if ( !enabled )
       return;
 
+    DrawRectangleRec( transform, background );
+
     switch ( type )
     {
       case Type::GridPanel:
-        PanelDraw();
+        grid_panel->PanelDraw( transform );
         break;
       case Type::DataPanel:
         // DataPanelDraw();

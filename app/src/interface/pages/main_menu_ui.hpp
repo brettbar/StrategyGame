@@ -84,28 +84,3 @@ namespace UI
       } );
   }
 };// namespace UI
-
-// TextButton( "main_menu_host_game" )
-//   .Text( "Host Game", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuHostGame ),
-// TextButton( "main_menu_join_game" )
-//   .Text( "Join Game", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuJoinGame ),
-// TextButton( "main_menu_start_game" )
-//   .Text( "Start Game", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuStartGame ),
-// TextButton( "main_menu_load_game" )
-//   .Text( "Load Game", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuLoadGame ),
-// TextButton( "main_menu_settings" )
-//   .Text( "Settings", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuSettings ),
-// TextButton( "main_menu_exit_game" )
-//   .Text( "Exit Game", 32 )
-//   .Background( BLUE )
-//   .SetEvent( InterfaceEvent::ID::MainMenuExitGame ),

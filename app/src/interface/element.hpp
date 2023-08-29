@@ -54,6 +54,14 @@ namespace UI
 
     u32 GridIndex( u32, u32 );
 
+    void PanelEnable( rect );
+    void PanelRegister();
+    void PanelDisable();
+    void PanelResize( rect );
+    void PanelReposition( rect );
+    void PanelDraw( rect );
+    void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+
     GridPanelElement() = delete;
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
   };
@@ -78,12 +86,25 @@ namespace UI
 
   struct TextButtonElement
   {
-    InterfaceEvent::ID event;
+    InterfaceEvent::ID event_id;
     sptr<TextLabelElement> label;
+    sptr<InterfaceEvent::Data> on_click;
 
     TextButtonElement() = delete;
-    TextButtonElement( InterfaceEvent::ID event, sptr<TextLabelElement> label )
-        : event( event ), label( label )
+    TextButtonElement(
+      InterfaceEvent::ID event_id,
+      sptr<TextLabelElement> label
+    )
+        : event_id( event_id ), label( label )
+    {
+    }
+
+    TextButtonElement(
+      InterfaceEvent::Data event,
+      sptr<TextLabelElement> label
+    )
+        : label( label ),
+          on_click( std::make_shared<InterfaceEvent::Data>( event ) )
     {
     }
 
@@ -167,13 +188,6 @@ namespace UI
     void FireEvent();
 
     friend class GridPanelBuilder;
-    void PanelEnable();
-    void PanelRegister();
-    void PanelDisable();
-    void PanelResize();
-    void PanelReposition();
-    void PanelDraw();
-    void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     // friend class DataPanelBuilder;
     // void DataPanelEnable();
@@ -239,11 +253,7 @@ public:
     }
   };
 
-  inline GridPanelBuilder GridPanel(
-    std::string id,
-    u32 num_cols,
-    u32 num_rows
-  )
+  inline GridPanelBuilder GridPanel( str id, u32 num_cols, u32 num_rows )
   {
     return GridPanelBuilder{ id, num_cols, num_rows };
   }
@@ -361,7 +371,17 @@ public:
     str id,
     str txt,
     u32 font_size,
-    InterfaceEvent::ID event
+    InterfaceEvent::ID event_id
+  )
+  {
+    return TextButtonBuilder{ id, txt, font_size, event_id };
+  }
+
+  inline TextButtonBuilder TextButton(
+    str id,
+    str txt,
+    u32 font_size,
+    InterfaceEvent::Data event
   )
   {
     return TextButtonBuilder{ id, txt, font_size, event };

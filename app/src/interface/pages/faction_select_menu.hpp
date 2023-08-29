@@ -6,49 +6,57 @@
 
 namespace UI
 {
+  inline sptr<Element> CreateFactionSelectMenuUI()
+  {
 
-  // inline std::vector<Element> CreateFactionButtons()
-  // {
-  //   // TODO replace with read in from json
-  //   std::map<std::string, Color> factions = {
-  //     { "romans", RED },
-  //     { "greeks", BLUE },
-  //     { "celts", GREEN },
-  //     { "punics", PURPLE },
-  //     { "persians", ORANGE },
-  //     { "scythians", PINK },
-  //     { "germans", GRAY },
-  //   };
-  //   // TODO replace with read in from json
-  //   std::map<std::string, std::string> full_names = {
-  //     { "romans", "Roman Republic" },
-  //     { "greeks", "Greek Cities" },
-  //     { "celts", "Celtic Tribes" },
-  //     { "punics", "Punic Colonies" },
-  //     { "persians", "Persian Empire" },
-  //     { "scythians", "Scythian Horde" },
-  //     { "germans", "Germanic Federation" },
-  //   };
+    return GridPanel( "faction_select_menu", 1, 7 );
+  }
 
-  //   std::vector<Element> text_buttons = {
-  //     TextLabel( "faction_select_label" ).Text( "Select your faction", 32 ),
-  //   };
+  inline list<sptr<Element>> CreateFactionButtons()
+  {
+    // TODO replace with read in from json
+    std::map<std::string, Color> factions = {
+      { "romans", RED },
+      { "greeks", BLUE },
+      { "celts", GREEN },
+      { "punics", PURPLE },
+      { "persians", ORANGE },
+      { "scythians", PINK },
+      { "germans", GRAY },
+    };
+    // TODO replace with read in from json
+    std::map<std::string, std::string> full_names = {
+      { "romans", "Roman Republic" },
+      { "greeks", "Greek Cities" },
+      { "celts", "Celtic Tribes" },
+      { "punics", "Punic Colonies" },
+      { "persians", "Persian Empire" },
+      { "scythians", "Scythian Horde" },
+      { "germans", "Germanic Federation" },
+    };
 
-  //   for ( const auto &[name, color]: factions )
-  //   {
-  //     std::string faction = name;
-  //     std::string id = "faction_select_" + faction;
+    list<sptr<Element>> text_buttons = {
+      TextLabel( "faction_select_label", "Select your faction", 32 ),
+    };
 
-  //     text_buttons.push_back( TextButton( id )
-  //                               .Text( full_names[name], 32 )
-  //                               .Background( color )
-  //                               .SetEvent( InterfaceEvent::Data(
-  //                                 InterfaceEvent::ID::FactionSelected, faction
-  //                               ) ) );
-  //   }
+    for ( const auto &[name, color]: factions )
+    {
+      std::string faction = name;
+      std::string id = "faction_select_" + faction;
 
-  //   return text_buttons;
-  // }
+      text_buttons.push_back(
+        TextButton(
+          id,
+          full_names[name],
+          32,
+          InterfaceEvent::Data( InterfaceEvent::ID::FactionSelected, faction )
+        )
+          .Background( color )
+      );
+    }
+
+    return text_buttons;
+  }
 
   // inline std::vector<Element> CreateFactionSelectMenuUI()
   // {

@@ -11,14 +11,12 @@ namespace UI
   }
 
 
-  void Element::PanelEnable()
+  void GridPanelElement::PanelEnable( rect transform )
   {
-    assert( type == Type::GridPanel );
-    enabled = true;
-    PanelResize();
-    RepositionRecursive();
+    PanelResize( transform );
+    PanelReposition( transform );
 
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->Enable();
       slot.child->ResizeRecursive();
@@ -26,38 +24,31 @@ namespace UI
     }
   }
 
-  void Element::PanelRegister()
+  void GridPanelElement::PanelRegister()
   {
-    assert( type == Type::GridPanel );
-    lookup.emplace( id, std::make_shared<Element>( *this ) );
 
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->Register();
     }
   }
 
-  void Element::PanelDisable()
+  void GridPanelElement::PanelDisable()
   {
-    assert( type == Type::GridPanel );
-
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->Disable();
     }
-
-    enabled = false;
   }
 
-  void Element::PanelReposition()
+  void GridPanelElement::PanelReposition( rect transform )
   {
-    assert( type == Type::GridPanel );
 
-    u32 slot_width = transform.width / grid_panel->num_cols;
-    u32 slot_height = transform.height / grid_panel->num_rows;
+    u32 slot_width = transform.width / num_cols;
+    u32 slot_height = transform.height / num_rows;
 
 
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->transform.x = transform.x + slot.dims.start_col * slot_width;
       slot.child->transform.y = transform.y + slot.dims.start_row * slot_height;
@@ -66,14 +57,13 @@ namespace UI
     }
   }
 
-  void Element::PanelResize()
+  void GridPanelElement::PanelResize( rect transform )
   {
-    assert( type == Type::GridPanel );
 
-    u32 slot_width = transform.width / grid_panel->num_cols;
-    u32 slot_height = transform.height / grid_panel->num_rows;
+    u32 slot_width = transform.width / num_cols;
+    u32 slot_height = transform.height / num_rows;
 
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       u32 num_wide = slot.dims.end_col - slot.dims.start_col + 1;
       u32 num_tall = slot.dims.end_row - slot.dims.start_row + 1;
@@ -85,18 +75,15 @@ namespace UI
     }
   }
 
-  void Element::PanelDraw()
+  void GridPanelElement::PanelDraw( rect transform )
   {
-    assert( type == Type::GridPanel );
+    u32 slot_width = transform.width / num_cols;
+    u32 slot_height = transform.height / num_rows;
 
-    DrawRectangleRec( transform, background );
-
-    u32 slot_width = transform.width / grid_panel->num_cols;
-    u32 slot_height = transform.height / grid_panel->num_rows;
-
-    for ( u32 c = 0; c < grid_panel->num_cols; c++ )
+    // Draw the grid
+    for ( u32 c = 0; c < num_cols; c++ )
     {
-      for ( u32 r = 0; r < grid_panel->num_rows; r++ )
+      for ( u32 r = 0; r < num_rows; r++ )
       {
         DrawRectangleRec(
           {
@@ -105,7 +92,7 @@ namespace UI
             (f32) slot_width,
             (f32) slot_height,
           },
-          background
+          GRAY
         );
         DrawRectangleLinesEx(
           {
@@ -120,21 +107,17 @@ namespace UI
       }
     }
 
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->Draw();
     }
   }
 
-  void Element::PanelExecuteInterfaceUpdate(
+  void GridPanelElement::PanelExecuteInterfaceUpdate(
     const InterfaceUpdate::Update &update
   )
   {
-    assert( type == Type::GridPanel );
-    if ( updates.contains( update.id ) )
-      updates[update.id]( *this, update );
-
-    for ( GridPanelElement::Slot &slot: grid_panel->children )
+    for ( GridPanelElement::Slot &slot: children )
     {
       slot.child->ExecuteInterfaceUpdate( update );
     }
