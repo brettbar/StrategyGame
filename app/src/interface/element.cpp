@@ -214,10 +214,13 @@ namespace UI
     }
   }
 
+  // X2749B
   void Element::FireEvent()
   {
     if ( on_click )
+    {
       InterfaceEvent::event_emitter.publish( *on_click );
+    }
   }
 
 };// namespace UI

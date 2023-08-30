@@ -86,18 +86,11 @@ namespace UI
 
   struct TextButtonElement
   {
-    InterfaceEvent::ID event_id;
     sptr<TextLabelElement> label;
     sptr<InterfaceEvent::Data> on_click;
 
     TextButtonElement() = delete;
-    TextButtonElement(
-      InterfaceEvent::ID event_id,
-      sptr<TextLabelElement> label
-    )
-        : event_id( event_id ), label( label )
-    {
-    }
+    TextButtonElement( sptr<TextLabelElement> label ) : label( label ) {}
 
     TextButtonElement(
       InterfaceEvent::Data event,
@@ -186,33 +179,6 @@ namespace UI
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
     void Update();
     void FireEvent();
-
-    friend class GridPanelBuilder;
-
-    // friend class DataPanelBuilder;
-    // void DataPanelEnable();
-    // void DataPanelRegister();
-    // void DataPanelDisable();
-    // void DataPanelResize();
-    // void DataPanelReposition();
-    // void DataPanelDraw();
-    // void DataPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
-    // void CreateElementForDatapoints( Element );
-
-    // friend class StackPanelBuilder;
-    // void StackPanelEnable();
-    // void StackPanelRegister();
-    // void StackPanelDisable();
-    // void StackPanelSwitchChild( u32 );
-    // void StackPanelResize();
-    // void StackPanelReposition();
-    // void StackPanelDraw();
-    // void StackPanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
-
-    friend class TextLabelBuilder;
-    // friend class TextButtonBuilder;
-    // friend class TextureLabelBuilder;
-    // friend class TextureButtonBuilder;
   };
 
   class GridPanelBuilder
@@ -315,16 +281,10 @@ public:
       return std::move( element );
     }
 
-    explicit TextButtonBuilder(
-      str id,
-      str txt,
-      u32 font_size,
-      InterfaceEvent::ID event
-    )
+    explicit TextButtonBuilder( str id, str txt, u32 font_size )
         : element{ std::make_shared<Element>(
             id,
             std::make_shared<TextButtonElement>(
-              event,
               std::make_shared<TextLabelElement>( txt, font_size )
             )
           ) }
@@ -367,24 +327,8 @@ public:
     }
   };
 
-  inline TextButtonBuilder TextButton(
-    str id,
-    str txt,
-    u32 font_size,
-    InterfaceEvent::ID event_id
-  )
+  inline TextButtonBuilder TextButton( str id, str txt, u32 font_size )
   {
-    return TextButtonBuilder{ id, txt, font_size, event_id };
+    return TextButtonBuilder{ id, txt, font_size };
   }
-
-  inline TextButtonBuilder TextButton(
-    str id,
-    str txt,
-    u32 font_size,
-    InterfaceEvent::Data event
-  )
-  {
-    return TextButtonBuilder{ id, txt, font_size, event };
-  }
-
 };// namespace UI

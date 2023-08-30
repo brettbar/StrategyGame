@@ -279,7 +279,7 @@ private:
         {
           if ( element->clickable )
           {
-            std::cout << "INTERACTION DETECTED!!!" << std::endl;
+            std::cout << "Interactable element clicked" << '\n';
 
             element->FireEvent();
           }
