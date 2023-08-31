@@ -7,16 +7,24 @@
 
 #include "actor_context.hpp"
 #include "settlement_context/settlement_context.hpp"
+#include <raylib.h>
 
 
 namespace UI
 {
-  // inline std::vector<Element> CreateCampaignUI()
-  // {
-  //   return {
-  //     CreateSettlementContextPanel(),
-  //     CreateActorContextPanel(),
-  //   };
-  // }
+  inline sptr<Element> CreateCampaignUI()
+  {
+    return {
+      GridPanel( "campaign_root", 3, 3 )
+        .FixedSize( GetScreenWidth(), GetScreenHeight() )
+        .SetChildren( {
+          GridPanelElement::Slot{
+            { 1, 1, 2, 2 },
+            CreateSettlementContextPanel(),
+          },
+          // CreateActorContextPanel(),
+        } ),
+    };
+  }
 
 };// namespace UI

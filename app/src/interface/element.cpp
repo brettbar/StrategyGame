@@ -160,11 +160,11 @@ namespace UI
     if ( !enabled )
       return;
 
-    DrawRectangleRec( transform, background );
 
     switch ( type )
     {
       case Type::GridPanel:
+        // DrawRectangleRec( transform, background );
         grid_panel->PanelDraw( transform );
         break;
       case Type::DataPanel:
@@ -174,6 +174,7 @@ namespace UI
         // StackPanelDraw();
         break;
       case Type::TextLabel:
+        DrawRectangleRec( transform, background );
         text_label->Draw( background, transform );
         break;
       case Type::TextButton:
@@ -202,12 +203,14 @@ namespace UI
         //   );
         // }
         // else
+        DrawRectangleRec( transform, background );
         text_button->Draw( background, transform );
       }
       break;
       case Type::TextureLabel:
       case Type::TextureButton:
       {
+        DrawRectangleRec( transform, background );
         DrawTextureEx( texture, { transform.x, transform.y }, 0.0, 1, WHITE );
       }
       break;
