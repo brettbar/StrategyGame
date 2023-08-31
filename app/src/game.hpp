@@ -483,7 +483,7 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::MainMenuStartGame:
         {
           _single_player = true;
-          UI::System::SwitchPage( UI::FactionSelectMenu );
+          UI::System::SwitchPage( UI::SinglePlayerLobby );
         }
         break;
         case InterfaceEvent::ID::MainMenuLoadGame:

@@ -81,31 +81,31 @@ namespace UI
     u32 slot_height = transform.height / num_rows;
 
     // Draw the grid
-    for ( u32 c = 0; c < num_cols; c++ )
-    {
-      for ( u32 r = 0; r < num_rows; r++ )
-      {
-        DrawRectangleRec(
-          {
-            transform.x + (f32) ( c * slot_width ),
-            transform.y + (f32) ( r * slot_height ),
-            (f32) slot_width,
-            (f32) slot_height,
-          },
-          GRAY
-        );
-        DrawRectangleLinesEx(
-          {
-            transform.x + (f32) ( c * slot_width ),
-            transform.y + (f32) ( r * slot_height ),
-            (f32) slot_width,
-            (f32) slot_height,
-          },
-          4,
-          BLACK
-        );
-      }
-    }
+    // for ( u32 c = 0; c < num_cols; c++ )
+    // {
+    //   for ( u32 r = 0; r < num_rows; r++ )
+    //   {
+    //     DrawRectangleRec(
+    //       {
+    //         transform.x + (f32) ( c * slot_width ),
+    //         transform.y + (f32) ( r * slot_height ),
+    //         (f32) slot_width,
+    //         (f32) slot_height,
+    //       },
+    //       GRAY
+    //     );
+    //     DrawRectangleLinesEx(
+    //       {
+    //         transform.x + (f32) ( c * slot_width ),
+    //         transform.y + (f32) ( r * slot_height ),
+    //         (f32) slot_width,
+    //         (f32) slot_height,
+    //       },
+    //       4,
+    //       BLACK
+    //     );
+    //   }
+    // }
 
     for ( GridPanelElement::Slot &slot: children )
     {

@@ -46,8 +46,8 @@ namespace UI
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
-        // CreateSinglePlayerLobby(),
-        // CreateModalMenuUI(),
+        CreateSinglePlayerLobby(),
+        CreateModalMenuUI(),
         CreateCampaignUI(),
         // CreateLobbyBrowser(),
         // CreateLobbyUI(),

@@ -104,7 +104,16 @@ namespace UI
 
   void Element::UpdateText( std::string new_text )
   {
-    text_label->text = new_text;
+
+    switch ( type )
+    {
+      case Type::TextButton:
+        text_button->label->text = new_text;
+        break;
+      case Type::TextLabel:
+        text_label->text = new_text;
+        break;
+    }
   }
 
   void Element::UpdateBackground( Color new_color )
