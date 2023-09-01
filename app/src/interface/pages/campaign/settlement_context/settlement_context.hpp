@@ -7,45 +7,39 @@ namespace UI
   {
     return GridPanel( "settlement_context", 3, 3 )
       .FixedSize( 1200, 285 )
-      .Background( Fade( BLACK, 0.5 ) );
-    // .On(
-    //   InterfaceUpdate::ID::SettlementContext,
-    //   []( Element &self, InterfaceUpdate::Update update ) {
-    //     if ( update.condition )
-    //       self.Enable();
-    //     else
-    //       self.Disable();
-    //   }
-    // );
-    // .Children( {
-    //   Panel( "settlement_title" )
-    //     .FixedSize( 1200, 24 )
-    //     .Children( {
-    //       Panel( "settlement_context_tab_group" )
-    //         .Axis( Axis::Column )
-    //         .Background( BLUE )
-    //         .Children( {
-    //           TextureButton( "settlement_context_tab_population" )
-    //             .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab
-    //             ),
-    //           TextureButton( "settlement_context_tab_construction" )
-    //             .SetEvent(
-    //               InterfaceEvent::ID::SettlementContextConstructionTab
-    //             ),
-    //           TextureButton( "settlement_context_tab_resources" )
-    //             .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab
-    //             ),
-    //           TextureButton( "settlement_context_tab_garrison" )
-    //             .SetEvent( InterfaceEvent::ID::SettlementContextMilitaryTab ),
-    //           TextureButton( "settlement_context_tab_culture" ),
-    //         } ),
-    //       StackPanel( "settlement_context_content" )
-    //         .Background( RED )
-    //         .Children( {
-    //           MilitaryTab(),
-    //         } ),
-    //     } ),
-    // } );
+      .Background( Fade( BLACK, 0.5 ) )
+      .On(
+        InterfaceUpdate::ID::SettlementContext,
+        []( Element &self, InterfaceUpdate::Update update ) {
+          if ( update.condition )
+            self.Enable();
+          else
+            self.Disable();
+        }
+      )
+      .SetChildren( {
+        GridPanelElement::Slot{
+          { 0, 0, 0, 2 },
+          GridPanel( "settlement_context_tab_group", 1, 5 )
+            .Background( BLUE )
+            .SetChildren( {
+              // TextureButton( "settlement_context_tab_population" )
+              //   .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab ),
+              // TextureButton( "settlement_context_tab_construction" )
+              //   .SetEvent( InterfaceEvent::ID::SettlementContextConstructionTab ),
+              // TextureButton( "settlement_context_tab_resources" )
+              //   .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab ),
+              // TextureButton( "settlement_context_tab_garrison" )
+              //   .SetEvent( InterfaceEvent::ID::SettlementContextMilitaryTab ),
+              // TextureButton( "settlement_context_tab_culture" ),
+            } ),
+          // StackPanel( "settlement_context_content" )
+          //   .Background( RED )
+          //   .Children( {
+          //     MilitaryTab(),
+          //   } ),
+        },
+      } );
   }
 
 

@@ -86,6 +86,7 @@ namespace UI
 
   struct TextButtonElement
   {
+    bool clickable = true;
     sptr<TextLabelElement> label;
     sptr<InterfaceEvent::Data> on_click;
 
@@ -105,6 +106,20 @@ namespace UI
     {
       label->Draw( background, transform );
     }
+  };
+
+  struct TextureLabelElement
+  {
+    Texture2D texture = Texture2D();
+    TextureLabelElement() = delete;
+  };
+
+  struct TextureButtonElement
+  {
+    bool clickable = true;
+    sptr<TextureLabelElement> label;
+    sptr<InterfaceEvent::Data> on_click = nullptr;
+    TextureButtonElement() = delete;
   };
 
   struct Element
@@ -157,13 +172,6 @@ namespace UI
     u32 curr_index = 0;
 
 
-    // TextButton
-    bool clickable = true;
-    sptr<InterfaceEvent::Data> on_click = nullptr;
-
-    // TextureLabel
-    Texture2D texture = Texture2D();
-
     // High Level
     void Enable();
     void Register();
@@ -196,6 +204,16 @@ public:
     operator sptr<Element>() const
     {
       return std::move( element );
+    }
+
+    GridPanelBuilder &On(
+      InterfaceUpdate::ID update_id,
+      std::function<void( Element &self, InterfaceUpdate::Update update )>
+        update_fn
+    )
+    {
+      element->updates.emplace( update_id, update_fn );
+      return *this;
     }
 
     GridPanelBuilder &FixedSize( u32 width, u32 height )
