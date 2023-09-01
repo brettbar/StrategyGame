@@ -22,7 +22,10 @@ namespace UI
             { 1, 1, 2, 2 },
             CreateSettlementContextPanel(),
           },
-          // CreateActorContextPanel(),
+          // GridPanelElement::Slot{
+          //   { 1, 1, 2, 2 },
+          //   CreateActorContextPanel(),
+          // },
         } ),
     };
   }

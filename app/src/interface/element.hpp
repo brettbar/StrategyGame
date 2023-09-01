@@ -92,13 +92,11 @@ namespace UI
 
     TextButtonElement() = delete;
     TextButtonElement( sptr<TextLabelElement> label ) : label( label ) {}
-
     TextButtonElement(
-      InterfaceEvent::Data event,
-      sptr<TextLabelElement> label
+      sptr<TextLabelElement> label,
+      sptr<InterfaceEvent::Data> event
     )
-        : label( label ),
-          on_click( std::make_shared<InterfaceEvent::Data>( event ) )
+        : label( label ), on_click( event )
     {
     }
 
@@ -112,6 +110,7 @@ namespace UI
   {
     Texture2D texture = Texture2D();
     TextureLabelElement() = delete;
+    TextureLabelElement( Texture2D texture ) : texture( texture ) {}
   };
 
   struct TextureButtonElement
@@ -120,6 +119,13 @@ namespace UI
     sptr<TextureLabelElement> label;
     sptr<InterfaceEvent::Data> on_click = nullptr;
     TextureButtonElement() = delete;
+    TextureButtonElement(
+      sptr<TextureLabelElement> label,
+      sptr<InterfaceEvent::Data> on_click
+    )
+        : label( label ), on_click( on_click )
+    {
+    }
   };
 
   struct Element
@@ -145,6 +151,20 @@ namespace UI
     {
     }
 
+    // TextureLabel
+    Element( str id, sptr<TextureLabelElement> texture_label )
+        : type( Type::TextureLabel ), id( id ), texture_label( texture_label )
+    {
+    }
+
+    // TextureButton
+    Element( str id, sptr<TextureButtonElement> texture_button )
+        : type( Type::TextureButton ), id( id ),
+          texture_button( texture_button )
+    {
+    }
+
+
     Type type;
     str id = "INVALID";
     bool enabled = false;
@@ -156,6 +176,8 @@ namespace UI
     sptr<GridPanelElement> grid_panel = nullptr;
     sptr<TextLabelElement> text_label = nullptr;
     sptr<TextButtonElement> text_button = nullptr;
+    sptr<TextureLabelElement> texture_label = nullptr;
+    sptr<TextureButtonElement> texture_button = nullptr;
 
     //DataPanel
     std::map<std::string, Element> data_points = {};
@@ -195,9 +217,11 @@ namespace UI
 
 public:
     GridPanelBuilder( str id, u32 cols, u32 rows )
-        : element{ std::make_shared<Element>(
-            Element{ id, std::make_shared<GridPanelElement>( cols, rows ) }
-          ) }
+        : element{
+            std::make_shared<Element>(
+              Element{ id, std::make_shared<GridPanelElement>( cols, rows ) }
+            ),
+          }
     {
     }
 
@@ -254,10 +278,12 @@ public:
     }
 
     explicit TextLabelBuilder( str id, str txt, u32 font_size )
-        : element{ std::make_shared<Element>(
-            id,
-            std::make_shared<TextLabelElement>( txt, font_size )
-          ) }
+        : element{
+            std::make_shared<Element>(
+              id,
+              std::make_shared<TextLabelElement>( txt, font_size )
+            ),
+          }
     {
     }
 
@@ -300,12 +326,14 @@ public:
     }
 
     explicit TextButtonBuilder( str id, str txt, u32 font_size )
-        : element{ std::make_shared<Element>(
-            id,
-            std::make_shared<TextButtonElement>(
-              std::make_shared<TextLabelElement>( txt, font_size )
-            )
-          ) }
+        : element{
+            std::make_shared<Element>(
+              id,
+              std::make_shared<TextButtonElement>(
+                std::make_shared<TextLabelElement>( txt, font_size )
+              )
+            ),
+          }
     {
     }
 
@@ -333,14 +361,15 @@ public:
 
     TextButtonBuilder &SetEvent( InterfaceEvent::Data event )
     {
-      element->on_click = std::make_shared<InterfaceEvent::Data>( event );
+      element->text_button->on_click =
+        std::make_shared<InterfaceEvent::Data>( event );
       return *this;
     }
 
 
     TextButtonBuilder &Clickable( bool clickable )
     {
-      element->clickable = clickable;
+      element->text_button->clickable = clickable;
       return *this;
     }
   };
@@ -349,4 +378,58 @@ public:
   {
     return TextButtonBuilder{ id, txt, font_size };
   }
+
+  class TextureLabelBuilder
+  {
+    sptr<Element> element;
+
+public:
+    operator sptr<Element>() const
+    {
+      return std::move( element );
+    }
+
+    explicit TextureLabelBuilder( str id, Texture2D texture )
+        : element{
+            std::make_shared<Element>(
+              id,
+              std::make_shared<TextureLabelElement>( texture )
+            ),
+          }
+    {
+    }
+  };
+
+  inline TextureLabelBuilder TextureLabel( str id, Texture2D texture )
+  {
+    return TextureLabelBuilder{ id, texture };
+  }
+
+  class TextureButtonBuilder
+  {
+    sptr<Element> element;
+
+public:
+    operator sptr<Element>() const
+    {
+      return std::move( element );
+    }
+
+    explicit TextureButtonBuilder(
+      str id,
+      Texture2D texture,
+      sptr<InterfaceEvent::Data> on_click
+    )
+        : element{
+            std::make_shared<Element>(
+              id,
+              std::make_shared<TextureButtonElement>(
+                std::make_shared<TextureLabelElement>( texture ),
+                on_click
+              )
+            ),
+          }
+    {
+    }
+  };
 };// namespace UI

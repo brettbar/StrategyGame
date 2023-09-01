@@ -11,6 +11,7 @@ namespace UI
       .On(
         InterfaceUpdate::ID::SettlementContext,
         []( Element &self, InterfaceUpdate::Update update ) {
+          printf( "InterfaceUpdate::ID::SettlementContext\n" );
           if ( update.condition )
             self.Enable();
           else

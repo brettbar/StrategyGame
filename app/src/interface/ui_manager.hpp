@@ -269,15 +269,23 @@ private:
         if ( !Manager()->over_any_elem )
           Manager()->over_any_elem = inside;
 
+        bool clickable = false;
+
+        if ( element->type == Type::TextureButton )
+        {
+          // TODO
+          // clickable = element->texture_button->clickable;
+        }
+        else if ( element->type == Type::TextButton )
+        {
+          clickable = element->text_button->clickable;
+        }
+
         if ( Manager()->DoInteraction(
-               element,
-               element->clickable,
-               inside,
-               mouse_went_up,
-               mouse_went_down
+               element, clickable, inside, mouse_went_up, mouse_went_down
              ) )
         {
-          if ( element->clickable )
+          if ( clickable )
           {
             std::cout << "Interactable element clicked" << '\n';
 

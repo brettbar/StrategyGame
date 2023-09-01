@@ -123,7 +123,15 @@ namespace UI
 
   void Element::UpdateClickable( bool new_clickable )
   {
-    clickable = new_clickable;
+    switch ( type )
+    {
+      case Type::TextButton:
+        text_button->clickable = new_clickable;
+        break;
+      case Type::TextureButton:
+        texture_button->clickable = new_clickable;
+        break;
+    }
   }
 
   void Element::ExecuteInterfaceUpdate( const InterfaceUpdate::Update &update )
@@ -217,10 +225,23 @@ namespace UI
       }
       break;
       case Type::TextureLabel:
+      {
+        DrawRectangleRec( transform, background );
+        DrawTextureEx(
+          texture_label->texture, { transform.x, transform.y }, 0.0, 1, WHITE
+        );
+      }
+      break;
       case Type::TextureButton:
       {
         DrawRectangleRec( transform, background );
-        DrawTextureEx( texture, { transform.x, transform.y }, 0.0, 1, WHITE );
+        DrawTextureEx(
+          texture_button->label->texture,
+          { transform.x, transform.y },
+          0.0,
+          1,
+          WHITE
+        );
       }
       break;
     }
@@ -229,9 +250,24 @@ namespace UI
   // X2749B
   void Element::FireEvent()
   {
-    if ( on_click )
+    switch ( type )
     {
-      InterfaceEvent::event_emitter.publish( *on_click );
+      case ( Type::TextButton ):
+      {
+        if ( text_button->on_click )
+        {
+          InterfaceEvent::event_emitter.publish( *text_button->on_click );
+        }
+      }
+      break;
+      case ( Type::TextureButton ):
+      {
+        // if ( texture_button->on_click )
+        // {
+        //   InterfaceEvent::event_emitter.publish( *on_click );
+        // }
+      }
+      break;
     }
   }
 
