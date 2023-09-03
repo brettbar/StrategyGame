@@ -15,8 +15,6 @@
 
 namespace SelectionSystem
 {
-  template<typename T>
-  inline void ClearSelection( view<T> );
 
   template<typename T>
   inline void ClearSelection( view<T> component_view )
@@ -27,6 +25,9 @@ namespace SelectionSystem
       component.selected = false;
       Global::world.remove<Selected::Component>( entity );
     }
+
+    // TODO Think we are double sending event here
+
 
     InterfaceUpdate::Update{
       .id = InterfaceUpdate::ID::SettlementContext,

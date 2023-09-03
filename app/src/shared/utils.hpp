@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "global.hpp"
 #include <memory>
 
 inline i32 DetermineTileIdFromPosition( Vector2 );
@@ -259,4 +260,9 @@ inline static std::string EntityIdToString( entt::entity entity )
     return "-1";
   else
     return std::to_string( (std::uint32_t) entity );
+}
+
+inline Texture2D GetTexture( str id )
+{
+  return Global::texture_cache[hstr{ id.c_str() }]->texture;
 }

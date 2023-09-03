@@ -11,7 +11,11 @@ namespace UI
       .On(
         InterfaceUpdate::ID::SettlementContext,
         []( Element &self, InterfaceUpdate::Update update ) {
-          printf( "InterfaceUpdate::ID::SettlementContext\n" );
+          printf(
+            "InterfaceUpdate::ID::SettlementContext %d\n", update.condition
+          );
+
+          printf( "Currently enabled? %d\n", self.enabled );
           if ( update.condition )
             self.Enable();
           else
@@ -24,15 +28,47 @@ namespace UI
           GridPanel( "settlement_context_tab_group", 1, 5 )
             .Background( BLUE )
             .SetChildren( {
-              // TextureButton( "settlement_context_tab_population" )
-              //   .SetEvent( InterfaceEvent::ID::SettlementContextPopulationTab ),
-              // TextureButton( "settlement_context_tab_construction" )
-              //   .SetEvent( InterfaceEvent::ID::SettlementContextConstructionTab ),
-              // TextureButton( "settlement_context_tab_resources" )
-              //   .SetEvent( InterfaceEvent::ID::SettlementContextResourcesTab ),
-              // TextureButton( "settlement_context_tab_garrison" )
-              //   .SetEvent( InterfaceEvent::ID::SettlementContextMilitaryTab ),
-              // TextureButton( "settlement_context_tab_culture" ),
+              GridPanelElement::Slot{
+                { 0, 0, 0, 0 },
+                TextureButton(
+                  "settlement_context_tab_population",
+                  GetTexture( "settlement_context_tab_population" ),
+                  InterfaceEvent::ID::SettlementContextPopulationTab
+                ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 1, 1 },
+                TextureButton(
+                  "settlement_context_tab_construction",
+                  GetTexture( "settlement_context_tab_construction" ),
+                  InterfaceEvent::ID::SettlementContextConstructionTab
+                ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 2, 2 },
+                TextureButton(
+                  "settlement_context_tab_resources",
+                  GetTexture( "settlement_context_tab_resources" ),
+                  InterfaceEvent::ID::SettlementContextResourcesTab
+                ),
+              },
+              GridPanelElement::Slot{
+                { 0, 0, 3, 3 },
+                TextureButton(
+                  "settlement_context_tab_garrison",
+                  GetTexture( "settlement_context_tab_garrison" ),
+                  InterfaceEvent::ID::SettlementContextMilitaryTab
+                ),
+              },
+
+              GridPanelElement::Slot{
+                { 0, 0, 4, 4 },
+                TextureButton(
+                  "settlement_context_tab_culture",
+                  GetTexture( "settlement_context_tab_culture" ),
+                  InterfaceEvent::ID::SettlementContextMilitaryTab
+                ),
+              },
             } ),
           // StackPanel( "settlement_context_content" )
           //   .Background( RED )

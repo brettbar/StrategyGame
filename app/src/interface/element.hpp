@@ -418,18 +418,27 @@ public:
     explicit TextureButtonBuilder(
       str id,
       Texture2D texture,
-      sptr<InterfaceEvent::Data> on_click
+      InterfaceEvent::Data on_click
     )
         : element{
             std::make_shared<Element>(
               id,
               std::make_shared<TextureButtonElement>(
                 std::make_shared<TextureLabelElement>( texture ),
-                on_click
+                std::make_shared<InterfaceEvent::Data>( on_click )
               )
             ),
           }
     {
     }
   };
+
+  inline TextureButtonBuilder TextureButton(
+    str id,
+    Texture2D texture,
+    InterfaceEvent::Data on_click
+  )
+  {
+    return TextureButtonBuilder{ id, texture, on_click };
+  }
 };// namespace UI
