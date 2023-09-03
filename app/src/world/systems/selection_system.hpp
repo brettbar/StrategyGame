@@ -25,20 +25,6 @@ namespace SelectionSystem
       component.selected = false;
       Global::world.remove<Selected::Component>( entity );
     }
-
-    // TODO Think we are double sending event here
-
-
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::SettlementContext,
-      .condition = false,
-    }
-      .Send();
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::ActorContext,
-      .condition = false,
-    }
-      .Send();
   }
 
   inline entt::entity GetSelectedEntity()
@@ -189,8 +175,20 @@ namespace SelectionSystem
     view<Province::Component> prov_view =
       Global::world.view<Province::Component>();
 
+
     ClearSelection<Actor::Component>( actors_view );
     ClearSelection<Province::Component>( prov_view );
+
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::SettlementContext,
+      .condition = false,
+    }
+      .Send();
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::ActorContext,
+      .condition = false,
+    }
+      .Send();
 
     CheckSelectActors( click_pos, player_id );
     CheckSelectProvince( click_pos, player_id );

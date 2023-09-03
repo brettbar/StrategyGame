@@ -54,7 +54,7 @@ namespace UI
 
     u32 GridIndex( u32, u32 );
 
-    void PanelEnable( rect );
+    void Enable( rect );
     void PanelRegister();
     void PanelDisable();
     void PanelResize( rect );
@@ -169,7 +169,7 @@ namespace UI
     str id = "INVALID";
     bool enabled = false;
     bool starts_disabled = false;
-    Color background = BLACK;
+    Color background = Fade( BLACK, 0.0 );
     rect transform = rect{ 0, 0, 0, 0 };
     Margins margins = Margins{ 0, 0, 0, 0 };
 
@@ -195,6 +195,7 @@ namespace UI
 
 
     // High Level
+    void Initialize();
     void Enable();
     void Register();
     void Disable();
@@ -228,6 +229,12 @@ public:
     operator sptr<Element>() const
     {
       return std::move( element );
+    }
+
+    GridPanelBuilder &StartsDisabled()
+    {
+      element->starts_disabled = true;
+      return *this;
     }
 
     GridPanelBuilder &On(

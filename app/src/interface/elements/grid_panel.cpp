@@ -11,7 +11,7 @@ namespace UI
   }
 
 
-  void GridPanelElement::PanelEnable( rect transform )
+  void GridPanelElement::Enable( rect transform )
   {
     PanelResize( transform );
     PanelReposition( transform );

@@ -66,7 +66,7 @@ namespace UI
       // Manager()->debug.Enable();
       Manager()->SetScene( MainMenu );
       EnableContent();
-    }// namespace System
+    }
 
     inline void SwitchPage( PageType page )
     {
@@ -75,10 +75,11 @@ namespace UI
       EnableContent();
     }
 
-    inline void EnableCampaignUI()
+    inline void InitCampaignUI()
     {
       DisableCurrentContent();
       Manager()->SetScene( Campaign );
+      Manager()->ActivePage()->Initialize();
     }
 
     inline void EnableContent()

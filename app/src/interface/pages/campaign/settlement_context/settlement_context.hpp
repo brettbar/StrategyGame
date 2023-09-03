@@ -6,6 +6,7 @@ namespace UI
   inline sptr<Element> CreateSettlementContextPanel()
   {
     return GridPanel( "settlement_context", 3, 3 )
+      .StartsDisabled()
       .FixedSize( 1200, 285 )
       .Background( Fade( BLACK, 0.5 ) )
       .On(

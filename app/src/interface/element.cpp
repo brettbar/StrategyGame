@@ -20,13 +20,34 @@ namespace UI
     }
   }
 
+  void Element::Initialize()
+  {
+    if ( starts_disabled )
+      return;
+
+    enabled = true;
+
+    switch ( type )
+    {
+      case Type::GridPanel:
+        grid_panel->Enable( transform );
+        break;
+      case Type::DataPanel:
+        // DataPanelEnable();
+        break;
+      case Type::StackPanel:
+        // StackPanelEnable();
+        break;
+    }
+  }
+
   void Element::Enable()
   {
     enabled = true;
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelEnable( transform );
+        grid_panel->Enable( transform );
         break;
       case Type::DataPanel:
         // DataPanelEnable();
@@ -181,7 +202,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        // DrawRectangleRec( transform, background );
+        DrawRectangleRec( transform, background );
         grid_panel->PanelDraw( transform );
         break;
       case Type::DataPanel:

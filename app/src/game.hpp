@@ -142,7 +142,7 @@ class IGame
 
     _campaign = new class Campaign( true );
 
-    UI::System::EnableCampaignUI();
+    UI::System::InitCampaignUI();
 
     auto player = Global::world.create();
     Global::world.emplace<Player::Component>(
@@ -184,7 +184,7 @@ class IGame
 
     _campaign = new Campaign( false );
 
-    UI::System::EnableCampaignUI();
+    UI::System::InitCampaignUI();
 
     for ( auto client: Network::Host()->_clients )
     {
@@ -237,7 +237,7 @@ class IGame
 
     _campaign = new class Campaign( false );
 
-    UI::System::EnableCampaignUI();
+    UI::System::InitCampaignUI();
 
     for ( auto peer: Network::Client()->_peers )
     {
@@ -317,7 +317,7 @@ class IGame
     if ( _campaign )
       delete _campaign;
     _campaign = new class Campaign( "output.dat" );
-    UI::System::EnableCampaignUI();
+    UI::System::InitCampaignUI();
 
     Game()->_mode = ProgramMode::Campaign;
   }
@@ -342,7 +342,7 @@ class IGame
     else if ( _mode == ProgramMode::ModalMenu )
     {
       _mode = ProgramMode::Campaign;
-      UI::System::EnableCampaignUI();
+      UI::System::InitCampaignUI();
     }
   }
 
