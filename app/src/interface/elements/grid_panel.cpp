@@ -10,6 +10,20 @@ namespace UI
     return col + (num_cols) *row;
   }
 
+  void GridPanelElement::Initialize( rect transform )
+  {
+    PanelResize( transform );
+    PanelReposition( transform );
+
+    for ( GridPanelElement::Slot &slot: children )
+    {
+      if ( slot.child->starts_disabled )
+        continue;
+      slot.child->Enable();
+      slot.child->ResizeRecursive();
+      slot.child->RepositionRecursive();
+    }
+  }
 
   void GridPanelElement::Enable( rect transform )
   {

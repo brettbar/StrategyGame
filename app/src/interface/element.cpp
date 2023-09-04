@@ -30,7 +30,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->Enable( transform );
+        grid_panel->Initialize( transform );
         break;
       case Type::DataPanel:
         // DataPanelEnable();

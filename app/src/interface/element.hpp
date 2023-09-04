@@ -54,6 +54,7 @@ namespace UI
 
     u32 GridIndex( u32, u32 );
 
+    void Initialize( rect );
     void Enable( rect );
     void PanelRegister();
     void PanelDisable();
