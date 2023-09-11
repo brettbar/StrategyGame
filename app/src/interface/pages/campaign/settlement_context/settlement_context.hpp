@@ -23,61 +23,65 @@ namespace UI
             self.Disable();
         }
       )
-      .SetChildren( {
-        GridPanelElement::Slot{
-          { 0, 0, 0, 2 },
-          GridPanel( "settlement_context_tab_group", 1, 5 )
-            .Background( BLUE )
-            .SetChildren( {
-              GridPanelElement::Slot{
-                { 0, 0, 0, 0 },
-                TextureButton(
-                  "settlement_context_tab_population",
-                  GetTexture( "settlement_context_tab_population" ),
-                  InterfaceEvent::ID::SettlementContextPopulationTab
-                ),
-              },
-              GridPanelElement::Slot{
-                { 0, 0, 1, 1 },
-                TextureButton(
-                  "settlement_context_tab_construction",
-                  GetTexture( "settlement_context_tab_construction" ),
-                  InterfaceEvent::ID::SettlementContextConstructionTab
-                ),
-              },
-              GridPanelElement::Slot{
-                { 0, 0, 2, 2 },
-                TextureButton(
-                  "settlement_context_tab_resources",
-                  GetTexture( "settlement_context_tab_resources" ),
-                  InterfaceEvent::ID::SettlementContextResourcesTab
-                ),
-              },
-              GridPanelElement::Slot{
-                { 0, 0, 3, 3 },
-                TextureButton(
-                  "settlement_context_tab_garrison",
-                  GetTexture( "settlement_context_tab_garrison" ),
-                  InterfaceEvent::ID::SettlementContextMilitaryTab
-                ),
-              },
+      .SetChildren(
+        { GridPanelElement::Slot{
+            { 0, 0, 0, 2 },
+            GridPanel( "settlement_context_tab_group", 1, 5 )
+              .Background( BLUE )
+              .SetChildren( {
+                GridPanelElement::Slot{
+                  { 0, 0, 0, 0 },
+                  TextureButton(
+                    "settlement_context_tab_population",
+                    GetTexture( "settlement_context_tab_population" ),
+                    InterfaceEvent::ID::SettlementContextPopulationTab
+                  ),
+                },
+                GridPanelElement::Slot{
+                  { 0, 0, 1, 1 },
+                  TextureButton(
+                    "settlement_context_tab_construction",
+                    GetTexture( "settlement_context_tab_construction" ),
+                    InterfaceEvent::ID::SettlementContextConstructionTab
+                  ),
+                },
+                GridPanelElement::Slot{
+                  { 0, 0, 2, 2 },
+                  TextureButton(
+                    "settlement_context_tab_resources",
+                    GetTexture( "settlement_context_tab_resources" ),
+                    InterfaceEvent::ID::SettlementContextResourcesTab
+                  ),
+                },
+                GridPanelElement::Slot{
+                  { 0, 0, 3, 3 },
+                  TextureButton(
+                    "settlement_context_tab_garrison",
+                    GetTexture( "settlement_context_tab_garrison" ),
+                    InterfaceEvent::ID::SettlementContextMilitaryTab
+                  ),
+                },
 
-              GridPanelElement::Slot{
-                { 0, 0, 4, 4 },
-                TextureButton(
-                  "settlement_context_tab_culture",
-                  GetTexture( "settlement_context_tab_culture" ),
-                  InterfaceEvent::ID::SettlementContextMilitaryTab
-                ),
-              },
-            } ),
-          // StackPanel( "settlement_context_content" )
-          //   .Background( RED )
-          //   .Children( {
-          //     MilitaryTab(),
-          //   } ),
-        },
-      } );
+                GridPanelElement::Slot{
+                  { 0, 0, 4, 4 },
+                  TextureButton(
+                    "settlement_context_tab_culture",
+                    GetTexture( "settlement_context_tab_culture" ),
+                    InterfaceEvent::ID::SettlementContextMilitaryTab
+                  ),
+                },
+              } ),
+          },
+          GridPanelElement::Slot{
+            { 0, 0, 0, 0 },
+            StackPanel(
+              "settlement_context_content",
+              {
+                // MilitaryTab(),
+              }
+            ),
+          } }
+      );
   }
 
 

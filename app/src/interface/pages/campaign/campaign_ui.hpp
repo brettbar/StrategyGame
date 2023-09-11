@@ -2,7 +2,7 @@
 
 #include "../../../shared/common.hpp"
 
-#include "../../element.hpp"
+#include "../../builders.hpp"
 #include "../../ui_utils.hpp"
 
 #include "actor_context.hpp"
@@ -21,6 +21,7 @@ namespace UI
           GridPanelElement::Slot{
             { 1, 1, 2, 2 },
             CreateSettlementContextPanel(),
+
           },
           // GridPanelElement::Slot{
           //   { 1, 1, 2, 2 },

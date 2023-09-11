@@ -67,6 +67,15 @@ namespace UI
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
   };
 
+  struct StackPanelElement
+  {
+    u32 curr_index = 0;
+    list<sptr<Element>> tabs;
+
+    StackPanelElement() = delete;
+    StackPanelElement( list<sptr<Element>> tabs ) : tabs( tabs ) {}
+  };
+
   struct TextLabelElement
   {
     str text = "INVALID";
@@ -139,6 +148,12 @@ namespace UI
     {
     }
 
+    // StackPanel
+    Element( str id, sptr<StackPanelElement> stack_panel )
+        : type( Type::StackPanel ), id( id ), stack_panel( stack_panel )
+    {
+    }
+
     // TextLabel
     Element( str id, sptr<TextLabelElement> text_label )
         : type( Type::TextLabel ), id( id ), text_label( text_label )
@@ -175,6 +190,7 @@ namespace UI
     Margins margins = Margins{ 0, 0, 0, 0 };
 
     sptr<GridPanelElement> grid_panel = nullptr;
+    sptr<StackPanelElement> stack_panel = nullptr;
     sptr<TextLabelElement> text_label = nullptr;
     sptr<TextButtonElement> text_button = nullptr;
     sptr<TextureLabelElement> texture_label = nullptr;
@@ -189,10 +205,6 @@ namespace UI
       InterfaceUpdate::ID,
       std::function<void( Element &, InterfaceUpdate::Update )>>
       updates = {};
-
-    // StackPanel
-    // TODO this should probably be made private
-    u32 curr_index = 0;
 
 
     // High Level
@@ -213,240 +225,4 @@ namespace UI
     void FireEvent();
   };
 
-  class GridPanelBuilder
-  {
-    sptr<Element> element;
-
-public:
-    GridPanelBuilder( str id, u32 cols, u32 rows )
-        : element{
-            std::make_shared<Element>(
-              Element{ id, std::make_shared<GridPanelElement>( cols, rows ) }
-            ),
-          }
-    {
-    }
-
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    GridPanelBuilder &StartsDisabled()
-    {
-      element->starts_disabled = true;
-      return *this;
-    }
-
-    GridPanelBuilder &On(
-      InterfaceUpdate::ID update_id,
-      std::function<void( Element &self, InterfaceUpdate::Update update )>
-        update_fn
-    )
-    {
-      element->updates.emplace( update_id, update_fn );
-      return *this;
-    }
-
-    GridPanelBuilder &FixedSize( u32 width, u32 height )
-    {
-      element->grid_panel->abs_size = true;
-      element->transform.width = width;
-      element->transform.height = height;
-      return *this;
-    }
-
-    GridPanelBuilder &Background( Color background )
-    {
-      element->background = background;
-      return *this;
-    }
-
-    GridPanelBuilder &SetChildren( list<GridPanelElement::Slot> children )
-    {
-      element->grid_panel->children = children;
-      return *this;
-    }
-  };
-
-  inline GridPanelBuilder GridPanel( str id, u32 num_cols, u32 num_rows )
-  {
-    return GridPanelBuilder{ id, num_cols, num_rows };
-  }
-
-
-  class TextLabelBuilder
-  {
-    sptr<Element> element;
-
-public:
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    explicit TextLabelBuilder( str id, str txt, u32 font_size )
-        : element{
-            std::make_shared<Element>(
-              id,
-              std::make_shared<TextLabelElement>( txt, font_size )
-            ),
-          }
-    {
-    }
-
-    TextLabelBuilder &On(
-      InterfaceUpdate::ID update_id,
-      std::function<void( Element &self, InterfaceUpdate::Update update )>
-        update_fn
-    )
-    {
-      element->updates.emplace( update_id, update_fn );
-      return *this;
-    }
-
-    TextLabelBuilder &Background( Color background )
-    {
-      element->background = background;
-      return *this;
-    }
-
-    TextLabelBuilder &Margins( Margins margins )
-    {
-      element->margins = margins;
-      return *this;
-    }
-  };
-
-  inline TextLabelBuilder TextLabel( str id, str txt, u32 font_size )
-  {
-    return TextLabelBuilder{ id, txt, font_size };
-  }
-
-  class TextButtonBuilder
-  {
-    sptr<Element> element;
-
-public:
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    explicit TextButtonBuilder( str id, str txt, u32 font_size )
-        : element{
-            std::make_shared<Element>(
-              id,
-              std::make_shared<TextButtonElement>(
-                std::make_shared<TextLabelElement>( txt, font_size )
-              )
-            ),
-          }
-    {
-    }
-
-    TextButtonBuilder &On(
-      InterfaceUpdate::ID update_id,
-      std::function<void( Element &self, InterfaceUpdate::Update update )>
-        update_fn
-    )
-    {
-      element->updates.emplace( update_id, update_fn );
-      return *this;
-    }
-
-    TextButtonBuilder &StartDisabled()
-    {
-      element->starts_disabled = true;
-      return *this;
-    }
-
-    TextButtonBuilder &Background( Color background )
-    {
-      element->background = background;
-      return *this;
-    }
-
-    TextButtonBuilder &SetEvent( InterfaceEvent::Data event )
-    {
-      element->text_button->on_click =
-        std::make_shared<InterfaceEvent::Data>( event );
-      return *this;
-    }
-
-
-    TextButtonBuilder &Clickable( bool clickable )
-    {
-      element->text_button->clickable = clickable;
-      return *this;
-    }
-  };
-
-  inline TextButtonBuilder TextButton( str id, str txt, u32 font_size )
-  {
-    return TextButtonBuilder{ id, txt, font_size };
-  }
-
-  class TextureLabelBuilder
-  {
-    sptr<Element> element;
-
-public:
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    explicit TextureLabelBuilder( str id, Texture2D texture )
-        : element{
-            std::make_shared<Element>(
-              id,
-              std::make_shared<TextureLabelElement>( texture )
-            ),
-          }
-    {
-    }
-  };
-
-  inline TextureLabelBuilder TextureLabel( str id, Texture2D texture )
-  {
-    return TextureLabelBuilder{ id, texture };
-  }
-
-  class TextureButtonBuilder
-  {
-    sptr<Element> element;
-
-public:
-    operator sptr<Element>() const
-    {
-      return std::move( element );
-    }
-
-    explicit TextureButtonBuilder(
-      str id,
-      Texture2D texture,
-      InterfaceEvent::Data on_click
-    )
-        : element{
-            std::make_shared<Element>(
-              id,
-              std::make_shared<TextureButtonElement>(
-                std::make_shared<TextureLabelElement>( texture ),
-                std::make_shared<InterfaceEvent::Data>( on_click )
-              )
-            ),
-          }
-    {
-    }
-  };
-
-  inline TextureButtonBuilder TextureButton(
-    str id,
-    Texture2D texture,
-    InterfaceEvent::Data on_click
-  )
-  {
-    return TextureButtonBuilder{ id, texture, on_click };
-  }
 };// namespace UI
