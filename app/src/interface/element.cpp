@@ -70,7 +70,7 @@ namespace UI
         // DataPanelDisable();
         break;
       case Type::StackPanel:
-        // StackPanelDisable();
+        stack_panel->Disable();
         break;
     }
     enabled = false;
@@ -119,7 +119,7 @@ namespace UI
         // DataPanelReposition();
         break;
       case Type::StackPanel:
-        // StackPanelReposition();
+        stack_panel->Reposition( transform );
         break;
     }
   }
@@ -170,7 +170,7 @@ namespace UI
         // DataPanelExecuteInterfaceUpdate( update );
         break;
       case Type::StackPanel:
-        // StackPanelExecuteInterfaceUpdate( update );
+        stack_panel->ExecuteInterfaceUpdate( update );
         break;
     }
   }
@@ -210,7 +210,6 @@ namespace UI
         // DataPanelDraw();
         break;
       case Type::StackPanel:
-        // StackPanelDraw();
         DrawRectangleRec( transform, background );
         stack_panel->Draw();
         break;

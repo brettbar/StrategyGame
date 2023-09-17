@@ -23,12 +23,12 @@ namespace UI
             self.Disable();
         }
       )
-      .SetChildren(
+      .Children(
         { GridPanelElement::Slot{
             { 0, 0, 0, 2 },
             GridPanel( "settlement_context_tab_group", 1, 5 )
               .Background( BLUE )
-              .SetChildren( {
+              .Children( {
                 GridPanelElement::Slot{
                   { 0, 0, 0, 0 },
                   TextureButton(
@@ -73,13 +73,14 @@ namespace UI
               } ),
           },
           GridPanelElement::Slot{
-            { 0, 0, 0, 0 },
+            { 1, 2, 0, 2 },
             StackPanel(
               "settlement_context_content",
               {
                 // MilitaryTab(),
                 GridPanel( "military_tab", 3, 3 )
-                  .SetChildren( {
+                  .Background( BLUE )
+                  .Children( {
                     GridPanelElement::Slot{
                       { 1, 1, 1, 1 },
                       TextLabel( "military_tab_content", "Military Tab", 32 )
@@ -87,7 +88,8 @@ namespace UI
                     },
                   } ),
               }
-            ),
+            )
+              .Background( GREEN ),
           } }
       );
   }

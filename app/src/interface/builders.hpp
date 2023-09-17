@@ -53,7 +53,7 @@ public:
       return *this;
     }
 
-    GridPanelBuilder &SetChildren( list<GridPanelElement::Slot> children )
+    GridPanelBuilder &Children( list<GridPanelElement::Slot> children )
     {
       element->grid_panel->children = children;
       return *this;
@@ -78,6 +78,12 @@ public:
     operator sptr<Element>() const
     {
       return std::move( element );
+    }
+
+    StackPanelBuilder &Background( Color background )
+    {
+      element->background = background;
+      return *this;
     }
 
     StackPanelBuilder &On(
