@@ -2,6 +2,7 @@
 
 #include "../../shared/common.hpp"
 
+#include "../builders.hpp"
 #include "../element.hpp"
 #include <raylib.h>
 
@@ -13,11 +14,11 @@ namespace UI
       GridPanel( "model_menu_root", 3, 3 )
         .FixedSize( GetScreenWidth(), GetScreenHeight() )
         .Background( Fade( BLACK, 0.5 ) )
-        .SetChildren( {
+        .Children( {
           GridPanelElement::Slot{
             { 1, 1, 1, 1 },
             GridPanel( "modal_menu", 1, 6 )
-              .SetChildren( {
+              .Children( {
                 GridPanelElement::Slot{
                   { 0, 0, 0, 0 },
                   TextButton( "modal_menu_load_game", "Load Game", 32 )

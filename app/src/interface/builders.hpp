@@ -66,13 +66,33 @@ public:
     sptr<Element> element;
 
 public:
-    StackPanelBuilder( str id, list<sptr<Element>> tabs )
+    StackPanelBuilder(
+      str id,
+      list<sptr<Element>> tabs,
+      list<InterfaceUpdate::ID> change_tabs_map
+    )
         : element{
-            std::make_shared<Element>(
-              Element{ id, std::make_shared<StackPanelElement>( tabs ) }
-            ),
+            std::make_shared<Element>( Element{
+              id,
+              std::make_shared<StackPanelElement>( tabs, change_tabs_map ) } ),
           }
     {
+      for ( auto &update: change_tabs_map )
+      {
+        element->updates.emplace(
+          update,
+          []( Element &self, InterfaceUpdate::Update update ) {
+            for ( int i = 0; i < self.stack_panel->change_tabs_map.size(); i++ )
+            {
+              auto update_id = self.stack_panel->change_tabs_map[i];
+              if ( update.id == update_id )
+              {
+                self.stack_panel->SwitchChild( i );
+              }
+            }
+          }
+        );
+      }
     }
 
     operator sptr<Element>() const
@@ -86,7 +106,7 @@ public:
       return *this;
     }
 
-    StackPanelBuilder &On(
+    StackPanelBuilder &Subscribe(
       InterfaceUpdate::ID update_id,
       std::function<void( Element &self, InterfaceUpdate::Update update )>
         update_fn
@@ -256,9 +276,13 @@ public:
     return GridPanelBuilder{ id, num_cols, num_rows };
   }
 
-  inline StackPanelBuilder StackPanel( str id, list<sptr<Element>> tabs )
+  inline StackPanelBuilder StackPanel(
+    str id,
+    list<sptr<Element>> tabs,
+    list<InterfaceUpdate::ID> change_tabs_map
+  )
   {
-    return StackPanelBuilder{ id, tabs };
+    return StackPanelBuilder{ id, tabs, change_tabs_map };
   }
 
   inline TextLabelBuilder TextLabel( str id, str txt, u32 font_size )

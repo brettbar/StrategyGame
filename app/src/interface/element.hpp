@@ -71,16 +71,23 @@ namespace UI
   {
     u32 curr_index = 0;
     list<sptr<Element>> tabs;
+    list<InterfaceUpdate::ID> change_tabs_map;
 
     StackPanelElement() = delete;
-    StackPanelElement( list<sptr<Element>> tabs ) : tabs( tabs ) {}
+    StackPanelElement(
+      list<sptr<Element>> tabs,
+      list<InterfaceUpdate::ID> change_tabs_map
+    )
+        : tabs( tabs ), change_tabs_map( change_tabs_map )
+    {
+    }
 
     void Draw();
     void Initialize( rect );
     void Enable( rect );
     void Register();
     void Disable();
-    void Resize( rect & );
+    void Resize( rect );
     void Reposition( rect );
     void SwitchChild( u32 );
     void Draw( rect );

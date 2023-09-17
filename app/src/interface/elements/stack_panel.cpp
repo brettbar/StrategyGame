@@ -45,11 +45,11 @@ namespace UI
     tabs[curr_index]->Enable();
   }
 
-  void StackPanelElement::Resize( rect &transform )
+  void StackPanelElement::Resize( rect transform )
   {
+    tabs[curr_index]->transform.width = transform.width;
+    tabs[curr_index]->transform.height = transform.height;
     tabs[curr_index]->ResizeRecursive();
-    transform.width = tabs[curr_index]->transform.width;
-    transform.height = tabs[curr_index]->transform.height;
   }
 
   void StackPanelElement::Reposition( rect transform )

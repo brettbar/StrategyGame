@@ -60,11 +60,11 @@ namespace UI
   {
     return GridPanel( "faction_select_root", 3, 3 )
       .FixedSize( GetScreenWidth(), GetScreenHeight() )
-      .SetChildren( {
+      .Children( {
         GridPanelElement::Slot{
           { 1, 1, 1, 1 },
           GridPanel( "faction_select_menu", 1, 8 )
-            .SetChildren( CreateFactionButtons() ),
+            .Children( CreateFactionButtons() ),
         },
       } );
   }

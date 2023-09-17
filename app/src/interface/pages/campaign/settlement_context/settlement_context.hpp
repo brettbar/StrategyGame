@@ -5,9 +5,9 @@ namespace UI
 {
   inline sptr<Element> CreateSettlementContextPanel()
   {
-    return GridPanel( "settlement_context", 3, 3 )
+    return GridPanel( "settlement_context", 4, 3 )
       .StartsDisabled()
-      .FixedSize( 1200, 285 )
+      .FixedSize( 1600, 285 )
       .Background( Fade( BLACK, 0.5 ) )
       .On(
         InterfaceUpdate::ID::SettlementContext,
@@ -73,23 +73,36 @@ namespace UI
               } ),
           },
           GridPanelElement::Slot{
-            { 1, 2, 0, 2 },
+            { 1, 3, 0, 2 },
             StackPanel(
               "settlement_context_content",
               {
                 // MilitaryTab(),
                 GridPanel( "military_tab", 3, 3 )
-                  .Background( BLUE )
+                  .Background( RED )
                   .Children( {
                     GridPanelElement::Slot{
                       { 1, 1, 1, 1 },
-                      TextLabel( "military_tab_content", "Military Tab", 32 )
-                        .Background( RED ),
+                      TextLabel( "military_tab_content", "Military Tab", 32 ),
                     },
                   } ),
+
+                GridPanel( "contruction_tab", 3, 3 )
+                  .Background( RED )
+                  .Children( {
+                    GridPanelElement::Slot{
+                      { 1, 1, 1, 1 },
+                      TextLabel(
+                        "construction_tab_content", "Construction Tab", 32
+                      ),
+                    },
+                  } ),
+              },
+              {
+                InterfaceUpdate::ID::SettlementContextMilitaryTab,
+                InterfaceUpdate::ID::SettlementContextConstructionTab,
               }
-            )
-              .Background( GREEN ),
+            ),
           } }
       );
   }

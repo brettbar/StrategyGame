@@ -17,7 +17,7 @@ namespace UI
     return {
       GridPanel( "campaign_root", 3, 3 )
         .FixedSize( GetScreenWidth(), GetScreenHeight() )
-        .SetChildren( {
+        .Children( {
           GridPanelElement::Slot{
             { 1, 1, 2, 2 },
             CreateSettlementContextPanel(),

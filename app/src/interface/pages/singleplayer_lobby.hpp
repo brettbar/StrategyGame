@@ -3,6 +3,7 @@
 
 #include "../../shared/common.hpp"
 
+#include "../builders.hpp"
 #include "../element.hpp"
 
 #include "../../network/client.hpp"
@@ -17,10 +18,10 @@ namespace UI
     return {
       GridPanel( "singleplayer_lobby_root", 3, 3 )
         .FixedSize( GetScreenWidth(), GetScreenHeight() )
-        .SetChildren( { GridPanelElement::Slot{
+        .Children( { GridPanelElement::Slot{
           { 1, 1, 1, 1 },
           GridPanel( "singleplayer_lobby", 1, 3 )
-            .SetChildren( {
+            .Children( {
               GridPanelElement::Slot{
                 { 0, 0, 0, 0 },
                 TextButton(

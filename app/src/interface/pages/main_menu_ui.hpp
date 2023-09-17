@@ -13,12 +13,12 @@ namespace UI
     return GridPanel( "main_menu_root", 3, 3 )
       .FixedSize( GetScreenWidth(), GetScreenHeight() )
       .Background( GRAY )
-      .SetChildren( {
+      .Children( {
         GridPanelElement::Slot{
           { 1, 1, 1, 1 },
           GridPanel( "main_menu", 1, 6 )
             .Background( GREEN )
-            .SetChildren( {
+            .Children( {
               GridPanelElement::Slot{
                 { 0, 0, 0, 0 },
                 TextButton( "main_menu_host_game", "Host Game", 32 )

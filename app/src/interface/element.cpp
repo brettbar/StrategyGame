@@ -285,10 +285,10 @@ namespace UI
       break;
       case ( Type::TextureButton ):
       {
-        // if ( texture_button->on_click )
-        // {
-        //   InterfaceEvent::event_emitter.publish( *on_click );
-        // }
+        if ( text_button->on_click )
+        {
+          InterfaceEvent::event_emitter.publish( *text_button->on_click );
+        }
       }
       break;
     }
