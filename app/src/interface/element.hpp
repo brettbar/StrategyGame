@@ -56,12 +56,12 @@ namespace UI
 
     void Initialize( rect );
     void Enable( rect );
-    void PanelRegister();
-    void PanelDisable();
-    void PanelResize( rect );
-    void PanelReposition( rect );
-    void PanelDraw( rect );
-    void PanelExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
+    void Register();
+    void Disable();
+    void Resize( rect );
+    void Reposition( rect );
+    void Draw( rect );
+    void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
     GridPanelElement() = delete;
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
@@ -74,6 +74,17 @@ namespace UI
 
     StackPanelElement() = delete;
     StackPanelElement( list<sptr<Element>> tabs ) : tabs( tabs ) {}
+
+    void Draw();
+    void Initialize( rect );
+    void Enable( rect );
+    void Register();
+    void Disable();
+    void Resize( rect & );
+    void Reposition( rect );
+    void SwitchChild( u32 );
+    void Draw( rect );
+    void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
   };
 
   struct TextLabelElement

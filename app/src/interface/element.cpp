@@ -1,4 +1,5 @@
 #include "element.hpp"
+#include <raylib.h>
 
 namespace UI
 {
@@ -9,13 +10,13 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelRegister();
+        grid_panel->Register();
         break;
       case Type::DataPanel:
         // DataPanelRegister();
         break;
       case Type::StackPanel:
-        // StackPanelRegister();
+        stack_panel->Register();
         break;
     }
   }
@@ -36,7 +37,7 @@ namespace UI
         // DataPanelEnable();
         break;
       case Type::StackPanel:
-        // StackPanelEnable();
+        stack_panel->Initialize( transform );
         break;
     }
   }
@@ -53,7 +54,7 @@ namespace UI
         // DataPanelEnable();
         break;
       case Type::StackPanel:
-        // StackPanelEnable();
+        stack_panel->Enable( transform );
         break;
     }
   }
@@ -63,7 +64,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelDisable();
+        grid_panel->Disable();
         break;
       case Type::DataPanel:
         // DataPanelDisable();
@@ -87,13 +88,13 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelResize( transform );
+        grid_panel->Resize( transform );
         break;
       case Type::DataPanel:
         // DataPanelResize();
         break;
       case Type::StackPanel:
-        // StackPanelResize();
+        stack_panel->Resize( transform );
         break;
     }
   }
@@ -112,7 +113,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelReposition( transform );
+        grid_panel->Reposition( transform );
         break;
       case Type::DataPanel:
         // DataPanelReposition();
@@ -163,7 +164,7 @@ namespace UI
     switch ( type )
     {
       case Type::GridPanel:
-        grid_panel->PanelExecuteInterfaceUpdate( update );
+        grid_panel->ExecuteInterfaceUpdate( update );
         break;
       case Type::DataPanel:
         // DataPanelExecuteInterfaceUpdate( update );
@@ -203,13 +204,15 @@ namespace UI
     {
       case Type::GridPanel:
         DrawRectangleRec( transform, background );
-        grid_panel->PanelDraw( transform );
+        grid_panel->Draw( transform );
         break;
       case Type::DataPanel:
         // DataPanelDraw();
         break;
       case Type::StackPanel:
         // StackPanelDraw();
+        DrawRectangleRec( transform, background );
+        stack_panel->Draw();
         break;
       case Type::TextLabel:
         DrawRectangleRec( transform, background );

@@ -78,6 +78,14 @@ namespace UI
               "settlement_context_content",
               {
                 // MilitaryTab(),
+                GridPanel( "military_tab", 3, 3 )
+                  .SetChildren( {
+                    GridPanelElement::Slot{
+                      { 1, 1, 1, 1 },
+                      TextLabel( "military_tab_content", "Military Tab", 32 )
+                        .Background( RED ),
+                    },
+                  } ),
               }
             ),
           } }

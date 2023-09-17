@@ -12,8 +12,8 @@ namespace UI
 
   void GridPanelElement::Initialize( rect transform )
   {
-    PanelResize( transform );
-    PanelReposition( transform );
+    Resize( transform );
+    Reposition( transform );
 
     for ( GridPanelElement::Slot &slot: children )
     {
@@ -27,8 +27,8 @@ namespace UI
 
   void GridPanelElement::Enable( rect transform )
   {
-    PanelResize( transform );
-    PanelReposition( transform );
+    Resize( transform );
+    Reposition( transform );
 
     for ( GridPanelElement::Slot &slot: children )
     {
@@ -38,7 +38,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelRegister()
+  void GridPanelElement::Register()
   {
 
     for ( GridPanelElement::Slot &slot: children )
@@ -47,7 +47,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelDisable()
+  void GridPanelElement::Disable()
   {
     for ( GridPanelElement::Slot &slot: children )
     {
@@ -55,7 +55,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelReposition( rect transform )
+  void GridPanelElement::Reposition( rect transform )
   {
 
     u32 slot_width = transform.width / num_cols;
@@ -71,7 +71,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelResize( rect transform )
+  void GridPanelElement::Resize( rect transform )
   {
 
     u32 slot_width = transform.width / num_cols;
@@ -89,7 +89,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelDraw( rect transform )
+  void GridPanelElement::Draw( rect transform )
   {
     u32 slot_width = transform.width / num_cols;
     u32 slot_height = transform.height / num_rows;
@@ -127,7 +127,7 @@ namespace UI
     }
   }
 
-  void GridPanelElement::PanelExecuteInterfaceUpdate(
+  void GridPanelElement::ExecuteInterfaceUpdate(
     const InterfaceUpdate::Update &update
   )
   {

@@ -2,89 +2,72 @@
 
 namespace UI
 {
-  // void Element::StackPanelEnable()
-  // {
-  //   assert( type == Type::StackPanel );
+  void StackPanelElement::Initialize( rect transform )
+  {
+    Resize( transform );
+    Reposition( transform );
 
-  //   enabled = true;
-  //   ResizeRecursive();
-  //   RepositionRecursive();
+    if ( !tabs[curr_index]->starts_disabled )
+      tabs[curr_index]->Enable();
+  }
 
-  //   children[curr_index].Enable();
-  //   children[curr_index].ResizeRecursive();
-  //   children[curr_index].RepositionRecursive();
-  // }
+  void StackPanelElement::Enable( rect transform )
+  {
+    Resize( transform );
+    Reposition( transform );
 
-  // void Element::StackPanelRegister()
-  // {
-  //   assert( type == Type::StackPanel );
+    tabs[curr_index]->Enable();
+  }
 
-  //   lookup.emplace( id, std::make_shared<Element>( *this ) );
-  //   children[curr_index].Register();
-  // }
+  void StackPanelElement::Register()
+  {
+    tabs[curr_index]->Register();
+  }
 
-  // void Element::StackPanelDisable()
-  // {
-  //   assert( type == Type::StackPanel );
-  //   children[curr_index].Disable();
-  //   enabled = false;
-  // }
+  void StackPanelElement::Disable()
+  {
+    tabs[curr_index]->Disable();
+  }
 
-  // void Element::StackPanelSwitchChild( u32 index )
-  // {
-  //   assert( type == Type::StackPanel );
+  void StackPanelElement::SwitchChild( u32 index )
+  {
+    if ( index > tabs.size() )
+    {
+      assert( false );
+      std::cout << "ERROR :: "
+                << "StackPanel tried to switch to index greater than its "
+                   "number of children."
+                << "\n";
+      return;
+    }
+    tabs[curr_index]->Disable();
+    curr_index = index;
+    tabs[curr_index]->Enable();
+  }
 
-  //   if ( index > children.size() )
-  //   {
-  //     assert( false );
-  //     std::cout << "ERROR :: "
-  //               << "StackPanel tried to switch to index greater than its "
-  //                  "number of children."
-  //               << "\n";
-  //     return;
-  //   }
-  //   children[curr_index].Disable();
-  //   curr_index = index;
-  //   children[curr_index].Enable();
-  // }
+  void StackPanelElement::Resize( rect &transform )
+  {
+    tabs[curr_index]->ResizeRecursive();
+    transform.width = tabs[curr_index]->transform.width;
+    transform.height = tabs[curr_index]->transform.height;
+  }
 
-  // void Element::StackPanelResize()
-  // {
-  //   assert( type == Type::StackPanel );
+  void StackPanelElement::Reposition( rect transform )
+  {
+    tabs[curr_index]->transform.x = transform.x;
+    tabs[curr_index]->transform.y = transform.y;
+    tabs[curr_index]->RepositionRecursive();
+  }
 
-  //   children[curr_index].ResizeRecursive();
-  //   transform.width = children[curr_index].transform.width;
-  //   transform.height = children[curr_index].transform.height;
-  // }
+  void StackPanelElement::Draw()
+  {
+    tabs[curr_index]->Draw();
+  }
 
-  // void Element::StackPanelReposition()
-  // {
-  //   assert( type == Type::StackPanel );
-  //   children[curr_index].transform.x = transform.x;
-  //   children[curr_index].transform.y = transform.y;
-  //   children[curr_index].RepositionRecursive();
-  // }
-
-  // void Element::StackPanelDraw()
-  // {
-  //   DrawRectangleV(
-  //     { transform.x, transform.y },
-  //     { transform.width, transform.height },
-  //     background
-  //   );
-
-  //   children[curr_index].Draw();
-  // }
-
-  // void Element::StackPanelExecuteInterfaceUpdate(
-  //   const InterfaceUpdate::Update &update
-  // )
-  // {
-  //   assert( type == Type::StackPanel );
-
-  //   if ( updates.contains( update.id ) )
-  //     updates[update.id]( *this, update );
-
-  //   children[curr_index].ExecuteInterfaceUpdate( update );
-  // }
+  void StackPanelElement::ExecuteInterfaceUpdate(
+    const InterfaceUpdate::Update &update
+  )
+  {
+    tabs[curr_index]->ExecuteInterfaceUpdate( update );
+  }
 };// namespace UI
