@@ -88,7 +88,7 @@ namespace UI
                   } ),
 
                 GridPanel( "contruction_tab", 3, 3 )
-                  .Background( RED )
+                  .Background( GREEN )
                   .Children( {
                     GridPanelElement::Slot{
                       { 1, 1, 1, 1 },
