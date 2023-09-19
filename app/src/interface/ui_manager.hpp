@@ -248,11 +248,11 @@ private:
       break;
       case Type::StackPanel:
       {
-        // Interact(
-        //   element->grid_panel->children[element->curr_index],
-        //   mouse_went_up,
-        //   mouse_went_down
-        // );
+        Interact(
+          element->stack_panel->tabs[element->stack_panel->curr_index],
+          mouse_went_up,
+          mouse_went_down
+        );
 
         // if ( !Manager()->over_any_elem )
         // {
@@ -273,8 +273,7 @@ private:
 
         if ( element->type == Type::TextureButton )
         {
-          // TODO
-          // clickable = element->texture_button->clickable;
+          clickable = element->texture_button->clickable;
         }
         else if ( element->type == Type::TextButton )
         {
