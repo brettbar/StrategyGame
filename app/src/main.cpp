@@ -54,27 +54,29 @@ void SteamAPIDebugTextHook( int severity, const char *msg )
 */
 int main()
 {
+  Global::mp_capable = true;
+
   if ( SteamAPI_RestartAppIfNecessary( 480 ) )
   {
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamAPI_Init() )
   {
     printf( "SteamAPI_Init() failed!\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamUser()->BLoggedOn() )
   {
     printf( "Steam user is not logged in\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamInput()->Init( false ) )
   {
     printf( "SteamInput()->Init failed.\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );

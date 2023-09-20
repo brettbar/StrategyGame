@@ -8,26 +8,26 @@
 
 namespace UI
 {
-  // inline Element RecruitmentWindow()
-  // {
-  //   return Panel( "recruitment_window" )
-  //     .MaximumSize()
-  //     .Children( {
-  //       TextButton( "train_hastati" )
-  //         .Text( "Train", 24 )
-  //         .Background( GREEN )
-  //         .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati ),
-  //     } );
-  // }
+  inline sptr<Element> RecruitmentWindow()
+  {
+    return GridPanel( "recruitment_window", 3, 3 )
+      .Children( {
+        Slot(
+          { 0, 0, 0, 0 },
+          TextButton( "train_hastati", "Train", 24 )
+            .Background( GREEN )
+            .SetEvent( InterfaceEvent::ID::SettlementContextTrainHastati )
+        ),
+      } );
+  }
 
-  // inline Element TrainingWindow()
-  // {
-  //   return Panel( "training_window" )
-  //     .MaximumSize()
-  //     .Children( {
-  //       TextLabel( "training" ).Text( "Training", 24 ),
-  //     } );
-  // }
+  inline sptr<Element> TrainingWindow()
+  {
+    return GridPanel( "training_window", 3, 3 )
+      .Children( {
+        Slot( { 0, 0, 0, 0 }, TextLabel( "training", "Training", 24 ) ),
+      } );
+  }
 
   // inline Element GarrisonWindow()
   // {
@@ -56,16 +56,14 @@ namespace UI
   // }
 
 
-  // inline Element MilitaryTab()
-  // {
-  //   return Panel( "settlement_context_military" )
-  //     .MaximumSize()
-  //     .Children( {
-  //       RecruitmentWindow(),
-  //       TrainingWindow(),
-  //       GarrisonWindow(),
-  //     } );
-  // }
-
+  inline sptr<Element> CreateSettlementContextTabMilitary()
+  {
+    return GridPanel( "settlement_context_military", 3, 1 )
+      .Children( {
+        Slot( { 0, 0, 0, 0 }, RecruitmentWindow() ),
+        Slot( { 1, 1, 0, 0 }, TrainingWindow() ),
+        // GarrisonWindow(),
+      } );
+  }
 
 }// namespace UI

@@ -10,6 +10,7 @@
 namespace Global
 {
 
+  inline bool mp_capable;
   inline State state = {
     .mapWidth = 128,
     .mapHeight = 128,

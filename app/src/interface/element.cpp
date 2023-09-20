@@ -3,6 +3,14 @@
 
 namespace UI
 {
+  GridPanelElement::Slot Slot(
+    GridPanelElement::Slot::Dimensions dims,
+    sptr<Element> child
+  )
+  {
+    return GridPanelElement::Slot{ dims, child };
+  }
+
   void Element::Register()
   {
     lookup.emplace( id, std::make_shared<Element>( *this ) );

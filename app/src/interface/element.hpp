@@ -67,6 +67,9 @@ namespace UI
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
   };
 
+  GridPanelElement::
+    Slot Slot( GridPanelElement::Slot::Dimensions, sptr<Element> );
+
   struct StackPanelElement
   {
     u32 curr_index = 0;

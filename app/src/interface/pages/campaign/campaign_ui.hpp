@@ -15,13 +15,12 @@ namespace UI
   inline sptr<Element> CreateCampaignUI()
   {
     return {
-      GridPanel( "campaign_root", 3, 3 )
+      GridPanel( "campaign_root", 4, 3 )
         .FixedSize( GetScreenWidth(), GetScreenHeight() )
         .Children( {
           GridPanelElement::Slot{
-            { 1, 1, 2, 2 },
+            { 1, 2, 2, 2 },
             CreateSettlementContextPanel(),
-
           },
           // GridPanelElement::Slot{
           //   { 1, 1, 2, 2 },
