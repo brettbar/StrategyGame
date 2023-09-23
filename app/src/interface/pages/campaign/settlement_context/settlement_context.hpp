@@ -19,7 +19,6 @@ namespace UI
             "InterfaceUpdate::ID::SettlementContext %d\n", update.condition
           );
 
-          printf( "Currently enabled? %d\n", self.enabled );
           if ( update.condition )
             self.Enable();
           else

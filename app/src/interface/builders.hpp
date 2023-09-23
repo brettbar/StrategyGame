@@ -100,13 +100,26 @@ public:
       return std::move( element );
     }
 
+    StackPanelBuilder &StartsDisabled()
+    {
+      element->starts_disabled = true;
+      return *this;
+    }
+
+    StackPanelBuilder &FixedSize( f32 width, f32 height )
+    {
+      element->transform.width = width;
+      element->transform.height = height;
+      return *this;
+    }
+
     StackPanelBuilder &Background( Color background )
     {
       element->background = background;
       return *this;
     }
 
-    StackPanelBuilder &Subscribe(
+    StackPanelBuilder &On(
       InterfaceUpdate::ID update_id,
       std::function<void( Element &self, InterfaceUpdate::Update update )>
         update_fn

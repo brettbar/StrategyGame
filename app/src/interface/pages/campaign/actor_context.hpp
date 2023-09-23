@@ -8,43 +8,47 @@
 
 namespace UI
 {
-  // inline Element CreateActorContextPanel()
-  // {
-  //   return Panel( "actor_context_panel" )
-  //     .Anchor( Anchor::BottomMid )
-  //     .Background( Fade( BLACK, 0.5 ) )
-  //     .FixedSize( 800, 350 )
-  //     .On(
-  //       InterfaceUpdate::ID::ActorContext,
-  //       []( Element &self, InterfaceUpdate::Update update ) {
-  //         if ( update.condition )
-  //           self.Enable();
-  //         else
-  //           self.Disable();
-  //       }
-  //     )
-  //     .Children( {
-  //       Panel( "actor_actions_panel" )
-  //         .Children( {
-  //           TextButton( "actor_spawn_settlement_button" )
-  //             .Clickable( false )
-  //             .Background( RED )
-  //             .Text( "Spawn?", 26 )
-  //             .SetEvent(
-  //               InterfaceEvent::Data( InterfaceEvent::ID::ActorSpawnSettlment )
-  //             )
-  //             .On(
-  //               InterfaceUpdate::ID::ActorCanSpawnSettlement,
-  //               []( Element &self, InterfaceUpdate::Update update ) {
-  //                 self.UpdateClickable( update.condition );
+  inline sptr<Element> CreateActorContextPanel()
+  {
+    return GridPanel( "actor_context_panel", 4, 3 )
+      .StartsDisabled()
+      .Background( Fade( BLACK, 0.5 ) )
+      .On(
+        InterfaceUpdate::ID::ActorContext,
+        []( Element &self, InterfaceUpdate::Update update ) {
+          printf( "InterfaceUpdate::ID::ActorContext %d\n", update.condition );
 
-  //                 if ( update.condition )
-  //                   self.UpdateBackground( GREEN );
-  //                 else
-  //                   self.UpdateBackground( RED );
-  //               }
-  //             ),
-  //         } ),
-  //     } );
-  // }
+          if ( update.condition )
+            self.Enable();
+          else
+            self.Disable();
+        }
+      )
+      .Children( {
+        Slot(
+          { 0, 0, 0, 0 },
+          GridPanel( "actor_actions_panel", 1, 1 )
+            .Children( { Slot(
+              { 0, 0, 0, 0 },
+              TextButton( "actor_spawn_settlement_button", "Spawn?", 26 )
+                .Clickable( false )
+                .Background( RED )
+                .SetEvent( InterfaceEvent::Data(
+                  InterfaceEvent::ID::ActorSpawnSettlment
+                ) )
+                .On(
+                  InterfaceUpdate::ID::ActorCanSpawnSettlement,
+                  []( Element &self, InterfaceUpdate::Update update ) {
+                    self.UpdateClickable( update.condition );
+
+                    if ( update.condition )
+                      self.UpdateBackground( GREEN );
+                    else
+                      self.UpdateBackground( RED );
+                  }
+                )
+            ) } )
+        ),
+      } );
+  }
 }// namespace UI
