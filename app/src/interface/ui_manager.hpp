@@ -240,7 +240,7 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( GridPanelElement::Slot &slot: element->grid_panel->children )
+        for ( GridPanelElement::Slot &slot: element->grid_panel->filled_slots )
         {
           Interact( slot.child, mouse_went_up, mouse_went_down );
         }
@@ -320,7 +320,7 @@ private:
     {
       case Type::GridPanel:
       {
-        for ( GridPanelElement::Slot &slot: grid_panel->children )
+        for ( GridPanelElement::Slot &slot: grid_panel->filled_slots )
         {
           slot.child->Destroy();
         }

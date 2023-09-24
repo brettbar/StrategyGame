@@ -55,7 +55,15 @@ public:
 
     GridPanelBuilder &Children( list<GridPanelElement::Slot> children )
     {
-      element->grid_panel->children = children;
+      element->grid_panel->filled_slots = children;
+      return *this;
+    }
+
+    GridPanelBuilder &UpdateChildren(
+      func<void( GridPanelElement & )> update_children
+    )
+    {
+      element->grid_panel->update_children = update_children;
       return *this;
     }
   };

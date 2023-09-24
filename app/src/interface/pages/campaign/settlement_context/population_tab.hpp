@@ -9,7 +9,7 @@ namespace UI
     return GridPanel( "population_tab", 3, 3 )
       .Background( BLUE )
       .Children( {
-        Slot(
+        GridSlot(
           { 0, 0, 0, 0 },
           TextLabel( "settlement_name", "Uninhabited", 26 )
             .On(
@@ -22,7 +22,7 @@ namespace UI
               }
             )
         ),
-        Slot(
+        GridSlot(
           { 1, 1, 0, 0 },
           TextLabel( "settlement_population", "Uninhabited", 26 )
             .On(
@@ -35,7 +35,7 @@ namespace UI
               }
             )
         ),
-        Slot(
+        GridSlot(
           { 2, 2, 0, 0 },
           TextLabel( "settlement_development", "Uninhabited", 26 )
             .On(

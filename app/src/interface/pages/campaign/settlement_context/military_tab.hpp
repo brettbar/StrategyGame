@@ -12,7 +12,7 @@ namespace UI
   {
     return GridPanel( "recruitment_window", 3, 3 )
       .Children( {
-        Slot(
+        GridSlot(
           { 0, 0, 0, 0 },
           TextButton( "train_hastati", "Train", 24 )
             .Background( GREEN )
@@ -25,7 +25,7 @@ namespace UI
   {
     return GridPanel( "training_window", 3, 3 )
       .Children( {
-        Slot( { 0, 0, 0, 0 }, TextLabel( "training", "Training", 24 ) ),
+        GridSlot( { 0, 0, 0, 0 }, TextLabel( "training", "Training", 24 ) ),
       } );
   }
 
@@ -60,8 +60,8 @@ namespace UI
   {
     return GridPanel( "settlement_context_military", 3, 1 )
       .Children( {
-        Slot( { 0, 0, 0, 0 }, RecruitmentWindow() ),
-        Slot( { 1, 1, 0, 0 }, TrainingWindow() ),
+        GridSlot( { 0, 0, 0, 0 }, RecruitmentWindow() ),
+        GridSlot( { 1, 1, 0, 0 }, TrainingWindow() ),
         // GarrisonWindow(),
       } );
   }

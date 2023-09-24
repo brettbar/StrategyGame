@@ -50,12 +50,15 @@ namespace UI
     bool abs_size = false;
     u32 num_cols = 0;
     u32 num_rows = 0;
-    list<Slot> children = {};
+    list<Slot> filled_slots = {};
+
+    func<void( GridPanelElement & )> update_children;
 
     u32 GridIndex( u32, u32 );
 
     void Initialize( rect );
     void Enable( rect );
+    void Update();
     void Register();
     void Disable();
     void Resize( rect );
@@ -63,12 +66,15 @@ namespace UI
     void Draw( rect );
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
 
+    bool AlreadyHasChild( str );
+    void FillNextGridSlot( sptr<Element> );
+
     GridPanelElement() = delete;
     GridPanelElement( u32 c, u32 r ) : num_cols( c ), num_rows( r ) {}
   };
 
   GridPanelElement::
-    Slot Slot( GridPanelElement::Slot::Dimensions, sptr<Element> );
+    Slot GridSlot( GridPanelElement::Slot::Dimensions, sptr<Element> );
 
   struct StackPanelElement
   {

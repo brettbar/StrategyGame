@@ -26,12 +26,12 @@ namespace UI
         }
       )
       .Children( {
-        Slot(
+        GridSlot(
           { 0, 0, 0, 2 },
           GridPanel( "settlement_context_tab_group", 1, 5 )
             .Background( BLUE )
             .Children( {
-              Slot(
+              GridSlot(
                 { 0, 0, 0, 0 },
                 TextureButton(
                   "settlement_context_tab_population",
@@ -39,7 +39,7 @@ namespace UI
                   InterfaceEvent::ID::SettlementContextPopulationTab
                 )
               ),
-              Slot(
+              GridSlot(
                 { 0, 0, 1, 1 },
                 TextureButton(
                   "settlement_context_tab_construction",
@@ -47,7 +47,7 @@ namespace UI
                   InterfaceEvent::ID::SettlementContextConstructionTab
                 )
               ),
-              Slot(
+              GridSlot(
                 { 0, 0, 2, 2 },
                 TextureButton(
                   "settlement_context_tab_resources",
@@ -55,7 +55,7 @@ namespace UI
                   InterfaceEvent::ID::SettlementContextResourcesTab
                 )
               ),
-              Slot(
+              GridSlot(
                 { 0, 0, 3, 3 },
                 TextureButton(
                   "settlement_context_tab_garrison",
@@ -64,7 +64,7 @@ namespace UI
                 )
               ),
 
-              Slot(
+              GridSlot(
                 { 0, 0, 4, 4 },
                 TextureButton(
                   "settlement_context_tab_culture",
@@ -75,7 +75,7 @@ namespace UI
             } )
         ),
 
-        Slot(
+        GridSlot(
           { 1, 3, 0, 2 },
           StackPanel(
             "settlement_context_content",
@@ -85,10 +85,10 @@ namespace UI
               GridPanel( "resources_tab", 3, 3 )
                 .Background( PURPLE )
                 .Children( {
-                  GridPanelElement::Slot{
+                  GridSlot(
                     { 1, 1, 1, 1 },
-                    TextLabel( "resources_tab_content", "Resources Tab", 32 ),
-                  },
+                    TextLabel( "resources_tab_content", "Resources Tab", 32 )
+                  ),
                 } ),
 
               CreateSettlementContextTabConstruction(),

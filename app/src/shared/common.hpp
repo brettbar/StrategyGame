@@ -22,6 +22,12 @@ using hstr = entt::hashed_string;
 using vec2 = Vector2;
 using rect = Rectangle;
 
+template<typename K, typename V>
+using map = std::map<K, V>;
+
+template<typename T>
+using func = std::function<T>;
+
 template<typename T>
 using list = std::vector<T>;
 

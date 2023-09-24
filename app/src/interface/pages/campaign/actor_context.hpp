@@ -25,10 +25,10 @@ namespace UI
         }
       )
       .Children( {
-        Slot(
+        GridSlot(
           { 0, 0, 0, 0 },
           GridPanel( "actor_actions_panel", 1, 1 )
-            .Children( { Slot(
+            .Children( { GridSlot(
               { 0, 0, 0, 0 },
               TextButton( "actor_spawn_settlement_button", "Spawn?", 26 )
                 .Clickable( false )
