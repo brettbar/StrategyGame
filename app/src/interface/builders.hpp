@@ -59,9 +59,7 @@ public:
       return *this;
     }
 
-    GridPanelBuilder &UpdateChildren(
-      func<void( GridPanelElement & )> update_children
-    )
+    GridPanelBuilder &UpdateChildren( func<void( Element & )> update_children )
     {
       element->grid_panel->update_children = update_children;
       return *this;

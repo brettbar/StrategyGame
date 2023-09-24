@@ -54,6 +54,8 @@ namespace UI
     u32 next_col = next_child_index % num_cols;
     u32 next_row = ( next_child_index - next_col ) / num_cols;
 
+    std::cout << "FillNextGridSlot " << next_col << " " << next_row << "\n";
+
     // TODO account for multiple slot spanning children
     this->filled_slots.push_back(
       GridSlot( { next_col, next_col, next_row, next_row }, new_child )
@@ -62,9 +64,9 @@ namespace UI
 
   void GridPanelElement::Update()
   {
-    if ( update_children )
+    for ( auto &slot: filled_slots )
     {
-      update_children( *this );
+      slot.child->Update();
     }
   }
 

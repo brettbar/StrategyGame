@@ -120,10 +120,9 @@ namespace UI
 
       InterfaceUpdate::dispatcher.update();
 
-      Manager()->ActivePage()->Update();
-
       Manager()->over_any_elem = false;
 
+      Manager()->ActivePage()->Update();
       Manager()->ActivePage()->ResizeRecursive();
       Manager()->ActivePage()->RepositionRecursive();
       Interact( Manager()->ActivePage(), mouseWentUp, mouseWentDown );

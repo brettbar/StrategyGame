@@ -45,20 +45,20 @@ namespace UI
         GridSlot(
           { 0, 0, 3, 3 },
           GridPanel( "settlement_context_building_list", 5, 4 )
-            .UpdateChildren( []( GridPanelElement &self ) {
+            .UpdateChildren( []( Element &self ) {
+              printf( "UpdateChildren!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" );
+
               std::vector<Buildings::Building> buildings =
                 SettlementSystem::SelectedSettlementBuildingList();
 
               for ( auto building: buildings )
               {
-
                 str building_name = "building_list_item_" + building.name_str;
-
                 str id = "building_list_item_" + building.name_str;
 
-                if ( !self.AlreadyHasChild( id ) )
+                if ( !self.grid_panel->AlreadyHasChild( id ) )
                 {
-                  self.FillNextGridSlot(
+                  self.grid_panel->FillNextGridSlot(
                     GridPanel( id, 1, 5 )
                       .Children( {
                         GridSlot(

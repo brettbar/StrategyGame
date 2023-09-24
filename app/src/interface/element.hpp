@@ -11,7 +11,6 @@ namespace UI
   enum class Type : u32
   {
     GridPanel,
-    DataPanel,
     StackPanel,
     TextLabel,
     TextButton,
@@ -52,7 +51,7 @@ namespace UI
     u32 num_rows = 0;
     list<Slot> filled_slots = {};
 
-    func<void( GridPanelElement & )> update_children;
+    func<void( Element & )> update_children = {};
 
     u32 GridIndex( u32, u32 );
 
@@ -222,10 +221,6 @@ namespace UI
     sptr<TextButtonElement> text_button = nullptr;
     sptr<TextureLabelElement> texture_label = nullptr;
     sptr<TextureButtonElement> texture_button = nullptr;
-
-    //DataPanel
-    std::map<std::string, Element> data_points = {};
-    std::function<void( Element & )> self_update = {};
 
     list<InterfaceUpdate::ID> subscribed_updates = {};
     std::map<

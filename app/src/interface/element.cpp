@@ -12,9 +12,6 @@ namespace UI
       case Type::GridPanel:
         grid_panel->Register();
         break;
-      case Type::DataPanel:
-        // DataPanelRegister();
-        break;
       case Type::StackPanel:
         stack_panel->Register();
         break;
@@ -33,9 +30,6 @@ namespace UI
       case Type::GridPanel:
         grid_panel->Initialize( transform );
         break;
-      case Type::DataPanel:
-        // DataPanelEnable();
-        break;
       case Type::StackPanel:
         stack_panel->Initialize( transform );
         break;
@@ -50,9 +44,6 @@ namespace UI
       case Type::GridPanel:
         grid_panel->Enable( transform );
         break;
-      case Type::DataPanel:
-        // DataPanelEnable();
-        break;
       case Type::StackPanel:
         stack_panel->Enable( transform );
         break;
@@ -66,9 +57,6 @@ namespace UI
       case Type::GridPanel:
         grid_panel->Disable();
         break;
-      case Type::DataPanel:
-        // DataPanelDisable();
-        break;
       case Type::StackPanel:
         stack_panel->Disable();
         break;
@@ -76,22 +64,37 @@ namespace UI
     enabled = false;
   }
 
-  // TODO This should only be called for Panels
-  void Element::ResizeRecursive()
-  {
-    bool is_panel = type == Type::GridPanel || type == Type::DataPanel ||
-                    type == Type::StackPanel;
 
-    if ( !is_panel )
+  void Element::Update()
+  {
+    if ( !enabled )
       return;
 
     switch ( type )
     {
       case Type::GridPanel:
+      {
+        if ( grid_panel->update_children )
+        {
+          grid_panel->update_children( *this );
+        }
+        grid_panel->Update();
+      }
+      break;
+      case Type::StackPanel:
+      {
+        stack_panel->tabs[stack_panel->curr_index]->Update();
+      }
+      break;
+    }
+  }
+
+  void Element::ResizeRecursive()
+  {
+    switch ( type )
+    {
+      case Type::GridPanel:
         grid_panel->Resize( transform );
-        break;
-      case Type::DataPanel:
-        // DataPanelResize();
         break;
       case Type::StackPanel:
         stack_panel->Resize( transform );
@@ -100,23 +103,12 @@ namespace UI
   }
 
 
-  // TODO This should only be called for Panels
   void Element::RepositionRecursive()
   {
-    bool is_panel = type == Type::GridPanel || type == Type::DataPanel ||
-                    type == Type::StackPanel;
-
-    if ( !is_panel )
-      return;
-
-
     switch ( type )
     {
       case Type::GridPanel:
         grid_panel->Reposition( transform );
-        break;
-      case Type::DataPanel:
-        // DataPanelReposition();
         break;
       case Type::StackPanel:
         stack_panel->Reposition( transform );
@@ -166,35 +158,9 @@ namespace UI
       case Type::GridPanel:
         grid_panel->ExecuteInterfaceUpdate( update );
         break;
-      case Type::DataPanel:
-        // DataPanelExecuteInterfaceUpdate( update );
-        break;
       case Type::StackPanel:
         stack_panel->ExecuteInterfaceUpdate( update );
         break;
-    }
-  }
-
-  void Element::Update()
-  {
-    if ( !enabled )
-      return;
-
-    switch ( type )
-    {
-      case Type::GridPanel:
-      {
-        grid_panel->Update();
-      }
-      break;
-      case Type::DataPanel:
-      {
-        if ( self_update )
-        {
-          self_update( *this );
-        }
-      }
-      break;
     }
   }
 
@@ -210,9 +176,6 @@ namespace UI
       case Type::GridPanel:
         DrawRectangleRec( transform, background );
         grid_panel->Draw( transform );
-        break;
-      case Type::DataPanel:
-        // DataPanelDraw();
         break;
       case Type::StackPanel:
         DrawRectangleRec( transform, background );
