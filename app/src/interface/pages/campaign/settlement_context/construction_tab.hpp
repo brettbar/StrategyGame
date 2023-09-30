@@ -46,8 +46,6 @@ namespace UI
           { 0, 0, 3, 3 },
           GridPanel( "settlement_context_building_list", 5, 4 )
             .UpdateChildren( []( Element &self ) {
-              printf( "UpdateChildren!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" );
-
               std::vector<Buildings::Building> buildings =
                 SettlementSystem::SelectedSettlementBuildingList();
 

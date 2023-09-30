@@ -48,18 +48,24 @@ namespace UI
 
   void GridPanelElement::FillNextGridSlot( sptr<Element> new_child )
   {
-    u32 num_children = filled_slots.size();
-    u32 next_child_index = ( num_rows * num_cols ) - num_children;
-
+    u32 next_child_index = ( num_rows * num_cols ) - filled_slots.size();
     u32 next_col = next_child_index % num_cols;
     u32 next_row = ( next_child_index - next_col ) / num_cols;
 
+    std::cout << "Num Children " << filled_slots.size() << "\n";
+    std::cout << "Rows x Columns " << num_cols << " " << num_rows << "\n";
+    std::cout << "NextChildIndex " << next_child_index << "\n";
     std::cout << "FillNextGridSlot " << next_col << " " << next_row << "\n";
 
-    // TODO account for multiple slot spanning children
-    this->filled_slots.push_back(
-      GridSlot( { next_col, next_col, next_row, next_row }, new_child )
-    );
+
+    // TODO This keeps filling until it hits 20
+    if ( next_child_index < ( num_rows * num_cols ) )
+    {
+      // TODO account for multiple slot spanning children
+      this->filled_slots.push_back(
+        GridSlot( { next_col, next_col, next_row, next_row }, new_child )
+      );
+    }
   }
 
   void GridPanelElement::Update()
@@ -112,7 +118,6 @@ namespace UI
     {
       slot.child->transform.x = transform.x + slot.dims.start_col * slot_width;
       slot.child->transform.y = transform.y + slot.dims.start_row * slot_height;
-
       slot.child->RepositionRecursive();
     }
   }
@@ -130,7 +135,6 @@ namespace UI
 
       slot.child->transform.width = slot_width * num_wide;
       slot.child->transform.height = slot_height * num_tall;
-
       slot.child->ResizeRecursive();
     }
   }
