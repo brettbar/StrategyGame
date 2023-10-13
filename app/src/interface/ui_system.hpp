@@ -10,12 +10,10 @@
 #include "pages/singleplayer_lobby.hpp"
 #include "ui_manager.hpp"
 
-namespace UI
-{
+namespace UI {
   struct UpdateListener
   {
-    void ReceiveUpdate( const InterfaceUpdate::Update &update )
-    {
+    void ReceiveUpdate( const InterfaceUpdate::Update &update ) {
       // for ( auto &panel: )
       // {
       //   // TODO probably add a check that if the element is disabled we dont want to fire updates,
@@ -27,22 +25,19 @@ namespace UI
       Manager()->ActivePage()->ExecuteInterfaceUpdate( update );
     }
 
-    void Listen()
-    {
+    void Listen() {
       InterfaceUpdate::dispatcher.sink<InterfaceUpdate::Update>()
         .connect<&UpdateListener::ReceiveUpdate>( this );
     }
   };
 
-  namespace System
-  {
+  namespace System {
     void EnableContent();
     void DisableCurrentContent();
 
     void Draw();
 
-    inline void Init()
-    {
+    inline void Init() {
       Manager()->pages = {
         CreateMainMenuUI(),
         CreateFactionSelectMenuUI(),
@@ -68,36 +63,31 @@ namespace UI
       EnableContent();
     }
 
-    inline void SwitchPage( PageType page )
-    {
+    inline void SwitchPage( PageType page ) {
       DisableCurrentContent();
       Manager()->SetScene( page );
       EnableContent();
     }
 
-    inline void InitCampaignUI()
-    {
+    inline void InitCampaignUI() {
       DisableCurrentContent();
       Manager()->SetScene( Campaign );
       Manager()->ActivePage()->Initialize();
     }
 
-    inline void EnableContent()
-    {
+    inline void EnableContent() {
       if ( Manager()->ActivePage()->starts_disabled )
         return;
 
       Manager()->ActivePage()->Enable();
     }
 
-    inline void DisableCurrentContent()
-    {
+    inline void DisableCurrentContent() {
       Manager()->SetContextNull();
       Manager()->ActivePage()->Disable();
     }
 
-    inline void UpdateOnFrame()
-    {
+    inline void UpdateOnFrame() {
       vec2 mousePos = GetMousePosition();
       bool mouseWentUp = IsMouseButtonReleased( 0 );
       bool mouseWentDown = IsMouseButtonPressed( 0 );
@@ -105,16 +95,13 @@ namespace UI
       const f32 screen_width = GetScreenWidth();
       const f32 screen_height = GetScreenHeight();
 
-      if ( screen_width >= 3840 )
-      {
+      if ( screen_width >= 3840 ) {
         SCALE = 1.5;
       }
-      else if ( screen_width >= 2560 )
-      {
+      else if ( screen_width >= 2560 ) {
         SCALE = 1.25;
       }
-      else
-      {
+      else {
         SCALE = 1.0;
       }
 
@@ -135,8 +122,7 @@ namespace UI
         Manager()->SetContextNull();
     }
 
-    inline void Draw()
-    {
+    inline void Draw() {
       Manager()->ActivePage()->Draw();
 
       // Manager()->debug.Draw();

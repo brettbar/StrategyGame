@@ -13,36 +13,29 @@
 #include "../../signals/updates.hpp"
 
 
-namespace SelectionSystem
-{
+namespace SelectionSystem {
 
   template<typename T>
-  inline void ClearSelection( view<T> component_view )
-  {
-    for ( entt::entity entity: component_view )
-    {
+  inline void ClearSelection( view<T> component_view ) {
+    for ( entt::entity entity: component_view ) {
       T &component = Global::world.get<T>( entity );
       component.selected = false;
       Global::world.remove<Selected::Component>( entity );
     }
   }
 
-  inline entt::entity GetSelectedEntity()
-  {
+  inline entt::entity GetSelectedEntity() {
     return Global::world.view<Selected::Component>().front();
   }
 
-  inline void Draw( TextureCache &cache, bool isDebug )
-  {
+  inline void Draw( TextureCache &cache, bool isDebug ) {
     auto provsView =
       Global::world.view<Province::Component, Selected::Component>();
 
-    for ( auto entity: provsView )
-    {
+    for ( auto entity: provsView ) {
       auto &prov = provsView.get<Province::Component>( entity );
 
-      if ( isDebug )
-      {
+      if ( isDebug ) {
         DrawTexture(
           cache[hstr{ "tile_outline" }]->texture,
           prov.tile->position.x,
@@ -54,28 +47,24 @@ namespace SelectionSystem
   }
 
 
-  inline void CheckSelectActors( vec2 click_pos, std::string player_id )
-  {
+  inline void CheckSelectActors( vec2 click_pos, std::string player_id ) {
     auto actors_view = Global::world.view<Actor::Component>();
     auto player_view = Global::world.view<Player::Component>();
     auto selected_entity = Global::world.view<Selected::Component>().front();
 
     entt::entity owner_e = entt::null;
 
-    for ( auto player_e: player_view )
-    {
+    for ( auto player_e: player_view ) {
       Player::Component player_c =
         player_view.get<Player::Component>( player_e );
 
-      if ( player_id == player_c.player_id )
-      {
+      if ( player_id == player_c.player_id ) {
         owner_e = player_e;
       }
     }
 
     // use forward iterators and get only the components of interest
-    for ( auto &entity: actors_view )
-    {
+    for ( auto &entity: actors_view ) {
       if ( selected_entity != entt::null )
         return;
 
@@ -84,8 +73,7 @@ namespace SelectionSystem
       if ( actor.owner != owner_e )
         continue;
 
-      if ( CheckCollisionPointCircle( actor.position, click_pos, 32 ) )
-      {
+      if ( CheckCollisionPointCircle( actor.position, click_pos, 32 ) ) {
         Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
@@ -105,8 +93,7 @@ namespace SelectionSystem
     }
   }
 
-  inline void CheckSelectProvince( vec2 click_pos, std::string player_id )
-  {
+  inline void CheckSelectProvince( vec2 click_pos, std::string player_id ) {
     i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
     auto prov_view = Global::world.view<Province::Component>();
     auto selected_entity = Global::world.view<Selected::Component>().front();
@@ -114,15 +101,13 @@ namespace SelectionSystem
     if ( tile_pos_id == -1 )
       return;
 
-    for ( auto &entity: prov_view )
-    {
+    for ( auto &entity: prov_view ) {
       if ( selected_entity != entt::null )
         return;
 
       auto &prov = prov_view.get<Province::Component>( entity );
 
-      if ( tile_pos_id == prov.tile->id )
-      {
+      if ( tile_pos_id == prov.tile->id ) {
         Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
@@ -130,8 +115,7 @@ namespace SelectionSystem
 
         selected_entity = entity;
 
-        if ( Global::world.all_of<Settlement::Component>( selected_entity ) )
-        {
+        if ( Global::world.all_of<Settlement::Component>( selected_entity ) ) {
           Settlement::Component settlement =
             Global::world.get<Settlement::Component>( selected_entity );
 
@@ -149,8 +133,7 @@ namespace SelectionSystem
           }
             .Send();
         }
-        else
-        {
+        else {
           InterfaceUpdate::Update{
             .id = InterfaceUpdate::ID::SettlementContext,
             .condition = true,
@@ -169,8 +152,7 @@ namespace SelectionSystem
     }
   }
 
-  inline void UpdateSelection( Vector2 click_pos, std::string player_id )
-  {
+  inline void UpdateSelection( Vector2 click_pos, std::string player_id ) {
     view<Actor::Component> actors_view = Global::world.view<Actor::Component>();
     view<Province::Component> prov_view =
       Global::world.view<Province::Component>();

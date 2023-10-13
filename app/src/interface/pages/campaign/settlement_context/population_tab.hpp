@@ -2,10 +2,8 @@
 #include "../../../element.hpp"
 
 
-namespace UI
-{
-  inline sptr<Element> CreateSettlementContextTabPopulation()
-  {
+namespace UI {
+  inline sptr<Element> CreateSettlementContextTabPopulation() {
     return GridPanel( "population_tab", 3, 3 )
       .Background( BLUE )
       .Children( {
@@ -15,8 +13,7 @@ namespace UI
             .On(
               InterfaceUpdate::ID::SettlementContext,
               []( Element &self, InterfaceUpdate::Update update ) {
-                if ( update.condition )
-                {
+                if ( update.condition ) {
                   self.UpdateText( update.json["name"] );
                 }
               }
@@ -26,10 +23,9 @@ namespace UI
           { 1, 1, 0, 0 },
           TextLabel( "settlement_population", "Uninhabited", 26 )
             .On(
-              InterfaceUpdate::ID::SettlementContext,
+              InterfaceUpdate::ID::SettlementPopUpdated,
               []( Element &self, InterfaceUpdate::Update update ) {
-                if ( update.condition )
-                {
+                if ( update.condition ) {
                   self.UpdateText( update.json["population"] );
                 }
               }
@@ -41,8 +37,7 @@ namespace UI
             .On(
               InterfaceUpdate::ID::SettlementContext,
               []( Element &self, InterfaceUpdate::Update update ) {
-                if ( update.condition )
-                {
+                if ( update.condition ) {
                   self.UpdateText( update.json["development"] );
                 }
               }

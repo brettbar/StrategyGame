@@ -41,8 +41,7 @@ namespace fs = std::filesystem;
 void LoadResources();
 
 
-void SteamAPIDebugTextHook( int severity, const char *msg )
-{
+void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "S::%d", severity );
   printf( "%s\n", msg );
 }
@@ -52,29 +51,24 @@ void SteamAPIDebugTextHook( int severity, const char *msg )
   Main application entrypoint
 ========================================================
 */
-int main()
-{
+int main() {
   Global::mp_capable = true;
 
-  if ( SteamAPI_RestartAppIfNecessary( 480 ) )
-  {
+  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
     Global::mp_capable = false;
   }
 
-  if ( !SteamAPI_Init() )
-  {
+  if ( !SteamAPI_Init() ) {
     printf( "SteamAPI_Init() failed!\n" );
     Global::mp_capable = false;
   }
 
-  if ( !SteamUser()->BLoggedOn() )
-  {
+  if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
     Global::mp_capable = false;
   }
 
-  if ( !SteamInput()->Init( false ) )
-  {
+  if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
     Global::mp_capable = false;
   }
@@ -99,8 +93,7 @@ int main()
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever
   UnloadShader( Renderer::shader );
-  for ( auto resource: Global::texture_cache )
-  {
+  for ( auto resource: Global::texture_cache ) {
     UnloadTexture( resource.second->texture );
   }
   Global::texture_cache.clear();
@@ -110,8 +103,7 @@ int main()
   return EXIT_SUCCESS;
 }
 
-Image InitTileOutline()
-{
+Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
   // N -> NE
@@ -130,8 +122,7 @@ Image InitTileOutline()
   return base;
 }
 
-void LoadResources()
-{
+void LoadResources() {
   std::string asset_folder = "app/assets/";
 
   LoadResource(
@@ -306,8 +297,7 @@ void LoadResources()
   );
 
   std::string path = asset_folder + "/images/resources";
-  for ( const auto &entry: fs::directory_iterator( path ) )
-  {
+  for ( const auto &entry: fs::directory_iterator( path ) ) {
     std::cout << entry.path().filename() << std::endl;
 
     std::string filename = entry.path().filename().generic_string();

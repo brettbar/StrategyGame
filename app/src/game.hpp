@@ -16,29 +16,24 @@
 
 #include "campaign.hpp"
 
-enum class ProgramMode
-{
+enum class ProgramMode {
   MainMenu,
   ModalMenu,
   Campaign,
   Editor,
 };
 
-class IGame
-{
+class IGame {
   public:
-  static IGame *Game()
-  {
+  static IGame *Game() {
     static IGame instance;
     return &instance;
   }
 
-  void MainLoop()
-  {
+  void MainLoop() {
     RegisterEventListeners();
 
-    while ( !WindowShouldClose() && ShouldRun() )
-    {
+    while ( !WindowShouldClose() && ShouldRun() ) {
       SteamAPI_RunCallbacks();
 
       // 1. Update Time
@@ -49,8 +44,7 @@ class IGame
       // 5. Run all Updates
       {
         // Update 60 times a second
-        while ( _lag >= _MS_PER_UPDATE )
-        {
+        while ( _lag >= _MS_PER_UPDATE ) {
           if ( _campaign )
             _campaign->Update60TPS();
           _lag -= _MS_PER_UPDATE;
@@ -72,8 +66,7 @@ class IGame
         // Update once per second but modified by timeScale
         // TODO? Do we want to fold this timescale business into campaign itself
         // Since we dont care about timescale in other program_modes
-        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
-        {
+        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
           if ( _campaign )
             _campaign->Update1TPS();
           _oncelag = 0.0f;
@@ -90,8 +83,7 @@ class IGame
     ExitGameLoopCleanup();
   }
 
-  Campaign *GetCampaign()
-  {
+  Campaign *GetCampaign() {
     return _campaign;
   }
 
@@ -119,13 +111,11 @@ class IGame
   void operator=( const IGame & ) = delete;
 
   IGame() {}
-  ~IGame()
-  {
+  ~IGame() {
     delete _campaign;
   }
 
-  bool ShouldRun()
-  {
+  bool ShouldRun() {
     return !_hit_exit;
   }
 
@@ -133,8 +123,7 @@ class IGame
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartSingleplayerCampaign( std::string player_faction )
-  {
+  void StartSingleplayerCampaign( std::string player_faction ) {
     printf( "pending new!!\n" );
 
     if ( _campaign )
@@ -163,8 +152,7 @@ class IGame
   /*=============================================================
                         Begin: Multiplayer
   =============================================================*/
-  void HostMultiplayerLobby()
-  {
+  void HostMultiplayerLobby() {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
@@ -177,8 +165,7 @@ class IGame
       .Send();
   }
 
-  void HostStartMultiplayerCampaign()
-  {
+  void HostStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
@@ -186,8 +173,7 @@ class IGame
 
     UI::System::InitCampaignUI();
 
-    for ( auto client: Network::Host()->_clients )
-    {
+    for ( auto client: Network::Host()->_clients ) {
       if ( !client.peer_data.active )
         continue;
 
@@ -207,8 +193,7 @@ class IGame
     }
 
     for ( auto player_e:
-          Global::world.view<Player::Component, Faction::Component>() )
-    {
+          Global::world.view<Player::Component, Faction::Component>() ) {
       Player::Component player =
         Global::world.get<Player::Component>( player_e );
       Faction::Component faction =
@@ -216,12 +201,10 @@ class IGame
 
       std::cout << "Initialized Player: " << player.player_id << '\n';
       std::cout << "Faction: " << faction.id << '\n';
-      if ( Global::world.any_of<Player::LocalTag>( player_e ) )
-      {
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
         std::cout << "with LocalTag!" << '\n';
       }
-      if ( Global::world.any_of<Player::RemoteTag>( player_e ) )
-      {
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
         std::cout << "with RemoteTag!" << '\n';
       }
     }
@@ -230,8 +213,7 @@ class IGame
     Game()->_mode = ProgramMode::Campaign;
   }
 
-  void ClientStartMultiplayerCampaign()
-  {
+  void ClientStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
@@ -239,8 +221,7 @@ class IGame
 
     UI::System::InitCampaignUI();
 
-    for ( auto peer: Network::Client()->_peers )
-    {
+    for ( auto peer: Network::Client()->_peers ) {
       if ( !peer.active )
         continue;
 
@@ -260,8 +241,7 @@ class IGame
     }
 
     for ( auto player_e:
-          Global::world.view<Player::Component, Faction::Component>() )
-    {
+          Global::world.view<Player::Component, Faction::Component>() ) {
       Player::Component player =
         Global::world.get<Player::Component>( player_e );
       Faction::Component faction =
@@ -269,12 +249,10 @@ class IGame
 
       std::cout << "Initialized Player: " << player.player_id << '\n';
       std::cout << "Faction: " << faction.id << '\n';
-      if ( Global::world.any_of<Player::LocalTag>( player_e ) )
-      {
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
         std::cout << "with LocalTag!" << '\n';
       }
-      if ( Global::world.any_of<Player::RemoteTag>( player_e ) )
-      {
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
         std::cout << "with RemoteTag!" << '\n';
       }
     }
@@ -282,24 +260,21 @@ class IGame
     Game()->_mode = ProgramMode::Campaign;
   }
 
-  void LookForMultiplayerLobby()
-  {
+  void LookForMultiplayerLobby() {
     _single_player = false;
     Network::is_host = false;
     Network::Client()->Init();
     UI::System::SwitchPage( UI::LobbyBrowser );
   }
 
-  void JoinMultiplayerLobby( CSteamID lobby_id )
-  {
+  void JoinMultiplayerLobby( CSteamID lobby_id ) {
     InterfaceUpdate::Update{
       .id = InterfaceUpdate::ID::JoinLobby,
       .player_id = "player_0",
     }
       .Send();
 
-    if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
-    {
+    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
       printf( "Sending joined lobby event!\n" );
       UI::System::SwitchPage( UI::Lobby );
     }
@@ -312,8 +287,7 @@ class IGame
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadGame()
-  {
+  void LoadGame() {
     if ( _campaign )
       delete _campaign;
     _campaign = new class Campaign( "output.dat" );
@@ -322,41 +296,33 @@ class IGame
     Game()->_mode = ProgramMode::Campaign;
   }
 
-  void SaveGame()
-  {
+  void SaveGame() {
     SaveSystem::Save();
   }
 
-  void ExitGame()
-  {
+  void ExitGame() {
     _hit_exit = true;
   }
 
-  void ToggleModalMenu()
-  {
-    if ( _mode == ProgramMode::Campaign )
-    {
+  void ToggleModalMenu() {
+    if ( _mode == ProgramMode::Campaign ) {
       _mode = ProgramMode::ModalMenu;
       UI::System::SwitchPage( UI::ModalMenu );
     }
-    else if ( _mode == ProgramMode::ModalMenu )
-    {
+    else if ( _mode == ProgramMode::ModalMenu ) {
       _mode = ProgramMode::Campaign;
       UI::System::InitCampaignUI();
     }
   }
 
-  void ReturnToMain()
-  {
+  void ReturnToMain() {
     UI::System::SwitchPage( UI::MainMenu );
     _mode = ProgramMode::MainMenu;
   }
 
 
-  inline void CheckMenuToggle()
-  {
-    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) )
-    {
+  inline void CheckMenuToggle() {
+    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
       InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
         InterfaceEvent::ID::ModalMenuToggle,
       } );
@@ -367,21 +333,16 @@ class IGame
   =============================================================*/
 
 
-  void UpdateOnFrame()
-  {
-    if ( Network::is_host )
-    {
+  void UpdateOnFrame() {
+    if ( Network::is_host ) {
       Network::Host()->Update();
     }
-    else
-    {
+    else {
       Network::Client()->Update();
     }
 
-    switch ( _mode )
-    {
-      case ProgramMode::MainMenu:
-      {
+    switch ( _mode ) {
+      case ProgramMode::MainMenu: {
         UI::System::UpdateOnFrame();
 
         CameraUpdate( Global::state.camera, _dt );
@@ -392,11 +353,9 @@ class IGame
           Renderer::DrawUI();
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
-      case ProgramMode::ModalMenu:
-      {
+      case ProgramMode::ModalMenu: {
         CheckMenuToggle();
 
         UI::System::UpdateOnFrame();
@@ -410,21 +369,17 @@ class IGame
           Renderer::DrawUI();
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
-      case ProgramMode::Campaign:
-      {
+      case ProgramMode::Campaign: {
         CheckMenuToggle();
 
-        if ( _single_player )
-        {
+        if ( _single_player ) {
           // Singleplayer Campaign
           if ( _campaign )
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
         }
-        else
-        {
+        else {
           // Multiplayer Campaign
           if ( _campaign )
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
@@ -440,16 +395,14 @@ class IGame
           DrawFPS( GetScreenWidth() - 100, 2 );
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
       case ProgramMode::Editor:
         break;
     }
   }
 
-  void ExitGameLoopCleanup()
-  {
+  void ExitGameLoopCleanup() {
     if ( Network::is_host )
       Network::Host()->Delete();
     else
@@ -464,14 +417,12 @@ class IGame
   void RegisterEventListeners();
 };
 
-inline void IGame::RegisterEventListeners()
-{
+inline void IGame::RegisterEventListeners() {
   InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
     [&](
       const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
     ) {
-      switch ( event.event_id )
-      {
+      switch ( event.event_id ) {
         /// BASIC
         // MainMenu
         case InterfaceEvent::ID::MainMenuHostGame:
@@ -480,12 +431,10 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::MainMenuJoinGame:
           LookForMultiplayerLobby();
           break;
-        case InterfaceEvent::ID::MainMenuStartGame:
-        {
+        case InterfaceEvent::ID::MainMenuStartGame: {
           _single_player = true;
           UI::System::SwitchPage( UI::SinglePlayerLobby );
-        }
-        break;
+        } break;
         case InterfaceEvent::ID::MainMenuLoadGame:
           LoadGame();
           break;
@@ -517,39 +466,27 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::ReturnToMain:
           ReturnToMain();
           break;
-        case InterfaceEvent::ID::PlayerToggledReady:
-        {
-          if ( Network::is_host )
-          {
+        case InterfaceEvent::ID::PlayerToggledReady: {
+          if ( Network::is_host ) {
             Network::Host()->ToggleReady();
           }
-          else
-          {
+          else {
             Network::Client()->ToggleReady();
           }
-        }
-        break;
-        case InterfaceEvent::ID::HostStartGame:
-        {
+        } break;
+        case InterfaceEvent::ID::HostStartGame: {
           Network::Host()->StartHostedCampaign();
           HostStartMultiplayerCampaign();
-        }
-        break;
-        case InterfaceEvent::ID::JoinHostedCampaign:
-        {
+        } break;
+        case InterfaceEvent::ID::JoinHostedCampaign: {
           ClientStartMultiplayerCampaign();
-        }
-        break;
-        case InterfaceEvent::ID::JoinLobby:
-        {
-          if ( event.msg == "lobby_entry_Conquistador's lobby" )
-          {
+        } break;
+        case InterfaceEvent::ID::JoinLobby: {
+          if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
             JoinMultiplayerLobby( event.lobby_id );
           }
-        }
-        break;
-        case InterfaceEvent::ID::FactionSelected:
-        {
+        } break;
+        case InterfaceEvent::ID::FactionSelected: {
           printf(
             "In listener, %s %s\n",
             InterfaceEvent::IDString[(u32) InterfaceEvent::ID::FactionSelected],
@@ -558,8 +495,7 @@ inline void IGame::RegisterEventListeners()
 
           faction = event.msg;
 
-          if ( _single_player )
-          {
+          if ( _single_player ) {
             InterfaceUpdate::Update{
               .id = InterfaceUpdate::ID::PlayerSelectedFaction,
               .update_txt = faction,
@@ -569,12 +505,10 @@ inline void IGame::RegisterEventListeners()
 
             UI::System::SwitchPage( UI::SinglePlayerLobby );
           }
-          else
-          {
+          else {
             std::string player_id = "";
 
-            if ( Network::is_host )
-            {
+            if ( Network::is_host ) {
               player_id = Network::Host()->_player_id;
               Network::Host()->SetHostFaction( faction );
               Network::Host()->SendMessageToAllActiveClients( Network::Message{
@@ -585,8 +519,7 @@ inline void IGame::RegisterEventListeners()
                 },
               } );
             }
-            else
-            {
+            else {
               player_id = Network::Client()->_local_player_id;
               Network::Client()->SendMessageToHost( Network::Message{
                 Network::MessageID::PlayerFactionSelect,
@@ -606,15 +539,12 @@ inline void IGame::RegisterEventListeners()
 
             UI::System::SwitchPage( UI::Lobby );
           }
-        }
-        break;
+        } break;
 
-        case InterfaceEvent::ID::ClientReceivedCommand:
-        {
+        case InterfaceEvent::ID::ClientReceivedCommand: {
           if ( _campaign )
             _campaign->ConvertCommandRequest( event.msg );
-        }
-        break;
+        } break;
 
         // TODO(??) maybe we just need a separate queue or something
         // for the campaign
@@ -624,12 +554,10 @@ inline void IGame::RegisterEventListeners()
         case InterfaceEvent::ID::SettlementContextResourcesTab:
         case InterfaceEvent::ID::SettlementContextConstructionTab:
         case InterfaceEvent::ID::SettlementContextConstructBuilding:
-        case InterfaceEvent::ID::SettlementContextTrainHastati:
-        {
+        case InterfaceEvent::ID::SettlementContextTrainHastati: {
           if ( _campaign )
             _campaign->ForwardEvent( event );
-        }
-        break;
+        } break;
 
         default:
           printf( "Error, unregistered UI event fired\n" );
@@ -639,7 +567,6 @@ inline void IGame::RegisterEventListeners()
   );
 }
 
-inline IGame *Game()
-{
+inline IGame *Game() {
   return IGame::Game();
 }

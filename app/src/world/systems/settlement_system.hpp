@@ -7,8 +7,7 @@
 #include "../components/settlement.hpp"
 #include "selection_system.hpp"
 
-namespace SettlementSystem
-{
+namespace SettlementSystem {
 
   inline void Update( State & );
   inline void UpdateSettlement( Settlement::Component & );
@@ -17,8 +16,7 @@ namespace SettlementSystem
   inline void UpdateSprawl( Settlement::Component & );
   inline void Draw( TextureCache &, bool );
 
-  inline void Init()
-  {
+  inline void Init() {
     Image buildings =
       LoadImageFromTexture( Global::texture_cache[hstr{ "buildings" }]->texture
       );
@@ -46,10 +44,8 @@ namespace SettlementSystem
 
   inline void Update(
     view<Province::Component, Settlement::Component> settlements
-  )
-  {
-    for ( entt::entity entity: settlements )
-    {
+  ) {
+    for ( entt::entity entity: settlements ) {
       auto &settlement = Global::world.get<Settlement::Component>( entity );
 
       UpdateSettlement( settlement );
@@ -69,8 +65,7 @@ namespace SettlementSystem
   //         return LoadTextureFromImage( base );
   // }
 
-  inline void SpawnSettlement()
-  {
+  inline void SpawnSettlement() {
     Actor::Component unit =
       Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
       );
@@ -81,17 +76,13 @@ namespace SettlementSystem
     if ( closest_tile == -1 )
       return;
 
-    for ( auto entity: Global::world.view<Province::Component>() )
-    {
+    for ( auto entity: Global::world.view<Province::Component>() ) {
       auto &prov = Global::world.get<Province::Component>( entity );
 
       // TODO pretty sure I am checking this twice, another time in the Actor colonist area
-      if ( prov.tile->id == closest_tile )
-      {
-        if ( prov.owner == unit.owner )
-        {
-          if ( !Global::world.any_of<Settlement::Component>( entity ) )
-          {
+      if ( prov.tile->id == closest_tile ) {
+        if ( prov.owner == unit.owner ) {
+          if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
             printf( "spawning settlement\n" );
 
             Settlement::Component settlement = {
@@ -120,8 +111,7 @@ namespace SettlementSystem
     }
   }
 
-  inline void TrainRegiment( UnitType type )
-  {
+  inline void TrainRegiment( UnitType type ) {
     Settlement::Component &settlement =
       Global::world.get<Settlement::Component>(
         SelectionSystem::GetSelectedEntity()
@@ -134,8 +124,7 @@ namespace SettlementSystem
     } );
   }
 
-  inline void ConstructBuilding( std::string building_name )
-  {
+  inline void ConstructBuilding( std::string building_name ) {
     Settlement::Component &settlement =
       Global::world.get<Settlement::Component>(
         SelectionSystem::GetSelectedEntity()
@@ -148,8 +137,7 @@ namespace SettlementSystem
     } );
   }
 
-  inline void UpdateSettlement( Settlement::Component &settlement )
-  {
+  inline void UpdateSettlement( Settlement::Component &settlement ) {
     bool needs_sprawl_update = UpdatePopulation( settlement );
 
     // Update Sprawl
@@ -157,6 +145,7 @@ namespace SettlementSystem
       return;
 
     printf( "Sprawl increase at %d\n", settlement.population.current );
+
 
     // TODO determine development from population
     settlement.development = Settlement::Development::Village;
@@ -179,65 +168,53 @@ namespace SettlementSystem
       LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
   }
 
-  inline Settlement::Component ReadSelectedComponent()
-  {
+  inline Settlement::Component ReadSelectedComponent() {
     return Global::world.get<Settlement::Component>(
       SelectionSystem::GetSelectedEntity()
     );
   }
 
-  inline void UpdateResources( Settlement::Component &settlement )
-  {
-    for ( Buildings::Building &building: settlement.buildings )
-    {
-      switch ( building.type )
-      {
-        case Buildings::Type::Gathering:
-        {
-          if ( building.name == Buildings::BuildingName::Farm )
-          {
+  inline void UpdateResources( Settlement::Component &settlement ) {
+    for ( Buildings::Building &building: settlement.buildings ) {
+      switch ( building.type ) {
+        case Buildings::Type::Gathering: {
+          if ( building.name == Buildings::BuildingName::Farm ) {
             settlement.raw_materials[Resources::RawMaterial::Wheat] = 1;
           }
-        }
-        break;
+        } break;
         default:
           break;
       }
     }
   }
 
-  inline std::vector<Buildings::Building> SelectedSettlementBuildingList()
-  {
+  inline std::vector<Buildings::Building> SelectedSettlementBuildingList() {
     Settlement::Component *settlement =
       Global::world.try_get<Settlement::Component>(
         SelectionSystem::GetSelectedEntity()
       );
 
-    if ( settlement == nullptr )
-    {
+    if ( settlement == nullptr ) {
       return {};
     }
 
     return settlement->buildings;
   }
 
-  inline std::vector<Regiment> SelectedSettlementGarrisonList()
-  {
+  inline std::vector<Regiment> SelectedSettlementGarrisonList() {
     Settlement::Component *settlement =
       Global::world.try_get<Settlement::Component>(
         SelectionSystem::GetSelectedEntity()
       );
 
-    if ( settlement == nullptr )
-    {
+    if ( settlement == nullptr ) {
       return {};
     }
 
     return settlement->garrison;
   }
 
-  inline bool UpdatePopulation( Settlement::Component &settlement )
-  {
+  inline bool UpdatePopulation( Settlement::Component &settlement ) {
     Settlement::Population &pop = settlement.population;
 
     int before = settlement.population.current / 100;
@@ -265,21 +242,30 @@ namespace SettlementSystem
     // int after = (int) ( settlement.population.current / pow( 10, digits ) );
     int after = settlement.population.current / 100;
 
-    if ( before < after )
-    {
+    // InterfaceUpdate::Update{
+    //   .id = InterfaceUpdate::ID::SettlementPopUpdated,
+    //   .condition = true,
+    //   .json =
+    //     {
+    //       { "name", settlement.name },
+    //       { "population", std::to_string( settlement.population.current ) },
+    //       { "development", Settlement::dev_names.at( settlement.development ) },
+    //     },
+    // }
+    //   .Send();
+
+    if ( before < after ) {
       return true;
     }
 
     return false;
   }
 
-  inline void Draw( TextureCache &cache, bool showOverlays )
-  {
+  inline void Draw( TextureCache &cache, bool showOverlays ) {
     auto settlements =
       Global::world.view<Province::Component, Settlement::Component>();
 
-    for ( auto entity: settlements )
-    {
+    for ( auto entity: settlements ) {
       auto &province = settlements.get<Province::Component>( entity );
       auto &settlement = settlements.get<Settlement::Component>( entity );
 

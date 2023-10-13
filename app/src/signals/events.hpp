@@ -4,11 +4,9 @@
 #include <steam/steamclientpublic.h>
 
 // Used for sending data from the UI to the Game State
-namespace InterfaceEvent
-{
+namespace InterfaceEvent {
   // TODO replace with ID + string? or something categorized
-  enum class ID : u32
-  {
+  enum class ID : u32 {
     MainMenuHostGame,
     MainMenuJoinGame,
     MainMenuStartGame,
@@ -92,13 +90,9 @@ namespace InterfaceEvent
     Data( ID id ) : event_id( id ) {}
     Data( ID id, std::string msg ) : event_id( id ), msg( msg ) {}
     Data( ID id, std::string msg, std::string source )
-        : event_id( id ), msg( msg ), source( source )
-    {
-    }
+        : event_id( id ), msg( msg ), source( source ) {}
     Data( ID id, std::string msg, CSteamID lobby_id )
-        : event_id( id ), msg( msg ), lobby_id( lobby_id )
-    {
-    }
+        : event_id( id ), msg( msg ), lobby_id( lobby_id ) {}
 
 
     ID event_id;
@@ -108,8 +102,7 @@ namespace InterfaceEvent
   };
 
   struct EventEmitter : entt::emitter<EventEmitter>
-  {
-  };
+  {};
 
   inline EventEmitter event_emitter;
 
