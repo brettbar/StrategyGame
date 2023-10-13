@@ -1,14 +1,11 @@
 #include "element.hpp"
 #include <raylib.h>
 
-namespace UI
-{
-  void Element::Register()
-  {
+namespace UI {
+  void Element::Register() {
     lookup.emplace( id, std::make_shared<Element>( *this ) );
 
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Register();
         break;
@@ -18,15 +15,13 @@ namespace UI
     }
   }
 
-  void Element::Initialize()
-  {
+  void Element::Initialize() {
     if ( starts_disabled )
       return;
 
     enabled = true;
 
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Initialize( transform );
         break;
@@ -36,11 +31,9 @@ namespace UI
     }
   }
 
-  void Element::Enable()
-  {
+  void Element::Enable() {
     enabled = true;
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Enable( transform );
         break;
@@ -50,10 +43,8 @@ namespace UI
     }
   }
 
-  void Element::Disable()
-  {
-    switch ( type )
-    {
+  void Element::Disable() {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Disable();
         break;
@@ -65,34 +56,25 @@ namespace UI
   }
 
 
-  void Element::Update()
-  {
+  void Element::Update() {
     if ( !enabled )
       return;
 
-    switch ( type )
-    {
-      case Type::GridPanel:
-      {
-        if ( grid_panel->update_children )
-        {
+    switch ( type ) {
+      case Type::GridPanel: {
+        if ( grid_panel->update_children ) {
           grid_panel->update_children( *this );
         }
         grid_panel->Update();
-      }
-      break;
-      case Type::StackPanel:
-      {
+      } break;
+      case Type::StackPanel: {
         stack_panel->tabs[stack_panel->curr_index]->Update();
-      }
-      break;
+      } break;
     }
   }
 
-  void Element::ResizeRecursive()
-  {
-    switch ( type )
-    {
+  void Element::ResizeRecursive() {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Resize( transform );
         break;
@@ -103,10 +85,8 @@ namespace UI
   }
 
 
-  void Element::RepositionRecursive()
-  {
-    switch ( type )
-    {
+  void Element::RepositionRecursive() {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->Reposition( transform );
         break;
@@ -116,11 +96,9 @@ namespace UI
     }
   }
 
-  void Element::UpdateText( std::string new_text )
-  {
+  void Element::UpdateText( std::string new_text ) {
 
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::TextButton:
         text_button->label->text = new_text;
         break;
@@ -130,15 +108,12 @@ namespace UI
     }
   }
 
-  void Element::UpdateBackground( Color new_color )
-  {
+  void Element::UpdateBackground( Color new_color ) {
     background = new_color;
   }
 
-  void Element::UpdateClickable( bool new_clickable )
-  {
-    switch ( type )
-    {
+  void Element::UpdateClickable( bool new_clickable ) {
+    switch ( type ) {
       case Type::TextButton:
         text_button->clickable = new_clickable;
         break;
@@ -148,13 +123,12 @@ namespace UI
     }
   }
 
-  void Element::ExecuteInterfaceUpdate( const InterfaceUpdate::Update &update )
-  {
+  void Element::ExecuteInterfaceUpdate( const InterfaceUpdate::Update &update
+  ) {
     if ( updates.contains( update.id ) )
       updates[update.id]( *this, update );
 
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::GridPanel:
         grid_panel->ExecuteInterfaceUpdate( update );
         break;
@@ -165,14 +139,12 @@ namespace UI
   }
 
 
-  void Element::Draw()
-  {
+  void Element::Draw() {
     if ( !enabled )
       return;
 
 
-    switch ( type )
-    {
+    switch ( type ) {
       case Type::GridPanel:
         DrawRectangleRec( transform, background );
         grid_panel->Draw( transform );
@@ -185,8 +157,7 @@ namespace UI
         DrawRectangleRec( transform, background );
         text_label->Draw( background, transform );
         break;
-      case Type::TextButton:
-      {
+      case Type::TextButton: {
         // TODO - do we really want this to black out like that
         // Caused me to lose my sanity for a month
         // Bruh
@@ -213,18 +184,14 @@ namespace UI
         // else
         DrawRectangleRec( transform, background );
         text_button->Draw( background, transform );
-      }
-      break;
-      case Type::TextureLabel:
-      {
+      } break;
+      case Type::TextureLabel: {
         DrawRectangleRec( transform, background );
         DrawTextureEx(
           texture_label->texture, { transform.x, transform.y }, 0.0, 1, WHITE
         );
-      }
-      break;
-      case Type::TextureButton:
-      {
+      } break;
+      case Type::TextureButton: {
         DrawRectangleRec( transform, background );
         DrawTextureEx(
           texture_button->label->texture,
@@ -233,32 +200,41 @@ namespace UI
           1,
           WHITE
         );
-      }
-      break;
+      } break;
     }
   }
 
   // X2749B
-  void Element::FireEvent()
-  {
-    switch ( type )
-    {
-      case ( Type::TextButton ):
-      {
-        if ( text_button->on_click )
-        {
+  void Element::FireEvent() {
+    switch ( type ) {
+      case ( Type::TextButton ): {
+        if ( text_button->on_click ) {
           InterfaceEvent::event_emitter.publish( *text_button->on_click );
         }
-      }
-      break;
-      case ( Type::TextureButton ):
-      {
-        if ( texture_button->on_click )
-        {
+      } break;
+      case ( Type::TextureButton ): {
+        if ( texture_button->on_click ) {
           InterfaceEvent::event_emitter.publish( *texture_button->on_click );
         }
-      }
-      break;
+      } break;
+    }
+  }
+
+  inline void Element::Destroy() {
+    switch ( type ) {
+      case Type::GridPanel: {
+        for ( GridPanelElement::Slot &slot: grid_panel->filled_slots ) {
+          slot.child->Destroy();
+        }
+        // Manager()->lookup.erase( id );
+      } break;
+      case Type::StackPanel: {
+        // grid_panel->children[curr_index]->Destroy();
+        // // Manager()->lookup.erase( id );
+      } break;
+      default:
+        // Manager()->lookup.erase( id );
+        break;
     }
   }
 

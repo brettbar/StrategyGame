@@ -1,7 +1,5 @@
 #pragma once
 
-#include "interface/ui_manager.hpp"
-#include "interface/ui_system.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 

@@ -9,10 +9,8 @@
 
 #include "../element.hpp"
 
-#include "../ui_manager.hpp"
 
-namespace UI
-{
+namespace UI {
   // inline std::vector<Element> CreateLobbyBrowser()
   // {
   //   return {
