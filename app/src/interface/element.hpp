@@ -4,12 +4,11 @@
 #include "../shared/utils.hpp"
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
-#include "ui_shared.hpp"
+#include "irongui/immediate.hpp"
+#include "ui_shared.hpp"
 
-namespace UI
-{
-  enum class Type : u32
-  {
+namespace UI {
+  enum class Type : u32 {
     GridPanel,
     StackPanel,
     TextLabel,
@@ -86,9 +85,7 @@ namespace UI
       list<sptr<Element>> tabs,
       list<InterfaceUpdate::ID> change_tabs_map
     )
-        : tabs( tabs ), change_tabs_map( change_tabs_map )
-    {
-    }
+        : tabs( tabs ), change_tabs_map( change_tabs_map ) {}
 
     void Draw();
     void Initialize( rect );
@@ -113,9 +110,7 @@ namespace UI
 
     TextLabelElement() = delete;
     TextLabelElement( str text, u32 font_size )
-        : text( text ), font_size( font_size )
-    {
-    }
+        : text( text ), font_size( font_size ) {}
 
     void Draw( Color, rect );
   };
@@ -132,12 +127,9 @@ namespace UI
       sptr<TextLabelElement> label,
       sptr<InterfaceEvent::Data> event
     )
-        : label( label ), on_click( event )
-    {
-    }
+        : label( label ), on_click( event ) {}
 
-    inline void Draw( Color background, rect transform )
-    {
+    inline void Draw( Color background, rect transform ) {
       label->Draw( background, transform );
     }
   };
@@ -159,9 +151,7 @@ namespace UI
       sptr<TextureLabelElement> label,
       sptr<InterfaceEvent::Data> on_click
     )
-        : label( label ), on_click( on_click )
-    {
-    }
+        : label( label ), on_click( on_click ) {}
   };
 
   struct Element
@@ -170,41 +160,31 @@ namespace UI
 
     // GridPanel
     Element( str id, sptr<GridPanelElement> grid_panel )
-        : type( Type::GridPanel ), id( id ), grid_panel( grid_panel )
-    {
-    }
+        : type( Type::GridPanel ), id( id ), grid_panel( grid_panel ) {}
 
     // StackPanel
     Element( str id, sptr<StackPanelElement> stack_panel )
-        : type( Type::StackPanel ), id( id ), stack_panel( stack_panel )
-    {
-    }
+        : type( Type::StackPanel ), id( id ), stack_panel( stack_panel ) {}
 
     // TextLabel
     Element( str id, sptr<TextLabelElement> text_label )
         : type( Type::TextLabel ), id( id ), text_label( text_label )
 
-    {
-    }
+    {}
 
     // TextButton
     Element( str id, sptr<TextButtonElement> text_button )
-        : type( Type::TextButton ), id( id ), text_button( text_button )
-    {
-    }
+        : type( Type::TextButton ), id( id ), text_button( text_button ) {}
 
     // TextureLabel
     Element( str id, sptr<TextureLabelElement> texture_label )
-        : type( Type::TextureLabel ), id( id ), texture_label( texture_label )
-    {
+        : type( Type::TextureLabel ), id( id ), texture_label( texture_label ) {
     }
 
     // TextureButton
     Element( str id, sptr<TextureButtonElement> texture_button )
         : type( Type::TextureButton ), id( id ),
-          texture_button( texture_button )
-    {
-    }
+          texture_button( texture_button ) {}
 
 
     Type type;

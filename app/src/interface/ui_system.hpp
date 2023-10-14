@@ -9,6 +9,9 @@
 #include "pages/modal_menu_ui.hpp"
 #include "pages/singleplayer_lobby.hpp"
 
+#include "../world/systems/selection_system.hpp"
+
+
 namespace UI {
 
 
@@ -398,6 +401,11 @@ private:
     }
 
     inline void Draw() {
+
+      if ( SelectionSystem::SettlementSelected() ) {
+        DrawSettlementContext();
+      }
+
       Manager()->ActivePage()->Draw();
 
       // Manager()->debug.Draw();
