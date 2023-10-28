@@ -9,17 +9,23 @@ namespace UI {
 
   inline void DrawSettlementContext( Settlement::Component *settlement ) {
 
-    auto forge = Iron::Forge();
+    auto f = Iron::Forge();
+
     rect r = rect{ 0, 0, 250, 250 };
+    auto grid = f.IronGrid( r, 3, 3 );
+    rect slot = grid->Slot( 4 );
 
-    forge.Grid( r, 3, 3 );
+    // bool okay_pressed = f.IronTextButton( slot, "Okay" );
+    auto text_button = f.IronTextLabel( slot, "Okay" );
 
-    rect footprint = forge.Footprint( { 4 } );
-    bool okay_pressed = forge.TextButton( footprint, "Okay", BLUE );
+    // if ( okay_pressed ) {
+    //   printf( "okay pressed\n" );
+    // }
 
 
     {
-      forge.Draw();
+      f.Draw();
+
 
       // if ( settlement ) {
       //   Iron::DrawTextButton( rectangle, settlement->name, BLUE );

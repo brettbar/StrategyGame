@@ -1,121 +1,138 @@
 #include "../shared/common.hpp"
 #include "../shared/utils.hpp"
 #include <raylib.h>
+#include <stack>
 
 namespace Iron {
   enum class Type {
     Grid,
-    TextButton,
+    TextLabel,
   };
+
+  struct Element;
 
   struct Grid {
-    u32 rows;
     u32 cols;
-    list<rect> slots;
+    u32 rows;
+
+    Grid() = delete;
+    Grid( u32 c, u32 r ) : cols( c ), rows( r ) {}
   };
 
-  // Final output of this is a draw call for one frame
-  struct Forge {
+  struct TextLabel {
+    str text;
+    TextLabel() = delete;
+    TextLabel( str t ) : text( t ) {}
+  };
+
+
+  struct Element {
     Type type;
     rect transform;
     Color background;
 
     union {
-      Grid grid;
-    };
+      Grid *grid;
+      TextLabel *text_label;
+    } t;
 
-    Forge() {}
-    ~Forge() {}
+    void Draw() {
 
+      switch ( type ) {
+        case Type::Grid: {
+          // @volatile
+          u32 slot_width = transform.width / t.grid->cols;
+          u32 slot_height = transform.height / t.grid->rows;
 
-    inline void Grid( rect rectangle, u32 rows, u32 cols ) {
-      type = Type::Grid;
-      transform = rectangle;
+          // Draw the grid
+          for ( u32 c = 0; c < t.grid->cols; c++ ) {
+            for ( u32 r = 0; r < t.grid->rows; r++ ) {
+              DrawRectangleRec(
+                {
+                  transform.x + (f32) ( c * slot_width ),
+                  transform.y + (f32) ( r * slot_height ),
+                  (f32) slot_width,
+                  (f32) slot_height,
+                },
+                GRAY
+              );
+              DrawRectangleLinesEx(
+                {
+                  transform.x + (f32) ( c * slot_width ),
+                  transform.y + (f32) ( r * slot_height ),
+                  (f32) slot_width,
+                  (f32) slot_height,
+                },
+                4,
+                BLACK
+              );
+            }
+          }
+
+          // for ( GridPanelElement::Slot &slot: filled_slots )
+          // {
+          //   slot.child->Draw();
+          // }
+        } break;
+        case Type::TextLabel: {
+
+          DrawRectangleRec( transform, background );
+          DrawText(
+            t.text_label->text.c_str(), transform.x, transform.y, 28, WHITE
+          );
+        } break;
+      }
+      /*
+      0 1 1 0
+      0 0 0 0
+      0 0 0 0
+    */
     }
 
-    inline rect Footprint( u32 start_slot_i, u32 slots_wide, u32 slots_tall ) {
-      u32 width = 0;
-      u32 height = 0;
+    rect Slot( u32 i ) {
+      assert( type == Type::Grid && t.grid != nullptr );
 
-
-      // starting at the slot
-      // for the next slots_wide cols add up the widths
-      // for the next slots_tall rows, add up the heights
-
-      vec2u starting_coords = CoordsFromIndex( start_slot_i, grid.cols );
-
-      for ( u32 c = starting_coords.x; c < slots_wide; c++ ) {
-        width +=
-          grid.slots[IndexFromCoords( c, starting_coords.y, grid.cols )].width;
-      }
-
-      for ( u32 r = starting_coords.y; r < slots_tall; r++ ) {
-        height +=
-          grid.slots[IndexFromCoords( starting_coords.x, r, grid.rows )].height;
-      }
-
+      auto coords = CoordsFromIndex( i, t.grid->cols );
+      u32 slot_width = transform.width / t.grid->cols;
+      u32 slot_height = transform.height / t.grid->rows;
 
       return rect{
-        (f32) starting_coords.x,
-        (f32) starting_coords.y,
-        (f32) width,
-        (f32) height };
+        transform.x + (f32) ( coords.x * slot_width ),
+        transform.y + (f32) ( coords.y * slot_height ),
+        (f32) slot_width,
+        (f32) slot_height,
+      };
+    }
+  };
+
+  struct Forge {
+    list<Element *> queue;
+
+    Element *IronGrid( rect t, u32 c, u32 r ) {
+      auto e = new Element();
+      e->type = Type::Grid;
+      e->background = BLUE;
+      e->transform = t;
+      e->t.grid = new Grid( c, r );
+      queue.push_back( e );
+      return e;
     }
 
-    inline bool TextButton( rect rectangle, str text, Color background ) {}
+    Element *IronTextLabel( rect t, str txt ) {
+      auto e = new Element();
+      e->type = Type::TextLabel;
+      e->background = BLUE;
+      e->transform = t;
+      e->t.text_label = new TextLabel( txt );
+      queue.push_back( e );
+      return e;
+    }
 
-
-    // inline void DrawTextButton(
-    //   rect transform,
-    //   str text,
-    //   f32 font_size,
-    //   Color background
-    // ) {
-    //   DrawRectangleRec( transform, background );
-    //   DrawText( text.c_str(), transform.x, transform.y, font_size, WHITE );
-    // }
-
-
-    //   inline void Draw( Grid grid ) {
-    //     /*
-    //   0 1 1 0
-    //   0 0 0 0
-    //   0 0 0 0
-    // */
-
-    //     u32 slot_width = grid.transform.width / grid.cols;
-    //     u32 slot_height = grid.transform.height / grid.rows;
-
-    //     // Draw the grid
-    //     for ( u32 c = 0; c < grid.cols; c++ ) {
-    //       for ( u32 r = 0; r < grid.rows; r++ ) {
-    //         DrawRectangleRec(
-    //           {
-    //             grid.transform.x + (f32) ( c * slot_width ),
-    //             grid.transform.y + (f32) ( r * slot_height ),
-    //             (f32) slot_width,
-    //             (f32) slot_height,
-    //           },
-    //           GRAY
-    //         );
-    //         DrawRectangleLinesEx(
-    //           {
-    //             grid.transform.x + (f32) ( c * slot_width ),
-    //             grid.transform.y + (f32) ( r * slot_height ),
-    //             (f32) slot_width,
-    //             (f32) slot_height,
-    //           },
-    //           4,
-    //           BLACK
-    //         );
-    //       }
-    //     }
-
-    //     // for ( GridPanelElement::Slot &slot: filled_slots )
-    //     // {
-    //     //   slot.child->Draw();
-    //     // }
-    //   }
+    inline void Draw() {
+      for ( u32 i = 0; i < queue.size(); i++ ) {
+        queue[i]->Draw();
+      }
+    }
   };
 
 

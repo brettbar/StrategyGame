@@ -399,7 +399,14 @@ private:
 
       if ( SelectionSystem::
              Selected<Province::Component, Settlement::Component>() ) {
-        DrawSettlementContext( SelectionSystem::GetSelectedSettlement() );
+        auto settlement = SelectionSystem::GetSelectedSettlement();
+
+        if ( !settlement ) {
+          printf( "Got null settlement??\n" );
+          return;
+        }
+
+        DrawSettlementContext( settlement );
       }
 
 
