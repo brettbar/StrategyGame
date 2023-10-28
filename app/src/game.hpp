@@ -485,12 +485,6 @@ inline void IGame::RegisterEventListeners() {
           }
         } break;
         case InterfaceEvent::ID::FactionSelected: {
-          printf(
-            "In listener, %s %s\n",
-            InterfaceEvent::IDString[(u32) InterfaceEvent::ID::FactionSelected],
-            event.msg.c_str()
-          );
-
           faction = event.msg;
 
           if ( _single_player ) {

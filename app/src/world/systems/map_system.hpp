@@ -22,11 +22,9 @@
 #include <chrono>
 #include <string>
 
-namespace MapSystem
-{
+namespace MapSystem {
 
-  enum class Mode
-  {
+  enum class Mode {
     Terrain,
     Political,
   };
@@ -48,8 +46,7 @@ namespace MapSystem
   inline void FilterIslands( NoiseMap &, f32 );
   inline void NormalizeMap( NoiseMap & );
 
-  inline void Init()
-  {
+  inline void Init() {
     f32 seed = 25;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
 
@@ -57,8 +54,7 @@ namespace MapSystem
     //    FilterIslands(pNoise, waterLevel);
     NormalizeMap( pNoise );
 
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ )
-    {
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
       u32 y = i / MAP_HEIGHT;
 
@@ -68,7 +64,7 @@ namespace MapSystem
       Vector2 position;
       Biome biome;
 
-      f32 noise = pNoise[index( x, y )];
+      f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
 
       // Montanas
       if ( noise >= 0.8f )
@@ -100,13 +96,13 @@ namespace MapSystem
         Tile::Visibility::UNEXPLORED,
       };
 
-      tile_map[index( x, y )] = std::make_shared<Tile::Component>( tile );
+      tile_map[IndexFromCoords( x, y, MAP_WIDTH )] =
+        std::make_shared<Tile::Component>( tile );
     }
   }
 
 
-  inline void Draw( Camera2D &camera, TextureCache &cache )
-  {
+  inline void Draw( Camera2D &camera, TextureCache &cache ) {
     Texture2D land_tile = cache[hstr{ "land_tile" }]->texture;
     Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
     Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
@@ -115,8 +111,7 @@ namespace MapSystem
 
     Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
-    for ( auto &tile: tile_map )
-    {
+    for ( auto &tile: tile_map ) {
 
       if (
       tile->position.x - TILE_WIDTH >
@@ -134,8 +129,7 @@ namespace MapSystem
 
       //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
       //    DrawTextureRec(hex, frameRec, tile.position, WHITE);
-      switch ( tile->biome )
-      {
+      switch ( tile->biome ) {
         case Biome::Mountains:
           // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
           DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
@@ -178,12 +172,10 @@ namespace MapSystem
     }
   }
 
-  inline void UpdateFOW()
-  {
+  inline void UpdateFOW() {
     auto view = Global::world.view<Actor::Component, Sight::Component>();
 
-    for ( auto &entity: view )
-    {
+    for ( auto &entity: view ) {
       Sight::Component sight = view.get<Sight::Component>( entity );
       Actor::Component actor = view.get<Actor::Component>( entity );
 
@@ -203,18 +195,15 @@ namespace MapSystem
         tile_map[index( x - 1, y - 1 )],
       };
 
-      if ( y % 2 == 1 )
-      {
+      if ( y % 2 == 1 ) {
         neighbors[0] = tile_map[index( x + 1, y - 1 )];
         neighbors[2] = tile_map[index( x + 1, y + 1 )];
         neighbors[3] = tile_map[index( x, y + 1 )];
         neighbors[5] = tile_map[index( x, y - 1 )];
       }
 
-      for ( auto neighbor: neighbors )
-      {
-        if ( neighbor != nullptr )
-        {
+      for ( auto neighbor: neighbors ) {
+        if ( neighbor != nullptr ) {
 
           neighbor->visibility = Tile::Visibility::VISIBILE;
         }
@@ -226,8 +215,7 @@ namespace MapSystem
 
   // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  inline NoiseMap GeneratePerlinNoise( float seed, int nOctaves, float fBias )
-  {
+  inline NoiseMap GeneratePerlinNoise( float seed, int nOctaves, float fBias ) {
     srand( seed );
     //    srand(time(NULL));
 
@@ -242,8 +230,7 @@ namespace MapSystem
     NoiseMap fOutput;
 
     for ( int x = 0; x < MAP_WIDTH; x++ )
-      for ( int y = 0; y < MAP_HEIGHT; y++ )
-      {
+      for ( int y = 0; y < MAP_HEIGHT; y++ ) {
         // used to accumulate the perlin noise for a point, will be normalized in the end
         float fNoise = 0.0f;
         // used to sum all scaling factors, used to normalize our final perlin noise
@@ -251,8 +238,7 @@ namespace MapSystem
         // halved for each octave
         float fScale = 1.0f;
 
-        for ( int o = 0; o < nOctaves; o++ )
-        {
+        for ( int o = 0; o < nOctaves; o++ ) {
           // We need two sample points to linearly interpolate between.
           // The distance between these sample points, is called pitch.
 
@@ -310,11 +296,9 @@ namespace MapSystem
     return fOutput;
   }
 
-  inline void FilterIslands( NoiseMap &noiseMap, f32 waterLevel )
-  {
+  inline void FilterIslands( NoiseMap &noiseMap, f32 waterLevel ) {
     for ( int x = 1; x < MAP_WIDTH - 1; x++ )
-      for ( int y = 1; y < MAP_HEIGHT - 1; y++ )
-      {
+      for ( int y = 1; y < MAP_HEIGHT - 1; y++ ) {
         u32 numWater = 0;
 
         float NE = noiseMap.at( index( x, y - 1 ) );
@@ -341,37 +325,27 @@ namespace MapSystem
         if ( NW < waterLevel )
           numWater++;
 
-        if ( numWater >= 5 )
-        {
+        if ( numWater >= 5 ) {
           noiseMap[index( x, y )] = 0.0f;
         }
       }
   }
 
-  inline void NormalizeMap( NoiseMap &pNoise )
-  {
+  inline void NormalizeMap( NoiseMap &pNoise ) {
     float min = std::numeric_limits<float>::max();
     float max = 0;
 
-    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ )
-    {
+    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ ) {
       if ( pNoise[x] < min )
         min = pNoise[x];
       if ( pNoise[x] > max )
         max = pNoise[x];
     }
 
-    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ )
-    {
+    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ ) {
       pNoise[x] = ( pNoise[x] - min ) / ( max - min );
     }
   }
 
-
-  // i = x + W * y;
-  inline u32 index( u32 x, u32 y )
-  {
-    return x + MAP_WIDTH * y;
-  };
 
 };// namespace MapSystem

@@ -70,7 +70,7 @@ namespace SettlementSystem {
       Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
       );
 
-    vec2 pos = unit.position;
+    vec2f pos = unit.position;
     i32 closest_tile = DetermineTileIdFromPosition( pos );
 
     if ( closest_tile == -1 )

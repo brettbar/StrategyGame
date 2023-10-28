@@ -10,19 +10,15 @@
 #include "province_system.hpp"
 #include <raylib.h>
 
-namespace OverlaySystem
-{
+namespace OverlaySystem {
 
-  inline void DrawProvinceOverlays( TextureCache &texture_cache )
-  {
+  inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
     auto provinces = Global::world.view<Province::Component>();
 
-    for ( auto entity: provinces )
-    {
+    for ( auto entity: provinces ) {
       auto &prov = provinces.get<Province::Component>( entity );
 
-      if ( prov.owner != entt::null )
-      {
+      if ( prov.owner != entt::null ) {
         Player::Component player =
           Global::world.get<Player::Component>( prov.owner );
         Faction::Component faction =
@@ -99,13 +95,11 @@ namespace OverlaySystem
     }
   }
 
-  inline void DrawSettlementOverlays( TextureCache &texture_cache )
-  {
+  inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
     auto settlements =
       Global::world.view<Province::Component, Settlement::Component>();
 
-    for ( auto entity: settlements )
-    {
+    for ( auto entity: settlements ) {
       auto &province = settlements.get<Province::Component>( entity );
       auto &settlement = settlements.get<Settlement::Component>( entity );
 
@@ -126,7 +120,7 @@ namespace OverlaySystem
         province.tile->position.y + 24,
       };
 
-      const vec2 text_dims = MeasureTextEx(
+      const vec2f text_dims = MeasureTextEx(
         Global::font_cache[hstr{ "font_romulus" }]->font,
         settlement.name.c_str(),
         14,

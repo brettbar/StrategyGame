@@ -19,7 +19,7 @@ using f32 = float;
 using u64 = unsigned long long;
 using str = std::string;
 using hstr = entt::hashed_string;
-using vec2 = Vector2;
+using vec2f = Vector2;
 using rect = Rectangle;
 
 template<typename K, typename V>
@@ -41,14 +41,12 @@ template<typename... T>
 using view =
   entt::basic_view<entt::get_t<entt::storage_for_t<T>...>, entt::exclude_t<>>;
 
-struct IVector2
-{
+struct vec2i {
   i32 x;
   i32 y;
 };
 
-struct UVector2
-{
+struct vec2u {
   u32 x;
   u32 y;
 };

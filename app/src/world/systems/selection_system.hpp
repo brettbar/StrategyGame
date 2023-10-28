@@ -27,6 +27,11 @@ namespace SelectionSystem {
   inline entt::entity GetSelectedEntity() {
     return Global::world.view<Selected::Component>().front();
   }
+  template<typename... T>
+  inline bool Selected() {
+    auto selected_entity = Global::world.view<Selected::Component>().front();
+    return Global::world.all_of<T...>( selected_entity );
+  }
 
   inline void Draw( TextureCache &cache, bool isDebug ) {
     auto provsView =
@@ -47,7 +52,7 @@ namespace SelectionSystem {
   }
 
 
-  inline void CheckSelectActors( vec2 click_pos, std::string player_id ) {
+  inline void CheckSelectActors( vec2f click_pos, std::string player_id ) {
     auto actors_view = Global::world.view<Actor::Component>();
     auto player_view = Global::world.view<Player::Component>();
     auto selected_entity = Global::world.view<Selected::Component>().front();
@@ -93,7 +98,17 @@ namespace SelectionSystem {
     }
   }
 
-  inline void CheckSelectProvince( vec2 click_pos, std::string player_id ) {
+  inline Settlement::Component *GetSelectedSettlement() {
+    auto selected_entity = Global::world.view<Selected::Component>().front();
+
+    if ( Global::world.all_of<Settlement::Component>( selected_entity ) ) {
+      return &Global::world.get<Settlement::Component>( selected_entity );
+    }
+
+    return nullptr;
+  }
+
+  inline void CheckSelectProvince( vec2f click_pos, std::string player_id ) {
     i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
     auto prov_view = Global::world.view<Province::Component>();
     auto selected_entity = Global::world.view<Selected::Component>().front();
@@ -132,8 +147,7 @@ namespace SelectionSystem {
               },
           }
             .Send();
-        }
-        else {
+        } else {
           InterfaceUpdate::Update{
             .id = InterfaceUpdate::ID::SettlementContext,
             .condition = true,
@@ -175,4 +189,5 @@ namespace SelectionSystem {
     CheckSelectActors( click_pos, player_id );
     CheckSelectProvince( click_pos, player_id );
   }
+
 };// namespace SelectionSystem

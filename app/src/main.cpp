@@ -46,6 +46,7 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "%s\n", msg );
 }
 
+
 /*
 ========================================================
   Main application entrypoint

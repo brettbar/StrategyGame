@@ -74,8 +74,7 @@ public:
 
           _context.active = "";
         }
-      }
-      else if ( entity->id == _context.hot && clickable ) {
+      } else if ( entity->id == _context.hot && clickable ) {
         if ( mouseWentDown )
           _context.active = entity->id;
       }
@@ -148,8 +147,7 @@ private:
     return IManager::Manager();
   }
 
-  struct UpdateListener
-  {
+  struct UpdateListener {
     void ReceiveUpdate( const InterfaceUpdate::Update &update ) {
       // for ( auto &panel: )
       // {
@@ -276,8 +274,7 @@ private:
 
         if ( element->type == Type::TextureButton ) {
           clickable = element->texture_button->clickable;
-        }
-        else if ( element->type == Type::TextButton ) {
+        } else if ( element->type == Type::TextButton ) {
           clickable = element->text_button->clickable;
         }
 
@@ -366,7 +363,7 @@ private:
     }
 
     inline void UpdateOnFrame() {
-      vec2 mousePos = GetMousePosition();
+      vec2f mousePos = GetMousePosition();
       bool mouseWentUp = IsMouseButtonReleased( 0 );
       bool mouseWentDown = IsMouseButtonPressed( 0 );
       bool mouseHeldDown = IsMouseButtonDown( 0 );
@@ -375,11 +372,9 @@ private:
 
       if ( screen_width >= 3840 ) {
         SCALE = 1.5;
-      }
-      else if ( screen_width >= 2560 ) {
+      } else if ( screen_width >= 2560 ) {
         SCALE = 1.25;
-      }
-      else {
+      } else {
         SCALE = 1.0;
       }
 
@@ -402,9 +397,11 @@ private:
 
     inline void Draw() {
 
-      if ( SelectionSystem::SettlementSelected() ) {
-        DrawSettlementContext();
+      if ( SelectionSystem::
+             Selected<Province::Component, Settlement::Component>() ) {
+        DrawSettlementContext( SelectionSystem::GetSelectedSettlement() );
       }
+
 
       Manager()->ActivePage()->Draw();
 

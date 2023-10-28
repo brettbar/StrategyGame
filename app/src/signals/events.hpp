@@ -42,48 +42,6 @@ namespace InterfaceEvent {
     // NOTE: Final Enum used to get count, must be in last place
     NumberOfEvents
   };
-  // TODO this is a disaster waiting to happen,
-  // Do something other than this
-  //
-  // This needs to be in the same order as the ID enum
-  inline const char *const IDString[(u32) ID::NumberOfEvents] = {
-    "MainMenuHostGame",
-    "MainMenuJoinGame",
-    "MainMenuStartGame",
-    "MainMenuLoadGame",
-    "MainMenuSettings",
-    "MainMenuExitGame",
-
-    "OpenFactionSelectPage",
-    "SinglePlayerLobbyStartGame",
-
-    "ModalMenuLoadGame",
-    "ModalMenuSaveGame",
-    "ModalMenuSettings",
-    "ModalMenuSaveExitMain",
-    "ModalMenuExitMain",
-    "ModalMenuExitGame",
-    "ModalMenuToggle",
-
-    "ReturnToMain",
-    "PlayerToggledReadyUp",
-    "HostStartGame",
-    "JoinLobby",
-
-    "JoinHostedCampaign",
-
-    "FactionSelected",
-    "ClientReceivedCommand",
-
-    "SettlementContextPopulationTab",
-    "SettlementContextResourcesTab",
-    "SettlementContextConstructionTab",
-    "SettlementContextConstructBuilding",
-
-    "ActorSpawnSettlment",
-    //
-  };
-
 
   struct Data
   {
