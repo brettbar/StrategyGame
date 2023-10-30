@@ -2,15 +2,23 @@
 
 #include "../../shared/common.hpp"
 
-#include "../builders.hpp"
 #include "../immediate.hpp"
 #include <raylib.h>
 
 
 namespace UI {
 
+  enum class Action_MainMenu {
+    None,
+    StartGame,
+    HostGame,
+    JoinGame,
+    Settings,
+    ExitGame,
+  };
 
-  inline void DrawMainMenu() {
+
+  inline Action_MainMenu DrawMainMenu() {
     auto f = Iron::Forge();
 
     rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
@@ -26,26 +34,33 @@ namespace UI {
 
     if ( start_pressed ) {
       printf( "Start Game!!\n" );
+      return Action_MainMenu::StartGame;
     }
 
 
     if ( host_pressed ) {
       printf( "Host Game!!\n" );
+      return Action_MainMenu::HostGame;
     }
 
     if ( join_pressed ) {
       printf( "Join Game!!\n" );
+      return Action_MainMenu::JoinGame;
     }
 
     if ( settings_pressed ) {
       printf( "Settings!!\n" );
+      return Action_MainMenu::Settings;
     }
 
     if ( exit_pressed ) {
       printf( "Exit Game!!\n" );
+      return Action_MainMenu::ExitGame;
     }
 
     f.Draw();
+
+    return Action_MainMenu::None;
   }
 
 

@@ -3,66 +3,47 @@
 
 #include "../../shared/common.hpp"
 
-#include "../builders.hpp"
-#include "../element.hpp"
+#include "../immediate.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
 #include "../../network/network.hpp"
 #include <raylib.h>
 
-namespace UI
-{
-  inline sptr<Element> CreateSinglePlayerLobby()
-  {
-    return {
-      GridPanel( "singleplayer_lobby_root", 3, 3 )
-        .FixedSize( GetScreenWidth(), GetScreenHeight() )
-        .Children( { GridPanelElement::Slot{
-          { 1, 1, 1, 1 },
-          GridPanel( "singleplayer_lobby", 1, 3 )
-            .Children( {
-              GridPanelElement::Slot{
-                { 0, 0, 0, 0 },
-                TextButton(
-                  "singleplayer_faction_label", "Select your faction", 32
-                )
-                  .Background( GREEN )
-                  .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage ),
-              },
-              GridPanelElement::Slot{
-                { 0, 0, 1, 1 },
-                TextButton(
-                  "player_0_faction_selected", "Waiting to Select Faction", 32
-                )
-                  .Background( GRAY )
-                  .On(
-                    InterfaceUpdate::ID::PlayerSelectedFaction,
-                    []( Element &self, InterfaceUpdate::Update update ) {
-                      if ( self.id == update.player_id + "_faction_selected" )
-                      {
-                        printf( "PlayerSelectedFaction !!!!!!!!!!!\n" );
-                        printf( "update_txt: %s\n", update.update_txt.c_str() );
-                        self.UpdateText( update.update_txt );
-                        self.UpdateBackground(
-                          GetPrimaryFactionColor( update.update_txt )
-                        );
-                      }
-                    }
-                  ),
-              },
+namespace UI {
 
-              GridPanelElement::Slot{
-                { 0, 0, 2, 2 },
-                TextButton(
-                  "singleplayer_lobby_started_game", "Start Game", 32
-                )
-                  .Background( BLUE )
-                  .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame ),
-              },
-            }
+  enum class Action_SinglePlayerLobby {
+    None,
+    SelectFaction,
+    ExitPressed,
+  };
 
-            ),
-        } } ) };
+  inline Action_SinglePlayerLobby DrawSinglePlayerLobby() {
+    auto f = Iron::Forge();
+
+    rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_grid = f.Grid( root, 3, 3 );
+
+    auto grid = f.Grid( root_grid->Slot( 4 ), 1, 5 );
+
+    bool select_faction =
+      f.TextButton( grid->Slot( 0 ), "Select Faction", BLUE );
+
+    f.TextLabel( grid->Slot( 1 ), "Waiting for faction", BLUE );
+
+    bool exit_pressed = f.TextButton( grid->Slot( 4 ), "Return to Main", BLUE );
+
+    if ( select_faction ) {
+      return Action_SinglePlayerLobby::SelectFaction;
+    }
+
+    if ( exit_pressed ) {
+      return Action_SinglePlayerLobby::ExitPressed;
+    }
+
+    f.Draw();
+
+    return Action_SinglePlayerLobby::None;
   }
+
 };// namespace UI

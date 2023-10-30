@@ -1,6 +1,8 @@
 #pragma once
 
+#include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
+#include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -14,9 +16,12 @@
 #include "world/systems/selection_system.hpp"
 
 #include "campaign.hpp"
+#include <raylib.h>
 
 enum class Scene {
   MainMenu,
+  SinglePlayerLobby,
+  FactionSelect,
   ModalMenu,
   Campaign,
   Editor,
@@ -347,8 +352,56 @@ class IGame {
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          UI::DrawMainMenu();
+          auto action = UI::DrawMainMenu();
+
+          switch ( action ) {
+            case UI::Action_MainMenu::StartGame:
+              _mode = Scene::SinglePlayerLobby;
+              break;
+            case UI::Action_MainMenu::HostGame:
+              break;
+            case UI::Action_MainMenu::JoinGame:
+              break;
+            case UI::Action_MainMenu::Settings:
+              break;
+            case UI::Action_MainMenu::ExitGame:
+
+              // TODO probably dont wanna do this so brute force
+              CloseWindow();
+              break;
+          }
           // Renderer::DrawUI();
+        }
+        EndDrawing();
+      } break;
+
+      case Scene::SinglePlayerLobby: {
+        BeginDrawing();
+        {
+          auto action = UI::DrawSinglePlayerLobby();
+          switch ( action ) {
+            case UI::Action_SinglePlayerLobby::SelectFaction:
+              _mode = Scene::FactionSelect;
+              break;
+            case UI::Action_SinglePlayerLobby::ExitPressed:
+              _mode = Scene::MainMenu;
+              break;
+          }
+        }
+        EndDrawing();
+      } break;
+
+      case Scene::FactionSelect: {
+        BeginDrawing();
+        {
+          auto selection = UI::DrawFactionSelectScreen();
+
+          // @voltile
+          // TODO make this a faction enum
+          if ( selection != "" ) {
+            _mode = Scene::Campaign;
+            StartSingleplayerCampaign( selection );
+          }
         }
         EndDrawing();
       } break;
@@ -364,7 +417,7 @@ class IGame {
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
-          Renderer::DrawUI();
+          // Renderer::DrawUI();
         }
         EndDrawing();
       } break;

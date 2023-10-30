@@ -267,10 +267,6 @@ inline void Campaign::CheckForInput() {
     );
   }
 
-  if ( Iron::GetWatcher()->MouseIsOverUI() ) {
-    printf( "OVER IRON UI\n" );
-  }
-
   if ( IsMouseButtonPressed( 0 ) ) {
     // if ( !UI::Manager()->MouseIsOverUI() ) {
     //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );

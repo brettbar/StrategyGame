@@ -141,7 +141,7 @@ namespace Iron {
   };
 
 
-  struct Watcher {
+  struct Foreman {
 
 private:
     struct Context {
@@ -149,11 +149,11 @@ private:
       i32 active = -1;
     };
 
-    Watcher() {}
-    ~Watcher() {}
+    Foreman() {}
+    ~Foreman() {}
 
-    Watcher( Watcher const & ) = delete;
-    void operator=( const Watcher & ) = delete;
+    Foreman( Foreman const & ) = delete;
+    void operator=( const Foreman & ) = delete;
 
 
     Context context;
@@ -163,8 +163,8 @@ public:
       return context.hot != -1 || context.active != -1;
     }
 
-    static Watcher *GetWatcher() {
-      static Watcher instance;
+    static Foreman *GetWatcher() {
+      static Foreman instance;
       return &instance;
     }
 
@@ -207,8 +207,8 @@ public:
     }
   };
 
-  inline Watcher *GetWatcher() {
-    return Watcher::GetWatcher();
+  inline Foreman *GetWatcher() {
+    return Foreman::GetWatcher();
   }
 
   struct Forge {
