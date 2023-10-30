@@ -7,34 +7,6 @@
 
 namespace UI {
 
-  inline void DrawSettlementContext( Settlement::Component *settlement ) {
-
-    auto f = Iron::Forge();
-
-    rect r = rect{ 0, 0, 250, 250 };
-    auto grid = f.IronGrid( r, 3, 3 );
-    rect slot = grid->Slot( 4 );
-
-    // bool okay_pressed = f.IronTextButton( slot, "Okay" );
-    auto text_button = f.IronTextLabel( slot, "Okay" );
-
-    // if ( okay_pressed ) {
-    //   printf( "okay pressed\n" );
-    // }
-
-
-    {
-      f.Draw();
-
-
-      // if ( settlement ) {
-      //   Iron::DrawTextButton( rectangle, settlement->name, BLUE );
-      // } else {
-      //   Iron::DrawTextButton( rectangle, "Uninhabited", BLUE );
-      // }
-    }
-  }
-
   // inline sptr<Element> CreateSettlementContextPanel() {
   //   return GridPanel( "settlement_context", 4, 3 )
   //     .StartsDisabled()

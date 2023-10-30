@@ -14,6 +14,8 @@
 #pragma once
 
 
+#include "network/client.hpp"
+#include "network/host.hpp"
 #include "network/network.hpp"
 #include "shared/save.hpp"
 
@@ -28,17 +30,15 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/ui_system.hpp"
+#include "interface/immediate.hpp"
 
-enum class CommandType
-{
+enum class CommandType {
   TimeChange,
   Spawn,
   Move,
 };
 
-struct Command
-{
+struct Command {
   CommandType type;
   entt::entity player_e;
 
@@ -47,25 +47,21 @@ struct Command
   entt::entity entity;
 };
 
-class Campaign
-{
+class Campaign {
   public:
-  Campaign( bool is_singleplayer )
-  {
+  Campaign( bool is_singleplayer ) {
     _is_singleplayer = is_singleplayer;
     Start();
   }
 
-  Campaign( bool is_singleplayer, const char * )
-  {
+  Campaign( bool is_singleplayer, const char * ) {
     _is_singleplayer = is_singleplayer;
 
     // TODO make take in file path
     Load();
   }
 
-  ~Campaign()
-  {
+  ~Campaign() {
     Global::ClearRegistry();
     // delete _command_queue;
   }
@@ -82,7 +78,7 @@ class Campaign
   void HandleSpawnRequest( const Command & );
   void HandleTimeChangeRequest( const Command & );
 
-  void ForwardEvent( const InterfaceEvent::Data & );
+  // void ForwardEvent( const InterfaceEvent::Data & );
   void ConvertCommandRequest( std::string );
 
 
@@ -94,20 +90,15 @@ class Campaign
   void Load();
 };
 
-inline std::string Campaign::GetLocalPlayerID()
-{
-  if ( _is_singleplayer || Network::is_host )
-  {
+inline std::string Campaign::GetLocalPlayerID() {
+  if ( _is_singleplayer || Network::is_host ) {
     return "player_0";
-  }
-  else
-  {
+  } else {
     return Network::Client()->_local_player_id;
   }
 }
 
-inline void Campaign::Start()
-{
+inline void Campaign::Start() {
   MapSystem::Init();
   FactionSystem::Init();
   SettlementSystem::Init();
@@ -118,8 +109,7 @@ inline void Campaign::Start()
   _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
 }
 
-inline void Campaign::Load()
-{
+inline void Campaign::Load() {
   SaveSystem::Load();
   MapSystem::Init();
   Renderer::Init();
@@ -136,20 +126,18 @@ inline void Campaign::Load()
 }
 
 // Runs inside game loop
-inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag )
-{
+inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   // 2. Check for Input
   CheckForInput();
 
   // 3. Process all commands
   _command_queue.update();
-  UI::System::UpdateOnFrame();
+  // UI::System::UpdateOnFrame();
 }
 
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
-inline void Campaign::Update60TPS()
-{
+inline void Campaign::Update60TPS() {
   auto animated_actors =
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
@@ -162,8 +150,7 @@ inline void Campaign::Update60TPS()
   //  Terrain::UpdateFOW(reg);
 }
 
-inline void Campaign::Update1TPS()
-{
+inline void Campaign::Update1TPS() {
   SettlementSystem::Update(
     Global::world.view<Province::Component, Settlement::Component>()
   );
@@ -172,130 +159,105 @@ inline void Campaign::Update1TPS()
 
   if ( Global::state.month < 12 )
     Global::state.month++;
-  else
-  {
+  else {
     Global::state.year++;
     Global::state.month = 1;
   }
 }
 
-inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event )
-{
+// inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
+//   Vector2 click_pos =
+//     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
+
+//   auto player_e =
+//     Global::world.view<Player::Component, Player::LocalTag>().front();
+
+//   if ( player_e == entt::null ) {
+//     std::cout << "ERROR"
+//               << " no local player was found" << '\n';
+//     return;
+//   }
+
+//   switch ( event.event_id ) {
+//     case InterfaceEvent::ID::SettlementContextMilitaryTab: {
+//       InterfaceUpdate::Update{
+//         .id = InterfaceUpdate::ID::SettlementContextMilitaryTab,
+//       }
+//         .Send();
+//     }; break;
+//     case InterfaceEvent::ID::SettlementContextPopulationTab: {
+//       InterfaceUpdate::Update{
+//         .id = InterfaceUpdate::ID::SettlementContextPopulationTab,
+//       }
+//         .Send();
+//     }; break;
+//     case InterfaceEvent::ID::SettlementContextResourcesTab: {
+//       InterfaceUpdate::Update{
+//         .id = InterfaceUpdate::ID::SettlementContextResourcesTab,
+//       }
+//         .Send();
+//     }; break;
+//     case InterfaceEvent::ID::SettlementContextConstructionTab: {
+//       InterfaceUpdate::Update{
+//         .id = InterfaceUpdate::ID::SettlementContextConstructionTab,
+//       }
+//         .Send();
+//     }; break;
+//     case InterfaceEvent::ID::SettlementContextConstructBuilding: {
+//       SettlementSystem::ConstructBuilding( event.msg );
+//     }; break;
+//     case InterfaceEvent::ID::SettlementContextTrainHastati: {
+//       SettlementSystem::TrainRegiment( UnitType::Hastati );
+//     }; break;
+//     case InterfaceEvent::ID::ActorSpawnSettlment: {
+//       PostCommand( Command{
+//         .type = CommandType::Spawn,
+//         .player_e = player_e,
+//         .msg = "Player spawn Settlement",
+//         .click_pos = click_pos,
+//       } );
+//     }; break;
+//     default:
+//       std::cout << "Unknown event in Campaign::ForwardEvent" << '\n';
+//       break;
+//   };
+// }
+
+inline void Campaign::CheckForInput() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
   auto player_e =
     Global::world.view<Player::Component, Player::LocalTag>().front();
 
-  if ( player_e == entt::null )
-  {
+  if ( player_e == entt::null ) {
     std::cout << "ERROR"
               << " no local player was found" << '\n';
     return;
   }
 
-  switch ( event.event_id )
-  {
-    case InterfaceEvent::ID::SettlementContextMilitaryTab:
-    {
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::SettlementContextMilitaryTab,
-      }
-        .Send();
-    };
-    break;
-    case InterfaceEvent::ID::SettlementContextPopulationTab:
-    {
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::SettlementContextPopulationTab,
-      }
-        .Send();
-    };
-    break;
-    case InterfaceEvent::ID::SettlementContextResourcesTab:
-    {
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::SettlementContextResourcesTab,
-      }
-        .Send();
-    };
-    break;
-    case InterfaceEvent::ID::SettlementContextConstructionTab:
-    {
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::SettlementContextConstructionTab,
-      }
-        .Send();
-    };
-    break;
-    case InterfaceEvent::ID::SettlementContextConstructBuilding:
-    {
-      SettlementSystem::ConstructBuilding( event.msg );
-    };
-    break;
-    case InterfaceEvent::ID::SettlementContextTrainHastati:
-    {
-      SettlementSystem::TrainRegiment( UnitType::Hastati );
-    };
-    break;
-    case InterfaceEvent::ID::ActorSpawnSettlment:
-    {
-      PostCommand( Command{
-        .type = CommandType::Spawn,
-        .player_e = player_e,
-        .msg = "Player spawn Settlement",
-        .click_pos = click_pos,
-      } );
-    };
-    break;
-    default:
-      std::cout << "Unknown event in Campaign::ForwardEvent" << '\n';
-      break;
-  };
-}
-
-inline void Campaign::CheckForInput()
-{
-  Vector2 click_pos =
-    GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
-
-  auto player_e =
-    Global::world.view<Player::Component, Player::LocalTag>().front();
-
-  if ( player_e == entt::null )
-  {
-    std::cout << "ERROR"
-              << " no local player was found" << '\n';
-    return;
-  }
-
-  if ( IsKeyPressed( KEY_SPACE ) )
-  {
+  if ( IsKeyPressed( KEY_SPACE ) ) {
     PostCommand( { CommandType::TimeChange, player_e, "Player request Pause" }
     );
   }
 
-  if ( IsKeyPressed( KEY_MINUS ) )
-  {
+  if ( IsKeyPressed( KEY_MINUS ) ) {
     PostCommand( { CommandType::TimeChange, player_e, "Player request Slower" }
     );
   }
 
-  if ( IsKeyPressed( KEY_EQUAL ) )
-  {
+  if ( IsKeyPressed( KEY_EQUAL ) ) {
     PostCommand( { CommandType::TimeChange, player_e, "Player request Faster" }
     );
   }
 
-  if ( IsKeyPressed( KEY_V ) )
-  {
+  if ( IsKeyPressed( KEY_V ) ) {
     PostCommand(
       { CommandType::Spawn, player_e, "Player spawn Villager", click_pos }
     );
   }
 
-  if ( IsKeyPressed( KEY_C ) )
-  {
+  if ( IsKeyPressed( KEY_C ) ) {
     // TODO rename to took ownership
     PostCommand(
       { CommandType::Spawn,
@@ -305,51 +267,50 @@ inline void Campaign::CheckForInput()
     );
   }
 
-  if ( IsMouseButtonPressed( 0 ) )
-  {
-    if ( !UI::Manager()->MouseIsOverUI() )
-    {
+  if ( Iron::Forge()->MouseIsOverUI() ) {
+    printf( "OVER IRON UI\n" );
+  }
+
+  if ( IsMouseButtonPressed( 0 ) ) {
+    // if ( !UI::Manager()->MouseIsOverUI() ) {
+    //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
+    // }
+    if ( !Iron::Forge()->MouseIsOverUI() ) {
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
-  if ( IsMouseButtonPressed( 1 ) )
-  {
-    if ( !UI::Manager()->MouseIsOverUI() )
-    {
-      auto selected_e =
-        Global::world
-          .view<Actor::Component, Animated::Component, Selected::Component>()
-          .front();
+  if ( IsMouseButtonPressed( 1 ) ) {
+    // if ( !UI::Manager()->MouseIsOverUI() ) {
+    //   auto selected_e =
+    //     Global::world
+    //       .view<Actor::Component, Animated::Component, Selected::Component>()
+    //       .front();
 
-      if ( selected_e != entt::null )
-      {
-        std::cout << "Moving entity: " << EntityIdToString( selected_e )
-                  << '\n';
-        PostCommand( {
-          CommandType::Move,
-          player_e,
-          "Player move",
-          click_pos,
-          selected_e,
-        } );
-      }
-    }
+    //   if ( selected_e != entt::null ) {
+    //     std::cout << "Moving entity: " << EntityIdToString( selected_e )
+    //               << '\n';
+    //     PostCommand( {
+    //       CommandType::Move,
+    //       player_e,
+    //       "Player move",
+    //       click_pos,
+    //       selected_e,
+    //     } );
+    //   }
+    // }
   }
 
-  if ( IsKeyPressed( KEY_P ) )
-  {
+  if ( IsKeyPressed( KEY_P ) ) {
     MapSystem::mode = MapSystem::Mode::Political;
   }
 
-  if ( IsKeyPressed( KEY_T ) )
-  {
+  if ( IsKeyPressed( KEY_T ) ) {
     MapSystem::mode = MapSystem::Mode::Terrain;
   }
 }
 
-inline void Campaign::ConvertCommandRequest( std::string str )
-{
+inline void Campaign::ConvertCommandRequest( std::string str ) {
   nlohmann::json body = nlohmann::json::parse( str );
 
   std::cout << "BODY" << body << '\n';
@@ -363,15 +324,13 @@ inline void Campaign::ConvertCommandRequest( std::string str )
 
   auto players = Global::world.view<Player::Component>();
 
-  for ( entt::entity player: players )
-  {
+  for ( entt::entity player: players ) {
     Player::Component pc = Global::world.get<Player::Component>( player );
 
     std::cout << "pc.player_id: " << pc.player_id << '\n';
     std::cout << "cmd_player_id: " << cmd_player_id << '\n';
 
-    if ( pc.player_id == cmd_player_id )
-    {
+    if ( pc.player_id == cmd_player_id ) {
       _command_queue.enqueue( Command{
         .type = cmd_type,
         .player_e = player,
@@ -384,14 +343,10 @@ inline void Campaign::ConvertCommandRequest( std::string str )
 }
 
 
-inline void Campaign::PostCommand( Command cmd )
-{
-  if ( _is_singleplayer )
-  {
+inline void Campaign::PostCommand( Command cmd ) {
+  if ( _is_singleplayer ) {
     _command_queue.enqueue( cmd );
-  }
-  else
-  {
+  } else {
     auto body = nlohmann::json{
       { "cmd_player", GetLocalPlayerID() },
       { "cmd_type", cmd.type },
@@ -401,16 +356,13 @@ inline void Campaign::PostCommand( Command cmd )
       { "entity", cmd.entity },
     };
 
-    if ( Network::is_host )
-    {
+    if ( Network::is_host ) {
       Network::Host()->SendMessageToAllActiveClients( Network::Message{
         Network::MessageID::Command,
         body,
       } );
       _command_queue.enqueue( cmd );
-    }
-    else
-    {
+    } else {
       Network::Client()->SendMessageToHost( Network::Message{
         Network::MessageID::Command,
         body,
@@ -420,40 +372,32 @@ inline void Campaign::PostCommand( Command cmd )
 }
 
 
-inline void Campaign::Receive( const Command &cmd )
-{
-  switch ( cmd.type )
-  {
-    case CommandType::TimeChange:
-    {
+inline void Campaign::Receive( const Command &cmd ) {
+  switch ( cmd.type ) {
+    case CommandType::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
     }
-    case CommandType::Spawn:
-    {
-      if ( cmd.msg == "Player spawn Villager" )
-      {
+    case CommandType::Spawn: {
+      if ( cmd.msg == "Player spawn Villager" ) {
         ActorSystem::SpawnColonist( cmd.player_e, cmd.click_pos );
         return;
       }
 
       // TODO(nick) if (cmd.msg = "Player spawn Army")
 
-      if ( cmd.msg == "Player taking ownership of Province" )
-      {
+      if ( cmd.msg == "Player taking ownership of Province" ) {
         ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
       }
 
-      if ( cmd.msg == "Player spawn Settlement" )
-      {
+      if ( cmd.msg == "Player spawn Settlement" ) {
         SettlementSystem::SpawnSettlement();
       }
 
 
       return;
     }
-    case CommandType::Move:
-    {
+    case CommandType::Move: {
       MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }
@@ -461,33 +405,26 @@ inline void Campaign::Receive( const Command &cmd )
 }
 
 
-inline void Campaign::HandleTimeChangeRequest( const Command &cmd )
-{
-  if ( cmd.msg == "Player request Pause" )
-  {
+inline void Campaign::HandleTimeChangeRequest( const Command &cmd ) {
+  if ( cmd.msg == "Player request Pause" ) {
     std::cout << cmd.msg << std::endl;
 
-    if ( Global::state.timeScale > 0.0f )
-    {
+    if ( Global::state.timeScale > 0.0f ) {
       Global::state.prevTimeScale = Global::state.timeScale;
       Global::state.timeScale = 0.0f;
-    }
-    else if ( Global::state.timeScale == 0.0f )
-    {
+    } else if ( Global::state.timeScale == 0.0f ) {
       Global::state.timeScale = Global::state.prevTimeScale;
     }
 
     return;
   }
 
-  if ( cmd.msg == "Player request Slower" )
-  {
+  if ( cmd.msg == "Player request Slower" ) {
     Global::state.timeScale -= 0.5f;
     if ( Global::state.timeScale < 0.0f )
       Global::state.timeScale = 0.0f;
 
-    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f )
-    {
+    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
       Global::state.prevTimeScale -= 0.5f;
       Global::state.timeScale = Global::state.prevTimeScale;
     }
@@ -495,8 +432,7 @@ inline void Campaign::HandleTimeChangeRequest( const Command &cmd )
     return;
   }
 
-  if ( cmd.msg == "Player request Faster" )
-  {
+  if ( cmd.msg == "Player request Faster" ) {
     Global::state.timeScale += 0.5f;
     if ( Global::state.timeScale > 1.5f )
       Global::state.timeScale = 1.5f;

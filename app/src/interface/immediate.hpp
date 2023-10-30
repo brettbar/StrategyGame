@@ -1,46 +1,53 @@
+#pragma once
+
 #include "../shared/common.hpp"
 #include "../shared/utils.hpp"
 #include <raylib.h>
 #include <stack>
 
 namespace Iron {
-  enum class Type {
+  enum class Type_t {
     Grid,
     TextLabel,
   };
 
-  struct Element;
 
-  struct Grid {
+  struct IElement;
+
+  struct IGrid {
     u32 cols;
     u32 rows;
 
-    Grid() = delete;
-    Grid( u32 c, u32 r ) : cols( c ), rows( r ) {}
+    IGrid() = delete;
+    IGrid( u32 c, u32 r ) : cols( c ), rows( r ) {}
   };
 
-  struct TextLabel {
+  struct ITextLabel {
     str text;
-    TextLabel() = delete;
-    TextLabel( str t ) : text( t ) {}
+    ITextLabel() = delete;
+    ITextLabel( str t ) : text( t ) {}
   };
 
-
-  struct Element {
-    Type type;
+  struct IElement {
+    Type_t type;
+    u32 id;
     rect transform;
     Color background;
+    bool interactable = false;
 
     union {
-      Grid *grid;
-      TextLabel *text_label;
+      IGrid *grid;
+      ITextLabel *text_label;
     } t;
+
 
     void Draw() {
 
       switch ( type ) {
-        case Type::Grid: {
-          // @volatile
+        case Type_t::Grid: {
+
+
+          // @volatile assuming the slots always have same dimensions
           u32 slot_width = transform.width / t.grid->cols;
           u32 slot_height = transform.height / t.grid->rows;
 
@@ -74,7 +81,7 @@ namespace Iron {
           //   slot.child->Draw();
           // }
         } break;
-        case Type::TextLabel: {
+        case Type_t::TextLabel: {
 
           DrawRectangleRec( transform, background );
           DrawText(
@@ -90,9 +97,10 @@ namespace Iron {
     }
 
     rect Slot( u32 i ) {
-      assert( type == Type::Grid && t.grid != nullptr );
+      assert( type == Type_t::Grid && t.grid != nullptr );
 
       auto coords = CoordsFromIndex( i, t.grid->cols );
+      // @volatile
       u32 slot_width = transform.width / t.grid->cols;
       u32 slot_height = transform.height / t.grid->rows;
 
@@ -103,29 +111,124 @@ namespace Iron {
         (f32) slot_height,
       };
     }
+
+    rect Slots( u32 start_i, u32 end_i ) {
+      assert( type == Type_t::Grid && t.grid != nullptr && start_i <= end_i );
+
+      auto start_coords = CoordsFromIndex( start_i, t.grid->cols );
+      auto end_coords = CoordsFromIndex( end_i, t.grid->cols );
+
+      // @volatile
+      u32 slot_width = transform.width / t.grid->cols;
+      u32 slot_height = transform.height / t.grid->rows;
+
+      if ( start_i == end_i ) {
+        return Slot( start_i );
+      }
+
+      // Account for 0 indexing
+      u32 slots_wide = 1 + end_coords.x - start_coords.x;
+      u32 slots_tall = 1 + end_coords.y - end_coords.y;
+
+
+      return rect{
+        transform.x + (f32) ( start_coords.x * slot_width ),
+        transform.y + (f32) ( start_coords.y * slot_height ),
+        (f32) ( slots_wide * slot_width ),
+        (f32) ( slots_tall * slot_height ),
+      };
+    }
   };
 
-  struct Forge {
-    list<Element *> queue;
+  struct Context {
+    i32 hot = -1;
+    i32 active = -1;
+  };
 
-    Element *IronGrid( rect t, u32 c, u32 r ) {
-      auto e = new Element();
-      e->type = Type::Grid;
+  struct IForge {
+private:
+    IForge() {}
+    ~IForge() {}
+
+public:
+    list<IElement *> queue;
+    Context context;
+
+    IForge( IForge const & ) = delete;
+    void operator=( const IForge & ) = delete;
+
+    static IForge *Forge() {
+      static IForge instance;
+      return &instance;
+    }
+
+    bool MouseIsOverUI() {
+      return context.hot != -1 && context.active != -1;
+    }
+
+    bool CheckInteract( IElement e ) {
+      if ( !e.interactable )
+        return false;
+
+      vec2f mouse_pos = GetMousePosition();
+      bool mouse_went_up = IsMouseButtonReleased( 0 );
+      bool mouse_went_down = IsMouseButtonPressed( 0 );
+      // bool mouse_held_down = IsMouseButtonDown( 0 );
+
+
+      bool inside = CheckCollisionPointRec( mouse_pos, e.transform );
+
+      if ( !inside )
+        return false;
+
+      bool result = false;
+
+      if ( e.id == context.active ) {
+        if ( mouse_went_up ) {
+          if ( e.id == context.hot )
+            result = true;// do the button action
+
+          context.active = -1;
+        }
+      } else if ( e.id == context.hot && e.interactable ) {
+        if ( mouse_went_down )
+          context.active = e.id;
+      }
+
+      if ( inside ) {
+        if ( context.active == -1 ) {
+          context.hot = e.id;
+
+          if ( mouse_went_down )
+            context.active = e.id;
+        }
+      }
+
+      return result;
+    }
+
+    IElement *Grid( rect t, u32 c, u32 r ) {
+      auto e = new IElement();
+      e->type = Type_t::Grid;
       e->background = BLUE;
       e->transform = t;
-      e->t.grid = new Grid( c, r );
+      e->t.grid = new IGrid( c, r );
       queue.push_back( e );
       return e;
     }
 
-    Element *IronTextLabel( rect t, str txt ) {
-      auto e = new Element();
-      e->type = Type::TextLabel;
-      e->background = BLUE;
+    IElement *TextLabel( rect t, str txt, Color c ) {
+      auto e = new IElement();
+      e->type = Type_t::TextLabel;
+      e->background = c;
       e->transform = t;
-      e->t.text_label = new TextLabel( txt );
+      e->t.text_label = new ITextLabel( txt );
       queue.push_back( e );
       return e;
+    }
+
+    bool TextButton( rect t, str txt, Color c ) {
+      return CheckInteract( *TextLabel( t, txt, c ) );
     }
 
     inline void Draw() {
@@ -134,6 +237,10 @@ namespace Iron {
       }
     }
   };
+
+  inline IForge *Forge() {
+    return IForge::Forge();
+  }
 
 
 };// namespace Iron

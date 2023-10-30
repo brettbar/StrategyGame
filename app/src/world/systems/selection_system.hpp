@@ -98,11 +98,12 @@ namespace SelectionSystem {
     }
   }
 
-  inline Settlement::Component *GetSelectedSettlement() {
-    auto selected_entity = Global::world.view<Selected::Component>().front();
+  template<typename T>
+  inline T *GetSelectedComponent() {
+    auto selected_entity = GetSelectedEntity();
 
-    if ( Global::world.all_of<Settlement::Component>( selected_entity ) ) {
-      return &Global::world.get<Settlement::Component>( selected_entity );
+    if ( Global::world.all_of<T>( selected_entity ) ) {
+      return &Global::world.get<T>( selected_entity );
     }
 
     return nullptr;

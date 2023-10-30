@@ -4,7 +4,6 @@
 #include "../shared/utils.hpp"
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
-#include "immediate.hpp"
 #include "ui_shared.hpp"
 
 
@@ -18,8 +17,7 @@ namespace UI {
     TextureButton,
   };
 
-  struct Margins
-  {
+  struct Margins {
     u32 left;
     u32 right;
     u32 top;
@@ -29,12 +27,9 @@ namespace UI {
   struct Element;
 
 
-  struct GridPanelElement
-  {
-    struct Slot
-    {
-      struct Dimensions
-      {
+  struct GridPanelElement {
+    struct Slot {
+      struct Dimensions {
         u32 start_col;
         u32 end_col;
         u32 start_row;
@@ -75,8 +70,7 @@ namespace UI {
   GridPanelElement::
     Slot GridSlot( GridPanelElement::Slot::Dimensions, sptr<Element> );
 
-  struct StackPanelElement
-  {
+  struct StackPanelElement {
     u32 curr_index = 0;
     list<sptr<Element>> tabs;
     list<InterfaceUpdate::ID> change_tabs_map;
@@ -100,8 +94,7 @@ namespace UI {
     void ExecuteInterfaceUpdate( const InterfaceUpdate::Update & );
   };
 
-  struct TextLabelElement
-  {
+  struct TextLabelElement {
     str text = "INVALID";
     u32 font_size = 14;
     Color text_color = WHITE;
@@ -116,8 +109,7 @@ namespace UI {
     void Draw( Color, rect );
   };
 
-  struct TextButtonElement
-  {
+  struct TextButtonElement {
     bool clickable = true;
     sptr<TextLabelElement> label;
     sptr<InterfaceEvent::Data> on_click;
@@ -135,15 +127,13 @@ namespace UI {
     }
   };
 
-  struct TextureLabelElement
-  {
+  struct TextureLabelElement {
     Texture2D texture = Texture2D();
     TextureLabelElement() = delete;
     TextureLabelElement( Texture2D texture ) : texture( texture ) {}
   };
 
-  struct TextureButtonElement
-  {
+  struct TextureButtonElement {
     bool clickable = true;
     sptr<TextureLabelElement> label;
     sptr<InterfaceEvent::Data> on_click = nullptr;
@@ -155,8 +145,7 @@ namespace UI {
         : label( label ), on_click( on_click ) {}
   };
 
-  struct Element
-  {
+  struct Element {
     Element() = delete;
 
     // GridPanel

@@ -3,60 +3,81 @@
 #include "../../shared/common.hpp"
 
 #include "../builders.hpp"
+#include "../immediate.hpp"
 #include <raylib.h>
 
-namespace UI
-{
 
-  inline sptr<Element> CreateMainMenuUI()
-  {
-    return GridPanel( "main_menu_root", 3, 3 )
-      .FixedSize( GetScreenWidth(), GetScreenHeight() )
-      .Background( GRAY )
-      .Children( {
-        GridSlot(
-          { 1, 1, 1, 1 },
-          GridPanel( "main_menu", 1, 6 )
-            .Background( GREEN )
-            .Children( {
-              GridSlot(
-                { 0, 0, 0, 0 },
-                TextButton( "main_menu_host_game", "Host Game", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuHostGame )
-                  .Background( BLUE )
-              ),
-              GridSlot(
-                { 0, 0, 1, 1 },
-                TextButton( "main_menu_join_game", "Join Game", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuJoinGame )
-                  .Background( BLUE )
-              ),
-              GridSlot(
-                { 0, 0, 2, 2 },
-                TextButton( "main_menu_start_game", "Start Game", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuStartGame )
-                  .Background( BLUE )
-              ),
-              GridSlot(
-                { 0, 0, 3, 3 },
-                TextButton( "main_menu_load_game", "Load Game", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuLoadGame )
-                  .Background( BLUE )
-              ),
-              GridSlot(
-                { 0, 0, 4, 4 },
-                TextButton( "main_menu_settings", "Settings", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuSettings )
-                  .Background( BLUE )
-              ),
-              GridSlot(
-                { 0, 0, 5, 5 },
-                TextButton( "main_menu_exit_game", "Exit Game", 32 )
-                  .SetEvent( InterfaceEvent::ID::MainMenuExitGame )
-                  .Background( BLUE )
-              ),
-            } )
-        ),
-      } );
+namespace UI {
+
+
+  inline void DrawMainMenu() {
+    auto f = Iron::Forge();
+
+
+    rect r = rect{ 0, 0, 250, 250 };
+    auto grid = f->Grid( r, 3, 3 );
+
+    f->TextLabel( grid->Slot( 0 ), "Actor", GREEN );
+    bool okay_pressed = f->TextButton( grid->Slot( 2 ), "Okay", BLUE );
+
+    if ( okay_pressed ) {
+      printf( "okay pressed\n" );
+    }
+
+    f->Draw();
   }
+
+
+  // inline sptr<Element> CreateMainMenuUI()
+  // {
+  //   return GridPanel( "ma
+  //     .FixedSize(
+  //     .Background
+  //     .Children( {
+  //       GridSlot(
+  //         { 1, 1, 1, 1 },
+  //         GridPanel( "ma
+  //           .Background
+  //           .Children( {
+  //             GridSlot(
+  //               { 0, 0, 0, 0 },
+  //               TextButton( "main_men
+  //
+  //                 .Back
+  //             ),
+  //             GridSlot(
+  //               { 0, 0, 1, 1 },
+  //               TextButton( "main_men
+  //
+  //                 .Back
+  //             ),
+  //             GridSlot(
+  //               { 0, 0, 2, 2 },
+  //               TextButton( "main_men
+  //
+  //                 .Back
+  //             ),
+  //             GridSlot(
+  //               { 0, 0, 3, 3 },
+  //               TextButton( "main_men
+  //
+  //                 .Back
+  //             ),
+  //             GridSlot(
+  //               { 0, 0, 4, 4 },
+  //               TextButton( "main_men
+  //
+  //                 .Back
+  //             ),
+  //             GridSlot(
+  //               { 0, 0, 5, 5 },
+  //               TextButton( "main_men
+  //
+  //
+  //
+  //
+  //       ),
+
+  //     } );
+  // }
 };// namespace UI

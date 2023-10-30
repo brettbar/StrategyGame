@@ -12,8 +12,7 @@
 
 #include <raylib.h>
 
-namespace Renderer
-{
+namespace Renderer {
 
   inline Shader shader;
   inline Shader outline_shader;
@@ -21,8 +20,7 @@ namespace Renderer
   inline void DrawActors( bool debug );
 
 
-  inline void Init()
-  {
+  inline void Init() {
     shader = LoadShader(
       "app/assets/shaders/pixel.vs", "app/assets/shaders/pixel.fs"
     );
@@ -54,8 +52,7 @@ namespace Renderer
   }
 
 
-  inline void Draw( TextureCache &texture_cache )
-  {
+  inline void Draw( TextureCache &texture_cache ) {
 
 
     ClearBackground( DARKGRAY );
@@ -87,18 +84,13 @@ namespace Renderer
 
       BeginShaderMode( shader );
       {
-        switch ( MapSystem::mode )
-        {
-          case MapSystem::Mode::Terrain:
-          {
+        switch ( MapSystem::mode ) {
+          case MapSystem::Mode::Terrain: {
             SettlementSystem::Draw( texture_cache, false );
-          }
-          break;
-          case MapSystem::Mode::Political:
-          {
+          } break;
+          case MapSystem::Mode::Political: {
             SettlementSystem::Draw( texture_cache, false );
-          }
-          break;
+          } break;
         }
 
         // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
@@ -115,17 +107,15 @@ namespace Renderer
     EndMode2D();
   }
 
-  inline void DrawUI()
-  {
+  inline void DrawUI() {
     // TODO right now alpha issues are cropping up with the shader
     // BeginShaderMode( shader );
 
-    UI::System::Draw();
+    // UI::System::Draw();
     // EndShaderMode();
   }
 
-  inline void DrawActors( bool debug )
-  {
+  inline void DrawActors( bool debug ) {
     entt::basic_view actors =
       Global::world.view<Actor::Component, Animated::Component>();
 
@@ -142,8 +132,7 @@ namespace Renderer
       //        WHITE);
 
 
-      if ( actor.selected )
-      {
+      if ( actor.selected ) {
         BeginShaderMode( outline_shader );
         DrawTextureRec(
           anim.sprite,
@@ -152,9 +141,7 @@ namespace Renderer
           WHITE
         );
         EndShaderMode();
-      }
-      else
-      {
+      } else {
         BeginShaderMode( shader );
         DrawTextureRec(
           anim.sprite,
@@ -178,8 +165,7 @@ namespace Renderer
       //   { actor.position.x - 64.0f, actor.position.y - 64.0f },
       //   WHITE );
 
-      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f )
-      {
+      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f ) {
         DrawLineEx( actor.position, actor.destination, 2, MAGENTA );
       }
     } );
