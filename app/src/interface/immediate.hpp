@@ -140,36 +140,35 @@ namespace Iron {
     }
   };
 
-  struct Context {
-    i32 hot = -1;
-    i32 active = -1;
-  };
 
-  struct IForge {
+  struct Watcher {
+
 private:
-    IForge() {}
-    ~IForge() {}
+    struct Context {
+      i32 hot = -1;
+      i32 active = -1;
+    };
 
-public:
-    list<IElement *> queue;
+    Watcher() {}
+    ~Watcher() {}
+
+    Watcher( Watcher const & ) = delete;
+    void operator=( const Watcher & ) = delete;
+
+
     Context context;
 
-    IForge( IForge const & ) = delete;
-    void operator=( const IForge & ) = delete;
+public:
+    bool MouseIsOverUI() {
+      return context.hot != -1 || context.active != -1;
+    }
 
-    static IForge *Forge() {
-      static IForge instance;
+    static Watcher *GetWatcher() {
+      static Watcher instance;
       return &instance;
     }
 
-    bool MouseIsOverUI() {
-      return context.hot != -1 && context.active != -1;
-    }
-
     bool CheckInteract( IElement e ) {
-      if ( !e.interactable )
-        return false;
-
       vec2f mouse_pos = GetMousePosition();
       bool mouse_went_up = IsMouseButtonReleased( 0 );
       bool mouse_went_down = IsMouseButtonPressed( 0 );
@@ -206,6 +205,20 @@ public:
 
       return result;
     }
+  };
+
+  inline Watcher *GetWatcher() {
+    return Watcher::GetWatcher();
+  }
+
+  struct Forge {
+    list<IElement *> queue;
+
+    Forge() {}
+    ~Forge() {
+      queue.clear();
+    }
+
 
     IElement *Grid( rect t, u32 c, u32 r ) {
       auto e = new IElement();
@@ -228,7 +241,7 @@ public:
     }
 
     bool TextButton( rect t, str txt, Color c ) {
-      return CheckInteract( *TextLabel( t, txt, c ) );
+      return GetWatcher()->CheckInteract( *TextLabel( t, txt, c ) );
     }
 
     inline void Draw() {
@@ -237,10 +250,6 @@ public:
       }
     }
   };
-
-  inline IForge *Forge() {
-    return IForge::Forge();
-  }
 
 
 };// namespace Iron

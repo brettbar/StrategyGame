@@ -15,7 +15,7 @@
 
 #include "campaign.hpp"
 
-enum class ProgramMode {
+enum class Scene {
   MainMenu,
   ModalMenu,
   Campaign,
@@ -93,7 +93,7 @@ class IGame {
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
   bool _hit_exit = false;
-  ProgramMode _mode = ProgramMode::MainMenu;
+  Scene _mode = Scene::MainMenu;
 
   f32 _oncelag = 0.0f;
   f32 _lag = 0.0f;
@@ -141,7 +141,7 @@ class IGame {
       player, FactionSystem::factions.at( player_faction )
     );
 
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
   /*=============================================================
                         End: Singleplayer
@@ -209,7 +209,7 @@ class IGame {
     }
 
 
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
 
   void ClientStartMultiplayerCampaign() {
@@ -256,7 +256,7 @@ class IGame {
       }
     }
 
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
 
   void LookForMultiplayerLobby() {
@@ -292,7 +292,7 @@ class IGame {
     _campaign = new class Campaign( "output.dat" );
     // UI::System::InitCampaignUI();
 
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
 
   void SaveGame() {
@@ -304,18 +304,18 @@ class IGame {
   }
 
   void ToggleModalMenu() {
-    if ( _mode == ProgramMode::Campaign ) {
-      _mode = ProgramMode::ModalMenu;
+    if ( _mode == Scene::Campaign ) {
+      _mode = Scene::ModalMenu;
       // UI::System::SwitchPage( UI::ModalMenu );
-    } else if ( _mode == ProgramMode::ModalMenu ) {
-      _mode = ProgramMode::Campaign;
+    } else if ( _mode == Scene::ModalMenu ) {
+      _mode = Scene::Campaign;
       // UI::System::InitCampaignUI();
     }
   }
 
   void ReturnToMain() {
     // UI::System::SwitchPage( UI::MainMenu );
-    _mode = ProgramMode::MainMenu;
+    _mode = Scene::MainMenu;
   }
 
 
@@ -339,7 +339,7 @@ class IGame {
     }
 
     switch ( _mode ) {
-      case ProgramMode::MainMenu: {
+      case Scene::MainMenu: {
         // UI::System::UpdateOnFrame();
 
         CameraUpdate( Global::state.camera, _dt );
@@ -353,7 +353,7 @@ class IGame {
         EndDrawing();
       } break;
 
-      case ProgramMode::ModalMenu: {
+      case Scene::ModalMenu: {
         CheckMenuToggle();
 
         // UI::System::UpdateOnFrame();
@@ -369,7 +369,7 @@ class IGame {
         EndDrawing();
       } break;
 
-      case ProgramMode::Campaign: {
+      case Scene::Campaign: {
         CheckMenuToggle();
 
         if ( _single_player ) {
@@ -394,7 +394,7 @@ class IGame {
         EndDrawing();
       } break;
 
-      case ProgramMode::Editor:
+      case Scene::Editor:
         break;
     }
   }
