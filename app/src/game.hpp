@@ -396,7 +396,7 @@ class IGame {
         {
           auto selection = UI::DrawFactionSelectScreen();
 
-          // @voltile
+          // @volatile
           // TODO make this a faction enum
           if ( selection != "" ) {
             _mode = Scene::Campaign;
