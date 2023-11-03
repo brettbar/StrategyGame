@@ -2,6 +2,7 @@
 
 #include "../shared/common.hpp"
 #include "../shared/utils.hpp"
+#include "ui_shared.hpp"
 #include <raylib.h>
 #include <stack>
 
@@ -155,10 +156,9 @@ private:
     Foreman( Foreman const & ) = delete;
     void operator=( const Foreman & ) = delete;
 
-
+public:
     Context context;
 
-public:
     bool MouseIsOverUI() {
       return context.hot != -1 || context.active != -1;
     }
@@ -195,7 +195,7 @@ public:
       }
 
       if ( inside ) {
-        if ( context.active == -1 ) {
+        if ( context.active == -1 && e.interactable ) {
           context.hot = e.id;
 
           if ( mouse_went_down )
@@ -207,7 +207,7 @@ public:
     }
   };
 
-  inline Foreman *GetWatcher() {
+  inline Foreman *Watcher() {
     return Foreman::GetWatcher();
   }
 
@@ -223,6 +223,7 @@ public:
     IElement *Grid( rect t, u32 c, u32 r ) {
       auto e = new IElement();
       e->type = Type_t::Grid;
+      e->id = queue.size();
       e->background = BLUE;
       e->transform = t;
       e->t.grid = new IGrid( c, r );
@@ -233,6 +234,7 @@ public:
     IElement *TextLabel( rect t, str txt, Color c ) {
       auto e = new IElement();
       e->type = Type_t::TextLabel;
+      e->id = queue.size();
       e->background = c;
       e->transform = t;
       e->t.text_label = new ITextLabel( txt );
@@ -241,11 +243,14 @@ public:
     }
 
     bool TextButton( rect t, str txt, Color c ) {
-      return GetWatcher()->CheckInteract( *TextLabel( t, txt, c ) );
+      auto e = TextLabel( t, txt, c );
+      e->interactable = true;
+      return Watcher()->context.active == e->id;
     }
 
     inline void Draw() {
       for ( u32 i = 0; i < queue.size(); i++ ) {
+        Watcher()->CheckInteract( *queue[i] );
         queue[i]->Draw();
       }
     }

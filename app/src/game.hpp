@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interface/immediate.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
@@ -437,13 +438,7 @@ class IGame {
 
         // 6. Draw everything
         BeginDrawing();
-        {
-          Renderer::Draw( Global::texture_cache );
-          // Renderer::DrawUI();
-
-          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-          DrawFPS( GetScreenWidth() - 100, 2 );
-        }
+        { _campaign->Draw(); }
         EndDrawing();
       } break;
 

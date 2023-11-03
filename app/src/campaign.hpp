@@ -32,6 +32,10 @@
 
 #include "interface/immediate.hpp"
 
+#include "interface/pages/campaign/campaign_ui.hpp"
+#include <raylib.h>
+
+
 enum class CommandType {
   TimeChange,
   Spawn,
@@ -73,6 +77,8 @@ class Campaign {
   void Update60TPS();
   void Update1TPS();
   void PostCommand( Command );
+
+  void Draw();
 
   void Receive( const Command & );
   void HandleSpawnRequest( const Command & );
@@ -163,6 +169,55 @@ inline void Campaign::Update1TPS() {
     Global::state.year++;
     Global::state.month = 1;
   }
+}
+
+inline void Campaign::Draw() {
+  Renderer::Draw( Global::texture_cache );
+  // Renderer::DrawUI();
+
+  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
+       ) ) {
+    auto settlement =
+      SelectionSystem::GetSelectedComponent<Settlement::Component>();
+
+    if ( !settlement ) {
+      printf( "Got null settlement??\n" );
+      return;
+    }
+
+    UI::DrawSettlementContext( settlement );
+  }
+
+  if ( SelectionSystem::Selected<Actor::Component>() ) {
+    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
+
+    if ( !actor ) {
+      printf( "Got null actor??\n" );
+      return;
+    }
+
+    UI::DrawActorContext( actor );
+  }
+
+  UI::DrawDebug();
+
+
+  {
+    DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+    DrawFPS( GetScreenWidth() - 100, 2 );
+  }
+
+  {
+    DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
+    str foo = "h: " + std::to_string( Iron::Watcher()->context.hot ) +
+              ", a: " + std::to_string( Iron::Watcher()->context.active );
+    DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
+  }
+
+
+  // @todo this needs to go elsewhere so that its accoutned for in main menu for example
+  Iron::Watcher()->context.hot = -1;
+  Iron::Watcher()->context.active = -1;
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
@@ -271,7 +326,8 @@ inline void Campaign::CheckForInput() {
     // if ( !UI::Manager()->MouseIsOverUI() ) {
     //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     // }
-    if ( !Iron::GetWatcher()->MouseIsOverUI() ) {
+    if ( !Iron::Watcher()->MouseIsOverUI() ) {
+      printf( "Should be selecting\n" );
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
