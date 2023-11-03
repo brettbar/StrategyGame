@@ -344,11 +344,12 @@ class IGame {
       Network::Client()->Update();
     }
 
+    Iron::Watcher()->over_any_elem = false;
+
     switch ( _mode ) {
       case Scene::MainMenu: {
         // UI::System::UpdateOnFrame();
 
-        CameraUpdate( Global::state.camera, _dt );
 
         BeginDrawing();
         {
@@ -379,6 +380,7 @@ class IGame {
       case Scene::SinglePlayerLobby: {
         BeginDrawing();
         {
+          ClearBackground( BLACK );
           auto action = UI::DrawSinglePlayerLobby();
           switch ( action ) {
             case UI::Action_SinglePlayerLobby::SelectFaction:
@@ -444,6 +446,11 @@ class IGame {
 
       case Scene::Editor:
         break;
+    }
+
+    if ( !Iron::Watcher()->over_any_elem ) {
+      Iron::Watcher()->context.hot = -1;
+      Iron::Watcher()->context.active = -1;
     }
   }
 

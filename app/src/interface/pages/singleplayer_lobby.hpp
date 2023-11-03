@@ -31,6 +31,7 @@ namespace UI {
 
     f.TextLabel( grid->Slot( 1 ), "Waiting for faction", BLUE );
 
+
     bool exit_pressed = f.TextButton( grid->Slot( 4 ), "Return to Main", BLUE );
 
     if ( select_faction ) {

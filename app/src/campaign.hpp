@@ -216,8 +216,8 @@ inline void Campaign::Draw() {
 
 
   // @todo this needs to go elsewhere so that its accoutned for in main menu for example
-  Iron::Watcher()->context.hot = -1;
-  Iron::Watcher()->context.active = -1;
+  // Iron::Watcher()->context.hot = -1;
+  // Iron::Watcher()->context.active = -1;
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
@@ -333,24 +333,24 @@ inline void Campaign::CheckForInput() {
   }
 
   if ( IsMouseButtonPressed( 1 ) ) {
-    // if ( !UI::Manager()->MouseIsOverUI() ) {
-    //   auto selected_e =
-    //     Global::world
-    //       .view<Actor::Component, Animated::Component, Selected::Component>()
-    //       .front();
+    if ( !Iron::Watcher()->MouseIsOverUI() ) {
+      auto selected_e =
+        Global::world
+          .view<Actor::Component, Animated::Component, Selected::Component>()
+          .front();
 
-    //   if ( selected_e != entt::null ) {
-    //     std::cout << "Moving entity: " << EntityIdToString( selected_e )
-    //               << '\n';
-    //     PostCommand( {
-    //       CommandType::Move,
-    //       player_e,
-    //       "Player move",
-    //       click_pos,
-    //       selected_e,
-    //     } );
-    //   }
-    // }
+      if ( selected_e != entt::null ) {
+        std::cout << "Moving entity: " << EntityIdToString( selected_e )
+                  << '\n';
+        PostCommand( {
+          CommandType::Move,
+          player_e,
+          "Player move",
+          click_pos,
+          selected_e,
+        } );
+      }
+    }
   }
 
   if ( IsKeyPressed( KEY_P ) ) {

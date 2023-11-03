@@ -49,33 +49,33 @@ namespace Iron {
 
 
           // @volatile assuming the slots always have same dimensions
-          u32 slot_width = transform.width / t.grid->cols;
-          u32 slot_height = transform.height / t.grid->rows;
+          // u32 slot_width = transform.width / t.grid->cols;
+          // u32 slot_height = transform.height / t.grid->rows;
 
-          // Draw the grid
-          for ( u32 c = 0; c < t.grid->cols; c++ ) {
-            for ( u32 r = 0; r < t.grid->rows; r++ ) {
-              DrawRectangleRec(
-                {
-                  transform.x + (f32) ( c * slot_width ),
-                  transform.y + (f32) ( r * slot_height ),
-                  (f32) slot_width,
-                  (f32) slot_height,
-                },
-                GRAY
-              );
-              DrawRectangleLinesEx(
-                {
-                  transform.x + (f32) ( c * slot_width ),
-                  transform.y + (f32) ( r * slot_height ),
-                  (f32) slot_width,
-                  (f32) slot_height,
-                },
-                4,
-                BLACK
-              );
-            }
-          }
+          // // Draw the grid
+          // for ( u32 c = 0; c < t.grid->cols; c++ ) {
+          //   for ( u32 r = 0; r < t.grid->rows; r++ ) {
+          //     DrawRectangleRec(
+          //       {
+          //         transform.x + (f32) ( c * slot_width ),
+          //         transform.y + (f32) ( r * slot_height ),
+          //         (f32) slot_width,
+          //         (f32) slot_height,
+          //       },
+          //       GRAY
+          //     );
+          //     DrawRectangleLinesEx(
+          //       {
+          //         transform.x + (f32) ( c * slot_width ),
+          //         transform.y + (f32) ( r * slot_height ),
+          //         (f32) slot_width,
+          //         (f32) slot_height,
+          //       },
+          //       4,
+          //       BLACK
+          //     );
+          //   }
+          // }
 
           // for ( GridPanelElement::Slot &slot: filled_slots )
           // {
@@ -158,9 +158,10 @@ private:
 
 public:
     Context context;
+    bool over_any_elem;
 
     bool MouseIsOverUI() {
-      return context.hot != -1 || context.active != -1;
+      return over_any_elem;
     }
 
     static Foreman *GetWatcher() {
@@ -179,6 +180,9 @@ public:
 
       if ( !inside )
         return false;
+
+      if ( !over_any_elem )
+        over_any_elem = inside;
 
       bool result = false;
 
