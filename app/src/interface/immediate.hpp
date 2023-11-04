@@ -158,10 +158,11 @@ private:
 
 public:
     Context context;
-    bool over_any_elem;
+    bool over_any_elem = false;
+    bool did_action_this_frame = false;
 
     bool MouseIsOverUI() {
-      return over_any_elem;
+      return context.hot != -1 || context.active != -1 || over_any_elem;
     }
 
     static Foreman *GetWatcher() {
@@ -181,15 +182,18 @@ public:
       if ( !inside )
         return false;
 
-      if ( !over_any_elem )
+      if ( !over_any_elem && e.interactable )
         over_any_elem = inside;
 
       bool result = false;
 
       if ( e.id == context.active ) {
         if ( mouse_went_up ) {
-          if ( e.id == context.hot )
+          if ( e.id == context.hot ) {
             result = true;// do the button action
+            did_action_this_frame = true;
+          }
+
 
           context.active = -1;
         }

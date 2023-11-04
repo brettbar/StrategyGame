@@ -11,7 +11,12 @@
 
 namespace UI {
 
-  inline void DrawActorContext( Actor::Component *actor ) {
+  enum class Action_ActorContext {
+    None,
+    SpawnSettlement,
+  };
+
+  inline Action_ActorContext DrawActorContext( Actor::Component *actor ) {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
@@ -20,13 +25,16 @@ namespace UI {
     auto grid = f.Grid( root_g->Slot( 7 ), 3, 3 );
 
     f.TextLabel( grid->Slot( 0 ), "Actor", GREEN );
-    bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Okay", BLUE );
+    bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Settlement", BLUE );
 
     if ( okay_pressed ) {
       printf( "okay pressed\n" );
+      return Action_ActorContext::SpawnSettlement;
     }
 
     f.Draw();
+
+    return Action_ActorContext::None;
   }
 
   inline void DrawSettlementContext( Settlement::Component *settlement ) {

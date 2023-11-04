@@ -36,7 +36,7 @@ class IGame {
   }
 
   void MainLoop() {
-    RegisterEventListeners();
+    // RegisterEventListeners();
 
     while ( !WindowShouldClose() && ShouldRun() ) {
       SteamAPI_RunCallbacks();
@@ -469,146 +469,146 @@ class IGame {
   void RegisterEventListeners();
 };
 
-inline void IGame::RegisterEventListeners() {
-  InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
-    [&](
-      const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
-    ) {
-      switch ( event.event_id ) {
-        /// BASIC
-        // MainMenu
-        case InterfaceEvent::ID::MainMenuHostGame:
-          HostMultiplayerLobby();
-          break;
-        case InterfaceEvent::ID::MainMenuJoinGame:
-          LookForMultiplayerLobby();
-          break;
-        case InterfaceEvent::ID::MainMenuStartGame: {
-          _single_player = true;
-          // UI::System::SwitchPage( UI::SinglePlayerLobby );
-        } break;
-        case InterfaceEvent::ID::MainMenuLoadGame:
-          LoadGame();
-          break;
-        case InterfaceEvent::ID::MainMenuExitGame:
-          ExitGame();
-          break;
-          // FactionSelect
-        case InterfaceEvent::ID::OpenFactionSelectPage:
-          // UI::System::SwitchPage( UI::FactionSelectMenu );
-          break;
-        case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
-          StartSingleplayerCampaign( faction );
-          break;
-        case InterfaceEvent::ID::ModalMenuLoadGame:
-          LoadGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuSaveGame:
-          SaveGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuExitMain:
-          ReturnToMain();
-          break;
-        case InterfaceEvent::ID::ModalMenuExitGame:
-          ExitGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuToggle:
-          ToggleModalMenu();
-          break;
-        case InterfaceEvent::ID::ReturnToMain:
-          ReturnToMain();
-          break;
-        case InterfaceEvent::ID::PlayerToggledReady: {
-          if ( Network::is_host ) {
-            Network::Host()->ToggleReady();
-          } else {
-            Network::Client()->ToggleReady();
-          }
-        } break;
-        case InterfaceEvent::ID::HostStartGame: {
-          Network::Host()->StartHostedCampaign();
-          HostStartMultiplayerCampaign();
-        } break;
-        case InterfaceEvent::ID::JoinHostedCampaign: {
-          ClientStartMultiplayerCampaign();
-        } break;
-        case InterfaceEvent::ID::JoinLobby: {
-          if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
-            JoinMultiplayerLobby( event.lobby_id );
-          }
-        } break;
-        case InterfaceEvent::ID::FactionSelected: {
-          faction = event.msg;
+// inline void IGame::RegisterEventListeners() {
+//   InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
+//     [&](
+//       const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
+//     ) {
+//       switch ( event.event_id ) {
+//         /// BASIC
+//         // MainMenu
+//         case InterfaceEvent::ID::MainMenuHostGame:
+//           HostMultiplayerLobby();
+//           break;
+//         case InterfaceEvent::ID::MainMenuJoinGame:
+//           LookForMultiplayerLobby();
+//           break;
+//         case InterfaceEvent::ID::MainMenuStartGame: {
+//           _single_player = true;
+//           // UI::System::SwitchPage( UI::SinglePlayerLobby );
+//         } break;
+//         case InterfaceEvent::ID::MainMenuLoadGame:
+//           LoadGame();
+//           break;
+//         case InterfaceEvent::ID::MainMenuExitGame:
+//           ExitGame();
+//           break;
+//           // FactionSelect
+//         case InterfaceEvent::ID::OpenFactionSelectPage:
+//           // UI::System::SwitchPage( UI::FactionSelectMenu );
+//           break;
+//         case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
+//           StartSingleplayerCampaign( faction );
+//           break;
+//         case InterfaceEvent::ID::ModalMenuLoadGame:
+//           LoadGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuSaveGame:
+//           SaveGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuExitMain:
+//           ReturnToMain();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuExitGame:
+//           ExitGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuToggle:
+//           ToggleModalMenu();
+//           break;
+//         case InterfaceEvent::ID::ReturnToMain:
+//           ReturnToMain();
+//           break;
+//         case InterfaceEvent::ID::PlayerToggledReady: {
+//           if ( Network::is_host ) {
+//             Network::Host()->ToggleReady();
+//           } else {
+//             Network::Client()->ToggleReady();
+//           }
+//         } break;
+//         case InterfaceEvent::ID::HostStartGame: {
+//           Network::Host()->StartHostedCampaign();
+//           HostStartMultiplayerCampaign();
+//         } break;
+//         case InterfaceEvent::ID::JoinHostedCampaign: {
+//           ClientStartMultiplayerCampaign();
+//         } break;
+//         case InterfaceEvent::ID::JoinLobby: {
+//           if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
+//             JoinMultiplayerLobby( event.lobby_id );
+//           }
+//         } break;
+//         case InterfaceEvent::ID::FactionSelected: {
+//           faction = event.msg;
 
-          if ( _single_player ) {
-            InterfaceUpdate::Update{
-              .id = InterfaceUpdate::ID::PlayerSelectedFaction,
-              .update_txt = faction,
-              .player_id = "player_0",
-            }
-              .Send();
+//           if ( _single_player ) {
+//             InterfaceUpdate::Update{
+//               .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+//               .update_txt = faction,
+//               .player_id = "player_0",
+//             }
+//               .Send();
 
-            // UI::System::SwitchPage( UI::SinglePlayerLobby );
-          } else {
-            std::string player_id = "";
+//             // UI::System::SwitchPage( UI::SinglePlayerLobby );
+//           } else {
+//             std::string player_id = "";
 
-            if ( Network::is_host ) {
-              player_id = Network::Host()->_player_id;
-              Network::Host()->SetHostFaction( faction );
-              Network::Host()->SendMessageToAllActiveClients( Network::Message{
-                Network::MessageID::PlayerFactionSelect,
-                nlohmann::json{
-                  { "player_id", player_id },
-                  { "faction", faction },
-                },
-              } );
-            } else {
-              player_id = Network::Client()->_local_player_id;
-              Network::Client()->SendMessageToHost( Network::Message{
-                Network::MessageID::PlayerFactionSelect,
-                nlohmann::json{
-                  { "player_id", player_id },
-                  { "faction", faction },
-                },
-              } );
-            }
+//             if ( Network::is_host ) {
+//               player_id = Network::Host()->_player_id;
+//               Network::Host()->SetHostFaction( faction );
+//               Network::Host()->SendMessageToAllActiveClients( Network::Message{
+//                 Network::MessageID::PlayerFactionSelect,
+//                 nlohmann::json{
+//                   { "player_id", player_id },
+//                   { "faction", faction },
+//                 },
+//               } );
+//             } else {
+//               player_id = Network::Client()->_local_player_id;
+//               Network::Client()->SendMessageToHost( Network::Message{
+//                 Network::MessageID::PlayerFactionSelect,
+//                 nlohmann::json{
+//                   { "player_id", player_id },
+//                   { "faction", faction },
+//                 },
+//               } );
+//             }
 
-            InterfaceUpdate::Update{
-              .id = InterfaceUpdate::ID::PlayerSelectedFaction,
-              .update_txt = faction,
-              .player_id = player_id,
-            }
-              .Send();
+//             InterfaceUpdate::Update{
+//               .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+//               .update_txt = faction,
+//               .player_id = player_id,
+//             }
+//               .Send();
 
-            // UI::System::SwitchPage( UI::Lobby );
-          }
-        } break;
+//             // UI::System::SwitchPage( UI::Lobby );
+//           }
+//         } break;
 
-        case InterfaceEvent::ID::ClientReceivedCommand: {
-          if ( _campaign )
-            _campaign->ConvertCommandRequest( event.msg );
-        } break;
+//         case InterfaceEvent::ID::ClientReceivedCommand: {
+//           if ( _campaign )
+//             _campaign->ConvertCommandRequest( event.msg );
+//         } break;
 
-        // TODO(??) maybe we just need a separate queue or something
-        // for the campaign
-        case InterfaceEvent::ID::ActorSpawnSettlment:
-        case InterfaceEvent::ID::SettlementContextMilitaryTab:
-        case InterfaceEvent::ID::SettlementContextPopulationTab:
-        case InterfaceEvent::ID::SettlementContextResourcesTab:
-        case InterfaceEvent::ID::SettlementContextConstructionTab:
-        case InterfaceEvent::ID::SettlementContextConstructBuilding:
-        case InterfaceEvent::ID::SettlementContextTrainHastati: {
-          // if ( _campaign )
-          //   _campaign->ForwardEvent( event );
-        } break;
+//         // TODO(??) maybe we just need a separate queue or something
+//         // for the campaign
+//         case InterfaceEvent::ID::ActorSpawnSettlment:
+//         case InterfaceEvent::ID::SettlementContextMilitaryTab:
+//         case InterfaceEvent::ID::SettlementContextPopulationTab:
+//         case InterfaceEvent::ID::SettlementContextResourcesTab:
+//         case InterfaceEvent::ID::SettlementContextConstructionTab:
+//         case InterfaceEvent::ID::SettlementContextConstructBuilding:
+//         case InterfaceEvent::ID::SettlementContextTrainHastati: {
+//           // if ( _campaign )
+//           //   _campaign->ForwardEvent( event );
+//         } break;
 
-        default:
-          printf( "Error, unregistered UI event fired\n" );
-          break;
-      }
-    }
-  );
-}
+//         default:
+//           printf( "Error, unregistered UI event fired\n" );
+//           break;
+//       }
+//     }
+//   );
+// }
 
 inline IGame *Game() {
   return IGame::Game();

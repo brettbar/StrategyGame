@@ -6,27 +6,24 @@
 #include "../components/player.hpp"
 
 
-namespace PlayerSystem
-{
+namespace PlayerSystem {
   inline void HumanUpdate( Player::Component & );
   inline void AIUpdate( AI::Component &, Player::Component & );
 
-  inline void Update( view<Player::Component> players )
-  {
+
+  inline void Update( view<Player::Component> players ) {
     // Change to exclude AI
-    for ( auto entity: players )
-    {
+    for ( auto entity: players ) {
       Player::Component &player =
         Global::world.get<Player::Component>( entity );
 
-      if ( player.is_human )
-      {
+      if ( player.is_human ) {
         HumanUpdate( player );
       }
     }
 
-    for ( auto entity: Global::world.view<Player::Component, AI::Component>() )
-    {
+    for ( auto entity:
+          Global::world.view<Player::Component, AI::Component>() ) {
       Player::Component &player =
         Global::world.get<Player::Component>( entity );
       AI::Component &ai = Global::world.get<AI::Component>( entity );
@@ -37,22 +34,15 @@ namespace PlayerSystem
 
   inline void HumanUpdate( Player::Component &player ) {}
 
-  inline void AIUpdate( AI::Component &ai, Player::Component &player )
-  {
-    switch ( ai.current_goal )
-    {
-      case AI::Goal::DevelopSettlements:
-      {
-        if ( !ai.has_colonist )
-        {
+  inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
+    switch ( ai.current_goal ) {
+      case AI::Goal::DevelopSettlements: {
+        if ( !ai.has_colonist ) {
           // ActorSystem::SpawnColonist( player.id );
           ai.has_colonist = true;
+        } else if ( ai.has_colonist && !ai.has_settlement ) {
         }
-        else if ( ai.has_colonist && !ai.has_settlement )
-        {
-        }
-      }
-      break;
+      } break;
     }
   }
 

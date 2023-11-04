@@ -196,11 +196,21 @@ inline void Campaign::Draw() {
       return;
     }
 
-    UI::DrawActorContext( actor );
+    auto action = UI::DrawActorContext( actor );
+
+    switch ( action ) {
+      case UI::Action_ActorContext::SpawnSettlement: {
+        auto player_e = GetLocalPlayerID();
+
+        PostCommand( Command{
+          .type = CommandType::Spawn,
+          .msg = "Player spawn Settlement",
+        } );
+      } break;
+      case UI::Action_ActorContext::None:
+        break;
+    }
   }
-
-  UI::DrawDebug();
-
 
   {
     DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
@@ -213,11 +223,6 @@ inline void Campaign::Draw() {
               ", a: " + std::to_string( Iron::Watcher()->context.active );
     DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
   }
-
-
-  // @todo this needs to go elsewhere so that its accoutned for in main menu for example
-  // Iron::Watcher()->context.hot = -1;
-  // Iron::Watcher()->context.active = -1;
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
