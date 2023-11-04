@@ -46,7 +46,9 @@ namespace Iron {
 
       switch ( type ) {
         case Type_t::Grid: {
-
+          if ( background.a > 0 ) {
+            DrawRectangleRec( transform, background );
+          }
 
           // @volatile assuming the slots always have same dimensions
           // u32 slot_width = transform.width / t.grid->cols;
@@ -228,12 +230,13 @@ public:
     }
 
 
-    IElement *Grid( rect t, u32 c, u32 r ) {
+    IElement *Grid( rect t, u32 c, u32 r, Color color = { 0, 0, 0, 0 } ) {
       auto e = new IElement();
       e->type = Type_t::Grid;
       e->id = queue.size();
       e->background = BLUE;
       e->transform = t;
+      e->background = color;
       e->t.grid = new IGrid( c, r );
       queue.push_back( e );
       return e;

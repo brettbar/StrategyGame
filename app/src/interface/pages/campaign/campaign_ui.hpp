@@ -20,9 +20,9 @@ namespace UI {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f.Grid( root_r, 3, 3 );
+    auto root_g = f.Grid( root_r, 4, 3 );
 
-    auto grid = f.Grid( root_g->Slot( 7 ), 3, 3 );
+    auto grid = f.Grid( root_g->Slots( 9, 10 ), 4, 4 );
 
     f.TextLabel( grid->Slot( 0 ), "Actor", GREEN );
     bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Settlement", BLUE );
@@ -41,16 +41,20 @@ namespace UI {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f.Grid( root_r, 3, 3 );
+    auto root_g = f.Grid( root_r, 4, 3 );
 
-    auto grid = f.Grid( root_g->Slot( 7 ), 3, 3 );
+    auto grid = f.Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5f ) );
 
-    f.TextLabel( grid->Slot( 0 ), "Settlement", GREEN );
-    bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Okay", BLUE );
+    f.TextLabel( grid->Slot( 0 ), settlement->name, GREEN );
+    f.TextLabel(
+      grid->Slot( 1 ), Settlement::dev_names[settlement->development], GREEN
+    );
+    f.TextLabel(
+      grid->Slot( 2 ),
+      std::to_string( settlement->population.current ).c_str(),
+      GREEN
+    );
 
-    if ( okay_pressed ) {
-      printf( "okay pressed\n" );
-    }
 
     f.Draw();
   }
