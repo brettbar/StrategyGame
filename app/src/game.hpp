@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interface/immediate.hpp"
+#include "interface/irongui/state.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
@@ -344,7 +344,7 @@ class IGame {
       Network::Client()->Update();
     }
 
-    Iron::Watcher()->over_any_elem = false;
+    Iron::State()->over_any_elem = false;
 
     switch ( _mode ) {
       case Scene::MainMenu: {
@@ -448,9 +448,9 @@ class IGame {
         break;
     }
 
-    if ( !Iron::Watcher()->over_any_elem ) {
-      Iron::Watcher()->context.hot = -1;
-      Iron::Watcher()->context.active = -1;
+    if ( !Iron::State()->over_any_elem ) {
+      Iron::State()->context.hot = -1;
+      Iron::State()->context.active = -1;
     }
   }
 

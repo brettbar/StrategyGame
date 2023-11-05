@@ -1,11 +1,64 @@
 #pragma once
 
+#include "../../../irongui/forge.hpp"
 #include "construction_tab.hpp"
 #include "military_tab.hpp"
 #include "population_tab.hpp"
 
 
 namespace UI {
+
+  inline void SettlementContext( Settlement::Component *settlement ) {
+    auto f = Iron::Forge();
+
+
+    rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_g = f.Grid( root_r, 4, 3 );
+
+    auto context_g =
+      f.Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5f ) );
+
+    auto tabs_g = f.Grid( context_g->Col( 0 ), 1, 5 );
+
+    bool pop_clicked = f.TextButton( tabs_g->Slot( 0 ), "Population", BLUE );
+    bool constr_clicked =
+      f.TextButton( tabs_g->Slot( 1 ), "Construction", YELLOW );
+    bool resources_clicked =
+      f.TextButton( tabs_g->Slot( 2 ), "Resources", GREEN );
+    bool mil_clicked = f.TextButton( tabs_g->Slot( 3 ), "Military", RED );
+    bool agents_clicked = f.TextButton( tabs_g->Slot( 4 ), "Agents", PURPLE );
+
+
+    if ( pop_clicked )
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+    else if ( constr_clicked )
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
+    else if ( resources_clicked )
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
+    else if ( mil_clicked )
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
+    else if ( agents_clicked )
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
+    else
+      f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+
+
+    // content
+    // f.TextLabel( context_g->Slot( 0 ), settlement->name, GREEN );
+    // f.TextLabel(
+    //   context_g->Slot( 1 ),
+    //   Settlement::dev_names[settlement->development],
+    //   GREEN
+    // );
+    // f.TextLabel(
+    //   context_g->Slot( 2 ),
+    //   std::to_string( settlement->population.current ).c_str(),
+    //   GREEN
+    // );
+
+
+    f.Draw();
+  }
 
   // inline sptr<Element> CreateSettlementContextPanel() {
   //   return GridPanel( "settlement_context", 4, 3 )

@@ -30,7 +30,7 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/immediate.hpp"
+#include "interface/irongui/state.hpp"
 
 #include "interface/pages/campaign/campaign_ui.hpp"
 #include <raylib.h>
@@ -136,6 +136,42 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   // 2. Check for Input
   CheckForInput();
 
+  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
+       ) ) {
+    auto settlement =
+      SelectionSystem::GetSelectedComponent<Settlement::Component>();
+
+    if ( !settlement ) {
+      printf( "Got null settlement??\n" );
+      return;
+    }
+
+    UI::SettlementContext( settlement );
+  }
+
+  if ( SelectionSystem::Selected<Actor::Component>() ) {
+    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
+
+    if ( !actor ) {
+      printf( "Got null actor??\n" );
+      return;
+    }
+
+    auto action = UI::DrawActorContext( actor );
+
+    switch ( action ) {
+      case UI::Action_ActorContext::SpawnSettlement: {
+        auto player_e = GetLocalPlayerID();
+
+        PostCommand( Command{
+          .type = CommandType::Spawn,
+          .msg = "Player spawn Settlement",
+        } );
+      } break;
+      case UI::Action_ActorContext::None:
+        break;
+    }
+  }
   // 3. Process all commands
   _command_queue.update();
   // UI::System::UpdateOnFrame();
@@ -175,42 +211,6 @@ inline void Campaign::Draw() {
   Renderer::Draw( Global::texture_cache );
   // Renderer::DrawUI();
 
-  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
-       ) ) {
-    auto settlement =
-      SelectionSystem::GetSelectedComponent<Settlement::Component>();
-
-    if ( !settlement ) {
-      printf( "Got null settlement??\n" );
-      return;
-    }
-
-    UI::DrawSettlementContext( settlement );
-  }
-
-  if ( SelectionSystem::Selected<Actor::Component>() ) {
-    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
-
-    if ( !actor ) {
-      printf( "Got null actor??\n" );
-      return;
-    }
-
-    auto action = UI::DrawActorContext( actor );
-
-    switch ( action ) {
-      case UI::Action_ActorContext::SpawnSettlement: {
-        auto player_e = GetLocalPlayerID();
-
-        PostCommand( Command{
-          .type = CommandType::Spawn,
-          .msg = "Player spawn Settlement",
-        } );
-      } break;
-      case UI::Action_ActorContext::None:
-        break;
-    }
-  }
 
   {
     DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
@@ -219,8 +219,8 @@ inline void Campaign::Draw() {
 
   {
     DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
-    str foo = "h: " + std::to_string( Iron::Watcher()->context.hot ) +
-              ", a: " + std::to_string( Iron::Watcher()->context.active );
+    str foo = "h: " + std::to_string( Iron::State()->context.hot ) +
+              ", a: " + std::to_string( Iron::State()->context.active );
     DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
   }
 }
@@ -331,14 +331,14 @@ inline void Campaign::CheckForInput() {
     // if ( !UI::Manager()->MouseIsOverUI() ) {
     //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     // }
-    if ( !Iron::Watcher()->MouseIsOverUI() ) {
+    if ( !Iron::State()->MouseIsOverUI() ) {
       printf( "Should be selecting\n" );
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
   if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !Iron::Watcher()->MouseIsOverUI() ) {
+    if ( !Iron::State()->MouseIsOverUI() ) {
       auto selected_e =
         Global::world
           .view<Actor::Component, Animated::Component, Selected::Component>()

@@ -2,7 +2,7 @@
 
 #include "../../../shared/common.hpp"
 
-#include "../../immediate.hpp"
+#include "../../irongui/forge.hpp"
 
 #include "actor_context.hpp"
 #include "settlement_context/settlement_context.hpp"
@@ -37,28 +37,6 @@ namespace UI {
     return Action_ActorContext::None;
   }
 
-  inline void DrawSettlementContext( Settlement::Component *settlement ) {
-    auto f = Iron::Forge();
-
-    rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f.Grid( root_r, 4, 3 );
-
-    auto grid = f.Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5f ) );
-
-    f.TextLabel( grid->Slot( 0 ), settlement->name, GREEN );
-    f.TextLabel(
-      grid->Slot( 1 ), Settlement::dev_names[settlement->development], GREEN
-    );
-    f.TextLabel(
-      grid->Slot( 2 ),
-      std::to_string( settlement->population.current ).c_str(),
-      GREEN
-    );
-
-
-    f.Draw();
-  }
-
   inline void DrawDebug() {
     auto f = Iron::Forge();
 
@@ -73,8 +51,8 @@ namespace UI {
     if ( okay_pressed ) {
       printf( "okay pressed\n" );
 
-      str foo = "h: " + std::to_string( Iron::Watcher()->context.hot ) +
-                ", a: " + std::to_string( Iron::Watcher()->context.active ) +
+      str foo = "h: " + std::to_string( Iron::State()->context.hot ) +
+                ", a: " + std::to_string( Iron::State()->context.active ) +
                 "\n";
 
       printf( "%s", foo.c_str() );

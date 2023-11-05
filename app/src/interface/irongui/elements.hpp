@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../shared/common.hpp"
-#include "../shared/utils.hpp"
-#include "ui_shared.hpp"
+#include "../../shared/common.hpp"
+#include "../../shared/utils.hpp"
+#include "../ui_shared.hpp"
 #include <raylib.h>
 #include <stack>
 
@@ -13,7 +13,7 @@ namespace Iron {
   };
 
 
-  struct IElement;
+  struct Element;
 
   struct IGrid {
     u32 cols;
@@ -29,7 +29,11 @@ namespace Iron {
     ITextLabel( str t ) : text( t ) {}
   };
 
-  struct IElement {
+  struct ITabs {
+    ITabs() = delete;
+  };
+
+  struct Element {
     Type_t type;
     u32 id;
     rect transform;
@@ -49,7 +53,6 @@ namespace Iron {
           if ( background.a > 0 ) {
             DrawRectangleRec( transform, background );
           }
-
           // @volatile assuming the slots always have same dimensions
           // u32 slot_width = transform.width / t.grid->cols;
           // u32 slot_height = transform.height / t.grid->rows;
@@ -78,25 +81,54 @@ namespace Iron {
           //     );
           //   }
           // }
-
-          // for ( GridPanelElement::Slot &slot: filled_slots )
-          // {
-          //   slot.child->Draw();
-          // }
         } break;
         case Type_t::TextLabel: {
-
           DrawRectangleRec( transform, background );
           DrawText(
             t.text_label->text.c_str(), transform.x, transform.y, 28, WHITE
           );
         } break;
       }
-      /*
-      0 1 1 0
-      0 0 0 0
-      0 0 0 0
-    */
+    }
+
+    rect Col( u32 col ) {
+      assert(
+        type == Type_t::Grid && t.grid != nullptr && col <= t.grid->cols
+      );
+
+      // @volatile
+      u32 slot_width = transform.width / t.grid->cols;
+      u32 slot_height = transform.height / t.grid->rows;
+
+      return rect{
+        transform.x + (f32) ( col * slot_width ),
+        transform.y,
+        (f32) slot_width,
+        (f32) slot_height * t.grid->rows,
+      };
+    }
+
+    rect Cols( u32 start_col, u32 end_col ) {
+      assert(
+        type == Type_t::Grid && t.grid != nullptr && start_col <= end_col
+      );
+
+      // @volatile
+      u32 slot_width = transform.width / t.grid->cols;
+      u32 slot_height = transform.height / t.grid->rows;
+      u32 width = 0;
+
+      for ( u32 i = start_col; i < end_col; i++ ) {
+        rect col = Col( i );
+        width += col.width;
+      }
+
+      return rect{
+        transform.x + (f32) ( start_col * slot_width ),
+        transform.y,
+        (f32) width,
+        (f32) slot_height * t.grid->rows,
+      };
     }
 
     rect Slot( u32 i ) {
@@ -140,130 +172,6 @@ namespace Iron {
         (f32) ( slots_wide * slot_width ),
         (f32) ( slots_tall * slot_height ),
       };
-    }
-  };
-
-
-  struct Foreman {
-
-private:
-    struct Context {
-      i32 hot = -1;
-      i32 active = -1;
-    };
-
-    Foreman() {}
-    ~Foreman() {}
-
-    Foreman( Foreman const & ) = delete;
-    void operator=( const Foreman & ) = delete;
-
-public:
-    Context context;
-    bool over_any_elem = false;
-    bool did_action_this_frame = false;
-
-    bool MouseIsOverUI() {
-      return context.hot != -1 || context.active != -1 || over_any_elem;
-    }
-
-    static Foreman *GetWatcher() {
-      static Foreman instance;
-      return &instance;
-    }
-
-    bool CheckInteract( IElement e ) {
-      vec2f mouse_pos = GetMousePosition();
-      bool mouse_went_up = IsMouseButtonReleased( 0 );
-      bool mouse_went_down = IsMouseButtonPressed( 0 );
-      // bool mouse_held_down = IsMouseButtonDown( 0 );
-
-
-      bool inside = CheckCollisionPointRec( mouse_pos, e.transform );
-
-      if ( !inside )
-        return false;
-
-      if ( !over_any_elem && e.interactable )
-        over_any_elem = inside;
-
-      bool result = false;
-
-      if ( e.id == context.active ) {
-        if ( mouse_went_up ) {
-          if ( e.id == context.hot ) {
-            result = true;// do the button action
-            did_action_this_frame = true;
-          }
-
-
-          context.active = -1;
-        }
-      } else if ( e.id == context.hot && e.interactable ) {
-        if ( mouse_went_down )
-          context.active = e.id;
-      }
-
-      if ( inside ) {
-        if ( context.active == -1 && e.interactable ) {
-          context.hot = e.id;
-
-          if ( mouse_went_down )
-            context.active = e.id;
-        }
-      }
-
-      return result;
-    }
-  };
-
-  inline Foreman *Watcher() {
-    return Foreman::GetWatcher();
-  }
-
-  struct Forge {
-    list<IElement *> queue;
-
-    Forge() {}
-    ~Forge() {
-      queue.clear();
-    }
-
-
-    IElement *Grid( rect t, u32 c, u32 r, Color color = { 0, 0, 0, 0 } ) {
-      auto e = new IElement();
-      e->type = Type_t::Grid;
-      e->id = queue.size();
-      e->background = BLUE;
-      e->transform = t;
-      e->background = color;
-      e->t.grid = new IGrid( c, r );
-      queue.push_back( e );
-      return e;
-    }
-
-    IElement *TextLabel( rect t, str txt, Color c ) {
-      auto e = new IElement();
-      e->type = Type_t::TextLabel;
-      e->id = queue.size();
-      e->background = c;
-      e->transform = t;
-      e->t.text_label = new ITextLabel( txt );
-      queue.push_back( e );
-      return e;
-    }
-
-    bool TextButton( rect t, str txt, Color c ) {
-      auto e = TextLabel( t, txt, c );
-      e->interactable = true;
-      return Watcher()->context.active == e->id;
-    }
-
-    inline void Draw() {
-      for ( u32 i = 0; i < queue.size(); i++ ) {
-        Watcher()->CheckInteract( *queue[i] );
-        queue[i]->Draw();
-      }
     }
   };
 
