@@ -28,20 +28,42 @@ namespace UI {
     bool mil_clicked = f.TextButton( tabs_g->Slot( 3 ), "Military", RED );
     bool agents_clicked = f.TextButton( tabs_g->Slot( 4 ), "Agents", PURPLE );
 
+    auto tabs = f.TabsVertical( 5 );
 
-    if ( pop_clicked )
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
-    else if ( constr_clicked )
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
-    else if ( resources_clicked )
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
-    else if ( mil_clicked )
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
-    else if ( agents_clicked )
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
-    else
-      f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+    switch ( tabs.tab ) {
+      case 0:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+        break;
+      case 1:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
+        break;
+      case 2:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
+        break;
+      case 3:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
+        break;
+      case 4:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
+        break;
+      default:
+        f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+        break;
+    }
 
+
+    // if ( pop_clicked )
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+    // else if ( constr_clicked )
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
+    // else if ( resources_clicked )
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
+    // else if ( mil_clicked )
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
+    // else if ( agents_clicked )
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
+    // else
+    //   f.Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
 
     // content
     // f.TextLabel( context_g->Slot( 0 ), settlement->name, GREEN );

@@ -30,7 +30,10 @@ namespace Iron {
   };
 
   struct ITabs {
+    u32 tabs;
+    u32 tab_index = 0;
     ITabs() = delete;
+    ITabs( u32 tabs ) : tabs( tabs ) {}
   };
 
   struct Element {
