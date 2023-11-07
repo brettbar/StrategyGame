@@ -16,7 +16,7 @@ namespace UI {
     SpawnSettlement,
   };
 
-  inline Action_ActorContext DrawActorContext( Actor::Component *actor ) {
+  inline Action_ActorContext ActorContext( Actor::Component *actor ) {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };

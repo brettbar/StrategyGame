@@ -29,9 +29,30 @@ namespace UI {
 
     auto tabs = f->Tabs( tab_btns );
     switch ( tabs->t.tabs->current_tab ) {
-      case 0:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
-        break;
+      case 0: {// Population
+
+        auto population_g = f->Grid( context_g->Cols( 1, 4 ), 3, 1, BLUE );
+
+        auto growth_g =
+          f->Grid( population_g->Slot( 0 ), 3, 3, Color{ 0, 0, 100, 255 } );
+        auto demographics_g =
+          f->Grid( population_g->Slot( 1 ), 3, 3, Color{ 0, 0, 155, 255 } );
+        auto public_order_g =
+          f->Grid( population_g->Slot( 2 ), 3, 3, Color{ 0, 0, 250, 255 } );
+
+        // f->TextLabel( population_g->Slot( 0 ), settlement->name, BLACK );
+        // f->TextLabel(
+        //   population_g->Slot( 1 ),
+        //   Settlement::dev_names[settlement->development],
+        //   BLACK
+        // );
+        // f->TextLabel(
+        //   population_g->Slot( 2 ),
+        //   std::to_string( settlement->population.current ),
+        //   BLACK
+        // );
+
+      } break;
       case 1:
         f->Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
         break;
@@ -48,33 +69,6 @@ namespace UI {
         f->Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
         break;
     }
-
-
-    // if ( pop_clicked )
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
-    // else if ( constr_clicked )
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
-    // else if ( resources_clicked )
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
-    // else if ( mil_clicked )
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
-    // else if ( agents_clicked )
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
-    // else
-    //   f->Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
-
-    // content
-    // f->TextLabel( context_g->Slot( 0 ), settlement->name, GREEN );
-    // f->TextLabel(
-    //   context_g->Slot( 1 ),
-    //   Settlement::dev_names[settlement->development],
-    //   GREEN
-    // );
-    // f->TextLabel(
-    //   context_g->Slot( 2 ),
-    //   std::to_string( settlement->population.current ).c_str(),
-    //   GREEN
-    // );
   }
 
   // inline sptr<Element> CreateSettlementContextPanel() {

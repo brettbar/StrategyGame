@@ -157,7 +157,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       return;
     }
 
-    auto action = UI::DrawActorContext( actor );
+    auto action = UI::ActorContext( actor );
 
     switch ( action ) {
       case UI::Action_ActorContext::SpawnSettlement: {
