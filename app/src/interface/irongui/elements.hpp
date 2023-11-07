@@ -7,11 +7,11 @@
 #include <stack>
 
 namespace Iron {
-  enum class Type_t {
+  enum class Type {
     Grid,
     TextLabel,
+    Tabs,
   };
-
 
   struct Element;
 
@@ -30,29 +30,28 @@ namespace Iron {
   };
 
   struct ITabs {
-    u32 tabs;
-    u32 tab_index = 0;
-    ITabs() = delete;
-    ITabs( u32 tabs ) : tabs( tabs ) {}
+    u32 current_tab;
   };
 
   struct Element {
-    Type_t type;
+    Type type;
     u32 id;
     rect transform;
     Color background;
+    bool stateful = false;
     bool interactable = false;
 
     union {
       IGrid *grid;
       ITextLabel *text_label;
+      ITabs *tabs;
     } t;
 
 
     void Draw() {
 
       switch ( type ) {
-        case Type_t::Grid: {
+        case Type::Grid: {
           if ( background.a > 0 ) {
             DrawRectangleRec( transform, background );
           }
@@ -85,7 +84,7 @@ namespace Iron {
           //   }
           // }
         } break;
-        case Type_t::TextLabel: {
+        case Type::TextLabel: {
           DrawRectangleRec( transform, background );
           DrawText(
             t.text_label->text.c_str(), transform.x, transform.y, 28, WHITE
@@ -95,9 +94,7 @@ namespace Iron {
     }
 
     rect Col( u32 col ) {
-      assert(
-        type == Type_t::Grid && t.grid != nullptr && col <= t.grid->cols
-      );
+      assert( type == Type::Grid && t.grid != nullptr && col <= t.grid->cols );
 
       // @volatile
       u32 slot_width = transform.width / t.grid->cols;
@@ -112,9 +109,7 @@ namespace Iron {
     }
 
     rect Cols( u32 start_col, u32 end_col ) {
-      assert(
-        type == Type_t::Grid && t.grid != nullptr && start_col <= end_col
-      );
+      assert( type == Type::Grid && t.grid != nullptr && start_col <= end_col );
 
       // @volatile
       u32 slot_width = transform.width / t.grid->cols;
@@ -135,7 +130,7 @@ namespace Iron {
     }
 
     rect Slot( u32 i ) {
-      assert( type == Type_t::Grid && t.grid != nullptr );
+      assert( type == Type::Grid && t.grid != nullptr );
 
       auto coords = CoordsFromIndex( i, t.grid->cols );
       // @volatile
@@ -151,7 +146,7 @@ namespace Iron {
     }
 
     rect Slots( u32 start_i, u32 end_i ) {
-      assert( type == Type_t::Grid && t.grid != nullptr && start_i <= end_i );
+      assert( type == Type::Grid && t.grid != nullptr && start_i <= end_i );
 
       auto start_coords = CoordsFromIndex( start_i, t.grid->cols );
       auto end_coords = CoordsFromIndex( end_i, t.grid->cols );

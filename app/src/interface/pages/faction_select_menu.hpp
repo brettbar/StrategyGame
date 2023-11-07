@@ -30,7 +30,7 @@ namespace UI {
       GRAY,
     };
 
-    auto f = Iron::State();
+    auto f = Iron::Forge();
     rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_grid = f->Grid( root, 1, 3 );
 

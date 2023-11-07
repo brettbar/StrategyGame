@@ -19,7 +19,7 @@ namespace UI {
 
 
   inline Action_MainMenu MainMenu() {
-    auto f = Iron::State();
+    auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 3, 3 );

@@ -343,7 +343,7 @@ class IGame {
       Network::Client()->Update();
     }
 
-    Iron::State()->over_any_elem = false;
+    Iron::Forge()->over_any_elem = false;
 
     switch ( _mode ) {
       case Scene::MainMenu: {
@@ -368,8 +368,8 @@ class IGame {
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          Iron::State()->DrawAll();
-          Iron::State()->DrawDebug();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -388,8 +388,8 @@ class IGame {
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          Iron::State()->DrawAll();
-          Iron::State()->DrawDebug();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -407,8 +407,8 @@ class IGame {
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          Iron::State()->DrawAll();
-          Iron::State()->DrawDebug();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -443,8 +443,8 @@ class IGame {
         BeginDrawing();
         {
           _campaign->Draw();
-          Iron::State()->DrawAll();
-          Iron::State()->DrawDebug();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -453,9 +453,9 @@ class IGame {
         break;
     }
 
-    if ( !Iron::State()->over_any_elem ) {
-      Iron::State()->context.hot = -1;
-      Iron::State()->context.active = -1;
+    if ( !Iron::Forge()->over_any_elem ) {
+      Iron::Forge()->context.hot = -1;
+      Iron::Forge()->context.active = -1;
     }
   }
 

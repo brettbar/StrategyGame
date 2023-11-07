@@ -317,14 +317,14 @@ inline void Campaign::CheckForInput() {
     // if ( !UI::Manager()->MouseIsOverUI() ) {
     //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     // }
-    if ( !Iron::State()->MouseIsOverUI() ) {
+    if ( !Iron::Forge()->MouseIsOverUI() ) {
       printf( "Should be selecting\n" );
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
   if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !Iron::State()->MouseIsOverUI() ) {
+    if ( !Iron::Forge()->MouseIsOverUI() ) {
       auto selected_e =
         Global::world
           .view<Actor::Component, Animated::Component, Selected::Component>()

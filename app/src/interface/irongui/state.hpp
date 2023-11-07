@@ -5,7 +5,7 @@
 
 namespace Iron {
 
-  struct StateHandler {
+  struct IForge {
 
 private:
     struct Context {
@@ -13,11 +13,19 @@ private:
       i32 active = -1;
     };
 
-    StateHandler() {}
-    ~StateHandler() {}
+    union State {
+      struct {
+        u32 index;
+      } tab_state;
+    };
 
-    StateHandler( StateHandler const & ) = delete;
-    void operator=( const StateHandler & ) = delete;
+    map<u32, State> ui_state = {};
+
+    IForge() {}
+    ~IForge() {}
+
+    IForge( IForge const & ) = delete;
+    void operator=( const IForge & ) = delete;
 
     list<Element *> queue;
 
@@ -25,24 +33,39 @@ public:
     Context context;
     bool over_any_elem = false;
 
+    static IForge *ForgeSingleton() {
+      static IForge instance;
+      return &instance;
+    }
+
     void ClearQueue() {
       queue.clear();
     }
+    void ClearState() {
+      ui_state.clear();
+    }
 
     void DrawAll() {
-      for ( const auto e: queue ) {
+      list<u32> stateful_ids = {};
+
+      for ( u32 i = 0; i < queue.size(); i++ ) {
+        Element *e = queue[i];
+
+        if ( e->stateful )
+          stateful_ids.push_back( e->id );
+
         e->Draw();
       }
+
+      map<u32, State> new_state = {};
+
+      for ( const u32 id: stateful_ids ) {
+        if ( ui_state.contains( id ) )
+          new_state[id] = ui_state[id];
+      }
+
+      ui_state = new_state;
       queue.clear();
-    }
-
-    bool MouseIsOverUI() {
-      return context.hot != -1 || context.active != -1 || over_any_elem;
-    }
-
-    static StateHandler *GetStateHandler() {
-      static StateHandler instance;
-      return &instance;
     }
 
     void DrawDebug() {
@@ -59,6 +82,9 @@ public:
       }
     }
 
+    bool MouseIsOverUI() {
+      return context.hot != -1 || context.active != -1 || over_any_elem;
+    }
 
     bool CheckInteract( Element e ) {
       vec2f mouse_pos = GetMousePosition();
@@ -104,7 +130,7 @@ public:
 
     Element *Grid( rect t, u32 c, u32 r, Color color = { 0, 0, 0, 0 } ) {
       auto e = new Element();
-      e->type = Type_t::Grid;
+      e->type = Type::Grid;
       e->id = queue.size();
       e->background = BLUE;
       e->transform = t;
@@ -116,11 +142,37 @@ public:
 
     Element *TextLabel( rect t, str txt, Color c ) {
       auto e = new Element();
-      e->type = Type_t::TextLabel;
+      e->type = Type::TextLabel;
       e->id = queue.size();
       e->background = c;
       e->transform = t;
       e->t.text_label = new ITextLabel( txt );
+      queue.push_back( e );
+      return e;
+    }
+
+    Element *Tabs( list<bool> tabs_clicked ) {
+      auto e = new Element();
+      e->type = Type::Tabs;
+      e->id = queue.size();
+      e->stateful = true;
+      e->t.tabs = new ITabs();
+
+
+      if ( !ui_state.contains( e->id ) ) {
+        ui_state[e->id] = State{ .tab_state = { 0 } };
+      } else {
+        e->t.tabs->current_tab = ui_state[e->id].tab_state.index;
+      }
+
+
+      for ( u32 i = 0; i < tabs_clicked.size(); i++ ) {
+        if ( tabs_clicked[i] ) {
+          ui_state[e->id] = State{ .tab_state{ i } };
+          e->t.tabs->current_tab = i;
+        }
+      }
+
       queue.push_back( e );
       return e;
     }
@@ -132,8 +184,8 @@ public:
     }
   };
 
-  inline StateHandler *State() {
-    return StateHandler::GetStateHandler();
+  inline IForge *Forge() {
+    return IForge::ForgeSingleton();
   }
 
 
