@@ -6,49 +6,34 @@
 #include "../../element.hpp"
 #include "../../ui_utils.hpp"
 
-namespace UI
-{
-  inline sptr<Element> CreateActorContextPanel()
-  {
-    return GridPanel( "actor_context_panel", 4, 3 )
-      .StartsDisabled()
-      .Background( Fade( BLACK, 0.5 ) )
-      .On(
-        InterfaceUpdate::ID::ActorContext,
-        []( Element &self, InterfaceUpdate::Update update ) {
-          printf( "InterfaceUpdate::ID::ActorContext %d\n", update.condition );
+#include "../../../world/components/actor.hpp"
 
-          if ( update.condition )
-            self.Enable();
-          else
-            self.Disable();
-        }
-      )
-      .Children( {
-        GridSlot(
-          { 0, 0, 0, 0 },
-          GridPanel( "actor_actions_panel", 1, 1 )
-            .Children( { GridSlot(
-              { 0, 0, 0, 0 },
-              TextButton( "actor_spawn_settlement_button", "Spawn?", 26 )
-                .Clickable( false )
-                .Background( RED )
-                .SetEvent( InterfaceEvent::Data(
-                  InterfaceEvent::ID::ActorSpawnSettlment
-                ) )
-                .On(
-                  InterfaceUpdate::ID::ActorCanSpawnSettlement,
-                  []( Element &self, InterfaceUpdate::Update update ) {
-                    self.UpdateClickable( update.condition );
+#include "../../irongui/state.hpp"
 
-                    if ( update.condition )
-                      self.UpdateBackground( GREEN );
-                    else
-                      self.UpdateBackground( RED );
-                  }
-                )
-            ) } )
-        ),
-      } );
+namespace UI {
+  enum class Action_ActorContext {
+    None,
+    SpawnSettlement,
+  };
+
+  inline Action_ActorContext ActorContext( Actor::Component *actor ) {
+    auto f = Iron::Forge();
+
+    rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_g = f->Grid( root_r, 4, 3 );
+
+    auto grid = f->Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5 ) );
+
+    f->TextLabel( grid->Slot( 0 ), "Actor", GREEN );
+    bool okay_pressed = f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
+
+    if ( okay_pressed ) {
+      printf( "okay pressed\n" );
+      return Action_ActorContext::SpawnSettlement;
+    }
+
+    return Action_ActorContext::None;
   }
+
+
 }// namespace UI

@@ -19,6 +19,9 @@ namespace Iron {
     u32 cols;
     u32 rows;
 
+    list<f32> col_weights = {};
+    list<f32> row_weights = {};
+
     IGrid() = delete;
     IGrid( u32 c, u32 r ) : cols( c ), rows( r ) {}
   };
@@ -49,12 +52,13 @@ namespace Iron {
 
 
     void Draw() {
-
       switch ( type ) {
         case Type::Grid: {
+          // We don't want to draw invisible grids
           if ( background.a > 0 ) {
             DrawRectangleRec( transform, background );
           }
+
           // @volatile assuming the slots always have same dimensions
           // u32 slot_width = transform.width / t.grid->cols;
           // u32 slot_height = transform.height / t.grid->rows;
@@ -93,6 +97,8 @@ namespace Iron {
       }
     }
 
+    // @refactor Should probably find a way to fit all these functions into IGrid itself
+    // to avoid all these asserts
     rect Col( u32 col ) {
       assert( type == Type::Grid && t.grid != nullptr && col <= t.grid->cols );
 
@@ -170,6 +176,30 @@ namespace Iron {
         (f32) ( slots_wide * slot_width ),
         (f32) ( slots_tall * slot_height ),
       };
+    }
+
+    // @todo - these are defined but arent called yet
+    // gonna have to determine how to do the weight multiplications.
+    // Maybe default is list of 1's, so that in the standard case
+    // we just multiplying by 1? Then for custom weights we pass
+    // floats like 0.5, which will multiply the relevant col/row by 0.5.
+    // sounds good i think but gotta figure out how to setup that default case
+    // cleanly.
+    void WeightCols( list<f32> col_weights ) {
+      assert(
+        type == Type::Grid && t.grid != nullptr &&
+        col_weights.size() == t.grid->cols
+      );
+
+      t.grid->col_weights = col_weights;
+    }
+    void WeightRows( list<f32> row_weights ) {
+      assert(
+        type == Type::Grid && t.grid != nullptr &&
+        row_weights.size() == t.grid->rows
+      );
+
+      t.grid->row_weights = row_weights;
     }
   };
 
