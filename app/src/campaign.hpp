@@ -209,20 +209,6 @@ inline void Campaign::Update1TPS() {
 
 inline void Campaign::Draw() {
   Renderer::Draw( Global::texture_cache );
-  // Renderer::DrawUI();
-
-
-  {
-    DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-    DrawFPS( GetScreenWidth() - 100, 2 );
-  }
-
-  {
-    DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
-    str foo = "h: " + std::to_string( Iron::State()->context.hot ) +
-              ", a: " + std::to_string( Iron::State()->context.active );
-    DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
-  }
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {

@@ -336,7 +336,6 @@ class IGame {
                         End: Shared
   =============================================================*/
 
-
   void UpdateOnFrame() {
     if ( Network::is_host ) {
       Network::Host()->Update();
@@ -348,63 +347,68 @@ class IGame {
 
     switch ( _mode ) {
       case Scene::MainMenu: {
-        // UI::System::UpdateOnFrame();
+        auto action = UI::MainMenu();
 
+        switch ( action ) {
+          case UI::Action_MainMenu::StartGame:
+            _mode = Scene::SinglePlayerLobby;
+            break;
+          case UI::Action_MainMenu::HostGame:
+            break;
+          case UI::Action_MainMenu::JoinGame:
+            break;
+          case UI::Action_MainMenu::Settings:
+            break;
+          case UI::Action_MainMenu::ExitGame:
+            // TODO probably dont wanna do this so brute force
+            CloseWindow();
+            break;
+        }
 
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          auto action = UI::DrawMainMenu();
-
-          switch ( action ) {
-            case UI::Action_MainMenu::StartGame:
-              _mode = Scene::SinglePlayerLobby;
-              break;
-            case UI::Action_MainMenu::HostGame:
-              break;
-            case UI::Action_MainMenu::JoinGame:
-              break;
-            case UI::Action_MainMenu::Settings:
-              break;
-            case UI::Action_MainMenu::ExitGame:
-
-              // TODO probably dont wanna do this so brute force
-              CloseWindow();
-              break;
-          }
-          // Renderer::DrawUI();
+          Iron::State()->DrawAll();
+          Iron::State()->DrawDebug();
         }
         EndDrawing();
       } break;
 
       case Scene::SinglePlayerLobby: {
+        auto action = UI::SinglePlayerLobby();
+
+        switch ( action ) {
+          case UI::Action_SinglePlayerLobby::SelectFaction:
+            _mode = Scene::FactionSelect;
+            break;
+          case UI::Action_SinglePlayerLobby::ExitPressed:
+            _mode = Scene::MainMenu;
+            break;
+        }
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          auto action = UI::DrawSinglePlayerLobby();
-          switch ( action ) {
-            case UI::Action_SinglePlayerLobby::SelectFaction:
-              _mode = Scene::FactionSelect;
-              break;
-            case UI::Action_SinglePlayerLobby::ExitPressed:
-              _mode = Scene::MainMenu;
-              break;
-          }
+          Iron::State()->DrawAll();
+          Iron::State()->DrawDebug();
         }
         EndDrawing();
       } break;
 
       case Scene::FactionSelect: {
+        auto selection = UI::DrawFactionSelectScreen();
+
+        // @volatile
+        // TODO make this a faction enum
+        if ( selection != "" ) {
+          _mode = Scene::Campaign;
+          StartSingleplayerCampaign( selection );
+        }
+
         BeginDrawing();
         {
-          auto selection = UI::DrawFactionSelectScreen();
-
-          // @volatile
-          // TODO make this a faction enum
-          if ( selection != "" ) {
-            _mode = Scene::Campaign;
-            StartSingleplayerCampaign( selection );
-          }
+          ClearBackground( BLACK );
+          Iron::State()->DrawAll();
+          Iron::State()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -412,15 +416,12 @@ class IGame {
       case Scene::ModalMenu: {
         CheckMenuToggle();
 
-        // UI::System::UpdateOnFrame();
-
         BeginDrawing();
         {
           Renderer::Draw( Global::texture_cache );
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
-          // Renderer::DrawUI();
         }
         EndDrawing();
       } break;
@@ -440,7 +441,11 @@ class IGame {
 
         // 6. Draw everything
         BeginDrawing();
-        { _campaign->Draw(); }
+        {
+          _campaign->Draw();
+          Iron::State()->DrawAll();
+          Iron::State()->DrawDebug();
+        }
         EndDrawing();
       } break;
 

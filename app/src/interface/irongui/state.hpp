@@ -19,12 +19,22 @@ private:
     StateHandler( StateHandler const & ) = delete;
     void operator=( const StateHandler & ) = delete;
 
+    list<Element *> queue;
+
 public:
     Context context;
     bool over_any_elem = false;
-    bool did_action_this_frame = false;
 
-    void DrawAll() {}
+    void ClearQueue() {
+      queue.clear();
+    }
+
+    void DrawAll() {
+      for ( const auto e: queue ) {
+        e->Draw();
+      }
+      queue.clear();
+    }
 
     bool MouseIsOverUI() {
       return context.hot != -1 || context.active != -1 || over_any_elem;
@@ -34,6 +44,21 @@ public:
       static StateHandler instance;
       return &instance;
     }
+
+    void DrawDebug() {
+      {
+        DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+        DrawFPS( GetScreenWidth() - 100, 2 );
+      }
+
+      {
+        DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
+        str foo = "h: " + std::to_string( context.hot ) +
+                  ", a: " + std::to_string( context.active );
+        DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
+      }
+    }
+
 
     bool CheckInteract( Element e ) {
       vec2f mouse_pos = GetMousePosition();
@@ -56,9 +81,7 @@ public:
         if ( mouse_went_up ) {
           if ( e.id == context.hot ) {
             result = true;// do the button action
-            did_action_this_frame = true;
           }
-
 
           context.active = -1;
         }
@@ -78,10 +101,40 @@ public:
 
       return result;
     }
+
+    Element *Grid( rect t, u32 c, u32 r, Color color = { 0, 0, 0, 0 } ) {
+      auto e = new Element();
+      e->type = Type_t::Grid;
+      e->id = queue.size();
+      e->background = BLUE;
+      e->transform = t;
+      e->background = color;
+      e->t.grid = new IGrid( c, r );
+      queue.push_back( e );
+      return e;
+    }
+
+    Element *TextLabel( rect t, str txt, Color c ) {
+      auto e = new Element();
+      e->type = Type_t::TextLabel;
+      e->id = queue.size();
+      e->background = c;
+      e->transform = t;
+      e->t.text_label = new ITextLabel( txt );
+      queue.push_back( e );
+      return e;
+    }
+
+    bool TextButton( rect t, str txt, Color c ) {
+      auto e = TextLabel( t, txt, c );
+      e->interactable = true;
+      return CheckInteract( *e );
+    }
   };
 
   inline StateHandler *State() {
     return StateHandler::GetStateHandler();
   }
+
 
 };// namespace Iron

@@ -3,7 +3,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../irongui/forge.hpp"
+#include "../irongui/state.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -18,21 +18,22 @@ namespace UI {
     ExitPressed,
   };
 
-  inline Action_SinglePlayerLobby DrawSinglePlayerLobby() {
-    auto f = Iron::Forge();
+  inline Action_SinglePlayerLobby SinglePlayerLobby() {
+    auto f = Iron::State();
 
     rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_grid = f.Grid( root, 3, 3 );
+    auto root_grid = f->Grid( root, 3, 3 );
 
-    auto grid = f.Grid( root_grid->Slot( 4 ), 1, 5 );
+    auto grid = f->Grid( root_grid->Slot( 4 ), 1, 5 );
 
     bool select_faction =
-      f.TextButton( grid->Slot( 0 ), "Select Faction", BLUE );
+      f->TextButton( grid->Slot( 0 ), "Select Faction", BLUE );
 
-    f.TextLabel( grid->Slot( 1 ), "Waiting for faction", BLUE );
+    f->TextLabel( grid->Slot( 1 ), "Waiting for faction", BLUE );
 
 
-    bool exit_pressed = f.TextButton( grid->Slot( 4 ), "Return to Main", BLUE );
+    bool exit_pressed =
+      f->TextButton( grid->Slot( 4 ), "Return to Main", BLUE );
 
     if ( select_faction ) {
       return Action_SinglePlayerLobby::SelectFaction;
@@ -41,8 +42,6 @@ namespace UI {
     if ( exit_pressed ) {
       return Action_SinglePlayerLobby::ExitPressed;
     }
-
-    f.Draw();
 
     return Action_SinglePlayerLobby::None;
   }

@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../irongui/forge.hpp"
+#include "../irongui/state.hpp"
 #include <raylib.h>
 
 
@@ -18,19 +18,19 @@ namespace UI {
   };
 
 
-  inline Action_MainMenu DrawMainMenu() {
-    auto f = Iron::Forge();
+  inline Action_MainMenu MainMenu() {
+    auto f = Iron::State();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f.Grid( root_r, 3, 3 );
+    auto root_g = f->Grid( root_r, 3, 3 );
 
-    auto grid = f.Grid( root_g->Slot( 4 ), 1, 5 );
+    auto grid = f->Grid( root_g->Slot( 4 ), 1, 5 );
 
-    bool start_pressed = f.TextButton( grid->Slot( 0 ), "Start Game", BLUE );
-    bool host_pressed = f.TextButton( grid->Slot( 1 ), "Host Game", BLUE );
-    bool join_pressed = f.TextButton( grid->Slot( 2 ), "Join Game", BLUE );
-    bool settings_pressed = f.TextButton( grid->Slot( 3 ), "Settings", BLUE );
-    bool exit_pressed = f.TextButton( grid->Slot( 4 ), "Exit Game", BLUE );
+    bool start_pressed = f->TextButton( grid->Slot( 0 ), "Start Game", BLUE );
+    bool host_pressed = f->TextButton( grid->Slot( 1 ), "Host Game", BLUE );
+    bool join_pressed = f->TextButton( grid->Slot( 2 ), "Join Game", BLUE );
+    bool settings_pressed = f->TextButton( grid->Slot( 3 ), "Settings", BLUE );
+    bool exit_pressed = f->TextButton( grid->Slot( 4 ), "Exit Game", BLUE );
 
 
     // str foo = "h: " + std::to_string( Iron::Watcher()->context.hot ) +
@@ -65,8 +65,6 @@ namespace UI {
       printf( "Exit Game!!\n" );
       return Action_MainMenu::ExitGame;
     }
-
-    f.Draw();
 
     return Action_MainMenu::None;
   }

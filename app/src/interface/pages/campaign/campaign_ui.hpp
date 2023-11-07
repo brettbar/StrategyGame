@@ -2,7 +2,7 @@
 
 #include "../../../shared/common.hpp"
 
-#include "../../irongui/forge.hpp"
+#include "../../irongui/state.hpp"
 
 #include "actor_context.hpp"
 #include "settlement_context/settlement_context.hpp"
@@ -17,49 +17,25 @@ namespace UI {
   };
 
   inline Action_ActorContext DrawActorContext( Actor::Component *actor ) {
-    auto f = Iron::Forge();
+    auto f = Iron::State();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f.Grid( root_r, 4, 3 );
+    auto root_g = f->Grid( root_r, 4, 3 );
 
-    auto grid = f.Grid( root_g->Slots( 9, 10 ), 4, 4 );
+    auto grid = f->Grid( root_g->Slots( 9, 10 ), 4, 4 );
 
-    f.TextLabel( grid->Slot( 0 ), "Actor", GREEN );
-    bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Settlement", BLUE );
+    f->TextLabel( grid->Slot( 0 ), "Actor", GREEN );
+    bool okay_pressed = f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
 
     if ( okay_pressed ) {
       printf( "okay pressed\n" );
       return Action_ActorContext::SpawnSettlement;
     }
 
-    f.Draw();
-
     return Action_ActorContext::None;
   }
 
-  inline void DrawDebug() {
-    auto f = Iron::Forge();
 
-    rect root_r =
-      rect{ 0, 0, (f32) GetScreenWidth() / 3, (f32) GetScreenHeight() / 3 };
-
-    auto grid = f.Grid( root_r, 3, 3 );
-
-    f.TextLabel( grid->Slot( 0 ), "Settlement", GREEN );
-    bool okay_pressed = f.TextButton( grid->Slot( 2 ), "Okay", BLUE );
-
-    if ( okay_pressed ) {
-      printf( "okay pressed\n" );
-
-      str foo = "h: " + std::to_string( Iron::State()->context.hot ) +
-                ", a: " + std::to_string( Iron::State()->context.active ) +
-                "\n";
-
-      printf( "%s", foo.c_str() );
-    }
-
-    f.Draw();
-  }
   // inline sptr<Element> CreateCampaignUI() {
   //   return {
   //     GridPanel( "campaign_root", 4, 3 )

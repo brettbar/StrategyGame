@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../irongui/forge.hpp"
+#include "../irongui/state.hpp"
 
 namespace UI {
   inline str DrawFactionSelectScreen() {
@@ -30,22 +30,20 @@ namespace UI {
       GRAY,
     };
 
-    auto f = Iron::Forge();
+    auto f = Iron::State();
     rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_grid = f.Grid( root, 1, 3 );
+    auto root_grid = f->Grid( root, 1, 3 );
 
-    auto grid = f.Grid( root_grid->Slot( 1 ), num_factions, 1 );
+    auto grid = f->Grid( root_grid->Slot( 1 ), num_factions, 1 );
 
     for ( u32 i = 0; i < num_factions; i++ ) {
       bool faction_select =
-        f.TextButton( grid->Slot( i ), factions[i], colors[i] );
+        f->TextButton( grid->Slot( i ), factions[i], colors[i] );
 
       if ( faction_select ) {
         return factions[i];
       }
     }
-
-    f.Draw();
 
     return "";
   }
