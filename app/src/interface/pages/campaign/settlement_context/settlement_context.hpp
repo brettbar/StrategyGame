@@ -15,10 +15,23 @@ namespace UI {
     auto root_g = f->Grid( root_r, 4, 3 );
 
     auto context_g =
-      f->Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5f ) );
+      f->Grid( root_g->Slots( 9, 10 ), 1, 4, Fade( BLACK, 0.5f ) );
+
+    auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
+    f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );
+    f->TextLabel(
+      header_g->Slot( 1 ), Settlement::dev_names[settlement->development], BLACK
+    );
+    f->TextLabel(
+      header_g->Slot( 2 ),
+      std::to_string( settlement->population.current ),
+      BLACK
+    );
+
+    auto content_g = f->Grid( context_g->Rows( 1, 4 ), 5, 4 );
 
 
-    auto tabs_g = f->Grid( context_g->Col( 0 ), 1, 5 );
+    auto tabs_g = f->Grid( content_g->Col( 0 ), 1, 5 );
     auto tab_btns = {
       f->TextButton( tabs_g->Slot( 0 ), "Population", BLUE ),
       f->TextButton( tabs_g->Slot( 1 ), "Construction", YELLOW ),
@@ -31,42 +44,31 @@ namespace UI {
     switch ( tabs->t.tabs->current_tab ) {
       case 0: {// Population
 
-        auto population_g = f->Grid( context_g->Cols( 1, 4 ), 3, 1, BLUE );
+        auto population_g = f->Grid( content_g->Cols( 1, 4 ), 3, 1, BLUE );
 
         auto growth_g =
-          f->Grid( population_g->Slot( 0 ), 3, 3, Color{ 0, 0, 100, 255 } );
+          f->Grid( population_g->Slot( 0 ), 1, 3, Color{ 0, 0, 100, 255 } );
         auto demographics_g =
-          f->Grid( population_g->Slot( 1 ), 3, 3, Color{ 0, 0, 155, 255 } );
+          f->Grid( population_g->Slot( 1 ), 1, 3, Color{ 0, 0, 155, 255 } );
         auto public_order_g =
-          f->Grid( population_g->Slot( 2 ), 3, 3, Color{ 0, 0, 250, 255 } );
+          f->Grid( population_g->Slot( 2 ), 1, 3, Color{ 0, 0, 250, 255 } );
 
-        // f->TextLabel( population_g->Slot( 0 ), settlement->name, BLACK );
-        // f->TextLabel(
-        //   population_g->Slot( 1 ),
-        //   Settlement::dev_names[settlement->development],
-        //   BLACK
-        // );
-        // f->TextLabel(
-        //   population_g->Slot( 2 ),
-        //   std::to_string( settlement->population.current ),
-        //   BLACK
-        // );
 
       } break;
       case 1:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, YELLOW );
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
         break;
       case 2:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, GREEN );
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
         break;
       case 3:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, RED );
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, RED );
         break;
       case 4:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, PURPLE );
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
         break;
       default:
-        f->Grid( context_g->Cols( 1, 4 ), 4, 4, BLUE );
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, BLUE );
         break;
     }
   }
