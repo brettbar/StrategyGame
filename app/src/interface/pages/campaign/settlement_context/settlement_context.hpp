@@ -1,0 +1,88 @@
+#pragma once
+
+#include "../../../irongui/state.hpp"
+#include "construction_tab.hpp"
+#include "military_tab.hpp"
+#include "population_tab.hpp"
+
+
+namespace UI {
+
+  enum class Action_SettlementContext {
+    None,
+    SpawnActor,
+  };
+
+  inline Action_SettlementContext SettlementContext(
+    Settlement::Component *settlement
+  ) {
+    auto f = Iron::Forge();
+
+    rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_g = f->Grid( root_r, 4, 3 );
+
+    auto context_g = f->Grid( root_g->Slots( 9, 10 ), 1, 5 );
+
+    auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
+    f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );
+    f->TextLabel(
+      header_g->Slot( 1 ), Settlement::dev_names[settlement->development], BLACK
+    );
+    f->TextLabel(
+      header_g->Slot( 2 ),
+      std::to_string( settlement->population.current ),
+      BLACK
+    );
+
+    auto content_g = f->Grid( context_g->Rows( 1, 5 ), 5, 4 );
+
+
+    auto tabs_g = f->Grid( content_g->Col( 0 ), 1, 5 );
+    auto tab_btns = {
+      f->TextButton( tabs_g->Slot( 0 ), "Population", BLUE ),
+      f->TextButton( tabs_g->Slot( 1 ), "Construction", YELLOW ),
+      f->TextButton( tabs_g->Slot( 2 ), "Resources", GREEN ),
+      f->TextButton( tabs_g->Slot( 3 ), "Military", RED ),
+      f->TextButton( tabs_g->Slot( 4 ), "Agents", PURPLE ),
+    };
+
+    auto tabs = f->Tabs( tab_btns );
+    switch ( tabs->t.tabs->current_tab ) {
+      case 0: {// Population
+
+        auto population_g = f->Grid( content_g->Cols( 1, 5 ), 3, 1, BLUE );
+
+        auto growth_g =
+          f->Grid( population_g->Slot( 0 ), 1, 3, Color{ 0, 0, 100, 255 } );
+        auto demographics_g =
+          f->Grid( population_g->Slot( 1 ), 1, 3, Color{ 0, 0, 155, 255 } );
+        auto public_order_g =
+          f->Grid( population_g->Slot( 2 ), 1, 3, Color{ 0, 0, 250, 255 } );
+
+
+      } break;
+      case 1:
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
+        break;
+      case 2:
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
+        break;
+      case 3:
+        f->Grid( content_g->Cols( 1, 5 ), 4, 4, RED );
+        break;
+      case 4:
+        auto agent_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
+        {
+          auto spawn_agent =
+            f->TextButton( agent_g->Slot( 0 ), "Spawn", GREEN );
+
+          if ( spawn_agent ) {
+            return Action_SettlementContext::SpawnActor;
+          }
+        }
+        break;
+    }
+
+    return Action_SettlementContext::None;
+  }
+}// namespace UI

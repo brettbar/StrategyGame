@@ -20,19 +20,19 @@ AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
-  # AfterCaseLabel: false
-  AfterCaseLabel: true
-#   AfterClass: false
-#   AfterControlStatement: Never
-#   AfterEnum: false
-#   AfterFunction: false
-#   AfterNamespace: false
-#   AfterUnion: false
-#   BeforeCatch: false
-#   BeforeElse: true 
-#   SplitEmptyFunction: false
-#   SplitEmptyRecord: false
-#   IndentBraces: false
+   AfterCaseLabel: false
+   AfterClass: false
+   AfterStruct: false
+   AfterControlStatement: Never
+   AfterEnum: false
+   AfterFunction: false
+   AfterNamespace: false
+   AfterUnion: false
+   BeforeCatch: false
+   BeforeElse: false
+   SplitEmptyFunction: false
+   SplitEmptyRecord: false
+   IndentBraces: false
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon

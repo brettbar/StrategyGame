@@ -2,91 +2,60 @@
 // be in json
 #pragma once
 
+#include "resources.hpp"
 #include "settlement.hpp"
 #include <map>
 #include <string>
 #include <vector>
-// enum class GatheringBuildingName {
-//   WoodCutter,// nc
-//   Farm,
-//   Fisherman,// nc
-//   Quarry,
-//   Shepherd,
-//   Tanner,
-//   Mine,
-// };
 
-// enum class ProcessingBuildingName {
-//   Sawmill,
-//   Mill,
-//   Kiln,// nc
-//   Stonemason,
-//   Spinner,
-//   Tanner,
-//   Smith,
-// };
+namespace Buildings
+{
 
-// enum class ProductionBuildingName {
-//   OlivePress,
-//   SwordSmith,//nc?
-//   Poleturner,
-//   Armourer,
-//   Jeweler,
-//   Tailor,
-// };
+  enum class Type
+  {
+    Gathering,
+    Processing,
+    Producton,
+  };
 
-namespace Buildings {
+  using Recipe = std::map<std::string, std::vector<std::string>>;
 
-enum class Type {
-  Gathering,
-  Processing,
-  Producton,
-};
+  enum class BuildingName
+  {
+    // Gathering
+    WoodCutter,// nc
+    Farm,
+    Fisherman,// nc
+    Quarry,
+    Shepherd,
+    Mine,
 
-using Recipe = std::map<std::string, std::vector<std::string>>;
+    // Refinement
+    Sawmill,
+    Mill,
+    Kiln,// nc
+    Stonemason,
+    Spinner,
+    Tanner,
+    Smith,
 
-inline std::vector<std::string> gathering{
-  "wood_cutter",
-  "farm",
-  "fisherman",
-  "quarry",
-  "shepherd",
-  "tanner",
-  "mine",
-};
+    // Production
+    OlivePress,
+    SwordSmith,//nc?
+    Poleturner,
+    Armourer,
+    Jeweler,
+    Tailor,
+  };
 
-inline std::vector<std::string> refining{
-  "sawmill",
-  "mill",
-  "kiln",
-  "stonemason",
-  "spinner",
-  "tanner",
-  "smith",
-};
+  struct Building
+  {
+    BuildingName name;
+    Type type;
+    std::string name_str;
 
-inline std::vector<std::string> production{
-  "olive_press",
-  "sword_smith",
-  "poleturner",
-  "armourer",
-  "jeweler",
-  "tailor",
-};
-
-inline std::map<Settlement::Development, std::vector<std::string>>
-  available_buildings = {
-
-};
-
-
-struct Building {
-  std::string name;
-  Type type;
-
-  std::string curr_output;
-
-  std::vector<Recipe> recipes;
-};
+    std::vector<Resources::RawMaterial> producing;
+    std::vector<Resources::Natural> consuming;
+  };
 
 };// namespace Buildings

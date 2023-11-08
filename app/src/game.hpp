@@ -1,6 +1,9 @@
 #pragma once
 
-#include "interface/ui_manager.hpp"
+#include "interface/irongui/state.hpp"
+#include "interface/pages/faction_select_menu.hpp"
+#include "interface/pages/main_menu_ui.hpp"
+#include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -10,36 +13,32 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/input.hpp"
-
-#include "campaign.hpp"
 #include "signals/updates.hpp"
 #include "world/systems/selection_system.hpp"
+
+#include "campaign.hpp"
 #include <raylib.h>
 
-enum class ProgramMode
-{
+enum class Scene {
   MainMenu,
+  SinglePlayerLobby,
+  FactionSelect,
   ModalMenu,
   Campaign,
   Editor,
 };
 
-class IGame
-{
+class IGame {
   public:
-  static IGame *Game()
-  {
+  static IGame *Game() {
     static IGame instance;
     return &instance;
   }
 
-  void MainLoop()
-  {
-    RegisterEventListeners();
+  void MainLoop() {
+    // RegisterEventListeners();
 
-    while ( !WindowShouldClose() && ShouldRun() )
-    {
+    while ( !WindowShouldClose() && ShouldRun() ) {
       SteamAPI_RunCallbacks();
 
       // 1. Update Time
@@ -50,31 +49,31 @@ class IGame
       // 5. Run all Updates
       {
         // Update 60 times a second
-        while ( _lag >= _MS_PER_UPDATE )
-        {
-          Update60TPS();
+        while ( _lag >= _MS_PER_UPDATE ) {
+          if ( _campaign )
+            _campaign->Update60TPS();
           _lag -= _MS_PER_UPDATE;
         }
 
-        // Update once per second
-        while ( _oncelag >= _ONCE_A_SECOND )
-        {
-          if ( Network::is_host )
-          {
-            // Network::Host()->PingAllActiveClients();
-          }
-          _oncelag = 0.0f;
-        }
+        // Update once per second no timeScale
+        // while ( _oncelag >= _ONCE_A_SECOND )
+        // {
+        //   std::cout << "What the fuck???" << '\n';
+
+        //   if ( Network::is_host )
+        //   {
+
+        //     // Network::Host()->PingAllActiveClients();
+        //   }
+        //   _oncelag = 0.0f;
+        // }
 
         // Update once per second but modified by timeScale
         // TODO? Do we want to fold this timescale business into campaign itself
         // Since we dont care about timescale in other program_modes
-        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) )
-        {
+        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
           if ( _campaign )
-          {
             _campaign->Update1TPS();
-          }
           _oncelag = 0.0f;
         }
 
@@ -89,14 +88,18 @@ class IGame
     ExitGameLoopCleanup();
   }
 
+  Campaign *GetCampaign() {
+    return _campaign;
+  }
+
   private:
-  Campaign *_campaign = nullptr;
+  Campaign *_campaign;
   bool _single_player = true;
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
   bool _hit_exit = false;
-  ProgramMode _mode = ProgramMode::MainMenu;
+  Scene _mode = Scene::MainMenu;
 
   f32 _oncelag = 0.0f;
   f32 _lag = 0.0f;
@@ -113,10 +116,11 @@ class IGame
   void operator=( const IGame & ) = delete;
 
   IGame() {}
-  ~IGame() {}
+  ~IGame() {
+    delete _campaign;
+  }
 
-  bool ShouldRun()
-  {
+  bool ShouldRun() {
     return !_hit_exit;
   }
 
@@ -124,25 +128,26 @@ class IGame
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartCampaign( std::string player_faction )
-  {
+  void StartSingleplayerCampaign( std::string player_faction ) {
     printf( "pending new!!\n" );
 
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new Campaign();
+    _campaign = new class Campaign( true );
 
-    UI::System::EnableCampaignUI();
+    // UI::System::InitCampaignUI();
 
-    Global::host_player = Global::world.create();
+    auto player = Global::world.create();
     Global::world.emplace<Player::Component>(
-      Global::host_player, Global::host_player, true, player_faction
+      player, player, "player_0", true
+    );
+    Global::world.emplace<Player::LocalTag>( player );
+    Global::world.emplace<Faction::Component>(
+      player, FactionSystem::factions.at( player_faction )
     );
 
-    SelectionSystem::Start();
-
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
   /*=============================================================
                         End: Singleplayer
@@ -152,54 +157,131 @@ class IGame
   /*=============================================================
                         Begin: Multiplayer
   =============================================================*/
-  void HostMultiplayerCampaign()
-  {
+  void HostMultiplayerLobby() {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
-    UI::System::SwitchPage( UI::Lobby );
+    // UI::System::SwitchPage( UI::Lobby );
 
-    // InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-    //   .SetText( "Start Game" )
-    //   .build()
-    //   .send();
-    InterfaceUpdate::Text( InterfaceUpdate::ID::HostLobby )
-      .SetTarget( Network::Host()->_player_id + "_label" )
-      .SetText( Network::Host()->_player_id )
-      .build()
-      .send();
-    InterfaceUpdate::Clickable( InterfaceUpdate::ID::HostLobby, true )
-      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .build()
-      .send();
-    InterfaceUpdate::Background( InterfaceUpdate::ID::HostLobby, GREEN )
-      .SetTarget( Network::Host()->_player_id + "_faction_selection" )
-      .build()
-      .send();
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::HostLobby,
+      .player_id = Network::Host()->_player_id,
+    }
+      .Send();
   }
 
-  void StartMultiplayerCampaign() {}
+  void HostStartMultiplayerCampaign() {
+    if ( _campaign )
+      delete _campaign;
 
-  void LookForMultiplayerCampaign()
-  {
+    _campaign = new Campaign( false );
+
+    // UI::System::InitCampaignUI();
+
+    for ( auto client: Network::Host()->_clients ) {
+      if ( !client.peer_data.active )
+        continue;
+
+      auto player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        player, player, client.peer_data.player_id, true
+      );
+
+      if ( client.peer_data.player_id == "player_0" )
+        Global::world.emplace<Player::LocalTag>( player );
+      else
+        Global::world.emplace<Player::RemoteTag>( player );
+
+      Global::world.emplace<Faction::Component>(
+        player, FactionSystem::factions.at( client.peer_data.faction )
+      );
+    }
+
+    for ( auto player_e:
+          Global::world.view<Player::Component, Faction::Component>() ) {
+      Player::Component player =
+        Global::world.get<Player::Component>( player_e );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( player_e );
+
+      std::cout << "Initialized Player: " << player.player_id << '\n';
+      std::cout << "Faction: " << faction.id << '\n';
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
+        std::cout << "with LocalTag!" << '\n';
+      }
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
+        std::cout << "with RemoteTag!" << '\n';
+      }
+    }
+
+
+    Game()->_mode = Scene::Campaign;
+  }
+
+  void ClientStartMultiplayerCampaign() {
+    if ( _campaign )
+      delete _campaign;
+
+    _campaign = new class Campaign( false );
+
+    // UI::System::InitCampaignUI();
+
+    for ( auto peer: Network::Client()->_peers ) {
+      if ( !peer.active )
+        continue;
+
+      auto player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        player, player, peer.player_id, true
+      );
+
+      if ( Network::Client()->_local_player_id == peer.player_id )
+        Global::world.emplace<Player::LocalTag>( player );
+      else
+        Global::world.emplace<Player::RemoteTag>( player );
+
+      Global::world.emplace<Faction::Component>(
+        player, FactionSystem::factions.at( peer.faction )
+      );
+    }
+
+    for ( auto player_e:
+          Global::world.view<Player::Component, Faction::Component>() ) {
+      Player::Component player =
+        Global::world.get<Player::Component>( player_e );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( player_e );
+
+      std::cout << "Initialized Player: " << player.player_id << '\n';
+      std::cout << "Faction: " << faction.id << '\n';
+      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
+        std::cout << "with LocalTag!" << '\n';
+      }
+      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
+        std::cout << "with RemoteTag!" << '\n';
+      }
+    }
+
+    Game()->_mode = Scene::Campaign;
+  }
+
+  void LookForMultiplayerLobby() {
     _single_player = false;
     Network::is_host = false;
     Network::Client()->Init();
-    UI::System::SwitchPage( UI::LobbyBrowser );
+    // UI::System::SwitchPage( UI::LobbyBrowser );
   }
 
-  void JoinMultiplayerLobby( CSteamID lobby_id )
-  {
-    if ( Network::Client()->AttemptJoinLobby( lobby_id ) )
-    {
+  void JoinMultiplayerLobby( CSteamID lobby_id ) {
+    InterfaceUpdate::Update{
+      .id = InterfaceUpdate::ID::JoinLobby,
+      .player_id = "player_0",
+    }
+      .Send();
+
+    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
       printf( "Sending joined lobby event!\n" );
-      UI::System::SwitchPage( UI::Lobby );
-
-
-      // InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-      //   .SetText( "Ready Up" )
-      //   .build()
-      //   .send();
+      // UI::System::SwitchPage( UI::Lobby );
     }
   }
 
@@ -210,83 +292,129 @@ class IGame
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadGame()
-  {
+  void LoadGame() {
     if ( _campaign )
       delete _campaign;
-    _campaign = new Campaign( "output.dat" );
-    UI::System::EnableCampaignUI();
+    _campaign = new class Campaign( "output.dat" );
+    // UI::System::InitCampaignUI();
 
-    Game()->_mode = ProgramMode::Campaign;
+    Game()->_mode = Scene::Campaign;
   }
 
-  void SaveGame()
-  {
+  void SaveGame() {
     SaveSystem::Save();
   }
 
-  void ExitGame()
-  {
+  void ExitGame() {
     _hit_exit = true;
   }
 
-  void ToggleModalMenu()
-  {
-    if ( _mode == ProgramMode::Campaign )
-    {
-      _mode = ProgramMode::ModalMenu;
-      UI::System::SwitchPage( UI::ModalMenu );
-    }
-    else if ( _mode == ProgramMode::ModalMenu )
-    {
-      _mode = ProgramMode::Campaign;
-      UI::System::EnableCampaignUI();
+  void ToggleModalMenu() {
+    if ( _mode == Scene::Campaign ) {
+      _mode = Scene::ModalMenu;
+      // UI::System::SwitchPage( UI::ModalMenu );
+    } else if ( _mode == Scene::ModalMenu ) {
+      _mode = Scene::Campaign;
+      // UI::System::InitCampaignUI();
     }
   }
 
-  void ReturnToMain()
-  {
-    UI::System::SwitchPage( UI::MainMenu );
-    _mode = ProgramMode::MainMenu;
+  void ReturnToMain() {
+    // UI::System::SwitchPage( UI::MainMenu );
+    _mode = Scene::MainMenu;
+  }
+
+
+  inline void CheckMenuToggle() {
+    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
+      InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+        InterfaceEvent::ID::ModalMenuToggle,
+      } );
+    }
   }
   /*=============================================================
                         End: Shared
   =============================================================*/
 
-
-  void UpdateOnFrame()
-  {
-    if ( Network::is_host )
-    {
+  void UpdateOnFrame() {
+    if ( Network::is_host ) {
       Network::Host()->Update();
-    }
-    else
-    {
+    } else {
       Network::Client()->Update();
     }
 
-    switch ( _mode )
-    {
-      case ProgramMode::MainMenu:
-      {
-        UI::System::UpdateOnFrame();
+    Iron::Forge()->over_any_elem = false;
 
-        CameraUpdate( Global::state.camera, _dt );
+    switch ( _mode ) {
+      case Scene::MainMenu: {
+        auto action = UI::MainMenu();
+
+        switch ( action ) {
+          case UI::Action_MainMenu::StartGame:
+            _mode = Scene::SinglePlayerLobby;
+            break;
+          case UI::Action_MainMenu::HostGame:
+            break;
+          case UI::Action_MainMenu::JoinGame:
+            break;
+          case UI::Action_MainMenu::Settings:
+            break;
+          case UI::Action_MainMenu::ExitGame:
+            // TODO probably dont wanna do this so brute force
+            CloseWindow();
+            break;
+        }
 
         BeginDrawing();
         {
           ClearBackground( BLACK );
-          Renderer::DrawUI();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
-      case ProgramMode::ModalMenu:
-      {
-        Input::CheckMenuToggle();
+      case Scene::SinglePlayerLobby: {
+        auto action = UI::SinglePlayerLobby();
 
-        UI::System::UpdateOnFrame();
+        switch ( action ) {
+          case UI::Action_SinglePlayerLobby::SelectFaction:
+            _mode = Scene::FactionSelect;
+            break;
+          case UI::Action_SinglePlayerLobby::ExitPressed:
+            _mode = Scene::MainMenu;
+            break;
+        }
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
+        }
+        EndDrawing();
+      } break;
+
+      case Scene::FactionSelect: {
+        auto selection = UI::DrawFactionSelectScreen();
+
+        // @volatile
+        // TODO make this a faction enum
+        if ( selection != "" ) {
+          _mode = Scene::Campaign;
+          StartSingleplayerCampaign( selection );
+        }
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
+        }
+        EndDrawing();
+      } break;
+
+      case Scene::ModalMenu: {
+        CheckMenuToggle();
 
         BeginDrawing();
         {
@@ -294,22 +422,18 @@ class IGame
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
-          Renderer::DrawUI();
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
-      case ProgramMode::Campaign:
-      {
-        if ( _single_player )
-        {
+      case Scene::Campaign: {
+        CheckMenuToggle();
+
+        if ( _single_player ) {
           // Singleplayer Campaign
           if ( _campaign )
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
-        }
-        else
-        {
+        } else {
           // Multiplayer Campaign
           if ( _campaign )
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
@@ -318,32 +442,24 @@ class IGame
         // 6. Draw everything
         BeginDrawing();
         {
-          Renderer::Draw( Global::texture_cache );
-          Renderer::DrawUI();
-
-          DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-          DrawFPS( GetScreenWidth() - 100, 2 );
+          _campaign->Draw();
+          Iron::Forge()->DrawAll();
+          Iron::Forge()->DrawDebug();
         }
         EndDrawing();
-      }
-      break;
+      } break;
 
-      case ProgramMode::Editor:
+      case Scene::Editor:
         break;
     }
-  }
 
-  void Update60TPS()
-  {
-    if ( _campaign )
-    {
-      _campaign->Update60TPS();
+    if ( !Iron::Forge()->over_any_elem ) {
+      Iron::Forge()->context.hot = -1;
+      Iron::Forge()->context.active = -1;
     }
   }
 
-
-  void ExitGameLoopCleanup()
-  {
+  void ExitGameLoopCleanup() {
     if ( Network::is_host )
       Network::Host()->Delete();
     else
@@ -358,172 +474,147 @@ class IGame
   void RegisterEventListeners();
 };
 
-inline void IGame::RegisterEventListeners()
-{
-  InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
-    [&](
-      const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
-    ) {
-      switch ( event.event_id )
-      {
-        /// BASIC
-        // MainMenu
-        case InterfaceEvent::ID::MainMenuHostGame:
-          HostMultiplayerCampaign();
-          break;
-        case InterfaceEvent::ID::MainMenuJoinGame:
-          LookForMultiplayerCampaign();
-          break;
-        case InterfaceEvent::ID::MainMenuStartGame:
-        {
-          _single_player = true;
-          UI::System::SwitchPage( UI::FactionSelectMenu );
-        }
-        break;
-        case InterfaceEvent::ID::MainMenuLoadGame:
-          LoadGame();
-          break;
-        case InterfaceEvent::ID::MainMenuExitGame:
-          ExitGame();
-          break;
-          // FactionSelect
-        case InterfaceEvent::ID::OpenFactionSelectPage:
-          UI::System::SwitchPage( UI::FactionSelectMenu );
-          break;
-        case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
-          StartCampaign( faction );
-          break;
-        case InterfaceEvent::ID::ModalMenuLoadGame:
-          LoadGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuSaveGame:
-          SaveGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuExitMain:
-          ReturnToMain();
-          break;
-        case InterfaceEvent::ID::ModalMenuExitGame:
-          ExitGame();
-          break;
-        case InterfaceEvent::ID::ModalMenuToggle:
-          ToggleModalMenu();
-          break;
-        case InterfaceEvent::ID::ReturnToMain:
-          ReturnToMain();
-          break;
-        case InterfaceEvent::ID::ReadyUp:
-          StartCampaign( faction );
-          break;
-        case InterfaceEvent::ID::JoinLobby:
-          if ( event.msg == "lobby_entry_Conquistador's lobby" )
-          {
-            JoinMultiplayerLobby( event.lobby_id );
-          }
-          break;
+// inline void IGame::RegisterEventListeners() {
+//   InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
+//     [&](
+//       const InterfaceEvent::Data &event, InterfaceEvent::EventEmitter &emitter
+//     ) {
+//       switch ( event.event_id ) {
+//         /// BASIC
+//         // MainMenu
+//         case InterfaceEvent::ID::MainMenuHostGame:
+//           HostMultiplayerLobby();
+//           break;
+//         case InterfaceEvent::ID::MainMenuJoinGame:
+//           LookForMultiplayerLobby();
+//           break;
+//         case InterfaceEvent::ID::MainMenuStartGame: {
+//           _single_player = true;
+//           // UI::System::SwitchPage( UI::SinglePlayerLobby );
+//         } break;
+//         case InterfaceEvent::ID::MainMenuLoadGame:
+//           LoadGame();
+//           break;
+//         case InterfaceEvent::ID::MainMenuExitGame:
+//           ExitGame();
+//           break;
+//           // FactionSelect
+//         case InterfaceEvent::ID::OpenFactionSelectPage:
+//           // UI::System::SwitchPage( UI::FactionSelectMenu );
+//           break;
+//         case InterfaceEvent::ID::SinglePlayerLobbyStartGame:
+//           StartSingleplayerCampaign( faction );
+//           break;
+//         case InterfaceEvent::ID::ModalMenuLoadGame:
+//           LoadGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuSaveGame:
+//           SaveGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuExitMain:
+//           ReturnToMain();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuExitGame:
+//           ExitGame();
+//           break;
+//         case InterfaceEvent::ID::ModalMenuToggle:
+//           ToggleModalMenu();
+//           break;
+//         case InterfaceEvent::ID::ReturnToMain:
+//           ReturnToMain();
+//           break;
+//         case InterfaceEvent::ID::PlayerToggledReady: {
+//           if ( Network::is_host ) {
+//             Network::Host()->ToggleReady();
+//           } else {
+//             Network::Client()->ToggleReady();
+//           }
+//         } break;
+//         case InterfaceEvent::ID::HostStartGame: {
+//           Network::Host()->StartHostedCampaign();
+//           HostStartMultiplayerCampaign();
+//         } break;
+//         case InterfaceEvent::ID::JoinHostedCampaign: {
+//           ClientStartMultiplayerCampaign();
+//         } break;
+//         case InterfaceEvent::ID::JoinLobby: {
+//           if ( event.msg == "lobby_entry_Conquistador's lobby" ) {
+//             JoinMultiplayerLobby( event.lobby_id );
+//           }
+//         } break;
+//         case InterfaceEvent::ID::FactionSelected: {
+//           faction = event.msg;
 
-        /// STRING
-        case InterfaceEvent::ID::FactionSelected:
-        {
-          printf(
-            "In listener, %s %s\n",
-            InterfaceEvent::IDString[(u32) InterfaceEvent::ID::FactionSelected],
-            event.msg.c_str()
-          );
+//           if ( _single_player ) {
+//             InterfaceUpdate::Update{
+//               .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+//               .update_txt = faction,
+//               .player_id = "player_0",
+//             }
+//               .Send();
 
-          faction = event.msg;
+//             // UI::System::SwitchPage( UI::SinglePlayerLobby );
+//           } else {
+//             std::string player_id = "";
 
-          if ( _single_player )
-          {
-            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetText( faction )
-              .build()
-              .send();
+//             if ( Network::is_host ) {
+//               player_id = Network::Host()->_player_id;
+//               Network::Host()->SetHostFaction( faction );
+//               Network::Host()->SendMessageToAllActiveClients( Network::Message{
+//                 Network::MessageID::PlayerFactionSelect,
+//                 nlohmann::json{
+//                   { "player_id", player_id },
+//                   { "faction", faction },
+//                 },
+//               } );
+//             } else {
+//               player_id = Network::Client()->_local_player_id;
+//               Network::Client()->SendMessageToHost( Network::Message{
+//                 Network::MessageID::PlayerFactionSelect,
+//                 nlohmann::json{
+//                   { "player_id", player_id },
+//                   { "faction", faction },
+//                 },
+//               } );
+//             }
 
-            InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected,
-              GetPrimaryFactionColor( faction )
-            )
-              .build()
-              .send();
+//             InterfaceUpdate::Update{
+//               .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+//               .update_txt = faction,
+//               .player_id = player_id,
+//             }
+//               .Send();
 
-            UI::System::SwitchPage( UI::SinglePlayerLobby );
-          }
-          else
-          {
-            std::string player_id = "";
+//             // UI::System::SwitchPage( UI::Lobby );
+//           }
+//         } break;
 
-            if ( Network::is_host )
-            {
-              player_id = Network::Host()->_player_id;
-              Network::Host()->SetHostFaction( faction );
-              Network::Host()->SendMessageToAllClients( Network::Message{
-                Network::MessageID::PlayerFactionSelect,
-                nlohmann::json{
-                  { "player_id", player_id },
-                  { "faction", faction },
-                },
-              } );
-            }
-            else
-            {
-              player_id = Network::Client()->_local_player_id;
-              Network::Client()->SendMessageToHost( Network::Message{
-                Network::MessageID::PlayerFactionSelect,
-                nlohmann::json{
-                  { "player_id", player_id },
-                  { "faction", faction },
-                },
-              } );
-            }
+//         case InterfaceEvent::ID::ClientReceivedCommand: {
+//           if ( _campaign )
+//             _campaign->ConvertCommandRequest( event.msg );
+//         } break;
 
-            InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-              .SetTarget( player_id + "_select_faction" )
-              .SetText( faction )
-              .build()
-              .send();
+//         // TODO(??) maybe we just need a separate queue or something
+//         // for the campaign
+//         case InterfaceEvent::ID::ActorSpawnSettlment:
+//         case InterfaceEvent::ID::SettlementContextMilitaryTab:
+//         case InterfaceEvent::ID::SettlementContextPopulationTab:
+//         case InterfaceEvent::ID::SettlementContextResourcesTab:
+//         case InterfaceEvent::ID::SettlementContextConstructionTab:
+//         case InterfaceEvent::ID::SettlementContextConstructBuilding:
+//         case InterfaceEvent::ID::SettlementContextTrainHastati: {
+//           // if ( _campaign )
+//           //   _campaign->ForwardEvent( event );
+//         } break;
 
-            InterfaceUpdate::Background(
-              InterfaceUpdate::ID::FactionSelected,
-              GetPrimaryFactionColor( faction )
-            )
-              .SetTarget( player_id + "_select_faction" )
-              .build()
-              .send();
+//         default:
+//           printf( "Error, unregistered UI event fired\n" );
+//           break;
+//       }
+//     }
+//   );
+// }
 
-            UI::System::SwitchPage( UI::Lobby );
-          }
-        }
-        break;
-
-        default:
-          printf( "Error, unregistered UI event fired\n" );
-          break;
-      }
-    }
-  );
-
-
-  // Events::event_emitter.on<Events::ButtonClick>(
-  //   [&]( const Events::ButtonClick &event, Events::EventEmitter &emitter ) {
-  //     // else if ( event.origin_id == "faction_select" ) {
-  //     //   //// StartCampaign( event.msg );
-  //     // }
-  //     if ( event.origin_id == "faction_selected" ) {}
-  //     else if ( event.origin_id == "mp_faction_select" ) {
-  //       UI::System::SwitchPage( UI::FactionSelectMenu );
-  //     }
-  //     else if ( event.origin_id == "actor_spawn_settlement" ) {
-  //       printf(
-  //         "In listener, %s %s\n", event.origin_id.c_str(), event.msg.c_str()
-  //       );
-
-  //       SettlementSystem::SpawnSettlement();
-  //     }
-  //   }
-  // );
-}
-
-inline IGame *Game()
-{
+inline IGame *Game() {
   return IGame::Game();
 }

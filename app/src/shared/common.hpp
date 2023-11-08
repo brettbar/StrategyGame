@@ -17,26 +17,36 @@ using u32 = unsigned int;
 using i32 = int;
 using f32 = float;
 using u64 = unsigned long long;
-// using str = std::string;
+using str = std::string;
 using hstr = entt::hashed_string;
-using vec2 = Vector2;
+using vec2f = Vector2;
 using rect = Rectangle;
 
+template<typename K, typename V>
+using map = std::map<K, V>;
+
 template<typename T>
-using ptr = std::shared_ptr<T>;
+using func = std::function<T>;
+
+template<typename T>
+using list = std::vector<T>;
+
+template<typename T>
+using sptr = std::shared_ptr<T>;
+
+template<typename T>
+using uptr = std::unique_ptr<T>;
 
 template<typename... T>
-using View =
+using view =
   entt::basic_view<entt::get_t<entt::storage_for_t<T>...>, entt::exclude_t<>>;
 
-struct IVector2
-{
+struct vec2i {
   i32 x;
   i32 y;
 };
 
-struct UVector2
-{
+struct vec2u {
   u32 x;
   u32 y;
 };

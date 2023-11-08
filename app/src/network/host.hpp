@@ -13,8 +13,9 @@
 #include "../shared/utils.hpp"
 #include "network.hpp"
 #include <chrono>
-#include <isteammatchmaking.h>
+#include <steam/isteammatchmaking.h>
 
+#include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 
 namespace Network
@@ -31,8 +32,6 @@ namespace Network
 
       ClientConnectionData()
       {
-        peer_data.player_id = "";
-        peer_data.active = false;
         conn = 0;
         latest_timestamp = TimestampMS();
         ping_ms = 1000;
@@ -57,9 +56,6 @@ private:
 
     CSteamID _server_id;
 
-    // Used after lobby is done
-    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
-    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
     HSteamListenSocket _socket;
     // HSteamNetPollGroup _poll_grp;
@@ -124,6 +120,9 @@ private:
 public:
     // TODO make private
     std::string _player_id = "player_0";
+    // Used after lobby is done
+    // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
+    std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
     MessageQueue _msg_queue;
 
@@ -254,48 +253,139 @@ public:
             );
           }
 
-          InterfaceUpdate::Text( InterfaceUpdate::ID::FactionSelected )
-            .SetTarget( target )
-            .SetText( faction )
-            .build()
-            .send();
-
-          InterfaceUpdate::Background(
-            InterfaceUpdate::ID::FactionSelected,
-            GetPrimaryFactionColor( faction )
-          )
-            .SetTarget( target )
-            .build()
-            .send();
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+            .update_txt = faction,
+            .player_id = player_id,
+          }
+            .Send();
         }
+        break;
+        case PlayerToggledReady:
+        {
+          std::string player_id = msg.body["player_id"];
+          bool ready = msg.body["ready"];
+
+          u32 index = player_id_index[player_id];
+          _clients[index].peer_data.readied_up = ready;
+
+          InterfaceUpdate::Update{
+            .id = InterfaceUpdate::ID::PlayerToggledReady,
+            .player_id = player_id,
+            .condition = ready,
+          }
+            .Send();
+
+          SendMessageToAllActiveClients( Message{
+            MessageID::PlayerToggledReady,
+            nlohmann::json{
+              { "player_id", player_id },
+              { "ready", ready },
+            },
+          } );
+
+          CheckIfAllPlayersReady();
+        }
+        break;
+        case Command:
+        {
+
+          for ( auto &client: _clients )
+          {
+            if ( !client.peer_data.active )
+              continue;
+
+            if ( client.peer_data.player_id == "player_0" )
+              continue;
+
+            SendMessageOnConnection( client.conn, msg );
+          }
+
+          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+            InterfaceEvent::ID::ClientReceivedCommand,
+            msg.body.dump(),
+          } );
+        };
         default:
           break;
       }
     }
 
-    void PingAllActiveClients()
+    void ToggleReady()
     {
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+      std::cout << "Host()->ToggleReady!!!" << '\n';
+
+      _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
+
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::PlayerToggledReady,
+        .player_id = "player_0",
+        .condition = _clients[0].peer_data.readied_up,
+      }
+        .Send();
+
+      SendMessageToAllActiveClients( Message{
+        MessageID::PlayerToggledReady,
+        nlohmann::json{
+          { "player_id", _clients[0].peer_data.player_id },
+          { "ready", _clients[0].peer_data.readied_up } },
+      } );
+
+      CheckIfAllPlayersReady();
+    }
+
+    void CheckIfAllPlayersReady()
+    {
+      u32 num_active = 0;
+      u32 num_ready = 0;
+      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
       {
         if ( !_clients[i].peer_data.active )
           continue;
 
-        auto timestamp =
-          std::chrono::system_clock::now().time_since_epoch().count();
-
-        SendMessageOnConnection(
-          _clients[i].conn,
-          Message{
-            MessageID::HostPingRequest,
-            std::to_string( timestamp ).c_str(),
-          }
-        );
+        num_active++;
+        if ( _clients[i].peer_data.readied_up )
+          num_ready++;
       }
+
+      // Update if all players are ready or not
+      InterfaceUpdate::Update{
+        .id = InterfaceUpdate::ID::AllPlayersReady,
+        .condition = num_active > 1// at least 2 players
+                     && ( num_active == num_ready ),
+      }
+        .Send();
     }
 
-    void SendMessageToAllClients( Message message )
+    void StartHostedCampaign()
     {
+      SendMessageToAllActiveClients( Message{
+        MessageID::HostStartedCampaign,
+      } );
+    }
 
+    // void PingAllActiveClients()
+    // {
+    //   for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
+    //   {
+    //     if ( !_clients[i].peer_data.active )
+    //       continue;
+
+    //     auto timestamp =
+    //       std::chrono::system_clock::now().time_since_epoch().count();
+
+    //     SendMessageOnConnection(
+    //       _clients[i].conn,
+    //       Message
+    //         MessageID::HostPingRequest,
+    //         std::to_string( timestamp ).c_str(),
+    //       }
+    //     );
+    //   }
+    // }
+
+    void SendMessageToAllActiveClients( Message message )
+    {
       // We start at 1 since host is always i=0
       for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
       {
@@ -306,25 +396,9 @@ public:
       }
     }
 
-
     void Delete()
     {
       delete this;
-    }
-
-    std::vector<Network::PeerData> GetConnectedUsers()
-    {
-      std::vector<PeerData> clients = {};
-
-      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
-        if ( _clients[i].peer_data.active )
-        {
-          clients.push_back( _clients[i].peer_data );
-        }
-      }
-
-      return clients;
     }
   };
 
@@ -454,16 +528,11 @@ public:
           Message{ MessageID::AssignedPlayerId, new_player_id_body }
         );
 
-        auto player_id = _clients[i].peer_data.player_id;
-        InterfaceUpdate::Text( InterfaceUpdate::ID::JoinLobby )
-          .SetTarget( player_id + "_label" )
-          .SetText( player_id )
-          .build()
-          .send();
-        InterfaceUpdate::Background( InterfaceUpdate::ID::JoinLobby, PURPLE )
-          .SetTarget( player_id + "_faction_selection" )
-          .build()
-          .send();
+        InterfaceUpdate::Update{
+          .id = InterfaceUpdate::ID::PlayerJoinedLobby,
+          .player_id = _clients[i].peer_data.player_id,
+        }
+          .Send();
 
         // Tell the new client about all the current clients
         for ( auto &client: _clients )

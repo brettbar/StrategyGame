@@ -14,7 +14,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="app\src\interface\element.cpp" />
+    <ClCompile Include="app\src\interface\elements\data_panel.cpp" />
+    <ClCompile Include="app\src\interface\elements\grid_panel.cpp" />
+    <ClCompile Include="app\src\interface\elements\labels_buttons.cpp" />
+    <ClCompile Include="app\src\interface\elements\stack_panel.cpp" />
     <ClCompile Include="app\src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="app\src\interface\element.hpp" />
+    <ClInclude Include="app\src\interface\immediate.hpp" />
+    <ClInclude Include="app\src\interface\pages\main_menu_ui.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

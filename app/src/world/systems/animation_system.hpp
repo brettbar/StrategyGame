@@ -1,55 +1,63 @@
 #pragma once
 
 #include "../../shared/common.hpp"
+#include "../components/actor.hpp"
 #include "../components/animated.hpp"
-#include "../components/unit.hpp"
 #include "movement_system.hpp"
 #include <raylib.h>
 
-namespace AnimationSystem {
+namespace AnimationSystem
+{
 
-inline void
-Draw( View<Unit::Component, Animated::Component> animated_units, bool debug ) {
+  inline void Draw(
+    view<Actor::Component, Animated::Component> animated_actors,
+    bool debug
+  )
+  {
 
-  // TODO maybe a better soln?
-  Global::world.sort<Unit::Component>(
-    []( const Unit::Component &lhs, const Unit::Component &rhs ) {
-      return rhs.position.y > lhs.position.y;
-    }
-  );
-
-  animated_units.each( [debug](
-                         Unit::Component &unit, Animated::Component &anim
-                       ) {
-    DrawTextureRec(
-      anim.sprite,
-      anim.frameRec,
-      { unit.position.x - 64.0f, unit.position.y - 64.0f },
-      WHITE
+    // TODO maybe a better soln?
+    Global::world.sort<Actor::Component>(
+      []( const Actor::Component &lhs, const Actor::Component &rhs ) {
+        return rhs.position.y > lhs.position.y;
+      }
     );
 
-    if ( debug && Vector2Distance( unit.position, unit.destination ) > 0.5f ) {
-      DrawLineEx( unit.position, unit.destination, 2, MAGENTA );
-    }
-  } );
-}
+    animated_actors.each( [debug](
+                            Actor::Component &actor, Animated::Component &anim
+                          ) {
+      DrawTextureRec(
+        anim.sprite,
+        anim.frameRec,
+        { actor.position.x - 64.0f, actor.position.y - 64.0f },
+        WHITE
+      );
 
-inline void Update(
-  View<Unit::Component, Animated::Component> animated_units,
-  f32 timeScale
-) {
-  for ( auto &entity: animated_units ) {
-    Animated::Component &anim =
-      animated_units.get<Animated::Component>( entity );
-
-    float animSpeed = 0.18f;
-    anim.animTime += anim.animations[anim.state].speed * timeScale * animSpeed;
-    anim.currFrame =
-      (int) anim.animTime % anim.animations[anim.state].frameLength;
-
-    anim.frameRec.x = (f32) anim.currFrame * 128;
-    anim.frameRec.y = anim.state * 128;
+      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f )
+      {
+        DrawLineEx( actor.position, actor.destination, 2, MAGENTA );
+      }
+    } );
   }
-}
+
+  inline void Update(
+    view<Actor::Component, Animated::Component> animated_actors,
+    f32 timeScale
+  )
+  {
+    for ( auto &entity: animated_actors )
+    {
+      Animated::Component &anim =
+        animated_actors.get<Animated::Component>( entity );
+
+      float animSpeed = 0.18f;
+      anim.animTime +=
+        anim.animations[anim.state].speed * timeScale * animSpeed;
+      anim.currFrame =
+        (int) anim.animTime % anim.animations[anim.state].frameLength;
+
+      anim.frameRec.x = (f32) anim.currFrame * 128;
+      anim.frameRec.y = anim.state * 128;
+    }
+  }
 
 };// namespace AnimationSystem

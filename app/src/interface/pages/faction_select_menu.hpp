@@ -2,62 +2,50 @@
 
 #include "../../shared/common.hpp"
 
-#include "../ui_system.hpp"
+#include "../irongui/state.hpp"
 
-namespace UI
-{
+namespace UI {
+  inline str DrawFactionSelectScreen() {
 
-  inline std::vector<Element> CreateFactionButtons()
-  {
-    // TODO replace with read in from json
-    std::map<std::string, Color> factions = {
-      { "romans", RED },
-      { "greeks", BLUE },
-      { "celts", GREEN },
-      { "punics", PURPLE },
-      { "persians", ORANGE },
-      { "scythians", PINK },
-      { "germans", GRAY },
+    const int num_factions = 7;
+
+    // TODO read this in from a dedicated faction.hpp or something like that
+    const str factions[num_factions] = {
+      "romans",
+      "greeks",
+      "celts",
+      "punics",
+      "persians",
+      "scythians",
+      "germans",
     };
-    // TODO replace with read in from json
-    std::map<std::string, std::string> full_names = {
-      { "romans", "Roman Republic" },
-      { "greeks", "Greek Cities" },
-      { "celts", "Celtic Tribes" },
-      { "punics", "Punic Colonies" },
-      { "persians", "Persian Empire" },
-      { "scythians", "Scythian Horde" },
-      { "germans", "Germanic Federation" },
-    };
-
-    std::vector<Element> text_buttons = {
-      TextLabel( "faction_select_label" ).SetText( "Select your faction", 32 ),
+    // TODO read this in from a dedicated faction.hpp or something like that
+    const Color colors[num_factions] = {
+      RED,
+      BLUE,
+      GREEN,
+      PURPLE,
+      ORANGE,
+      PINK,
+      GRAY,
     };
 
-    for ( const auto &[name, color]: factions )
-    {
-      std::string faction = name;
-      std::string id = "faction_select_" + faction;
+    auto f = Iron::Forge();
+    rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_grid = f->Grid( root, 1, 3 );
 
-      text_buttons.push_back( TextButton( id )
-                                .SetText( full_names[name], 32 )
-                                .Background( color )
-                                .SetEvent( InterfaceEvent::Data(
-                                  InterfaceEvent::ID::FactionSelected, faction
-                                ) ) );
+    auto grid = f->Grid( root_grid->Slot( 1 ), num_factions, 1 );
+
+    for ( u32 i = 0; i < num_factions; i++ ) {
+      bool faction_select =
+        f->TextButton( grid->Slot( i ), factions[i], colors[i] );
+
+      if ( faction_select ) {
+        return factions[i];
+      }
     }
 
-    return text_buttons;
-  }
-
-  inline std::vector<Element> CreateFactionSelectMenuUI()
-  {
-    return {
-      Panel( "faction_select_menu" )
-        .SetAxis( Axis::Column )
-        .SetAnchor( Anchor::Centered )
-        .Children( CreateFactionButtons() ),
-    };
+    return "";
   }
 
 

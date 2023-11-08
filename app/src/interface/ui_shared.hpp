@@ -1,5 +1,6 @@
 #pragma once
 #include "../shared/global.hpp"
+#include "element.hpp"
 
 namespace UI
 {
@@ -10,9 +11,10 @@ namespace UI
     std::string active;
   };
 
-  inline f32 SCALE = 2.0f;
+  inline f32 SCALE = 1.0f;
 
-  class Element;
-  inline std::map<std::string, ptr<Element>> lookup;
+  struct Element;
+  inline std::map<std::string, sptr<Element>> lookup;
+
 
 };// namespace UI

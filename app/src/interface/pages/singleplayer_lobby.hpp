@@ -3,36 +3,47 @@
 
 #include "../../shared/common.hpp"
 
-#include "../element.hpp"
+#include "../irongui/state.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
 #include "../../network/network.hpp"
+#include <raylib.h>
 
-namespace UI
-{
-  inline std::vector<Element> CreateSinglePlayerLobby()
-  {
-    return {
-      Panel( "singleplayer_lobby" )
-        .SetAnchor( Anchor::Centered )
-        .SetAxis( Axis::Column )
-        .Children( {
-          TextButton( "singleplayer_faction_label" )
-            .SetText( "Select your faction", 32 )
-            .Background( GREEN )
-            .SetEvent( InterfaceEvent::ID::OpenFactionSelectPage ),
-          TextButton( "singleplayer_faction_selected" )
-            .SetText( "Waiting to Select Faction", 32 )
-            .Background( GRAY )
-            .ListensFor( { InterfaceUpdate::ID::FactionSelected } ),
-          TextButton( "singleplayer_lobby_started_game" )
-            .SetText( "Start Game", 32 )
-            .Background( BLUE )
-            .SetEvent( InterfaceEvent::ID::SinglePlayerLobbyStartGame ),
-        }
+namespace UI {
 
-        ),
-    };
+  enum class Action_SinglePlayerLobby {
+    None,
+    SelectFaction,
+    ExitPressed,
+  };
+
+  inline Action_SinglePlayerLobby SinglePlayerLobby() {
+    auto f = Iron::Forge();
+
+    rect root = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    auto root_grid = f->Grid( root, 3, 3 );
+
+    auto grid = f->Grid( root_grid->Slot( 4 ), 1, 5 );
+
+    bool select_faction =
+      f->TextButton( grid->Slot( 0 ), "Select Faction", BLUE );
+
+    f->TextLabel( grid->Slot( 1 ), "Waiting for faction", BLUE );
+
+
+    bool exit_pressed =
+      f->TextButton( grid->Slot( 4 ), "Return to Main", BLUE );
+
+    if ( select_faction ) {
+      return Action_SinglePlayerLobby::SelectFaction;
+    }
+
+    if ( exit_pressed ) {
+      return Action_SinglePlayerLobby::ExitPressed;
+    }
+
+    return Action_SinglePlayerLobby::None;
   }
+
 };// namespace UI

@@ -46,29 +46,32 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "%s\n", msg );
 }
 
+
 /*
 ========================================================
   Main application entrypoint
 ========================================================
 */
-int main( void ) {
+int main() {
+  Global::mp_capable = true;
+
   if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamAPI_Init() ) {
     printf( "SteamAPI_Init() failed!\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   if ( !SteamInput()->Init( false ) ) {
     printf( "SteamInput()->Init failed.\n" );
-    return EXIT_FAILURE;
+    Global::mp_capable = false;
   }
 
   SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
@@ -79,7 +82,7 @@ int main( void ) {
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
   InitWindow( 1920, 1080, "FieldsOfMars" );
   LoadResources();
-  UI::System::Init();
+  // UI::System::Init();
 
   SetExitKey( KEY_NULL );
 
@@ -169,7 +172,7 @@ void LoadResources() {
     Global::texture_cache
   );
   LoadResource(
-    hstr{ "blueOverlay" },
+    hstr{ "cyanOverlay" },
     LoadImage( ( asset_folder + "/images/overlays/Blue.png" ).c_str() ),
     Global::texture_cache
   );
@@ -200,6 +203,19 @@ void LoadResources() {
     LoadImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str() ),
     Global::texture_cache
   );
+
+  LoadResource(
+    hstr{ "romans_hastati_texture" },
+    LoadImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "romans_hastati_texture_overview" },
+    CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str()
+    ),
+    Global::texture_cache
+  );
+
   LoadResource(
     hstr{ "greeks_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/GreekVillager.png" ).c_str() ),
@@ -286,6 +302,8 @@ void LoadResources() {
     std::cout << entry.path().filename() << std::endl;
 
     std::string filename = entry.path().filename().generic_string();
+
+    std::cout << filename << '\n';
 
     LoadResource(
       hstr{ filename.c_str() },

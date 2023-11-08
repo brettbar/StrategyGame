@@ -48,14 +48,20 @@ namespace Network
     InitiateContact,
     AssignedPlayerId,
     HostPingRequest,
+    HostStartedCampaign,
     ClientPingResponse,
     PlayerConnected,
     PlayerDisconnected,
 
+    PlayerToggledReady,
+
     PlayerFactionSelect,
+
+    Command,
 
     NumMessageIDs,
   };
+
   struct Message
   {
     MessageID message_id;
@@ -66,8 +72,8 @@ namespace Network
   {
     std::string player_id;
     std::string faction = "";
-    bool active;
-    bool readied_up;
+    bool active = false;
+    bool readied_up = false;
     CSteamID steam_user_id;
     // uint64 tick_count_last_data;
   };

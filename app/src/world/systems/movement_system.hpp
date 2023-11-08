@@ -3,91 +3,109 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
+#include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/selected.hpp"
-#include "../components/unit.hpp"
 
-namespace MovementSystem {
+namespace MovementSystem
+{
 
-// REFACTOR
-inline void SetDestinations( Camera2D camera ) {
-  entt::basic_view view =
-    Global::world
-      .view<Unit::Component, Animated::Component, Selected::Component>();
+  // REFACTOR
+  inline void SetDestinations( entt::entity entity, Vector2 click_pos )
+  {
+    // entt::basic_view view =
+    //   Global::world
+    //     .view<Actor::Component, Animated::Component, Selected::Component>();
 
-  for ( auto entity: view ) {
-    Unit::Component &unit = view.get<Unit::Component>( entity );
-    Animated::Component &anim = view.get<Animated::Component>( entity );
+    // for ( auto entity: view )
+    // {
+    Actor::Component &actor = Global::world.get<Actor::Component>( entity );
+    Animated::Component &anim =
+      Global::world.get<Animated::Component>( entity );
 
-    std::unique_ptr<Vector2> dest_tile =
-      DetermineTilePos( GetScreenToWorld2D( GetMousePosition(), camera ) );
 
-    if ( dest_tile != nullptr ) {
-      unit.destination = *dest_tile;
+    std::unique_ptr<Vector2> dest_tile = DetermineTilePos( click_pos );
 
-      if ( unit.destination.x > unit.position.x )
+    if ( dest_tile != nullptr )
+    {
+      actor.destination = *dest_tile;
+
+      if ( actor.destination.x > actor.position.x )
         anim.direction = Animated::IDLE_DR;
-      else if ( unit.destination.x < unit.position.x )
+      else if ( actor.destination.x < actor.position.x )
         anim.direction = Animated::IDLE_DL;
     }
+    // }
   }
-}
 
-inline void
-Update( View<Unit::Component, Animated::Component> units, f32 timeScale ) {
-  for ( auto &entity: units ) {
-    Unit::Component &unit = units.get<Unit::Component>( entity );
-    Animated::Component &anim = units.get<Animated::Component>( entity );
+  inline void Update(
+    view<Actor::Component, Animated::Component> actors,
+    f32 timeScale
+  )
+  {
+    for ( auto &entity: actors )
+    {
+      Actor::Component &actor = actors.get<Actor::Component>( entity );
+      Animated::Component &anim = actors.get<Animated::Component>( entity );
 
-    if ( Vector2Distance( unit.destination, unit.position ) > 0.7f ) {
-      Vector2 unitVec = Vector2Normalize( {
-        unit.destination.x - unit.position.x,
-        unit.destination.y - unit.position.y,
-      } );
+      if ( Vector2Distance( actor.destination, actor.position ) > 0.7f )
+      {
+        Vector2 actorVec = Vector2Normalize( {
+          actor.destination.x - actor.position.x,
+          actor.destination.y - actor.position.y,
+        } );
 
-      unit.position.x += unitVec.x * unit.speed * timeScale;
-      unit.position.y += unitVec.y * unit.speed * timeScale;
+        actor.position.x += actorVec.x * actor.speed * timeScale;
+        actor.position.y += actorVec.y * actor.speed * timeScale;
 
-      // TODO maybe these 2 ifs could be consolidated
-      if ( unit.destination.x > unit.position.x ) {
-        anim.state = Animated::WALK_DR;
-        unit.moving = true;
-      }
-      else if ( unit.destination.x < unit.position.x ) {
-        anim.state = Animated::WALK_DL;
-        unit.moving = true;
-      }
-      if ( unit.destination.x == unit.position.x ) {
-        if ( anim.state == Animated::IDLE_DR ) {
+        // TODO maybe these 2 ifs could be consolidated
+        if ( actor.destination.x > actor.position.x )
+        {
           anim.state = Animated::WALK_DR;
-          unit.moving = true;
+          actor.moving = true;
         }
-        else if ( anim.state == Animated::IDLE_DL ) {
-
+        else if ( actor.destination.x < actor.position.x )
+        {
           anim.state = Animated::WALK_DL;
-          unit.moving = true;
+          actor.moving = true;
         }
-      }
+        if ( actor.destination.x == actor.position.x )
+        {
+          if ( anim.state == Animated::IDLE_DR )
+          {
+            anim.state = Animated::WALK_DR;
+            actor.moving = true;
+          }
+          else if ( anim.state == Animated::IDLE_DL )
+          {
+
+            anim.state = Animated::WALK_DL;
+            actor.moving = true;
+          }
+        }
 
 
-      if ( Vector2Distance( unit.destination, unit.position ) <= 0.7f ) {
-        unit.position = unit.destination;
-        unit.moving = false;
+        if ( Vector2Distance( actor.destination, actor.position ) <= 0.7f )
+        {
+          actor.position = actor.destination;
+          actor.moving = false;
 
-        if ( anim.direction == 0 )
-          anim.state = Animated::IDLE_DR;
-        else if ( anim.direction == 1 )
-          anim.state = Animated::IDLE_DL;
+          if ( anim.direction == 0 )
+            anim.state = Animated::IDLE_DR;
+          else if ( anim.direction == 1 )
+            anim.state = Animated::IDLE_DL;
+        }
       }
     }
   }
-}
 
-inline bool UnitIsMoving( entt::entity entity ) {
-  if ( Global::world.all_of<Unit::Component>( entity ) ) {
-    return Global::world.get<Unit::Component>( entity ).moving;
+  inline bool ActorIsMoving( entt::entity entity )
+  {
+    if ( Global::world.all_of<Actor::Component>( entity ) )
+    {
+      return Global::world.get<Actor::Component>( entity ).moving;
+    }
+    return false;
   }
-  return false;
-}
 
 };// namespace MovementSystem
