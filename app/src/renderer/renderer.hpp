@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../interface/ui_system.hpp"
 #include "../shared/common.hpp"
 #include "../shared/fonts.hpp"
 #include "../shared/textures.hpp"

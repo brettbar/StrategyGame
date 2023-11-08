@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interface/irongui/state.hpp"
+#include "interface/irongui/forge.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"

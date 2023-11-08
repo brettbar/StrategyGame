@@ -3,7 +3,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../irongui/state.hpp"
+#include "../irongui/forge.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"

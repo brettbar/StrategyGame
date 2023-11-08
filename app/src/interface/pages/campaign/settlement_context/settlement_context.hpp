@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../../irongui/state.hpp"
+#include "../../../../world/components/settlement.hpp"
+#include "../../../irongui/forge.hpp"
 #include "construction_tab.hpp"
 #include "military_tab.hpp"
 #include "population_tab.hpp"
@@ -11,6 +12,7 @@ namespace UI {
   enum class Action_SettlementContext {
     None,
     SpawnActor,
+    SpawnHastati,
   };
 
   inline Action_SettlementContext SettlementContext(
@@ -62,25 +64,46 @@ namespace UI {
 
       } break;
       case 1:
+        // Construction
         f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
         break;
       case 2:
+        // Resources
         f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
         break;
-      case 3:
-        f->Grid( content_g->Cols( 1, 5 ), 4, 4, RED );
-        break;
-      case 4:
-        auto agent_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
-        {
-          auto spawn_agent =
-            f->TextButton( agent_g->Slot( 0 ), "Spawn", GREEN );
+      case 3: {
+        // Military
+        auto military_g = f->Grid( content_g->Cols( 1, 5 ), 3, 1, RED );
 
-          if ( spawn_agent ) {
-            return Action_SettlementContext::SpawnActor;
+        {
+          auto recruitment_g =
+            f->Grid( military_g->Slot( 0 ), 1, 3, Color{ 100, 0, 0, 255 } );
+
+          f->TextLabel( recruitment_g->Slot( 0 ), "Recruitment", GREEN );
+          auto spawn_hastati =
+            f->TextButton( recruitment_g->Slot( 1 ), "Hastati", GREEN );
+
+          if ( spawn_hastati ) {
+            return Action_SettlementContext::SpawnHastati;
           }
         }
-        break;
+
+
+        auto training_g =
+          f->Grid( military_g->Slot( 1 ), 1, 3, Color{ 155, 0, 0, 255 } );
+        auto garrison_g =
+          f->Grid( military_g->Slot( 2 ), 1, 3, Color{ 250, 0, 0, 255 } );
+
+      } break;
+      case 4: {
+        // Agents
+        auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
+        auto spawn_agent = f->TextButton( agents_g->Slot( 0 ), "Spawn", GREEN );
+
+        if ( spawn_agent ) {
+          return Action_SettlementContext::SpawnActor;
+        }
+      } break;
     }
 
     return Action_SettlementContext::None;

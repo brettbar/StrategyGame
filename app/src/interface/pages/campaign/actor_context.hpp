@@ -2,13 +2,11 @@
 
 #include "../../../shared/common.hpp"
 
-#include "../../builders.hpp"
-#include "../../element.hpp"
 #include "../../ui_utils.hpp"
 
 #include "../../../world/components/actor.hpp"
 
-#include "../../irongui/state.hpp"
+#include "../../irongui/forge.hpp"
 
 namespace UI {
   enum class Action_ActorContext {

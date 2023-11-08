@@ -32,6 +32,12 @@ namespace Iron {
     ITextLabel( str t ) : text( t ) {}
   };
 
+  struct ITextureLabel {
+    hstr texture_id;
+    ITextureLabel() = delete;
+    ITextureLabel( hstr id ) : texture_id( id ) {}
+  };
+
   struct ITabs {
     u32 current_tab;
   };

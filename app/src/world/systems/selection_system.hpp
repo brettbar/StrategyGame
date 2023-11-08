@@ -81,8 +81,8 @@ namespace SelectionSystem {
       if ( CheckCollisionPointCircle( actor.position, click_pos, 32 ) ) {
         Global::world.emplace<Selected::Component>( entity, player_id );
 
-        std::cout << EntityIdToString( entity ) << std::endl;
-        std::cout << EntityIdToString( actor.owner ) << std::endl;
+        // std::cout << EntityIdToString( entity ) << std::endl;
+        // std::cout << EntityIdToString( actor.owner ) << std::endl;
 
         actor.selected = true;
         selected_entity = entity;

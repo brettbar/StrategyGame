@@ -1,12 +1,9 @@
 #pragma once
 #include "../shared/global.hpp"
-#include "element.hpp"
 
-namespace UI
-{
+namespace UI {
 
-  struct Context
-  {
+  struct Context {
     std::string hot;
     std::string active;
   };

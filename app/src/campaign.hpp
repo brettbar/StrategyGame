@@ -35,11 +35,11 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/irongui/state.hpp"
+#include "interface/irongui/forge.hpp"
 
-#include "interface/pages/campaign/campaign_ui.hpp"
+#include "interface/pages/campaign/actor_context.hpp"
+#include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include <raylib.h>
-
 
 enum class CommandType {
   TimeChange,
@@ -264,6 +264,8 @@ inline void Campaign::CheckForUIInteractions() {
           .click_pos = SettlementSystem::SettlementPosition( *prov ),
         } );
         break;
+      case UI::Action_SettlementContext::SpawnHastati:
+        break;
       case UI::Action_SettlementContext::None:
         break;
     }
@@ -349,7 +351,6 @@ inline void Campaign::CheckForInput() {
     //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     // }
     if ( !Iron::Forge()->MouseIsOverUI() ) {
-      printf( "Should be selecting\n" );
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
