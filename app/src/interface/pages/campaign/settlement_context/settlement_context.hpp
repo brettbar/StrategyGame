@@ -8,14 +8,21 @@
 
 namespace UI {
 
-  inline void SettlementContext( Settlement::Component *settlement ) {
+  enum class Action_SettlementContext {
+    None,
+    SpawnActor,
+  };
+
+  inline Action_SettlementContext SettlementContext(
+    Settlement::Component *settlement
+  ) {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 4, 3 );
 
     auto context_g =
-      f->Grid( root_g->Slots( 9, 10 ), 1, 4, Fade( BLACK, 0.5f ) );
+      f->Grid( root_g->Slots( 9, 10 ), 1, 5, Fade( BLACK, 0.5f ) );
 
     auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
     f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );
@@ -28,7 +35,7 @@ namespace UI {
       BLACK
     );
 
-    auto content_g = f->Grid( context_g->Rows( 1, 4 ), 5, 4 );
+    auto content_g = f->Grid( context_g->Rows( 1, 5 ), 5, 4 );
 
 
     auto tabs_g = f->Grid( content_g->Col( 0 ), 1, 5 );
@@ -44,7 +51,7 @@ namespace UI {
     switch ( tabs->t.tabs->current_tab ) {
       case 0: {// Population
 
-        auto population_g = f->Grid( content_g->Cols( 1, 4 ), 3, 1, BLUE );
+        auto population_g = f->Grid( content_g->Cols( 1, 5 ), 3, 1, BLUE );
 
         auto growth_g =
           f->Grid( population_g->Slot( 0 ), 1, 3, Color{ 0, 0, 100, 255 } );
@@ -65,109 +72,18 @@ namespace UI {
         f->Grid( content_g->Cols( 1, 5 ), 4, 4, RED );
         break;
       case 4:
-        f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
-        break;
-      default:
-        f->Grid( content_g->Cols( 1, 5 ), 4, 4, BLUE );
+        auto agent_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
+        {
+          auto spawn_agent =
+            f->TextButton( agent_g->Slot( 0 ), "Spawn", GREEN );
+
+          if ( spawn_agent ) {
+            return Action_SettlementContext::SpawnActor;
+          }
+        }
         break;
     }
+
+    return Action_SettlementContext::None;
   }
-
-  // inline sptr<Element> CreateSettlementContextPanel() {
-  //   return GridPanel( "settlement_context", 4, 3 )
-  //     .StartsDisabled()
-  //     .Background( Fade( BLACK, 0.5 ) )
-  //     .On(
-  //       InterfaceUpdate::ID::SettlementContext,
-  //       []( Element &self, InterfaceUpdate::Update update ) {
-  //         printf(
-  //           "InterfaceUpdate::ID::SettlementContext %d\n", update.condition
-  //         );
-
-  //         if ( update.condition )
-  //           self.Enable();
-  //         else
-  //           self.Disable();
-  //       }
-  //     )
-  //     .Children( {
-  //       GridSlot(
-  //         { 0, 0, 0, 2 },
-  //         GridPanel( "settlement_context_tab_group", 1, 5 )
-  //           .Background( BLUE )
-  //           .Children( {
-  //             GridSlot(
-  //               { 0, 0, 0, 0 },
-  //               TextureButton(
-  //                 "settlement_context_tab_population",
-  //                 GetTexture( "settlement_context_tab_population" ),
-  //                 InterfaceEvent::ID::SettlementContextPopulationTab
-  //               )
-  //             ),
-  //             GridSlot(
-  //               { 0, 0, 1, 1 },
-  //               TextureButton(
-  //                 "settlement_context_tab_construction",
-  //                 GetTexture( "settlement_context_tab_construction" ),
-  //                 InterfaceEvent::ID::SettlementContextConstructionTab
-  //               )
-  //             ),
-  //             GridSlot(
-  //               { 0, 0, 2, 2 },
-  //               TextureButton(
-  //                 "settlement_context_tab_resources",
-  //                 GetTexture( "settlement_context_tab_resources" ),
-  //                 InterfaceEvent::ID::SettlementContextResourcesTab
-  //               )
-  //             ),
-  //             GridSlot(
-  //               { 0, 0, 3, 3 },
-  //               TextureButton(
-  //                 "settlement_context_tab_garrison",
-  //                 GetTexture( "settlement_context_tab_garrison" ),
-  //                 InterfaceEvent::ID::SettlementContextMilitaryTab
-  //               )
-  //             ),
-
-  //             GridSlot(
-  //               { 0, 0, 4, 4 },
-  //               TextureButton(
-  //                 "settlement_context_tab_culture",
-  //                 GetTexture( "settlement_context_tab_culture" ),
-  //                 InterfaceEvent::ID::SettlementContextMilitaryTab
-  //               )
-  //             ),
-  //           } )
-  //       ),
-
-  //       GridSlot(
-  //         { 1, 3, 0, 2 },
-  //         StackPanel(
-  //           "settlement_context_content",
-  //           {
-  //             CreateSettlementContextTabPopulation(),
-
-  //             GridPanel( "resources_tab", 3, 3 )
-  //               .Background( PURPLE )
-  //               .Children( {
-  //                 GridSlot(
-  //                   { 1, 1, 1, 1 },
-  //                   TextLabel( "resources_tab_content", "Resources Tab", 32 )
-  //                 ),
-  //               } ),
-
-  //             CreateSettlementContextTabConstruction(),
-
-  //             CreateSettlementContextTabMilitary(),
-  //           },
-  //           {
-  //             InterfaceUpdate::ID::SettlementContextPopulationTab,
-  //             InterfaceUpdate::ID::SettlementContextResourcesTab,
-  //             InterfaceUpdate::ID::SettlementContextConstructionTab,
-  //             InterfaceUpdate::ID::SettlementContextMilitaryTab,
-  //           }
-  //         )
-  //       ),
-  //     } );
-  // }
 }// namespace UI

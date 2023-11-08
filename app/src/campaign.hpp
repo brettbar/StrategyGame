@@ -14,11 +14,16 @@
 #pragma once
 
 
+#include "interface/pages/campaign/actor_context.hpp"
+#include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 #include "network/network.hpp"
 #include "shared/save.hpp"
 
+#include "shared/common.hpp"
+
+#include "world/components/player.hpp"
 #include "world/systems/actor_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/faction_system.hpp"
@@ -46,7 +51,7 @@ struct Command {
   CommandType type;
   entt::entity player_e;
 
-  std::string msg;
+  str msg;
   Vector2 click_pos;
   entt::entity entity;
 };
@@ -70,9 +75,12 @@ class Campaign {
     // delete _command_queue;
   }
 
-  std::string GetLocalPlayerID();
+  str GetLocalPlayerID();
+
+  entt::entity GetLocalPlayerE();
 
   void CheckForInput();
+  void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
   void Update1TPS();
@@ -85,7 +93,7 @@ class Campaign {
   void HandleTimeChangeRequest( const Command & );
 
   // void ForwardEvent( const InterfaceEvent::Data & );
-  void ConvertCommandRequest( std::string );
+  void ConvertCommandRequest( str );
 
 
   private:
@@ -96,7 +104,11 @@ class Campaign {
   void Load();
 };
 
-inline std::string Campaign::GetLocalPlayerID() {
+inline entt::entity Campaign::GetLocalPlayerE() {
+  return Global::world.view<Player::LocalTag>().front();
+}
+
+inline str Campaign::GetLocalPlayerID() {
   if ( _is_singleplayer || Network::is_host ) {
     return "player_0";
   } else {
@@ -133,50 +145,10 @@ inline void Campaign::Load() {
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
-  // 2. Check for Input
   CheckForInput();
-
-  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
-       ) ) {
-    auto settlement =
-      SelectionSystem::GetSelectedComponent<Settlement::Component>();
-
-    if ( !settlement ) {
-      printf( "Got null settlement??\n" );
-      return;
-    }
-
-    UI::SettlementContext( settlement );
-  }
-
-  if ( SelectionSystem::Selected<Actor::Component>() ) {
-    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
-
-    if ( !actor ) {
-      printf( "Got null actor??\n" );
-      return;
-    }
-
-    auto action = UI::ActorContext( actor );
-
-    switch ( action ) {
-      case UI::Action_ActorContext::SpawnSettlement: {
-        auto player_e = GetLocalPlayerID();
-
-        PostCommand( Command{
-          .type = CommandType::Spawn,
-          .msg = "Player spawn Settlement",
-        } );
-      } break;
-      case UI::Action_ActorContext::None:
-        break;
-    }
-  }
-  // 3. Process all commands
+  CheckForUIInteractions();
   _command_queue.update();
-  // UI::System::UpdateOnFrame();
 }
-
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
 inline void Campaign::Update60TPS() {
@@ -269,6 +241,65 @@ inline void Campaign::Draw() {
 //   };
 // }
 
+inline void Campaign::CheckForUIInteractions() {
+  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
+       ) ) {
+    auto settlement =
+      SelectionSystem::GetSelectedComponent<Settlement::Component>();
+    auto prov = SelectionSystem::GetSelectedComponent<Province::Component>();
+    entt::entity player_e = GetLocalPlayerE();
+
+    if ( !settlement || !prov ) {
+      printf( "Got null prov/settlement??\n" );
+      return;
+    }
+
+    auto action = UI::SettlementContext( settlement );
+    switch ( action ) {
+      case UI::Action_SettlementContext::SpawnActor:
+        PostCommand( {
+          .type = CommandType::Spawn,
+          .player_e = player_e,
+          .msg = "Player spawn Villager",
+          .click_pos = SettlementSystem::SettlementPosition( *prov ),
+        } );
+        break;
+      case UI::Action_SettlementContext::None:
+        break;
+    }
+  }
+
+  if ( SelectionSystem::Selected<Actor::Component>() ) {
+    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
+    entt::entity player_e = GetLocalPlayerE();
+
+    if ( !actor ) {
+      printf( "Got null actor??\n" );
+      return;
+    }
+
+    auto action = UI::ActorContext( actor );
+
+    switch ( action ) {
+      case UI::Action_ActorContext::ClaimProvince: {
+        PostCommand( {
+          CommandType::Spawn,
+          player_e,
+          "Player taking ownership of Province",
+          actor->position,
+        } );
+      } break;
+      case UI::Action_ActorContext::SpawnSettlement: {
+        PostCommand( Command{
+          .type = CommandType::Spawn,
+          .msg = "Player spawn Settlement",
+        } );
+      } break;
+      case UI::Action_ActorContext::None:
+        break;
+    }
+  }
+}
 inline void Campaign::CheckForInput() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
@@ -353,14 +384,14 @@ inline void Campaign::CheckForInput() {
   }
 }
 
-inline void Campaign::ConvertCommandRequest( std::string str ) {
-  nlohmann::json body = nlohmann::json::parse( str );
+inline void Campaign::ConvertCommandRequest( str cmd ) {
+  nlohmann::json body = nlohmann::json::parse( cmd );
 
   std::cout << "BODY" << body << '\n';
 
-  std::string cmd_player_id = body["cmd_player"];
+  str cmd_player_id = body["cmd_player"];
   CommandType cmd_type = body["cmd_type"];
-  std::string cmd_msg = body["cmd_msg"];
+  str cmd_msg = body["cmd_msg"];
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
   entt::entity entity = body["entity"];

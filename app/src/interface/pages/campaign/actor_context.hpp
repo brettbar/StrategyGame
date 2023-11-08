@@ -13,6 +13,7 @@
 namespace UI {
   enum class Action_ActorContext {
     None,
+    ClaimProvince,
     SpawnSettlement,
   };
 
@@ -25,10 +26,15 @@ namespace UI {
     auto grid = f->Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5 ) );
 
     f->TextLabel( grid->Slot( 0 ), "Actor", GREEN );
-    bool okay_pressed = f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
+    bool claim_province = f->TextButton( grid->Slot( 1 ), "Claim", RED );
+    bool spawn_settlement =
+      f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
 
-    if ( okay_pressed ) {
-      printf( "okay pressed\n" );
+    if ( claim_province ) {
+      return Action_ActorContext::ClaimProvince;
+    }
+
+    if ( spawn_settlement ) {
       return Action_ActorContext::SpawnSettlement;
     }
 

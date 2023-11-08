@@ -261,6 +261,13 @@ namespace SettlementSystem {
     return false;
   }
 
+  inline vec2f SettlementPosition( Province::Component province ) {
+    return vec2f{
+      province.tile->position.x + 24,
+      province.tile->position.y + 24,
+    };
+  }
+
   inline void Draw( TextureCache &cache, bool showOverlays ) {
     auto settlements =
       Global::world.view<Province::Component, Settlement::Component>();
@@ -300,18 +307,13 @@ namespace SettlementSystem {
       //   continue;
 
 
-      Vector2 settlement_pos = {
-        province.tile->position.x + 24,
-        province.tile->position.y + 24,
-      };
-
       // // DrawRectangleRec({provPos.x + 50,
       // //                   provPos.y + 86, 128, 64},
       // //                  Fade(WHITE, 0.8f));
       // // DrawSingleBorder(tile);
 
       // // Draw Settlement
-      DrawTextureV( settlement.texture, settlement_pos, WHITE );
+      DrawTextureV( settlement.texture, SettlementPosition( province ), WHITE );
     }
   }
 
