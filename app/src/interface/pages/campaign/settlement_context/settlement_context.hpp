@@ -21,8 +21,7 @@ namespace UI {
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 4, 3 );
 
-    auto context_g =
-      f->Grid( root_g->Slots( 9, 10 ), 1, 5, Fade( BLACK, 0.5f ) );
+    auto context_g = f->Grid( root_g->Slots( 9, 10 ), 1, 5 );
 
     auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
     f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );
