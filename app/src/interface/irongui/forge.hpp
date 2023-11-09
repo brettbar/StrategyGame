@@ -142,11 +142,26 @@ public:
 
     Element *TextLabel( rect t, str txt, Color c ) {
       auto e = new Element();
-      e->type = Type::TextLabel;
+      e->type = Type::Text;
       e->id = queue.size();
       e->background = c;
       e->transform = t;
-      e->t.text_label = new ITextLabel( txt );
+      e->t.text = new IText( txt );
+      queue.push_back( e );
+      return e;
+    }
+
+    Element *TextureLabel(
+      rect t,
+      hstr texture_id,
+      Color color = { 0, 0, 0, 0 }
+    ) {
+      auto e = new Element();
+      e->type = Type::Texture;
+      e->id = queue.size();
+      e->transform = t;
+      e->background = color;
+      e->t.texture = new ITexture( texture_id );
       queue.push_back( e );
       return e;
     }
@@ -179,6 +194,12 @@ public:
 
     bool TextButton( rect t, str txt, Color c ) {
       auto e = TextLabel( t, txt, c );
+      e->interactable = true;
+      return CheckInteract( *e );
+    }
+
+    bool TextureButton( rect t, hstr texture_id, Color c = { 0, 0, 0, 0 } ) {
+      auto e = TextureLabel( t, texture_id, c );
       e->interactable = true;
       return CheckInteract( *e );
     }

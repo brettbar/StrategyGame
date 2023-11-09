@@ -9,7 +9,8 @@
 namespace Iron {
   enum class Type {
     Grid,
-    TextLabel,
+    Text,
+    Texture,
     Tabs,
   };
 
@@ -26,17 +27,18 @@ namespace Iron {
     IGrid( u32 c, u32 r ) : cols( c ), rows( r ) {}
   };
 
-  struct ITextLabel {
+  struct IText {
     str text;
-    ITextLabel() = delete;
-    ITextLabel( str t ) : text( t ) {}
+    IText() = delete;
+    IText( str t ) : text( t ) {}
   };
 
-  struct ITextureLabel {
+  struct ITexture {
     hstr texture_id;
-    ITextureLabel() = delete;
-    ITextureLabel( hstr id ) : texture_id( id ) {}
+    ITexture() = delete;
+    ITexture( hstr id ) : texture_id( id ) {}
   };
+
 
   struct ITabs {
     u32 current_tab;
@@ -52,10 +54,10 @@ namespace Iron {
 
     union {
       IGrid *grid;
-      ITextLabel *text_label;
+      IText *text;
+      ITexture *texture;
       ITabs *tabs;
     } t;
-
 
     void Draw() {
       switch ( type ) {
@@ -94,12 +96,19 @@ namespace Iron {
           //   }
           // }
         } break;
-        case Type::TextLabel: {
+        case Type::Text: {
           DrawRectangleRec( transform, background );
-          DrawText(
-            t.text_label->text.c_str(), transform.x, transform.y, 28, WHITE
-          );
+          DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
         } break;
+        case Type::Texture:
+          auto resource = Global::texture_cache[t.texture->texture_id].handle();
+          Texture texture = resource.get()->texture;
+
+          if ( background.a > 0 ) {
+            DrawRectangleRec( transform, background );
+          }
+          DrawTexture( texture, transform.x, transform.y, WHITE );
+          break;
       }
     }
 

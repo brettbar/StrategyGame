@@ -66,13 +66,12 @@ namespace MapSystem {
 
       f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
 
-      // Montanas
       if ( noise >= 0.8f )
         biome = Biome::Mountains;
-      // Colina
-      else if ( noise >= 0.75f )
-        biome = Biome::Hills;
-      // Tierra
+      // else if ( noise >= 0.75f )
+      //   biome = Biome::Hills;
+      else if ( noise >= 0.7f )
+        biome = Biome::Forest;
       else if ( noise >= waterLevel )
         biome = Biome::Plains;
       else
@@ -104,6 +103,7 @@ namespace MapSystem {
 
   inline void Draw( Camera2D &camera, TextureCache &cache ) {
     Texture2D land_tile = cache[hstr{ "land_tile" }]->texture;
+    Texture2D forest_tile = cache[hstr{ "forest_tile" }]->texture;
     Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
     Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
     Texture2D sand_tile = cache[hstr{ "sand_tile" }]->texture;
@@ -137,6 +137,10 @@ namespace MapSystem {
         case Biome::Hills:
           // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
           DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+          break;
+        case Biome::Forest:
+          // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+          DrawTextureRec( forest_tile, frameRec, tile->position, WHITE );
           break;
         case Biome::Plains:
           // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );

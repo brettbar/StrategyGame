@@ -143,6 +143,11 @@ void LoadResources() {
     Global::texture_cache
   );
   LoadResource(
+    hstr{ "forest_tile" },
+    LoadImage( ( asset_folder + "/images/hexagons/Forest.bmp" ).c_str() ),
+    Global::texture_cache
+  );
+  LoadResource(
     hstr{ "water_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Ocean.bmp" ).c_str() ),
     Global::texture_cache

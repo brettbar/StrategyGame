@@ -80,8 +80,10 @@ namespace UI {
             f->Grid( military_g->Slot( 0 ), 1, 3, Color{ 100, 0, 0, 255 } );
 
           f->TextLabel( recruitment_g->Slot( 0 ), "Recruitment", GREEN );
-          auto spawn_hastati =
-            f->TextButton( recruitment_g->Slot( 1 ), "Hastati", GREEN );
+
+          auto spawn_hastati = f->TextureButton(
+            recruitment_g->Slot( 1 ), "romans_hastati_texture_overview", BLACK
+          );
 
           if ( spawn_hastati ) {
             return Action_SettlementContext::SpawnHastati;
