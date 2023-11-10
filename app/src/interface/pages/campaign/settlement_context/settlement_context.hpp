@@ -13,6 +13,7 @@ namespace UI {
     None,
     SpawnActor,
     SpawnHastati,
+    BuildFarm,
   };
 
   inline Action_SettlementContext SettlementContext(
@@ -63,14 +64,36 @@ namespace UI {
 
 
       } break;
-      case 1:
+      case 1: {
         // Construction
-        f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
-        break;
-      case 2:
+        auto construction_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
+        auto build_farm =
+          f->TextButton( construction_g->Slot( 0 ), "Farm", RED );
+
+        if ( build_farm ) {
+          return Action_SettlementContext::BuildFarm;
+        }
+
+      } break;
+      case 2: {
         // Resources
-        f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
-        break;
+        auto resources_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
+
+        // @volatile
+        u32 slot = 0;
+        for ( const auto resource: settlement->raw_materials ) {
+          if ( resource.second > 0 ) {
+            f->TextureLabel(
+              resources_g->Slot( slot ),
+              hstr{
+                Resources::GetRawMaterialName( resource.first ).c_str(),
+              }
+            );
+          }
+        }
+
+
+      } break;
       case 3: {
         // Military
         auto military_g = f->Grid( content_g->Cols( 1, 5 ), 3, 1, RED );

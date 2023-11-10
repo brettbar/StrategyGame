@@ -266,6 +266,8 @@ inline void Campaign::CheckForUIInteractions() {
         break;
       case UI::Action_SettlementContext::SpawnHastati:
         break;
+      case UI::Action_SettlementContext::BuildFarm:
+        break;
       case UI::Action_SettlementContext::None:
         break;
     }

@@ -7,10 +7,8 @@
 #include <string>
 #include <vector>
 
-namespace Resources
-{
-  enum class Natural
-  {
+namespace Resources {
+  enum class Natural {
     Soil,// not sure about this one
     Trees,
     Fish,
@@ -26,8 +24,7 @@ namespace Resources
     Gemstones,
   };
 
-  enum class RawMaterial
-  {
+  enum class RawMaterial {
     Timber,
     Wheat,
     Olives,
@@ -45,10 +42,8 @@ namespace Resources
     Gems,
   };
 
-  inline std::string GetRawMaterialName( RawMaterial mat )
-  {
-    switch ( mat )
-    {
+  inline std::string GetRawMaterialName( RawMaterial mat ) {
+    switch ( mat ) {
       case RawMaterial::Wheat:
         return "wheat";
       default:
