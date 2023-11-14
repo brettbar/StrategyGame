@@ -66,12 +66,12 @@ namespace MapSystem {
 
       f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
 
-      if ( noise >= 0.8f )
+      if ( noise >= 0.75f )
         biome = Biome::Mountains;
-      // else if ( noise >= 0.75f )
-      //   biome = Biome::Hills;
       else if ( noise >= 0.7f )
-        biome = Biome::Forest;
+        biome = Biome::Hills;
+      // else if ( noise >= 0.7f )
+      //   biome = Biome::Forest;
       else if ( noise >= waterLevel )
         biome = Biome::Plains;
       else
@@ -107,7 +107,8 @@ namespace MapSystem {
     Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
     Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
     Texture2D sand_tile = cache[hstr{ "sand_tile" }]->texture;
-    Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
+    Texture2D mountains_tile = cache[hstr{ "mountains_tile" }]->texture;
+    // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
 
     Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
@@ -132,7 +133,7 @@ namespace MapSystem {
       switch ( tile->biome ) {
         case Biome::Mountains:
           // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
-          DrawTextureRec( snow_tile, frameRec, tile->position, WHITE );
+          DrawTextureRec( mountains_tile, frameRec, tile->position, WHITE );
           break;
         case Biome::Hills:
           // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
