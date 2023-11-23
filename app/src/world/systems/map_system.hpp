@@ -1,7 +1,3 @@
-//
-// Created by brett on 2/3/2022.
-//
-
 #pragma once
 
 #include "../../shared/global.hpp"
@@ -11,15 +7,10 @@
 #include "../components/province.hpp"
 #include "../components/settlement.hpp"
 #include "../components/sight.hpp"
-
-// #include "../../common.hpp"
-// #include "../../components/sight.hpp"
-// #include "../../components/tile.hpp"
-// #include "../../components/actor.hpp"
-// #include "../../global.hpp"
-// #include "../../renderer/textures.hpp"
-
+#include <algorithm>
 #include <chrono>
+#include <raylib.h>
+#include <stdlib.h>
 #include <string>
 
 namespace MapSystem {
@@ -31,29 +22,30 @@ namespace MapSystem {
 
   inline Mode mode = Mode::Terrain;
 
-
   using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
   using TileMap =
     std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
   inline TileMap tile_map = {};
+  inline vec2f points[MAP_WIDTH * MAP_HEIGHT];
 
   inline void Init();
   inline void Draw( Camera2D &, TextureCache & );
   inline void UpdateFOW();
-  inline u32 index( u32, u32 );
   inline NoiseMap GeneratePerlinNoise( float, int, float );
   inline void FilterIslands( NoiseMap &, f32 );
-  inline void NormalizeMap( NoiseMap & );
+  inline NoiseMap NormalizeMap( NoiseMap );
 
-  inline void Init() {
-    f32 seed = 25;
-    NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
+  inline void dump_print_noise( NoiseMap noise ) {
+    for ( u32 i = 0; i < MAP_HEIGHT; ++i ) {
+      for ( u32 j = 0; j < MAP_WIDTH; ++j ) {
+        printf( "%.2f ", noise[IndexFromCoords( i, j, MAP_WIDTH )] );
+      }
+      printf( "\n" );
+    }
+  }
 
-    float waterLevel = 0.59;
-    //    FilterIslands(pNoise, waterLevel);
-    NormalizeMap( pNoise );
-
+  inline void assign_terrain( NoiseMap noise, f32 sea_lvl ) {
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
       u32 y = i / MAP_HEIGHT;
@@ -64,15 +56,15 @@ namespace MapSystem {
       Vector2 position;
       Biome biome;
 
-      f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
+      f32 noise_val = noise[IndexFromCoords( x, y, MAP_WIDTH )];
 
-      if ( noise >= 0.75f )
+      if ( noise_val >= 0.75f )
         biome = Biome::Mountains;
-      else if ( noise >= 0.7f )
+      else if ( noise_val >= 0.7f )
         biome = Biome::Hills;
       // else if ( noise >= 0.7f )
       //   biome = Biome::Forest;
-      else if ( noise >= waterLevel )
+      else if ( noise_val >= sea_lvl )
         biome = Biome::Plains;
       else
         biome = Biome::Sea;
@@ -84,7 +76,7 @@ namespace MapSystem {
 
       Tile::Component tile = {
         i,
-        noise,
+        noise_val,
         position,
         {
           position.x + ( TILE_WIDTH / 2 ),
@@ -99,6 +91,104 @@ namespace MapSystem {
         std::make_shared<Tile::Component>( tile );
     }
   }
+
+  inline f32 random_float( f32 min, f32 max ) {
+    return min + ( (f32) rand() / RAND_MAX ) * ( max - min );
+  }
+
+  inline void print_points( const vec2f *points, int num_points ) {}
+
+  // Voronoi
+  inline void voronoi_init() {
+    // 1. generate list of points
+    f32 min_x = 0;
+    f32 min_y = 0;
+    f32 max_x = TILE_WIDTH * MAP_WIDTH;
+    f32 max_y = TILE_HEIGHT * MAP_HEIGHT;
+
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      points[i].x = random_float( min_x, max_x );
+      points[i].y = random_float( min_y, max_y );
+    }
+  }
+
+  inline void voronoi_draw() {}
+
+  inline void Init() {
+
+    voronoi_init();
+
+    f32 seed = 25;
+    NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
+
+    //    FilterIslands(pNoise, waterLevel);
+    NormalizeMap( pNoise );
+
+    assign_terrain( pNoise, 0.3 );
+  }
+
+  //  @attempt
+  // inline void Init() {
+  //   // 0. NOISE
+  //   f32 seed = 25;
+  //   NoiseMap noise = GeneratePerlinNoise( seed, 7, 1.2f );
+  //   // NormalizeMap( noise );
+
+  //   printf( "Perlin Noise\n" );
+
+  //   NoiseMap crust = GeneratePerlinNoise( seed, 7, 1.2f );
+  //   // NormalizeMap( crust );
+
+  //   f32 noise_factor = 10;
+  //   f32 crust_factor = 6;
+  //   f32 tectonic_factor = 3;
+  //   f32 pangaea = -5;
+
+  //   // 1. TECTONICS
+  //   {
+  //     auto tectonic_median = approximateQuantile( crust, 0.5 );
+
+  //     NoiseMap tectonic = {};
+
+  //     for ( u32 i = 0; i < crust.size(); i++ ) {
+  //       tectonic[i] = ( 0.2f / abs( tectonic_median - crust[i] ) + 0.1 ) - 0.95;
+  //     }
+
+
+  //     NoiseMap elevation = {};
+
+  //     for ( u32 i = 0; i < noise.size(); i++ ) {
+  //       elevation[i] =
+  //         5 + noise[i] * noise_factor + crust[i] * crust_factor +
+  //         tectonic[i] * tectonic_factor +
+  //         -pangaea * ( abs( (f32) i / ( MAP_WIDTH * MAP_HEIGHT ) - 0.5 ) +
+  //                      abs( (f32) ( i % MAP_WIDTH ) / MAP_WIDTH - 0.5 ) );
+  //     }
+
+  //     dump_print_noise( elevation );
+
+  //     elevation = NormalizeMap( elevation );
+
+  //     f32 sea_lvl = approximateQuantile( elevation, 0.2 );
+  //     f32 flatness = 0.5f;
+
+  //     NoiseMap final = {};
+
+  //     for ( u32 i = 0; i < elevation.size(); i++ ) {
+  //       if ( elevation[i] < sea_lvl ) {
+  //         final[i] = -pow( 1 - elevation[i] / sea_lvl, 0.35 );
+  //       } else {
+  //         final[i] = pow(
+  //           ( ( elevation[i] - sea_lvl ) * ( 0.5 + tectonic[i] * 0.5 ) ) /
+  //             ( 1 - sea_lvl ),
+  //           1 + 2 * flatness
+  //         );
+  //       }
+  //     }
+
+  //     assign_terrain( final, sea_lvl );
+  //   }
+  // }
 
 
   inline void Draw( Camera2D &camera, TextureCache &cache ) {
@@ -175,6 +265,24 @@ namespace MapSystem {
       //     break;
       // }
     }
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      vec2f point = points[i];
+
+      if (
+      point.x - TILE_WIDTH >
+        camera.target.x + ( camera.offset.x / camera.zoom ) ||
+      point.x + TILE_WIDTH <
+        camera.target.x - ( camera.offset.x / camera.zoom ) ||
+      point.y - TILE_WIDTH >
+        camera.target.y + ( camera.offset.y / camera.zoom ) ||
+      point.y + TILE_WIDTH <
+        camera.target.y - ( camera.offset.y / camera.zoom ) )
+      {
+        continue;
+      }
+
+      DrawCircle( point.x, point.y, 2, RED );
+    }
   }
 
   inline void UpdateFOW() {
@@ -192,19 +300,19 @@ namespace MapSystem {
       u32 y = closest->coords.y;
 
       std::array<std::shared_ptr<Tile::Component>, 6> neighbors = {
-        tile_map[index( x, y - 1 )],
-        tile_map[index( x + 1, y )],
-        tile_map[index( x, y + 1 )],
-        tile_map[index( x - 1, y + 1 )],
-        tile_map[index( x - 1, y )],
-        tile_map[index( x - 1, y - 1 )],
+        tile_map[IndexFromCoords( x, y - 1, MAP_WIDTH )],
+        tile_map[IndexFromCoords( x + 1, y, MAP_WIDTH )],
+        tile_map[IndexFromCoords( x, y + 1, MAP_WIDTH )],
+        tile_map[IndexFromCoords( x - 1, y + 1, MAP_WIDTH )],
+        tile_map[IndexFromCoords( x - 1, y, MAP_WIDTH )],
+        tile_map[IndexFromCoords( x - 1, y - 1, MAP_WIDTH )],
       };
 
       if ( y % 2 == 1 ) {
-        neighbors[0] = tile_map[index( x + 1, y - 1 )];
-        neighbors[2] = tile_map[index( x + 1, y + 1 )];
-        neighbors[3] = tile_map[index( x, y + 1 )];
-        neighbors[5] = tile_map[index( x, y - 1 )];
+        neighbors[0] = tile_map[IndexFromCoords( x + 1, y - 1, MAP_WIDTH )];
+        neighbors[2] = tile_map[IndexFromCoords( x + 1, y + 1, MAP_WIDTH )];
+        neighbors[3] = tile_map[IndexFromCoords( x, y + 1, MAP_WIDTH )];
+        neighbors[5] = tile_map[IndexFromCoords( x, y - 1, MAP_WIDTH )];
       }
 
       for ( auto neighbor: neighbors ) {
@@ -306,51 +414,55 @@ namespace MapSystem {
       for ( int y = 1; y < MAP_HEIGHT - 1; y++ ) {
         u32 numWater = 0;
 
-        float NE = noiseMap.at( index( x, y - 1 ) );
+        float NE = noiseMap.at( IndexFromCoords( x, y - 1, MAP_WIDTH ) );
         if ( NE < waterLevel )
           numWater++;
 
-        float E = noiseMap.at( index( x + 1, y ) );
+        float E = noiseMap.at( IndexFromCoords( x + 1, y, MAP_WIDTH ) );
         if ( E < waterLevel )
           numWater++;
 
-        float SE = noiseMap.at( index( x, y + 1 ) );
+        float SE = noiseMap.at( IndexFromCoords( x, y + 1, MAP_WIDTH ) );
         if ( SE < waterLevel )
           numWater++;
 
-        float SW = noiseMap.at( index( x - 1, y + 1 ) );
+        float SW = noiseMap.at( IndexFromCoords( x - 1, y + 1, MAP_WIDTH ) );
         if ( SW < waterLevel )
           numWater++;
 
-        float W = noiseMap.at( index( x - 1, y ) );
+        float W = noiseMap.at( IndexFromCoords( x - 1, y, MAP_WIDTH ) );
         if ( W < waterLevel )
           numWater++;
 
-        float NW = noiseMap.at( index( x - 1, y - 1 ) );
+        float NW = noiseMap.at( IndexFromCoords( x - 1, y - 1, MAP_WIDTH ) );
         if ( NW < waterLevel )
           numWater++;
 
         if ( numWater >= 5 ) {
-          noiseMap[index( x, y )] = 0.0f;
+          noiseMap[IndexFromCoords( x, y, MAP_WIDTH )] = 0.0f;
         }
       }
   }
 
-  inline void NormalizeMap( NoiseMap &pNoise ) {
-    float min = std::numeric_limits<float>::max();
-    float max = 0;
+  inline NoiseMap NormalizeMap( NoiseMap noise ) {
+    NoiseMap normalized = {};
 
-    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ ) {
-      if ( pNoise[x] < min )
-        min = pNoise[x];
-      if ( pNoise[x] > max )
-        max = pNoise[x];
+    f32 min = noise[0];
+    f32 max = noise[0];
+
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      if ( noise[i] < min )
+        min = noise[i];
+      if ( noise[i] > max )
+        max = noise[i];
     }
 
-    for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ ) {
-      pNoise[x] = ( pNoise[x] - min ) / ( max - min );
+    f32 range = max - min;
+
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      normalized[i] = ( noise[i] - min ) / ( range );
     }
+
+    return normalized;
   }
-
-
 };// namespace MapSystem
