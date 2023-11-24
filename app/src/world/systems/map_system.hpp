@@ -25,11 +25,13 @@
 namespace MapSystem {
 
   enum class Mode {
+    Default,
     Terrain,
     Political,
+    Resources,
   };
 
-  inline Mode mode = Mode::Terrain;
+  inline Mode mode = Mode::Default;
 
 
   using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;

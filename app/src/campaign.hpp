@@ -15,6 +15,7 @@
 
 
 #include "interface/pages/campaign/actor_context.hpp"
+#include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
@@ -242,6 +243,25 @@ inline void Campaign::Draw() {
 // }
 
 inline void Campaign::CheckForUIInteractions() {
+
+  auto change_map_mode = UI::MapModeMenu();
+  switch ( change_map_mode ) {
+    case UI::Action_MapModeChange::Default:
+      MapSystem::mode = MapSystem::Mode::Default;
+      break;
+    case UI::Action_MapModeChange::Terrain:
+      MapSystem::mode = MapSystem::Mode::Terrain;
+      break;
+    case UI::Action_MapModeChange::Political:
+      MapSystem::mode = MapSystem::Mode::Terrain;
+      break;
+    case UI::Action_MapModeChange::Resources:
+      MapSystem::mode = MapSystem::Mode::Resources;
+      break;
+    default:
+      break;
+  }
+
   if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
        ) ) {
     auto settlement =
