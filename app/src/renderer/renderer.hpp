@@ -17,6 +17,7 @@ namespace Renderer {
   inline Shader outline_shader;
 
   inline void DrawActors( bool debug );
+  inline void draw_map( MapSystem::Mode );
 
 
   inline void Init() {
@@ -51,9 +52,7 @@ namespace Renderer {
   }
 
 
-  inline void Draw( TextureCache &texture_cache ) {
-
-
+  inline void draw_map( MapSystem::Mode map_mode ) {
     ClearBackground( DARKGRAY );
 
     BeginMode2D( Global::state.camera );
@@ -62,34 +61,55 @@ namespace Renderer {
     BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
     {
 
+
+      // First, always draw terrain
       BeginShaderMode( shader );
       {
         // Draw Terrain
-        MapSystem::Draw( Global::state.camera, texture_cache );
-        // TODO this is causing fps to drop to 110
         ProvinceSystem::Draw( Global::state.camera );
       }
       EndShaderMode();
 
-      // Overlay shouldn't be ran through shader?
-      OverlaySystem::DrawProvinceOverlays( texture_cache );
-      SelectionSystem::Draw(
-        // texture_cache, Global::state.gameState == GameState::EDITOR
-        texture_cache,
-        true
-      );
-      OverlaySystem::DrawSettlementOverlays( texture_cache );
+      switch ( map_mode ) {
+        case MapSystem::Mode::Default:
+          // Draw TransparentOverlay
+          break;
+        case MapSystem::Mode::Terrain:
+          // Do nothing
+          break;
+        case MapSystem::Mode::Political:
+          // Draw OpaqueOverlay
+
+          // Overlay shouldn't be ran through shader?
+          OverlaySystem::draw_political();
+          SelectionSystem::Draw(
+            // Global::texture_cache, Global::state.gameState == GameState::EDITOR
+            Global::texture_cache,
+            true
+          );
+          OverlaySystem::draw_settlement_name();
+          break;
+        case MapSystem::Mode::Resources:
+          // Draw Resources
+          break;
+      }
 
 
       BeginShaderMode( shader );
       {
-        switch ( MapSystem::mode ) {
-          case MapSystem::Mode::Terrain: {
-            SettlementSystem::Draw( texture_cache, false );
-          } break;
-          case MapSystem::Mode::Political: {
-            SettlementSystem::Draw( texture_cache, false );
-          } break;
+        switch ( map_mode ) {
+          case MapSystem::Mode::Default:
+            SettlementSystem::Draw( Global::texture_cache, false );
+            break;
+          case MapSystem::Mode::Terrain:
+            SettlementSystem::Draw( Global::texture_cache, false );
+            break;
+          case MapSystem::Mode::Political:
+            SettlementSystem::Draw( Global::texture_cache, false );
+            break;
+          case MapSystem::Mode::Resources:
+            SettlementSystem::Draw( Global::texture_cache, false );
+            break;
         }
 
         // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );

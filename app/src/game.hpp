@@ -14,6 +14,7 @@
 #include "renderer/renderer.hpp"
 
 #include "signals/updates.hpp"
+#include "world/systems/map_system.hpp"
 #include "world/systems/selection_system.hpp"
 
 #include "campaign.hpp"
@@ -418,7 +419,7 @@ class IGame {
 
         BeginDrawing();
         {
-          Renderer::Draw( Global::texture_cache );
+          Renderer::draw_map( MapSystem::mode );
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );

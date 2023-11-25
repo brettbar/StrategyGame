@@ -12,7 +12,7 @@
 
 namespace OverlaySystem {
 
-  inline void DrawProvinceOverlays( TextureCache &texture_cache ) {
+  inline void draw_political() {
     auto provinces = Global::world.view<Province::Component>();
 
     for ( auto entity: provinces ) {
@@ -27,75 +27,18 @@ namespace OverlaySystem {
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
         DrawTextureRec(
-          texture_cache[hstr{ ( faction.primary_color + "Overlay" ).c_str() }]
+          Global::texture_cache[hstr{ ( faction.primary_color + "Overlay" )
+                                        .c_str() }]
             ->texture,
           frameRec,
           prov.tile->position,
           Fade( WHITE, 0.5 )
         );
-
-        // switch ( player.faction ) {
-        //   case Faction::ID::Romans:
-        //     DrawTextureRec(
-        //       texture_cache[hstr{ "redOverlay" }]->texture,
-        //       frameRec,
-        //       prov.tile->position,
-        //       Fade( WHITE, 0.5 )
-        //     );
-        //     break;
-        //   case Faction::ID::Greeks:
-        //     DrawTextureRec(
-        //       texture_cache[hstr{ "blueOverlay" }]->texture,
-        //       frameRec,
-        //       prov.tile->position,
-        //       Fade( WHITE, 0.5 )
-        //     );
-        //     break;
-        //   case Faction::ID::Celts:
-        //     DrawTextureRec(
-        //       texture_cache[hstr{ "greenOverlay" }]->texture,
-        //       frameRec,
-        //       prov.tile->position,
-        //       Fade( WHITE, 0.5 )
-        //     );
-        //     break;
-        //   case Faction::ID::Punics:
-        //     DrawTextureRec(
-        //       texture_cache[hstr{ "purpleOverlay" }]->texture,
-        //       frameRec,
-        //       prov.tile->position,
-        //       Fade( WHITE, 0.5 )
-        //     );
-        //     break;
-        //   case Faction::ID::Persians:
-        //     DrawTextureRec(
-        //       texture_cache[hstr{ "orangeOverlay" }]->texture,
-        //       frameRec,
-        //       prov.tile->position,
-        //       Fade( WHITE, 0.5 )
-        //     );
-        //     break;
-        //     // case Faction::ID::Germans:
-        //     //   DrawTextureRec(
-        //     //     texture_cache[hstr{ "greyOverlay" }]->texture,
-        //     //     frameRec,
-        //     //     prov.tile->position,
-        //     //     Fade( WHITE, 0.5 ) );
-        //     //   break;
-        //     // case Faction::ID::Scythians:
-        //     //   DrawTextureRec(
-        //     //     texture_cache[hstr{ "pinkOverlay" }]->texture,
-        //     //     frameRec,
-        //     //     prov.tile->position,
-        //     //     Fade( WHITE, 0.5 ) );
-        //     //   break;
-        //     break;
-        // }
       }
     }
   }
 
-  inline void DrawSettlementOverlays( TextureCache &texture_cache ) {
+  inline void draw_settlement_name() {
     auto settlements =
       Global::world.view<Province::Component, Settlement::Component>();
 

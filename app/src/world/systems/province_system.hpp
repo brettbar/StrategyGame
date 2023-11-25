@@ -4,15 +4,12 @@
 #include "../components/selected.hpp"
 #include "map_system.hpp"
 
-namespace ProvinceSystem
-{
+namespace ProvinceSystem {
 
   inline void SetProvinceOwner( u32 owner );
 
-  inline void Init()
-  {
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ )
-    {
+  inline void Init() {
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       entt::entity prov_entity = Global::world.create();
 
       Province::Component prov = {
@@ -35,11 +32,55 @@ namespace ProvinceSystem
     }
   }
 
-  inline void Draw( Camera2D &camera )
-  {
+  inline void DrawTileTerrain( Tile::Component tile ) {
+    Texture2D land_tile = Global::texture_cache[hstr{ "land_tile" }]->texture;
+    Texture2D forest_tile =
+      Global::texture_cache[hstr{ "forest_tile" }]->texture;
+    Texture2D water_tile = Global::texture_cache[hstr{ "water_tile" }]->texture;
+    Texture2D hills_tile = Global::texture_cache[hstr{ "hills_tile" }]->texture;
+    Texture2D sand_tile = Global::texture_cache[hstr{ "sand_tile" }]->texture;
+    Texture2D mountains_tile =
+      Global::texture_cache[hstr{ "mountains_tile" }]->texture;
+
+    Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+
+    // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
+    // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+    // DrawTextureRec(hex, frameRec, tile.position, WHITE);
+    switch ( tile.biome ) {
+      case Biome::Mountains:
+        // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( mountains_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Hills:
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Forest:
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( forest_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Plains:
+        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Desert:
+        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Sea:
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        break;
+      default:
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        break;
+    }
+  }
+  inline void Draw( Camera2D &camera ) {
     // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
-    for ( auto entity: Global::world.view<Province::Component>() )
-    {
+    for ( auto entity: Global::world.view<Province::Component>() ) {
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
@@ -56,33 +97,18 @@ namespace ProvinceSystem
         continue;
       }
 
-      switch ( prov.tile->biome )
-      {
-        case Biome::Plains:
-        {
-          // std::cout << "Foo!!!" << '\n';
-          // std::cout << "Bar!!!" << '\n';
-          // DrawTextureV(
-          //   tex,
-          //   { prov.tile->position.x + 16.0f, prov.tile->position.y + 16.0f },
-          //   WHITE
-          // );
-          // std::cout << "Baz!!!" << '\n';
-        }
-        break;
-      }
+      DrawTileTerrain( *prov.tile );
     }
   }
 
-  inline void AssignProvince( entt::entity owner, Vector2 pos )
-  {
+
+  inline void AssignProvince( entt::entity owner, Vector2 pos ) {
     i32 prov_id = DetermineTileIdFromPosition( pos );
     assert( prov_id >= 0 );
 
     auto provinces = Global::world.view<Province::Component>();
 
-    for ( auto entity: provinces )
-    {
+    for ( auto entity: provinces ) {
       auto &prov = provinces.get<Province::Component>( entity );
 
       if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
@@ -141,14 +167,12 @@ namespace ProvinceSystem
     }
   }
 
-  inline void SetProvinceOwner( entt::entity owner )
-  {
+  inline void SetProvinceOwner( entt::entity owner ) {
     auto selectedView =
       Global::world.view<Selected::Component, Actor::Component>();
     auto selectedEntity = selectedView.front();
 
-    if ( selectedEntity == entt::null )
-    {
+    if ( selectedEntity == entt::null ) {
       printf( "No selected entity, cancelling\n" );
       return;
     }

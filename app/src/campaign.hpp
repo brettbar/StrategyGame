@@ -181,7 +181,7 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::Draw( Global::texture_cache );
+  Renderer::draw_map( MapSystem::mode );
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
@@ -253,7 +253,7 @@ inline void Campaign::CheckForUIInteractions() {
       MapSystem::mode = MapSystem::Mode::Terrain;
       break;
     case UI::Action_MapModeChange::Political:
-      MapSystem::mode = MapSystem::Mode::Terrain;
+      MapSystem::mode = MapSystem::Mode::Political;
       break;
     case UI::Action_MapModeChange::Resources:
       MapSystem::mode = MapSystem::Mode::Resources;
