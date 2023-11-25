@@ -6,9 +6,7 @@
 #include "military_tab.hpp"
 #include "population_tab.hpp"
 
-
 namespace UI {
-
   enum class Action_SettlementContext {
     None,
     SpawnActor,

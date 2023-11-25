@@ -48,6 +48,10 @@ namespace MapSystem {
   inline void FilterIslands( NoiseMap &, f32 );
   inline void NormalizeMap( NoiseMap & );
 
+  inline u32 index( u32 x, u32 y ) {
+    return IndexFromCoords( x, y, MAP_WIDTH );
+  }
+
   inline void Init() {
     f32 seed = 25;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
@@ -102,20 +106,59 @@ namespace MapSystem {
     }
   }
 
-
-  inline void Draw( Camera2D &camera, TextureCache &cache ) {
-    Texture2D land_tile = cache[hstr{ "land_tile" }]->texture;
-    Texture2D forest_tile = cache[hstr{ "forest_tile" }]->texture;
-    Texture2D water_tile = cache[hstr{ "water_tile" }]->texture;
-    Texture2D hills_tile = cache[hstr{ "hills_tile" }]->texture;
-    Texture2D sand_tile = cache[hstr{ "sand_tile" }]->texture;
-    Texture2D mountains_tile = cache[hstr{ "mountains_tile" }]->texture;
-    // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
+  inline void DrawTileTerrain( Tile::Component tile ) {
+    Texture2D land_tile = Global::texture_cache[hstr{ "land_tile" }]->texture;
+    Texture2D forest_tile =
+      Global::texture_cache[hstr{ "forest_tile" }]->texture;
+    Texture2D water_tile = Global::texture_cache[hstr{ "water_tile" }]->texture;
+    Texture2D hills_tile = Global::texture_cache[hstr{ "hills_tile" }]->texture;
+    Texture2D sand_tile = Global::texture_cache[hstr{ "sand_tile" }]->texture;
+    Texture2D mountains_tile =
+      Global::texture_cache[hstr{ "mountains_tile" }]->texture;
 
     Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
+    // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
+    // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+    // DrawTextureRec(hex, frameRec, tile.position, WHITE);
+    switch ( tile.biome ) {
+      case Biome::Mountains:
+        // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
+        DrawTextureRec( mountains_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Hills:
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Forest:
+        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( forest_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Plains:
+        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Desert:
+        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
+        break;
+      case Biome::Sea:
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        break;
+      default:
+        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+        break;
+    }
+  }
+
+  inline void Draw( Camera2D &camera, TextureCache &cache ) {
+
+
     for ( auto &tile: tile_map ) {
 
+      // if the tile isnt within the cameras view
       if (
       tile->position.x - TILE_WIDTH >
         camera.target.x + ( camera.offset.x / camera.zoom ) ||
@@ -129,39 +172,12 @@ namespace MapSystem {
         continue;
       }
 
-
-      //        DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
-      //    DrawTextureRec(hex, frameRec, tile.position, WHITE);
-      switch ( tile->biome ) {
-        case Biome::Mountains:
-          // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
-          DrawTextureRec( mountains_tile, frameRec, tile->position, WHITE );
-          break;
-        case Biome::Hills:
-          // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-          break;
-        case Biome::Forest:
-          // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( forest_tile, frameRec, tile->position, WHITE );
-          break;
-        case Biome::Plains:
-          // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-          break;
-        case Biome::Desert:
-          // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-          break;
-        case Biome::Sea:
-          // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-          break;
-        default:
-          // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-          DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-          break;
+      if ( mode == Mode::Default ) {
+      } else if ( mode == Mode::Political ) {
+      } else if ( mode == Mode::Terrain ) {
+        DrawTileTerrain( *tile );
       }
+
 
       // switch (tile->visibility)
       // {

@@ -24,11 +24,11 @@ namespace UI {
     bool switch_default =
       f->TextButton( map_mode_g->Slot( 0 ), "Default", BLUE );
     bool switch_terrain =
-      f->TextButton( map_mode_g->Slot( 0 ), "Terrain", GREEN );
+      f->TextButton( map_mode_g->Slot( 1 ), "Terrain", GREEN );
     bool switch_political =
-      f->TextButton( map_mode_g->Slot( 1 ), "Political", RED );
+      f->TextButton( map_mode_g->Slot( 2 ), "Political", RED );
     bool switch_resources =
-      f->TextButton( map_mode_g->Slot( 0 ), "Resources", ORANGE );
+      f->TextButton( map_mode_g->Slot( 3 ), "Resources", ORANGE );
 
     if ( switch_default )
       return Action_MapModeChange::Default;
