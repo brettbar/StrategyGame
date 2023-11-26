@@ -36,21 +36,34 @@ namespace OverlaySystem {
           Fade( WHITE, 0.25 )
         );
 
+        DrawText(
+          ( std::to_string( prov.tile->coords.x ) + "," +
+            std::to_string( prov.tile->coords.y ) )
+            .c_str(),
+          prov.tile->position.x,
+          prov.tile->position.y,
+          20,
+          BLACK
+        );
+
 
         auto neighbors = MapSystem::get_neighbors( *prov.tile );
 
         // @leftoff, need to get these in the correct order
         Vector4 edge_coords[6] = {
-          Vector4{ 0, 16, 32, 0 },
-          Vector4{ 64, 16, 64, 48 },
-          Vector4{ 32, 0, 64, 16 },
-          Vector4{ 64, 48, 32, 64 },
-          Vector4{ 32, 64, 0, 48 },
-          Vector4{ 0, 48, 0, 16 },
+          Vector4{ 32, 0, 64, 16 }, // ne
+          Vector4{ 64, 16, 64, 48 },// e
+          Vector4{ 64, 48, 32, 64 },// se
+          Vector4{ 32, 64, 0, 48 }, // sw
+          Vector4{ 0, 48, 0, 16 },  // w
+          Vector4{ 0, 16, 32, 0 },  // nw
         };
 
         for ( u32 i = 0; i < neighbors.size(); i++ ) {
           auto neighbor = neighbors[i];
+          if ( !neighbor )
+            continue;
+
           if ( neighbor->owner != prov.tile->owner )
             DrawLineEx(
               { prov.tile->position.x + edge_coords[i].x,
@@ -60,7 +73,6 @@ namespace OverlaySystem {
               2,
               RED
             );
-          break;
         }
       }
     }

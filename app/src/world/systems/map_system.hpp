@@ -111,16 +111,8 @@ namespace MapSystem {
   inline std::array<sptr<Tile::Component>, 6> get_neighbors(
     Tile::Component tile
   ) {
-    f32 x = tile.coords.x;
-    f32 y = tile.coords.y;
-
-    i32 ne = index( x, y - 1 );
-    i32 e = index( x, y - 1 );
-    i32 se = index( x, y + 1 );
-    i32 sw = index( x - 1, y + 1 );
-    i32 w = index( x - 1, y );
-    i32 nw = index( x - 1, y - 1 );
-
+    u32 x = tile.coords.x;
+    u32 y = tile.coords.y;
     sptr<Tile::Component> ne_tile = nullptr;
     sptr<Tile::Component> e_tile = nullptr;
     sptr<Tile::Component> se_tile = nullptr;
@@ -128,27 +120,51 @@ namespace MapSystem {
     sptr<Tile::Component> w_tile = nullptr;
     sptr<Tile::Component> nw_tile = nullptr;
 
-    if ( ne >= 0 )
-      ne_tile = tile_map[ne];
-    if ( e >= 0 )
-      e_tile = tile_map[e];
-    if ( se >= 0 )
-      se_tile = tile_map[se];
-    if ( sw >= 0 )
-      sw_tile = tile_map[sw];
-    if ( w >= 0 )
-      w_tile = tile_map[w];
-    if ( nw >= 0 )
-      nw_tile = tile_map[nw];
+    if ( y % 2 == 0 ) {
+      i32 ne = index( x, y - 1 );
+      i32 e = index( x + 1, y );
+      i32 se = index( x, y + 1 );
+      i32 sw = index( x - 1, y + 1 );
+      i32 w = index( x - 1, y );
+      i32 nw = index( x - 1, y - 1 );
+
+      if ( ne >= 0 )
+        ne_tile = tile_map[ne];
+      if ( e >= 0 )
+        e_tile = tile_map[e];
+      if ( se >= 0 )
+        se_tile = tile_map[se];
+      if ( sw >= 0 )
+        sw_tile = tile_map[sw];
+      if ( w >= 0 )
+        w_tile = tile_map[w];
+      if ( nw >= 0 )
+        nw_tile = tile_map[nw];
+    } else {
+      i32 ne = index( x + 1, y - 1 );
+      i32 e = index( x + 1, y );
+      i32 se = index( x + 1, y + 1 );
+      i32 sw = index( x, y + 1 );
+      i32 w = index( x - 1, y );
+      i32 nw = index( x, y - 1 );
+
+      if ( ne >= 0 )
+        ne_tile = tile_map[ne];
+      if ( e >= 0 )
+        e_tile = tile_map[e];
+      if ( se >= 0 )
+        se_tile = tile_map[se];
+      if ( sw >= 0 )
+        sw_tile = tile_map[sw];
+      if ( w >= 0 )
+        w_tile = tile_map[w];
+      if ( nw >= 0 )
+        nw_tile = tile_map[nw];
+    }
+
 
     return std::array<sptr<Tile::Component>, 6>{
-      ne_tile,
-      e_tile,
-      se_tile,
-      sw_tile,
-      w_tile,
-      nw_tile,
-    };
+      ne_tile, e_tile, se_tile, sw_tile, w_tile, nw_tile };
   }
 
 
