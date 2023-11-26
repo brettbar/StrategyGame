@@ -81,7 +81,7 @@ namespace SettlementSystem {
 
       // TODO pretty sure I am checking this twice, another time in the Actor colonist area
       if ( prov.tile->id == closest_tile ) {
-        if ( prov.owner == unit.owner ) {
+        if ( prov.tile->owner == unit.owner ) {
           if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
             printf( "spawning settlement\n" );
 

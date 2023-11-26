@@ -7,17 +7,16 @@
 
 namespace Province {
 
-struct Component {
-  entt::entity owner;
-  bool selected = false;
+  struct Component {
+    bool selected = false;
 
-  std::shared_ptr<Tile::Component> tile;
-  std::vector<Resources::Natural> resources;
+    std::shared_ptr<Tile::Component> tile;
+    std::vector<Resources::Natural> resources;
 
-  template<class Archive>
-  void serialize( Archive &ar ) {
-    ar( owner, selected, tile, CEREAL_NVP( resources ) );
-  }
-};
+    template<class Archive>
+    void serialize( Archive &ar ) {
+      ar( selected, tile, CEREAL_NVP( resources ) );
+    }
+  };
 
 }// namespace Province

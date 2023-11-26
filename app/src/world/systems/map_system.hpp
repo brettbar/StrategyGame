@@ -47,6 +47,10 @@ namespace MapSystem {
   inline void NormalizeMap( NoiseMap & );
 
   inline u32 index( u32 x, u32 y ) {
+    if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
+      return -1;
+    }
+
     return IndexFromCoords( x, y, MAP_WIDTH );
   }
 
@@ -87,6 +91,7 @@ namespace MapSystem {
         position = { xPos, yPos };
 
       Tile::Component tile = {
+        entt::null,
         i,
         noise,
         position,
@@ -99,24 +104,50 @@ namespace MapSystem {
         Tile::Visibility::UNEXPLORED,
       };
 
-      tile_map[IndexFromCoords( x, y, MAP_WIDTH )] =
-        std::make_shared<Tile::Component>( tile );
+      tile_map[index( x, y )] = std::make_shared<Tile::Component>( tile );
     }
   }
 
   inline std::array<sptr<Tile::Component>, 6> get_neighbors(
     Tile::Component tile
   ) {
-    f32 x = tile.position.x;
-    f32 y = tile.position.y;
+    f32 x = tile.coords.x;
+    f32 y = tile.coords.y;
 
-    return std::array<std::shared_ptr<Tile::Component>, 6>{
-      tile_map[index( x, y - 1 )],
-      tile_map[index( x + 1, y )],
-      tile_map[index( x, y + 1 )],
-      tile_map[index( x - 1, y + 1 )],
-      tile_map[index( x - 1, y )],
-      tile_map[index( x - 1, y - 1 )],
+    i32 ne = index( x, y - 1 );
+    i32 e = index( x, y - 1 );
+    i32 se = index( x, y + 1 );
+    i32 sw = index( x - 1, y + 1 );
+    i32 w = index( x - 1, y );
+    i32 nw = index( x - 1, y - 1 );
+
+    sptr<Tile::Component> ne_tile = nullptr;
+    sptr<Tile::Component> e_tile = nullptr;
+    sptr<Tile::Component> se_tile = nullptr;
+    sptr<Tile::Component> sw_tile = nullptr;
+    sptr<Tile::Component> w_tile = nullptr;
+    sptr<Tile::Component> nw_tile = nullptr;
+
+    if ( ne >= 0 )
+      ne_tile = tile_map[ne];
+    if ( e >= 0 )
+      e_tile = tile_map[e];
+    if ( se >= 0 )
+      se_tile = tile_map[se];
+    if ( sw >= 0 )
+      sw_tile = tile_map[sw];
+    if ( w >= 0 )
+      w_tile = tile_map[w];
+    if ( nw >= 0 )
+      nw_tile = tile_map[nw];
+
+    return std::array<sptr<Tile::Component>, 6>{
+      ne_tile,
+      e_tile,
+      se_tile,
+      sw_tile,
+      w_tile,
+      nw_tile,
     };
   }
 

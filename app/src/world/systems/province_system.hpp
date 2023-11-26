@@ -13,7 +13,6 @@ namespace ProvinceSystem {
       entt::entity prov_entity = Global::world.create();
 
       Province::Component prov = {
-        .owner = entt::null,
         .selected = false,
         .tile = MapSystem::tile_map[i],
         .resources = {},
@@ -114,7 +113,7 @@ namespace ProvinceSystem {
       if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
         continue;
 
-      prov.owner = owner;
+      prov.tile->owner = owner;
       // Settlement::Component settlement = {
       //   .id = prov.id,
       //   .population =

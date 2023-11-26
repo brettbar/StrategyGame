@@ -7,6 +7,7 @@
 #include "../components/faction.hpp"
 #include "../components/player.hpp"
 #include "../components/settlement.hpp"
+#include "map_system.hpp"
 #include "province_system.hpp"
 #include <raylib.h>
 
@@ -18,11 +19,11 @@ namespace OverlaySystem {
     for ( auto entity: provinces ) {
       auto &prov = provinces.get<Province::Component>( entity );
 
-      if ( prov.owner != entt::null ) {
+      if ( prov.tile->owner != entt::null ) {
         Player::Component player =
-          Global::world.get<Player::Component>( prov.owner );
+          Global::world.get<Player::Component>( prov.tile->owner );
         Faction::Component faction =
-          Global::world.get<Faction::Component>( prov.owner );
+          Global::world.get<Faction::Component>( prov.tile->owner );
 
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
@@ -34,6 +35,33 @@ namespace OverlaySystem {
           prov.tile->position,
           Fade( WHITE, 0.25 )
         );
+
+
+        auto neighbors = MapSystem::get_neighbors( *prov.tile );
+
+        // @leftoff, need to get these in the correct order
+        Vector4 edge_coords[6] = {
+          Vector4{ 0, 16, 32, 0 },
+          Vector4{ 64, 16, 64, 48 },
+          Vector4{ 32, 0, 64, 16 },
+          Vector4{ 64, 48, 32, 64 },
+          Vector4{ 32, 64, 0, 48 },
+          Vector4{ 0, 48, 0, 16 },
+        };
+
+        for ( u32 i = 0; i < neighbors.size(); i++ ) {
+          auto neighbor = neighbors[i];
+          if ( neighbor->owner != prov.tile->owner )
+            DrawLineEx(
+              { prov.tile->position.x + edge_coords[i].x,
+                prov.tile->position.y + edge_coords[i].y },
+              { prov.tile->position.x + edge_coords[i].z,
+                prov.tile->position.y + edge_coords[i].w },
+              2,
+              RED
+            );
+          break;
+        }
       }
     }
   }
@@ -44,11 +72,11 @@ namespace OverlaySystem {
     for ( auto entity: provinces ) {
       auto &prov = provinces.get<Province::Component>( entity );
 
-      if ( prov.owner != entt::null ) {
+      if ( prov.tile->owner != entt::null ) {
         Player::Component player =
-          Global::world.get<Player::Component>( prov.owner );
+          Global::world.get<Player::Component>( prov.tile->owner );
         Faction::Component faction =
-          Global::world.get<Faction::Component>( prov.owner );
+          Global::world.get<Faction::Component>( prov.tile->owner );
 
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 

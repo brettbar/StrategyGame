@@ -127,7 +127,7 @@ namespace SelectionSystem {
         Global::world.emplace<Selected::Component>( entity, player_id );
 
         std::cout << EntityIdToString( entity ) << std::endl;
-        std::cout << EntityIdToString( prov.owner ) << std::endl;
+        std::cout << EntityIdToString( prov.tile->owner ) << std::endl;
 
         selected_entity = entity;
 

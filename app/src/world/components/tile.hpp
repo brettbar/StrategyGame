@@ -11,8 +11,13 @@ namespace Tile {
     VISIBILE,
   };
 
-  // NOTE: Not part of the ECS
+  // @note Not part of the ECS
   struct Component {
+
+    // I don't like this
+    // its a dup of the owner in Province::Component
+    entt::entity owner = entt::null;
+
     u32 id;
     f32 noise;
     Vector2 position;

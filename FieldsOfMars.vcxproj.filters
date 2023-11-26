@@ -26,5 +26,8 @@
     <ClInclude Include="app\src\interface\pages\main_menu_ui.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="app\src\world\systems\overlay_system.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

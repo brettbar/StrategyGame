@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\src\interface\pages\main_menu_ui.hpp" />
+    <ClInclude Include="app\src\world\systems\overlay_system.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
