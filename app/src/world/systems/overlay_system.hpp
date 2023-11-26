@@ -12,6 +12,32 @@
 
 namespace OverlaySystem {
 
+  inline void draw_default() {
+    auto provinces = Global::world.view<Province::Component>();
+
+    for ( auto entity: provinces ) {
+      auto &prov = provinces.get<Province::Component>( entity );
+
+      if ( prov.owner != entt::null ) {
+        Player::Component player =
+          Global::world.get<Player::Component>( prov.owner );
+        Faction::Component faction =
+          Global::world.get<Faction::Component>( prov.owner );
+
+        Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+
+        DrawTextureRec(
+          Global::texture_cache[hstr{ ( faction.primary_color + "Overlay" )
+                                        .c_str() }]
+            ->texture,
+          frameRec,
+          prov.tile->position,
+          Fade( WHITE, 0.25 )
+        );
+      }
+    }
+  }
+
   inline void draw_political() {
     auto provinces = Global::world.view<Province::Component>();
 

@@ -34,9 +34,8 @@ namespace MapSystem {
   inline Mode mode = Mode::Default;
 
 
-  using NoiseMap = std::array<float, MAP_WIDTH * MAP_HEIGHT>;
-  using TileMap =
-    std::array<std::shared_ptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
+  using NoiseMap = std::array<f32, MAP_WIDTH * MAP_HEIGHT>;
+  using TileMap = std::array<sptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
   inline TileMap tile_map = {};
 
@@ -105,6 +104,22 @@ namespace MapSystem {
     }
   }
 
+  inline std::array<sptr<Tile::Component>, 6> get_neighbors(
+    Tile::Component tile
+  ) {
+    f32 x = tile.position.x;
+    f32 y = tile.position.y;
+
+    return std::array<std::shared_ptr<Tile::Component>, 6>{
+      tile_map[index( x, y - 1 )],
+      tile_map[index( x + 1, y )],
+      tile_map[index( x, y + 1 )],
+      tile_map[index( x - 1, y + 1 )],
+      tile_map[index( x - 1, y )],
+      tile_map[index( x - 1, y - 1 )],
+    };
+  }
+
 
   inline void UpdateFOW() {
     auto view = Global::world.view<Actor::Component, Sight::Component>();
@@ -120,14 +135,7 @@ namespace MapSystem {
       u32 x = closest->coords.x;
       u32 y = closest->coords.y;
 
-      std::array<std::shared_ptr<Tile::Component>, 6> neighbors = {
-        tile_map[index( x, y - 1 )],
-        tile_map[index( x + 1, y )],
-        tile_map[index( x, y + 1 )],
-        tile_map[index( x - 1, y + 1 )],
-        tile_map[index( x - 1, y )],
-        tile_map[index( x - 1, y - 1 )],
-      };
+      auto neighbors = get_neighbors( *closest );
 
       if ( y % 2 == 1 ) {
         neighbors[0] = tile_map[index( x + 1, y - 1 )];

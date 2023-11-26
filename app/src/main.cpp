@@ -35,7 +35,7 @@ rights reserved.
 
 namespace fs = std::filesystem;
 
-void LoadResources();
+void LoadAssets();
 
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
@@ -78,7 +78,7 @@ int main() {
   SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
   InitWindow( 1920, 1080, "FieldsOfMars" );
-  LoadResources();
+  LoadAssets();
   // UI::System::Init();
 
   SetExitKey( KEY_NULL );
@@ -104,28 +104,20 @@ int main() {
 Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
-  // N -> NE
   ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
-  // NE -> SE
   ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
-  // SE -> S
   ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
-  // S -> SW
   ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
-  // SW -> NW
   ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
-  // NW -> N
   ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
 
   return base;
 }
 
-void LoadResources() {
+void LoadAssets() {
   std::string asset_folder = "app/assets/";
 
-  LoadResource(
-    hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache
-  );
+  LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
 
   Global::font_cache.load(
     hstr{ "font_romulus" },
@@ -137,81 +129,76 @@ void LoadResources() {
     LoadFont( ( asset_folder + "/fonts/Perfect-DOS-VGA-437.png" ).c_str() )
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "land_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Grass.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "forest_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Forest.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "mountains_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Mountains.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "water_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Ocean.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "hills_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Hills.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "sand_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Sand.bmp" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "snow_tile" },
     LoadImage( ( asset_folder + "/images/hexagons/Snow.bmp" ).c_str() ),
     Global::texture_cache
   );
 
-  LoadResource(
-    hstr{ "redOverlay" },
-    LoadImage( ( asset_folder + "/images/overlays/Red.png" ).c_str() ),
-    Global::texture_cache
+  // LoadAsset(
+  //   hstr{ "redOverlay" },
+  //   LoadImage( ( asset_folder + "/images/overlays/Red.png" ).c_str() ),
+  //   Global::texture_cache
+  // );
+  create_hex_texture(
+    hstr{ "redOverlay" }, Fade( RED, 0.35 ), Global::texture_cache
   );
-  LoadResource(
-    hstr{ "cyanOverlay" },
-    LoadImage( ( asset_folder + "/images/overlays/Blue.png" ).c_str() ),
-    Global::texture_cache
+  create_hex_texture(
+    hstr{ "cyanOverlay" }, Fade( BLUE, 0.35 ), Global::texture_cache
   );
-  LoadResource(
-    hstr{ "greenOverlay" },
-    LoadImage( ( asset_folder + "/images/overlays/Green.png" ).c_str() ),
-    Global::texture_cache
+  create_hex_texture(
+    hstr{ "greenOverlay" }, Fade( GREEN, 0.35 ), Global::texture_cache
   );
-  LoadResource(
-    hstr{ "purpleOverlay" },
-    LoadImage( ( asset_folder + "/images/overlays/Purple.png" ).c_str() ),
-    Global::texture_cache
+  create_hex_texture(
+    hstr{ "purpleOverlay" }, Fade( PURPLE, 0.35 ), Global::texture_cache
   );
-  LoadResource(
-    hstr{ "orangeOverlay" },
-    LoadImage( ( asset_folder + "/images/overlays/Orange.png" ).c_str() ),
-    Global::texture_cache
+  create_hex_texture(
+    hstr{ "orangeOverlay" }, Fade( ORANGE, 0.35 ), Global::texture_cache
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "template" },
     LoadImage( ( asset_folder + "/images/Template.png" ).c_str() ),
     Global::texture_cache
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "romans_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str() ),
     Global::texture_cache
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "romans_hastati_texture" },
     LoadImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
     Global::texture_cache
@@ -223,36 +210,36 @@ void LoadResources() {
     Global::texture_cache
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "greeks_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/GreekVillager.png" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "celts_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/CelticVillager.png" ).c_str() ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "punics_villager_texture" },
     LoadImage(
       ( asset_folder + "/images/units/Carthaginian_Villager.png" ).c_str()
     ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "persians_villager_texture" },
     LoadImage( ( asset_folder + "/images/units/Persian_Villager.png" ).c_str()
     ),
     Global::texture_cache
   );
-  LoadResource(
+  LoadAsset(
     hstr{ "romanVillageTexture" },
     LoadImage( ( asset_folder + "/images/village_roman.png" ).c_str() ),
     Global::texture_cache
   );
 
-  LoadResource(
+  LoadAsset(
     hstr{ "buildings" },
     LoadImage( ( asset_folder + "/images/buildings.png" ).c_str() ),
     Global::texture_cache
@@ -312,7 +299,7 @@ void LoadResources() {
 
     std::cout << filename << '\n';
 
-    LoadResource(
+    LoadAsset(
       hstr{ filename.c_str() },
       LoadImage( ( path + "/" + filename ).c_str() ),
       Global::texture_cache
