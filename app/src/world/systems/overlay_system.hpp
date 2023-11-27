@@ -13,68 +13,72 @@
 
 namespace OverlaySystem {
 
+  inline void draw_borders() {
+    auto provinces = Global::world.view<Province::Component>();
+
+    for ( auto entity: provinces ) {
+      auto &prov = provinces.get<Province::Component>( entity );
+
+      if ( prov.tile->owner == entt::null )
+        continue;
+
+      Player::Component player =
+        Global::world.get<Player::Component>( prov.tile->owner );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( prov.tile->owner );
+
+      auto neighbors = MapSystem::get_neighbors( *prov.tile );
+
+      hstr borders[6] = {
+        hstr{ ( "ne_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "e_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "se_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "sw_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "w_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "nw_border_" + faction.primary_color ).c_str() },
+      };
+
+      for ( u32 i = 0; i < neighbors.size(); i++ ) {
+        auto neighbor = neighbors[i];
+        if ( !neighbor )
+          continue;
+
+        if ( neighbor->owner != prov.tile->owner ) {
+          DrawTexture(
+            Global::texture_cache[borders[i]]->texture,
+            prov.tile->position.x,
+            prov.tile->position.y,
+            WHITE
+          );
+        }
+      }
+    }
+  }
+
   inline void draw_default() {
     auto provinces = Global::world.view<Province::Component>();
 
     for ( auto entity: provinces ) {
       auto &prov = provinces.get<Province::Component>( entity );
 
-      if ( prov.tile->owner != entt::null ) {
-        Player::Component player =
-          Global::world.get<Player::Component>( prov.tile->owner );
-        Faction::Component faction =
-          Global::world.get<Faction::Component>( prov.tile->owner );
+      if ( prov.tile->owner == entt::null )
+        continue;
 
-        Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+      Player::Component player =
+        Global::world.get<Player::Component>( prov.tile->owner );
+      Faction::Component faction =
+        Global::world.get<Faction::Component>( prov.tile->owner );
 
-        DrawTextureRec(
-          Global::texture_cache[hstr{ ( faction.primary_color + "Overlay" )
-                                        .c_str() }]
-            ->texture,
-          frameRec,
-          prov.tile->position,
-          Fade( WHITE, 0.25 )
-        );
+      Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
-        DrawText(
-          ( std::to_string( prov.tile->coords.x ) + "," +
-            std::to_string( prov.tile->coords.y ) )
-            .c_str(),
-          prov.tile->position.x,
-          prov.tile->position.y,
-          20,
-          BLACK
-        );
-
-
-        auto neighbors = MapSystem::get_neighbors( *prov.tile );
-
-        // @leftoff, need to get these in the correct order
-        Vector4 edge_coords[6] = {
-          Vector4{ 32, 0, 64, 16 }, // ne
-          Vector4{ 64, 16, 64, 48 },// e
-          Vector4{ 64, 48, 32, 64 },// se
-          Vector4{ 32, 64, 0, 48 }, // sw
-          Vector4{ 0, 48, 0, 16 },  // w
-          Vector4{ 0, 16, 32, 0 },  // nw
-        };
-
-        for ( u32 i = 0; i < neighbors.size(); i++ ) {
-          auto neighbor = neighbors[i];
-          if ( !neighbor )
-            continue;
-
-          if ( neighbor->owner != prov.tile->owner )
-            DrawLineEx(
-              { prov.tile->position.x + edge_coords[i].x,
-                prov.tile->position.y + edge_coords[i].y },
-              { prov.tile->position.x + edge_coords[i].z,
-                prov.tile->position.y + edge_coords[i].w },
-              2,
-              RED
-            );
-        }
-      }
+      DrawTextureRec(
+        Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
+                                      .c_str() }]
+          ->texture,
+        frameRec,
+        prov.tile->position,
+        Fade( WHITE, 0.25 )
+      );
     }
   }
 
@@ -93,7 +97,7 @@ namespace OverlaySystem {
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
         DrawTextureRec(
-          Global::texture_cache[hstr{ ( faction.primary_color + "Overlay" )
+          Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
                                         .c_str() }]
             ->texture,
           frameRec,

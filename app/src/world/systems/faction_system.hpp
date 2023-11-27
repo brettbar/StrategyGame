@@ -5,8 +5,7 @@
 
 #include "../components/faction.hpp"
 
-namespace FactionSystem
-{
+namespace FactionSystem {
   inline std::map<std::string, Faction::Component> factions = {};
 
   inline std::map<std::string, Color> color_map = {
@@ -21,8 +20,7 @@ namespace FactionSystem
     { "grey", GRAY },
   };
 
-  inline void Init()
-  {
+  inline void Init() {
 
     std::filesystem::path cwd = std::filesystem::current_path();
 
@@ -37,8 +35,7 @@ namespace FactionSystem
       std::cout << js << std::endl;
       // std::cout << js["romans"] << std::endl;
       // std::cout << js["romans"]["adjectival"] << std::endl;
-      for ( auto &element: js.items() )
-      {
+      for ( auto &element: js.items() ) {
         std::cout << element.key() << std::endl;
         std::cout << element.value() << std::endl;
 
@@ -65,8 +62,7 @@ namespace FactionSystem
   }
 
 
-  inline Texture2D DetermineTextureFromFaction( entt::entity owner )
-  {
+  inline Texture2D DetermineTextureFromFaction( entt::entity owner ) {
     std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
     return Global::texture_cache[hstr{ ( faction_id + "_villager_texture" )
                                          .c_str() }]

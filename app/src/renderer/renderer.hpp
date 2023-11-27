@@ -73,12 +73,19 @@ namespace Renderer {
       switch ( map_mode ) {
         case MapSystem::Mode::Default:
           // Draw TransparentOverlay
+
           OverlaySystem::draw_default();
-          SelectionSystem::Draw(
-            // Global::texture_cache, Global::state.gameState == GameState::EDITOR
-            Global::texture_cache,
-            true
-          );
+          BeginShaderMode( shader );
+          {
+            OverlaySystem::draw_borders();
+            SelectionSystem::Draw(
+              // Global::texture_cache, Global::state.gameState == GameState::EDITOR
+              Global::texture_cache,
+              true
+            );
+          }
+          EndShaderMode();
+
           OverlaySystem::draw_settlement_name();
           break;
         case MapSystem::Mode::Terrain:

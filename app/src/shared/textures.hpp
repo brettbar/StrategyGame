@@ -42,6 +42,58 @@ inline Image CropUnitImage( std::string location ) {
   return img;
 }
 
+inline Image create_border(
+  Vector2 start,
+  Vector2 end,
+  Color color,
+  TextureCache &cache
+) {
+  Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
+  ImageDrawLineV( &base, start, end, color );
+  return base;
+}
+
+// inline void create_hex_texture(
+//   hstr id,
+//   Color color,
+//   f32 padding,
+//   TextureCache &cache
+// ) {
+//   RenderTexture2D target = LoadRenderTexture( TILE_WIDTH + 2, TILE_HEIGHT + 2 );
+//   BeginTextureMode( target );
+//   BeginDrawing();
+//   ClearBackground( BLANK );
+
+//   Vector4 edges[6] = {
+//     { 32, 0, 64, 16 }, // ne
+//     { 64, 16, 64, 48 },// e
+//     { 64, 48, 32, 64 },// se
+//     { 32, 64, 0, 48 }, // sw
+//     { 0, 48, 0, 16 },  // w
+//     { 0, 16, 32, 0 },  // nw
+//   };
+
+//   for ( auto edge: edges ) {
+//     DrawTriangle(
+//       { edge.x + 1, edge.y + 1 },
+//       { 32 + 1, 32 + 1 },
+//       { edge.z + 1, edge.w + 1 },
+//       color
+//     );
+//   }
+
+
+//   EndDrawing();
+//   EndTextureMode();
+
+//   cache.load( id, target.texture );
+
+//   // Draw the texture with padding at the specified position
+//   // DrawTexture(
+//   //   target.texture, position.x - padding, position.y - padding, WHITE
+//   // );
+// }
+
 inline void create_hex_texture( hstr id, Color color, TextureCache &cache ) {
   RenderTexture2D target = LoadRenderTexture( TILE_WIDTH, TILE_HEIGHT );
   BeginTextureMode( target );
@@ -57,5 +109,6 @@ inline void create_hex_texture( hstr id, Color color, TextureCache &cache ) {
 
   EndDrawing();
   EndTextureMode();
+  SetTextureWrap( target.texture, TEXTURE_WRAP_CLAMP );
   cache.load( id, target.texture );
 }

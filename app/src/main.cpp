@@ -3,6 +3,7 @@
 rights reserved.
 */
 
+#include "world/systems/faction_system.hpp"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
@@ -114,10 +115,52 @@ Image InitTileOutline() {
   return base;
 }
 
+void load_borders() {
+  std::string asset_folder = "app/assets/";
+
+  for ( const auto &pair: FactionSystem::color_map ) {
+    Color color = pair.second;
+    str color_str = pair.first;
+
+    LoadAsset(
+      hstr{ ( "ne_border_" + color_str ).c_str() },
+      create_border( { 32, 0 }, { 63, 16 }, color, Global::texture_cache ),
+      Global::texture_cache
+    );
+    LoadAsset(
+      hstr{ ( "e_border_" + color_str ).c_str() },
+      create_border( { 63, 16 }, { 63, 47 }, color, Global::texture_cache ),
+      // LoadImage( ( asset_folder + "/images/overlays-E.png" ).c_str() ),
+      Global::texture_cache
+    );
+    LoadAsset(
+      hstr{ ( "se_border_" + color_str ).c_str() },
+      create_border( { 63, 47 }, { 32, 63 }, color, Global::texture_cache ),
+      Global::texture_cache
+    );
+    LoadAsset(
+      hstr{ ( "sw_border_" + color_str ).c_str() },
+      create_border( { 31, 63 }, { 0, 47 }, color, Global::texture_cache ),
+      Global::texture_cache
+    );
+    LoadAsset(
+      hstr{ ( "w_border_" + color_str ).c_str() },
+      create_border( { 0, 47 }, { 0, 16 }, color, Global::texture_cache ),
+      Global::texture_cache
+    );
+    LoadAsset(
+      hstr{ ( "nw_border_" + color_str ).c_str() },
+      create_border( { 0, 16 }, { 31, 0 }, color, Global::texture_cache ),
+      Global::texture_cache
+    );
+  }
+}
+
 void LoadAssets() {
   std::string asset_folder = "app/assets/";
 
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
+  load_borders();
 
   Global::font_cache.load(
     hstr{ "font_romulus" },
@@ -165,25 +208,20 @@ void LoadAssets() {
     Global::texture_cache
   );
 
-  // LoadAsset(
-  //   hstr{ "redOverlay" },
-  //   LoadImage( ( asset_folder + "/images/overlays/Red.png" ).c_str() ),
-  //   Global::texture_cache
-  // );
   create_hex_texture(
-    hstr{ "redOverlay" }, Fade( RED, 0.35 ), Global::texture_cache
+    hstr{ "red_overlay" }, Fade( RED, 0.35 ), Global::texture_cache
   );
   create_hex_texture(
-    hstr{ "cyanOverlay" }, Fade( BLUE, 0.35 ), Global::texture_cache
+    hstr{ "cyan_overlay" }, Fade( BLUE, 0.35 ), Global::texture_cache
   );
   create_hex_texture(
-    hstr{ "greenOverlay" }, Fade( GREEN, 0.35 ), Global::texture_cache
+    hstr{ "green_overlay" }, Fade( GREEN, 0.35 ), Global::texture_cache
   );
   create_hex_texture(
-    hstr{ "purpleOverlay" }, Fade( PURPLE, 0.35 ), Global::texture_cache
+    hstr{ "purple_overlay" }, Fade( PURPLE, 0.35 ), Global::texture_cache
   );
   create_hex_texture(
-    hstr{ "orangeOverlay" }, Fade( ORANGE, 0.35 ), Global::texture_cache
+    hstr{ "orange_overlay" }, Fade( ORANGE, 0.35 ), Global::texture_cache
   );
 
   LoadAsset(
