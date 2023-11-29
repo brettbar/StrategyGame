@@ -109,6 +109,5 @@ inline void create_hex_texture( hstr id, Color color, TextureCache &cache ) {
 
   EndDrawing();
   EndTextureMode();
-  SetTextureWrap( target.texture, TEXTURE_WRAP_CLAMP );
   cache.load( id, target.texture );
 }

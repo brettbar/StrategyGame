@@ -208,21 +208,11 @@ void LoadAssets() {
     Global::texture_cache
   );
 
-  create_hex_texture(
-    hstr{ "red_overlay" }, Fade( RED, 0.35 ), Global::texture_cache
-  );
-  create_hex_texture(
-    hstr{ "cyan_overlay" }, Fade( BLUE, 0.35 ), Global::texture_cache
-  );
-  create_hex_texture(
-    hstr{ "green_overlay" }, Fade( GREEN, 0.35 ), Global::texture_cache
-  );
-  create_hex_texture(
-    hstr{ "purple_overlay" }, Fade( PURPLE, 0.35 ), Global::texture_cache
-  );
-  create_hex_texture(
-    hstr{ "orange_overlay" }, Fade( ORANGE, 0.35 ), Global::texture_cache
-  );
+  create_hex_texture( hstr{ "red_overlay" }, RED, Global::texture_cache );
+  create_hex_texture( hstr{ "cyan_overlay" }, BLUE, Global::texture_cache );
+  create_hex_texture( hstr{ "green_overlay" }, GREEN, Global::texture_cache );
+  create_hex_texture( hstr{ "purple_overlay" }, PURPLE, Global::texture_cache );
+  create_hex_texture( hstr{ "orange_overlay" }, ORANGE, Global::texture_cache );
 
   LoadAsset(
     hstr{ "template" },

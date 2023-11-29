@@ -7,6 +7,7 @@
 #include "../components/faction.hpp"
 #include "../components/player.hpp"
 #include "../components/settlement.hpp"
+#include "faction_system.hpp"
 #include "map_system.hpp"
 #include "province_system.hpp"
 #include <raylib.h>
@@ -71,13 +72,15 @@ namespace OverlaySystem {
 
       Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
+      Color color = FactionSystem::color_map[faction.primary_color];
+
       DrawTextureRec(
         Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
                                       .c_str() }]
           ->texture,
         frameRec,
         prov.tile->position,
-        Fade( WHITE, 0.25 )
+        Fade( color, 0.1 )
       );
     }
   }
@@ -96,13 +99,15 @@ namespace OverlaySystem {
 
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
+        Color color = FactionSystem::color_map[faction.primary_color];
+
         DrawTextureRec(
           Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
                                         .c_str() }]
             ->texture,
           frameRec,
           prov.tile->position,
-          Fade( WHITE, 0.5 )
+          Fade( color, 0.5 )
         );
       }
     }

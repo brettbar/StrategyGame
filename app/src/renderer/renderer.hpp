@@ -57,8 +57,8 @@ namespace Renderer {
 
     BeginMode2D( Global::state.camera );
 
-    // TODO does this actually do anything?
     BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
+    // BeginBlendMode( BLEND_ALPHA );
     {
 
 
@@ -78,11 +78,7 @@ namespace Renderer {
           BeginShaderMode( shader );
           {
             OverlaySystem::draw_borders();
-            SelectionSystem::Draw(
-              // Global::texture_cache, Global::state.gameState == GameState::EDITOR
-              Global::texture_cache,
-              true
-            );
+            SelectionSystem::Draw( Global::texture_cache, true );
           }
           EndShaderMode();
 
@@ -94,14 +90,14 @@ namespace Renderer {
         case MapSystem::Mode::Political:
           // Draw OpaqueOverlay
 
-          // Overlay shouldn't be ran through shader?
           OverlaySystem::draw_political();
-          SelectionSystem::Draw(
-            // Global::texture_cache, Global::state.gameState == GameState::EDITOR
-            Global::texture_cache,
-            true
-          );
+          BeginShaderMode( shader );
+          {
+            OverlaySystem::draw_borders();
+            SelectionSystem::Draw( Global::texture_cache, true );
+          }
           OverlaySystem::draw_settlement_name();
+          EndShaderMode();
           break;
         case MapSystem::Mode::Resources:
           // Draw Resources
