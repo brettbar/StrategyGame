@@ -60,8 +60,6 @@ namespace Renderer {
     BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
     // BeginBlendMode( BLEND_ALPHA );
     {
-
-
       // First, always draw terrain
       BeginShaderMode( shader );
       {
@@ -69,42 +67,47 @@ namespace Renderer {
         ProvinceSystem::Draw( Global::state.camera );
       }
       EndShaderMode();
+    }
+    EndBlendMode();
 
-      switch ( map_mode ) {
-        case MapSystem::Mode::Default:
-          // Draw TransparentOverlay
+    switch ( map_mode ) {
+      case MapSystem::Mode::Default:
+        // Draw TransparentOverlay
 
-          OverlaySystem::draw_default();
-          BeginShaderMode( shader );
-          {
-            OverlaySystem::draw_borders();
-            SelectionSystem::Draw( Global::texture_cache, true );
-          }
-          EndShaderMode();
+        OverlaySystem::draw_default();
+        BeginShaderMode( shader );
+        {
+          OverlaySystem::draw_borders();
+          SelectionSystem::Draw( Global::texture_cache, true );
+        }
+        EndShaderMode();
 
-          OverlaySystem::draw_settlement_name();
-          break;
-        case MapSystem::Mode::Terrain:
-          // Do nothing
-          break;
-        case MapSystem::Mode::Political:
-          // Draw OpaqueOverlay
+        OverlaySystem::draw_settlement_name();
+        break;
+      case MapSystem::Mode::Terrain:
+        // Do nothing
+        break;
+      case MapSystem::Mode::Political:
+        // Draw OpaqueOverlay
 
-          OverlaySystem::draw_political();
-          BeginShaderMode( shader );
-          {
-            OverlaySystem::draw_borders();
-            SelectionSystem::Draw( Global::texture_cache, true );
-          }
-          OverlaySystem::draw_settlement_name();
-          EndShaderMode();
-          break;
-        case MapSystem::Mode::Resources:
-          // Draw Resources
-          break;
-      }
+        OverlaySystem::draw_political();
+        BeginShaderMode( shader );
+        {
+          OverlaySystem::draw_borders();
+          SelectionSystem::Draw( Global::texture_cache, true );
+        }
+        OverlaySystem::draw_settlement_name();
+        EndShaderMode();
+        break;
+      case MapSystem::Mode::Resources:
+        // Draw Resources
+        break;
+    }
 
 
+    BeginBlendMode( BLEND_ALPHA_PREMULTIPLY );
+    // BeginBlendMode( BLEND_ALPHA );
+    {
       BeginShaderMode( shader );
       {
         switch ( map_mode ) {
