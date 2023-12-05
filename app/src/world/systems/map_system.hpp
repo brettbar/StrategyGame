@@ -46,6 +46,9 @@ namespace MapSystem {
   inline void FilterIslands( NoiseMap &, f32 );
   inline void NormalizeMap( NoiseMap & );
 
+
+  inline void map_pwr_two( NoiseMap & );
+
   inline u32 index( u32 x, u32 y ) {
     if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
       return -1;
@@ -54,13 +57,35 @@ namespace MapSystem {
     return IndexFromCoords( x, y, MAP_WIDTH );
   }
 
+
+  inline void apply_radial_gradient( NoiseMap &noise ) {
+    u32 center_x = MAP_WIDTH / 2;
+    u32 center_y = MAP_HEIGHT / 2;
+
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
+
+      f32 distance_x = ( center_x - coords.x ) * ( center_x - coords.x );
+      f32 distance_y = ( center_y - coords.y ) * ( center_y - coords.y );
+
+      f32 dist_to_center = sqrt( distance_x + distance_y );
+
+      dist_to_center = dist_to_center / MAP_WIDTH;
+
+      noise[i] = noise[i] - dist_to_center;
+    }
+  }
+
   inline void Init() {
     f32 seed = 25;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
 
-    float waterLevel = 0.59;
+    float waterLevel = 0.33;
     //    FilterIslands(pNoise, waterLevel);
     NormalizeMap( pNoise );
+    apply_radial_gradient( pNoise );
+    // map_pwr_two( pNoise );
+
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
@@ -74,9 +99,9 @@ namespace MapSystem {
 
       f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
 
-      if ( noise >= 0.75f )
+      if ( noise >= 0.6f )
         biome = Biome::Mountains;
-      else if ( noise >= 0.7f )
+      else if ( noise >= 0.5f )
         biome = Biome::Hills;
       // else if ( noise >= 0.7f )
       //   biome = Biome::Forest;
@@ -319,6 +344,13 @@ namespace MapSystem {
         }
       }
   }
+
+  inline void map_pwr_two( NoiseMap &noise ) {
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_WIDTH; i++ ) {
+      noise[i] = noise[i] * noise[i];
+    }
+  }
+
 
   inline void NormalizeMap( NoiseMap &pNoise ) {
     float min = std::numeric_limits<float>::max();

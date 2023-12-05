@@ -68,6 +68,11 @@ inline void PrintVec2( Vector2 vec ) {
 inline u32 RollN( u32 n ) {
   return rand() % n + 1;
 }
+inline f32 random_f32( f32 min, f32 max ) {
+  f32 randomf32 = ( (f32) rand() / (f32) RAND_MAX );
+  f32 result = min + ( randomf32 * ( max - min ) );
+  return result;
+}
 
 inline void PrintRect( Rectangle rect ) {
   printf(
