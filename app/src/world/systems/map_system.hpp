@@ -23,6 +23,7 @@
 #include <string>
 
 namespace MapSystem {
+  inline const f32 WATER_LEVEL = 0.4;
 
   enum class Mode {
     Default,
@@ -32,7 +33,6 @@ namespace MapSystem {
   };
 
   inline Mode mode = Mode::Default;
-
 
   using NoiseMap = std::array<f32, MAP_WIDTH * MAP_HEIGHT>;
   using TileMap = std::array<sptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
@@ -76,16 +76,40 @@ namespace MapSystem {
     }
   }
 
+  inline Biome determine_biome( f32 elevation ) {
+
+    if ( elevation >= 0.6f )
+      return Biome::Mountains;
+    else if ( elevation >= 0.5f )
+      return Biome::Hills;
+    // else if ( noise >= 0.7f )
+    //   biome = Biome::Forest;
+    else if ( elevation >= WATER_LEVEL )
+      return Biome::Plains;
+    else
+      return Biome::Sea;
+  }
+
+  inline void gen_island( NoiseMap &noise, u32 width, u32 height ) {
+    // f32 accum = 0;
+    // for ( const f32 n: pNoise ) {
+    //   accum += n;
+    //   printf( "%f ", n );
+    // }
+    // printf( "\n" );
+
+    // printf( "Average: %f\n", accum / pNoise.size() );
+    apply_radial_gradient( noise );
+  }
+
   inline void Init() {
-    f32 seed = 25;
+    u32 seed = 25;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
 
-    float waterLevel = 0.33;
-    //    FilterIslands(pNoise, waterLevel);
-    NormalizeMap( pNoise );
-    apply_radial_gradient( pNoise );
-    // map_pwr_two( pNoise );
+    gen_island( pNoise, MAP_WIDTH, MAP_HEIGHT );
+    f32 waterLevel = 0.4;
 
+    //    FilterIslands(pNoise, waterLevel);
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
@@ -95,20 +119,10 @@ namespace MapSystem {
       f32 yPos = y * ( TILE_HEIGHT * 0.75 );
 
       Vector2 position;
-      Biome biome;
 
       f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
 
-      if ( noise >= 0.6f )
-        biome = Biome::Mountains;
-      else if ( noise >= 0.5f )
-        biome = Biome::Hills;
-      // else if ( noise >= 0.7f )
-      //   biome = Biome::Forest;
-      else if ( noise >= waterLevel )
-        biome = Biome::Plains;
-      else
-        biome = Biome::Sea;
+      Biome biome = determine_biome( noise );
 
       if ( y % 2 == 1 )
         position = { xPos + ( TILE_WIDTH / 2 ), yPos };
@@ -229,7 +243,12 @@ namespace MapSystem {
 
   // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  inline NoiseMap GeneratePerlinNoise( float seed, int nOctaves, float fBias ) {
+  inline NoiseMap GeneratePerlinNoise(
+    float seed,
+    int nOctaves,
+    float
+      scaling_bias// the lower the scaling bias, the more the higher octaves dominate
+  ) {
     srand( seed );
     //    srand(time(NULL));
 
@@ -257,7 +276,9 @@ namespace MapSystem {
           // The distance between these sample points, is called pitch.
 
           // Each time we go up an octave, we halve the pitch.
-          // If we know our dimensions are always a power of 2, they can be halved quite easily
+          // @volatile
+          // If we know our dimensions are always a power of 2
+          // they can be halved quite easily
           // Divides width by 2 o times
           int nPitch = MAP_WIDTH >> o;
 
@@ -301,12 +322,14 @@ namespace MapSystem {
 
           fScaleAcc += fScale;
           fNoise += ( fBlendY * ( fSampleB - fSampleT ) + fSampleT ) * fScale;
-          fScale = fScale / fBias;
+          fScale = fScale / scaling_bias;
         }
 
         // set the normalized perlin noise to the element in the output array
         fOutput[y * MAP_WIDTH + x] = ( fNoise / fScaleAcc );
       }
+
+    NormalizeMap( fOutput );
     return fOutput;
   }
 
@@ -345,6 +368,7 @@ namespace MapSystem {
       }
   }
 
+  // @unused
   inline void map_pwr_two( NoiseMap &noise ) {
     for ( u32 i = 0; i < MAP_WIDTH * MAP_WIDTH; i++ ) {
       noise[i] = noise[i] * noise[i];
