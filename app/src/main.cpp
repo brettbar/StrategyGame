@@ -321,8 +321,6 @@ void LoadAssets() {
 
   std::string path = asset_folder + "/images/resources";
   for ( const auto &entry: fs::directory_iterator( path ) ) {
-    std::cout << entry.path().filename() << std::endl;
-
     std::string filename = entry.path().filename().generic_string();
 
     std::cout << filename << '\n';

@@ -3,6 +3,7 @@
 #include "../../shared/textures.hpp"
 #include "../components/selected.hpp"
 #include "map_system.hpp"
+#include "resource_system.hpp"
 
 namespace ProvinceSystem {
 
@@ -17,6 +18,9 @@ namespace ProvinceSystem {
         .tile = MapSystem::tile_map[i],
         .resources = {},
       };
+
+      ResourceSystem::SpawnResource( prov );
+
 
       // switch ( prov.tile->biome )
       // {

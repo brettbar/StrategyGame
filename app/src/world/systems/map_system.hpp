@@ -80,7 +80,7 @@ namespace MapSystem {
 
     if ( elevation >= 0.6f )
       return Biome::Mountains;
-    else if ( elevation >= 0.5f )
+    else if ( elevation >= 0.55f )
       return Biome::Hills;
     // else if ( noise >= 0.7f )
     //   biome = Biome::Forest;

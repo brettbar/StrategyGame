@@ -101,6 +101,7 @@ namespace Renderer {
         break;
       case MapSystem::Mode::Resources:
         // Draw Resources
+        ResourceSystem::Draw( Global::state.camera );
         break;
     }
 

@@ -10,8 +10,8 @@ namespace Province {
   struct Component {
     bool selected = false;
 
-    std::shared_ptr<Tile::Component> tile;
-    std::vector<Resources::Natural> resources;
+    sptr<Tile::Component> tile;
+    list<Resources::Natural> resources;
 
     template<class Archive>
     void serialize( Archive &ar ) {
