@@ -12,18 +12,11 @@
 #include "../components/settlement.hpp"
 #include "../components/sight.hpp"
 
-// #include "../../common.hpp"
-// #include "../../components/sight.hpp"
-// #include "../../components/tile.hpp"
-// #include "../../components/actor.hpp"
-// #include "../../global.hpp"
-// #include "../../renderer/textures.hpp"
-
 #include <chrono>
 #include <string>
 
 namespace MapSystem {
-  inline const f32 WATER_LEVEL = 0.4;
+  inline const f32 WATER_LEVEL = 0.35;
 
   enum class Mode {
     Default,
@@ -58,26 +51,42 @@ namespace MapSystem {
   }
 
 
-  inline void apply_radial_gradient( NoiseMap &noise ) {
-    u32 center_x = MAP_WIDTH / 2;
-    u32 center_y = MAP_HEIGHT / 2;
+  inline void apply_radial_gradient(
+    NoiseMap &noise,
+    u32 start_x,
+    u32 end_x,
+    u32 start_y,
+    u32 end_y
+  ) {
+    u32 width = ( end_x ) - ( start_x ) + 1;
+    u32 height = ( end_y ) - ( start_y ) + 1;
+
+    u32 center_x = start_x + width / 2;
+    u32 center_y = start_y + height / 2;
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
+
+      if (
+        coords.x < start_x || 
+        coords.x > end_x   || 
+        coords.y < start_y || 
+        coords.y > end_y
+      )
+        continue;
 
       f32 distance_x = ( center_x - coords.x ) * ( center_x - coords.x );
       f32 distance_y = ( center_y - coords.y ) * ( center_y - coords.y );
 
       f32 dist_to_center = sqrt( distance_x + distance_y );
 
-      dist_to_center = dist_to_center / MAP_WIDTH;
+      dist_to_center = dist_to_center / width;
 
       noise[i] = noise[i] - dist_to_center;
     }
   }
 
   inline Biome determine_biome( f32 elevation ) {
-
     if ( elevation >= 0.6f )
       return Biome::Mountains;
     else if ( elevation >= 0.55f )
@@ -90,25 +99,16 @@ namespace MapSystem {
       return Biome::Sea;
   }
 
-  inline void gen_island( NoiseMap &noise, u32 width, u32 height ) {
-    // f32 accum = 0;
-    // for ( const f32 n: pNoise ) {
-    //   accum += n;
-    //   printf( "%f ", n );
-    // }
-    // printf( "\n" );
-
-    // printf( "Average: %f\n", accum / pNoise.size() );
-    apply_radial_gradient( noise );
+  inline void gen_islands( NoiseMap &noise ) {
+    apply_radial_gradient( noise, 0, 63, 0, 127 );
+    apply_radial_gradient( noise, 64, 127, 0, 127 );
   }
 
   inline void Init() {
-    u32 seed = 25;
+    u32 seed = 132;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
 
-    gen_island( pNoise, MAP_WIDTH, MAP_HEIGHT );
-    f32 waterLevel = 0.4;
-
+    gen_islands( pNoise );
     //    FilterIslands(pNoise, waterLevel);
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
