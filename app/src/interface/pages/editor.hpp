@@ -7,11 +7,13 @@ namespace UI {
   enum class Action_EditorMode {
     None,
     Tiles,
+    GenerateMap,
   };
 
   inline Action_EditorMode EditorModePanel( Iron::IForge *, Iron::Element * );
+  inline bool EditorMapGenerator( Iron::IForge *, Iron::Element * );
 
-  inline void Editor() {
+  inline bool Editor( f32 waterLvl ) {
     auto f = Iron::Forge();
 
     auto root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
@@ -19,11 +21,23 @@ namespace UI {
 
     auto action = EditorModePanel( f, root_g );
 
-    {
-      auto grid = f->Grid( root_g->Slot( 7 ), 1, 1 );
-      f->TextLabel( grid->Slot( 0 ), "Foo", RED );
-    }
+    // {
+    //   auto grid = f->Grid( root_g->Slot( 7 ), 1, 1 );
+    //   f->TextLabel( grid->Slot( 0 ), "Foo", RED );
+    // }
+    auto grid = f->Grid( root_g->Slot( 7 ), 2, 6 );
+    f->TextLabel( grid->Slot( 0 ), "Map Generator", ORANGE );
+
+    f->TextLabel( grid->Slot( 2 ), "waterLvl", GRAY );
+    f->TextInput( grid->Slot( 3 ), std::to_string( waterLvl ).c_str(), BLUE );
+    f->TextLabel( grid->Slot( 4 ), "seed", GRAY );
+    f->TextLabel( grid->Slot( 6 ), "octaves", GRAY );
+    f->TextLabel( grid->Slot( 8 ), "bias", GRAY );
+
+    bool generate = f->TextButton( grid->Slot( 10 ), "generate", GREEN );
+    return generate;
   }
+
 
   inline Action_EditorMode EditorModePanel(
     Iron::IForge *f,

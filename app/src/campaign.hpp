@@ -17,9 +17,11 @@
 #include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
+#include "interface/pages/editor.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 #include "network/network.hpp"
+#include "shared/global.hpp"
 #include "shared/save.hpp"
 
 #include "shared/common.hpp"
@@ -243,7 +245,6 @@ inline void Campaign::Draw() {
 // }
 
 inline void Campaign::CheckForUIInteractions() {
-
   auto change_map_mode = UI::MapModeMenu();
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:

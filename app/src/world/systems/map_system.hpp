@@ -16,7 +16,7 @@
 #include <string>
 
 namespace MapSystem {
-  inline const f32 WATER_LEVEL = 0.3;
+  inline f32 waterLevel = 0.3;
 
   enum class Mode {
     Default,
@@ -89,7 +89,7 @@ namespace MapSystem {
       return Biome::Hills;
     // else if ( noise >= 0.7f )
     //   biome = Biome::Forest;
-    else if ( elevation >= WATER_LEVEL )
+    else if ( elevation >= waterLevel )
       return Biome::Plains;
     else
       return Biome::Sea;
@@ -115,6 +115,7 @@ namespace MapSystem {
   inline void Init() {
     u32 seed = 132;
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
+    // NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 0.8f );
 
     gen_islands( pNoise );
     //    FilterIslands(pNoise, waterLevel);

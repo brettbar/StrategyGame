@@ -166,6 +166,17 @@ public:
       return e;
     }
 
+    Element *TextInput( rect t, str txt, Color c ) {
+      auto e = new Element();
+      e->type = Type::TextInput;
+      e->id = queue.size();
+      e->background = c;
+      e->transform = t;
+      e->t.text_input = new ITextInput( txt );
+      queue.push_back( e );
+      return e;
+    }
+
     Element *Tabs( list<bool> tabs_clicked ) {
       auto e = new Element();
       e->type = Type::Tabs;

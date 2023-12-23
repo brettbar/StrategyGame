@@ -440,6 +440,10 @@ class IGame {
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
         }
 
+        if ( UI::Editor( MapSystem::waterLevel ) ) {
+          MapSystem::Init();
+        }
+
         // 6. Draw everything
         BeginDrawing();
         {

@@ -10,6 +10,7 @@ namespace Iron {
   enum class Type {
     Grid,
     Text,
+    TextInput,
     Texture,
     Tabs,
   };
@@ -31,6 +32,13 @@ namespace Iron {
     str text;
     IText() = delete;
     IText( str t ) : text( t ) {}
+  };
+
+  struct ITextInput {
+    str text;
+    bool editing;
+    ITextInput() = delete;
+    ITextInput( str t ) : text( t ), editing( false ) {}
   };
 
   struct ITexture {
@@ -55,6 +63,7 @@ namespace Iron {
     union {
       IGrid *grid;
       IText *text;
+      ITextInput *text_input;
       ITexture *texture;
       ITabs *tabs;
     } t;
@@ -97,6 +106,10 @@ namespace Iron {
           // }
         } break;
         case Type::Text: {
+          DrawRectangleRec( transform, background );
+          DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
+        } break;
+        case Type::TextInput: {
           DrawRectangleRec( transform, background );
           DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
         } break;
