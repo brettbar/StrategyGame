@@ -16,7 +16,7 @@
 #include <string>
 
 namespace MapSystem {
-  inline const f32 WATER_LEVEL = 0.35;
+  inline const f32 WATER_LEVEL = 0.3;
 
   enum class Mode {
     Default,
@@ -51,45 +51,41 @@ namespace MapSystem {
   }
 
 
-  inline void apply_radial_gradient(
-    NoiseMap &noise,
-    u32 start_x,
-    u32 end_x,
-    u32 start_y,
-    u32 end_y
-  ) {
-    u32 width = ( end_x ) - ( start_x ) + 1;
-    u32 height = ( end_y ) - ( start_y ) + 1;
-
-    u32 center_x = start_x + width / 2;
-    u32 center_y = start_y + height / 2;
+  inline void apply_radial_gradient( NoiseMap &noise, urect dims ) {
+    u32 width = dims.width();
+    u32 height = dims.height();
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
 
       if (
-        coords.x < start_x || 
-        coords.x > end_x   || 
-        coords.y < start_y || 
-        coords.y > end_y
+        coords.x < dims.x || 
+        coords.x > dims.z || 
+        coords.y < dims.y || 
+        coords.y > dims.w
       )
         continue;
 
-      f32 distance_x = ( center_x - coords.x ) * ( center_x - coords.x );
-      f32 distance_y = ( center_y - coords.y ) * ( center_y - coords.y );
+      vec2u center = dims.center();
 
+      f32 distance_x = ( center.x - coords.x ) * ( center.x - coords.x );
+      f32 distance_y = ( center.y - coords.y ) * ( center.y - coords.y );
       f32 dist_to_center = sqrt( distance_x + distance_y );
 
-      dist_to_center = dist_to_center / width;
+
+      // extends how far out the radial is applied, lower means longer
+      f32 scaling_factor = 0.8;
+
+      dist_to_center = ( dist_to_center / width ) * scaling_factor;
 
       noise[i] = noise[i] - dist_to_center;
     }
   }
 
   inline Biome determine_biome( f32 elevation ) {
-    if ( elevation >= 0.6f )
+    if ( elevation >= 0.7f )
       return Biome::Mountains;
-    else if ( elevation >= 0.55f )
+    else if ( elevation >= 0.50f )
       return Biome::Hills;
     // else if ( noise >= 0.7f )
     //   biome = Biome::Forest;
@@ -100,8 +96,20 @@ namespace MapSystem {
   }
 
   inline void gen_islands( NoiseMap &noise ) {
-    apply_radial_gradient( noise, 0, 63, 0, 127 );
-    apply_radial_gradient( noise, 64, 127, 0, 127 );
+
+    // @todo this is likely wrong and has off-by-ones
+    urect top_left = { 0, 0, 63, 63 };
+    urect top_right = { 64, 0, 127, 63 };
+    urect bottom_left = { 0, 64, 63, 127 };
+    urect bottom_right = { 64, 64, 127, 127 };
+
+    apply_radial_gradient( noise, top_left );
+
+    apply_radial_gradient( noise, top_right );
+
+    apply_radial_gradient( noise, bottom_left );
+
+    apply_radial_gradient( noise, bottom_right );
   }
 
   inline void Init() {
@@ -333,33 +341,33 @@ namespace MapSystem {
     return fOutput;
   }
 
-  inline void FilterIslands( NoiseMap &noiseMap, f32 waterLevel ) {
+  inline void FilterIslands( NoiseMap &noiseMap, f32 water_lvl ) {
     for ( int x = 1; x < MAP_WIDTH - 1; x++ )
       for ( int y = 1; y < MAP_HEIGHT - 1; y++ ) {
         u32 numWater = 0;
 
         float NE = noiseMap.at( index( x, y - 1 ) );
-        if ( NE < waterLevel )
+        if ( NE < water_lvl )
           numWater++;
 
         float E = noiseMap.at( index( x + 1, y ) );
-        if ( E < waterLevel )
+        if ( E < water_lvl )
           numWater++;
 
         float SE = noiseMap.at( index( x, y + 1 ) );
-        if ( SE < waterLevel )
+        if ( SE < water_lvl )
           numWater++;
 
         float SW = noiseMap.at( index( x - 1, y + 1 ) );
-        if ( SW < waterLevel )
+        if ( SW < water_lvl )
           numWater++;
 
         float W = noiseMap.at( index( x - 1, y ) );
-        if ( W < waterLevel )
+        if ( W < water_lvl )
           numWater++;
 
         float NW = noiseMap.at( index( x - 1, y - 1 ) );
-        if ( NW < waterLevel )
+        if ( NW < water_lvl )
           numWater++;
 
         if ( numWater >= 5 ) {

@@ -21,6 +21,36 @@ using str = std::string;
 using hstr = entt::hashed_string;
 using vec2f = Vector2;
 using rect = Rectangle;
+struct vec2i {
+  i32 x;
+  i32 y;
+};
+
+struct vec2u {
+  u32 x;
+  u32 y;
+};
+struct urect {
+  u32 x;
+  u32 y;
+  u32 z;
+  u32 w;
+
+  u32 width() {
+    return ( z - x ) + 1;
+  }
+
+  u32 height() {
+    return ( w - y ) + 1;
+  }
+
+  vec2u center() {
+    return {
+      x + width() / 2,
+      y + height() / 2,
+    };
+  }
+};
 
 template<typename K, typename V>
 using map = std::map<K, V>;
@@ -41,15 +71,6 @@ template<typename... T>
 using view =
   entt::basic_view<entt::get_t<entt::storage_for_t<T>...>, entt::exclude_t<>>;
 
-struct vec2i {
-  i32 x;
-  i32 y;
-};
-
-struct vec2u {
-  u32 x;
-  u32 y;
-};
 
 const f32 TILE_WIDTH = 64;
 const f32 TILE_HEIGHT = 64;
