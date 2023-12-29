@@ -68,19 +68,19 @@ public:
       queue.clear();
     }
 
-    void DrawDebug() {
-      {
-        DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
-        DrawFPS( GetScreenWidth() - 100, 2 );
-      }
+    // void DrawDebug() {
+    //   {
+    //     DrawRectangle( GetScreenWidth() - 120, 2, 100, 24.0f, BLACK );
+    //     DrawFPS( GetScreenWidth() - 100, 2 );
+    //   }
 
-      {
-        DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
-        str foo = "h: " + std::to_string( context.hot ) +
-                  ", a: " + std::to_string( context.active );
-        DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
-      }
-    }
+    //   {
+    //     DrawRectangle( GetScreenWidth() - 120, 0, 120, 50, BLACK );
+    //     str foo = "h: " + std::to_string( context.hot ) +
+    //               ", a: " + std::to_string( context.active );
+    //     DrawText( foo.c_str(), GetScreenWidth() - 120, 0, 24.0f, RED );
+    //   }
+    // }
 
     bool MouseIsOverUI() {
       return context.hot != -1 || context.active != -1 || over_any_elem;

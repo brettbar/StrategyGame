@@ -199,6 +199,39 @@ namespace Iron {
       };
     }
 
+
+    rect ColsByRows( u32 start_col, u32 end_col, u32 start_row, u32 end_row ) {
+
+      assert(
+        type == Type::Grid && t.grid != nullptr && start_row <= end_row &&
+        start_col <= end_col
+      );
+
+      // @volatile
+      u32 slot_width = transform.width / t.grid->cols;
+      u32 slot_height = transform.height / t.grid->rows;
+      u32 width = 0;
+      u32 height = 0;
+
+      for ( u32 i = start_col; i < end_col; i++ ) {
+        rect col = Col( i );
+        width += col.width;
+      }
+
+
+      for ( u32 i = start_row; i < end_row; i++ ) {
+        rect row = Row( i );
+        height += row.height;
+      }
+
+      return rect{
+        transform.x + (f32) ( start_col * slot_width ),
+        transform.y + (f32) ( start_row * slot_height ),
+        (f32) width,
+        (f32) height,
+      };
+    }
+
     rect Slot( u32 i ) {
       assert( type == Type::Grid && t.grid != nullptr );
 

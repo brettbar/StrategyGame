@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interface/irongui/forge.hpp"
+#include "interface/pages/editor.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
@@ -370,7 +371,7 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          Iron::Forge()->DrawDebug();
+          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -390,7 +391,7 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          Iron::Forge()->DrawDebug();
+          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -409,7 +410,7 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          Iron::Forge()->DrawDebug();
+          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -427,6 +428,7 @@ class IGame {
         EndDrawing();
       } break;
 
+      case Scene::Editor:
       case Scene::Campaign: {
         CheckMenuToggle();
 
@@ -440,8 +442,23 @@ class IGame {
             _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
         }
 
-        if ( UI::Editor( MapSystem::waterLevel ) ) {
-          MapSystem::Init();
+        if ( IsKeyPressed( KEY_GRAVE ) ) {
+          if ( _mode == Scene::Editor ) {
+            _mode = Scene::Campaign;
+          } else {
+            _mode = Scene::Editor;
+          }
+        }
+
+        if ( _mode == Scene::Editor ) {
+          auto editor_action = UI::Editor( MapSystem::waterLevel );
+          switch ( editor_action ) {
+            case UI::ActionEditorMode::None:
+              break;
+            case UI::ActionEditorMode::GenerateMap:
+              MapSystem::Init();
+              break;
+          }
         }
 
         // 6. Draw everything
@@ -449,13 +466,10 @@ class IGame {
         {
           _campaign->Draw();
           Iron::Forge()->DrawAll();
-          Iron::Forge()->DrawDebug();
+          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
-
-      case Scene::Editor:
-        break;
     }
 
     if ( !Iron::Forge()->over_any_elem ) {
