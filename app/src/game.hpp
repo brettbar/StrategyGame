@@ -452,8 +452,7 @@ class IGame {
 
         if ( _mode == Scene::Editor ) {
 
-          auto editor_action =
-            UI::Editor::Instance()->Panel( MapSystem::waterLevel );
+          auto editor_action = UI::Editor::Instance()->panel();
 
           switch ( editor_action ) {
             case UI::Editor::Action::None:
