@@ -452,12 +452,12 @@ class IGame {
 
         if ( _mode == Scene::Editor ) {
 
-          auto editor_action = UI::Editor::Instance()->panel();
+          auto editor_action = UI::panel();
 
           switch ( editor_action ) {
-            case UI::Editor::Action::None:
+            case UI::EditorAction::None:
               break;
-            case UI::Editor::Action::GenerateMap:
+            case UI::EditorAction::GenerateMap:
               MapSystem::Init();
               break;
           }

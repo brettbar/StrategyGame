@@ -18,6 +18,8 @@ private:
       struct {
         u32 index;
       } tab_state;
+
+      // editing?
     };
 
     map<u32, State> ui_state = {};

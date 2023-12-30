@@ -107,11 +107,33 @@ namespace Iron {
         } break;
         case Type::Text: {
           DrawRectangleRec( transform, background );
-          DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
+          // DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
+
+          Font romulus = Global::font_cache[hstr{ "font_romulus" }]->font;
+          DrawTextPro(
+            romulus,
+            t.text->text.c_str(),
+            vec2f{ transform.x, transform.y },
+            vec2f{ 0, 0 },
+            0,
+            28,
+            2,
+            WHITE
+          );
         } break;
         case Type::TextInput: {
           DrawRectangleRec( transform, background );
-          DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
+          Font romulus = Global::font_cache[hstr{ "font_romulus" }]->font;
+          DrawTextPro(
+            romulus,
+            t.text->text.c_str(),
+            vec2f{ transform.x, transform.y },
+            vec2f{ 0, 0 },
+            0,
+            28,
+            2,
+            BLACK
+          );
         } break;
         case Type::Texture:
           auto resource = Global::texture_cache[t.texture->texture_id].handle();
