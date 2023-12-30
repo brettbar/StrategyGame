@@ -451,11 +451,14 @@ class IGame {
         }
 
         if ( _mode == Scene::Editor ) {
-          auto editor_action = UI::Editor( MapSystem::waterLevel );
+
+          auto editor_action =
+            UI::Editor::Instance()->Panel( MapSystem::waterLevel );
+
           switch ( editor_action ) {
-            case UI::ActionEditorMode::None:
+            case UI::Editor::Action::None:
               break;
-            case UI::ActionEditorMode::GenerateMap:
+            case UI::Editor::Action::GenerateMap:
               MapSystem::Init();
               break;
           }

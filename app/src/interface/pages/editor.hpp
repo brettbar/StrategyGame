@@ -5,67 +5,114 @@
 
 namespace UI {
 
-  enum class ActionEditorMode {
-    None,
-    GenerateMap,
-    ModeTiles,
-    ModeUI,
-  };
+  struct Editor {
+    Editor() {}
+    ~Editor() {}
 
-  inline void top_bar( Iron::Element * );
-  inline ActionEditorMode EditorModePanel( Iron::Element * );
-  inline bool EditorMapGenerator( Iron::IForge *, Iron::Element * );
-  inline bool map_gen( Iron::Element *, f32 );
-
-  inline ActionEditorMode Editor( f32 waterLvl ) {
-    auto f = Iron::Forge();
-
-    auto root_g = f->Grid(
-      rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() }, 3, 3
-    );
-
-    auto editor_g = f->Grid( root_g->Slot( 2 ), 4, 4, Color{ 0, 0, 0, 155 } );
+    Editor( Editor const & ) = delete;
+    void operator=( const Editor & ) = delete;
 
 
-    top_bar( editor_g );
-
-    if ( EditorModePanel( editor_g ) != ActionEditorMode::None ) {
-      // change mode
+    static Editor *Instance() {
+      static Editor instance;
+      return &instance;
     }
 
-    // if ( map_gen( editor_g, waterLvl ) ) {
-    //   return ActionEditorMode::GenerateMap;
-    // }
+    enum class Mode {
+      UI,
+      Tiles,
+    };
+
+    str mode_str( Mode mode ) {
+      switch ( mode ) {
+        case Mode::UI:
+          return "UI";
+        case Mode::Tiles:
+          return "Tiles";
+      }
+    }
+
+    enum class Action {
+      None,
+      GenerateMap,
+    };
+
+    Mode _mode = Mode::UI;
 
 
-    return ActionEditorMode::None;
-  }
+    Action Panel( f32 waterLvl ) {
+      auto f = Iron::Forge();
 
-  inline void top_bar( Iron::Element *editor_g ) {
-    auto f = Iron::Forge();
+      auto root_g = f->Grid(
+        rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() }, 3, 3
+      );
 
-    auto bar_g = f->Grid( editor_g->Row( 0 ), 3, 1, BLACK );
+      auto editor_g = f->Grid( root_g->Slot( 2 ), 4, 4, Color{ 0, 0, 0, 155 } );
 
-    f->TextLabel( bar_g->Slot( 0 ), "MODE: ", GREEN );
-    f->TextLabel( bar_g->Slot( 1 ), "EDITOR", YELLOW );
-    f->TextLabel(
-      bar_g->Slot( 2 ), std::to_string( GetFPS() ) + " fps", BLACK
-    );
-  }
 
-  inline ActionEditorMode EditorModePanel( Iron::Element *editor_g ) {
-    auto f = Iron::Forge();
+      top_bar( editor_g );
 
-    auto mode_g = f->Grid( editor_g->ColsByRows( 0, 1, 1, 3 ), 1, 4 );
+      mode_panel( editor_g );
 
-    if ( f->TextButton( mode_g->Slot( 0 ), "Tiles", BLUE ) )
-      return ActionEditorMode::ModeTiles;
+      switch ( _mode ) {
+        case Mode::UI:
+          break;
+        case Mode::Tiles:
+          if ( map_gen( root_g, waterLvl ) ) {
+            return Action::GenerateMap;
+          }
+          break;
+      }
 
-    if ( f->TextButton( mode_g->Slot( 1 ), "UI", YELLOW ) )
-      return ActionEditorMode::ModeTiles;
 
-    return ActionEditorMode::None;
-  }
+      return Action::None;
+    }
+
+    void top_bar( Iron::Element *editor_g ) {
+      auto f = Iron::Forge();
+
+      auto bar_g = f->Grid( editor_g->Row( 0 ), 3, 1, BLACK );
+
+
+      f->TextLabel( bar_g->Slot( 0 ), "MODE: " + mode_str( _mode ), GREEN );
+      f->TextLabel( bar_g->Slot( 1 ), "EDITOR", YELLOW );
+      f->TextLabel(
+        bar_g->Slot( 2 ), std::to_string( GetFPS() ) + " fps", BLACK
+      );
+    }
+
+    void mode_panel( Iron::Element *editor_g ) {
+      auto f = Iron::Forge();
+
+      auto mode_g = f->Grid( editor_g->ColsByRows( 0, 1, 1, 3 ), 1, 4 );
+
+      if ( f->TextButton( mode_g->Slot( 0 ), "UI", YELLOW ) ) {
+        _mode = Mode::UI;
+      }
+
+      if ( f->TextButton( mode_g->Slot( 1 ), "Tiles", BLUE ) ) {
+        _mode = Mode::Tiles;
+        return;
+      }
+    }
+
+    bool map_gen( Iron::Element *root_g, f32 waterLvl ) {
+      auto f = Iron::Forge();
+      auto editor_g = f->Grid( root_g->Slot( 7 ), 2, 6 );
+      f->TextLabel( editor_g->Slot( 0 ), "Map Generator", ORANGE );
+
+      f->TextLabel( editor_g->Slot( 2 ), "waterLvl", GRAY );
+      f->TextInput(
+        editor_g->Slot( 3 ), std::to_string( waterLvl ).c_str(), BLUE
+      );
+      f->TextLabel( editor_g->Slot( 4 ), "seed", GRAY );
+      f->TextLabel( editor_g->Slot( 6 ), "octaves", GRAY );
+      f->TextLabel( editor_g->Slot( 8 ), "bias", GRAY );
+
+      return f->TextButton( editor_g->Slot( 10 ), "generate", GREEN );
+    }
+  };
+
 
   // inline void DebugInfo( Iron::Element *editor_g ) {
   //   auto f = Iron::Forge();
@@ -78,20 +125,5 @@ namespace UI {
   //   );
   // }
 
-  inline bool map_gen( Iron::Element *root_g, f32 waterLvl ) {
-    auto f = Iron::Forge();
-    auto editor_g = f->Grid( root_g->Slot( 7 ), 2, 6 );
-    f->TextLabel( editor_g->Slot( 0 ), "Map Generator", ORANGE );
-
-    f->TextLabel( editor_g->Slot( 2 ), "waterLvl", GRAY );
-    f->TextInput(
-      editor_g->Slot( 3 ), std::to_string( waterLvl ).c_str(), BLUE
-    );
-    f->TextLabel( editor_g->Slot( 4 ), "seed", GRAY );
-    f->TextLabel( editor_g->Slot( 6 ), "octaves", GRAY );
-    f->TextLabel( editor_g->Slot( 8 ), "bias", GRAY );
-
-    return f->TextButton( editor_g->Slot( 10 ), "generate", GREEN );
-  }
 
 };// namespace UI

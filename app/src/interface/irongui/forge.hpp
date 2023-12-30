@@ -13,6 +13,7 @@ private:
       i32 active = -1;
     };
 
+    // @todo migrate to state singleton?
     union State {
       struct {
         u32 index;
