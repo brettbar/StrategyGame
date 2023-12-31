@@ -4,6 +4,7 @@
 
 #include "../../world/systems/map_system.hpp"
 #include "../../world/systems/selection_system.hpp"
+#include <corecrt_math.h>
 #include <raylib.h>
 
 namespace UI {
@@ -90,7 +91,7 @@ namespace UI {
 
   /*==========================================================================
                                      PANELS
-      ========================================================================*/
+    ========================================================================*/
 
 
   inline bool mapgen_panel( Iron::Element *editor_g ) {
@@ -102,9 +103,20 @@ namespace UI {
     f->TextLabel( map_g->Row( 0 ), "Map Generator", ORANGE );
 
     f->TextLabel( map_g->Slot( 2 ), "waterLvl", GRAY );
-    f->TextInput(
-      map_g->Slot( 3 ), std::to_string( MapSystem::waterLevel ).c_str(), WHITE
+
+
+    str *new_water_lvl = f->TextInput(
+      map_g->Slot( 3 ),
+      std::to_string( MapSystem::Manager()->waterLevel ).c_str(),
+      WHITE
     );
+
+    if ( new_water_lvl ) {
+      MapSystem::Manager()->waterLevel =
+        (f32) atof( ( *new_water_lvl ).c_str() );
+    }
+
+
     f->TextLabel( map_g->Slot( 4 ), "seed", GRAY );
     f->TextLabel( map_g->Slot( 6 ), "octaves", GRAY );
     f->TextLabel( map_g->Slot( 8 ), "bias", GRAY );

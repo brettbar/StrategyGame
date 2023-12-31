@@ -35,10 +35,25 @@ namespace Iron {
   };
 
   struct ITextInput {
-    str text;
+    enum class InputType {
+      Both,
+      Textual,
+      Numeric,
+    };
+
+    str saved_text;
+    str edit_text;
     bool editing;
+    InputType input_type;
+
     ITextInput() = delete;
-    ITextInput( str t ) : text( t ), editing( false ) {}
+    ITextInput( str txt, InputType type = InputType::Both )
+        : saved_text( txt ), edit_text( txt ), editing( false ),
+          input_type( type ) {}
+
+    static bool is_valid_input_key( int key ) {
+      return ( key >= 32 ) && ( key <= 126 );
+    }
   };
 
   struct ITexture {
@@ -124,16 +139,31 @@ namespace Iron {
         case Type::TextInput: {
           DrawRectangleRec( transform, background );
           Font romulus = Global::font_cache[hstr{ "font_romulus" }]->font;
-          DrawTextPro(
-            romulus,
-            t.text->text.c_str(),
-            vec2f{ transform.x, transform.y },
-            vec2f{ 0, 0 },
-            0,
-            28,
-            2,
-            BLACK
-          );
+
+          if ( t.text_input->editing ) {
+            DrawTextPro(
+              romulus,
+              ( t.text_input->edit_text + "_" ).c_str(),
+              vec2f{ transform.x, transform.y },
+              vec2f{ 0, 0 },
+              0,
+              28,
+              2,
+              BLACK
+            );
+
+          } else {
+            DrawTextPro(
+              romulus,
+              t.text_input->saved_text.c_str(),
+              vec2f{ transform.x, transform.y },
+              vec2f{ 0, 0 },
+              0,
+              28,
+              2,
+              BLACK
+            );
+          }
         } break;
         case Type::Texture:
           auto resource = Global::texture_cache[t.texture->texture_id].handle();

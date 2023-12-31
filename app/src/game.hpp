@@ -40,6 +40,15 @@ class IGame {
   void MainLoop() {
     // RegisterEventListeners();
 
+    Global::state.camera = Camera2D{
+      .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
+      .target =
+        { ( Global::state.mapWidth * 64.0f ) / 2,
+          ( Global::state.mapHeight * 64.0f ) / 2 },
+      .rotation = 0,
+      .zoom = 2.0f,
+    };
+
     while ( !WindowShouldClose() && ShouldRun() ) {
       SteamAPI_RunCallbacks();
 
@@ -136,7 +145,7 @@ class IGame {
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new class Campaign( true );
+    _campaign = new struct Campaign( true );
 
     // UI::System::InitCampaignUI();
 
@@ -224,7 +233,7 @@ class IGame {
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new class Campaign( false );
+    _campaign = new struct Campaign( false );
 
     // UI::System::InitCampaignUI();
 
@@ -297,7 +306,7 @@ class IGame {
   void LoadGame() {
     if ( _campaign )
       delete _campaign;
-    _campaign = new class Campaign( "output.dat" );
+    _campaign = new struct Campaign( "output.dat" );
     // UI::System::InitCampaignUI();
 
     Game()->_mode = Scene::Campaign;
@@ -365,6 +374,8 @@ class IGame {
             // TODO probably dont wanna do this so brute force
             CloseWindow();
             break;
+          case UI::Action_MainMenu::None:
+            break;
         }
 
         BeginDrawing();
@@ -385,6 +396,8 @@ class IGame {
             break;
           case UI::Action_SinglePlayerLobby::ExitPressed:
             _mode = Scene::MainMenu;
+            break;
+          case UI::Action_SinglePlayerLobby::None:
             break;
         }
         BeginDrawing();
@@ -420,7 +433,7 @@ class IGame {
 
         BeginDrawing();
         {
-          Renderer::draw_map( MapSystem::mode );
+          Renderer::draw_map( MapSystem::Manager()->mode );
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
@@ -458,7 +471,9 @@ class IGame {
             case UI::EditorAction::None:
               break;
             case UI::EditorAction::GenerateMap:
-              MapSystem::Init();
+              // MapSystem::Init();
+              if ( _campaign )
+                _campaign->Start();
               break;
           }
         }

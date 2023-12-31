@@ -21,6 +21,7 @@ namespace FactionSystem {
   };
 
   inline void Init() {
+    factions = {};
 
     std::filesystem::path cwd = std::filesystem::current_path();
 

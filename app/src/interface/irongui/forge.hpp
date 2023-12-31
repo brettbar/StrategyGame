@@ -2,6 +2,7 @@
 
 #include "../../shared/common.hpp"
 #include "elements.hpp"
+#include <raylib.h>
 
 namespace Iron {
 
@@ -19,7 +20,10 @@ private:
         u32 index;
       } tab_state;
 
-      // editing?
+      struct {
+        bool editing;
+        const char *edit_text;
+      } text_input_state;
     };
 
     map<u32, State> ui_state = {};
@@ -169,17 +173,6 @@ public:
       return e;
     }
 
-    Element *TextInput( rect t, str txt, Color c ) {
-      auto e = new Element();
-      e->type = Type::TextInput;
-      e->id = queue.size();
-      e->background = c;
-      e->transform = t;
-      e->t.text_input = new ITextInput( txt );
-      queue.push_back( e );
-      return e;
-    }
-
     Element *Tabs( list<bool> tabs_clicked ) {
       auto e = new Element();
       e->type = Type::Tabs;
@@ -212,6 +205,81 @@ public:
       return CheckInteract( *e );
     }
 
+
+    str *TextInput( rect t, str txt, Color c ) {
+      auto e = new Element();
+      e->type = Type::TextInput;
+      e->id = queue.size();
+      e->background = c;
+      e->transform = t;
+      e->interactable = true;
+      e->stateful = true;
+      e->t.text_input = new ITextInput( txt );
+
+      str *result = nullptr;
+
+      if ( ui_state.contains( e->id ) ) {
+        e->t.text_input->editing = ui_state[e->id].text_input_state.editing;
+        e->t.text_input->edit_text = ui_state[e->id].text_input_state.edit_text;
+      }
+
+      if ( CheckInteract( *e ) ) {
+        e->t.text_input->editing = true;
+        ui_state[e->id].text_input_state.editing = true;
+      }
+
+      if ( e->t.text_input->editing ) {
+        if ( IsKeyPressed( KEY_ENTER ) ) {
+          //@todo validate input
+          e->t.text_input->saved_text = e->t.text_input->edit_text;
+          e->t.text_input->editing = false;
+          ui_state[e->id].text_input_state.editing = false;
+
+          result = &e->t.text_input->saved_text;
+        }
+
+        if ( IsKeyPressed( KEY_BACKSPACE ) ) {
+          e->t.text_input->edit_text = e->t.text_input->edit_text.substr(
+            0, e->t.text_input->edit_text.size() - 1
+          );
+
+          ui_state[e->id].text_input_state.edit_text =
+            e->t.text_input->edit_text.c_str();
+        } else {
+          int key = GetKeyPressed();
+          switch ( e->t.text_input->input_type ) {
+            case ITextInput::InputType::Numeric:
+              // @todo is input numeric
+              break;
+            case ITextInput::InputType::Textual:
+              //@todo is input strictly textual (like a name)
+              break;
+            case ITextInput::InputType::Both:
+              if ( ITextInput::is_valid_input_key( key ) ) {
+                e->t.text_input->edit_text += key;
+              }
+              break;
+          }
+
+          ui_state[e->id].text_input_state.edit_text =
+            e->t.text_input->edit_text.c_str();
+        }
+      }
+
+      if ( !ui_state.contains( e->id ) ) {
+        ui_state[e->id] = State{
+          .text_input_state = {
+            .editing = e->t.text_input->editing,
+            .edit_text = e->t.text_input->edit_text.c_str(),
+          } };
+      }
+
+
+      queue.push_back( e );
+      return result;
+    }// namespace Iron
+
+
     bool TextureButton( rect t, hstr texture_id, Color c = { 0, 0, 0, 0 } ) {
       auto e = TextureLabel( t, texture_id, c );
       e->interactable = true;
@@ -222,6 +290,4 @@ public:
   inline IForge *Forge() {
     return IForge::ForgeSingleton();
   }
-
-
 };// namespace Iron

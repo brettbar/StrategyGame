@@ -15,107 +15,44 @@
 #include <chrono>
 #include <string>
 
-namespace MapSystem {
-  inline f32 waterLevel = 0.3;
+struct MapSystem {
+  using NoiseMap = std::array<f32, MAP_WIDTH * MAP_HEIGHT>;
+  using TileMap = std::array<sptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
 
+  private:
+  MapSystem() {}
+  ~MapSystem() {}
+  MapSystem( MapSystem const & ) = delete;
+  void operator=( const MapSystem & ) = delete;
+
+  public:
   enum class Mode {
     Default,
     Terrain,
     Political,
     Resources,
   };
+  Mode mode = Mode::Default;
+  f32 waterLevel = 0.3;
+  TileMap tile_map = {};
 
-  inline Mode mode = Mode::Default;
+  static MapSystem *Manager(
 
-  using NoiseMap = std::array<f32, MAP_WIDTH * MAP_HEIGHT>;
-  using TileMap = std::array<sptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
-
-  inline TileMap tile_map = {};
-
-  inline void Init();
-  inline void UpdateFOW();
-  inline u32 index( u32, u32 );
-  inline NoiseMap GeneratePerlinNoise( float, int, float );
-  inline void FilterIslands( NoiseMap &, f32 );
-  inline void NormalizeMap( NoiseMap & );
-
-
-  inline void map_pwr_two( NoiseMap & );
-
-  inline u32 index( u32 x, u32 y ) {
-    if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
-      return -1;
-    }
-
-    return IndexFromCoords( x, y, MAP_WIDTH );
+  ) {
+    static MapSystem instance;
+    return &instance;
   }
 
 
-  inline void apply_radial_gradient( NoiseMap &noise, urect dims ) {
-    u32 width = dims.width();
-    u32 height = dims.height();
-
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-      vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
-
-      if (
-        coords.x < dims.x || 
-        coords.x > dims.z || 
-        coords.y < dims.y || 
-        coords.y > dims.w
-      )
-        continue;
-
-      vec2u center = dims.center();
-
-      f32 distance_x = ( center.x - coords.x ) * ( center.x - coords.x );
-      f32 distance_y = ( center.y - coords.y ) * ( center.y - coords.y );
-      f32 dist_to_center = sqrt( distance_x + distance_y );
-
-
-      // extends how far out the radial is applied, lower means longer
-      f32 scaling_factor = 0.8;
-
-      dist_to_center = ( dist_to_center / width ) * scaling_factor;
-
-      noise[i] = noise[i] - dist_to_center;
-    }
-  }
-
-  inline Biome determine_biome( f32 elevation ) {
-    if ( elevation >= 0.7f )
-      return Biome::Mountains;
-    else if ( elevation >= 0.50f )
-      return Biome::Hills;
-    // else if ( noise >= 0.7f )
-    //   biome = Biome::Forest;
-    else if ( elevation >= waterLevel )
-      return Biome::Plains;
-    else
-      return Biome::Sea;
-  }
-
-  inline void gen_islands( NoiseMap &noise ) {
-
-    // @todo this is likely wrong and has off-by-ones
-    urect top_left = { 0, 0, 63, 63 };
-    urect top_right = { 64, 0, 127, 63 };
-    urect bottom_left = { 0, 64, 63, 127 };
-    urect bottom_right = { 64, 64, 127, 127 };
-
-    apply_radial_gradient( noise, top_left );
-
-    apply_radial_gradient( noise, top_right );
-
-    apply_radial_gradient( noise, bottom_left );
-
-    apply_radial_gradient( noise, bottom_right );
-  }
-
-  inline void Init() {
+  void Init() {
     u32 seed = 132;
+
+    tile_map = {};
+
     NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
     // NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 0.8f );
+
+    std::cout << "MapSystem::Init with wl: " << waterLevel << "\n";
 
     gen_islands( pNoise );
     //    FilterIslands(pNoise, waterLevel);
@@ -156,9 +93,78 @@ namespace MapSystem {
     }
   }
 
-  inline std::array<sptr<Tile::Component>, 6> get_neighbors(
-    Tile::Component tile
-  ) {
+  u32 index( u32 x, u32 y ) {
+    if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
+      return -1;
+    }
+
+    return IndexFromCoords( x, y, MAP_WIDTH );
+  }
+
+
+  void apply_radial_gradient( NoiseMap &noise, urect dims ) {
+    u32 width = dims.width();
+    // u32 height = dims.height();
+
+    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+      vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
+
+      if (
+        coords.x < dims.x || 
+        coords.x > dims.z || 
+        coords.y < dims.y || 
+        coords.y > dims.w
+      )
+        continue;
+
+      vec2u center = dims.center();
+
+      f32 distance_x = ( center.x - coords.x ) * ( center.x - coords.x );
+      f32 distance_y = ( center.y - coords.y ) * ( center.y - coords.y );
+      f32 dist_to_center = sqrt( distance_x + distance_y );
+
+
+      // extends how far out the radial is applied, lower means longer
+      f32 scaling_factor = 0.8;
+
+      dist_to_center = ( dist_to_center / width ) * scaling_factor;
+
+      noise[i] = noise[i] - dist_to_center;
+    }
+  }
+
+  Biome determine_biome( f32 elevation ) {
+    if ( elevation >= 0.7f )
+      return Biome::Mountains;
+    else if ( elevation >= 0.50f )
+      return Biome::Hills;
+    // else if ( noise >= 0.7f )
+    //   biome = Biome::Forest;
+    else if ( elevation >= waterLevel )
+      return Biome::Plains;
+    else
+      return Biome::Sea;
+  }
+
+  void gen_islands( NoiseMap &noise ) {
+
+    // @todo this is likely wrong and has off-by-ones
+    urect top_left = { 0, 0, 63, 63 };
+    urect top_right = { 64, 0, 127, 63 };
+    urect bottom_left = { 0, 64, 63, 127 };
+    urect bottom_right = { 64, 64, 127, 127 };
+
+    apply_radial_gradient( noise, top_left );
+
+    apply_radial_gradient( noise, top_right );
+
+    apply_radial_gradient( noise, bottom_left );
+
+    apply_radial_gradient( noise, bottom_right );
+  }
+
+
+  std::array<sptr<Tile::Component>, 6> get_neighbors( Tile::Component tile ) {
     u32 x = tile.coords.x;
     u32 y = tile.coords.y;
     sptr<Tile::Component> ne_tile = nullptr;
@@ -216,11 +222,11 @@ namespace MapSystem {
   }
 
 
-  inline void UpdateFOW() {
+  void UpdateFOW() {
     auto view = Global::world.view<Actor::Component, Sight::Component>();
 
     for ( auto &entity: view ) {
-      Sight::Component sight = view.get<Sight::Component>( entity );
+      // Sight::Component sight = view.get<Sight::Component>( entity );
       Actor::Component actor = view.get<Actor::Component>( entity );
 
       i32 closestId = DetermineTileIdFromPosition( actor.position );
@@ -252,7 +258,7 @@ namespace MapSystem {
 
   // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  inline NoiseMap GeneratePerlinNoise(
+  NoiseMap GeneratePerlinNoise(
     float seed,
     int nOctaves,
     float
@@ -342,7 +348,7 @@ namespace MapSystem {
     return fOutput;
   }
 
-  inline void FilterIslands( NoiseMap &noiseMap, f32 water_lvl ) {
+  void FilterIslands( NoiseMap &noiseMap, f32 water_lvl ) {
     for ( int x = 1; x < MAP_WIDTH - 1; x++ )
       for ( int y = 1; y < MAP_HEIGHT - 1; y++ ) {
         u32 numWater = 0;
@@ -378,14 +384,14 @@ namespace MapSystem {
   }
 
   // @unused
-  inline void map_pwr_two( NoiseMap &noise ) {
+  void map_pwr_two( NoiseMap &noise ) {
     for ( u32 i = 0; i < MAP_WIDTH * MAP_WIDTH; i++ ) {
       noise[i] = noise[i] * noise[i];
     }
   }
 
 
-  inline void NormalizeMap( NoiseMap &pNoise ) {
+  void NormalizeMap( NoiseMap &pNoise ) {
     float min = std::numeric_limits<float>::max();
     float max = 0;
 
@@ -400,6 +406,4 @@ namespace MapSystem {
       pNoise[x] = ( pNoise[x] - min ) / ( max - min );
     }
   }
-
-
-};// namespace MapSystem
+};

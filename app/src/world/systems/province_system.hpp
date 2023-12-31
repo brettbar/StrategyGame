@@ -10,12 +10,14 @@ namespace ProvinceSystem {
   inline void SetProvinceOwner( u32 owner );
 
   inline void Init() {
+    Global::world.clear<Province::Component>();
+
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       entt::entity prov_entity = Global::world.create();
 
       Province::Component prov = {
         .selected = false,
-        .tile = MapSystem::tile_map[i],
+        .tile = MapSystem::Manager()->tile_map[i],
         .resources = {},
       };
 

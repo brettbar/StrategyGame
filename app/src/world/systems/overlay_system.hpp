@@ -28,7 +28,7 @@ namespace OverlaySystem {
       Faction::Component faction =
         Global::world.get<Faction::Component>( prov.tile->owner );
 
-      auto neighbors = MapSystem::get_neighbors( *prov.tile );
+      auto neighbors = MapSystem::Manager()->get_neighbors( *prov.tile );
 
       hstr borders[6] = {
         hstr{ ( "ne_border_" + faction.primary_color ).c_str() },

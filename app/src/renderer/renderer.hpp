@@ -39,16 +39,6 @@ namespace Renderer {
     SetShaderValue(
       outline_shader, outline_color_loc, outline_color, SHADER_UNIFORM_VEC4
     );
-
-
-    Global::state.camera = Camera2D{
-      .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
-      .target =
-        { ( Global::state.mapWidth * 64.0f ) / 2,
-          ( Global::state.mapHeight * 64.0f ) / 2 },
-      .rotation = 0,
-      .zoom = 2.0f,
-    };
   }
 
 

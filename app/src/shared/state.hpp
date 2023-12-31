@@ -8,14 +8,12 @@
 
 #include "common.hpp"
 
-enum class RunState
-{
+enum class RunState {
   RUNNING,
   PAUSE,
 };
 
-struct State
-{
+struct State {
   const u32 mapWidth;
   const u32 mapHeight;
   f32 timeScale;

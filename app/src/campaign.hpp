@@ -59,8 +59,7 @@ struct Command {
   entt::entity entity;
 };
 
-class Campaign {
-  public:
+struct Campaign {
   Campaign( bool is_singleplayer ) {
     _is_singleplayer = is_singleplayer;
     Start();
@@ -82,6 +81,8 @@ class Campaign {
 
   entt::entity GetLocalPlayerE();
 
+  void Start();
+  void Load();
   void CheckForInput();
   void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
@@ -102,9 +103,6 @@ class Campaign {
   private:
   entt::dispatcher _command_queue;
   bool _is_singleplayer = true;
-
-  void Start();
-  void Load();
 };
 
 inline entt::entity Campaign::GetLocalPlayerE() {
@@ -120,7 +118,7 @@ inline str Campaign::GetLocalPlayerID() {
 }
 
 inline void Campaign::Start() {
-  MapSystem::Init();
+  MapSystem::Manager()->Init();
   FactionSystem::Init();
   SettlementSystem::Init();
   ProvinceSystem::Init();
@@ -132,7 +130,7 @@ inline void Campaign::Start() {
 
 inline void Campaign::Load() {
   SaveSystem::Load();
-  MapSystem::Init();
+  MapSystem::Manager()->Init();
   Renderer::Init();
   // Commands::Listen();
   Global::world.view<Settlement::Component>().each(
@@ -183,7 +181,7 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::draw_map( MapSystem::mode );
+  Renderer::draw_map( MapSystem::Manager()->mode );
 }
 
 // inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
@@ -248,16 +246,16 @@ inline void Campaign::CheckForUIInteractions() {
   auto change_map_mode = UI::MapModeMenu();
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:
-      MapSystem::mode = MapSystem::Mode::Default;
+      MapSystem::Manager()->mode = MapSystem::Mode::Default;
       break;
     case UI::Action_MapModeChange::Terrain:
-      MapSystem::mode = MapSystem::Mode::Terrain;
+      MapSystem::Manager()->mode = MapSystem::Mode::Terrain;
       break;
     case UI::Action_MapModeChange::Political:
-      MapSystem::mode = MapSystem::Mode::Political;
+      MapSystem::Manager()->mode = MapSystem::Mode::Political;
       break;
     case UI::Action_MapModeChange::Resources:
-      MapSystem::mode = MapSystem::Mode::Resources;
+      MapSystem::Manager()->mode = MapSystem::Mode::Resources;
       break;
     default:
       break;
@@ -325,6 +323,7 @@ inline void Campaign::CheckForUIInteractions() {
     }
   }
 }
+
 inline void Campaign::CheckForInput() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
@@ -400,11 +399,11 @@ inline void Campaign::CheckForInput() {
   }
 
   if ( IsKeyPressed( KEY_P ) ) {
-    MapSystem::mode = MapSystem::Mode::Political;
+    MapSystem::Manager()->mode = MapSystem::Mode::Political;
   }
 
   if ( IsKeyPressed( KEY_T ) ) {
-    MapSystem::mode = MapSystem::Mode::Terrain;
+    MapSystem::Manager()->mode = MapSystem::Mode::Terrain;
   }
 }
 

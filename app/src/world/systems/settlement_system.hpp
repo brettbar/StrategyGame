@@ -17,6 +17,8 @@ namespace SettlementSystem {
   inline void Draw( TextureCache &, bool );
 
   inline void Init() {
+    Global::world.clear<Settlement::Component>();
+
     Image buildings =
       LoadImageFromTexture( Global::texture_cache[hstr{ "buildings" }]->texture
       );
