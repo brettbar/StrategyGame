@@ -243,7 +243,7 @@ inline void Campaign::Draw() {
 // }
 
 inline void Campaign::CheckForUIInteractions() {
-  auto change_map_mode = UI::MapModeMenu();
+  auto change_map_mode = UI::Minimap();
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:
       MapSystem::Manager()->mode = MapSystem::Mode::Default;

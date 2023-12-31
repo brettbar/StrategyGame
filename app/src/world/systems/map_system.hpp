@@ -35,19 +35,19 @@ struct MapSystem {
   Mode mode = Mode::Default;
   f32 waterLevel = 0.3;
   TileMap tile_map = {};
+  u32 seed = 132;
+  u32 octaves = 7;
+  f32 scaling_bias = 1.2f;
 
   static MapSystem *Manager() {
     static MapSystem instance;
     return &instance;
   }
 
-
   void Init() {
-    u32 seed = 132;
-
     tile_map = {};
 
-    NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 1.2f );
+    NoiseMap pNoise = GeneratePerlinNoise( seed, octaves, scaling_bias );
     // NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 0.8f );
 
     std::cout << "MapSystem::Init with wl: " << waterLevel << "\n";
@@ -100,7 +100,13 @@ struct MapSystem {
   }
 
   f32 get_noise( vec2u coords ) {
-    return tile_map[index( coords.x, coords.y )]->noise;
+    u32 i = index( coords.x, coords.y );
+
+    if ( i < 0 || i >= tile_map.size() ) {
+      return 0.0;
+    }
+
+    return tile_map[i]->noise;
   }
 
   void apply_radial_gradient( NoiseMap &noise, urect dims ) {

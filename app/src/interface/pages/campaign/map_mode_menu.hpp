@@ -13,13 +13,15 @@ namespace UI {
     Resources,
   };
 
-  inline Action_MapModeChange MapModeMenu() {
+  inline Action_MapModeChange Minimap() {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 4, 3 );
 
-    auto map_mode_g = f->Grid( root_g->Slot( 11 ), 4, 1, GREEN );
+    auto minimap_g = f->Grid( root_g->Slot( 11 ), 4, 4, Color{ 0, 0, 0, 125 } );
+
+    auto map_mode_g = f->Grid( minimap_g->Row( 3 ), 4, 1, GREEN );
 
     bool switch_default =
       f->TextButton( map_mode_g->Slot( 0 ), "Default", BLUE );

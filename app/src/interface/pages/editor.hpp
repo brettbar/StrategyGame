@@ -4,7 +4,6 @@
 
 #include "../../world/systems/map_system.hpp"
 #include "../../world/systems/selection_system.hpp"
-#include <corecrt_math.h>
 #include <raylib.h>
 #include <string>
 
@@ -99,27 +98,44 @@ namespace UI {
 
     auto map_g = f->Grid( editor_g->ColsByRows( 1, 4, 1, 4 ), 2, 6, BLACK );
 
-
     f->TextLabel( map_g->Row( 0 ), "Map Generator", ORANGE );
 
     f->TextLabel( map_g->Slot( 2 ), "waterLvl", GRAY );
-
-
     str *new_water_lvl = f->TextInput(
       map_g->Slot( 3 ),
       std::to_string( MapSystem::Manager()->waterLevel ).c_str(),
       WHITE
     );
-
     if ( new_water_lvl ) {
       MapSystem::Manager()->waterLevel =
         (f32) atof( ( *new_water_lvl ).c_str() );
     }
 
-
     f->TextLabel( map_g->Slot( 4 ), "seed", GRAY );
+    str *new_seed = f->TextInput(
+      map_g->Slot( 5 ), std::to_string( MapSystem::Manager()->seed ), WHITE
+    );
+    if ( new_seed ) {
+      MapSystem::Manager()->seed = (f32) atof( ( *new_seed ).c_str() );
+    }
+
     f->TextLabel( map_g->Slot( 6 ), "octaves", GRAY );
+    str *new_octaves = f->TextInput(
+      map_g->Slot( 7 ), std::to_string( MapSystem::Manager()->octaves ), WHITE
+    );
+    if ( new_octaves ) {
+      MapSystem::Manager()->octaves = (f32) atof( ( *new_octaves ).c_str() );
+    }
+
     f->TextLabel( map_g->Slot( 8 ), "bias", GRAY );
+    str *new_bias = f->TextInput(
+      map_g->Slot( 9 ),
+      std::to_string( MapSystem::Manager()->scaling_bias ),
+      WHITE
+    );
+    if ( new_bias ) {
+      MapSystem::Manager()->scaling_bias = (f32) atof( ( *new_bias ).c_str() );
+    }
 
     return f->TextButton( map_g->Row( 5 ), "generate", GREEN );
   }
