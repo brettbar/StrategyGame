@@ -6,6 +6,7 @@
 #include "../../world/systems/selection_system.hpp"
 #include <corecrt_math.h>
 #include <raylib.h>
+#include <string>
 
 namespace UI {
   enum Mode : u32 {
@@ -46,7 +47,6 @@ namespace UI {
     );
 
     auto editor_g = f->Grid( root_g->Slot( 2 ), 4, 4, Color{ 0, 0, 0, 155 } );
-
 
     auto mode_g = f->Grid( editor_g->ColsByRows( 0, 1, 1, 3 ), 1, 4 );
     auto tab_btns = {
@@ -147,8 +147,9 @@ namespace UI {
     sptr<vec2f> tile_pos = DetermineTilePos( world_pos );
     sptr<vec2u> tile_coords = DetermineTileCoords( world_pos );
 
-    std::string tile_coords_str = "Nil";
-    std::string tile_pos_str = "Nil";
+    str tile_coords_str = "Nil";
+    str tile_pos_str = "Nil";
+    str tile_noise_str = "Nil";
 
     if ( tile_coords != nullptr ) {
       tile_coords_str = std::to_string( tile_coords->x ) + ", " +
@@ -160,9 +161,14 @@ namespace UI {
         std::to_string( tile_pos->x ) + ", " + std::to_string( tile_pos->y );
     }
 
+    if ( tile_coords != nullptr ) {
+      tile_noise_str =
+        std::to_string( MapSystem::Manager()->get_noise( *tile_coords ) );
+    }
+
     f->TextLabel( tiles_g->Slot( 0 ), "Tile Coords: " + tile_coords_str, GRAY );
     f->TextLabel( tiles_g->Slot( 1 ), "Tile Pos: " + tile_pos_str, GRAY );
-    // f->TextLabel( tiles_g->Slot( 2 ), "Tile Noise: " + tile_noise_str, GRAY );
+    f->TextLabel( tiles_g->Slot( 2 ), "Tile Noise: " + tile_noise_str, GRAY );
   }
 
   inline void entities_panel( Iron::Element *editor_g ) {

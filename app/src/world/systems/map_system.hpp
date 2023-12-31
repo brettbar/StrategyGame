@@ -36,9 +36,7 @@ struct MapSystem {
   f32 waterLevel = 0.3;
   TileMap tile_map = {};
 
-  static MapSystem *Manager(
-
-  ) {
+  static MapSystem *Manager() {
     static MapSystem instance;
     return &instance;
   }
@@ -101,6 +99,9 @@ struct MapSystem {
     return IndexFromCoords( x, y, MAP_WIDTH );
   }
 
+  f32 get_noise( vec2u coords ) {
+    return tile_map[index( coords.x, coords.y )]->noise;
+  }
 
   void apply_radial_gradient( NoiseMap &noise, urect dims ) {
     u32 width = dims.width();
