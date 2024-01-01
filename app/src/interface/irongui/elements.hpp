@@ -287,7 +287,7 @@ namespace Iron {
     rect Slot( u32 i ) {
       assert( type == Type::Grid && t.grid != nullptr );
 
-      auto coords = CoordsFromIndex( i, t.grid->cols );
+      auto coords = coords_from_index( i, t.grid->cols );
       // @volatile
       u32 slot_width = transform.width / t.grid->cols;
       u32 slot_height = transform.height / t.grid->rows;
@@ -303,8 +303,8 @@ namespace Iron {
     rect Slots( u32 start_i, u32 end_i ) {
       assert( type == Type::Grid && t.grid != nullptr && start_i <= end_i );
 
-      auto start_coords = CoordsFromIndex( start_i, t.grid->cols );
-      auto end_coords = CoordsFromIndex( end_i, t.grid->cols );
+      auto start_coords = coords_from_index( start_i, t.grid->cols );
+      auto end_coords = coords_from_index( end_i, t.grid->cols );
 
       // @volatile
       u32 slot_width = transform.width / t.grid->cols;

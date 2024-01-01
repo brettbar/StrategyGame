@@ -10,12 +10,12 @@ inline std::unique_ptr<vec2u> DetermineTileCoords( Vector2 );
 inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( vec2u );
 
 // i = x + W * y;
-inline u32 IndexFromCoords( u32 x, u32 y, u32 w ) {
+inline u32 index( u32 x, u32 y, u32 w ) {
   return x + w * y;
 };
 
 
-inline vec2u CoordsFromIndex( u32 index, u32 w ) {
+inline vec2u coords_from_index( u32 index, u32 w ) {
   u32 x = index % w;
   u32 y = index / w;
   return { x, y };

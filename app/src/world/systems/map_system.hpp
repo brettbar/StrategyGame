@@ -35,12 +35,13 @@ struct MapSystem {
   Mode mode = Mode::Default;
 
   f32 waterLevel = 0.3;
-  f32 mtnsLevel = 0.7;
-  f32 hillsLevel = 0.5;
+  f32 mtnsLevel = 0.52;
+  f32 hillsLevel = 0.45;
 
   u32 seed = 132;
   u32 octaves = 7;
-  f32 scaling_bias = 1.2f;
+  f32 scaling_bias = 1.0f;
+  // f32 scaling_bias = 1.2f;
 
   TileMap tile_map = {};
 
@@ -52,13 +53,11 @@ struct MapSystem {
   void Init() {
     tile_map = {};
 
-    NoiseMap pNoise = GeneratePerlinNoise( seed, octaves, scaling_bias );
-    // NoiseMap pNoise = GeneratePerlinNoise( seed, 7, 0.8f );
+    NoiseMap pNoise = olc_gen_perlin_noise( seed, octaves, scaling_bias );
 
     std::cout << "MapSystem::Init with wl: " << waterLevel << "\n";
 
-    gen_islands( pNoise );
-    //    FilterIslands(pNoise, waterLevel);
+    gen_islands( pNoise, 3 );
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
@@ -69,7 +68,7 @@ struct MapSystem {
 
       Vector2 position;
 
-      f32 noise = pNoise[IndexFromCoords( x, y, MAP_WIDTH )];
+      f32 noise = pNoise[map_index( x, y )];
 
       Biome biome = determine_biome( noise );
 
@@ -94,20 +93,20 @@ struct MapSystem {
         .texture_key = random_assign_sprite_from_biome( biome ),
       };
 
-      tile_map[index( x, y )] = std::make_shared<Tile::Component>( tile );
+      tile_map[map_index( x, y )] = std::make_shared<Tile::Component>( tile );
     }
   }
 
-  u32 index( u32 x, u32 y ) {
+  u32 map_index( u32 x, u32 y ) {
     if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
       return -1;
     }
 
-    return IndexFromCoords( x, y, MAP_WIDTH );
+    return index( x, y, MAP_WIDTH );
   }
 
   f32 get_noise( vec2u coords ) {
-    u32 i = index( coords.x, coords.y );
+    u32 i = map_index( coords.x, coords.y );
 
     if ( i < 0 || i >= tile_map.size() ) {
       return 0.0;
@@ -116,19 +115,22 @@ struct MapSystem {
     return tile_map[i]->noise;
   }
 
+
+  bool out_of_bounds( vec2u coords, urect dims ) {
+    return (
+      coords.x < dims.x || coords.x > dims.z || coords.y < dims.y ||
+      coords.y > dims.w
+    );
+  }
+
   void apply_radial_gradient( NoiseMap &noise, urect dims ) {
     u32 width = dims.width();
     // u32 height = dims.height();
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-      vec2u coords = CoordsFromIndex( i, MAP_WIDTH );
+      vec2u coords = coords_from_index( i, MAP_WIDTH );
 
-      if (
-        coords.x < dims.x || 
-        coords.x > dims.z || 
-        coords.y < dims.y || 
-        coords.y > dims.w
-      )
+      if ( out_of_bounds( coords, dims ) )
         continue;
 
       vec2u center = dims.center();
@@ -137,8 +139,8 @@ struct MapSystem {
       f32 distance_y = ( center.y - coords.y ) * ( center.y - coords.y );
       f32 dist_to_center = sqrt( distance_x + distance_y );
 
-
       // extends how far out the radial is applied, lower means longer
+      // f32 scaling_factor = 0.8;
       f32 scaling_factor = 0.8;
 
       dist_to_center = ( dist_to_center / width ) * scaling_factor;
@@ -158,10 +160,7 @@ struct MapSystem {
         return "forest" + std::to_string( r ) + ".bmp";
       }
       case Biome::Hills: {
-        //@temp
-        // return "hills1.bmp";
-        u32 r = random_u32_inclmax( 1, 10 );
-        return "forest" + std::to_string( r ) + ".bmp";
+        return "hills1.bmp";
       }
       case Biome::Mountains:
         return "mountains1.bmp";
@@ -192,21 +191,59 @@ struct MapSystem {
       return Biome::Sea;
   }
 
-  void gen_islands( NoiseMap &noise ) {
+  void gen_islands( NoiseMap &noise, u32 num_islands ) {
+    assert( num_islands == 3 || num_islands == 4 );
 
-    // @todo this is likely wrong and has off-by-ones
-    urect top_left = { 0, 0, 63, 63 };
-    urect top_right = { 64, 0, 127, 63 };
-    urect bottom_left = { 0, 64, 63, 127 };
-    urect bottom_right = { 64, 64, 127, 127 };
 
-    apply_radial_gradient( noise, top_left );
+    if ( num_islands == 3 ) {
+      // srand( time( NULL ) );
 
-    apply_radial_gradient( noise, top_right );
+      u32 c = random_u32_inclmax( 0, 1 );
 
-    apply_radial_gradient( noise, bottom_left );
+      if ( c == 0 ) {
+        urect top_left = { 0, 0, 63, 63 };
+        urect top_right = { 64, 0, 127, 63 };
+        urect bottom = { 32, 64, 96, 127 };
 
-    apply_radial_gradient( noise, bottom_right );
+        apply_radial_gradient( noise, top_left );
+        apply_radial_gradient( noise, top_right );
+        apply_radial_gradient( noise, bottom );
+
+        for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+          vec2u coords = coords_from_index( i, MAP_WIDTH );
+          if ( out_of_bounds( coords, top_left ) && out_of_bounds( coords, top_right ) && out_of_bounds( coords, bottom ) ) {
+            noise[i] = 0;
+          }
+        }
+      } else {
+        urect top = { 32, 0, 96, 64 };
+        urect bottom_left = { 0, 64, 63, 127 };
+        urect bottom_right = { 64, 64, 127, 127 };
+
+        apply_radial_gradient( noise, top );
+        apply_radial_gradient( noise, bottom_left );
+        apply_radial_gradient( noise, bottom_right );
+
+        for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
+          vec2u coords = coords_from_index( i, MAP_WIDTH );
+          if ( out_of_bounds( coords, top ) && out_of_bounds( coords, bottom_left ) && out_of_bounds( coords, bottom_right ) ) {
+            noise[i] = 0;
+          }
+        }
+      }
+
+    } else if ( num_islands == 4 ) {
+      // @todo this is likely wrong and has off-by-ones
+      urect top_left = { 0, 0, 63, 63 };
+      urect top_right = { 64, 0, 127, 63 };
+      urect bottom_left = { 0, 64, 63, 127 };
+      urect bottom_right = { 64, 64, 127, 127 };
+
+      apply_radial_gradient( noise, top_left );
+      apply_radial_gradient( noise, top_right );
+      apply_radial_gradient( noise, bottom_left );
+      apply_radial_gradient( noise, bottom_right );
+    }
   }
 
 
@@ -221,12 +258,12 @@ struct MapSystem {
     sptr<Tile::Component> nw_tile = nullptr;
 
     if ( y % 2 == 0 ) {
-      i32 ne = index( x, y - 1 );
-      i32 e = index( x + 1, y );
-      i32 se = index( x, y + 1 );
-      i32 sw = index( x - 1, y + 1 );
-      i32 w = index( x - 1, y );
-      i32 nw = index( x - 1, y - 1 );
+      i32 ne = map_index( x, y - 1 );
+      i32 e = map_index( x + 1, y );
+      i32 se = map_index( x, y + 1 );
+      i32 sw = map_index( x - 1, y + 1 );
+      i32 w = map_index( x - 1, y );
+      i32 nw = map_index( x - 1, y - 1 );
 
       if ( ne >= 0 )
         ne_tile = tile_map[ne];
@@ -241,12 +278,12 @@ struct MapSystem {
       if ( nw >= 0 )
         nw_tile = tile_map[nw];
     } else {
-      i32 ne = index( x + 1, y - 1 );
-      i32 e = index( x + 1, y );
-      i32 se = index( x + 1, y + 1 );
-      i32 sw = index( x, y + 1 );
-      i32 w = index( x - 1, y );
-      i32 nw = index( x, y - 1 );
+      i32 ne = map_index( x + 1, y - 1 );
+      i32 e = map_index( x + 1, y );
+      i32 se = map_index( x + 1, y + 1 );
+      i32 sw = map_index( x, y + 1 );
+      i32 w = map_index( x - 1, y );
+      i32 nw = map_index( x, y - 1 );
 
       if ( ne >= 0 )
         ne_tile = tile_map[ne];
@@ -285,10 +322,10 @@ struct MapSystem {
       auto neighbors = get_neighbors( *closest );
 
       if ( y % 2 == 1 ) {
-        neighbors[0] = tile_map[index( x + 1, y - 1 )];
-        neighbors[2] = tile_map[index( x + 1, y + 1 )];
-        neighbors[3] = tile_map[index( x, y + 1 )];
-        neighbors[5] = tile_map[index( x, y - 1 )];
+        neighbors[0] = tile_map[map_index( x + 1, y - 1 )];
+        neighbors[2] = tile_map[map_index( x + 1, y + 1 )];
+        neighbors[3] = tile_map[map_index( x, y + 1 )];
+        neighbors[5] = tile_map[map_index( x, y - 1 )];
       }
 
       for ( auto neighbor: neighbors ) {
@@ -304,7 +341,7 @@ struct MapSystem {
 
   // Inspired from code written by: OneLoneCoder Javidx9
   // https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_PerlinNoise.cpp
-  NoiseMap GeneratePerlinNoise(
+  NoiseMap olc_gen_perlin_noise(
     float seed,
     int nOctaves,
     float
@@ -417,43 +454,41 @@ struct MapSystem {
       for ( int y = 1; y < MAP_HEIGHT - 1; y++ ) {
         u32 numWater = 0;
 
-        float NE = noiseMap.at( index( x, y - 1 ) );
+        float NE = noiseMap.at( map_index( x, y - 1 ) );
         if ( NE < water_lvl )
           numWater++;
 
-        float E = noiseMap.at( index( x + 1, y ) );
+        float E = noiseMap.at( map_index( x + 1, y ) );
         if ( E < water_lvl )
           numWater++;
 
-        float SE = noiseMap.at( index( x, y + 1 ) );
+        float SE = noiseMap.at( map_index( x, y + 1 ) );
         if ( SE < water_lvl )
           numWater++;
 
-        float SW = noiseMap.at( index( x - 1, y + 1 ) );
+        float SW = noiseMap.at( map_index( x - 1, y + 1 ) );
         if ( SW < water_lvl )
           numWater++;
 
-        float W = noiseMap.at( index( x - 1, y ) );
+        float W = noiseMap.at( map_index( x - 1, y ) );
         if ( W < water_lvl )
           numWater++;
 
-        float NW = noiseMap.at( index( x - 1, y - 1 ) );
+        float NW = noiseMap.at( map_index( x - 1, y - 1 ) );
         if ( NW < water_lvl )
           numWater++;
 
         if ( numWater >= 5 ) {
-          noiseMap[index( x, y )] = 0.0f;
+          noiseMap[map_index( x, y )] = 0.0f;
         }
       }
   }
 
-  // @unused
-  void map_pwr_two( NoiseMap &noise ) {
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_WIDTH; i++ ) {
-      noise[i] = noise[i] * noise[i];
-    }
-  }
 
+  f32 shift_avg( f32 perlin_v, f32 target_avg, f32 scale_factor ) {
+    return ( perlin_v * scale_factor ) +
+           ( target_avg * ( 1.0f - scale_factor ) );
+  }
 
   void NormalizeMap( NoiseMap &pNoise ) {
     float min = std::numeric_limits<float>::max();
@@ -468,6 +503,10 @@ struct MapSystem {
 
     for ( int x = 0; x < MAP_WIDTH * MAP_HEIGHT; x++ ) {
       pNoise[x] = ( pNoise[x] - min ) / ( max - min );
+
+
+      // try to get an avg around .5, it usually ends up being between 0.5 and 0.55
+      pNoise[x] = shift_avg( pNoise[x], 0.5, 0.6 );
     }
   }
 };
