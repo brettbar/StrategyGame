@@ -25,6 +25,7 @@ namespace Tile {
     vec2u coords;
     Biome biome;
     Visibility visibility;
+    str texture_key;
 
     template<class Archive>
     void serialize( Archive &ar ) {
@@ -38,7 +39,8 @@ namespace Tile {
         coords.x,
         coords.y,
         biome,
-        visibility
+        visibility,
+        texture_key
       );
     }
   };

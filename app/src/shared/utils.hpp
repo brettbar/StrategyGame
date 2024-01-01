@@ -74,6 +74,10 @@ inline f32 random_f32( f32 min, f32 max ) {
   return result;
 }
 
+inline u32 random_u32_inclmax( u32 min, u32 max ) {
+  return min + rand() % ( max - min + 1 );
+}
+
 inline void PrintRect( Rectangle rect ) {
   printf(
     "(x:%f, y:%f, w:%f, h:%f)\n", rect.x, rect.y, rect.width, rect.height

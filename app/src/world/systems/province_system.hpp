@@ -38,50 +38,16 @@ namespace ProvinceSystem {
   }
 
   inline void DrawTileTerrain( Tile::Component tile ) {
-    Texture2D land_tile = Global::texture_cache[hstr{ "land_tile" }]->texture;
-    Texture2D forest_tile =
-      Global::texture_cache[hstr{ "forest_tile" }]->texture;
-    Texture2D water_tile = Global::texture_cache[hstr{ "water_tile" }]->texture;
-    Texture2D hills_tile = Global::texture_cache[hstr{ "hills_tile" }]->texture;
-    Texture2D sand_tile = Global::texture_cache[hstr{ "sand_tile" }]->texture;
-    Texture2D mountains_tile =
-      Global::texture_cache[hstr{ "mountains_tile" }]->texture;
+    Texture2D texture =
+      Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
 
     Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
 
     // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
     // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
     // DrawTextureRec(hex, frameRec, tile.position, WHITE);
-    switch ( tile.biome ) {
-      case Biome::Mountains:
-        // DrawTextureRec( snow_tile, frameRec, tile.position, WHITE );
-        DrawTextureRec( mountains_tile, frameRec, tile.position, WHITE );
-        break;
-      case Biome::Hills:
-        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( hills_tile, frameRec, tile.position, WHITE );
-        break;
-      case Biome::Forest:
-        // DrawTextureRec( hills_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( forest_tile, frameRec, tile.position, WHITE );
-        break;
-      case Biome::Plains:
-        // DrawTextureRec( land_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( land_tile, frameRec, tile.position, WHITE );
-        break;
-      case Biome::Desert:
-        // DrawTextureRec( sand_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( sand_tile, frameRec, tile.position, WHITE );
-        break;
-      case Biome::Sea:
-        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
-        break;
-      default:
-        // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-        DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
-        break;
-    }
+    // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+    DrawTextureRec( texture, frameRec, tile.position, WHITE );
   }
   inline void Draw( Camera2D &camera ) {
     // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;

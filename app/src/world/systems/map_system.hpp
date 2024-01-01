@@ -33,7 +33,12 @@ struct MapSystem {
     Resources,
   };
   Mode mode = Mode::Default;
+
+
   f32 waterLevel = 0.3;
+  f32 mtnsLevel = 0.7;
+  f32 hillsLevel = 0.5;
+
   TileMap tile_map = {};
   u32 seed = 132;
   u32 octaves = 7;
@@ -74,17 +79,19 @@ struct MapSystem {
         position = { xPos, yPos };
 
       Tile::Component tile = {
-        entt::null,
-        i,
-        noise,
-        position,
-        {
-          position.x + ( TILE_WIDTH / 2 ),
-          position.y + ( TILE_HEIGHT / 2 ),
-        },
-        { x, y },
-        biome,
-        Tile::Visibility::UNEXPLORED,
+        .owner = entt::null,
+        .id = i,
+        .noise = noise,
+        .position = position,
+        .center =
+          {
+            position.x + ( TILE_WIDTH / 2 ),
+            position.y + ( TILE_HEIGHT / 2 ),
+          },
+        .coords = { x, y },
+        .biome = biome,
+        .visibility = Tile::Visibility::UNEXPLORED,
+        .texture_key = random_assign_sprite_from_biome( biome ),
       };
 
       tile_map[index( x, y )] = std::make_shared<Tile::Component>( tile );
@@ -140,10 +147,42 @@ struct MapSystem {
     }
   }
 
+  // @todo fix this shit
+  // @volatile right now i totally hardcode how many of each terrain sprites there are
+  str random_assign_sprite_from_biome( Biome biome ) {
+    switch ( biome ) {
+      case Biome::Desert:
+        return "sand1.bmp";
+      case Biome::Forest: {
+        u32 r = random_u32_inclmax( 1, 10 );
+        return "forest" + std::to_string( r ) + ".bmp";
+      }
+      case Biome::Hills: {
+        //@temp
+        // return "hills1.bmp";
+        u32 r = random_u32_inclmax( 1, 10 );
+        return "forest" + std::to_string( r ) + ".bmp";
+      }
+      case Biome::Mountains:
+        return "mountains1.bmp";
+      case Biome::Plains: {
+        u32 r = random_u32_inclmax( 1, 14 );
+        return "grass" + std::to_string( r ) + ".bmp";
+      }
+      case Biome::Sea:
+        return "water1.bmp";
+      case Biome::Steppe:
+        return "hills1.bmp";
+      case Biome::Taiga:
+      case Biome::Tundra:
+        return "snow1.bmp";
+    }
+  }
+
   Biome determine_biome( f32 elevation ) {
-    if ( elevation >= 0.7f )
+    if ( elevation >= mtnsLevel )
       return Biome::Mountains;
-    else if ( elevation >= 0.50f )
+    else if ( elevation >= hillsLevel )
       return Biome::Hills;
     // else if ( noise >= 0.7f )
     //   biome = Biome::Forest;

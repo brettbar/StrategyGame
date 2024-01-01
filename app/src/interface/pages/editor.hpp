@@ -96,40 +96,67 @@ namespace UI {
   inline bool mapgen_panel( Iron::Element *editor_g ) {
     auto f = Iron::Forge();
 
-    auto map_g = f->Grid( editor_g->ColsByRows( 1, 4, 1, 4 ), 2, 6, BLACK );
+    auto map_g = f->Grid( editor_g->ColsByRows( 1, 4, 1, 4 ), 2, 8, BLACK );
 
     f->TextLabel( map_g->Row( 0 ), "Map Generator", ORANGE );
 
-    f->TextLabel( map_g->Slot( 2 ), "waterLvl", GRAY );
-    str *new_water_lvl = f->TextInput(
-      map_g->Slot( 3 ),
-      std::to_string( MapSystem::Manager()->waterLevel ).c_str(),
-      WHITE
-    );
-    if ( new_water_lvl ) {
-      MapSystem::Manager()->waterLevel =
-        (f32) atof( ( *new_water_lvl ).c_str() );
+
+    {
+      f->TextLabel( map_g->Slot( 2 ), "waterLvl", GRAY );
+      str *new_water_lvl = f->TextInput(
+        map_g->Slot( 3 ),
+        std::to_string( MapSystem::Manager()->waterLevel ).c_str(),
+        WHITE
+      );
+      if ( new_water_lvl ) {
+        MapSystem::Manager()->waterLevel =
+          (f32) atof( ( *new_water_lvl ).c_str() );
+      }
+
+
+      f->TextLabel( map_g->Slot( 4 ), "mtnsLvl", GRAY );
+      str *new_mtn_lvl = f->TextInput(
+        map_g->Slot( 5 ),
+        std::to_string( MapSystem::Manager()->mtnsLevel ).c_str(),
+        WHITE
+      );
+      if ( new_mtn_lvl ) {
+        MapSystem::Manager()->mtnsLevel =
+          (f32) atof( ( *new_mtn_lvl ).c_str() );
+      }
+
+
+      f->TextLabel( map_g->Slot( 6 ), "hillsLvl", GRAY );
+      str *new_hills_lvl = f->TextInput(
+        map_g->Slot( 7 ),
+        std::to_string( MapSystem::Manager()->hillsLevel ).c_str(),
+        WHITE
+      );
+      if ( new_hills_lvl ) {
+        MapSystem::Manager()->hillsLevel =
+          (f32) atof( ( *new_hills_lvl ).c_str() );
+      }
     }
 
-    f->TextLabel( map_g->Slot( 4 ), "seed", GRAY );
+    f->TextLabel( map_g->Slot( 8 ), "seed", GRAY );
     str *new_seed = f->TextInput(
-      map_g->Slot( 5 ), std::to_string( MapSystem::Manager()->seed ), WHITE
+      map_g->Slot( 9 ), std::to_string( MapSystem::Manager()->seed ), WHITE
     );
     if ( new_seed ) {
       MapSystem::Manager()->seed = (f32) atof( ( *new_seed ).c_str() );
     }
 
-    f->TextLabel( map_g->Slot( 6 ), "octaves", GRAY );
+    f->TextLabel( map_g->Slot( 10 ), "octaves", GRAY );
     str *new_octaves = f->TextInput(
-      map_g->Slot( 7 ), std::to_string( MapSystem::Manager()->octaves ), WHITE
+      map_g->Slot( 11 ), std::to_string( MapSystem::Manager()->octaves ), WHITE
     );
     if ( new_octaves ) {
       MapSystem::Manager()->octaves = (f32) atof( ( *new_octaves ).c_str() );
     }
 
-    f->TextLabel( map_g->Slot( 8 ), "bias", GRAY );
+    f->TextLabel( map_g->Slot( 12 ), "bias", GRAY );
     str *new_bias = f->TextInput(
-      map_g->Slot( 9 ),
+      map_g->Slot( 13 ),
       std::to_string( MapSystem::Manager()->scaling_bias ),
       WHITE
     );
@@ -137,7 +164,7 @@ namespace UI {
       MapSystem::Manager()->scaling_bias = (f32) atof( ( *new_bias ).c_str() );
     }
 
-    return f->TextButton( map_g->Row( 5 ), "generate", GREEN );
+    return f->TextButton( map_g->Row( 7 ), "generate", GREEN );
   }
 
   inline void ui_panel( Iron::Element *editor_g ) {
