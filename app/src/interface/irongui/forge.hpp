@@ -12,16 +12,15 @@ private:
     struct Context {
       i32 hot = -1;
       i32 active = -1;
+      i32 editing = -1;
     };
 
-    // @todo migrate to state singleton?
     union State {
       struct {
         u32 index;
       } tab_state;
 
       struct {
-        bool editing;
         const char *edit_text;
       } text_input_state;
     };
@@ -219,13 +218,13 @@ public:
       str *result = nullptr;
 
       if ( ui_state.contains( e->id ) ) {
-        e->t.text_input->editing = ui_state[e->id].text_input_state.editing;
+        e->t.text_input->editing = context.editing == e->id;
         e->t.text_input->edit_text = ui_state[e->id].text_input_state.edit_text;
       }
 
-      if ( CheckInteract( *e ) ) {
+      if ( context.editing == -1 && CheckInteract( *e ) ) {
         e->t.text_input->editing = true;
-        ui_state[e->id].text_input_state.editing = true;
+        context.editing = e->id;
       }
 
       if ( e->t.text_input->editing ) {
@@ -233,9 +232,10 @@ public:
           //@todo validate input
           e->t.text_input->saved_text = e->t.text_input->edit_text;
           e->t.text_input->editing = false;
-          ui_state[e->id].text_input_state.editing = false;
-
+          context.editing = -1;
           result = &e->t.text_input->saved_text;
+
+          // ui_state.erase( e->id );
         }
 
         if ( IsKeyPressed( KEY_BACKSPACE ) ) {
@@ -269,7 +269,6 @@ public:
       if ( !ui_state.contains( e->id ) ) {
         ui_state[e->id] = State{
           .text_input_state = {
-            .editing = e->t.text_input->editing,
             .edit_text = e->t.text_input->edit_text.c_str(),
           } };
       }

@@ -34,15 +34,15 @@ struct MapSystem {
   };
   Mode mode = Mode::Default;
 
-
   f32 waterLevel = 0.3;
   f32 mtnsLevel = 0.7;
   f32 hillsLevel = 0.5;
 
-  TileMap tile_map = {};
   u32 seed = 132;
   u32 octaves = 7;
   f32 scaling_bias = 1.2f;
+
+  TileMap tile_map = {};
 
   static MapSystem *Manager() {
     static MapSystem instance;
@@ -323,7 +323,7 @@ struct MapSystem {
     // final array of perlin noise data
     NoiseMap fOutput;
 
-    for ( int x = 0; x < MAP_WIDTH; x++ )
+    for ( int x = 0; x < MAP_WIDTH; x++ ) {
       for ( int y = 0; y < MAP_HEIGHT; y++ ) {
         // used to accumulate the perlin noise for a point, will be normalized in the end
         float fNoise = 0.0f;
@@ -389,8 +389,26 @@ struct MapSystem {
         // set the normalized perlin noise to the element in the output array
         fOutput[y * MAP_WIDTH + x] = ( fNoise / fScaleAcc );
       }
+    }
+
+    f32 sum = 0;
+    for ( f32 n = 0; n < MAP_WIDTH * MAP_HEIGHT; n++ ) {
+      sum += fOutput[n];
+    }
+
+    std::cout << "Avg before normalization: "
+              << sum / ( MAP_WIDTH * MAP_HEIGHT ) << "\n";
 
     NormalizeMap( fOutput );
+
+    sum = 0;
+    for ( f32 n = 0; n < MAP_WIDTH * MAP_HEIGHT; n++ ) {
+      sum += fOutput[n];
+    }
+
+    std::cout << "Avg after normalization: " << sum / ( MAP_WIDTH * MAP_HEIGHT )
+              << "\n";
+
     return fOutput;
   }
 
