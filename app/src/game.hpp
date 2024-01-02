@@ -16,6 +16,7 @@
 
 #include "signals/updates.hpp"
 #include "world/systems/map_system.hpp"
+#include "world/systems/player_system.hpp"
 #include "world/systems/selection_system.hpp"
 
 #include "campaign.hpp"
@@ -139,24 +140,14 @@ class IGame {
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartSingleplayerCampaign( std::string player_faction ) {
+  void StartSingleplayerCampaign( str player_faction ) {
     printf( "pending new!!\n" );
 
     if ( _campaign )
       delete _campaign;
 
     _campaign = new struct Campaign( true );
-
-    // UI::System::InitCampaignUI();
-
-    auto player = Global::world.create();
-    Global::world.emplace<Player::Component>(
-      player, player, "player_0", true
-    );
-    Global::world.emplace<Player::LocalTag>( player );
-    Global::world.emplace<Faction::Component>(
-      player, FactionSystem::factions.at( player_faction )
-    );
+    _campaign->Start( player_faction );
 
     Game()->_mode = Scene::Campaign;
   }
@@ -189,42 +180,8 @@ class IGame {
 
     // UI::System::InitCampaignUI();
 
-    for ( auto client: Network::Host()->_clients ) {
-      if ( !client.peer_data.active )
-        continue;
 
-      auto player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        player, player, client.peer_data.player_id, true
-      );
-
-      if ( client.peer_data.player_id == "player_0" )
-        Global::world.emplace<Player::LocalTag>( player );
-      else
-        Global::world.emplace<Player::RemoteTag>( player );
-
-      Global::world.emplace<Faction::Component>(
-        player, FactionSystem::factions.at( client.peer_data.faction )
-      );
-    }
-
-    for ( auto player_e:
-          Global::world.view<Player::Component, Faction::Component>() ) {
-      Player::Component player =
-        Global::world.get<Player::Component>( player_e );
-      Faction::Component faction =
-        Global::world.get<Faction::Component>( player_e );
-
-      std::cout << "Initialized Player: " << player.player_id << '\n';
-      std::cout << "Faction: " << faction.id << '\n';
-      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
-        std::cout << "with LocalTag!" << '\n';
-      }
-      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
-        std::cout << "with RemoteTag!" << '\n';
-      }
-    }
-
+    PlayerSystem::HostStartMultiplayer();
 
     Game()->_mode = Scene::Campaign;
   }
@@ -237,41 +194,7 @@ class IGame {
 
     // UI::System::InitCampaignUI();
 
-    for ( auto peer: Network::Client()->_peers ) {
-      if ( !peer.active )
-        continue;
-
-      auto player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        player, player, peer.player_id, true
-      );
-
-      if ( Network::Client()->_local_player_id == peer.player_id )
-        Global::world.emplace<Player::LocalTag>( player );
-      else
-        Global::world.emplace<Player::RemoteTag>( player );
-
-      Global::world.emplace<Faction::Component>(
-        player, FactionSystem::factions.at( peer.faction )
-      );
-    }
-
-    for ( auto player_e:
-          Global::world.view<Player::Component, Faction::Component>() ) {
-      Player::Component player =
-        Global::world.get<Player::Component>( player_e );
-      Faction::Component faction =
-        Global::world.get<Faction::Component>( player_e );
-
-      std::cout << "Initialized Player: " << player.player_id << '\n';
-      std::cout << "Faction: " << faction.id << '\n';
-      if ( Global::world.any_of<Player::LocalTag>( player_e ) ) {
-        std::cout << "with LocalTag!" << '\n';
-      }
-      if ( Global::world.any_of<Player::RemoteTag>( player_e ) ) {
-        std::cout << "with RemoteTag!" << '\n';
-      }
-    }
+    PlayerSystem::ClientStartMultiplayer();
 
     Game()->_mode = Scene::Campaign;
   }
@@ -473,7 +396,8 @@ class IGame {
             case UI::EditorAction::GenerateMap:
               // MapSystem::Init();
               if ( _campaign )
-                _campaign->Start();
+                //@todo actualyl pass in the faction
+                _campaign->Start( "romans" );
               break;
           }
         }

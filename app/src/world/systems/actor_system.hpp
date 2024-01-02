@@ -15,6 +15,23 @@
 
 namespace ActorSystem {
 
+  inline void SpawnColonist( entt::entity, Vector2 );
+
+  inline void SpawnStartingColonists() {
+    auto players = Global::world.view<Player::Component>();
+
+
+    for ( auto player_e: players ) {
+      auto player = players.get<Player::Component>( player_e );
+
+      if ( player.player_id == "player_0" ) {
+        SpawnColonist( player.id, { 75 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+      } else {
+        SpawnColonist( player.id, { 70 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+      }
+    }
+  }
+
   // A settlement can be placed when
   // 0. A colonist is selected
   // 1. The colonist is not moving

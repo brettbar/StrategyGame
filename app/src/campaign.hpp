@@ -62,14 +62,14 @@ struct Command {
 struct Campaign {
   Campaign( bool is_singleplayer ) {
     _is_singleplayer = is_singleplayer;
-    Start();
+    // Start();
   }
 
   Campaign( bool is_singleplayer, const char * ) {
     _is_singleplayer = is_singleplayer;
 
     // TODO make take in file path
-    Load();
+    // Load();
   }
 
   ~Campaign() {
@@ -81,7 +81,7 @@ struct Campaign {
 
   entt::entity GetLocalPlayerE();
 
-  void Start();
+  void Start( str );
   void Load();
   void CheckForInput();
   void CheckForUIInteractions();
@@ -117,12 +117,16 @@ inline str Campaign::GetLocalPlayerID() {
   }
 }
 
-inline void Campaign::Start() {
-  MapSystem::Manager()->Init();
+inline void Campaign::Start( str player_faction ) {
   FactionSystem::Init();
+  PlayerSystem::StartSingleplayer( player_faction );
+
+  MapSystem::Manager()->Init();
   SettlementSystem::Init();
   ProvinceSystem::Init();
   Renderer::Init();
+
+  ActorSystem::SpawnStartingColonists();
 
   _command_queue = entt::dispatcher{};
   _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
