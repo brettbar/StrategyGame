@@ -5,7 +5,7 @@
 
 namespace AI {
 
-/*
+  /*
 
 The ultimate final goal a player will have is to become the most
 'powerful' in the game. They can do this in the following ways:
@@ -24,33 +24,69 @@ The ultimate final goal a player will have is to become the most
 - Civic Victory: 
   Maintain the largest population for X number of years
   Can increase by player wide or tall
-
-
 */
 
-// Long term goal
-enum class Goal {
-  BoostProduction,
-  ExpandBorders,
-  DevelopSettlements,
-};
+  enum class Goal_t {
+    // BoostProduction,
+    // ExpandBorders,
+    // DevelopSettlements,
+    None,
+    EstablishSettlement,
+  };
+  enum class Action_t {
+    MoveUnit,
+    ClaimProvince,
+  };
+  enum class Condition_t {
+    HasSettlement,
+  };
 
-// Short term goal
-// to achieve long term goal
-enum class Objective {
+  struct Condition {
+    Condition_t condition;
 
-};
+    func<bool()> is_satisified;
+  };
 
-// The approach to achieve
-// the Long term goal
-enum class Strategy {
-  Expand,
-};
+  struct Goal {
+    Goal_t goal = Goal_t::None;
+    list<Condition> conditions;
 
-struct Component {
-  Goal current_goal;
-  bool has_colonist = false;
-  bool has_settlement = false;
-};
+    bool succeeded() {
+      bool all_satisfied = false;
+
+      for ( auto cond: conditions )
+        all_satisfied = all_satisfied && cond.is_satisified();
+
+      return all_satisfied;
+    }
+  };
+
+  struct Action {
+    Action_t action;
+    f32 cost;
+
+    list<Condition> preconditions;
+    list<Condition> effects;
+
+    bool ready() {
+      bool all_satisfied = false;
+
+      for ( auto cond: preconditions )
+        all_satisfied = all_satisfied && cond.is_satisified();
+
+      return all_satisfied;
+    }
+  };
+
+  struct Plan {
+    list<Action> stack;
+  };
+
+
+  struct Component {
+    Goal current_goal;
+    // bool has_colonist = false;
+    // bool has_settlement = false;
+  };
 
 };// namespace AI

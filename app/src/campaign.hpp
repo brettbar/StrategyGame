@@ -28,6 +28,7 @@
 
 #include "world/components/player.hpp"
 #include "world/systems/actor_system.hpp"
+#include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/faction_system.hpp"
 #include "world/systems/map_system.hpp"
@@ -127,6 +128,7 @@ inline void Campaign::Start( str player_faction ) {
   Renderer::Init();
 
   ActorSystem::SpawnStartingColonists();
+  AI::Start();
 
   _command_queue = entt::dispatcher{};
   _command_queue.sink<Command>().connect<&Campaign::Receive>( this );

@@ -11,6 +11,7 @@
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
+#include "ai_system.hpp"
 
 namespace PlayerSystem {
   inline void HumanUpdate( Player::Component & );
@@ -37,6 +38,8 @@ namespace PlayerSystem {
       Global::world.emplace<Faction::Component>(
         ai_player, FactionSystem::factions.at( "greeks" )
       );
+
+      AI::Create( ai_player );
     }
   }
 
@@ -128,29 +131,12 @@ namespace PlayerSystem {
       }
     }
 
-    for ( auto entity:
+    for ( auto ai_player:
           Global::world.view<Player::Component, AI::Component>() ) {
-      Player::Component &player =
-        Global::world.get<Player::Component>( entity );
-      AI::Component &ai = Global::world.get<AI::Component>( entity );
 
-      AIUpdate( ai, player );
+      AI::CheckGoals( ai_player );
     }
   }
 
   inline void HumanUpdate( Player::Component &player ) {}
-
-  inline void AIUpdate( AI::Component &ai, Player::Component &player ) {
-    switch ( ai.current_goal ) {
-      case AI::Goal::DevelopSettlements: {
-        if ( !ai.has_colonist ) {
-          // ActorSystem::SpawnColonist( player.id );
-          ai.has_colonist = true;
-        } else if ( ai.has_colonist && !ai.has_settlement ) {
-        }
-      } break;
-    }
-  }
-
-
 };// namespace PlayerSystem
