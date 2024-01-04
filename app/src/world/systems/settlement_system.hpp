@@ -67,7 +67,7 @@ namespace SettlementSystem {
   //         return LoadTextureFromImage( base );
   // }
 
-  inline void SpawnSettlement() {
+  inline void spawn_settlement_for_selected() {
     Actor::Component unit =
       Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
       );
@@ -112,6 +112,8 @@ namespace SettlementSystem {
       }
     }
   }
+
+  inline void spawn_settlement_for_player( entt::entity owner ) {}
 
   inline void TrainRegiment( UnitType type ) {
     Settlement::Component &settlement =
@@ -317,6 +319,21 @@ namespace SettlementSystem {
       // // Draw Settlement
       DrawTextureV( settlement.texture, SettlementPosition( province ), WHITE );
     }
+  }
+
+  inline bool player_has_settlement( entt::entity owner ) {
+    auto settlements =
+      Global::world.view<Province::Component, Settlement::Component>();
+
+    for ( auto settlement_e: settlements ) {
+      auto prov = settlements.get<Province::Component>( settlement_e );
+      if ( prov.tile->owner == owner ) {
+        // printf( "AI HAS A SETTLEMENT!!!!!!!!!!!!!!!!!!\n" );
+        return true;
+      }
+    }
+
+    return false;
   }
 
 };// namespace SettlementSystem

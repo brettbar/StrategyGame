@@ -8,12 +8,17 @@
 #include "faction_system.hpp"
 #include "map_system.hpp"
 #include "movement_system.hpp"
+#include "province_system.hpp"
 #include "selection_system.hpp"
 #include "settlement_system.hpp"
 
 #include "../components/player.hpp"
 
 namespace ActorSystem {
+
+  // @todo get rid of this super hardcoded assumption of using the selected entity and selection system
+  // The functions should be oriented towards doing something for a player
+  // and then the selection system then just basically becomes a wrapper for the local human player / host
 
   inline void SpawnColonist( entt::entity, Vector2 );
 
@@ -32,23 +37,12 @@ namespace ActorSystem {
     }
   }
 
-  // A settlement can be placed when
-  // 0. A colonist is selected
-  // 1. The colonist is not moving
-  // 2. The colonist is in a province owned by their faction
-  // 3. The province does not already contain a settlement
-  inline bool ColonistCanPlaceSettlement() {
-    entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
-    // 0. if the colonist isnt selected, bail
-    if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
-      return false;
-
+  inline bool colonist_can_place_settlement( entt::entity colonist ) {
     // 1. if the colonist is moving, bail
-    if ( MovementSystem::ActorIsMoving( selected_entity ) )
+    if ( MovementSystem::ActorIsMoving( colonist ) )
       return false;
 
-    Actor::Component actor =
-      Global::world.get<Actor::Component>( selected_entity );
+    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
 
     i32 closest_tile = DetermineTileIdFromPosition( actor.position );
 
@@ -70,28 +64,54 @@ namespace ActorSystem {
     return false;
   }
 
-  // TODO(rf)
-  // This probably has totally shit performance since we are basically spamming true false
-  // interface updates.
-  //
-  // What would be better is to check the conditions every frame first and only toggle clickability
-  // If there is a change
-  inline void EvaluateActorActions() {
-    if ( ColonistCanPlaceSettlement() ) {
-      // std::cout << "ColonistCanPlace true" << '\n';
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ActorCanSpawnSettlement,
-        .condition = true,
+  inline bool colonist_can_claim_province( entt::entity colonist ) {
+    if ( MovementSystem::ActorIsMoving( colonist ) )
+      return false;
+
+    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
+
+    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+    // 2. if they aren't in a tile, bail
+    if ( closest_tile == -1 )
+      return false;
+
+    for ( auto entity: Global::world.view<Province::Component>() ) {
+      auto &prov = Global::world.get<Province::Component>( entity );
+
+      // 3. if the closest tile is unowned and of a valid biome
+      if ( prov.tile->id == closest_tile && prov.tile->owner == entt::null ) {
+        return true;
       }
-        .Send();
-    } else {
-      // std::cout << "ColonistCanPlace false" << '\n';
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ActorCanSpawnSettlement,
-        .condition = false,
-      }
-        .Send();
     }
+
+    // Otherwise, default to false
+    return false;
+  }
+
+  inline void colonist_claim_province( entt::entity colonist ) {
+
+    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
+
+    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+    // 2. if they aren't in a tile, bail
+    if ( closest_tile == -1 )
+      return;
+
+    ProvinceSystem::AssignProvince( actor.owner, actor.position );
+  }
+
+  // A settlement can be placed when
+  // 0. A colonist is selected
+  // 1. The colonist is not moving
+  // 2. The colonist is in a province owned by their faction
+  // 3. The province does not already contain a settlement
+  inline bool selected_colonist_can_place_settlement() {
+    entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
+    // 0. if the colonist isnt selected, bail
+    if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
+      return false;
+
+    return colonist_can_place_settlement( selected_entity );
   }
 
   inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
@@ -159,6 +179,20 @@ namespace ActorSystem {
     }
 
     Global::world.destroy( selectedEntity );
+  }
+
+  inline entt::entity get_colonist_of_player( entt::entity owner ) {
+    auto actors = Global::world.view<Actor::Component>();
+
+    for ( auto actor_e: actors ) {
+      Actor::Component actor = actors.get<Actor::Component>( actor_e );
+
+      if ( actor.type == Actor::Type::Colonist && actor.owner == owner ) {
+        return actor_e;
+      }
+    }
+
+    return entt::null;
   }
 
 };// namespace ActorSystem

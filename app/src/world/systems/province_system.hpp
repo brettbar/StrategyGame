@@ -49,6 +49,7 @@ namespace ProvinceSystem {
     // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
     DrawTextureRec( texture, frameRec, tile.position, WHITE );
   }
+
   inline void Draw( Camera2D &camera ) {
     // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
     for ( auto entity: Global::world.view<Province::Component>() ) {
@@ -72,6 +73,19 @@ namespace ProvinceSystem {
     }
   }
 
+  inline bool player_has_province( entt::entity owner ) {
+    auto settlements = Global::world.view<Province::Component>();
+
+    for ( auto settlement_e: settlements ) {
+      auto prov = settlements.get<Province::Component>( settlement_e );
+      if ( prov.tile->owner == owner ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 
   inline void AssignProvince( entt::entity owner, Vector2 pos ) {
     i32 prov_id = DetermineTileIdFromPosition( pos );
@@ -86,56 +100,14 @@ namespace ProvinceSystem {
         continue;
 
       prov.tile->owner = owner;
-      // Settlement::Component settlement = {
-      //   .id = prov.id,
-      //   .population =
-      //     {
-      //       .current = 200,
-      //       .birthRate = 40,
-      //       .deathRate = 10,
-      //       .growthRate = ( 40.0f - 10.0f ) / 200,
-      //       .carryingCapacity = 1000,
-      //     },
-      // };
-
-      // switch ( prov.owner ) {
-      //   case 0: {
-      //     settlement.name = "Rome";
-      //     u32 choice = RollN( 4 );
-      //     printf( "choice %d\n", choice );
-
-      //     std::string foo = "roman_s" + std::to_string( choice );
-      //     std::cout << "std::string " << foo << "\n";
-
-      //     const char *bar = foo.c_str();
-      //     printf( "c_str %s", bar );
-
-      //     Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-      //     ImageAlphaPremultiply( &base );
-      //     ImageDraw(
-      //       &base,
-      //       building_map.at( bar ),
-      //       { 0, 0, 16, 16 },
-      //       { 0, 0, 16, 16 },
-      //       WHITE );
-      //     settlement.texture = LoadTextureFromImage( base );
-      //   } break;
-      //   case 1:
-      //     settlement.name = "Athens";
-      //     break;
-      //   case 2:
-      //     settlement.name = "Lugudunon";
-      //     break;
-      //   case 3:
-      //     settlement.name = "Carthage";
-      //     break;
-      //   case 4:
-      //     settlement.name = "Persepolis";
-      //     break;
-      // }
-
-      // registry.emplace<Settlement::Component>( ent, settlement );
     }
+  }
+
+  inline void claim_province_for_player(
+    entt::entity owner,
+    vec2f colonist_pos
+  ) {
+    AssignProvince( owner, colonist_pos );
   }
 
   inline void SetProvinceOwner( entt::entity owner ) {
@@ -154,14 +126,3 @@ namespace ProvinceSystem {
     AssignProvince( owner, actor.position );
   }
 };// namespace ProvinceSystem
-
-
-//  Tile *FindTileByCoord(TileMap &tileMap, u32 x, u32 y)
-//  {
-//
-//    if ((x >= 0 && x <= MAP_WIDTH) && (y >= 0 && y <= MAP_HEIGHT))
-//    {
-//      return tileMap.tiles[index(x, y)];
-//    }
-//    return nullptr;
-//  }

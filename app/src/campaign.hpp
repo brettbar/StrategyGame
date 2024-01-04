@@ -167,7 +167,6 @@ inline void Campaign::Update60TPS() {
   MovementSystem::Update( animated_actors, Global::state.timeScale );
   AnimationSystem::Update( animated_actors, Global::state.timeScale );
   PlayerSystem::Update( players );
-  ActorSystem::EvaluateActorActions();
   //  Terrain::UpdateFOW(reg);
 }
 
@@ -494,7 +493,7 @@ inline void Campaign::Receive( const Command &cmd ) {
       }
 
       if ( cmd.msg == "Player spawn Settlement" ) {
-        SettlementSystem::SpawnSettlement();
+        SettlementSystem::spawn_settlement_for_selected();
       }
 
 
