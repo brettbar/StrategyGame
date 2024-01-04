@@ -127,7 +127,7 @@ inline void Campaign::Start( str player_faction ) {
   ProvinceSystem::Init();
   Renderer::Init();
 
-  ActorSystem::SpawnStartingColonists();
+  Actor::System::Init();
   AI::Start();
 
   _command_queue = entt::dispatcher{};
@@ -482,7 +482,7 @@ inline void Campaign::Receive( const Command &cmd ) {
     }
     case CommandType::Spawn: {
       if ( cmd.msg == "Player spawn Villager" ) {
-        ActorSystem::SpawnColonist( cmd.player_e, cmd.click_pos );
+        Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
         return;
       }
 

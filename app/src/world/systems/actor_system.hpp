@@ -14,185 +14,187 @@
 
 #include "../components/player.hpp"
 
-namespace ActorSystem {
+// @todo get rid of this super hardcoded assumption of using the selected entity and selection system
+// The functions should be oriented towards doing something for a player
+// and then the selection system then just basically becomes a wrapper for the local human player / host
 
-  // @todo get rid of this super hardcoded assumption of using the selected entity and selection system
-  // The functions should be oriented towards doing something for a player
-  // and then the selection system then just basically becomes a wrapper for the local human player / host
+namespace Actor {
 
-  inline void SpawnColonist( entt::entity, Vector2 );
+  class System {
 
-  inline void SpawnStartingColonists() {
-    auto players = Global::world.view<Player::Component>();
+public:
+    inline static void Init() {
+      auto players = Global::world.view<Player::Component>();
 
+      for ( auto player_e: players ) {
+        auto player = players.get<Player::Component>( player_e );
 
-    for ( auto player_e: players ) {
-      auto player = players.get<Player::Component>( player_e );
-
-      if ( player.player_id == "player_0" ) {
-        SpawnColonist( player.id, { 75 * TILE_WIDTH, 70 * TILE_HEIGHT } );
-      } else {
-        SpawnColonist( player.id, { 70 * TILE_WIDTH, 70 * TILE_HEIGHT } );
-      }
-    }
-  }
-
-  inline bool colonist_can_place_settlement( entt::entity colonist ) {
-    // 1. if the colonist is moving, bail
-    if ( MovementSystem::ActorIsMoving( colonist ) )
-      return false;
-
-    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
-
-    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
-
-    // 2. if they aren't in a tile, bail
-    if ( closest_tile == -1 )
-      return false;
-
-    for ( auto entity: Global::world.view<Province::Component>() ) {
-      auto &prov = Global::world.get<Province::Component>( entity );
-
-      // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
-      if ( prov.tile->id == closest_tile && prov.tile->owner == actor.owner && !Global::world.any_of<Settlement::Component>( entity ) )
-      {
-        return true;
+        if ( player.player_id == "player_0" ) {
+          spawn_colonist( player.id, { 75 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+        } else {
+          spawn_colonist( player.id, { 70 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+        }
       }
     }
 
-    // Otherwise, default to false
-    return false;
-  }
+    inline static entt::entity get_colonist_of_player( entt::entity owner ) {
+      auto actors = Global::world.view<Actor::Component>();
 
-  inline bool colonist_can_claim_province( entt::entity colonist ) {
-    if ( MovementSystem::ActorIsMoving( colonist ) )
-      return false;
+      for ( auto actor_e: actors ) {
+        Actor::Component actor = actors.get<Actor::Component>( actor_e );
 
-    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
-
-    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
-    // 2. if they aren't in a tile, bail
-    if ( closest_tile == -1 )
-      return false;
-
-    for ( auto entity: Global::world.view<Province::Component>() ) {
-      auto &prov = Global::world.get<Province::Component>( entity );
-
-      // 3. if the closest tile is unowned and of a valid biome
-      if ( prov.tile->id == closest_tile && prov.tile->owner == entt::null ) {
-        return true;
+        if ( actor.type == Actor::Type::Colonist && actor.owner == owner ) {
+          return actor_e;
+        }
       }
+
+      return entt::null;
     }
 
-    // Otherwise, default to false
-    return false;
-  }
+    inline static bool colonist_can_claim_province( entt::entity colonist ) {
+      if ( MovementSystem::ActorIsMoving( colonist ) )
+        return false;
 
-  inline void colonist_claim_province( entt::entity colonist ) {
+      Actor::Component actor = Global::world.get<Actor::Component>( colonist );
 
-    Actor::Component actor = Global::world.get<Actor::Component>( colonist );
+      i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+      // 2. if they aren't in a tile, bail
+      if ( closest_tile == -1 )
+        return false;
 
-    i32 closest_tile = DetermineTileIdFromPosition( actor.position );
-    // 2. if they aren't in a tile, bail
-    if ( closest_tile == -1 )
-      return;
+      for ( auto entity: Global::world.view<Province::Component>() ) {
+        auto &prov = Global::world.get<Province::Component>( entity );
 
-    ProvinceSystem::AssignProvince( actor.owner, actor.position );
-  }
-
-  // A settlement can be placed when
-  // 0. A colonist is selected
-  // 1. The colonist is not moving
-  // 2. The colonist is in a province owned by their faction
-  // 3. The province does not already contain a settlement
-  inline bool selected_colonist_can_place_settlement() {
-    entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
-    // 0. if the colonist isnt selected, bail
-    if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
-      return false;
-
-    return colonist_can_place_settlement( selected_entity );
-  }
-
-  inline void CreateColonist( entt::entity owner, Vector2 spawn ) {
-    Texture2D sprite = FactionSystem::DetermineTextureFromFaction( owner );
-    entt::entity entity = Global::world.create();
-    Actor::Component actor = {
-      .name = "Marcus Priscus",
-      .type = Actor::Type::Colonist,
-      .owner = owner,
-      .position = spawn,
-      .destination = spawn,
-      .speed = 1.0f,
-    };
-
-    Animated::Animations animations = {
-      { Animated::AnimState::IDLE_DR, 2, 0.2f },
-      { Animated::AnimState::IDLE_DL, 2, 0.2f },
-      { Animated::AnimState::WALK_DL, 8, 0.8f },
-      { Animated::AnimState::WALK_DL, 8, 0.8f },
-    };
-
-    Animated::Component animated = {
-      .sprite = sprite,
-      .frameRec = { 0, 0, 128, 128 },
-      .state = Animated::AnimState::IDLE_DR,
-      .animations = animations,
-      .direction = 0,
-      .currFrame = 0,
-      .animTime = 0.0f,
-      .moving = false,
-    };
-
-    Sight::Component sight = {
-      .range = 1,
-    };
-
-    Global::world.emplace<Actor::Component>( entity, actor );
-    Global::world.emplace<Animated::Component>( entity, animated );
-    Global::world.emplace<Sight::Component>( entity, sight );
-  }
-
-
-  inline void SpawnColonist( entt::entity owner, Vector2 clickPos ) {
-    std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
-    assert( spawn != nullptr );
-
-    ActorSystem::CreateColonist( owner, *spawn );
-  }
-
-  inline void SpawnColonist( entt::entity owner ) {
-    std::unique_ptr<Vector2> spawn =
-      std::make_unique<Vector2>( Vector2{ 64 * 64, 64 * 64 } );
-
-    ActorSystem::CreateColonist( owner, *spawn );
-  }
-
-  inline void DeleteSelected() {
-    auto selectedView =
-      Global::world.view<Selected::Component, Actor::Component>();
-    auto selectedEntity = selectedView.front();
-
-    if ( selectedEntity == entt::null ) {
-      printf( "No selected entity, cancelling\n" );
-      return;
-    }
-
-    Global::world.destroy( selectedEntity );
-  }
-
-  inline entt::entity get_colonist_of_player( entt::entity owner ) {
-    auto actors = Global::world.view<Actor::Component>();
-
-    for ( auto actor_e: actors ) {
-      Actor::Component actor = actors.get<Actor::Component>( actor_e );
-
-      if ( actor.type == Actor::Type::Colonist && actor.owner == owner ) {
-        return actor_e;
+        // 3. if the closest tile is unowned and of a valid biome
+        if ( prov.tile->id == closest_tile && prov.tile->owner == entt::null ) {
+          return true;
+        }
       }
+
+      // Otherwise, default to false
+      return false;
     }
 
-    return entt::null;
-  }
+    inline static void colonist_claim_province( entt::entity colonist ) {
+      Actor::Component actor = Global::world.get<Actor::Component>( colonist );
 
-};// namespace ActorSystem
+      i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+      // 2. if they aren't in a tile, bail
+      if ( closest_tile == -1 )
+        return;
+
+      ProvinceSystem::AssignProvince( actor.owner, actor.position );
+    }
+
+
+    inline static bool colonist_can_place_settlement( entt::entity colonist ) {
+      // 1. if the colonist is moving, bail
+      if ( MovementSystem::ActorIsMoving( colonist ) )
+        return false;
+
+      Actor::Component actor = Global::world.get<Actor::Component>( colonist );
+
+      i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+
+      // 2. if they aren't in a tile, bail
+      if ( closest_tile == -1 )
+        return false;
+
+      for ( auto entity: Global::world.view<Province::Component>() ) {
+        auto &prov = Global::world.get<Province::Component>( entity );
+
+        // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
+        if ( prov.tile->id == closest_tile && prov.tile->owner == actor.owner && !Global::world.any_of<Settlement::Component>( entity ) ) {
+          return true;
+        }
+      }
+
+      // Otherwise, default to false
+      return false;
+    }
+
+
+    inline static void spawn_colonist( entt::entity owner, Vector2 clickPos ) {
+      std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
+      assert( spawn != nullptr );
+
+      create_colonist( owner, *spawn );
+    }
+
+private:
+    // A settlement can be placed when
+    // 0. A colonist is selected
+    // 1. The colonist is not moving
+    // 2. The colonist is in a province owned by their faction
+    // 3. The province does not already contain a settlement
+    inline bool selected_colonist_can_place_settlement() {
+      entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
+      // 0. if the colonist isnt selected, bail
+      if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
+        return false;
+
+      return colonist_can_place_settlement( selected_entity );
+    }
+
+    inline static void create_colonist( entt::entity owner, Vector2 spawn ) {
+      Texture2D sprite = FactionSystem::DetermineTextureFromFaction( owner );
+      entt::entity entity = Global::world.create();
+      Actor::Component actor = {
+        .name = "Marcus Priscus",
+        .type = Actor::Type::Colonist,
+        .owner = owner,
+        .position = spawn,
+        .destination = spawn,
+        .speed = 1.0f,
+      };
+
+      Animated::Animations animations = {
+        { Animated::AnimState::IDLE_DR, 2, 0.2f },
+        { Animated::AnimState::IDLE_DL, 2, 0.2f },
+        { Animated::AnimState::WALK_DL, 8, 0.8f },
+        { Animated::AnimState::WALK_DL, 8, 0.8f },
+      };
+
+      Animated::Component animated = {
+        .sprite = sprite,
+        .frameRec = { 0, 0, 128, 128 },
+        .state = Animated::AnimState::IDLE_DR,
+        .animations = animations,
+        .direction = 0,
+        .currFrame = 0,
+        .animTime = 0.0f,
+        .moving = false,
+      };
+
+      Sight::Component sight = {
+        .range = 1,
+      };
+
+      Global::world.emplace<Actor::Component>( entity, actor );
+      Global::world.emplace<Animated::Component>( entity, animated );
+      Global::world.emplace<Sight::Component>( entity, sight );
+    }
+
+
+    inline void spawn_colonist( entt::entity owner ) {
+      std::unique_ptr<Vector2> spawn =
+        std::make_unique<Vector2>( Vector2{ 64 * 64, 64 * 64 } );
+
+      create_colonist( owner, *spawn );
+    }
+
+    inline void DeleteSelected() {
+      auto selectedView =
+        Global::world.view<Selected::Component, Actor::Component>();
+      auto selectedEntity = selectedView.front();
+
+      if ( selectedEntity == entt::null ) {
+        printf( "No selected entity, cancelling\n" );
+        return;
+      }
+
+      Global::world.destroy( selectedEntity );
+    }
+  };
+
+};// namespace Actor

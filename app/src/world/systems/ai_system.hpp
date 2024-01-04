@@ -24,12 +24,12 @@ namespace AI {
   inline bool condition_met( Condition cond, entt::entity ai_player ) {
     switch ( cond ) {
       case Condition::HasColonistOnEligibleTerrain: {
-        auto colonist_e = ActorSystem::get_colonist_of_player( ai_player );
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
 
         if ( colonist_e == entt::null )
           return false;
 
-        return ActorSystem::colonist_can_claim_province( colonist_e );
+        return Actor::System::colonist_can_claim_province( colonist_e );
 
       } break;
 
@@ -50,7 +50,7 @@ namespace AI {
       case Action_t::BuildSettlement:
         return true;
       case Action_t::ClaimProvince: {
-        auto colonist_e = ActorSystem::get_colonist_of_player( ai_player );
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
 
         if ( colonist_e == entt::null )
           return false;
@@ -58,7 +58,7 @@ namespace AI {
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        ActorSystem::colonist_claim_province( colonist_e);
+        Actor::System::colonist_claim_province( colonist_e );
 
         // @todo did it actually succeed
         return true;
