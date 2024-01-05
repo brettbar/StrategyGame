@@ -57,7 +57,18 @@ namespace AI {
           Global::world.get<Actor::Component>( colonist_e );
 
         Actor::System::colonist_build_settlement( colonist_e );
-        return false;
+
+        // @todo this is missing a step that is found in campaigns PostCommand
+        Commands::Manager()->enqueue( {
+          Commands::Type::Spawn,
+          ai_player,
+          "Player spawn Settlement",
+          actor.position,
+        } );
+
+
+        // @todo did it actually succeed
+        return true;
       } break;
       case Action_t::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
@@ -68,12 +79,12 @@ namespace AI {
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        // PostCommand( {
-        //   Commands::Command_t::Spawn,
-        //   ai_player,
-        //   "Player taking ownership of Province",
-        //   actor.position,
-        // } );
+        Commands::Manager()->enqueue( {
+          Commands::Type::ClaimProvince,
+          ai_player,
+          "Player taking ownership of Province",
+          actor.position,
+        } );
 
         // @todo did it actually succeed
         return true;

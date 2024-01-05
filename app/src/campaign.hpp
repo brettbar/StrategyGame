@@ -81,8 +81,8 @@ struct Campaign {
 
   void Draw();
 
-  void Receive( const Commands::Command & );
-  void HandleSpawnRequest( const Commands::Command & );
+  void EvaluteCommands( const Commands::Command & );
+  // void HandleSpawnRequest( const Commands::Command & );
   void HandleTimeChangeRequest( const Commands::Command & );
 
   // void ForwardEvent( const InterfaceEvent::Data & );
@@ -90,7 +90,6 @@ struct Campaign {
 
 
   private:
-  entt::dispatcher _command_queue;
   bool _is_singleplayer = true;
 };
 
@@ -118,31 +117,34 @@ inline void Campaign::Start( str player_faction ) {
   Actor::System::Init();
   AI::Start();
 
-  _command_queue = entt::dispatcher{};
-  _command_queue.sink<Commands::Command>().connect<&Campaign::Receive>( this );
+  Commands::Manager()->init();
+
+  Commands::Manager()
+    ->queue.sink<Commands::Command>()
+    .connect<&Campaign::EvaluteCommands>( this );
 }
 
 inline void Campaign::Load() {
   SaveSystem::Load();
   MapSystem::Manager()->Init();
   Renderer::Init();
-  // Commands::Listen();
+  Commands::Manager()->init();
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
       settlement.texture =
         LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
     }
   );
-
-  _command_queue = entt::dispatcher{};
-  _command_queue.sink<Commands::Command>().connect<&Campaign::Receive>( this );
+  Commands::Manager()
+    ->queue.sink<Commands::Command>()
+    .connect<&Campaign::EvaluteCommands>( this );
 }
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   CheckForInput();
   CheckForUIInteractions();
-  _command_queue.update();
+  Commands::Manager()->poll();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
@@ -150,7 +152,6 @@ inline void Campaign::Update60TPS() {
   auto animated_actors =
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
-
 
   MovementSystem::Update( animated_actors, Global::state.timeScale );
   AnimationSystem::Update( animated_actors, Global::state.timeScale );
@@ -270,7 +271,7 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnActor:
         PostCommand( {
-          .type = Commands::Command_t::Spawn,
+          .type = Commands::Type::Spawn,
           .player_e = player_e,
           .msg = "Player spawn Villager",
           .click_pos = SettlementSystem::SettlementPosition( *prov ),
@@ -299,7 +300,7 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_ActorContext::ClaimProvince: {
         PostCommand( {
-          Commands::Command_t::Spawn,
+          Commands::Type::Spawn,
           player_e,
           "Player taking ownership of Province",
           actor->position,
@@ -307,8 +308,10 @@ inline void Campaign::CheckForUIInteractions() {
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
         PostCommand( Commands::Command{
-          .type = Commands::Command_t::Spawn,
-          .msg = "Player spawn Settlement",
+          Commands::Type::BuildSettlement,
+          player_e,
+          "Player spawn Settlement",
+          actor->position,
         } );
       } break;
       case UI::Action_ActorContext::None:
@@ -332,35 +335,32 @@ inline void Campaign::CheckForInput() {
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
     PostCommand(
-      { Commands::Command_t::TimeChange, player_e, "Player request Pause" }
+      { Commands::Type::TimeChange, player_e, "Player request Pause" }
     );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) ) {
     PostCommand(
-      { Commands::Command_t::TimeChange, player_e, "Player request Slower" }
+      { Commands::Type::TimeChange, player_e, "Player request Slower" }
     );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) ) {
     PostCommand(
-      { Commands::Command_t::TimeChange, player_e, "Player request Faster" }
+      { Commands::Type::TimeChange, player_e, "Player request Faster" }
     );
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
     PostCommand(
-      { Commands::Command_t::Spawn,
-        player_e,
-        "Player spawn Villager",
-        click_pos }
+      { Commands::Type::Spawn, player_e, "Player spawn Villager", click_pos }
     );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
     // TODO rename to took ownership
     PostCommand(
-      { Commands::Command_t::Spawn,
+      { Commands::Type::ClaimProvince,
         player_e,
         "Player taking ownership of Province",
         click_pos }
@@ -387,7 +387,7 @@ inline void Campaign::CheckForInput() {
         std::cout << "Moving entity: " << EntityIdToString( selected_e )
                   << '\n';
         PostCommand( {
-          Commands::Command_t::Move,
+          Commands::Type::Move,
           player_e,
           "Player move",
           click_pos,
@@ -412,7 +412,7 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
   std::cout << "BODY" << body << '\n';
 
   str cmd_player_id = body["cmd_player"];
-  Commands::Command_t cmd_type = body["cmd_type"];
+  Commands::Type cmd_type = body["cmd_type"];
   str cmd_msg = body["cmd_msg"];
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
@@ -427,13 +427,15 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
     std::cout << "cmd_player_id: " << cmd_player_id << '\n';
 
     if ( pc.player_id == cmd_player_id ) {
-      _command_queue.enqueue( Commands::Command{
+      auto cmd = Commands::Command{
         .type = cmd_type,
         .player_e = player,
         .msg = cmd_msg,
         .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
         .entity = entity,
-      } );
+      };
+
+      Commands::Manager()->enqueue( cmd );
     }
   }
 }
@@ -441,7 +443,7 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
 
 inline void Campaign::PostCommand( Commands::Command cmd ) {
   if ( _is_singleplayer ) {
-    _command_queue.enqueue( cmd );
+    Commands::Manager()->enqueue( cmd );
   } else {
     auto body = nlohmann::json{
       { "cmd_player", GetLocalPlayerID() },
@@ -457,7 +459,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
         Network::MessageID::Command,
         body,
       } );
-      _command_queue.enqueue( cmd );
+      Commands::Manager()->enqueue( cmd );
     } else {
       Network::Client()->SendMessageToHost( Network::Message{
         Network::MessageID::Command,
@@ -468,23 +470,29 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
 }
 
 
-inline void Campaign::Receive( const Commands::Command &cmd ) {
+// @todo This should be split to explicit Evaluate and Execute steps.
+inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
-    case Commands::Command_t::TimeChange: {
+    case Commands::Type::BuildSettlement: {
+      if ( cmd.msg == "Player spawn Settlement" ) {
+        SettlementSystem::spawn_settlement_for_player();
+      }
+    } break;
+    case Commands::Type::ClaimProvince: {
+      if ( cmd.msg == "Player taking ownership of Province" ) {
+        ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
+      }
+    } break;
+    case Commands::Type::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
     }
-    case Commands::Command_t::Spawn: {
+    case Commands::Type::Spawn: {
       if ( cmd.msg == "Player spawn Villager" ) {
         Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
         return;
       }
 
-      // TODO(nick) if (cmd.msg = "Player spawn Army")
-
-      if ( cmd.msg == "Player taking ownership of Province" ) {
-        ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
-      }
 
       if ( cmd.msg == "Player spawn Settlement" ) {
         SettlementSystem::spawn_settlement_for_selected();
@@ -493,7 +501,7 @@ inline void Campaign::Receive( const Commands::Command &cmd ) {
 
       return;
     }
-    case Commands::Command_t::Move: {
+    case Commands::Type::Move: {
       MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }

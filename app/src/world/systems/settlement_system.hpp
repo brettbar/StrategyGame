@@ -55,6 +55,8 @@ namespace SettlementSystem {
     }
   }
 
+  inline void spawn_settlement_for_player( entt::entity owner ) {}
+
   inline void spawn_settlement_for_selected() {
     Actor::Component unit =
       Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
@@ -101,7 +103,6 @@ namespace SettlementSystem {
     }
   }
 
-  inline void spawn_settlement_for_player( entt::entity owner ) {}
 
   inline void TrainRegiment( UnitType type ) {
     Settlement::Component &settlement =
