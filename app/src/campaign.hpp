@@ -1,4 +1,4 @@
-// TODO
+// @todo
 // Add an explicity Eval step and Execute step
 // Eval:
 // - 0. (happens in game regardless of campaign) Process Events
@@ -30,12 +30,14 @@
 #include "world/systems/actor_system.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
+#include "world/systems/commands.hpp"
 #include "world/systems/faction_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
 #include "world/systems/settlement_system.hpp"
+
 
 #include "renderer/renderer.hpp"
 
@@ -45,20 +47,6 @@
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include <raylib.h>
 
-enum class CommandType {
-  TimeChange,
-  Spawn,
-  Move,
-};
-
-struct Command {
-  CommandType type;
-  entt::entity player_e;
-
-  str msg;
-  Vector2 click_pos;
-  entt::entity entity;
-};
 
 struct Campaign {
   Campaign( bool is_singleplayer ) {
@@ -89,13 +77,13 @@ struct Campaign {
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
   void Update1TPS();
-  void PostCommand( Command );
+  void PostCommand( Commands::Command );
 
   void Draw();
 
-  void Receive( const Command & );
-  void HandleSpawnRequest( const Command & );
-  void HandleTimeChangeRequest( const Command & );
+  void Receive( const Commands::Command & );
+  void HandleSpawnRequest( const Commands::Command & );
+  void HandleTimeChangeRequest( const Commands::Command & );
 
   // void ForwardEvent( const InterfaceEvent::Data & );
   void ConvertCommandRequest( str );
@@ -131,7 +119,7 @@ inline void Campaign::Start( str player_faction ) {
   AI::Start();
 
   _command_queue = entt::dispatcher{};
-  _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
+  _command_queue.sink<Commands::Command>().connect<&Campaign::Receive>( this );
 }
 
 inline void Campaign::Load() {
@@ -147,7 +135,7 @@ inline void Campaign::Load() {
   );
 
   _command_queue = entt::dispatcher{};
-  _command_queue.sink<Command>().connect<&Campaign::Receive>( this );
+  _command_queue.sink<Commands::Command>().connect<&Campaign::Receive>( this );
 }
 
 // Runs inside game loop
@@ -282,7 +270,7 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnActor:
         PostCommand( {
-          .type = CommandType::Spawn,
+          .type = Commands::Command_t::Spawn,
           .player_e = player_e,
           .msg = "Player spawn Villager",
           .click_pos = SettlementSystem::SettlementPosition( *prov ),
@@ -311,15 +299,15 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_ActorContext::ClaimProvince: {
         PostCommand( {
-          CommandType::Spawn,
+          Commands::Command_t::Spawn,
           player_e,
           "Player taking ownership of Province",
           actor->position,
         } );
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
-        PostCommand( Command{
-          .type = CommandType::Spawn,
+        PostCommand( Commands::Command{
+          .type = Commands::Command_t::Spawn,
           .msg = "Player spawn Settlement",
         } );
       } break;
@@ -343,30 +331,36 @@ inline void Campaign::CheckForInput() {
   }
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
-    PostCommand( { CommandType::TimeChange, player_e, "Player request Pause" }
+    PostCommand(
+      { Commands::Command_t::TimeChange, player_e, "Player request Pause" }
     );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) ) {
-    PostCommand( { CommandType::TimeChange, player_e, "Player request Slower" }
+    PostCommand(
+      { Commands::Command_t::TimeChange, player_e, "Player request Slower" }
     );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) ) {
-    PostCommand( { CommandType::TimeChange, player_e, "Player request Faster" }
+    PostCommand(
+      { Commands::Command_t::TimeChange, player_e, "Player request Faster" }
     );
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
     PostCommand(
-      { CommandType::Spawn, player_e, "Player spawn Villager", click_pos }
+      { Commands::Command_t::Spawn,
+        player_e,
+        "Player spawn Villager",
+        click_pos }
     );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
     // TODO rename to took ownership
     PostCommand(
-      { CommandType::Spawn,
+      { Commands::Command_t::Spawn,
         player_e,
         "Player taking ownership of Province",
         click_pos }
@@ -393,7 +387,7 @@ inline void Campaign::CheckForInput() {
         std::cout << "Moving entity: " << EntityIdToString( selected_e )
                   << '\n';
         PostCommand( {
-          CommandType::Move,
+          Commands::Command_t::Move,
           player_e,
           "Player move",
           click_pos,
@@ -418,7 +412,7 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
   std::cout << "BODY" << body << '\n';
 
   str cmd_player_id = body["cmd_player"];
-  CommandType cmd_type = body["cmd_type"];
+  Commands::Command_t cmd_type = body["cmd_type"];
   str cmd_msg = body["cmd_msg"];
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
@@ -433,7 +427,7 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
     std::cout << "cmd_player_id: " << cmd_player_id << '\n';
 
     if ( pc.player_id == cmd_player_id ) {
-      _command_queue.enqueue( Command{
+      _command_queue.enqueue( Commands::Command{
         .type = cmd_type,
         .player_e = player,
         .msg = cmd_msg,
@@ -445,7 +439,7 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
 }
 
 
-inline void Campaign::PostCommand( Command cmd ) {
+inline void Campaign::PostCommand( Commands::Command cmd ) {
   if ( _is_singleplayer ) {
     _command_queue.enqueue( cmd );
   } else {
@@ -474,13 +468,13 @@ inline void Campaign::PostCommand( Command cmd ) {
 }
 
 
-inline void Campaign::Receive( const Command &cmd ) {
+inline void Campaign::Receive( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
-    case CommandType::TimeChange: {
+    case Commands::Command_t::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
     }
-    case CommandType::Spawn: {
+    case Commands::Command_t::Spawn: {
       if ( cmd.msg == "Player spawn Villager" ) {
         Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
         return;
@@ -499,7 +493,7 @@ inline void Campaign::Receive( const Command &cmd ) {
 
       return;
     }
-    case CommandType::Move: {
+    case Commands::Command_t::Move: {
       MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }
@@ -507,7 +501,7 @@ inline void Campaign::Receive( const Command &cmd ) {
 }
 
 
-inline void Campaign::HandleTimeChangeRequest( const Command &cmd ) {
+inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
   if ( cmd.msg == "Player request Pause" ) {
     std::cout << cmd.msg << std::endl;
 

@@ -75,6 +75,15 @@ public:
       return false;
     }
 
+    inline static void colonist_build_settlement( entt::entity colonist ) {
+      Actor::Component actor = Global::world.get<Actor::Component>( colonist );
+
+      i32 closest_tile = DetermineTileIdFromPosition( actor.position );
+      // 2. if they aren't in a tile, bail
+      if ( closest_tile == -1 )
+        return;
+    }
+
     inline static void colonist_claim_province( entt::entity colonist ) {
       Actor::Component actor = Global::world.get<Actor::Component>( colonist );
 

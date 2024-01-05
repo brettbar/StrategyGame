@@ -8,6 +8,7 @@
 #include "../components/province.hpp"
 #include "../components/settlement.hpp"
 #include "actor_system.hpp"
+#include "commands.hpp"
 #include "province_system.hpp"
 #include "settlement_system.hpp"
 #include <condition_variable>
@@ -47,8 +48,17 @@ namespace AI {
 
   inline bool do_action( Action a, entt::entity ai_player ) {
     switch ( a.type ) {
-      case Action_t::BuildSettlement:
-        return true;
+      case Action_t::BuildSettlement: {
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
+        if ( colonist_e == entt::null )
+          return false;
+
+        Actor::Component actor =
+          Global::world.get<Actor::Component>( colonist_e );
+
+        Actor::System::colonist_build_settlement( colonist_e );
+        return false;
+      } break;
       case Action_t::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
 
@@ -58,7 +68,12 @@ namespace AI {
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        Actor::System::colonist_claim_province( colonist_e );
+        // PostCommand( {
+        //   Commands::Command_t::Spawn,
+        //   ai_player,
+        //   "Player taking ownership of Province",
+        //   actor.position,
+        // } );
 
         // @todo did it actually succeed
         return true;
@@ -125,16 +140,6 @@ namespace AI {
             },
         };
     }
-  }
-
-  inline bool goal_met( Goal goal, entt::entity ai_player ) {
-    for ( auto cond: goal.desired_state ) {
-      if ( !condition_met( cond, ai_player ) ) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   inline bool all_conds_met_for_action( Action a, entt::entity ai_player ) {
@@ -221,39 +226,25 @@ namespace AI {
 
     switch ( ai.current_goal.goal ) {
       case Goal_t::None:
-        ai.current_goal = goal( Goal_t::EstablishSettlement );
+        if ( !SettlementSystem::player_has_settlement( ai_player ) )
+          ai.current_goal = goal( Goal_t::EstablishSettlement );
+
         break;
-      case Goal_t::EstablishSettlement:
-        if ( goal_met( ai.current_goal, ai_player ) ) {
+      case Goal_t::EstablishSettlement: {
+        // printf( "player_1 has NOT finished their goal!\n" );
+
+        Plan plan = make_plan( ai.current_goal, ai_player );
+
+        if ( execute_plan( plan, ai_player ) ) {
           printf(
             "player_1 has finished their goal of %d!\n", ai.current_goal.goal
           );
-        } else {
-          // printf( "player_1 has NOT finished their goal!\n" );
 
-          Plan plan = make_plan( ai.current_goal, ai_player );
-
-          bool plan_success = execute_plan( plan, ai_player );
+          ai.current_goal = goal( Goal_t::None );
         }
-        break;
+
+      } break;
     }
   }
 
-
-  // inline void Planner() {
-  //   auto ai_players = Global::world.view<Player::Component, AI::Component>();
-
-  //   for ( auto player_e: ai_players ) {
-  //     auto ai = ai_players.get<AI::Component>( player_e );
-
-  //     switch ( ai.current_goal ) {
-  //       case Goal_t::None:
-  //         ai.current_goal = Goal_t::EstablishSettlement;
-  //         break;
-  //       case Goal_t::EstablishSettlement: {
-
-  //       } break;
-  //     }
-  //   }
-  // }
 };// namespace AI

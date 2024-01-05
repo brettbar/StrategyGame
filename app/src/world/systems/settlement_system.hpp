@@ -55,18 +55,6 @@ namespace SettlementSystem {
     }
   }
 
-  // inline Texture Temp() {
-  //         Image base = GenImageColor( 128, 128, ColorAlpha( WHITE, 0.0 ) );
-  //         // ImageAlphaPremultiply( &base );
-  //         ImageDraw(
-  //           &base,
-  //           building_map.at( "roman_m1" ),
-  //           { 0, 0, 16, 16 },
-  //           { 0, 0, 16, 16 },
-  //           WHITE );
-  //         return LoadTextureFromImage( base );
-  // }
-
   inline void spawn_settlement_for_selected() {
     Actor::Component unit =
       Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
