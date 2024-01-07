@@ -8,7 +8,7 @@ namespace Commands {
   enum class Type {
     Move,
     TimeChange,
-    Spawn,
+    SpawnActor,
     ClaimProvince,
     BuildSettlement,
   };
@@ -24,6 +24,55 @@ namespace Commands {
     Vector2 click_pos;
 
     entt::entity entity;
+
+
+    static Command move(
+      entt::entity player,
+      vec2f click_pos,
+      entt::entity selected_e
+    ) {
+      auto cmd = Command();
+      cmd.type = Type::Move;
+      cmd.player_e = player;
+      cmd.click_pos = click_pos;
+      cmd.entity = selected_e;
+      return cmd;
+    }
+
+
+    static Command build_settlement( entt::entity entity ) {
+      auto cmd = Command();
+      cmd.type = Type::BuildSettlement;
+      cmd.entity = entity;
+      return cmd;
+    }
+
+    static Command claim_province( entt::entity player, vec2f actor_pos ) {
+      auto cmd = Command();
+      cmd.type = Type::ClaimProvince;
+      cmd.player_e = player;
+      cmd.click_pos = actor_pos;
+      return cmd;
+    }
+
+    static Command spawn_actor( entt::entity player, vec2f click_pos ) {
+      auto cmd = Command();
+      cmd.type = Type::SpawnActor;
+      cmd.player_e = player;
+      cmd.click_pos = click_pos;
+      return cmd;
+    }
+
+    static Command time_change( entt::entity player, str msg ) {
+      auto cmd = Command();
+      cmd.type = Type::TimeChange;
+      cmd.player_e = player;
+      cmd.msg = msg;
+      return cmd;
+    }
+
+private:
+    Command() {}
   };
 
   class System {
@@ -38,6 +87,7 @@ public:
     void poll() {
       queue.update();
     }
+
 
     // void receive( const Command &cmd ) {}
 
@@ -61,5 +111,4 @@ private:
   inline System *Manager() {
     return System::Singleton();
   }
-
 };// namespace Commands

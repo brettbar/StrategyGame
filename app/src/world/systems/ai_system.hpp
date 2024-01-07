@@ -53,35 +53,25 @@ namespace AI {
         if ( colonist_e == entt::null )
           return false;
 
-        Actor::Component actor =
-          Global::world.get<Actor::Component>( colonist_e );
-
         // @todo this is missing a step that is found in campaigns PostCommand
-        Commands::Manager()->enqueue( Commands::Command{
-          .type = Commands::Type::BuildSettlement,
-          .msg = "Player spawn Settlement",
-          .entity = colonist_e,
-        } );
-
+        Commands::Manager()->enqueue(
+          Commands::Command::build_settlement( colonist_e )
+        );
 
         // @todo did it actually succeed
         return true;
       } break;
       case Action_t::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
-
         if ( colonist_e == entt::null )
           return false;
 
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        Commands::Manager()->enqueue( {
-          Commands::Type::ClaimProvince,
-          ai_player,
-          "Player taking ownership of Province",
-          actor.position,
-        } );
+        Commands::Manager()->enqueue(
+          Commands::Command::claim_province( ai_player, actor.position )
+        );
 
         // @todo did it actually succeed
         return true;

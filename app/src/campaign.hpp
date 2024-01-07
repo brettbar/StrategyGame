@@ -270,12 +270,9 @@ inline void Campaign::CheckForUIInteractions() {
     auto action = UI::SettlementContext( settlement );
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnActor:
-        PostCommand( {
-          .type = Commands::Type::Spawn,
-          .player_e = player_e,
-          .msg = "Player spawn Villager",
-          .click_pos = SettlementSystem::SettlementPosition( *prov ),
-        } );
+        PostCommand( Commands::Command::spawn_actor(
+          player_e, SettlementSystem::SettlementPosition( *prov )
+        ) );
         break;
       case UI::Action_SettlementContext::SpawnHastati:
         break;
@@ -299,20 +296,12 @@ inline void Campaign::CheckForUIInteractions() {
 
     switch ( action ) {
       case UI::Action_ActorContext::ClaimProvince: {
-        PostCommand( {
-          Commands::Type::Spawn,
-          player_e,
-          "Player taking ownership of Province",
-          actor->position,
-        } );
+        PostCommand(
+          Commands::Command::claim_province( player_e, actor->position )
+        );
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
-        PostCommand( Commands::Command{
-          Commands::Type::BuildSettlement,
-          player_e,
-          "Player spawn Settlement",
-          actor->position,
-        } );
+        PostCommand( Commands::Command::build_settlement( player_e ) );
       } break;
       case UI::Action_ActorContext::None:
         break;
@@ -335,36 +324,28 @@ inline void Campaign::CheckForInput() {
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
     PostCommand(
-      { Commands::Type::TimeChange, player_e, "Player request Pause" }
+      Commands::Command::time_change( player_e, "Player request Pause" )
     );
   }
 
   if ( IsKeyPressed( KEY_MINUS ) ) {
     PostCommand(
-      { Commands::Type::TimeChange, player_e, "Player request Slower" }
+      Commands::Command::time_change( player_e, "Player request Slower" )
     );
   }
 
   if ( IsKeyPressed( KEY_EQUAL ) ) {
     PostCommand(
-      { Commands::Type::TimeChange, player_e, "Player request Faster" }
+      Commands::Command::time_change( player_e, "Player request Faster" )
     );
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    PostCommand(
-      { Commands::Type::Spawn, player_e, "Player spawn Villager", click_pos }
-    );
+    PostCommand( Commands::Command::spawn_actor( player_e, click_pos ) );
   }
 
   if ( IsKeyPressed( KEY_C ) ) {
-    // TODO rename to took ownership
-    PostCommand(
-      { Commands::Type::ClaimProvince,
-        player_e,
-        "Player taking ownership of Province",
-        click_pos }
-    );
+    PostCommand( Commands::Command::claim_province( player_e, click_pos ) );
   }
 
   if ( IsMouseButtonPressed( 0 ) ) {
@@ -386,13 +367,9 @@ inline void Campaign::CheckForInput() {
       if ( selected_e != entt::null ) {
         std::cout << "Moving entity: " << EntityIdToString( selected_e )
                   << '\n';
-        PostCommand( {
-          Commands::Type::Move,
-          player_e,
-          "Player move",
-          click_pos,
-          selected_e,
-        } );
+        PostCommand( Commands::Command::move( player_e, click_pos, selected_e )
+
+        );
       }
     }
   }
@@ -427,15 +404,17 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
     std::cout << "cmd_player_id: " << cmd_player_id << '\n';
 
     if ( pc.player_id == cmd_player_id ) {
-      auto cmd = Commands::Command{
-        .type = cmd_type,
-        .player_e = player,
-        .msg = cmd_msg,
-        .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
-        .entity = entity,
-      };
+      // @todo Gonna need to redo converting net command requests to local again now that
+      // I changed how commands work
+      // auto cmd = Commands::Command{
+      //   .type = cmd_type,
+      //   .player_e = player,
+      //   .msg = cmd_msg,
+      //   .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
+      //   .entity = entity,
+      // };
 
-      Commands::Manager()->enqueue( cmd );
+      // Commands::Manager()->enqueue( cmd );
     }
   }
 }
@@ -474,9 +453,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
 inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
-      if ( cmd.msg == "Player spawn Settlement" ) {
-        SettlementSystem::spawn_settlement( cmd.entity );
-      }
+      SettlementSystem::spawn_settlement( cmd.entity );
 
       // if ( cmd.msg == "Player spawn Settlement" ) {
       //   SettlementSystem::spawn_settlement_for_selected();
@@ -485,20 +462,14 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
 
     } break;
     case Commands::Type::ClaimProvince: {
-      if ( cmd.msg == "Player taking ownership of Province" ) {
-        ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
-      }
+      ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
     } break;
     case Commands::Type::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
     }
-    case Commands::Type::Spawn: {
-      if ( cmd.msg == "Player spawn Villager" ) {
-        Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
-        return;
-      }
-
+    case Commands::Type::SpawnActor: {
+      Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
       return;
     }
     case Commands::Type::Move: {
