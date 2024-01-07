@@ -156,7 +156,10 @@ namespace PlayerSystem {
     for ( auto ai_player:
           Global::world.view<Player::Component, AI::Component>() ) {
 
-      AI::CheckGoals( ai_player );
+      if ( Global::state.timeScale <= 0 ) {
+      } else {
+        AI::execute_goals( ai_player );
+      }
     }
   }
 

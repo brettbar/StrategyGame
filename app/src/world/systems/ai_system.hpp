@@ -204,7 +204,7 @@ namespace AI {
   }
 
 
-  inline void CheckGoals( entt::entity ai_player ) {
+  inline void execute_goals( entt::entity ai_player ) {
     auto player = Global::world.get<Player::Component>( ai_player );
     auto &ai = Global::world.get<AI::Component>( ai_player );
 
