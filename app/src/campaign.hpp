@@ -36,6 +36,7 @@
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
+#include "world/systems/selection_system.hpp"
 #include "world/systems/settlement_system.hpp"
 
 
@@ -301,7 +302,9 @@ inline void Campaign::CheckForUIInteractions() {
         );
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
-        PostCommand( Commands::Command::build_settlement( player_e ) );
+        PostCommand( Commands::Command::build_settlement(
+          SelectionSystem::GetSelectedEntity()
+        ) );
       } break;
       case UI::Action_ActorContext::None:
         break;
@@ -454,12 +457,6 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
       SettlementSystem::spawn_settlement( cmd.entity );
-
-      // if ( cmd.msg == "Player spawn Settlement" ) {
-      //   SettlementSystem::spawn_settlement_for_selected();
-      // }
-
-
     } break;
     case Commands::Type::ClaimProvince: {
       ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );

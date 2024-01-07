@@ -96,10 +96,6 @@ namespace SettlementSystem {
     }
   }
 
-  inline void spawn_settlement_for_selected() {
-    spawn_settlement( SelectionSystem::GetSelectedEntity() );
-  }
-
 
   inline void TrainRegiment( UnitType type ) {
     Settlement::Component &settlement =
