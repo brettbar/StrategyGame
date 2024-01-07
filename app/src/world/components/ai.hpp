@@ -67,16 +67,20 @@ The ultimate final goal a player will have is to become the most
       stack.push_back( action );
     }
 
-    Action pop() {
-      Action top_action = stack.back();
+    Action peek() {
+      return stack.back();
+    }
+
+    void pop() {
       stack.pop_back();
-      return top_action;
     }
   };
 
 
   struct Component {
     Goal current_goal;
+    Plan current_plan;
+    bool executing_plan = false;
     // bool has_colonist = false;
     // bool has_settlement = false;
   };

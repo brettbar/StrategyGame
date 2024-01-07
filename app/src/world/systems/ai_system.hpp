@@ -70,7 +70,7 @@ namespace AI {
           Global::world.get<Actor::Component>( colonist_e );
 
         Commands::Manager()->enqueue(
-          Commands::Command::claim_province( ai_player, actor.position )
+          Commands::Command::claim_province( colonist_e )
         );
 
         // @todo did it actually succeed
@@ -192,20 +192,6 @@ namespace AI {
     return Plan{ plan };
   }
 
-  inline bool execute_plan( Plan plan, entt::entity ai_player ) {
-    while ( plan.stack.size() > 0 ) {
-      Action a = plan.pop();
-      // printf( "Action: %d\n", a.type );
-
-      if ( all_conds_met_for_action( a, ai_player ) ) {
-        if ( !do_action( a, ai_player ) )
-          return false;
-      }
-    }
-
-    return true;
-  }
-
 
   inline void Start() {
     auto ai_players = Global::world.view<Player::Component, AI::Component>();
@@ -231,15 +217,31 @@ namespace AI {
       case Goal_t::EstablishSettlement: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
-        Plan plan = make_plan( ai.current_goal, ai_player );
 
-        if ( execute_plan( plan, ai_player ) ) {
+        if ( !ai.executing_plan ) {
+          ai.current_plan = make_plan( ai.current_goal, ai_player );
+          ai.executing_plan = true;
+        }
+
+        if ( ai.current_plan.stack.size() > 0 ) {
+
+          Action next_action = ai.current_plan.peek();
+          // printf( "Action: %d\n", a.type );
+
+          if ( all_conds_met_for_action( next_action, ai_player ) ) {
+            if ( do_action( next_action, ai_player ) )
+              ai.current_plan.pop();
+          }
+        }
+
+        if ( ai.current_plan.stack.size() <= 0 ) {
           printf(
             "player_1 has finished their goal of %d!\n", ai.current_goal.goal
           );
 
           ai.current_goal = goal( Goal_t::None );
         }
+
 
       } break;
     }

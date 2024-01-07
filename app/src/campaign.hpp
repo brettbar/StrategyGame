@@ -108,7 +108,7 @@ inline str Campaign::GetLocalPlayerID() {
 
 inline void Campaign::Start( str player_faction ) {
   FactionSystem::Init();
-  PlayerSystem::StartSingleplayer( player_faction );
+  PlayerSystem::create_players_for_sp( player_faction );
 
   MapSystem::Manager()->Init();
   SettlementSystem::Init();
@@ -145,7 +145,6 @@ inline void Campaign::Load() {
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   CheckForInput();
   CheckForUIInteractions();
-  Commands::Manager()->poll();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
@@ -156,6 +155,7 @@ inline void Campaign::Update60TPS() {
 
   MovementSystem::Update( animated_actors, Global::state.timeScale );
   AnimationSystem::Update( animated_actors, Global::state.timeScale );
+  Commands::Manager()->poll();
   PlayerSystem::Update( players );
   //  Terrain::UpdateFOW(reg);
 }
@@ -178,64 +178,6 @@ inline void Campaign::Update1TPS() {
 inline void Campaign::Draw() {
   Renderer::draw_map( MapSystem::Manager()->mode );
 }
-
-// inline void Campaign::ForwardEvent( const InterfaceEvent::Data &event ) {
-//   Vector2 click_pos =
-//     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
-
-//   auto player_e =
-//     Global::world.view<Player::Component, Player::LocalTag>().front();
-
-//   if ( player_e == entt::null ) {
-//     std::cout << "ERROR"
-//               << " no local player was found" << '\n';
-//     return;
-//   }
-
-//   switch ( event.event_id ) {
-//     case InterfaceEvent::ID::SettlementContextMilitaryTab: {
-//       InterfaceUpdate::Update{
-//         .id = InterfaceUpdate::ID::SettlementContextMilitaryTab,
-//       }
-//         .Send();
-//     }; break;
-//     case InterfaceEvent::ID::SettlementContextPopulationTab: {
-//       InterfaceUpdate::Update{
-//         .id = InterfaceUpdate::ID::SettlementContextPopulationTab,
-//       }
-//         .Send();
-//     }; break;
-//     case InterfaceEvent::ID::SettlementContextResourcesTab: {
-//       InterfaceUpdate::Update{
-//         .id = InterfaceUpdate::ID::SettlementContextResourcesTab,
-//       }
-//         .Send();
-//     }; break;
-//     case InterfaceEvent::ID::SettlementContextConstructionTab: {
-//       InterfaceUpdate::Update{
-//         .id = InterfaceUpdate::ID::SettlementContextConstructionTab,
-//       }
-//         .Send();
-//     }; break;
-//     case InterfaceEvent::ID::SettlementContextConstructBuilding: {
-//       SettlementSystem::ConstructBuilding( event.msg );
-//     }; break;
-//     case InterfaceEvent::ID::SettlementContextTrainHastati: {
-//       SettlementSystem::TrainRegiment( UnitType::Hastati );
-//     }; break;
-//     case InterfaceEvent::ID::ActorSpawnSettlment: {
-//       PostCommand( Command{
-//         .type = CommandType::Spawn,
-//         .player_e = player_e,
-//         .msg = "Player spawn Settlement",
-//         .click_pos = click_pos,
-//       } );
-//     }; break;
-//     default:
-//       std::cout << "Unknown event in Campaign::ForwardEvent" << '\n';
-//       break;
-//   };
-// }
 
 inline void Campaign::CheckForUIInteractions() {
   auto change_map_mode = UI::Minimap();
@@ -286,7 +228,7 @@ inline void Campaign::CheckForUIInteractions() {
 
   if ( SelectionSystem::Selected<Actor::Component>() ) {
     auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
-    entt::entity player_e = GetLocalPlayerE();
+    // entt::entity player_e = GetLocalPlayerE();
 
     if ( !actor ) {
       printf( "Got null actor??\n" );
@@ -297,9 +239,9 @@ inline void Campaign::CheckForUIInteractions() {
 
     switch ( action ) {
       case UI::Action_ActorContext::ClaimProvince: {
-        PostCommand(
-          Commands::Command::claim_province( player_e, actor->position )
-        );
+        PostCommand( Commands::Command::claim_province(
+          SelectionSystem::GetSelectedEntity()
+        ) );
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
         PostCommand( Commands::Command::build_settlement(
@@ -347,14 +289,8 @@ inline void Campaign::CheckForInput() {
     PostCommand( Commands::Command::spawn_actor( player_e, click_pos ) );
   }
 
-  if ( IsKeyPressed( KEY_C ) ) {
-    PostCommand( Commands::Command::claim_province( player_e, click_pos ) );
-  }
 
   if ( IsMouseButtonPressed( 0 ) ) {
-    // if ( !UI::Manager()->MouseIsOverUI() ) {
-    //   SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
-    // }
     if ( !Iron::Forge()->MouseIsOverUI() ) {
       SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
@@ -459,7 +395,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       SettlementSystem::spawn_settlement( cmd.entity );
     } break;
     case Commands::Type::ClaimProvince: {
-      ProvinceSystem::AssignProvince( cmd.player_e, cmd.click_pos );
+      ProvinceSystem::colonist_claim_province( cmd.entity );
     } break;
     case Commands::Type::TimeChange: {
       HandleTimeChangeRequest( cmd );

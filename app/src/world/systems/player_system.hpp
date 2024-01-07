@@ -14,10 +14,7 @@
 #include "ai_system.hpp"
 
 namespace PlayerSystem {
-  inline void HumanUpdate( Player::Component & );
-  inline void AIUpdate( AI::Component &, Player::Component & );
-
-  inline void StartSingleplayer( str player_faction ) {
+  inline void create_players_for_sp( str player_faction ) {
     {
       auto player = Global::world.create();
       Global::world.emplace<Player::Component>(
@@ -37,6 +34,31 @@ namespace PlayerSystem {
       );
       Global::world.emplace<Faction::Component>(
         ai_player, FactionSystem::factions.at( "greeks" )
+      );
+
+      AI::Create( ai_player );
+    }
+
+    {
+      auto ai_player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        ai_player, ai_player, "player_2", true
+      );
+      Global::world.emplace<Faction::Component>(
+        ai_player, FactionSystem::factions.at( "celts" )
+      );
+
+      AI::Create( ai_player );
+    }
+
+
+    {
+      auto ai_player = Global::world.create();
+      Global::world.emplace<Player::Component>(
+        ai_player, ai_player, "player_3", true
+      );
+      Global::world.emplace<Faction::Component>(
+        ai_player, FactionSystem::factions.at( "celts" )
       );
 
       AI::Create( ai_player );
@@ -122,14 +144,14 @@ namespace PlayerSystem {
 
   inline void Update( view<Player::Component> players ) {
     // Change to exclude AI
-    for ( auto entity: players ) {
-      Player::Component &player =
-        Global::world.get<Player::Component>( entity );
+    // for ( auto entity: players ) {
+    //   Player::Component &player =
+    //     Global::world.get<Player::Component>( entity );
 
-      if ( player.is_human ) {
-        HumanUpdate( player );
-      }
-    }
+    //   if ( player.is_human ) {
+    //     HumanUpdate( player );
+    //   }
+    // }
 
     for ( auto ai_player:
           Global::world.view<Player::Component, AI::Component>() ) {
@@ -138,5 +160,4 @@ namespace PlayerSystem {
     }
   }
 
-  inline void HumanUpdate( Player::Component &player ) {}
 };// namespace PlayerSystem

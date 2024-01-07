@@ -87,8 +87,10 @@ namespace ProvinceSystem {
   }
 
 
-  inline void AssignProvince( entt::entity owner, Vector2 pos ) {
-    i32 prov_id = DetermineTileIdFromPosition( pos );
+  inline void colonist_claim_province( entt::entity colonist_e ) {
+    Actor::Component &actor = Global::world.get<Actor::Component>( colonist_e );
+
+    i32 prov_id = DetermineTileIdFromPosition( actor.position );
     assert( prov_id >= 0 );
 
     auto provinces = Global::world.view<Province::Component>();
@@ -99,30 +101,8 @@ namespace ProvinceSystem {
       if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
         continue;
 
-      prov.tile->owner = owner;
+      prov.tile->owner = actor.owner;
     }
   }
 
-  inline void claim_province_for_player(
-    entt::entity owner,
-    vec2f colonist_pos
-  ) {
-    AssignProvince( owner, colonist_pos );
-  }
-
-  inline void SetProvinceOwner( entt::entity owner ) {
-    auto selectedView =
-      Global::world.view<Selected::Component, Actor::Component>();
-    auto selectedEntity = selectedView.front();
-
-    if ( selectedEntity == entt::null ) {
-      printf( "No selected entity, cancelling\n" );
-      return;
-    }
-
-    Actor::Component &actor =
-      selectedView.get<Actor::Component>( selectedEntity );
-
-    AssignProvince( owner, actor.position );
-  }
 };// namespace ProvinceSystem

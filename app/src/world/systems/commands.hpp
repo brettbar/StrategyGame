@@ -47,11 +47,10 @@ namespace Commands {
       return cmd;
     }
 
-    static Command claim_province( entt::entity player, vec2f actor_pos ) {
+    static Command claim_province( entt::entity entity ) {
       auto cmd = Command();
       cmd.type = Type::ClaimProvince;
-      cmd.player_e = player;
-      cmd.click_pos = actor_pos;
+      cmd.entity = entity;
       return cmd;
     }
 
@@ -81,15 +80,11 @@ public:
 
     void init() {
       queue = entt::dispatcher{};
-      // queue.sink<Commands::Command>().connect<&System::receive>( this );
     }
 
     void poll() {
       queue.update();
     }
-
-
-    // void receive( const Command &cmd ) {}
 
     void enqueue( const Command &cmd ) {
       queue.enqueue( cmd );
