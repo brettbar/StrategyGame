@@ -56,14 +56,11 @@ namespace AI {
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        Actor::System::colonist_build_settlement( colonist_e );
-
         // @todo this is missing a step that is found in campaigns PostCommand
-        Commands::Manager()->enqueue( {
-          Commands::Type::Spawn,
-          ai_player,
-          "Player spawn Settlement",
-          actor.position,
+        Commands::Manager()->enqueue( Commands::Command{
+          .type = Commands::Type::BuildSettlement,
+          .msg = "Player spawn Settlement",
+          .entity = colonist_e,
         } );
 
 

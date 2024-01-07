@@ -475,8 +475,14 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
       if ( cmd.msg == "Player spawn Settlement" ) {
-        SettlementSystem::spawn_settlement_for_player();
+        SettlementSystem::spawn_settlement( cmd.entity );
       }
+
+      // if ( cmd.msg == "Player spawn Settlement" ) {
+      //   SettlementSystem::spawn_settlement_for_selected();
+      // }
+
+
     } break;
     case Commands::Type::ClaimProvince: {
       if ( cmd.msg == "Player taking ownership of Province" ) {
@@ -492,12 +498,6 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
         Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
         return;
       }
-
-
-      if ( cmd.msg == "Player spawn Settlement" ) {
-        SettlementSystem::spawn_settlement_for_selected();
-      }
-
 
       return;
     }

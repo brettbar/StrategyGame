@@ -55,12 +55,8 @@ namespace SettlementSystem {
     }
   }
 
-  inline void spawn_settlement_for_player( entt::entity owner ) {}
-
-  inline void spawn_settlement_for_selected() {
-    Actor::Component unit =
-      Global::world.get<Actor::Component>( SelectionSystem::GetSelectedEntity()
-      );
+  inline void spawn_settlement( entt::entity colonist_e ) {
+    Actor::Component unit = Global::world.get<Actor::Component>( colonist_e );
 
     vec2f pos = unit.position;
     i32 closest_tile = DetermineTileIdFromPosition( pos );
@@ -72,35 +68,36 @@ namespace SettlementSystem {
       auto &prov = Global::world.get<Province::Component>( entity );
 
       // TODO pretty sure I am checking this twice, another time in the Actor colonist area
-      if ( prov.tile->id == closest_tile ) {
-        if ( prov.tile->owner == unit.owner ) {
-          if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
-            printf( "spawning settlement\n" );
+      if ( prov.tile->id == closest_tile && prov.tile->owner == unit.owner ) {
+        if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
+          printf( "spawning settlement\n" );
 
-            Settlement::Component settlement = {
-              .name = "Rome",
-              .development = Settlement::Development::Village,
-              .population =
-                {
-                  .current = 200,
-                  .birthRate = 40,
-                  .deathRate = 10,
-                  .growthRate = ( 40.0f - 10.0f ) / 200,
-                  .carryingCapacity = 1000,
-                },
-              .texture =
-                LoadTextureFromImage( Settlement::building_map.at( "roman_m1" )
-                ),
-            };
+          Settlement::Component settlement = {
+            .name = "Athens",
+            .development = Settlement::Development::Village,
+            .population =
+              {
+                .current = 200,
+                .birthRate = 40,
+                .deathRate = 10,
+                .growthRate = ( 40.0f - 10.0f ) / 200,
+                .carryingCapacity = 1000,
+              },
+            .texture =
+              LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) ),
+          };
 
-            Global::world.emplace<Settlement::Component>( entity, settlement );
+          Global::world.emplace<Settlement::Component>( entity, settlement );
 
-            Global::world.destroy( SelectionSystem::GetSelectedEntity() );
-            return;
-          }
+          Global::world.destroy( colonist_e );
+          return;
         }
       }
     }
+  }
+
+  inline void spawn_settlement_for_selected() {
+    spawn_settlement( SelectionSystem::GetSelectedEntity() );
   }
 
 
