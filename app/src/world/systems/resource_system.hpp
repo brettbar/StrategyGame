@@ -7,23 +7,21 @@
 namespace ResourceSystem {
 
   inline void SpawnResource( Province::Component &prov ) {
-    f32 randomFloat = random_f32( 0, 10 );
-    if ( randomFloat > 3 ) {
-      return;
-    }
+    f32 randomFloat = random_u32_inclmax( 0, 10 );
 
     switch ( prov.tile->biome ) {
-      case Biome::Mountains:
-        if ( randomFloat > 2 ) {
-          prov.resources.push_back( Resources::Natural::CopperVein );
-        } else if ( randomFloat > 1 ) {
-          prov.resources.push_back( Resources::Natural::TinVein );
-        } else if ( randomFloat > 0 ) {
+      case Biome::Mountains: {
+        if ( randomFloat > 8 ) {
           prov.resources.push_back( Resources::Natural::IronVein );
+        } else if ( randomFloat > 7 ) {
+          prov.resources.push_back( Resources::Natural::TinVein );
+        } else if ( randomFloat > 6 ) {
+          prov.resources.push_back( Resources::Natural::CopperVein );
         }
-        break;
+      } break;
       case Biome::Hills:
-        prov.resources.push_back( Resources::Natural::Clay );
+        if ( randomFloat > 7 )
+          prov.resources.push_back( Resources::Natural::Clay );
         break;
       case Biome::Forest:
         prov.resources.push_back( Resources::Natural::Trees );
@@ -32,9 +30,10 @@ namespace ResourceSystem {
         break;
       case Biome::Desert:
         break;
-      case Biome::Sea:
-        prov.resources.push_back( Resources::Natural::Fish );
-        break;
+      case Biome::Sea: {
+        if ( randomFloat > 7 )
+          prov.resources.push_back( Resources::Natural::Fish );
+      } break;
       default:
         break;
     }

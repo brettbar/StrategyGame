@@ -53,11 +53,14 @@ struct MapSystem {
   void Init() {
     tile_map = {};
 
-    NoiseMap pNoise = olc_gen_perlin_noise( seed, octaves, scaling_bias );
+    NoiseMap elevation_noise =
+      olc_gen_perlin_noise( seed, octaves, scaling_bias );
+
+    NoiseMap flora_noise = olc_gen_perlin_noise( seed + 1, 8, 1.4 );
 
     std::cout << "MapSystem::Init with wl: " << waterLevel << "\n";
 
-    gen_islands( pNoise, 3 );
+    gen_islands( elevation_noise, 3 );
 
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       u32 x = i % MAP_WIDTH;
@@ -68,9 +71,10 @@ struct MapSystem {
 
       Vector2 position;
 
-      f32 noise = pNoise[map_index( x, y )];
+      f32 elevation = elevation_noise[map_index( x, y )];
+      f32 flora = flora_noise[map_index( x, y )];
 
-      Biome biome = determine_biome( noise );
+      Biome biome = determine_biome( elevation, flora );
 
       if ( y % 2 == 1 )
         position = { xPos + ( TILE_WIDTH / 2 ), yPos };
@@ -80,7 +84,7 @@ struct MapSystem {
       Tile::Component tile = {
         .owner = entt::null,
         .id = i,
-        .noise = noise,
+        .noise = elevation,
         .position = position,
         .center =
           {
@@ -178,16 +182,23 @@ struct MapSystem {
     }
   }
 
-  Biome determine_biome( f32 elevation ) {
-    if ( elevation >= mtnsLevel )
-      return Biome::Mountains;
-    else if ( elevation >= hillsLevel )
-      return Biome::Hills;
+  Biome determine_biome( f32 elevation, f32 flora ) {
     // else if ( noise >= 0.7f )
     //   biome = Biome::Forest;
-    else if ( elevation >= waterLevel )
-      return Biome::Plains;
-    else
+
+    if ( elevation >= mtnsLevel )
+      return Biome::Mountains;
+    else if ( elevation >= hillsLevel ) {
+      if ( flora >= 0.7f )
+        return Biome::Forest;
+      else
+        return Biome::Hills;
+    } else if ( elevation >= waterLevel ) {
+      if ( flora >= 0.7f )
+        return Biome::Forest;
+      else
+        return Biome::Plains;
+    } else
       return Biome::Sea;
   }
 

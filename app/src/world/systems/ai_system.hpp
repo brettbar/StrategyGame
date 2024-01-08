@@ -83,63 +83,6 @@ namespace AI {
     return false;
   }
 
-  inline Action action( Action_t type ) {
-    switch ( type ) {
-      case Action_t::BuildSettlement:
-        return Action{
-          .type = type,
-          .cost = 0,
-          .preconditions =
-            {
-              Condition::HasProvince,
-            },
-          .effect = Condition::HasSettlement,
-        };
-      case Action_t::ClaimProvince:
-        return Action{
-          .type = type,
-          .cost = 0,
-          .preconditions = { Condition::HasColonistOnEligibleTerrain },
-          .effect = Condition::HasProvince,
-        };
-      case Action_t::SpawnColonist:
-        return Action{
-          .type = type,
-          .cost = 0,
-          // @todo requirements to make colonist
-          .preconditions{},
-          .effect = Condition::HasColonistOnEligibleTerrain,
-        };
-
-      default:
-        // bad
-        return Action{
-          .type = Action_t::DoNothing,
-          .cost = 0,
-          .preconditions = {},
-          .effect = Condition::None,
-        };
-    }
-  };
-
-  inline Goal goal( Goal_t goal_t ) {
-    switch ( goal_t ) {
-      case Goal_t::None:
-        return Goal{
-          .goal = Goal_t::None,
-          .desired_state = {},
-        };
-      case Goal_t::EstablishSettlement:
-        return Goal{
-          .goal = Goal_t::EstablishSettlement,
-          .desired_state =
-            {
-              Condition::HasSettlement,
-            },
-        };
-    }
-  }
-
   inline bool all_conds_met_for_action( Action a, entt::entity ai_player ) {
     for ( auto cond: a.preconditions ) {
       if ( !condition_met( cond, ai_player ) ) {
