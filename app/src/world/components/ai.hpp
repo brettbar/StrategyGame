@@ -33,35 +33,36 @@ The ultimate final goal a player will have is to become the most
     EstablishSettlement,
   };
   enum class Action_t {
-    DoNothing,
-    MoveUnit,
+    MoveColonistToUnclaimedProvince,
     SpawnColonist,
     ClaimProvince,
     BuildSettlement,
   };
   enum class Condition {
     None,
-    HasColonistOnEligibleTerrain,
+    ColonistOnUnclaimedProvince,
+    ColonistOnOwnProvince,
+    HasColonist,
     HasProvince,
     HasSettlement,
   };
 
   struct Goal {
     Goal_t goal = Goal_t::None;
-    list<Condition> desired_state;
+    Condition desired_state;
   };
 
   struct Action {
     Action_t type;
-    f32 cost;
+    u32 cost = 0;
 
     list<Condition> preconditions;
-    // @note might need to be plural in the future
-    Condition effect;
+    list<Condition> effects;
   };
 
   struct Plan {
     list<Action> stack;
+    u32 cost;
 
     void push( Action action ) {
       stack.push_back( action );
@@ -85,7 +86,7 @@ The ultimate final goal a player will have is to become the most
     // bool has_settlement = false;
   };
 
-  inline Action action( Action_t type ) {
+  inline Action get_action( Action_t type ) {
     switch ( type ) {
       case Action_t::BuildSettlement:
         return Action{
@@ -95,14 +96,14 @@ The ultimate final goal a player will have is to become the most
             {
               Condition::HasProvince,
             },
-          .effect = Condition::HasSettlement,
+          .effects = { Condition::HasSettlement },
         };
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
           .cost = 0,
-          .preconditions = { Condition::HasColonistOnEligibleTerrain },
-          .effect = Condition::HasProvince,
+          .preconditions = { Condition::HasColonist },
+          .effects = { Condition::HasProvince },
         };
       case Action_t::SpawnColonist:
         return Action{
@@ -110,16 +111,15 @@ The ultimate final goal a player will have is to become the most
           .cost = 0,
           // @todo requirements to make colonist
           .preconditions{},
-          .effect = Condition::HasColonistOnEligibleTerrain,
+          .effects = { Condition::HasColonist },
         };
 
-      default:
-        // bad
+      case Action_t::MoveColonistToUnclaimedProvince:
         return Action{
-          .type = Action_t::DoNothing,
+          .type = type,
           .cost = 0,
-          .preconditions = {},
-          .effect = Condition::None,
+          .preconditions = { Condition::HasColonist },
+          .effects = { Condition::ColonistOnUnclaimedProvince },
         };
     }
   };
@@ -134,10 +134,7 @@ The ultimate final goal a player will have is to become the most
       case Goal_t::EstablishSettlement:
         return Goal{
           .goal = Goal_t::EstablishSettlement,
-          .desired_state =
-            {
-              Condition::HasSettlement,
-            },
+          .desired_state = Condition::HasSettlement,
         };
     }
   }

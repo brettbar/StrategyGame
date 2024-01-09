@@ -39,30 +39,30 @@ namespace PlayerSystem {
       AI::Create( ai_player );
     }
 
-    {
-      auto ai_player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        ai_player, ai_player, "player_2", true
-      );
-      Global::world.emplace<Faction::Component>(
-        ai_player, FactionSystem::factions.at( "celts" )
-      );
+    // {
+    //   auto ai_player = Global::world.create();
+    //   Global::world.emplace<Player::Component>(
+    //     ai_player, ai_player, "player_2", true
+    //   );
+    //   Global::world.emplace<Faction::Component>(
+    //     ai_player, FactionSystem::factions.at( "celts" )
+    //   );
 
-      AI::Create( ai_player );
-    }
+    //   AI::Create( ai_player );
+    // }
 
 
-    {
-      auto ai_player = Global::world.create();
-      Global::world.emplace<Player::Component>(
-        ai_player, ai_player, "player_3", true
-      );
-      Global::world.emplace<Faction::Component>(
-        ai_player, FactionSystem::factions.at( "celts" )
-      );
+    // {
+    //   auto ai_player = Global::world.create();
+    //   Global::world.emplace<Player::Component>(
+    //     ai_player, ai_player, "player_3", true
+    //   );
+    //   Global::world.emplace<Faction::Component>(
+    //     ai_player, FactionSystem::factions.at( "celts" )
+    //   );
 
-      AI::Create( ai_player );
-    }
+    //   AI::Create( ai_player );
+    // }
   }
 
   inline void HostStartMultiplayer() {

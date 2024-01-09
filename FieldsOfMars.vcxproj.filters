@@ -29,5 +29,11 @@
     <ClInclude Include="app\src\world\systems\overlay_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="app\src\world\systems\ai_system.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="app\src\world\components\ai.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

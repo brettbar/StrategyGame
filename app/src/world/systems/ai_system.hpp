@@ -22,18 +22,34 @@ namespace AI {
     );
   }
 
+  inline void Start() {
+    auto ai_players = Global::world.view<Player::Component, AI::Component>();
+
+    for ( auto player_e: ai_players ) {
+      auto ai = ai_players.get<AI::Component>( player_e );
+
+      ai.current_goal = goal( Goal_t::EstablishSettlement );
+    }
+  }
+
   inline bool condition_met( Condition cond, entt::entity ai_player ) {
     switch ( cond ) {
-      case Condition::HasColonistOnEligibleTerrain: {
+      case Condition::HasColonist: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
-
         if ( colonist_e == entt::null )
           return false;
-
-        return Actor::System::colonist_can_claim_province( colonist_e );
+        return true;
 
       } break;
 
+      case Condition::ColonistOnUnclaimedProvince: {
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
+        if ( colonist_e == entt::null )
+          return false;
+        return true;
+
+        return Actor::System::colonist_can_claim_province( colonist_e );
+      } break;
 
       case Condition::HasProvince:
         return ProvinceSystem::player_has_province( ai_player );
@@ -46,25 +62,23 @@ namespace AI {
     return false;
   }
 
-  inline bool do_action( Action a, entt::entity ai_player ) {
+  inline void do_action( Action a, entt::entity ai_player ) {
     switch ( a.type ) {
       case Action_t::BuildSettlement: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
         if ( colonist_e == entt::null )
-          return false;
+          return;
 
         // @todo this is missing a step that is found in campaigns PostCommand
         Commands::Manager()->enqueue(
           Commands::Command::build_settlement( colonist_e )
         );
 
-        // @todo did it actually succeed
-        return true;
       } break;
       case Action_t::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
         if ( colonist_e == entt::null )
-          return false;
+          return;
 
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
@@ -73,17 +87,38 @@ namespace AI {
           Commands::Command::claim_province( colonist_e )
         );
 
-        // @todo did it actually succeed
-        return true;
+      } break;
+      case Action_t::MoveColonistToUnclaimedProvince: {
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
+        if ( colonist_e == entt::null )
+          return;
+
+        Actor::Component actor =
+          Global::world.get<Actor::Component>( colonist_e );
+
+        Commands::Manager()->enqueue( Commands::Command::move(
+          ai_player,
+          { actor.position.x + 128, actor.position.y + 128 },
+          colonist_e
+        ) );
+
       } break;
       case Action_t::SpawnColonist:
-        return true;
+        break;
     }
-
-    return false;
   }
 
-  inline bool all_conds_met_for_action( Action a, entt::entity ai_player ) {
+  inline bool action_effects_met( Action a, entt::entity ai_player ) {
+    for ( auto cond: a.effects ) {
+      if ( !condition_met( cond, ai_player ) ) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  inline bool action_preconds_met( Action a, entt::entity ai_player ) {
     for ( auto cond: a.preconditions ) {
       if ( !condition_met( cond, ai_player ) ) {
         return false;
@@ -97,7 +132,9 @@ namespace AI {
     switch ( cond ) {
       case Condition::None:
         return {};
-      case Condition::HasColonistOnEligibleTerrain:
+      case Condition::ColonistOnUnclaimedProvince:
+        return { Action_t::MoveColonistToUnclaimedProvince };
+      case Condition::HasColonist:
         return { Action_t::SpawnColonist };
       case Condition::HasProvince:
         return { Action_t::ClaimProvince };
@@ -106,43 +143,111 @@ namespace AI {
     }
   };
 
-  inline void find_action_for_cond( Condition cond, list<Action> &plan ) {
-    auto possible_actions = actions_that_satisfy_cond( cond );
+  inline bool make_plan( Condition cond, entt::entity ai_player, Plan &plan ) {
+    if ( condition_met( cond, ai_player ) ) {
+      return true;
+    }
 
-    for ( auto action_t: possible_actions ) {
-      auto action_node = action( action_t );
+    list<Action_t> possible_actions = actions_that_satisfy_cond( cond );
+    for ( Action_t possible_action_t: possible_actions ) {
 
-      plan.push_back( action_node );
+      Action action = get_action( possible_action_t );
 
-      for ( auto precond: action_node.preconditions ) {
-        find_action_for_cond( precond, plan );
+      plan.push( action );
+      plan.cost += action.cost;
+
+      for ( auto precond: action.preconditions ) {
+        make_plan( precond, ai_player, plan );
       }
     }
   }
 
-  inline Plan make_plan( Goal goal, entt::entity ai_player ) {
-    // 1. Create action tree starting with the goal's cond as the first node
-    // 2. Evaluate cost of each branch
-    // 3. Pick the cheapest branch that is possible
-    // 4. If none are possible, we can't complete the goal currently
+  inline bool make_plans(
+    Condition cond,
+    entt::entity ai_player,
+    list<Plan> &plans
+  ) {
 
-    list<Action> plan = {};
+    Plan new_plan = {};
 
-    for ( auto cond: goal.desired_state ) {
-      find_action_for_cond( cond, plan );
-    }
+    make_plan( cond, ai_player, new_plan );
 
-    return Plan{ plan };
+    plans.push_back( new_plan );
+
+    return false;
   }
 
+  inline Plan get_cheapest_plan( list<Plan> plans ) {
+    assert( plans.size() > 0 );
+    Plan cheapest_plan = plans[0];
 
-  inline void Start() {
-    auto ai_players = Global::world.view<Player::Component, AI::Component>();
+    for ( Plan plan: plans ) {
+      if ( plan.cost < cheapest_plan.cost )
+        cheapest_plan = plan;
+    }
+    return cheapest_plan;
+  }
 
-    for ( auto player_e: ai_players ) {
-      auto ai = ai_players.get<AI::Component>( player_e );
+  inline void execute_plan( Plan plan, entt::entity ai_player ) {
+    auto &ai = Global::world.get<AI::Component>( ai_player );
 
-      ai.current_goal = goal( Goal_t::EstablishSettlement );
+    if ( plan.stack.size() > 0 ) {
+      Action a = plan.peek();
+
+      if ( action_effects_met( a, ai_player ) ) {
+        plan.pop();
+      } else {
+        if ( action_preconds_met( a, ai_player ) ) {
+          do_action( a, ai_player );
+        } else {
+          printf( "Plan no longer possible!\n" );
+          ai.current_plan = {};
+          ai.executing_plan = false;
+          return;
+        }
+      }
+    }
+
+    if ( plan.stack.size() <= 0 ) {
+      printf( "Plan finished!\n" );
+      ai.current_plan = {};
+      ai.executing_plan = false;
+      return;
+    }
+  }
+
+  inline void planner( Goal goal, entt::entity ai_player ) {
+
+    /*
+      Starting at the root (goal) we want to start building a tree of 
+      actions that satisfy the condition of that goal
+    
+      Let say we have a goal EstablishSettlement. This goal has as the HasSettlement condition.
+      So the first step is to acheive this goal is to check this condition. If the condition is true,
+      we are done and have met our goal. Otherwise, we need to find the actions who's effects can satisfy
+      this condition.
+
+      Lets say there exist 2 actions who's effects satisfy HasSettlement; BuildSettlement and CaptureSettlement.
+      So the first step would be to check the preconditions of BuildSettlement. If all of those conditions are true
+      then we know that action is ready to fire, and we have a valid action path (plan) that the ai can execute.      
+    */
+
+
+    // We need to make a list of plans
+    // A plan is a list of actions the first of which is eligible that lead to completing the goal
+    // If we get more than one possible plans, take the cheapest one
+    // If we get no possible plans, we cant proceed with this goal currently
+
+
+    list<Plan> plans = {};
+
+    bool at_least_one_plan = make_plans( goal.desired_state, ai_player, plans );
+
+    if ( at_least_one_plan ) {
+      Plan cheapest_plan = get_cheapest_plan( plans );
+      auto &ai = Global::world.get<AI::Component>( ai_player );
+      ai.executing_plan = true;
+      ai.current_plan = cheapest_plan;
     }
   }
 
@@ -162,27 +267,10 @@ namespace AI {
 
 
         if ( !ai.executing_plan ) {
-          ai.current_plan = make_plan( ai.current_goal, ai_player );
-          ai.executing_plan = true;
-        }
-
-        if ( ai.current_plan.stack.size() > 0 ) {
-
-          Action next_action = ai.current_plan.peek();
-          // printf( "Action: %d\n", a.type );
-
-          if ( all_conds_met_for_action( next_action, ai_player ) ) {
-            if ( do_action( next_action, ai_player ) )
-              ai.current_plan.pop();
-          }
-        }
-
-        if ( ai.current_plan.stack.size() <= 0 ) {
-          printf(
-            "player_1 has finished their goal of %d!\n", ai.current_goal.goal
-          );
-
-          ai.current_goal = goal( Goal_t::None );
+          // ai.current_plan = make_plan( ai.current_goal, ai_player );
+          planner( ai.current_goal, ai_player );
+        } else {
+          execute_plan( ai.current_plan, ai_player );
         }
 
 
