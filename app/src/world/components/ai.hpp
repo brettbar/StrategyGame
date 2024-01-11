@@ -25,7 +25,7 @@ The ultimate final goal a player will have is to become the most
   Can increase by player wide or tall
 */
 
-  enum class Goal_t {
+  enum class Goal {
     // BoostProduction,
     // ExpandBorders,
     // DevelopSettlements,
@@ -33,13 +33,14 @@ The ultimate final goal a player will have is to become the most
     EstablishSettlement,
   };
   enum class Action_t {
+    AchieveGoal,
     MoveColonistToUnclaimedProvince,
+    MoveColonistToOwnProvince,
     SpawnColonist,
     ClaimProvince,
     BuildSettlement,
   };
   enum class Condition {
-    None,
     ColonistOnUnclaimedProvince,
     ColonistOnOwnProvince,
     HasColonist,
@@ -47,17 +48,18 @@ The ultimate final goal a player will have is to become the most
     HasSettlement,
   };
 
-  struct Goal {
-    Goal_t goal = Goal_t::None;
-    Condition desired_state;
-  };
 
   struct Action {
     Action_t type;
-    u32 cost = 0;
 
     list<Condition> preconditions;
     list<Condition> effects;
+  };
+
+  struct Node {
+    Action action;
+    u32 cost = 0;
+    list<Node> children;
   };
 
   struct Plan {
@@ -91,7 +93,6 @@ The ultimate final goal a player will have is to become the most
       case Action_t::BuildSettlement:
         return Action{
           .type = type,
-          .cost = 0,
           .preconditions =
             {
               Condition::HasProvince,
@@ -101,14 +102,12 @@ The ultimate final goal a player will have is to become the most
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
-          .cost = 0,
           .preconditions = { Condition::HasColonist },
           .effects = { Condition::HasProvince },
         };
       case Action_t::SpawnColonist:
         return Action{
           .type = type,
-          .cost = 0,
           // @todo requirements to make colonist
           .preconditions{},
           .effects = { Condition::HasColonist },
@@ -117,25 +116,18 @@ The ultimate final goal a player will have is to become the most
       case Action_t::MoveColonistToUnclaimedProvince:
         return Action{
           .type = type,
-          .cost = 0,
           .preconditions = { Condition::HasColonist },
           .effects = { Condition::ColonistOnUnclaimedProvince },
         };
     }
   };
 
-  inline Goal goal( Goal_t goal_t ) {
-    switch ( goal_t ) {
-      case Goal_t::None:
-        return Goal{
-          .goal = Goal_t::None,
-          .desired_state = {},
-        };
-      case Goal_t::EstablishSettlement:
-        return Goal{
-          .goal = Goal_t::EstablishSettlement,
-          .desired_state = Condition::HasSettlement,
-        };
+  inline list<Condition> goal_conds( Goal goal ) {
+    switch ( goal ) {
+      case Goal::None:
+        return {};
+      case Goal::EstablishSettlement:
+        return { Condition::HasSettlement };
     }
   }
 

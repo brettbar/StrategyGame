@@ -30,19 +30,19 @@ public:
         auto player = players.get<Player::Component>( player_e );
 
         if ( player.player_id == "player_0" ) {
-          spawn_colonist( player.id, { 75 * TILE_WIDTH, 65 * TILE_HEIGHT } );
+          spawn_colonist( player.id, { 85 * TILE_WIDTH, 65 * TILE_HEIGHT } );
         }
 
         if ( player.player_id == "player_1" ) {
-          spawn_colonist( player.id, { 70 * TILE_WIDTH, 65 * TILE_HEIGHT } );
+          spawn_colonist( player.id, { 80 * TILE_WIDTH, 65 * TILE_HEIGHT } );
         }
 
         if ( player.player_id == "player_2" ) {
-          spawn_colonist( player.id, { 75 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+          spawn_colonist( player.id, { 85 * TILE_WIDTH, 70 * TILE_HEIGHT } );
         }
 
         if ( player.player_id == "player_3" ) {
-          spawn_colonist( player.id, { 70 * TILE_WIDTH, 70 * TILE_HEIGHT } );
+          spawn_colonist( player.id, { 80 * TILE_WIDTH, 70 * TILE_HEIGHT } );
         }
       }
     }
