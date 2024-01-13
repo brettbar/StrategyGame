@@ -54,12 +54,29 @@ The ultimate final goal a player will have is to become the most
 
     list<Condition> preconditions;
     list<Condition> effects;
+
+    str as_str() {
+      switch ( type ) {
+        case Action_t::AchieveGoal:
+          return "AchieveGoal";
+        case Action_t::MoveColonistToUnclaimedProvince:
+          return "MoveColonistToUnclaimedProvince";
+        case Action_t::MoveColonistToOwnProvince:
+          return "MoveColonistToOwnProvince";
+        case Action_t::SpawnColonist:
+          return "SpawnColonist";
+        case Action_t::ClaimProvince:
+          return "ClaimProvince";
+        case Action_t::BuildSettlement:
+          return "BuildSettlement";
+      }
+    }
   };
 
   struct Node {
     Action action;
     u32 cost = 0;
-    list<Node> children;
+    list<sptr<Node>> children;
   };
 
   struct Plan {
@@ -90,19 +107,25 @@ The ultimate final goal a player will have is to become the most
 
   inline Action get_action( Action_t type ) {
     switch ( type ) {
+      case Action_t::AchieveGoal:
+        return Action{
+          .type = type,
+          .preconditions = {},
+          .effects = {},
+        };
       case Action_t::BuildSettlement:
         return Action{
           .type = type,
           .preconditions =
             {
-              Condition::HasProvince,
+              Condition::ColonistOnOwnProvince,
             },
           .effects = { Condition::HasSettlement },
         };
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
-          .preconditions = { Condition::HasColonist },
+          .preconditions = { Condition::ColonistOnUnclaimedProvince },
           .effects = { Condition::HasProvince },
         };
       case Action_t::SpawnColonist:
@@ -119,6 +142,16 @@ The ultimate final goal a player will have is to become the most
           .preconditions = { Condition::HasColonist },
           .effects = { Condition::ColonistOnUnclaimedProvince },
         };
+      case Action_t::MoveColonistToOwnProvince:
+        return Action{
+          .type = type,
+          .preconditions =
+            {
+              Condition::HasColonist,
+              Condition::HasProvince,
+            },
+          .effects = { Condition::ColonistOnOwnProvince },
+        };
     }
   };
 
@@ -130,6 +163,22 @@ The ultimate final goal a player will have is to become the most
         return { Condition::HasSettlement };
     }
   }
+
+
+  inline list<Action_t> actions_that_satisfy_cond( Condition cond ) {
+    switch ( cond ) {
+      case Condition::ColonistOnUnclaimedProvince:
+        return { Action_t::MoveColonistToUnclaimedProvince };
+      case Condition::ColonistOnOwnProvince:
+        return { Action_t::MoveColonistToOwnProvince };
+      case Condition::HasColonist:
+        return { Action_t::SpawnColonist };
+      case Condition::HasProvince:
+        return { Action_t::ClaimProvince };
+      case Condition::HasSettlement:
+        return { Action_t::BuildSettlement };
+    }
+  };
 
 
 };// namespace AI
