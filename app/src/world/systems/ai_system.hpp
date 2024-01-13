@@ -49,6 +49,15 @@ namespace AI {
         return Actor::System::colonist_can_claim_province( colonist_e );
       } break;
 
+      case Condition::ColonistOnOwnProvince: {
+        auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
+        if ( colonist_e == entt::null )
+          return false;
+        return true;
+
+        return Actor::System::colonist_can_place_settlement( colonist_e );
+      } break;
+
       case Condition::HasProvince:
         return ProvinceSystem::player_has_province( ai_player );
       case Condition::HasSettlement:
@@ -84,6 +93,9 @@ namespace AI {
         );
 
       } break;
+      case Action_t::MoveColonistToOwnProvince: {
+        return;
+      }
       case Action_t::MoveColonistToUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
         if ( colonist_e == entt::null )
@@ -128,6 +140,7 @@ namespace AI {
   inline void build_graph( sptr<Node> parent, entt::entity ai_player ) {
 
     for ( auto cond: parent->action.preconditions ) {
+
       for ( auto possible_actions_t: actions_that_satisfy_cond( cond ) ) {
         auto possible_action = get_action( possible_actions_t );
 
@@ -137,11 +150,15 @@ namespace AI {
           .children = {},
         } );
 
-        parent->children.push_back( new_node );
+        if ( parent->children.contains( cond ) ) {
+          parent->children.at( cond ).push_back( new_node );
+        } else {
+          parent->children.emplace( cond, list<sptr<Node>>{ new_node } );
+        }
 
-        std::cout << "Parent: " << parent->action.as_str() << '\n';
-        std::cout << "Graph node: " << new_node->action.as_str() << '\n';
-        std::cout << std::endl;
+        // std::cout << "Parent: " << parent->action.as_str() << '\n';
+        // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
+        // std::cout << std::endl;
 
         build_graph( new_node, ai_player );
       };
@@ -153,17 +170,34 @@ namespace AI {
     list<Action> &plan,
     entt::entity ai_player
   ) {
-    if (parent->action.type == Action_t::AchieveGoal && action_preconds_met(parent->action, ai_player)) {
-      return true;
-    }
+    // In order to find a plan, we are looking for a series of actions until
+    // the final action has all its conditions met
 
-    for ( sptr<Node> node: parent->children ) {
-      for ( auto cond: node->action.preconditions ) {
-        if ( !condition_met( cond, ai_player ) ) {
-          return find_a_plan( node, plan, )
+    // this function will return true if at least one valid path exists
+    // otherwise it will return false
+    bool all_conds_met = true;
+
+    for ( auto cond: parent->action.preconditions ) {
+      if ( condition_met( cond, ai_player ) ) {
+        continue;
+      } else {
+        bool any_valid_action = false;
+
+        for ( auto node: parent->children.at( cond ) ) {
+          if ( find_a_plan( node, plan, ai_player ) ) {
+            any_valid_action = true;
+            plan.push_back( node->action );
+            break;
+          }
+        }
+
+        if ( !any_valid_action ) {
+          return false;
         }
       }
     }
+
+    return all_conds_met;
   }
 
   inline bool execute_plan( Plan &plan, entt::entity ai_player ) {
@@ -172,6 +206,7 @@ namespace AI {
     }
     Action action = plan.peek();
     if ( action_effects_met( action, ai_player ) ) {
+      std::cout << "Action " << action.as_str() << '\n';
       plan.pop();
     } else if ( action_preconds_met( action, ai_player ) ) {
       do_action( action, ai_player );
@@ -196,7 +231,7 @@ namespace AI {
         if ( !ai.executing_plan ) {
           sptr<Node> root = std::make_shared<Node>( Node{
             .action =
-              {
+              Action{
                 .type = Action_t::AchieveGoal,
                 .preconditions = goal_conds( ai.current_goal ),
                 .effects = {},
@@ -206,6 +241,8 @@ namespace AI {
           } );
 
           build_graph( root, ai_player );
+
+          root->print();
 
 
           list<Action> actions = {};

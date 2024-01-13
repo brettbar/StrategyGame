@@ -76,7 +76,21 @@ The ultimate final goal a player will have is to become the most
   struct Node {
     Action action;
     u32 cost = 0;
-    list<sptr<Node>> children;
+    map<Condition, list<sptr<Node>>> children;
+
+
+    void print( u32 depth = 0 ) {
+      for ( u32 i = 0; i < depth; ++i ) {
+        std::cout << "  ";
+      }
+      std::cout << "|--" << action.as_str() << '\n';
+
+      for ( const auto &condition: children ) {
+        for ( const auto &child: condition.second ) {
+          child->print( depth + 1 );
+        }
+      }
+    }
   };
 
   struct Plan {
