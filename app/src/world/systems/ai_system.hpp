@@ -44,7 +44,6 @@ namespace AI {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
         if ( colonist_e == entt::null )
           return false;
-        return true;
 
         return Actor::System::colonist_can_claim_province( colonist_e );
       } break;
@@ -53,7 +52,6 @@ namespace AI {
         auto colonist_e = Actor::System::get_colonist_of_player( ai_player );
         if ( colonist_e == entt::null )
           return false;
-        return true;
 
         return Actor::System::colonist_can_place_settlement( colonist_e );
       } break;
@@ -191,7 +189,8 @@ namespace AI {
         }
 
         if ( !any_valid_action ) {
-          return false;
+          all_conds_met = false;
+          break;
         }
       }
     }
@@ -206,10 +205,12 @@ namespace AI {
     if ( plan.stack.size() <= 0 ) {
       return true;
     }
-    Action action = plan.peek();
+
+    Action action = plan.stack.front();
+
     if ( action_effects_met( action, ai_player ) ) {
       std::cout << "Action " << action.as_str() << '\n';
-      plan.pop();
+      plan.stack.erase( plan.stack.begin() );
     } else if ( action_preconds_met( action, ai_player ) ) {
       do_action( action, ai_player );
     }
@@ -259,6 +260,8 @@ namespace AI {
           if ( execute_plan( ai.current_plan, ai_player ) ) {
             printf( "player_1 has finished their goal!\n" );
             ai.executing_plan = false;
+            ai.current_plan = Plan{ {}, 0 };
+            ai.current_goal = Goal::None;
           }
         }
 
