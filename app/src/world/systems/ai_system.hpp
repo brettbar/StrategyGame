@@ -186,7 +186,6 @@ namespace AI {
         for ( auto node: parent->children.at( cond ) ) {
           if ( find_a_plan( node, plan, ai_player ) ) {
             any_valid_action = true;
-            plan.push_back( node->action );
             break;
           }
         }
@@ -196,6 +195,9 @@ namespace AI {
         }
       }
     }
+
+    if ( all_conds_met )
+      plan.push_back( parent->action );
 
     return all_conds_met;
   }
