@@ -27,9 +27,16 @@ if (UNIX)
      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
      project(game)
 
-     find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
-
+     # find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED 
+  
      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+     # add_library(raylib STATIC IMPORTED)
+     # set_target_properties(
+     #   raylib PROPERTIES
+     #   IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/libraylib.a"
+     #   INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
+     # )
  
      add_library(steam_api SHARED IMPORTED)
      set_target_properties(
