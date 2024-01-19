@@ -61,6 +61,7 @@ public:
       return entt::null;
     }
 
+
     inline static bool colonist_can_claim_province( entt::entity colonist ) {
       if ( MovementSystem::ActorIsMoving( colonist ) )
         return false;
@@ -76,7 +77,11 @@ public:
         auto &prov = Global::world.get<Province::Component>( entity );
 
         // 3. if the closest tile is unowned and of a valid biome
-        if ( prov.tile->id == closest_tile && prov.tile->owner == entt::null ) {
+        if ( 
+          prov.tile->id == closest_tile && 
+          prov.tile->owner == entt::null && 
+          MapSystem::biome_inhabitable(prov.tile->biome)
+      ) {
           return true;
         }
       }

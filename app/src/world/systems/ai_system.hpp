@@ -9,6 +9,7 @@
 #include "../components/settlement.hpp"
 #include "actor_system.hpp"
 #include "commands.hpp"
+#include "movement_system.hpp"
 #include "province_system.hpp"
 #include "settlement_system.hpp"
 #include <condition_variable>
@@ -102,11 +103,16 @@ namespace AI {
         Actor::Component actor =
           Global::world.get<Actor::Component>( colonist_e );
 
-        Commands::Manager()->enqueue( Commands::Command::move(
-          ai_player,
-          { actor.position.x + 128, actor.position.y + 128 },
-          colonist_e
-        ) );
+        if ( MovementSystem::ActorIsMoving( colonist_e ) )
+          return;
+
+        auto nearest_eligible_tile =
+          ProvinceSystem::get_nearest_inhabitable_province( actor.position );
+
+        if ( nearest_eligible_tile )
+          Commands::Manager()->enqueue( Commands::Command::move(
+            ai_player, *nearest_eligible_tile, colonist_e
+          ) );
 
       } break;
       case Action_t::SpawnColonist:

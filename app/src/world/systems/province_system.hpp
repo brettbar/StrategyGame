@@ -74,10 +74,10 @@ namespace ProvinceSystem {
   }
 
   inline bool player_has_province( entt::entity owner ) {
-    auto settlements = Global::world.view<Province::Component>();
+    auto provinces = Global::world.view<Province::Component>();
 
-    for ( auto settlement_e: settlements ) {
-      auto prov = settlements.get<Province::Component>( settlement_e );
+    for ( auto province_e: provinces ) {
+      auto prov = provinces.get<Province::Component>( province_e );
       if ( prov.tile->owner == owner ) {
         return true;
       }
@@ -103,6 +103,37 @@ namespace ProvinceSystem {
 
       prov.tile->owner = actor.owner;
     }
+  }
+
+  inline static Province::Component *get_prov_from_vec2f( vec2f tile_pos ) {
+    auto provinces = Global::world.view<Province::Component>();
+    u32 tile_index = DetermineTileIdFromPosition( tile_pos );
+
+    for ( auto prov_e: provinces ) {
+      auto &prov = provinces.get<Province::Component>( prov_e );
+      if ( prov.tile->id == tile_index ) {
+        return &prov;
+      }
+    }
+
+    return nullptr;
+  }
+
+  inline static sptr<vec2f> get_nearest_inhabitable_province( vec2f entity_pos
+  ) {
+    auto prov = get_prov_from_vec2f( entity_pos );
+    if ( !prov ) {
+      return nullptr;
+    }
+
+    auto neighbors = MapSystem::Manager()->get_neighbors( *prov->tile );
+
+    for ( auto neighbor: neighbors ) {
+      if ( neighbor->owner == entt::null && MapSystem::biome_inhabitable( neighbor->biome ) )
+        return std::make_shared<vec2f>( neighbor->position );
+    }
+
+    return nullptr;
   }
 
 };// namespace ProvinceSystem

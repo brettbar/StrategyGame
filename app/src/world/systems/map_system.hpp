@@ -39,6 +39,7 @@ struct MapSystem {
   f32 hillsLevel = 0.45;
 
   u32 seed = 132;
+  // u32 seed = 132;
   u32 octaves = 7;
   f32 scaling_bias = 1.0f;
   // f32 scaling_bias = 1.2f;
@@ -194,12 +195,28 @@ struct MapSystem {
       else
         return Biome::Hills;
     } else if ( elevation >= waterLevel ) {
-      if ( flora >= 0.7f )
+      if ( flora >= 0.55f )
         return Biome::Forest;
       else
         return Biome::Plains;
     } else
       return Biome::Sea;
+  }
+
+  static bool biome_inhabitable( Biome biome ) {
+    switch ( biome ) {
+      case Biome::Desert:
+      case Biome::Forest:
+      case Biome::Hills:
+      case Biome::Plains:
+      case Biome::Steppe:
+      case Biome::Taiga:
+        return true;
+      case Biome::Mountains:
+      case Biome::Sea:
+      case Biome::Tundra:
+        return false;
+    }
   }
 
   void gen_islands( NoiseMap &noise, u32 num_islands ) {
