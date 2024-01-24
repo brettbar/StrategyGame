@@ -28,7 +28,7 @@ namespace FactionSystem {
     std::cout << "Current Working Directory: " << cwd.generic_string()
               << std::endl;
 
-    std::ifstream f( "app/data/factions.json" );
+    std::ifstream f( "assets/data/factions.json" );
     {
 
       nlohmann::json js = nlohmann::json::parse( f );

@@ -1,21 +1,18 @@
 #pragma once
 #include "../../shared/common.hpp"
 
-#include "../../../data/buildings.hpp"
-#include "../../../data/resources.hpp"
-#include "../../../data/settlement.hpp"
+#include "../../assets/data/buildings.hpp"
+#include "../../assets/data/resources.hpp"
+#include "../../assets/data/settlement.hpp"
 #include "regiment.hpp"
 
 #include <cereal/types/common.hpp>
 
-namespace Settlement
-{
-
+namespace Settlement {
   inline std::map<std::string, Image> building_map;
 
 
-  struct Component
-  {
+  struct Component {
     u32 id;
     std::string name;
     Development development;
@@ -30,14 +27,12 @@ namespace Settlement
 
     // TOOD might need separate save/load functions for this one
     template<class Archive>
-    void serialize( Archive &ar )
-    {
+    void serialize( Archive &ar ) {
       ar( id, name, development, population );
     }
 
     template<class Archive>
-    void serialize( Archive &ar, Population &pop )
-    {
+    void serialize( Archive &ar, Population &pop ) {
       ar( pop );
     }
 
