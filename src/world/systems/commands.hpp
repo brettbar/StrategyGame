@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../../shared/global.hpp"
 
 namespace Commands {
 
   enum class Type {
     Move,
     TimeChange,
-    SpawnActor,
+    SpawnColonist,
+    SpawnArmy,
     ClaimProvince,
     BuildSettlement,
   };
@@ -56,7 +56,7 @@ namespace Commands {
 
     static Command spawn_actor( entt::entity player, vec2f click_pos ) {
       auto cmd = Command();
-      cmd.type = Type::SpawnActor;
+      cmd.type = Type::SpawnColonist;
       cmd.player_e = player;
       cmd.click_pos = click_pos;
       return cmd;

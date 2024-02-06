@@ -212,12 +212,12 @@ inline void Campaign::CheckForUIInteractions() {
 
     auto action = UI::SettlementContext( settlement );
     switch ( action ) {
-      case UI::Action_SettlementContext::SpawnActor:
+      case UI::Action_SettlementContext::SpawnColonist:
         PostCommand( Commands::Command::spawn_actor(
           player_e, SettlementSystem::SettlementPosition( *prov )
         ) );
         break;
-      case UI::Action_SettlementContext::SpawnHastati:
+      case UI::Action_SettlementContext::SpawnArmy:
         break;
       case UI::Action_SettlementContext::BuildFarm:
         break;
@@ -401,7 +401,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       HandleTimeChangeRequest( cmd );
       return;
     }
-    case Commands::Type::SpawnActor: {
+    case Commands::Type::SpawnColonist: {
       Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
       return;
     }

@@ -10,7 +10,6 @@
 #include "movement_system.hpp"
 #include "province_system.hpp"
 #include "selection_system.hpp"
-#include "settlement_system.hpp"
 
 #include "../components/player.hpp"
 
@@ -30,7 +29,7 @@ public:
         auto player = players.get<Player::Component>( player_e );
 
         if ( player.player_id == "player_0" ) {
-          spawn_colonist( player.id, { 85 * TILE_WIDTH, 65 * TILE_HEIGHT } );
+          create_colonist( player.id, { 85 * TILE_WIDTH, 65 * TILE_HEIGHT } );
         }
 
         if ( player.player_id == "player_1" ) {
@@ -160,7 +159,7 @@ private:
       return colonist_can_place_settlement( selected_entity );
     }
 
-    inline static void create_colonist( entt::entity owner, Vector2 spawn ) {
+    inline static void create_colonist( entt::entity owner, Vector2 spawn = Vector2{64*64, 64*64} ) {
       Texture2D sprite = FactionSystem::DetermineTextureFromFaction( owner );
       entt::entity entity = Global::world.create();
       Actor::Component actor = {
@@ -197,14 +196,6 @@ private:
       Global::world.emplace<Actor::Component>( entity, actor );
       Global::world.emplace<Animated::Component>( entity, animated );
       Global::world.emplace<Sight::Component>( entity, sight );
-    }
-
-
-    inline void spawn_colonist( entt::entity owner ) {
-      std::unique_ptr<Vector2> spawn =
-        std::make_unique<Vector2>( Vector2{ 64 * 64, 64 * 64 } );
-
-      create_colonist( owner, *spawn );
     }
 
     inline void DeleteSelected() {

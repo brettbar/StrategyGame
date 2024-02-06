@@ -9,8 +9,8 @@
 namespace UI {
   enum class Action_SettlementContext {
     None,
-    SpawnActor,
-    SpawnHastati,
+    SpawnColonist,
+    SpawnArmy,
     BuildFarm,
   };
 
@@ -107,7 +107,7 @@ namespace UI {
           );
 
           if ( spawn_hastati ) {
-            return Action_SettlementContext::SpawnHastati;
+            return Action_SettlementContext::SpawnArmy;
           }
         }
 
@@ -121,10 +121,15 @@ namespace UI {
       case 4: {
         // Agents
         auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
-        auto spawn_agent = f->TextButton( agents_g->Slot( 0 ), "Spawn", GREEN );
+        auto spawn_colonist = f->TextButton( agents_g->Slot( 0 ), "Colonist", GREEN );
+        auto spawn_army = f->TextButton( agents_g->Slot( 1 ), "Army", GREEN );
 
-        if ( spawn_agent ) {
-          return Action_SettlementContext::SpawnActor;
+        if ( spawn_colonist) {
+          return Action_SettlementContext::SpawnColonist;
+        }
+
+        if ( spawn_army ) {
+          return Action_SettlementContext::SpawnArmy;
         }
       } break;
     }
