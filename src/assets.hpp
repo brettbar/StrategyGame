@@ -147,6 +147,12 @@ inline void LoadAssets() {
     LoadImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str() ),
     Global::texture_cache
   );
+  LoadTexturePointFilter(
+    hstr{ "romans_colonist_overview" },
+    CropUnitImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str()
+    ),
+    Global::texture_cache
+  );
 
   LoadAsset(
     hstr{ "romans_hastati_texture" },
@@ -154,7 +160,7 @@ inline void LoadAssets() {
     Global::texture_cache
   );
   LoadTexturePointFilter(
-    hstr{ "romans_hastati_texture_overview" },
+    hstr{ "romans_hastati_overview" },
     CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str()
     ),
     Global::texture_cache

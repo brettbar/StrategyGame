@@ -267,6 +267,7 @@ inline void Campaign::CheckForInput() {
     return;
   }
 
+
   if ( IsKeyPressed( KEY_SPACE ) ) {
     PostCommand(
       Commands::Command::time_change( player_e, "Player request Pause" )

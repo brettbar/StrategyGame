@@ -103,7 +103,7 @@ namespace UI {
           f->TextLabel( recruitment_g->Slot( 0 ), "Recruitment", GREEN );
 
           auto spawn_hastati = f->TextureButton(
-            recruitment_g->Slot( 1 ), "romans_hastati_texture_overview", BLACK
+            recruitment_g->Slot( 1 ), "romans_hastati_overview", 2.0f, BLACK
           );
 
           if ( spawn_hastati ) {
@@ -121,7 +121,7 @@ namespace UI {
       case 4: {
         // Agents
         auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
-        auto spawn_colonist = f->TextButton( agents_g->Slot( 0 ), "Colonist", GREEN );
+        auto spawn_colonist = f->TextureButton(agents_g->Slot(0), "romans_colonist_overview", 3.0f, BLACK);
         auto spawn_army = f->TextButton( agents_g->Slot( 1 ), "Army", GREEN );
 
         if ( spawn_colonist) {

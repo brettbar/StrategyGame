@@ -24,10 +24,10 @@ The FinalAnimations pixel will be the positions of ColorAnimations
 and the color of Reference.
 '''
 # Windows
-# ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
+ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
 
 # Linux
-ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator/"
+# ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator/"
 
 # WSL
 # ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"

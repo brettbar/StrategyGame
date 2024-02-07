@@ -160,6 +160,7 @@ public:
     Element *TextureLabel(
       rect t,
       hstr texture_id,
+      f32 scale = 1.0f,
       Color color = { 0, 0, 0, 0 }
     ) {
       auto e = new Element();
@@ -167,7 +168,7 @@ public:
       e->id = queue.size();
       e->transform = t;
       e->background = color;
-      e->t.texture = new ITexture( texture_id );
+      e->t.texture = new ITexture( texture_id, scale );
       queue.push_back( e );
       return e;
     }
@@ -279,8 +280,8 @@ public:
     }// namespace Iron
 
 
-    bool TextureButton( rect t, hstr texture_id, Color c = { 0, 0, 0, 0 } ) {
-      auto e = TextureLabel( t, texture_id, c );
+    bool TextureButton( rect t, hstr texture_id, f32 scale = 1.0f, Color c = { 0, 0, 0, 0 } ) {
+      auto e = TextureLabel( t, texture_id, scale, c );
       e->interactable = true;
       return CheckInteract( *e );
     }

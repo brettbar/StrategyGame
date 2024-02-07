@@ -58,8 +58,10 @@ namespace Iron {
 
   struct ITexture {
     hstr texture_id;
+    f32 scale;
+
     ITexture() = delete;
-    ITexture( hstr id ) : texture_id( id ) {}
+    ITexture( hstr id, f32 scale = 1.0f ) : texture_id( id ), scale(scale) {}
   };
 
 
@@ -170,9 +172,9 @@ namespace Iron {
           Texture texture = resource.get()->texture;
 
           if ( background.a > 0 ) {
-            DrawRectangleRec( transform, background );
+            DrawRectangleRec( rect{transform.x, transform.y, texture.width * t.texture->scale, texture.height * t.texture->scale}, background );
           }
-          DrawTexture( texture, transform.x, transform.y, WHITE );
+          DrawTextureEx( texture, vec2f{transform.x, transform.y}, 0, t.texture->scale, WHITE );
           break;
       }
     }
