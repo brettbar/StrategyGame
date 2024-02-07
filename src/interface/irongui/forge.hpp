@@ -134,24 +134,37 @@ public:
       return result;
     }
 
-    Element *Grid( rect t, u32 c, u32 r, Color color = { 0, 0, 0, 0 } ) {
+    Element *Grid(
+      rect t,
+      u32 c,
+      u32 r,
+      Color color = { 0, 0, 0, 0 },
+      f32 s = 1.0f
+    ) {
       auto e = new Element();
       e->type = Type::Grid;
       e->id = queue.size();
       e->background = BLUE;
       e->transform = t;
+      e->scale = s;
       e->background = color;
       e->t.grid = new IGrid( c, r );
       queue.push_back( e );
       return e;
     }
 
-    Element *TextLabel( rect t, str txt, Color c ) {
+    Element *TextLabel(
+      rect t,
+      str txt,
+      Color c = { 0, 0, 0, 0 },
+      f32 s = 1.0f
+    ) {
       auto e = new Element();
       e->type = Type::Text;
       e->id = queue.size();
       e->background = c;
       e->transform = t;
+      e->scale = s;
       e->t.text = new IText( txt );
       queue.push_back( e );
       return e;
@@ -160,15 +173,17 @@ public:
     Element *TextureLabel(
       rect t,
       hstr texture_id,
-      f32 scale = 1.0f,
-      Color color = { 0, 0, 0, 0 }
+      Color color = { 0, 0, 0, 0 },
+      f32 scale = 1.0f
     ) {
       auto e = new Element();
       e->type = Type::Texture;
       e->id = queue.size();
-      e->transform = t;
+      e->scale = scale;
       e->background = color;
-      e->t.texture = new ITexture( texture_id, scale );
+      e->t.texture = new ITexture( texture_id );
+      auto texture = Global::texture_cache[e->t.texture->texture_id]->texture;
+      e->transform = {t.x, t.y, (f32)texture.width * scale, (f32)texture.height *scale };
       queue.push_back( e );
       return e;
     }
@@ -199,19 +214,20 @@ public:
       return e;
     }
 
-    bool TextButton( rect t, str txt, Color c ) {
-      auto e = TextLabel( t, txt, c );
+    bool TextButton( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f ) {
+      auto e = TextLabel( t, txt, c, s );
       e->interactable = true;
       return CheckInteract( *e );
     }
 
 
-    str *TextInput( rect t, str txt, Color c ) {
+    str *TextInput( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f  ) {
       auto e = new Element();
       e->type = Type::TextInput;
       e->id = queue.size();
       e->background = c;
       e->transform = t;
+      e->scale = s;
       e->interactable = true;
       e->stateful = true;
       e->t.text_input = new ITextInput( txt );
@@ -269,9 +285,11 @@ public:
 
       if ( !ui_state.contains( e->id ) ) {
         ui_state[e->id] = State{
-          .text_input_state = {
-            .edit_text = e->t.text_input->edit_text.c_str(),
-          } };
+          .text_input_state =
+            {
+              .edit_text = e->t.text_input->edit_text.c_str(),
+            }
+        };
       }
 
 
@@ -280,8 +298,13 @@ public:
     }// namespace Iron
 
 
-    bool TextureButton( rect t, hstr texture_id, f32 scale = 1.0f, Color c = { 0, 0, 0, 0 } ) {
-      auto e = TextureLabel( t, texture_id, scale, c );
+    bool TextureButton(
+      rect t,
+      hstr texture_id,
+      Color c = { 0, 0, 0, 0 },
+      f32 scale = 1.0f
+    ) {
+      auto e = TextureLabel( t, texture_id, c, scale );
       e->interactable = true;
       return CheckInteract( *e );
     }

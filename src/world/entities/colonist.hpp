@@ -1,0 +1,106 @@
+#pragma once
+
+#include "../../shared/global.hpp"
+#include "../../shared/utils.hpp"
+#include "../components/actor.hpp"
+#include "../components/animated.hpp"
+#include "../components/selected.hpp"
+#include "../components/sight.hpp"
+#include "../systems/faction_system.hpp"
+
+namespace Entities {
+
+  inline static void create_army( entt::entity owner, vec2f spawn ) {
+    Texture2D sprite = FactionSystem::hastati_texure_from_owner( owner );
+    entt::entity entity = Global::world.create();
+    Actor::Component actor = {
+      .name = "Marcus Priscus",
+      .type = Actor::Type::Colonist,
+      .owner = owner,
+      .position = spawn,
+      .destination = spawn,
+      .speed = 1.0f,
+    };
+
+    Animated::Animations animations = {
+      { Animated::AnimState::IDLE_DR, 2, 0.2f },
+      { Animated::AnimState::IDLE_DL, 2, 0.2f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
+    };
+
+    Animated::Component animated = {
+      .sprite = sprite,
+      .frameRec = { 0, 0, 128, 128 },
+      .state = Animated::AnimState::IDLE_DR,
+      .animations = animations,
+      .direction = 0,
+      .currFrame = 0,
+      .animTime = 0.0f,
+      .moving = false,
+    };
+
+    Sight::Component sight = {
+      .range = 1,
+    };
+
+    Global::world.emplace<Actor::Component>( entity, actor );
+    Global::world.emplace<Animated::Component>( entity, animated );
+    Global::world.emplace<Sight::Component>( entity, sight );
+  }
+
+  inline static void create_colonist(
+    entt::entity owner,
+    Vector2 spawn = Vector2{ 64 * 64, 64 * 64 }
+  ) {
+    Texture2D sprite = FactionSystem::villagar_texure_from_owner( owner );
+    entt::entity entity = Global::world.create();
+    Actor::Component actor = {
+      .name = "Marcus Priscus",
+      .type = Actor::Type::Colonist,
+      .owner = owner,
+      .position = spawn,
+      .destination = spawn,
+      .speed = 1.0f,
+    };
+
+    Animated::Animations animations = {
+      { Animated::AnimState::IDLE_DR, 2, 0.2f },
+      { Animated::AnimState::IDLE_DL, 2, 0.2f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
+      { Animated::AnimState::WALK_DL, 8, 0.8f },
+    };
+
+    Animated::Component animated = {
+      .sprite = sprite,
+      .frameRec = { 0, 0, 128, 128 },
+      .state = Animated::AnimState::IDLE_DR,
+      .animations = animations,
+      .direction = 0,
+      .currFrame = 0,
+      .animTime = 0.0f,
+      .moving = false,
+    };
+
+    Sight::Component sight = {
+      .range = 1,
+    };
+
+    Global::world.emplace<Actor::Component>( entity, actor );
+    Global::world.emplace<Animated::Component>( entity, animated );
+    Global::world.emplace<Sight::Component>( entity, sight );
+  }
+
+  inline void DeleteSelected() {
+    auto selectedView =
+      Global::world.view<Selected::Component, Actor::Component>();
+    auto selectedEntity = selectedView.front();
+
+    if ( selectedEntity == entt::null ) {
+      printf( "No selected entity, cancelling\n" );
+      return;
+    }
+
+    Global::world.destroy( selectedEntity );
+  }
+};// namespace Entities
