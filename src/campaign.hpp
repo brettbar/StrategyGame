@@ -213,11 +213,14 @@ inline void Campaign::CheckForUIInteractions() {
     auto action = UI::SettlementContext( settlement );
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnColonist:
-        PostCommand( Commands::Command::spawn_actor(
+        PostCommand( Commands::Command::spawn_colonist(
           player_e, SettlementSystem::SettlementPosition( *prov )
         ) );
         break;
       case UI::Action_SettlementContext::SpawnArmy:
+        PostCommand( Commands::Command::spawn_army(
+          player_e, SettlementSystem::SettlementPosition( *prov )
+        ) );
         break;
       case UI::Action_SettlementContext::BuildFarm:
         break;
@@ -287,7 +290,7 @@ inline void Campaign::CheckForInput() {
   }
 
   if ( IsKeyPressed( KEY_V ) ) {
-    PostCommand( Commands::Command::spawn_actor( player_e, click_pos ) );
+    PostCommand( Commands::Command::spawn_colonist( player_e, click_pos ) );
   }
 
 
@@ -394,16 +397,22 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
       SettlementSystem::spawn_settlement( cmd.entity );
-    } break;
+      return;
+    } 
     case Commands::Type::ClaimProvince: {
       ProvinceSystem::colonist_claim_province( cmd.entity );
-    } break;
+      return;
+    } 
     case Commands::Type::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
     }
     case Commands::Type::SpawnColonist: {
       Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
+      return;
+    }
+    case Commands::Type::SpawnArmy: {
+      Actor::System::spawn_army(cmd.player_e, cmd.click_pos);
       return;
     }
     case Commands::Type::Move: {

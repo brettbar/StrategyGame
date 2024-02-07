@@ -122,7 +122,7 @@ namespace UI {
         // Agents
         auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
         auto spawn_colonist = f->TextureButton(agents_g->Slot(0), "romans_colonist_overview", 3.0f, BLACK);
-        auto spawn_army = f->TextButton( agents_g->Slot( 1 ), "Army", GREEN );
+        auto spawn_army = f->TextureButton(agents_g->Slot(1), "romans_hastati_overview", 3.0f, BLACK);
 
         if ( spawn_colonist) {
           return Action_SettlementContext::SpawnColonist;

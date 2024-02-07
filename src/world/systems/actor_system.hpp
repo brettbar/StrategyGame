@@ -13,10 +13,6 @@
 
 #include "../components/player.hpp"
 
-// @todo get rid of this super hardcoded assumption of using the selected entity and selection system
-// The functions should be oriented towards doing something for a player
-// and then the selection system then just basically becomes a wrapper for the local human player / host
-
 namespace Actor {
 
   class System {
@@ -144,6 +140,48 @@ public:
       create_colonist( owner, *spawn );
     }
 
+    inline static void spawn_army(entt::entity owner, vec2f click_pos) {
+      std::unique_ptr<Vector2> spawn = DetermineTilePos( click_pos);
+      assert( spawn != nullptr );
+
+      Texture2D sprite = FactionSystem::hastati_texure_from_owner( owner );
+      entt::entity entity = Global::world.create();
+      Actor::Component actor = {
+        .name = "Marcus Priscus",
+        .type = Actor::Type::Colonist,
+        .owner = owner,
+        .position = *spawn,
+        .destination = *spawn,
+        .speed = 1.0f,
+      };
+
+      Animated::Animations animations = {
+        { Animated::AnimState::IDLE_DR, 2, 0.2f },
+        { Animated::AnimState::IDLE_DL, 2, 0.2f },
+        { Animated::AnimState::WALK_DL, 8, 0.8f },
+        { Animated::AnimState::WALK_DL, 8, 0.8f },
+      };
+
+      Animated::Component animated = {
+        .sprite = sprite,
+        .frameRec = { 0, 0, 128, 128 },
+        .state = Animated::AnimState::IDLE_DR,
+        .animations = animations,
+        .direction = 0,
+        .currFrame = 0,
+        .animTime = 0.0f,
+        .moving = false,
+      };
+
+      Sight::Component sight = {
+        .range = 1,
+      };
+
+      Global::world.emplace<Actor::Component>( entity, actor );
+      Global::world.emplace<Animated::Component>( entity, animated );
+      Global::world.emplace<Sight::Component>( entity, sight );
+    }
+
 private:
     // A settlement can be placed when
     // 0. A colonist is selected
@@ -160,7 +198,7 @@ private:
     }
 
     inline static void create_colonist( entt::entity owner, Vector2 spawn = Vector2{64*64, 64*64} ) {
-      Texture2D sprite = FactionSystem::DetermineTextureFromFaction( owner );
+      Texture2D sprite = FactionSystem::villagar_texure_from_owner( owner );
       entt::entity entity = Global::world.create();
       Actor::Component actor = {
         .name = "Marcus Priscus",

@@ -54,9 +54,17 @@ namespace Commands {
       return cmd;
     }
 
-    static Command spawn_actor( entt::entity player, vec2f click_pos ) {
+    static Command spawn_colonist( entt::entity player, vec2f click_pos ) {
       auto cmd = Command();
       cmd.type = Type::SpawnColonist;
+      cmd.player_e = player;
+      cmd.click_pos = click_pos;
+      return cmd;
+    }
+
+    static Command spawn_army( entt::entity player, vec2f click_pos ) {
+      auto cmd = Command();
+      cmd.type = Type::SpawnArmy;
       cmd.player_e = player;
       cmd.click_pos = click_pos;
       return cmd;
