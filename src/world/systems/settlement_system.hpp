@@ -5,6 +5,7 @@
 #include "../../shared/textures.hpp"
 #include "../components/province.hpp"
 #include "../components/settlement.hpp"
+#include "../components/faction.hpp"
 #include "selection_system.hpp"
 
 namespace SettlementSystem {
@@ -72,8 +73,10 @@ namespace SettlementSystem {
         if ( !Global::world.any_of<Settlement::Component>( entity ) ) {
           printf( "spawning settlement\n" );
 
+          Faction::Component faction = Global::world.get<Faction::Component>(unit.owner);
+
           Settlement::Component settlement = {
-            .name = "Athens",
+            .name = faction.settlement_names[0],
             .development = Settlement::Development::Village,
             .population =
               {

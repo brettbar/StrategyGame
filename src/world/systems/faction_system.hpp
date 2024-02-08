@@ -52,11 +52,12 @@ namespace FactionSystem {
         std::cout << element.value() << std::endl;
 
         Faction::Component faction = {
-          element.key(),
-          element.value().at( "primary_color" ),
-          element.value().at( "secondary_color" ),
-          element.value().at( "adjectival" ),
-          element.value().at( "denonym" ),
+          .id = element.key(),
+          .primary_color = element.value().at( "primary_color" ),
+          .secondary_color = element.value().at( "secondary_color" ),
+          .adjectival = element.value().at( "adjectival" ),
+          .denonym = element.value().at( "denonym" ),
+          .settlement_names = element.value().at("settlement_names"),
         };
 
         factions.emplace( element.key(), faction );

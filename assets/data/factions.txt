@@ -1,24 +1,34 @@
-{
+faction = {
   id = "romans"
-  primary_color = "red"
-  secondary_color = "gold"
-  denonym = "Romans"
-  adjectival = "Roman"
-  settledness: "settled"
 
-  gov.start = "republic"
-  gov.empire.name = "Roman Empire"
-  gov.empire.leader = "Imperator"
-  gov.republic.name = "Roman Republic"
-  gov.republic.leader = "Consul"
-  gov.federation.name = "Italic Confederation"
-  gov.federation.leader = "Rex"
+  colors = {
+    primary_color = red
+    secondary_color = gold
+  }
+
+  words: {
+    denonym = "Romans"
+    adjectival = "Roman"
+  }
+
+  settledness = "settled"
+
+  gov = {
+    start = "republic"
+
+    empire_name = "Roman Empire"
+    empire_leader = "Imperator"
+    republic_name = "Roman Republic"
+    republic_leader = "Consul"
+    federation_name = "Italic Confederation"
+    federation_leader = "Rex"
+  }
 
   settlement_names = [
     "Rome", 
     "Veii", 
     "Alba Longa", 
-    "Caerce"
+    "Caerce",
   ]
 }
 

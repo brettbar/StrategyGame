@@ -11,11 +11,12 @@ namespace Faction
     str secondary_color;
     str adjectival;
     str denonym;
+    list<str> settlement_names;
 
     template<class Archive>
     void serialize( Archive &ar )
     {
-      ar( id, primary_color, secondary_color, adjectival, denonym );
+      ar( id, primary_color, secondary_color, adjectival, denonym, settlement_names );
     }
   };
 
