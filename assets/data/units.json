@@ -1,0 +1,20 @@
+{
+  "romans": [
+    "hastati": {
+      "type": "sword_infantry",
+      "tier": 2
+    }
+  ],
+  "greeks": [
+    "perioikoi": {
+      "type": "spear_infantry",
+      "tier": 2
+    }
+  ],
+  "celts": [
+    "warband": {
+      "type": "sword_infantry",
+      "tier": 2
+    }
+  ]
+}

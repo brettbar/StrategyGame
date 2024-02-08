@@ -13,7 +13,7 @@ namespace Entities {
     entt::entity entity = Global::world.create();
     Actor::Component actor = {
       .name = "Marcus Priscus",
-      .type = Actor::Type::Colonist,
+      .type = Actor::Type::Army,
       .owner = owner,
       .position = spawn,
       .destination = spawn,

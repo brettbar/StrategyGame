@@ -6,18 +6,7 @@
 #include "../components/faction.hpp"
 
 namespace FactionSystem {
-  inline std::map<std::string, Faction::Component> factions = {
-    // {
-    //   "romans",
-    //   {
-    //     .id = "romans",
-    //     .primary_color = "red",
-    //     .secondary_color = "gold",
-    //     .adjectival = "romans",
-    //     .denonym = "gold",
-    //   },
-    // },
-  };
+  inline std::map<std::string, Faction::Component> factions = { };
 
   inline std::map<std::string, Color> color_map = {
     { "red", RED },

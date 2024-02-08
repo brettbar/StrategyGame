@@ -23,17 +23,26 @@ namespace UI {
 
     auto grid = f->Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5 ) );
 
-    f->TextLabel( grid->Slot( 0 ), "Actor", GREEN );
-    bool claim_province = f->TextButton( grid->Slot( 1 ), "Claim", RED );
-    bool spawn_settlement =
-      f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
 
-    if ( claim_province ) {
-      return Action_ActorContext::ClaimProvince;
-    }
+    switch ( actor->type ) {
+      case Actor::Type::Colonist: {
+        f->TextLabel( grid->Slot( 0 ), "Colonist", GREEN );
+        bool claim_province = f->TextButton( grid->Slot( 1 ), "Claim", RED );
+        bool spawn_settlement =
+          f->TextButton( grid->Slot( 2 ), "Settlement", BLUE );
 
-    if ( spawn_settlement ) {
-      return Action_ActorContext::SpawnSettlement;
+        if ( claim_province ) {
+          return Action_ActorContext::ClaimProvince;
+        }
+
+        if ( spawn_settlement ) {
+          return Action_ActorContext::SpawnSettlement;
+        }
+      } break;
+      case Actor::Type::Army: {
+        f->TextLabel( grid->Slot( 0 ), "Army", GREEN );
+        
+      } break;
     }
 
     return Action_ActorContext::None;
