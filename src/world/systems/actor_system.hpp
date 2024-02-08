@@ -10,6 +10,7 @@
 #include "province_system.hpp"
 #include "selection_system.hpp"
 
+#include "../entities/army.hpp"
 #include "../entities/colonist.hpp"
 
 #include "../components/player.hpp"
@@ -145,6 +146,19 @@ public:
 
       // Otherwise, default to false
       return false;
+    }
+
+    inline void DeleteSelected() {
+      auto selectedView =
+        Global::world.view<Selected::Component, Actor::Component>();
+      auto selectedEntity = selectedView.front();
+
+      if ( selectedEntity == entt::null ) {
+        printf( "No selected entity, cancelling\n" );
+        return;
+      }
+
+      Global::world.destroy( selectedEntity );
     }
 
 private:

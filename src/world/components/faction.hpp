@@ -6,11 +6,11 @@ namespace Faction
 {
   struct Component
   {
-    std::string id;
-    std::string primary_color;
-    std::string secondary_color;
-    std::string adjectival;
-    std::string denonym;
+    str id;
+    str primary_color;
+    str secondary_color;
+    str adjectival;
+    str denonym;
 
     template<class Archive>
     void serialize( Archive &ar )
