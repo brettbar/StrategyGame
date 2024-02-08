@@ -10,12 +10,12 @@ namespace fs = std::filesystem;
 inline Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
-  ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
-  ImageDrawLineV( &base, { 64, 16 }, { 64, 48 }, YELLOW );
-  ImageDrawLineV( &base, { 32, 0 }, { 64, 16 }, YELLOW );
-  ImageDrawLineV( &base, { 64, 48 }, { 32, 64 }, YELLOW );
-  ImageDrawLineV( &base, { 32, 64 }, { 0, 48 }, YELLOW );
-  ImageDrawLineV( &base, { 0, 48 }, { 0, 16 }, YELLOW );
+  ImageDrawLineV( &base, { 0, 16 }, { 31, 0 }, YELLOW );
+  ImageDrawLineV( &base, { 63, 16 }, { 63, 47 }, YELLOW );
+  ImageDrawLineV( &base, { 32, 0 }, { 63, 16 }, YELLOW );
+  ImageDrawLineV( &base, { 63, 47 }, { 32, 63 }, YELLOW );
+  ImageDrawLineV( &base, { 31, 63 }, { 0, 47 }, YELLOW );
+  ImageDrawLineV( &base, { 0, 47 }, { 0, 16 }, YELLOW );
 
   return base;
 }
