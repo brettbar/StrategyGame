@@ -6,7 +6,7 @@
 #include "../components/faction.hpp"
 
 namespace FactionSystem {
-  inline std::map<std::string, Faction::Component> factions = { };
+  inline std::map<std::string, Faction::Component> factions = {};
 
   inline std::map<std::string, Color> color_map = {
     { "red", RED },
@@ -40,13 +40,39 @@ namespace FactionSystem {
         std::cout << element.key() << std::endl;
         std::cout << element.value() << std::endl;
 
+        auto colors = element.value().at( "colors" );
+        auto culture = element.value().at( "culture" );
+        auto government = element.value().at( "government" );
+        auto mobility = element.value().at( "mobility" );
+
         Faction::Component faction = {
           .id = element.key(),
-          .primary_color = element.value().at( "primary_color" ),
-          .secondary_color = element.value().at( "secondary_color" ),
-          .adjectival = element.value().at( "adjectival" ),
-          .denonym = element.value().at( "denonym" ),
-          .settlement_names = element.value().at("settlement_names"),
+          .colors =
+            {
+              .primary = colors.at( "primary" ),
+              .secondary = colors.at( "secondary" ),
+            },
+          .culture =
+            {
+              .adjective = culture.at( "adjective" ),
+              .denonym = culture.at( "denonym" ),
+              .settlement_names = culture.at( "settlement_names" ),
+            },
+          .government =
+            {
+              .start_gov = Faction::Component::Government::gov_from_str(government.at( "start_gov" )),
+              .empire_name = government.at( "empire_name" ),
+              .empire_leader_title = government.at( "empire_leader_title" ),
+              .republic_name = government.at( "republic_name" ),
+              .republic_leader_title = government.at( "republic_leader_title" ),
+              .federation_name = government.at( "federation_name" ),
+              .federation_leader_title =
+                government.at( "federation_leader_title" ),
+            },
+          .mobility =
+            {
+              .type = mobility.at( "type" ),
+            }
         };
 
         factions.emplace( element.key(), faction );

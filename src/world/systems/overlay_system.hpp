@@ -30,13 +30,15 @@ namespace OverlaySystem {
 
       auto neighbors = MapSystem::Manager()->get_neighbors( *prov.tile );
 
+      str primary = faction.colors.primary;
+
       hstr borders[6] = {
-        hstr{ ( "ne_border_" + faction.primary_color ).c_str() },
-        hstr{ ( "e_border_" + faction.primary_color ).c_str() },
-        hstr{ ( "se_border_" + faction.primary_color ).c_str() },
-        hstr{ ( "sw_border_" + faction.primary_color ).c_str() },
-        hstr{ ( "w_border_" + faction.primary_color ).c_str() },
-        hstr{ ( "nw_border_" + faction.primary_color ).c_str() },
+        hstr{ ( "ne_border_" + primary ).c_str() },
+        hstr{ ( "e_border_" + primary ).c_str() },
+        hstr{ ( "se_border_" + primary ).c_str() },
+        hstr{ ( "sw_border_" + primary ).c_str() },
+        hstr{ ( "w_border_" + primary ).c_str() },
+        hstr{ ( "nw_border_" + primary ).c_str() },
       };
 
       for ( u32 i = 0; i < neighbors.size(); i++ ) {
@@ -72,10 +74,10 @@ namespace OverlaySystem {
 
       Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
-      Color color = FactionSystem::color_map[faction.primary_color];
+      Color color = FactionSystem::color_map[faction.colors.primary];
 
       DrawTextureRec(
-        Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
+        Global::texture_cache[hstr{ ( faction.colors.primary + "_overlay" )
                                       .c_str() }]
           ->texture,
         frameRec,
@@ -99,10 +101,10 @@ namespace OverlaySystem {
 
         Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
 
-        Color color = FactionSystem::color_map[faction.primary_color];
+        Color color = FactionSystem::color_map[faction.colors.primary];
 
         DrawTextureRec(
-          Global::texture_cache[hstr{ ( faction.primary_color + "_overlay" )
+          Global::texture_cache[hstr{ ( faction.colors.primary + "_overlay" )
                                         .c_str() }]
             ->texture,
           frameRec,

@@ -76,7 +76,7 @@ namespace SettlementSystem {
           Faction::Component faction = Global::world.get<Faction::Component>(unit.owner);
 
           Settlement::Component settlement = {
-            .name = faction.settlement_names[0],
+            .name = faction.culture.settlement_names[0],
             .development = Settlement::Development::Village,
             .population =
               {
