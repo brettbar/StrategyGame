@@ -10,11 +10,58 @@ namespace Faction {
     Nomadic
   };
 
+  inline str as_str( Mobility_t type ) {
+    switch ( type ) {
+      case Mobility_t::Settled:
+        return "settled";
+      case Mobility_t::Tribal:
+        return "tribal";
+      case Mobility_t::Nomadic:
+        return "nomadic";
+    }
+  }
+
+  inline Mobility_t from_str( str type_str ) {
+    if ( type_str == "settled" )
+      return Mobility_t::Settled;
+    if ( type_str == "tribal" )
+      return Mobility_t::Tribal;
+    if ( type_str == "nomadic" )
+      return Mobility_t::Nomadic;
+
+    // @todo error handle
+    return Mobility_t::Settled;
+  }
+
+
   enum class Government_t {
     Federation,
     Republic,
     Empire
   };
+
+  inline str gov_as_str( Government_t gov ) {
+    switch ( gov ) {
+      case Government_t::Empire:
+        return "empire";
+      case Government_t::Federation:
+        return "federation";
+      case Government_t::Republic:
+        return "republic";
+    }
+  }
+
+  inline Government_t gov_from_str( str gov_str ) {
+    if ( gov_str == "empire" )
+      return Government_t::Empire;
+    if ( gov_str == "republic" )
+      return Government_t::Republic;
+    if ( gov_str == "federation" )
+      return Government_t::Federation;
+
+    // @todo error handle
+    return Government_t::Empire;
+  }
 
 
   struct Component {
@@ -63,28 +110,6 @@ namespace Faction {
         );
       }
 
-      str gov_as_str( Government_t gov ) {
-        switch ( gov ) {
-          case Government_t::Empire:
-            return "empire";
-          case Government_t::Federation:
-            return "federation";
-          case Government_t::Republic:
-            return "republic";
-        }
-      }
-
-      Government_t gov_from_str( str gov_str ) {
-        if ( gov_str == "empire" )
-          return Government_t::Empire;
-        if ( gov_str == "republic" )
-          return Government_t::Republic;
-        if ( gov_str == "federation" )
-          return Government_t::Federation;
-
-        // @todo error handle
-        return Government_t::Empire;
-      }
     } government;
 
     struct Mobility {
@@ -93,29 +118,6 @@ namespace Faction {
       template<class Archive>
       void serialize( Archive &ar ) {
         ar( as_str( type ) );
-      }
-
-      str as_str( Mobility_t type ) {
-        switch ( type ) {
-          case Mobility_t::Settled:
-            return "settled";
-          case Mobility_t::Tribal:
-            return "tribal";
-          case Mobility_t::Nomadic:
-            return "nomadic";
-        }
-      }
-
-      Mobility_t from_str( str type_str ) {
-        if ( type_str == "settled" )
-          return Mobility_t::Settled;
-        if ( type_str == "tribal" )
-          return Mobility_t::Tribal;
-        if ( type_str == "nomadic" )
-          return Mobility_t::Nomadic;
-
-        // @todo error handle
-        return Mobility_t::Settled;
       }
 
     } mobility;

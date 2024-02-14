@@ -60,7 +60,7 @@ namespace FactionSystem {
             },
           .government =
             {
-              .start_gov = Faction::Component::Government::gov_from_str(government.at( "start_gov" )),
+              .start_gov = Faction::gov_from_str(government.at( "start_gov" )),
               .empire_name = government.at( "empire_name" ),
               .empire_leader_title = government.at( "empire_leader_title" ),
               .republic_name = government.at( "republic_name" ),
@@ -71,7 +71,7 @@ namespace FactionSystem {
             },
           .mobility =
             {
-              .type = mobility.at( "type" ),
+              .type = Faction::from_str(mobility.at( "type" )),
             }
         };
 
