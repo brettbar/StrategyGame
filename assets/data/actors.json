@@ -1,0 +1,8 @@
+{
+  "romans": [
+    "colonist": {
+      "type": "colonist",
+      "sprite": "roman_villager"
+    }
+  ]
+}
