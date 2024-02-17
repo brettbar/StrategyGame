@@ -79,14 +79,6 @@ namespace FactionSystem {
       }
     }
     f.close();
-
-    // entt::entity ai_player = Global::world.create();
-    // Global::world.emplace<Player::Component>(
-    //   ai_player, ai_player, false, "celts"
-    // );
-    // Global::world.emplace<AI::Component>(
-    //   ai_player, AI::Goal::DevelopSettlements
-    // );
   }
 
 

@@ -76,6 +76,46 @@ inline void load_all_in_folder( str path ) {
   }
 }
 
+inline void load_faction_actors() {
+  str path = "assets/images/factions";
+  
+  LoadAsset(
+    hstr{ "romans_villager_texture" },
+    LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "romans_colonist_overview" },
+    CropUnitImage( ( path + "/romans/actors/roman_villager.png" ).c_str()
+    ),
+    Global::texture_cache
+  );
+  LoadAsset(
+    hstr{ "romans_hastati_texture" },
+    LoadImage( ( path + "/romans/actors/RomanHastati.png" ).c_str() ),
+    Global::texture_cache
+  );
+  LoadTexturePointFilter(
+    hstr{ "romans_hastati_overview" },
+    CropUnitImage( ( path + "/romans/actors/RomanHastati.png" ).c_str()
+    ),
+    Global::texture_cache
+  );
+
+  LoadAsset(
+    hstr{ "greeks_villager_texture" },
+    LoadImage( ( path+ "/greeks/actors/greek_villager.png" ).c_str() ),
+    Global::texture_cache
+  );
+
+  LoadAsset(
+    hstr{ "celts_villager_texture" },
+    LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
+    Global::texture_cache
+  );
+
+} 
+
 inline void LoadAssets() {
   std::string asset_folder = "assets/";
 
@@ -92,42 +132,6 @@ inline void LoadAssets() {
     LoadFont( ( asset_folder + "/fonts/Perfect-DOS-VGA-437.png" ).c_str() )
   );
 
-  // LoadAsset(
-  //   hstr{ "land_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Grass.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "forest_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Forest.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "mountains_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Mountains.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "water_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Ocean.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "hills_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Hills.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "sand_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Sand.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  // LoadAsset(
-  //   hstr{ "snow_tile" },
-  //   LoadImage( ( asset_folder + "/images/hexagons/Snow.bmp" ).c_str() ),
-  //   Global::texture_cache
-  // );
-
   load_all_in_folder( asset_folder + "/images/hexagons" );
 
   create_hex_texture( hstr{ "red_overlay" }, RED, Global::texture_cache );
@@ -142,53 +146,6 @@ inline void LoadAssets() {
     Global::texture_cache
   );
 
-  LoadAsset(
-    hstr{ "romans_villager_texture" },
-    LoadImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "romans_colonist_overview" },
-    CropUnitImage( ( asset_folder + "/images/units/RomanVillager.png" ).c_str()
-    ),
-    Global::texture_cache
-  );
-
-  LoadAsset(
-    hstr{ "romans_hastati_texture" },
-    LoadImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "romans_hastati_overview" },
-    CropUnitImage( ( asset_folder + "/images/units/RomanHastati.png" ).c_str()
-    ),
-    Global::texture_cache
-  );
-
-  LoadAsset(
-    hstr{ "greeks_villager_texture" },
-    LoadImage( ( asset_folder + "/images/units/GreekVillager.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadAsset(
-    hstr{ "celts_villager_texture" },
-    LoadImage( ( asset_folder + "/images/units/CelticVillager.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadAsset(
-    hstr{ "punics_villager_texture" },
-    LoadImage(
-      ( asset_folder + "/images/units/Carthaginian_Villager.png" ).c_str()
-    ),
-    Global::texture_cache
-  );
-  LoadAsset(
-    hstr{ "persians_villager_texture" },
-    LoadImage( ( asset_folder + "/images/units/Persian_Villager.png" ).c_str()
-    ),
-    Global::texture_cache
-  );
   LoadAsset(
     hstr{ "romanVillageTexture" },
     LoadImage( ( asset_folder + "/images/village_roman.png" ).c_str() ),

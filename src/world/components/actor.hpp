@@ -6,17 +6,14 @@
 
 #include "../../shared/common.hpp"
 
-namespace Actor
-{
+namespace Actor {
 
-  enum class Type
-  {
+  enum class Type {
     Colonist,
-    Army
+    Army,
   };
 
-  struct Component
-  {
+  struct Component {
 
     std::string name;
     Type type;
@@ -28,8 +25,7 @@ namespace Actor
     bool moving = false;
 
     template<class Archive>
-    void serialize( Archive &ar )
-    {
+    void serialize( Archive &ar ) {
       ar(
         name,
         type,

@@ -3,6 +3,30 @@
     "colonist": {
       "type": "colonist",
       "sprite": "roman_villager"
+    },
+    "general": {
+      "type": "general",
+      "sprite": "roman_general"
+    }
+  ],
+  "greeks": [
+    "colonist": {
+      "type": "colonist",
+      "sprite": "greek_villager"
+    },
+    "general": {
+      "type": "general",
+      "sprite": "greek_general"
+    }
+  ],
+  "celts": [
+    "villager": {
+      "type": "colonist",
+      "sprite": "celtic_villager"
+    },
+    "general": {
+      "type": "general",
+      "sprite": "greek_general"
     }
   ]
 }
