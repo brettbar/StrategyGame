@@ -91,11 +91,13 @@ inline void load_faction_actors() {
             fs::directory_iterator( path + "/" + faction + "/actors" ) ) {
 
         str sprite = entry.path().stem().generic_string();
+        str path = entry.path().generic_string();
+
         std::cout << sprite << "\n";
 
         LoadAsset(
           hstr{ sprite.c_str() },
-          LoadImage( ( entry.path() ).c_str() ),
+          LoadImage( path.c_str() ),
           Global::texture_cache
         );
       }

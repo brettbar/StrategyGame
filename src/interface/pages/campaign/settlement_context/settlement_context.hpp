@@ -121,10 +121,16 @@ namespace UI {
       case 4: {
         // Agents
         auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
-        auto spawn_colonist = f->TextureButton(agents_g->Slot(0), "romans_colonist_overview", BLACK, 3.0f);
-        auto spawn_army = f->TextureButton(agents_g->Slot(1), "romans_hastati_overview", BLACK, 3.0f);
 
-        if ( spawn_colonist) {
+
+        auto spawn_colonist = f->TextureButton(
+          agents_g->Slot( 0 ), "romans_colonist_overview", BLACK, 3.0f
+        );
+        auto spawn_army = f->TextureButton(
+          agents_g->Slot( 1 ), "romans_hastati_overview", BLACK, 3.0f
+        );
+
+        if ( spawn_colonist ) {
           return Action_SettlementContext::SpawnColonist;
         }
 
