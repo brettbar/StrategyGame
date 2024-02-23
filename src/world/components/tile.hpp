@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../assets/data/biomes.hpp"
+#include "../../data/biomes.hpp"
 #include "../../shared/common.hpp"
 
 namespace Tile {

@@ -66,7 +66,7 @@ inline void load_all_in_folder( str path ) {
   for ( const auto &entry: fs::directory_iterator( path ) ) {
     std::string filename = entry.path().filename().generic_string();
 
-    std::cout << filename << '\n';
+    // std::cout << filename << '\n';
 
     LoadAsset(
       hstr{ filename.c_str() },
@@ -78,43 +78,63 @@ inline void load_all_in_folder( str path ) {
 
 inline void load_faction_actors() {
   str path = "assets/images/factions";
-  
-  LoadAsset(
-    hstr{ "romans_villager_texture" },
-    LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
-    Global::texture_cache
-  );
+
+  // for each faction
+  for ( const auto &entry: fs::directory_iterator( path ) ) {
+    std::string faction = entry.path().filename().generic_string();
+
+    // for each sprite set (actors, units, buildings, etc)
+    for ( const auto &entry: fs::directory_iterator( path + "/" + faction ) ) {
+
+      // for each file in the folder
+      for ( const auto &entry:
+            fs::directory_iterator( path + "/" + faction + "/actors" ) ) {
+
+        str sprite = entry.path().stem().generic_string();
+        std::cout << sprite << "\n";
+
+        LoadAsset(
+          hstr{ sprite.c_str() },
+          LoadImage( ( entry.path() ).c_str() ),
+          Global::texture_cache
+        );
+      }
+    }
+  }
+
+  // LoadAsset(
+  //   hstr{ "romans_villager_texture" },
+  //   LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
+  //   Global::texture_cache
+  // );
   LoadTexturePointFilter(
     hstr{ "romans_colonist_overview" },
-    CropUnitImage( ( path + "/romans/actors/roman_villager.png" ).c_str()
-    ),
+    CropUnitImage( ( path + "/romans/actors/romans_villager.png" ).c_str() ),
     Global::texture_cache
   );
-  LoadAsset(
-    hstr{ "romans_hastati_texture" },
-    LoadImage( ( path + "/romans/actors/RomanHastati.png" ).c_str() ),
-    Global::texture_cache
-  );
+  // LoadAsset(
+  //   hstr{ "romans_hastati_texture" },
+  //   LoadImage( ( path + "/romans/actors/roman_hastati.png" ).c_str() ),
+  //   Global::texture_cache
+  // );
   LoadTexturePointFilter(
     hstr{ "romans_hastati_overview" },
-    CropUnitImage( ( path + "/romans/actors/RomanHastati.png" ).c_str()
-    ),
+    CropUnitImage( ( path + "/romans/actors/romans_hastati.png" ).c_str() ),
     Global::texture_cache
   );
 
-  LoadAsset(
-    hstr{ "greeks_villager_texture" },
-    LoadImage( ( path+ "/greeks/actors/greek_villager.png" ).c_str() ),
-    Global::texture_cache
-  );
+  // LoadAsset(
+  //   hstr{ "greeks_villager_texture" },
+  //   LoadImage( ( path + "/greeks/actors/greek_villager.png" ).c_str() ),
+  //   Global::texture_cache
+  // );
 
-  LoadAsset(
-    hstr{ "celts_villager_texture" },
-    LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
-    Global::texture_cache
-  );
-
-} 
+  // LoadAsset(
+  //   hstr{ "celts_villager_texture" },
+  //   LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
+  //   Global::texture_cache
+  // );
+}
 
 inline void LoadAssets() {
   std::string asset_folder = "assets/";
@@ -133,6 +153,8 @@ inline void LoadAssets() {
   );
 
   load_all_in_folder( asset_folder + "/images/hexagons" );
+
+  load_faction_actors();
 
   create_hex_texture( hstr{ "red_overlay" }, RED, Global::texture_cache );
   create_hex_texture( hstr{ "cyan_overlay" }, BLUE, Global::texture_cache );
@@ -158,49 +180,49 @@ inline void LoadAssets() {
     Global::texture_cache
   );
 
-  // TODO at somepoint these UI textures should probably
+  // TODO at somepoint these ui textures should probably
   // be set to bilinear and then run through the fragment shader
   // But before I can do that I need to fix the shader with how
   // it deals with alpha
   LoadTexturePointFilter(
     hstr{ "context_panel" },
-    LoadImage( ( asset_folder + "/images/UI/UI_test.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/ui_test.png" ).c_str() ),
     Global::texture_cache
   );
 
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_overview" },
-    LoadImage( ( asset_folder + "/images/UI/Overview.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Overview.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_population" },
-    LoadImage( ( asset_folder + "/images/UI/Population.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Population.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_culture" },
-    LoadImage( ( asset_folder + "/images/UI/Culture.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Culture.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_religion" },
-    LoadImage( ( asset_folder + "/images/UI/Religion.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Religion.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_resources" },
-    LoadImage( ( asset_folder + "/images/UI/Resources.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Resources.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_construction" },
-    LoadImage( ( asset_folder + "/images/UI/Construction.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Construction.png" ).c_str() ),
     Global::texture_cache
   );
   LoadTexturePointFilter(
     hstr{ "settlement_context_tab_garrison" },
-    LoadImage( ( asset_folder + "/images/UI/Garrison.png" ).c_str() ),
+    LoadImage( ( asset_folder + "/images/ui/Garrison.png" ).c_str() ),
     Global::texture_cache
   );
 

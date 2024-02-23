@@ -1,9 +1,9 @@
 #pragma once
 #include "../../shared/common.hpp"
 
-#include "../../assets/data/buildings.hpp"
-#include "../../assets/data/resources.hpp"
-#include "../../assets/data/settlement.hpp"
+#include "../../data/buildings.hpp"
+#include "../../data/resources.hpp"
+#include "../../data/settlement.hpp"
 #include "regiment.hpp"
 
 #include <cereal/types/common.hpp>

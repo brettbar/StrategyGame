@@ -15,7 +15,7 @@ inline void Init() {
     // std::cout << "Current Working Directory: " << cwd.generic_string()
     //           << std::endl;
     //
-    // std::ifstream f( "assets/data/units.json" );
+    // std::ifstream f( "data/units.json" );
     // {
     //
     //   nlohmann::json js = nlohmann::json::parse( f );

@@ -28,7 +28,7 @@ namespace FactionSystem {
     std::cout << "Current Working Directory: " << cwd.generic_string()
               << std::endl;
 
-    std::ifstream f( "assets/data/factions.json" );
+    std::ifstream f( "data/factions.json" );
     {
 
       nlohmann::json js = nlohmann::json::parse( f );
@@ -60,7 +60,8 @@ namespace FactionSystem {
             },
           .government =
             {
-              .start_gov = Faction::gov_from_str(government.at( "start_gov" )),
+              .start_gov =
+                Faction::gov_from_str( government.at( "start_gov" ) ),
               .empire_name = government.at( "empire_name" ),
               .empire_leader_title = government.at( "empire_leader_title" ),
               .republic_name = government.at( "republic_name" ),
@@ -69,11 +70,9 @@ namespace FactionSystem {
               .federation_leader_title =
                 government.at( "federation_leader_title" ),
             },
-          .mobility =
-            {
-              .type = Faction::from_str(mobility.at( "type" )),
-            }
-        };
+          .mobility = {
+            .type = Faction::from_str( mobility.at( "type" ) ),
+          } };
 
         factions.emplace( element.key(), faction );
       }
@@ -84,15 +83,13 @@ namespace FactionSystem {
 
   inline Texture2D villagar_texure_from_owner( entt::entity owner ) {
     std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
-    return Global::texture_cache[hstr{ ( faction_id + "_villager_texture" )
-                                         .c_str() }]
+    return Global::texture_cache[hstr{ ( faction_id + "_villager" ).c_str() }]
       ->texture;
   }
 
   inline Texture2D hastati_texure_from_owner( entt::entity owner ) {
     std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
-    return Global::texture_cache[hstr{ ( faction_id + "_hastati_texture" )
-                                         .c_str() }]
+    return Global::texture_cache[hstr{ ( faction_id + "_hastati" ).c_str() }]
       ->texture;
   }
 };// namespace FactionSystem
