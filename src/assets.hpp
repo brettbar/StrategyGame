@@ -3,7 +3,6 @@
 #include "shared/common.hpp"
 #include "shared/global.hpp"
 #include "shared/textures.hpp"
-#include "world/systems/faction_system.hpp"
 
 namespace fs = std::filesystem;
 
@@ -21,9 +20,9 @@ inline Image InitTileOutline() {
 }
 
 inline void load_borders() {
-  std::string asset_folder = "assets/";
+  std::string asset_folder = "src/assets/";
 
-  for ( const auto &pair: FactionSystem::color_map ) {
+  for ( const auto &pair: color_map ) {
     Color color = pair.second;
     str color_str = pair.first;
 
@@ -76,70 +75,9 @@ inline void load_all_in_folder( str path ) {
   }
 }
 
-inline void load_faction_actors() {
-  str path = "assets/images/factions";
-
-  // for each faction
-  for ( const auto &entry: fs::directory_iterator( path ) ) {
-    std::string faction = entry.path().filename().generic_string();
-
-    // for each sprite set (actors, units, buildings, etc)
-    for ( const auto &entry: fs::directory_iterator( path + "/" + faction ) ) {
-
-      // for each file in the folder
-      for ( const auto &entry:
-            fs::directory_iterator( path + "/" + faction + "/actors" ) ) {
-
-        str sprite = entry.path().stem().generic_string();
-        str path = entry.path().generic_string();
-
-        std::cout << sprite << "\n";
-
-        LoadAsset(
-          hstr{ sprite.c_str() },
-          LoadImage( path.c_str() ),
-          Global::texture_cache
-        );
-      }
-    }
-  }
-
-  // LoadAsset(
-  //   hstr{ "romans_villager_texture" },
-  //   LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  LoadTexturePointFilter(
-    hstr{ "romans_colonist_overview" },
-    CropUnitImage( ( path + "/romans/actors/romans_villager.png" ).c_str() ),
-    Global::texture_cache
-  );
-  // LoadAsset(
-  //   hstr{ "romans_hastati_texture" },
-  //   LoadImage( ( path + "/romans/actors/roman_hastati.png" ).c_str() ),
-  //   Global::texture_cache
-  // );
-  LoadTexturePointFilter(
-    hstr{ "romans_hastati_overview" },
-    CropUnitImage( ( path + "/romans/actors/romans_hastati.png" ).c_str() ),
-    Global::texture_cache
-  );
-
-  // LoadAsset(
-  //   hstr{ "greeks_villager_texture" },
-  //   LoadImage( ( path + "/greeks/actors/greek_villager.png" ).c_str() ),
-  //   Global::texture_cache
-  // );
-
-  // LoadAsset(
-  //   hstr{ "celts_villager_texture" },
-  //   LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
-  //   Global::texture_cache
-  // );
-}
 
 inline void LoadAssets() {
-  std::string asset_folder = "assets/";
+  std::string asset_folder = "src/assets/";
 
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
   load_borders();
@@ -155,8 +93,6 @@ inline void LoadAssets() {
   );
 
   load_all_in_folder( asset_folder + "/images/hexagons" );
-
-  load_faction_actors();
 
   create_hex_texture( hstr{ "red_overlay" }, RED, Global::texture_cache );
   create_hex_texture( hstr{ "cyan_overlay" }, BLUE, Global::texture_cache );

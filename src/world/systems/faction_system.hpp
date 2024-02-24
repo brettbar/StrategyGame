@@ -8,18 +8,6 @@
 namespace FactionSystem {
   inline std::map<std::string, Faction::Component> factions = {};
 
-  inline std::map<std::string, Color> color_map = {
-    { "red", RED },
-    { "gold", GOLD },
-    { "cyan", BLUE },
-    { "green", GREEN },
-    { "white", WHITE },
-    { "purple", PURPLE },
-    { "orange", ORANGE },
-    { "pink", PINK },
-    { "grey", GRAY },
-  };
-
   inline void Init() {
     factions = {};
 
@@ -28,9 +16,8 @@ namespace FactionSystem {
     std::cout << "Current Working Directory: " << cwd.generic_string()
               << std::endl;
 
-    std::ifstream f( "data/factions.json" );
+    std::ifstream f( "src/data/factions.json" );
     {
-
       nlohmann::json js = nlohmann::json::parse( f );
 
       std::cout << js << std::endl;
@@ -81,15 +68,15 @@ namespace FactionSystem {
   }
 
 
-  inline Texture2D villagar_texure_from_owner( entt::entity owner ) {
-    std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
-    return Global::texture_cache[hstr{ ( faction_id + "_villager" ).c_str() }]
-      ->texture;
-  }
+  // inline Texture2D villagar_texure_from_owner( entt::entity owner ) {
+  //   std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
+  //   return Global::texture_cache[hstr{ ( faction_id + "_villager" ).c_str() }]
+  //     ->texture;
+  // }
 
-  inline Texture2D hastati_texure_from_owner( entt::entity owner ) {
-    std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
-    return Global::texture_cache[hstr{ ( faction_id + "_hastati" ).c_str() }]
-      ->texture;
-  }
+  // inline Texture2D hastati_texure_from_owner( entt::entity owner ) {
+  //   std::string faction_id = Global::world.get<Faction::Component>( owner ).id;
+  //   return Global::texture_cache[hstr{ ( faction_id + "_hastati" ).c_str() }]
+  //     ->texture;
+  // }
 };// namespace FactionSystem

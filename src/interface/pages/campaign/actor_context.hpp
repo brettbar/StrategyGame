@@ -24,7 +24,7 @@ namespace UI {
     auto grid = f->Grid( root_g->Slots( 9, 10 ), 4, 4, Fade( BLACK, 0.5 ) );
 
 
-    switch ( actor->type ) {
+    switch ( actor->data.type ) {
       case Actor::Type::Colonist: {
         f->TextLabel( grid->Slot( 0 ), "Colonist", GREEN );
         bool claim_province = f->TextButton( grid->Slot( 1 ), "Claim", RED );
@@ -39,7 +39,7 @@ namespace UI {
           return Action_ActorContext::SpawnSettlement;
         }
       } break;
-      case Actor::Type::Army: {
+      case Actor::Type::ArmyTierI: {
         f->TextLabel( grid->Slot( 0 ), "Army", GREEN );
         
       } break;

@@ -1,20 +1,21 @@
 #pragma once
 
 #include "../../shared/global.hpp"
-#include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
+#include "../systems/actor_system.hpp"
 #include "../systems/faction_system.hpp"
+
 
 namespace Entities {
 
-  inline static void create_army( entt::entity owner, vec2f spawn ) {
-    Texture2D sprite = FactionSystem::hastati_texure_from_owner( owner );
+  inline void create_army( entt::entity owner, vec2f spawn ) {
+    str faction_id = Global::world.get<Faction::Component>( owner ).id;
+
     entt::entity entity = Global::world.create();
     Actor::Component actor = {
-      .name = "Marcus Priscus",
-      .type = Actor::Type::Army,
       .owner = owner,
+      .data = Actor::System::actor_data.at( faction_id + "_army_tier_i" ),
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,
@@ -28,7 +29,7 @@ namespace Entities {
     };
 
     Animated::Component animated = {
-      .sprite = sprite,
+      .sprite = Global::texture_cache[actor.data.sprite_id]->texture,
       .frameRec = { 0, 0, 128, 128 },
       .state = Animated::AnimState::IDLE_DR,
       .animations = animations,

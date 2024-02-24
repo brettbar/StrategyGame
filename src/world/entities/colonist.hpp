@@ -4,20 +4,21 @@
 #include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "../components/sight.hpp"
+#include "../systems/actor_system.hpp"
 #include "../systems/faction_system.hpp"
 
 namespace Entities {
 
-  inline static void create_colonist(
+  inline void create_colonist(
     entt::entity owner,
     Vector2 spawn = Vector2{ 64 * 64, 64 * 64 }
   ) {
-    Texture2D sprite = FactionSystem::villagar_texure_from_owner( owner );
+    str faction_id = Global::world.get<Faction::Component>( owner ).id;
+
     entt::entity entity = Global::world.create();
     Actor::Component actor = {
-      .name = "Marcus Priscus",
-      .type = Actor::Type::Colonist,
       .owner = owner,
+      .data = Actor::System::actor_data.at( faction_id + "_colonist" ),
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,
@@ -31,7 +32,7 @@ namespace Entities {
     };
 
     Animated::Component animated = {
-      .sprite = sprite,
+      .sprite = Global::texture_cache[actor.data.sprite_id]->texture,
       .frameRec = { 0, 0, 128, 128 },
       .state = Animated::AnimState::IDLE_DR,
       .animations = animations,

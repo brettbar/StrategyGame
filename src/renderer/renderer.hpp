@@ -22,10 +22,10 @@ namespace Renderer {
 
   inline void Init() {
     shader = LoadShader(
-      "app/assets/shaders/pixel.vs", "assets/shaders/pixel.fs"
+      "src/assets/shaders/pixel.vs", "src/assets/shaders/pixel.fs"
     );
     // LoadShader( 0, 0 );
-    outline_shader = LoadShader( 0, "assets/shaders/outline.fs" );
+    outline_shader = LoadShader( 0, "src/assets/shaders/outline.fs" );
 
     i32 outline_size_loc = GetShaderLocation( outline_shader, "outlineSize" );
     i32 outline_color_loc = GetShaderLocation( outline_shader, "outlineColor" );

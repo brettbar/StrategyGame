@@ -1,6 +1,7 @@
 #pragma once
 
 // TODO see which of these includes can be removed
+#include <cstdio>
 #include <entt/entt.hpp>
 #include <fstream>
 #include <iostream>
@@ -76,3 +77,16 @@ const f32 TILE_WIDTH = 64;
 const f32 TILE_HEIGHT = 64;
 const u32 MAP_WIDTH = 128;
 const u32 MAP_HEIGHT = 128;
+
+
+inline std::map<std::string, Color> color_map = {
+  { "red", RED },
+  { "gold", GOLD },
+  { "cyan", BLUE },
+  { "green", GREEN },
+  { "white", WHITE },
+  { "purple", PURPLE },
+  { "orange", ORANGE },
+  { "pink", PINK },
+  { "grey", GRAY },
+};
