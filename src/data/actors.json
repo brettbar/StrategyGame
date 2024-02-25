@@ -5,18 +5,6 @@
       "name": "plebeian"
     },
     {
-      "type": "diplomat",
-      "name": "diplomat"
-    },
-    {
-      "type": "explorer",
-      "name": "explorator"
-    },
-    {
-      "type": "merchant",
-      "name": "mercator"
-    },
-    {
       "type": "army_tier_i",
       "name": "hastati"
     }
@@ -25,22 +13,6 @@
     {
       "type": "colonist",
       "name": "colonist"
-    },
-    {
-      "type": "diplomat",
-      "name": "diplomat"
-    },
-    {
-      "type": "explorer",
-      "name": "explorer"
-    },
-    {
-      "type": "merchant",
-      "name": "merchant"
-    },
-    {
-      "type": "army_tier_i",
-      "name": "strategos"
     }
   ],
   "celts": [
@@ -49,20 +21,8 @@
       "name": "villager"
     },
     {
-      "type": "diplomat",
-      "name": "diplomat"
-    },
-    {
-      "type": "explorer",
-      "name": "explorer"
-    },
-    {
-      "type": "merchant",
-      "name": "merchant"
-    },
-    {
       "type": "army_tier_i",
-      "name": "warleader"
+      "name": "warrior"
     }
   ]
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "../world/components/actor.hpp"
+#include "../world/actor/component.hpp"
 #include "../world/components/animated.hpp"
 #include "../world/components/player.hpp"
 #include "../world/components/province.hpp"

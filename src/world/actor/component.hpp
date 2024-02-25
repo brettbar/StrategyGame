@@ -29,17 +29,38 @@ namespace Actor {
     { "special", Type::Special },
   };
 
+  inline str type_as_str( Type type ) {
+    switch ( type ) {
+      case Type::Colonist:
+        return "colonist";
+      case Type::Diplomat:
+        return "diplomat";
+      case Type::Explorer:
+        return "explorer";
+      case Type::Merchant:
+        return "merchant";
+
+      case Type::ArmyTierI:
+        return "army_tier_i";
+
+
+      case Type::Special:
+        return "special";
+    }
+  }
+
+
   struct Data {
     Type type;// Type::Colonist
 
     str actor_id;  // romans_colonist
     str name;      // plebeian
     str faction_id;// romans
-    hstr sprite_id;//  hstr{"romans_plebeian"}
+    str sprite_id; //  hstr{"romans_plebeian"}
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( type, actor_id, faction_id, sprite_id );
+      ar( type_as_str( type ), actor_id, name, faction_id, sprite_id );
     }
   };
 

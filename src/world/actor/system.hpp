@@ -4,134 +4,42 @@
 #pragma once
 
 #include "../../shared/global.hpp"
-#include "../components/actor.hpp"
-#include "map_system.hpp"
-#include "movement_system.hpp"
-#include "province_system.hpp"
-#include "selection_system.hpp"
-
-#include "../entities/army.hpp"
-#include "../entities/colonist.hpp"
-
 #include "../components/player.hpp"
+#include "../systems/map_system.hpp"
+#include "../systems/movement_system.hpp"
+#include "../systems/province_system.hpp"
+#include "../systems/selection_system.hpp"
+
+
+#include "component.hpp"
+#include "entities.hpp"
+#include "manager.hpp"
+
 #include <filesystem>
 #include <fstream>
 
-namespace fs = std::filesystem;
 
 namespace Actor {
 
   class System {
-
 public:
-    inline static std::map<str, Actor::Data> actor_data = {};
-
     static void spawn_colonist( entt::entity owner, Vector2 clickPos ) {
       std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
       assert( spawn != nullptr );
 
-      Entities::create_colonist( owner, *spawn );
+      create_colonist( owner, *spawn );
     }
 
     static void spawn_army( entt::entity owner, Vector2 clickPos ) {
       std::unique_ptr<Vector2> spawn = DetermineTilePos( clickPos );
       assert( spawn != nullptr );
 
-      Entities::create_army( owner, *spawn );
+      create_army( owner, *spawn );
     }
 
-    static void load_actors() {
-      std::ifstream f( "src/data/actors.json" );
-      {
-        nlohmann::json js = nlohmann::json::parse( f );
-
-        for ( auto &faction: js.items() ) {
-          for ( auto &actor: faction.value().items() ) {
-
-            str type = actor.value().at( "type" );
-            str faction_id = faction.key();
-            str actor_id = faction_id + "_" + type;
-            str name = actor.value().at( "name" );
-            hstr sprite_id = hstr{ ( faction_id + "_" + name ).c_str() };
-
-            actor_data.emplace(
-              actor_id,
-              Actor::Data{
-                Actor::type_lookup.at( type ),
-                actor_id,
-                name,
-                faction_id,
-                sprite_id,
-              }
-            );
-          }
-        }
-      }
-      f.close();
-
-
-      str root = "src/assets/images/actors";
-
-      // for each faction
-      for ( const auto &faction_folder: fs::directory_iterator( root ) ) {
-        std::string faction = faction_folder.path().filename().generic_string();
-
-
-        // for each file in the folder
-        for ( const auto &actor_file:
-              fs::directory_iterator( faction_folder ) ) {
-
-          str path = actor_file.path().generic_string();
-          str sprite =
-            faction + "_" + actor_file.path().stem().generic_string();
-
-          std::cout << sprite << "\n";
-
-          LoadAsset(
-            hstr{ sprite.c_str() },
-            LoadImage( path.c_str() ),
-            Global::texture_cache
-          );
-        }
-      }
-
-      // LoadAsset(
-      //   hstr{ "romans_villager_texture" },
-      //   LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-      LoadTexturePointFilter(
-        hstr{ "romans_colonist_overview" },
-        CropUnitImage( ( root + "/romans/actors/romans_villager.png" ).c_str()
-        ),
-        Global::texture_cache
-      );
-      // LoadAsset(
-      //   hstr{ "romans_hastati_texture" },
-      //   LoadImage( ( path + "/romans/actors/roman_hastati.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-      LoadTexturePointFilter(
-        hstr{ "romans_hastati_overview" },
-        CropUnitImage( ( root + "/romans/actors/romans_hastati.png" ).c_str() ),
-        Global::texture_cache
-      );
-
-      // LoadAsset(
-      //   hstr{ "greeks_villager_texture" },
-      //   LoadImage( ( path + "/greeks/actors/greek_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-
-      // LoadAsset(
-      //   hstr{ "celts_villager_texture" },
-      //   LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-    }
 
     static void Init() {
-      load_actors();
+      Manager::Get()->load_actors();
 
       auto players = Global::world.view<Player::Component>();
 

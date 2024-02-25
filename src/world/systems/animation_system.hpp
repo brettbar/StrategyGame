@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../components/actor.hpp"
+#include "../actor/component.hpp"
 #include "../components/animated.hpp"
 #include "movement_system.hpp"
 #include <raylib.h>

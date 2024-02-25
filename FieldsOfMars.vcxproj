@@ -18,7 +18,6 @@
     <ClInclude Include="app\src\world\components\ai.hpp" />
     <ClInclude Include="app\src\world\systems\ai_system.hpp" />
     <ClInclude Include="app\src\world\systems\overlay_system.hpp" />
-    <ClInclude Include="src\world\systems\actor_system.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

@@ -7,7 +7,7 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/actor.hpp"
+#include "../actor/component.hpp"
 #include "../components/province.hpp"
 #include "../components/settlement.hpp"
 #include "../components/sight.hpp"

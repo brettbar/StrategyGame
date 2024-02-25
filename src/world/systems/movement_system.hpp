@@ -1,18 +1,18 @@
+// @todo fold into actor system
+
 #pragma once
 
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/actor.hpp"
+#include "../actor/component.hpp"
 #include "../components/animated.hpp"
 #include "../components/selected.hpp"
 
-namespace MovementSystem
-{
+namespace MovementSystem {
 
   // REFACTOR
-  inline void SetDestinations( entt::entity entity, Vector2 click_pos )
-  {
+  inline void SetDestinations( entt::entity entity, Vector2 click_pos ) {
     // entt::basic_view view =
     //   Global::world
     //     .view<Actor::Component, Animated::Component, Selected::Component>();
@@ -26,8 +26,7 @@ namespace MovementSystem
 
     std::unique_ptr<Vector2> dest_tile = DetermineTilePos( click_pos );
 
-    if ( dest_tile != nullptr )
-    {
+    if ( dest_tile != nullptr ) {
       actor.destination = *dest_tile;
 
       if ( actor.destination.x > actor.position.x )
@@ -41,15 +40,12 @@ namespace MovementSystem
   inline void Update(
     view<Actor::Component, Animated::Component> actors,
     f32 timeScale
-  )
-  {
-    for ( auto &entity: actors )
-    {
+  ) {
+    for ( auto &entity: actors ) {
       Actor::Component &actor = actors.get<Actor::Component>( entity );
       Animated::Component &anim = actors.get<Animated::Component>( entity );
 
-      if ( Vector2Distance( actor.destination, actor.position ) > 0.7f )
-      {
+      if ( Vector2Distance( actor.destination, actor.position ) > 0.7f ) {
         Vector2 actorVec = Vector2Normalize( {
           actor.destination.x - actor.position.x,
           actor.destination.y - actor.position.y,
@@ -59,25 +55,18 @@ namespace MovementSystem
         actor.position.y += actorVec.y * actor.speed * timeScale;
 
         // TODO maybe these 2 ifs could be consolidated
-        if ( actor.destination.x > actor.position.x )
-        {
+        if ( actor.destination.x > actor.position.x ) {
           anim.state = Animated::WALK_DR;
           actor.moving = true;
-        }
-        else if ( actor.destination.x < actor.position.x )
-        {
+        } else if ( actor.destination.x < actor.position.x ) {
           anim.state = Animated::WALK_DL;
           actor.moving = true;
         }
-        if ( actor.destination.x == actor.position.x )
-        {
-          if ( anim.state == Animated::IDLE_DR )
-          {
+        if ( actor.destination.x == actor.position.x ) {
+          if ( anim.state == Animated::IDLE_DR ) {
             anim.state = Animated::WALK_DR;
             actor.moving = true;
-          }
-          else if ( anim.state == Animated::IDLE_DL )
-          {
+          } else if ( anim.state == Animated::IDLE_DL ) {
 
             anim.state = Animated::WALK_DL;
             actor.moving = true;
@@ -85,8 +74,7 @@ namespace MovementSystem
         }
 
 
-        if ( Vector2Distance( actor.destination, actor.position ) <= 0.7f )
-        {
+        if ( Vector2Distance( actor.destination, actor.position ) <= 0.7f ) {
           actor.position = actor.destination;
           actor.moving = false;
 
@@ -99,10 +87,8 @@ namespace MovementSystem
     }
   }
 
-  inline bool ActorIsMoving( entt::entity entity )
-  {
-    if ( Global::world.all_of<Actor::Component>( entity ) )
-    {
+  inline bool ActorIsMoving( entt::entity entity ) {
+    if ( Global::world.all_of<Actor::Component>( entity ) ) {
       return Global::world.get<Actor::Component>( entity ).moving;
     }
     return false;

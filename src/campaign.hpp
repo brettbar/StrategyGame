@@ -27,7 +27,7 @@
 #include "shared/common.hpp"
 
 #include "world/components/player.hpp"
-#include "world/systems/actor_system.hpp"
+#include "world/actor/system.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/commands.hpp"

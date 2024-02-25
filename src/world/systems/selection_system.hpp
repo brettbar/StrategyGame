@@ -1,10 +1,12 @@
+// @todo fold into actor system
+
 #pragma once
 
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/actor.hpp"
+#include "../actor/component.hpp"
 #include "../components/player.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"
