@@ -6,35 +6,25 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
 
 set(SOURCE_FILES 
-  app/src/main.cpp
-  app/src/shared/common.hpp
-  app/src/renderer/renderer.hpp
-  app/src/interface/element.cpp
-  app/src/interface/elements/grid_panel.cpp
-  app/src/interface/elements/data_panel.cpp
-  app/src/interface/elements/stack_panel.cpp
-  app/src/interface/elements/labels_buttons.cpp
-  app/src/world/systems/map_system.hpp
-  app/src/world/systems/province_system.hpp
-  app/src/world/systems/movement_system.hpp
-  app/src/world/systems/animation_system.hpp
-  app/src/world/systems/selection_system.hpp
-  app/src/world/systems/actor_system.hpp
-  app/src/world/components/actor.hpp
-  app/src/world/components/animated.hpp
-  app/src/world/components/province.hpp
-  app/src/world/components/selected.hpp
-  app/src/world/components/sight.hpp
-  app/src/world/components/tile.hpp
+  src/main.cpp
+  src/shared/common.hpp
+  src/renderer/renderer.hpp
   )
 
 if (UNIX)
      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
      project(game)
 
-     find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED
-
+     # find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED 
+  
      add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+     # add_library(raylib STATIC IMPORTED)
+     # set_target_properties(
+     #   raylib PROPERTIES
+     #   IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/libraylib.a"
+     #   INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
+     # )
  
      add_library(steam_api SHARED IMPORTED)
      set_target_properties(

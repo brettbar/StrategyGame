@@ -1,0 +1,476 @@
+
+
+Factions:
+
+Standard: Time periods: 1000 BC - 1 AD
+  Romans (Kingdom & Republican)
+  Greeks (Hellenistic & Classical)
+  Celts (Iron Age)
+  Germans (Iron Age)
+  Carthaginians (Punic Wars)
+  Egyptians (Bronze Age & Ptolymeic)
+  Persians (Achaemenid & Parthian)
+--------------------------------------------
+Advanced ideas: Time periods: 2500 BC - 800 AD
+
+Early 2500 BC - 550 BC
+{
+	Myceneans (Minoans, Myceneans, Trojans) >> Achilles, Ajax, Odysseus, Agamemnon, Menelaus, Hector, Priam, Paris, Helen, Aeneas
+  
+  Hebrews >> Moses, Samson, David, Solomon, Herod
+
+  Italians (Latins, Etruscans, Italiotes) 
+  
+  Egyptians (Bronze Age) >> Hatshepsut, Ramses II, Amenhotep III
+	
+  Sumerians (Sumerians, Akkadians) >> Sargon, Naram-Sin, Gilgamesh
+
+  Hittites >> 
+
+  Babylonians (Old) >> Hammurabi, 
+  
+  Assyrians (Old) 
+
+  Neo-Assyrians >> Sargon II, 
+
+  Neo-Babylonians >> Sennacherib, Ashurbanipal, Nabopolassar, Nebuchadnezzar II, Esarhaddon
+}
+
+High 539 BC - 235 AD  
+{
+  Achaemenids >> Cyrus, Darius I, Xerxes I
+ 
+  Greeks (Athenians, Spartans, Thebans) >> Themistocles, Pericles, Alcibiades, Lysander, Leonidas, Epaminondas, Pelopidas
+  Macedonians >> Phillip II, Parmenion, Alexander, Antipater, Cassander, Lysimachus, Seleucus, Pyrrhus, Ptolemy, Cleopatra
+
+  Early Romans (Founding => 3rd Punic War) >> Romulus, Cincinnatus, Camillus, Scipio Africanus, Scipio Aemilianus
+	Imperial Romans (Julio-Claudians => Severans) >> Marius, Sulla, Pompey Magnus, Julius Caesar, Marc Antony, 
+                                                   Augustus, Aggripa, Germanicus, Vespasian, Trajan, Hadrian, Marcus Aurelius, Septimius Severus
+
+  Celts (Sennones, Helvetii, Arverni, Iceni) >> Brennus, Vercingetorix, Boudicas
+	
+  Iberians (Lusitani, Celt-Iberans) >> Viriathus, Sertorius
+
+  Carthaginians >> Hannibal, Hamilcar, Xanthippus
+
+  Germans (Cherusci, Suebi, Allemanni, Marcomanni) >> Arminius, Ariovistus
+
+  Indians (Maurya, Baktria, Gupta)>> Ashoka, Chandragupta
+
+  Chinese (Han & Three-Kingdoms Period) >> Wen, Cao Cao, Liu Bei, Guan Yu, Lu Bu, Dong Zhuo
+
+  Scythians >>
+}
+
+Late 476 AD - 800 AD  
+{
+  Late Romans (3rd Cent. Crisis => Fall of the West) >> Maximinus Thrax, Claudius Gothicus, Aurelian, Diocletian, Constantine, Theodosius, Aetius, Stilicho
+  Eastern Romans (Fall of the West => Arab Invasion) >> Justinian, Belisarius, Maurice, Heraclius, Irene
+
+  Huns >> Attila, Bleda, Khushnavaz
+  
+  Sassanids (Sassanids, Parthians) >>  Mithradates II, Surena, Ardashir, Shapur, Shahrbaraz, Khosrow I
+
+  Franks (Clovis => Charlemagne) >> Childeric, Clovis, Pepin the Short, Charles Martel, Charlemagne
+
+  Romano-Britons >> Ambrosius Aurelianus, Uther Pendragon, Arthur, Merlin
+  
+	Arabs (Ghassanids, Lakhmid, Rashidun, Umayyad, Abbasid) >> Al-Mundhir, Abu Bakr, Umar, Uthman, Ali, Muawiya I
+
+  Slavs (Sclavenes, Rus) >> 
+
+  Norse (Bronze Age, Geates, Jutes, Danes) >> 
+  
+  Anglo-Saxons (Early) >> Cealin, Aethelberht
+
+  Late (Visigoths, Ostrogoths, Lombards, Vandals) >> Theodoric, Alaric, Genseric, Odacer
+
+  Alans & Bulgars >> 
+
+  Aksum 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Romans - 
+	Early (Founding => 2nd Punic War) >> Romulus, Cincinnatus, Camillus, Scipio Africanus
+	Late Republican (3rd Punic War => Caesar's Civil Wars) >> Scipio Aemilianus, Marius, Sulla, Pompey Magnus, Julius Caesar
+	Principate (Julio-Claudians => Severans) >> Augustus, Aggripa, Germanicus, Vespasian, Trajan, Hadrian, Marcus Aurelius, Septimius Severus
+	Dominate (3rd Cent. Crisis => Fall of the West) >> Maximinus Thrax, Claudius Gothicus, Aurelian, Diocletian, Constantine, Theodosius, Aetius, Stilicho
+	Eastern (Fall of the West => Arab Invasion) >> Justinian, Belisarius, Maurice, Heraclius
+
+Greeks - 
+	Bronze Age (Minoans, Myceneans, Trojans) >> Achilles, Ajax, Odysseus, Agamemnon, Menelaus, Hector, Priam, Paris, Helen, Aeneas
+  Classical (Athenians, Spartans, Thebans) >> Themistocles, Pericles, Alcibiades, Lysander, Leonidas, Epaminondas, Pelopidas
+  Hellenic (Macedonians) >> Phillip II, Parmenion, Alexander, Antipater, Cassander, Lysimachus, Seleucus, Pyrrhus
+
+Celts - 
+	Ancient (Sennones, Helvetii, Arverni, Iceni) >> Brennus, Vercingetorix, Boudica
+  Romano-Britons >> Ambrosius Aurelianus, Uther Pendragon, Arthur, Merlin
+	
+Germans - 
+	Ancient (Cherusci, Suebi, Allemanni, Marcomanni) >> Arminius, Ariovistus
+	Late (Visigoths, Ostrogoths, Lombards, Vandals) >> Theodoric, Alaric, Genseric, Odacer
+	Franks (Clovis => Charlemagne) >> Childeric, Clovis, Pepin the Short, Charles Martel, Charlemagne
+ 	Norse (Bronze Age, Geates, Jutes, Danes) >> Ragnar Lothbrok, Ro
+	Anglo-Saxons (Early) >> Cealin, Aethelberht
+
+Levantines - 
+	Carthaginians >> Hannibal, Hamilcar, Xanthippus
+  Hebrews >> Moses, Samson, David, Solomon, Herod
+
+Egyptians - 
+	Old (Bronze Age) >> Hatshepsut, Ramses II, Amenhotep III
+	Late (Hellic, Coptic, Roman) >> Ptolemy, Cleopatra, Marc Antony
+
+Mesopotamians - 
+	Bronze-Age (Sumerians, Akkadians, Old-Assyrians, Babylonians) >> Sargon, Naram-Sin, Gilgamesh, Hammurabi
+  Ancient (Neo-Assyrians, Neo-Babylonians) >> Sargon II, Sennacherib, Ashurbanipal, Nabopolassar, Nebuchadnezzar II
+ 
+Persians - 
+	Ancient (Achaemenids, Parthians) >> Cyrus, Darius I, Xerxes I, Mithradates II, Surena
+	Late (Sassanids) >>  Ardashir, Shapur, Shahrbaraz, Khosrow I
+
+Anatolians - 
+  Hittites >> 
+	Pontics (Mithradatic Wars) >> Mithradates VI of Pontus, Nicomedes of Bithynia
+
+Nomads - 
+	Scythians & Sarmatians >>
+	Huns & White-Huns(Hephthalites) >> Attila, Bleda, Khushnavaz
+	Alans & Bulgars >> 
+
+Indians - 
+	Maurya, Gupta >> Ashoka, Chandragupta
+
+Slavs -
+	Sclavenes >>
+	Rus >>
+
+Iberians -
+	Ancient (Lusitani, Celt-Iberans) >> Viriathus, Sertorius
+
+Arabs -
+	Pre-Islamic (Ghassanids, Lahkmids) >> Al-Mundhir, Amr I, Al Nu'man III
+	Islamic (Rashidun, Umayyad) >> Abu Bakr, Umar, Uthman, Ali, Muawiya I
+
+Han -
+	Ancient (Han & Three-Kingdoms Period) >> Wen, Cao Cao, Liu Bei, Guan Yu, Lu Bu, Dong Zhuo
+
+
+----------------------
+Units:
+  1. Militia Infantry
+  2. Light Sword Infantry
+  3. Heavy Sword Infantry
+  4. Light Spear Infantry
+  5. Heavy Spear Infantry
+  6. Elite Infantry
+  7. Militia Ranged
+  8. Ranged
+  9. Special Unit
+  10. Hero(s)
+  11. Militia Cavalry
+  12. Cavalry
+  a. Passive
+  b. Strengths
+  c. Weaknesses
+----------------------
+Overviews:
+  Early Romans:
+    1. Rorarii
+    2. Hastati
+    3. Principe
+    4. Samnite
+    5. Hoplite
+    6. Triarii
+    7. Velite
+    8. --
+    9. Signifer
+    10.
+      Romulus - Founder of Rome
+      Marcus Furius Camillus - Savior of Rome
+      Scipio Africanus - Bane of Carthage
+    11. --
+    12. Equites
+    Passive: Italian Allies - Units train faster / re-enforcements spawn faster
+    Strength: Strong infantry lineup
+    Weakness: Few choices in ranged and cavalry
+
+   Imperial Romans:
+    1. --
+    2. Early Legionary
+    3. Legionary
+    4. Foedorati
+    5. Auxilia
+    6. Praetorian
+    7. --
+    8. Syrian Archer
+    9. Centurion
+    10.
+      Julius Caesar - Conqueror of Gaul
+      Marcus Aggripa - Sword of the Princeps
+      Trajan - Subduer of the Dacians
+    11. Alae
+    12. --
+    Passive: Cohort System - Units have greatly increased morale while in formation
+    Strength: Strongest sword infantry in the game
+    Weakness: Few choices in ranged and cavalry, no levy infantry
+
+   Late Romans:
+    1. Foedorati
+    2. 3rd Cent. Legio
+    3. Comitatensis
+    4. Limitanei
+    5. Auxilia
+    6. Palatina
+    7. Ballistarii
+    8. Sagitarii
+    9. Catholic Priest
+    10.
+      Aurelian - Restorer of the World
+      Constantine the Great - Chosen of God
+      Theodosius - Bulwark of the Dominate
+    11. Foedorati Horseman
+    12. Catafractarii
+    Passive: Christian Faith - Units heal faster
+    Strength: Strong lineup of infantry in every category, Cataphracts are excellent cavalry
+    Weakness: Non-federated units have higher-than-average cost
+   
+  Eastern Romans:
+    1. Foedorati
+    2. Limitanei
+    3. Spathatoi
+    4. Kontaratoi
+    5. Skoutatoi
+    6. Varrangoi
+    7. Toxotae
+    8. Bucellarii
+    9. Orthodox Priest
+    10.
+      Belisarius - Destroyer of the Usurpers
+      Justinian - Restorer of the West
+      Basil II - The Bulgar Slayer
+
+    11. Alan Cavalry
+    12. Klibanophoroi
+    a. Passive
+    b. Strengths
+    c. Weaknesses
+
+  Greeks:
+    1. Helot
+    2. --
+    3. Hypastpist
+    4. Hoplite
+    5. Phalangite
+    6. Silver-Shield
+    7. Peltast
+    8. Cretan Archer
+    9. Spartan
+    10.
+      Alexander the Great - Conqueror of the World
+      Pyrrhus of Epirus - Greek Savior
+      Leonidas of Sparta - Shield of Hellas
+      Phillip II of Macedon - Champion of Macedon
+    11. Tarentine Cavalry
+    12. Companion Cavalry
+    Passive: Macedonian Phalanx - Spear units deal increased damage when assaulted from the front
+    Strength: Boast strongest spear infantry in the game by far
+    Weakness: Few choices for sword infantry, spear infantry are slower than average
+
+  Celts:
+    1. Gallic Levy
+    2. Arverni Warrior
+    3. Chosen Sword
+    4. Iceni Warrior
+    5. Galatian Spears
+    6. Batavian Champion
+    7. Gallic Slinger
+    8. --
+    9. Druid
+    10.
+      Vercingetorix - Hero of the Gauls
+      Boudica - Queen of the Iceni
+      Ambiorix
+      Brennus - The Terror of Rome
+    11. Belgii Cavalry
+    12. Chariots
+    Passive: Woad Ritual - Infantry have increased morale
+    Strength: Boast strong line up of light infantry
+    Weakness: Lack formations of other civilizations
+
+  Germans:
+    1. Germanic Youth
+    2. Gothic Swordsman
+    3. Alemanni Champion
+    4. Suebian Spearman
+    5. Gothic Spearman
+    6. Chosen of Tiwaz
+    7. Cherusci Skirmisher
+    8. Cherusci Archer
+    9. Berserker
+    10.
+      Arminius - Nightmare of the Romans
+      Alaric - King of the Goths
+      Theodoric - Gothic Champion
+    11. Suebi Horseman
+    12. Frankish Cavalry
+    Passive: Forest Ambushers - Ranged units have bonus damage when attacking near trees/brush
+    Strength: Boast strong all-around lineup
+    Weakness: Lack formations of other civilizations
+
+  Carthaginians:
+    1. Punic Sailor
+    2. Iberian Mercenary
+    3. Libyan Infantry
+    4. Gallic Mercenary
+    5. Hoplite
+    6. Sacred Band
+    7. Iberian Skirmisher
+    8. Balearic Slinger
+    9. African Elephant
+    10.
+      Hannibal - Slayer of Romans
+      Xanthippus - Spartan Teacher
+      Hamilcar - Punic Expansionist
+    11. Gallic Cavalry
+    12. Numidian Cavalry
+    Passive: Mercenary Army - Have access to buying X number of Units from other factions
+    Strength: Largest pool of available units in the game, strong infantry
+    Weakness: Carthaginian units are quite expensive, relying on mercenary infantry instead
+
+  Egyptians:
+    1. Egyptian Levy
+    2. Kopesh Infantry
+    3. Thorax Infantry
+    4. Nubian Warrior 
+    5. Phalangite
+    6. Pharaoh's Guard
+    7. Hebrew Slinger
+    8. Pharoah's Archer
+    9. Kemetic Priest
+    10.
+      Ramses II - Mighty Pharoah
+      Ptolemy - Macedonian Hegemon
+      Cleopatra - Queen of Persuasion
+    11. Camelry
+    12. Chariots
+    Passive: Wealth of the Nile - Units cost less than average
+    Strength: Strong variety of units, including heavy infantry and ranged
+    Weakness: Levy and light infantry have lower morale
+
+  Persians:
+    1. Indian Conscript
+    2. Levy
+    3. Iranian Infantry
+    4. Sassanid Spearman
+    5. Immortal
+    6. Dismounted Cataphract
+    7. Parthian Archer
+    8. Achaemenid Archer
+    9. Temple Immortal
+    10.
+      Cyrus the Great - King of Kings
+      Darius I - Subduer of Greeks
+      Xerxes - Slavemaster of the World
+    11. Parthian Horse Archer
+    12. Parthian Cataphract
+    Passive: Drink the Rivers Dry - Levy and light infantry are very cheap
+    Strength: Excellent ranged and cavalry units
+    Weakness: Levy and light infantry have lower morale
+
+  Iberians:
+    1. Iberian Levy
+    2. Scutarii Swordsman
+    3. Celt-Iberian Warrior
+    4. Cantabrian Spearman
+    5. Edetani Spearman
+    6. Lusitanian Noble
+    7. Vascone Skirmisher
+    8. Balearic Slinger
+    9. Aquitani Priestess
+    10.
+      Viriathus - Lusitani Freedom Fighter
+      Sertorius - Resistor of Sulla
+    11. Jinetes
+    12. Lanceari
+    Passive: Guerilla Warriors - Light infantry and ranged are stronger than usual
+    Strength: Excellent light infantry and ranged
+    Weakness: Units receive less bonus morale from formations
+
+  Han:
+    1. Militia
+    2. Sword Conscript
+    3. Han Swordsman
+    4. Yellow-Turban Spearman
+    5. Han Spearman
+    6. Imperial Guard
+    7. Archer Consript
+    8. Chu-ko-nu
+    9. Imperial Magistrate
+    10.
+      Lu Bu
+      Cao Cao
+    11. Lancers
+    12. Jade Dragon Cavalry
+    Passive: Middle Kingdom - Generate resources faster
+    Strength: Excellent ranged units and good infantry
+    Weakness: Spearman vulnerable to missiles
+  
+  Huns:
+
+    Passive: Scourge of God - Increased damage to enemy morale
+    Strength: Unmatched horse archers and light cavalry
+    Weakness: Lack heavy infantry
+
+  Indians:
+    1. Levy
+    2. Hindu Swordsman
+    3. --
+    4. Mauryan Spearman
+    5. --
+    6. Baktrian Phalangite
+    7. Conscript Archer
+    8. Gupta Longbowman
+    9. Indian Elephant
+    10. Chandragupta, Ashoka
+    11. Gupta Cavalry
+    12. Mauryan Lancer
+    Passive: Ancient Religion - Units regain morale faster
+    Strength: Good levy and light infantry
+    Weakness: Lack heavy armor besides elite unit
+
+  Mesoamericans:
+    Passive: Aztec Sacrifices - Chance to gain morale on enemy deaths
+    Strength: Infantry are faster than average
+    Weakness: Lack heavy armor, have no cavalry whatsoever
+
+
+  
+
+  

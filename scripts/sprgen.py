@@ -25,12 +25,10 @@ and the color of Reference.
 '''
 # Windows
 # ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
+ASSET_PATH = "C:\\Projects\\game\\creative\\Aseprite\\Units\\Generator\\"
 
 # Linux
-ASSET_PATH = "/home/brettbar/nextcloud/projects/gameart/Aseprite/Units/Generator/"
-
-# WSL
-# ASSET_PATH = "/mnt/c/Users/brett/Nextcloud/projects/gameart/Aseprite/Units/Generator/"
+# ASSET_PATH = "/home/brettbar/projects/gameart/Aseprite/Units/Generator/"
 
 SOURCE_PATH = ASSET_PATH + "Actors/"
 FINAL_PATH = ASSET_PATH + "FinalAnims/"
@@ -41,6 +39,7 @@ def main():
     gen_final_anims('Romans/RomanVillager')
     gen_final_anims('Romans/RomanHastati') 
     gen_final_anims('Greeks/GreekVillager')
+    gen_final_anims('Greeks/GreekPerioikoi')
     gen_final_anims('Celts/CelticVillager')
     gen_final_anims('Celts/CelticWarrior')
 
@@ -59,13 +58,13 @@ def gen_final_anims(sprite_folder):
 
     # 128 x 128 Source Maps for Sprite
     source_maps = {
-        'Legs': Image.open(SOURCE_PATH + sprite_folder + '/Legs.png').convert('RGBA'),
-        'Torso': Image.open(SOURCE_PATH + sprite_folder + '/Torso.png').convert('RGBA'),
-        'LeftArm': Image.open(SOURCE_PATH + sprite_folder + '/LeftArm.png').convert('RGBA'),
-        'Head': Image.open(SOURCE_PATH + sprite_folder + '/Head.png').convert('RGBA'),
-        'LeftEquip': Image.open(SOURCE_PATH + sprite_folder + '/LeftEquip.png').convert('RGBA'),
-        'RightEquip': Image.open(SOURCE_PATH + sprite_folder + '/RightEquip.png').convert('RGBA'),
-        'RightArm': Image.open(SOURCE_PATH + sprite_folder + '/RightArm.png').convert('RGBA'),
+        'Legs': Image.open(SOURCE_PATH + sprite_folder + '/output/Legs.png').convert('RGBA'),
+        'Torso': Image.open(SOURCE_PATH + sprite_folder + '/output/Torso.png').convert('RGBA'),
+        'LeftArm': Image.open(SOURCE_PATH + sprite_folder + '/output/LeftArm.png').convert('RGBA'),
+        'Head': Image.open(SOURCE_PATH + sprite_folder + '/output/Head.png').convert('RGBA'),
+        'LeftEquip': Image.open(SOURCE_PATH + sprite_folder + '/output/LeftEquip.png').convert('RGBA'),
+        'RightEquip': Image.open(SOURCE_PATH + sprite_folder + '/output/RightEquip.png').convert('RGBA'),
+        'RightArm': Image.open(SOURCE_PATH + sprite_folder + '/output/RightArm.png').convert('RGBA'),
     }
 
     # Entire Animation Spritesheet, separated by Layer

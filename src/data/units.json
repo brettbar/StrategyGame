@@ -1,0 +1,20 @@
+{
+  "romans": [
+    {
+      "type": "sword_infantry",
+      "tier": 2
+    }
+  ],
+  "greeks": [
+    {
+      "type": "spear_infantry",
+      "tier": 2
+    }
+  ],
+  "celts": [
+    {
+      "type": "sword_infantry",
+      "tier": 2
+    }
+  ]
+}
