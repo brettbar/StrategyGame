@@ -35,8 +35,8 @@
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
-#include "world/systems/selection_system.hpp"
-#include "world/systems/settlement_system.hpp"
+#include "world/systems/selection.hpp"
+#include "world/systems/settlement.hpp"
 
 
 #include "renderer/renderer.hpp"
@@ -110,7 +110,7 @@ inline void Campaign::Start( str player_faction ) {
   PlayerSystem::create_players_for_sp( player_faction );
 
   MapSystem::Manager()->Init();
-  SettlementSystem::Init();
+  Settlement::Init();
   ProvinceSystem::Init();
   Renderer::Init();
 
@@ -160,7 +160,7 @@ inline void Campaign::Update60TPS() {
 }
 
 inline void Campaign::Update1TPS() {
-  SettlementSystem::Update(
+  Settlement::Update(
     Global::world.view<Province::Component, Settlement::Component>()
   );
 
@@ -197,11 +197,9 @@ inline void Campaign::CheckForUIInteractions() {
       break;
   }
 
-  if ( SelectionSystem::Selected<Province::Component, Settlement::Component>(
-       ) ) {
-    auto settlement =
-      SelectionSystem::GetSelectedComponent<Settlement::Component>();
-    auto prov = SelectionSystem::GetSelectedComponent<Province::Component>();
+  if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
+    auto settlement = Selection::GetSelectedComponent<Settlement::Component>();
+    auto prov = Selection::GetSelectedComponent<Province::Component>();
     entt::entity player_e = GetLocalPlayerE();
 
     if ( !settlement || !prov ) {
@@ -213,12 +211,12 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnColonist:
         PostCommand( Commands::Command::spawn_colonist(
-          player_e, SettlementSystem::SettlementPosition( *prov )
+          player_e, Settlement::SettlementPosition( *prov )
         ) );
         break;
       case UI::Action_SettlementContext::SpawnArmy:
         PostCommand( Commands::Command::spawn_army(
-          player_e, SettlementSystem::SettlementPosition( *prov )
+          player_e, Settlement::SettlementPosition( *prov )
         ) );
         break;
       case UI::Action_SettlementContext::BuildFarm:
@@ -228,8 +226,8 @@ inline void Campaign::CheckForUIInteractions() {
     }
   }
 
-  if ( SelectionSystem::Selected<Actor::Component>() ) {
-    auto actor = SelectionSystem::GetSelectedComponent<Actor::Component>();
+  if ( Selection::Selected<Actor::Component>() ) {
+    auto actor = Selection::GetSelectedComponent<Actor::Component>();
     // entt::entity player_e = GetLocalPlayerE();
 
     if ( !actor ) {
@@ -241,14 +239,14 @@ inline void Campaign::CheckForUIInteractions() {
 
     switch ( action ) {
       case UI::Action_ActorContext::ClaimProvince: {
-        PostCommand( Commands::Command::claim_province(
-          SelectionSystem::GetSelectedEntity()
-        ) );
+        PostCommand(
+          Commands::Command::claim_province( Selection::GetSelectedEntity() )
+        );
       } break;
       case UI::Action_ActorContext::SpawnSettlement: {
-        PostCommand( Commands::Command::build_settlement(
-          SelectionSystem::GetSelectedEntity()
-        ) );
+        PostCommand(
+          Commands::Command::build_settlement( Selection::GetSelectedEntity() )
+        );
       } break;
       case UI::Action_ActorContext::None:
         break;
@@ -295,7 +293,7 @@ inline void Campaign::CheckForInput() {
 
   if ( IsMouseButtonPressed( 0 ) ) {
     if ( !Iron::Forge()->MouseIsOverUI() ) {
-      SelectionSystem::UpdateSelection( click_pos, GetLocalPlayerID() );
+      Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
@@ -395,7 +393,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
 inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
-      SettlementSystem::spawn_settlement( cmd.entity );
+      Settlement::spawn_settlement( cmd.entity );
       return;
     }
     case Commands::Type::ClaimProvince: {

@@ -9,18 +9,6 @@ set(SOURCE_FILES
   src/main.cpp
   src/shared/common.hpp
   src/renderer/renderer.hpp
-  src/world/systems/map_system.hpp
-  src/world/systems/province_system.hpp
-  src/world/systems/movement_system.hpp
-  src/world/systems/animation_system.hpp
-  src/world/systems/selection_system.hpp
-  src/world/systems/actor_system.hpp
-  src/world/components/actor.hpp
-  src/world/components/animated.hpp
-  src/world/components/province.hpp
-  src/world/components/selected.hpp
-  src/world/components/sight.hpp
-  src/world/components/tile.hpp
   )
 
 if (UNIX)

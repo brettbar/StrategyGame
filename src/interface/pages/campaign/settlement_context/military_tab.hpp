@@ -1,6 +1,6 @@
 // #pragma once
 
-// #include "../../../../world/systems/settlement_system.hpp"
+// #include "../../../../world/systems/settlement.hpp"
 // #include "../../../builders.hpp"
 // #include "../../../element.hpp"
 // #include "../../../ui_utils.hpp"
@@ -35,7 +35,7 @@
 //   //     // .MaximumSize()
 //   //     .Update( []( Element &self ) {
 //   //       std::vector<Regiment> regiments =
-//   //         SettlementSystem::SelectedSettlementGarrisonList();
+//   //         Settlement::SelectedSettlementGarrisonList();
 
 //   //       for ( auto regiment: regiments )
 //   //       {

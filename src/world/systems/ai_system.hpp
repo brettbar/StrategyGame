@@ -11,7 +11,7 @@
 #include "commands.hpp"
 #include "movement_system.hpp"
 #include "province_system.hpp"
-#include "settlement_system.hpp"
+#include "settlement.hpp"
 #include <condition_variable>
 
 
@@ -60,7 +60,7 @@ namespace AI {
       case Condition::HasProvince:
         return ProvinceSystem::player_has_province( ai_player );
       case Condition::HasSettlement:
-        return SettlementSystem::player_has_settlement( ai_player );
+        return Settlement::player_has_settlement( ai_player );
     }
 
     return false;
@@ -229,7 +229,7 @@ namespace AI {
 
     switch ( ai.current_goal ) {
       case Goal::None:
-        if ( !SettlementSystem::player_has_settlement( ai_player ) )
+        if ( !Settlement::player_has_settlement( ai_player ) )
           ai.current_goal = Goal::EstablishSettlement;
 
         break;

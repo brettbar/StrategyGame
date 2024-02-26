@@ -17,7 +17,7 @@
 #include "signals/updates.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/player_system.hpp"
-#include "world/systems/selection_system.hpp"
+#include "world/systems/selection.hpp"
 
 #include "campaign.hpp"
 #include <raylib.h>

@@ -2,11 +2,9 @@
 #include "../../../element.hpp"
 
 
-namespace UI
-{
+namespace UI {
 
-  inline sptr<Element> CreateSettlementContextTabResources()
-  {
+  inline sptr<Element> CreateSettlementContextTabResources() {
     return GridPanel( "settlement_context_resources", 1, 2 )
       .Children( {
         Slot(
@@ -17,7 +15,7 @@ namespace UI
         //   .Axis( Axis::Column )
         //   .Update( []( Element &self ) {
         //     Settlement::Component selected_settlement =
-        //       SettlementSystem::ReadSelectedComponent();
+        //       Settlement::ReadSelectedComponent();
 
 
         //     for ( auto [resource, count]: selected_settlement.raw_materials )

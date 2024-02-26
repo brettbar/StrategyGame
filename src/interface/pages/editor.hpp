@@ -3,7 +3,7 @@
 #include "../irongui/forge.hpp"
 
 #include "../../world/systems/map_system.hpp"
-#include "../../world/systems/selection_system.hpp"
+#include "../../world/systems/selection.hpp"
 #include <raylib.h>
 #include <string>
 
@@ -219,14 +219,14 @@ namespace UI {
 
     auto ent_g = f->Grid( editor_g->ColsByRows( 1, 4, 1, 4 ), 1, 4, BLACK );
 
-    entt::entity selected = SelectionSystem::GetSelectedEntity();
+    entt::entity selected = Selection::GetSelectedEntity();
 
-    if ( SelectionSystem::Selected<Actor::Component>() ) {
+    if ( Selection::Selected<Actor::Component>() ) {
       f->TextLabel( ent_g->Slot( 0 ), "Actor", RED );
       f->TextLabel(
         ent_g->Slot( 1 ), "ID: " + EntityIdToString( selected ), RED
       );
-    } else if ( SelectionSystem::Selected<Province::Component>() ) {
+    } else if ( Selection::Selected<Province::Component>() ) {
       f->TextLabel( ent_g->Slot( 0 ), "Prov", BLUE );
       f->TextLabel(
         ent_g->Slot( 1 ), "ID: " + EntityIdToString( selected ), BLUE

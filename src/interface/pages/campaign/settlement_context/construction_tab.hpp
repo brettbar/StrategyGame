@@ -1,5 +1,5 @@
 // #include "../../../../../data/buildings.hpp"
-// #include "../../../../world/systems/settlement_system.hpp"
+// #include "../../../../world/systems/settlement.hpp"
 
 // namespace UI {
 //   inline sptr<Element> CreateSettlementContextTabConstruction() {
@@ -43,7 +43,7 @@
 //           GridPanel( "settlement_context_building_list", 5, 4 )
 //             .UpdateChildren( []( Element &self ) {
 //               std::vector<Buildings::Building> buildings =
-//                 SettlementSystem::SelectedSettlementBuildingList();
+//                 Settlement::SelectedSettlementBuildingList();
 
 //               for ( auto building: buildings ) {
 //                 str building_name = "building_list_item_" + building.name_str;

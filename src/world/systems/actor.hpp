@@ -8,7 +8,7 @@
 #include "../systems/map_system.hpp"
 #include "../systems/movement_system.hpp"
 #include "../systems/province_system.hpp"
-#include "../systems/selection_system.hpp"
+#include "../systems/selection.hpp"
 
 
 #include "../components/actor.hpp"
@@ -174,7 +174,7 @@ private:
     // 2. The colonist is in a province owned by their faction
     // 3. The province does not already contain a settlement
     bool selected_colonist_can_place_settlement() {
-      entt::entity selected_entity = SelectionSystem::GetSelectedEntity();
+      entt::entity selected_entity = Selection::GetSelectedEntity();
       // 0. if the colonist isnt selected, bail
       if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
         return false;

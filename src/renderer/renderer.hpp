@@ -6,8 +6,8 @@
 #include "../world/components/animated.hpp"
 #include "../world/systems/map_system.hpp"
 #include "../world/systems/overlay_system.hpp"
-#include "../world/systems/selection_system.hpp"
-#include "../world/systems/settlement_system.hpp"
+#include "../world/systems/selection.hpp"
+#include "../world/systems/settlement.hpp"
 
 #include <raylib.h>
 
@@ -68,7 +68,7 @@ namespace Renderer {
         BeginShaderMode( shader );
         {
           OverlaySystem::draw_borders();
-          SelectionSystem::Draw( Global::texture_cache, true );
+          Selection::Draw( Global::texture_cache, true );
         }
         EndShaderMode();
 
@@ -84,7 +84,7 @@ namespace Renderer {
         BeginShaderMode( shader );
         {
           OverlaySystem::draw_borders();
-          SelectionSystem::Draw( Global::texture_cache, true );
+          Selection::Draw( Global::texture_cache, true );
         }
         OverlaySystem::draw_settlement_name();
         EndShaderMode();
@@ -105,16 +105,16 @@ namespace Renderer {
       {
         switch ( map_mode ) {
           case MapSystem::Mode::Default:
-            SettlementSystem::Draw( Global::texture_cache, false );
+            Settlement::Draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Terrain:
-            SettlementSystem::Draw( Global::texture_cache, false );
+            Settlement::Draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Political:
-            SettlementSystem::Draw( Global::texture_cache, false );
+            Settlement::Draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Resources:
-            SettlementSystem::Draw( Global::texture_cache, false );
+            Settlement::Draw( Global::texture_cache, false );
             break;
         }
 
