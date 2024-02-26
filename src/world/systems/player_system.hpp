@@ -7,7 +7,7 @@
 #include "../components/player.hpp"
 
 #include "../components/faction.hpp"
-#include "../systems/faction_system.hpp"
+#include "../managers/faction.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
@@ -22,7 +22,7 @@ namespace PlayerSystem {
       );
       Global::world.emplace<Player::LocalTag>( player );
       Global::world.emplace<Faction::Component>(
-        player, FactionSystem::factions.at( player_faction )
+        player, Faction::Manager::Get()->factions.at( player_faction )
       );
     }
 
@@ -33,7 +33,7 @@ namespace PlayerSystem {
         ai_player, ai_player, "player_1", true
       );
       Global::world.emplace<Faction::Component>(
-        ai_player, FactionSystem::factions.at( "greeks" )
+        ai_player, Faction::Manager::Get()->factions.at( "greeks" )
       );
 
       AI::Create( ai_player );
@@ -45,7 +45,7 @@ namespace PlayerSystem {
         ai_player, ai_player, "player_2", true
       );
       Global::world.emplace<Faction::Component>(
-        ai_player, FactionSystem::factions.at( "celts" )
+        ai_player, Faction::Manager::Get()->factions.at( "celts" )
       );
 
       AI::Create( ai_player );
@@ -58,7 +58,7 @@ namespace PlayerSystem {
         ai_player, ai_player, "player_3", true
       );
       Global::world.emplace<Faction::Component>(
-        ai_player, FactionSystem::factions.at( "celts" )
+        ai_player, Faction::Manager::Get()->factions.at( "celts" )
       );
 
       AI::Create( ai_player );
@@ -81,7 +81,7 @@ namespace PlayerSystem {
         Global::world.emplace<Player::RemoteTag>( player );
 
       Global::world.emplace<Faction::Component>(
-        player, FactionSystem::factions.at( client.peer_data.faction )
+        player, Faction::Manager::Get()->factions.at( client.peer_data.faction )
       );
     }
 
@@ -119,7 +119,7 @@ namespace PlayerSystem {
         Global::world.emplace<Player::RemoteTag>( player );
 
       Global::world.emplace<Faction::Component>(
-        player, FactionSystem::factions.at( peer.faction )
+        player, Faction::Manager::Get()->factions.at( peer.faction )
       );
     }
 

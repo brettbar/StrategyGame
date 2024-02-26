@@ -2,10 +2,11 @@
 
 #include "../../shared/global.hpp"
 #include "../components/animated.hpp"
+#include "../components/faction.hpp"
 #include "../components/sight.hpp"
-#include "../systems/faction_system.hpp"
 
-#include "manager.hpp"
+
+#include "../managers/actor.hpp"
 
 namespace Actor {
   inline void create_army( entt::entity owner, vec2f spawn ) {
@@ -72,7 +73,8 @@ namespace Actor {
     };
 
     Animated::Component animated = {
-      .sprite = Global::texture_cache[hstr{actor.data.sprite_id.c_str()}]->texture,
+      .sprite =
+        Global::texture_cache[hstr{ actor.data.sprite_id.c_str() }]->texture,
       .frameRec = { 0, 0, 128, 128 },
       .state = Animated::AnimState::IDLE_DR,
       .animations = animations,

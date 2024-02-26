@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "../world/actor/component.hpp"
+#include "../world/components/actor.hpp"
 #include "../world/components/animated.hpp"
 #include "../world/components/player.hpp"
 #include "../world/components/province.hpp"
@@ -17,11 +17,9 @@
 
 // using namespace entt::literals;
 
-namespace SaveSystem
-{
+namespace SaveSystem {
 
-  inline void Save()
-  {
+  inline void Save() {
     printf( "Saving to output\n" );
 
     std::ofstream file( "output.dat", std::ios::binary );
@@ -43,8 +41,7 @@ namespace SaveSystem
     file.close();
   }
 
-  inline void Load()
-  {
+  inline void Load() {
     printf( "Loading from output\n" );
 
 

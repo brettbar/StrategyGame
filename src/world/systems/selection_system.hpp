@@ -6,7 +6,7 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
-#include "../actor/component.hpp"
+#include "../components/actor.hpp"
 #include "../components/player.hpp"
 #include "../components/province.hpp"
 #include "../components/selected.hpp"

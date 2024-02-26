@@ -4,7 +4,7 @@
 
 #include "../../ui_utils.hpp"
 
-#include "../../../world/actor/component.hpp"
+#include "../../../world/components/actor.hpp"
 
 #include "../../irongui/forge.hpp"
 
@@ -41,7 +41,7 @@ namespace UI {
       } break;
       case Actor::Type::ArmyTierI: {
         f->TextLabel( grid->Slot( 0 ), "Army", GREEN );
-        
+
       } break;
     }
 

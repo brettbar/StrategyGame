@@ -27,11 +27,10 @@
 #include "shared/common.hpp"
 
 #include "world/components/player.hpp"
-#include "world/actor/system.hpp"
+#include "world/systems/actor.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/commands.hpp"
-#include "world/systems/faction_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
@@ -107,7 +106,7 @@ inline str Campaign::GetLocalPlayerID() {
 }
 
 inline void Campaign::Start( str player_faction ) {
-  FactionSystem::Init();
+  Faction::Manager::Get();
   PlayerSystem::create_players_for_sp( player_faction );
 
   MapSystem::Manager()->Init();
@@ -398,11 +397,11 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
     case Commands::Type::BuildSettlement: {
       SettlementSystem::spawn_settlement( cmd.entity );
       return;
-    } 
+    }
     case Commands::Type::ClaimProvince: {
       ProvinceSystem::colonist_claim_province( cmd.entity );
       return;
-    } 
+    }
     case Commands::Type::TimeChange: {
       HandleTimeChangeRequest( cmd );
       return;
@@ -412,7 +411,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::SpawnArmy: {
-      Actor::System::spawn_army(cmd.player_e, cmd.click_pos);
+      Actor::System::spawn_army( cmd.player_e, cmd.click_pos );
       return;
     }
     case Commands::Type::Move: {

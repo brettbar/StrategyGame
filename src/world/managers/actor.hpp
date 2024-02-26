@@ -3,7 +3,7 @@
 
 #include "../../shared/global.hpp"
 
-#include "component.hpp"
+#include "../components/actor.hpp"
 
 namespace fs = std::filesystem;
 

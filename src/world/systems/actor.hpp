@@ -11,9 +11,9 @@
 #include "../systems/selection_system.hpp"
 
 
-#include "component.hpp"
-#include "entities.hpp"
-#include "manager.hpp"
+#include "../components/actor.hpp"
+#include "../entities/actor.hpp"
+#include "../managers/actor.hpp"
 
 #include <filesystem>
 #include <fstream>

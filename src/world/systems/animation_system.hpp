@@ -1,19 +1,17 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../actor/component.hpp"
+#include "../components/actor.hpp"
 #include "../components/animated.hpp"
 #include "movement_system.hpp"
 #include <raylib.h>
 
-namespace AnimationSystem
-{
+namespace AnimationSystem {
 
   inline void Draw(
     view<Actor::Component, Animated::Component> animated_actors,
     bool debug
-  )
-  {
+  ) {
 
     // TODO maybe a better soln?
     Global::world.sort<Actor::Component>(
@@ -32,8 +30,7 @@ namespace AnimationSystem
         WHITE
       );
 
-      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f )
-      {
+      if ( debug && Vector2Distance( actor.position, actor.destination ) > 0.5f ) {
         DrawLineEx( actor.position, actor.destination, 2, MAGENTA );
       }
     } );
@@ -42,10 +39,8 @@ namespace AnimationSystem
   inline void Update(
     view<Actor::Component, Animated::Component> animated_actors,
     f32 timeScale
-  )
-  {
-    for ( auto &entity: animated_actors )
-    {
+  ) {
+    for ( auto &entity: animated_actors ) {
       Animated::Component &anim =
         animated_actors.get<Animated::Component>( entity );
 
