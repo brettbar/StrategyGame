@@ -9,11 +9,6 @@ namespace fs = std::filesystem;
 
 namespace Actor {
   class Manager {
-    Manager() {}
-    ~Manager() {}
-    Manager( Manager const & ) = delete;
-
-    void operator=( const Manager & ) = delete;
 
 public:
     static Manager *Get() {
@@ -22,6 +17,16 @@ public:
     }
 
     std::map<str, Actor::Data> roster = {};
+
+private:
+    Manager() {
+      init();
+    }
+    ~Manager() {}
+    Manager( Manager const & ) = delete;
+
+    void operator=( const Manager & ) = delete;
+
 
     void init() {
       std::ifstream f( "src/data/actors.json" );
@@ -84,35 +89,6 @@ public:
         }
       }
 
-      // LoadAsset(
-      //   hstr{ "romans_villager_texture" },
-      //   LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-      // LoadAsset(
-      //   hstr{ "romans_hastati_texture" },
-      //   LoadImage( ( path + "/romans/actors/roman_hastati.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-      // LoadTexturePointFilter(
-      //   hstr{ "romans_hastati_overview" },
-      //   CropUnitImage( ( root + "/romans/hastati.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-
-      // LoadAsset(
-      //   hstr{ "greeks_villager_texture" },
-      //   LoadImage( ( path + "/greeks/actors/greek_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-
-      // LoadAsset(
-      //   hstr{ "celts_villager_texture" },
-      //   LoadImage( ( path + "/celts/actors/celtic_villager.png" ).c_str() ),
-      //   Global::texture_cache
-      // );
-    }
-
-    void get_actor_roster() {}
-  };
-}// namespace Actor
+      void get_actor_for_faction( str faction_id, Type type ) {}
+    };
+  }// namespace Actor

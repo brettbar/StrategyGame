@@ -2,6 +2,8 @@
 
 #include "../../shared/common.hpp"
 
+#include "actor.hpp"
+
 namespace Faction {
 
   enum class Mobility_t {

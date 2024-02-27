@@ -106,7 +106,12 @@ inline str Campaign::GetLocalPlayerID() {
 }
 
 inline void Campaign::Start( str player_faction ) {
-  Faction::Manager::Get();
+  // Initialize manager singletons
+  {
+    Faction::Manager::Get();
+    Actor::Manager::Get();
+  }
+
   PlayerSystem::create_players_for_sp( player_faction );
 
   MapSystem::Manager()->Init();

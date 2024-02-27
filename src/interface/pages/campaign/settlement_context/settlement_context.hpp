@@ -15,6 +15,7 @@ namespace UI {
   };
 
   inline Action_SettlementContext SettlementContext(
+    str faction_id,
     Settlement::Component *settlement
   ) {
 
