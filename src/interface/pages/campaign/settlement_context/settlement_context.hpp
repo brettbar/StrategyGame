@@ -17,6 +17,7 @@ namespace UI {
   inline Action_SettlementContext SettlementContext(
     Settlement::Component *settlement
   ) {
+
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
@@ -124,7 +125,7 @@ namespace UI {
 
 
         auto spawn_colonist = f->TextureButton(
-          agents_g->Slot( 0 ), "romans_colonist_overview", BLACK, 3.0f
+          agents_g->Slot( 0 ), "romans_plebeian_overview", BLACK, 3.0f
         );
         auto spawn_army = f->TextureButton(
           agents_g->Slot( 1 ), "romans_hastati_overview", BLACK, 3.0f

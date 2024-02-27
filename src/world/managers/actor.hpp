@@ -16,14 +16,14 @@ namespace Actor {
     void operator=( const Manager & ) = delete;
 
 public:
-    std::map<str, Actor::Data> actor_data = {};
     static Manager *Get() {
       static Manager instance;
       return &instance;
     }
 
+    std::map<str, Actor::Data> roster = {};
 
-    void load_actors() {
+    void init() {
       std::ifstream f( "src/data/actors.json" );
       {
         nlohmann::json js = nlohmann::json::parse( f );
@@ -37,7 +37,7 @@ public:
             str name = actor.value().at( "name" );
             str sprite_id = ( faction_id + "_" + name ).c_str();
 
-            actor_data.emplace(
+            roster.emplace(
               actor_id,
               Actor::Data{
                 Actor::type_lookup.at( type ),
@@ -75,6 +75,12 @@ public:
             LoadImage( path.c_str() ),
             Global::texture_cache
           );
+
+          LoadTexturePointFilter(
+            hstr{ ( sprite + "_overview" ).c_str() },
+            CropUnitImage( path.c_str() ),
+            Global::texture_cache
+          );
         }
       }
 
@@ -83,21 +89,16 @@ public:
       //   LoadImage( ( path + "/romans/actors/roman_villager.png" ).c_str() ),
       //   Global::texture_cache
       // );
-      LoadTexturePointFilter(
-        hstr{ "romans_colonist_overview" },
-        CropUnitImage( ( root + "/romans/plebeian.png" ).c_str() ),
-        Global::texture_cache
-      );
       // LoadAsset(
       //   hstr{ "romans_hastati_texture" },
       //   LoadImage( ( path + "/romans/actors/roman_hastati.png" ).c_str() ),
       //   Global::texture_cache
       // );
-      LoadTexturePointFilter(
-        hstr{ "romans_hastati_overview" },
-        CropUnitImage( ( root + "/romans/hastati.png" ).c_str() ),
-        Global::texture_cache
-      );
+      // LoadTexturePointFilter(
+      //   hstr{ "romans_hastati_overview" },
+      //   CropUnitImage( ( root + "/romans/hastati.png" ).c_str() ),
+      //   Global::texture_cache
+      // );
 
       // LoadAsset(
       //   hstr{ "greeks_villager_texture" },
@@ -111,5 +112,7 @@ public:
       //   Global::texture_cache
       // );
     }
+
+    void get_actor_roster() {}
   };
 }// namespace Actor

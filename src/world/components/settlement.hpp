@@ -6,6 +6,8 @@
 #include "../../data/settlement.hpp"
 #include "regiment.hpp"
 
+#include "unit.hpp"
+
 #include <cereal/types/common.hpp>
 
 namespace Settlement {

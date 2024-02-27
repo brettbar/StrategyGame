@@ -11,11 +11,7 @@ namespace Unit {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar(
-        id,
-        faction,
-        tier
-      );
+      ar( id, faction, tier );
     }
   };
-};// namespace
+};// namespace Unit

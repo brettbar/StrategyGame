@@ -39,7 +39,7 @@ public:
 
 
     static void Init() {
-      Manager::Get()->load_actors();
+      Manager::Get()->init();
 
       auto players = Global::world.view<Player::Component>();
 

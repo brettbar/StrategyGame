@@ -15,8 +15,7 @@ namespace Actor {
     entt::entity entity = Global::world.create();
     Actor::Component actor = {
       .owner = owner,
-      .data =
-        Actor::Manager::Get()->actor_data.at( faction_id + "_army_tier_i" ),
+      .data = Actor::Manager::Get()->roster.at( faction_id + "_army_tier_i" ),
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,
@@ -59,7 +58,7 @@ namespace Actor {
     entt::entity entity = Global::world.create();
     Actor::Component actor = {
       .owner = owner,
-      .data = Actor::Manager::Get()->actor_data.at( faction_id + "_colonist" ),
+      .data = Actor::Manager::Get()->roster.at( faction_id + "_colonist" ),
       .position = spawn,
       .destination = spawn,
       .speed = 1.0f,

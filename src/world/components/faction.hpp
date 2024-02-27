@@ -122,6 +122,10 @@ namespace Faction {
 
     } mobility;
 
+    struct Roster {
+      list<Actor::Data> actors;
+    } roster;
+
 
     template<class Archive>
     void serialize( Archive &ar ) {

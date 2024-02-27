@@ -25,14 +25,14 @@ and the color of Reference.
 '''
 # Windows
 # ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
-ASSET_PATH = "C:\\Projects\\game\\creative\\Aseprite\\Units\\Generator\\"
+GENERATOR_ROOT = "C:\\Projects\\game\\creative\\Aseprite\\Units\\Generator\\"
 
 # Linux
 # ASSET_PATH = "/home/brettbar/projects/gameart/Aseprite/Units/Generator/"
 
-SOURCE_PATH = ASSET_PATH + "Actors/"
-FINAL_PATH = ASSET_PATH + "FinalAnims/"
-FINAL_ANIM_FILE = ASSET_PATH + "Template.png"
+SOURCE_PATH = GENERATOR_ROOT + "Actors/"
+FINAL_PATH = GENERATOR_ROOT + "FinalAnims/"
+FINAL_ANIM_FILE = GENERATOR_ROOT + "Template.png"
 
 def main():
     gen_color_maps() 
@@ -47,13 +47,13 @@ def gen_final_anims(sprite_folder):
     # 128 x 128 Color Maps for Sprite
     color_maps = {
         # 'Cape': Image.open(ASSET_PATH + 'TemplateLayers/Cape.png'),
-        'Legs': Image.open(ASSET_PATH + 'ColorMaps/Legs.png').convert('RGBA'),
-        'Torso': Image.open(ASSET_PATH + 'ColorMaps/Torso.png').convert('RGBA'),
-        'LeftArm': Image.open(ASSET_PATH + 'ColorMaps/LeftArm.png').convert('RGBA'),
-        'Head': Image.open(ASSET_PATH + 'ColorMaps/Head.png').convert('RGBA'),
-        'LeftEquip': Image.open(ASSET_PATH + 'ColorMaps/LeftEquip.png').convert('RGBA'),
-        'RightEquip': Image.open(ASSET_PATH + 'ColorMaps/RightEquip.png').convert('RGBA'),
-        'RightArm': Image.open(ASSET_PATH + 'ColorMaps/RightArm.png').convert('RGBA'),
+        'Legs': Image.open(GENERATOR_ROOT + 'ColorMaps/Legs.png').convert('RGBA'),
+        'Torso': Image.open(GENERATOR_ROOT + 'ColorMaps/Torso.png').convert('RGBA'),
+        'LeftArm': Image.open(GENERATOR_ROOT + 'ColorMaps/LeftArm.png').convert('RGBA'),
+        'Head': Image.open(GENERATOR_ROOT + 'ColorMaps/Head.png').convert('RGBA'),
+        'LeftEquip': Image.open(GENERATOR_ROOT + 'ColorMaps/LeftEquip.png').convert('RGBA'),
+        'RightEquip': Image.open(GENERATOR_ROOT + 'ColorMaps/RightEquip.png').convert('RGBA'),
+        'RightArm': Image.open(GENERATOR_ROOT + 'ColorMaps/RightArm.png').convert('RGBA'),
     }
 
     # 128 x 128 Source Maps for Sprite
@@ -69,13 +69,13 @@ def gen_final_anims(sprite_folder):
 
     # Entire Animation Spritesheet, separated by Layer
     color_anims = {
-        'Legs': Image.open(ASSET_PATH + 'ColorAnims/Legs.png').convert('RGBA'),
-        'Torso': Image.open(ASSET_PATH + 'ColorAnims/Torso.png').convert('RGBA'),
-        'LeftArm': Image.open(ASSET_PATH + 'ColorAnims/LeftArm.png').convert('RGBA'),
-        'Head': Image.open(ASSET_PATH + 'ColorAnims/Head.png').convert('RGBA'),
-        'LeftEquip': Image.open(ASSET_PATH + 'ColorAnims/LeftEquip.png').convert('RGBA'),
-        'RightEquip': Image.open(ASSET_PATH + 'ColorAnims/RightEquip.png').convert('RGBA'),
-        'RightArm': Image.open(ASSET_PATH + 'ColorAnims/RightArm.png').convert('RGBA'),
+        'Legs': Image.open(GENERATOR_ROOT + 'ColorAnims/Legs.png').convert('RGBA'),
+        'Torso': Image.open(GENERATOR_ROOT + 'ColorAnims/Torso.png').convert('RGBA'),
+        'LeftArm': Image.open(GENERATOR_ROOT + 'ColorAnims/LeftArm.png').convert('RGBA'),
+        'Head': Image.open(GENERATOR_ROOT + 'ColorAnims/Head.png').convert('RGBA'),
+        'LeftEquip': Image.open(GENERATOR_ROOT + 'ColorAnims/LeftEquip.png').convert('RGBA'),
+        'RightEquip': Image.open(GENERATOR_ROOT + 'ColorAnims/RightEquip.png').convert('RGBA'),
+        'RightArm': Image.open(GENERATOR_ROOT + 'ColorAnims/RightArm.png').convert('RGBA'),
     }
 
     # Entire Animation Spritesheet
@@ -172,13 +172,13 @@ def gen_final_anims(sprite_folder):
 def gen_color_maps():
     color_template_maps = {
         # 'Cape': Image.open(ASSET_PATH + 'TemplateLayers/Cape.png'),
-        'Legs': Image.open(ASSET_PATH + 'TemplateLayers/Legs.png').convert('RGBA'),
-        'Torso': Image.open(ASSET_PATH + 'TemplateLayers/Torso.png').convert('RGBA'),
-        'LeftArm': Image.open(ASSET_PATH + 'TemplateLayers/LeftArm.png').convert('RGBA'),
-        'Head': Image.open(ASSET_PATH + 'TemplateLayers/Head.png').convert('RGBA'),
-        'LeftEquip': Image.open(ASSET_PATH + 'TemplateLayers/LeftEquip.png').convert('RGBA'),
-        'RightEquip': Image.open(ASSET_PATH + 'TemplateLayers/RightEquip.png').convert('RGBA'),
-        'RightArm': Image.open(ASSET_PATH + 'TemplateLayers/RightArm.png').convert('RGBA'),
+        'Legs': Image.open(GENERATOR_ROOT + 'TemplateLayers/Legs.png').convert('RGBA'),
+        'Torso': Image.open(GENERATOR_ROOT + 'TemplateLayers/Torso.png').convert('RGBA'),
+        'LeftArm': Image.open(GENERATOR_ROOT + 'TemplateLayers/LeftArm.png').convert('RGBA'),
+        'Head': Image.open(GENERATOR_ROOT + 'TemplateLayers/Head.png').convert('RGBA'),
+        'LeftEquip': Image.open(GENERATOR_ROOT + 'TemplateLayers/LeftEquip.png').convert('RGBA'),
+        'RightEquip': Image.open(GENERATOR_ROOT + 'TemplateLayers/RightEquip.png').convert('RGBA'),
+        'RightArm': Image.open(GENERATOR_ROOT + 'TemplateLayers/RightArm.png').convert('RGBA'),
     }
 
     for part, image in color_template_maps.items():
@@ -215,7 +215,7 @@ def gen_color_maps():
             prev_pixel = pixel
 
 
-        new_color_map.save(ASSET_PATH + "ColorMaps/" + part + ".png")
+        new_color_map.save(GENERATOR_ROOT + "ColorMaps/" + part + ".png")
 
 
 if __name__ == "__main__":
