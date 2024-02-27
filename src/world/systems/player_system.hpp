@@ -7,7 +7,7 @@
 #include "../components/player.hpp"
 
 #include "../components/faction.hpp"
-#include "../managers/faction.hpp"
+#include "../managers/faction_manager.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"

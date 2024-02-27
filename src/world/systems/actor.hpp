@@ -13,7 +13,6 @@
 
 #include "../components/actor.hpp"
 #include "../entities/actor.hpp"
-#include "../managers/actor.hpp"
 
 #include <filesystem>
 #include <fstream>

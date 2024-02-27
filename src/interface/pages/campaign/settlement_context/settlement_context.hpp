@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../../../../world/components/settlement.hpp"
+#include "../../../../world/managers/faction_manager.hpp"
 #include "../../../irongui/forge.hpp"
 #include "construction_tab.hpp"
 #include "military_tab.hpp"
 #include "population_tab.hpp"
+
 
 namespace UI {
   enum class Action_SettlementContext {
@@ -15,7 +17,7 @@ namespace UI {
   };
 
   inline Action_SettlementContext SettlementContext(
-    str faction_id,
+    Faction::Component faction,
     Settlement::Component *settlement
   ) {
 
@@ -124,12 +126,18 @@ namespace UI {
         // Agents
         auto agents_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, PURPLE );
 
+        str colonist_overview =
+          faction.roster.actors.at( Actor::Type::Colonist ).sprite_id +
+          "_overview";
+        str army_tier_i_overview =
+          faction.roster.actors.at( Actor::Type::ArmyTierI ).sprite_id +
+          "_overview";
 
         auto spawn_colonist = f->TextureButton(
-          agents_g->Slot( 0 ), "romans_plebeian_overview", BLACK, 3.0f
+          agents_g->Slot( 0 ), hstr{ colonist_overview.c_str() }, BLACK, 3.0f
         );
         auto spawn_army = f->TextureButton(
-          agents_g->Slot( 1 ), "romans_hastati_overview", BLACK, 3.0f
+          agents_g->Slot( 1 ), hstr{ army_tier_i_overview.c_str() }, BLACK, 3.0f
         );
 
         if ( spawn_colonist ) {

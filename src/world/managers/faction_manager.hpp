@@ -7,7 +7,7 @@
 namespace Faction {
   class Manager {
 public:
-    std::map<std::string, Faction::Component> factions = {};
+    map<str, Faction::Component> factions = {};
 
     static Manager *Get() {
       static Manager instance;

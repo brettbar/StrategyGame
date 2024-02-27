@@ -3,6 +3,7 @@
 #include "../../shared/common.hpp"
 
 #include "actor.hpp"
+#include "cereal/details/helpers.hpp"
 
 namespace Faction {
 
@@ -125,7 +126,7 @@ namespace Faction {
     } mobility;
 
     struct Roster {
-      list<Actor::Data> actors;
+      map<Actor::Type, Actor::Data> actors;
     } roster;
 
 
@@ -136,6 +137,7 @@ namespace Faction {
       culture.serialize( ar );
       government.serialize( ar );
       mobility.serialize( ar );
+      ar( CEREAL_NVP( roster.actors ) );
     }
   };
 

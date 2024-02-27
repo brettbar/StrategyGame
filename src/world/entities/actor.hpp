@@ -6,7 +6,7 @@
 #include "../components/sight.hpp"
 
 
-#include "../managers/actor.hpp"
+#include "../managers/actor_manager.hpp"
 
 namespace Actor {
   inline void create_army( entt::entity owner, vec2f spawn ) {

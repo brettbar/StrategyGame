@@ -107,6 +107,7 @@ inline str Campaign::GetLocalPlayerID() {
 
 inline void Campaign::Start( str player_faction ) {
   // Initialize manager singletons
+  // Order matters here
   {
     Faction::Manager::Get();
     Actor::Manager::Get();
@@ -206,13 +207,14 @@ inline void Campaign::CheckForUIInteractions() {
     auto settlement = Selection::GetSelectedComponent<Settlement::Component>();
     auto prov = Selection::GetSelectedComponent<Province::Component>();
     entt::entity player_e = GetLocalPlayerE();
+    auto faction = Global::world.get<Faction::Component>( player_e );
 
     if ( !settlement || !prov ) {
       printf( "Got null prov/settlement??\n" );
       return;
     }
 
-    auto action = UI::SettlementContext( settlement );
+    auto action = UI::SettlementContext( faction, settlement );
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnColonist:
         PostCommand( Commands::Command::spawn_colonist(

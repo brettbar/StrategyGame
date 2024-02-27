@@ -5,6 +5,8 @@
 
 #include "../components/actor.hpp"
 
+#include "faction_manager.hpp"
+
 namespace fs = std::filesystem;
 
 namespace Actor {
@@ -29,6 +31,12 @@ private:
 
 
     void init() {
+      build_actors_from_data();
+      load_actor_assets();
+      assign_faction_rosters();
+    }
+
+    void build_actors_from_data() {
       std::ifstream f( "src/data/actors.json" );
       {
         nlohmann::json js = nlohmann::json::parse( f );
@@ -56,8 +64,9 @@ private:
         }
       }
       f.close();
+    }
 
-
+    void load_actor_assets() {
       str root = "src/assets/images/actors";
 
       // for each faction
@@ -88,7 +97,15 @@ private:
           );
         }
       }
+    }
 
-      void get_actor_for_faction( str faction_id, Type type ) {}
-    };
-  }// namespace Actor
+    void assign_faction_rosters() {
+      for ( auto &actor: roster ) {
+        Faction::Component &faction =
+          Faction::Manager::Get()->factions.at( actor.second.faction_id );
+
+        faction.roster.actors.emplace( actor.second.type, actor.second );
+      }
+    }
+  };
+}// namespace Actor
