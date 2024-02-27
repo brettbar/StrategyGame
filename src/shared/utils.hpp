@@ -238,7 +238,7 @@ inline Color GetPrimaryFactionColor( std::string faction ) {
     return BLUE;
   if ( faction == "celts" )
     return GREEN;
-  if ( faction == "punics" )
+  if ( faction == "carthaginians" )
     return PURPLE;
   if ( faction == "germans" )
     return GRAY;

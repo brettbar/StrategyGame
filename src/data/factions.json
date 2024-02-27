@@ -7,7 +7,9 @@
     "culture": {
       "adjective": "roman",
       "denonym": "romans",
-      "settlement_names": [ "rome" ]
+      "settlement_names": [
+        "rome"
+      ]
     },
     "government": {
       "start_gov": "republic",
@@ -30,7 +32,9 @@
     "culture": {
       "adjective": "greek",
       "denonym": "greeks",
-      "settlement_names": [ "athens" ]
+      "settlement_names": [
+        "athens"
+      ]
     },
     "government": {
       "start_gov": "federation",
@@ -53,7 +57,9 @@
     "culture": {
       "adjective": "celtic",
       "denonym": "celts",
-      "settlement_names": [ "lugudunon" ]
+      "settlement_names": [
+        "lugudunon"
+      ]
     },
     "government": {
       "start_gov": "federation",
@@ -66,6 +72,35 @@
     },
     "mobility": {
       "type": "tribal"
+    }
+  },
+  "carthaginians": {
+    "colors": {
+      "primary": "purple",
+      "secondary": "white"
+    },
+    "culture": {
+      "adjective": "punic",
+      "denonym": "carthaginians",
+      "settlement_names": [
+        "carthage",
+        "utica",
+        "tyre",
+        "byblos",
+        "sidon"
+      ]
+    },
+    "government": {
+      "start_gov": "republic",
+      "empire_name": "Phoenician Empire",
+      "empire_leader_title": "Melech",
+      "republic_name": "Punic Colonies",
+      "republic_leader_title": "Shophetim",
+      "federation_name": "Phoenician Cities",
+      "federation_leader_title": "Nagid"
+    },
+    "mobility": {
+      "type": "settled"
     }
   }
 }

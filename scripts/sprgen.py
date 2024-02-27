@@ -36,12 +36,14 @@ FINAL_ANIM_FILE = GENERATOR_ROOT + "Template.png"
 
 def main():
     gen_color_maps() 
-    gen_final_anims('Romans/RomanVillager')
-    gen_final_anims('Romans/RomanHastati') 
-    gen_final_anims('Greeks/GreekVillager')
-    gen_final_anims('Greeks/GreekPerioikoi')
-    gen_final_anims('Celts/CelticVillager')
-    gen_final_anims('Celts/CelticWarrior')
+    gen_final_anims('Romans/colonist')
+    gen_final_anims('Romans/hastati') 
+    gen_final_anims('Greeks/colonist')
+    gen_final_anims('Greeks/perioikoi')
+    gen_final_anims('Celts/villager')
+    gen_final_anims('Celts/warrior')
+    gen_final_anims('Carthaginians/colonist')
+    gen_final_anims('Carthaginians/hoplite')
 
 def gen_final_anims(sprite_folder):
     # 128 x 128 Color Maps for Sprite

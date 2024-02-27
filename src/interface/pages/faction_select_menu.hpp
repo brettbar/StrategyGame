@@ -14,7 +14,7 @@ namespace UI {
       "romans",
       "greeks",
       "celts",
-      "punics",
+      "carthaginians",
       "persians",
       "scythians",
       "germans",

@@ -13,6 +13,10 @@
     {
       "type": "colonist",
       "name": "colonist"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "perioikoi"
     }
   ],
   "celts": [
@@ -23,6 +27,16 @@
     {
       "type": "army_tier_i",
       "name": "warrior"
+    }
+  ],
+  "carthaginians": [
+    {
+      "type": "colonist",
+      "name": "colonist"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "hoplite"
     }
   ]
 }
