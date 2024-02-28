@@ -8,6 +8,14 @@ import math
 
 '''
 
+Terms:
+    - Sprite (actual art asset)
+    - Reference (descontructed sprite used for lookups)
+    - Archetype (single ususable sprite category, 1h spearman, 1h swordsman, female civilian, etc)
+    - Silhouette (flat color outline for archetype)
+
+
+
 End goal: FinishedAnimations
 
 Template -> ColorMap (program)
@@ -18,7 +26,7 @@ ColorAnimations + ColorMap + Reference -> FinishedAnimations
 
 The ColorAnimations pixels color's map to pixels in the ColorMap.
 
-he ColorMap's pixel positions map to the pixels in the Reference.
+The ColorMap's pixel positions map to the pixels in the Reference.
 
 The FinalAnimations pixel will be the positions of ColorAnimations 
 and the color of Reference.
