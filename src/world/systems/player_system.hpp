@@ -58,7 +58,7 @@ namespace PlayerSystem {
         ai_player, ai_player, "player_3", true
       );
       Global::world.emplace<Faction::Component>(
-        ai_player, Faction::Manager::Get()->factions.at( "celts" )
+        ai_player, Faction::Manager::Get()->factions.at( "carthaginians" )
       );
 
       AI::Create( ai_player );
