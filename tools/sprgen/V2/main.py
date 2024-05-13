@@ -5,32 +5,6 @@ from PIL import Image
 import colorsys
 
 
-'''
-## Definitions
-- Archetype
-	- Category of character, what sort of animations it can have
-	- Ex: unarmed male, 1h spearman, spear cavalry
-	- Ie: what kind of character?
-- Character Reference
-	- The still image of an actual character, usually including a left right view and separated by layers
-	- Ex: roman_hastati, celtic_villager
-	- Ie: the actual hand-drawn character in 2 or 4 tiles
-- Archetype Silhouette
-	- The still image of the greatest-extent flatcolor silhouette for an archetype, usually including a left right view and separated by layers
-	- Ex: 1h_swordsman
-	- Ie: the maximal silhouette of an archetype, big blobs with each limb/layer being a different flat color
-- Archetype Reference
-	- The archetype silhouette but processed so that each pixel on each layer is a unique color that can be used to map to the character reference during sprite generation
-- Animation Reference
-	- The archetype reference mapped into various animations, all of which belong to that given archetype
-	- Ie: a bunch of animation frames made using the many pixel colored blobs
-- Final Animations
-	- The final animations for the character
-
-## Process
-1. Archetype Silhouette -> Archetype Reference -> Animations Reference (Once per new Archetype and/or new Animation)
-2. Animations Reference + (Archetype Reference + Character Reference) -> Final Animations
-'''
 # Windows
 # ASSET_PATH = "C:\\Users\\brett\\Nextcloud\\projects\\gameart\\Aseprite\\Units\\Generator\\"
 GENERATOR_ROOT = "C:\\Projects\\game\\tools\\sprgen\\V2\\"
@@ -39,9 +13,113 @@ GENERATOR_ROOT = "C:\\Projects\\game\\tools\\sprgen\\V2\\"
 # ASSET_PATH = "/home/brettbar/projects/gameart/Aseprite/Units/Generator/"
 
 def main():
-    ref = Image.open(GENERATOR_ROOT + 'Reference.png').convert('HSV')
-    pass
+	archetypes = ['1HSpearman']
 
+	prefix = 'Archetypes\\'
+
+	for archetype in archetypes:
+		gen_archetype_map(prefix, archetype)
+		
+
+
+
+def gen_archetype_map(prefix, archetype):
+		path = GENERATOR_ROOT + prefix + archetype + "\\output\\"
+		silhouettes = {
+			'Legs': Image.open(path + 'Silhouette-Legs.png').convert('RGBA'),
+			'Torso': Image.open( path+ 'Silhouette-Torso.png').convert('RGBA'),
+			'LeftArm': Image.open(path + 'Silhouette-LeftArm.png').convert('RGBA'),
+			'Head': Image.open(path+ 'Silhouette-Head.png').convert('RGBA'),
+			'LeftEquip': Image.open(path+ 'Silhouette-LeftEquip.png').convert('RGBA'),
+			'RightEquip': Image.open(path+ 'Silhouette-RightEquip.png').convert('RGBA'),
+			'RightArm': Image.open(path + 'Silhouette-RightArm.png').convert('RGBA'),
+		}
+		# archetype_map = Image.new('RGBA', [256, 128])
+		hsv_map = Image.new('HSV', [256, 128])
+		for body_part, silhouette in silhouettes.items():
+			width = 128
+			height = 128
+			hsv_silh = silhouette.convert('HSV')
+
+			num_pixels = 0
+			for y in range(width):
+				for x in range(height):
+					h,s,v = hsv_silh.getpixel((x,y))
+					if v == 0: continue 
+					num_pixels+=1
+
+					ns = s - (y*3)
+					nv = v - (x*3)
+
+					# @leftoff. Making progress, now we just need to make it work off of only
+		 			# opaque pixels, this will save us a lot of color space so we dont
+					# have to go so desatured/devalued so quickly
+		 			# basically need a 2d array without the transparent pixels?
+
+					# (nr, ng, nb) = hsv_to_rgb(h, ns, nv)
+					hsv_map.putpixel([x,y], (h,ns,nv))
+
+					# red = x % 256
+					# grn = y % 256
+					# # blu = (x + y) % 256
+					# archetype_map.putpixel([x,y], (red,grn, 0,255))
+
+
+
+		# for body_part, silhouette in silhouettes.items():
+		# 	left_bank = {}
+		# 	right_bank = {}
+		# 	unique_color_map = {}
+
+		# 	width = 128
+		# 	height = 128
+		# 	num_pixels = 0
+		# 	for y in range(0, width -1):
+		# 		for x in range(0, height-1):
+		# 			r,g,b,a = silhouette.getpixel((x,y))
+		# 			if a == 0: continue 
+		# 			num_pixels += 1
+		# 			h,s,v = rgb_to_hsv(r,g,b)
+		# 			hue = h - 2*num_pixels
+
+		# 			# archetype_map.putpixel([x, y], (r, g, b, 255))
+		# 			left_bank[(x,y)] = (hue, s, v)
+
+		# 	for x in range(width, (2*width)-1):
+		# 		for y in range(0, height-1):
+		# 			r,g,b,a = silhouette.getpixel((x,y))
+		# 			if a == 0: continue 
+		# 			h,s,v = rgb_to_hsv(r,g,b)
+		# 			right_bank[(x,y)] = (h, s, v)
+
+		# 	print(left_bank)
+		# 	print(right_bank)
+		# 	for pixel, color in left_bank.items():
+		# 		(h, s, v) = color
+		# 		r, g, b = hsv_to_rgb(h, s, v)
+		# 		if (r,g,b) in unique_color_map:
+		# 			print("ERROR: duplicate color found", (r,g,b))
+		# 			# return
+		# 		else:
+		# 			unique_color_map[(r,g,b)] = 1
+
+		# 		archetype_map.putpixel([pixel[0], pixel[1]], (r,g,b,255))
+
+		# 			# archetype_map.putpixel([x, y], (r, g, b, 255))
+
+
+		hsv_map.convert('RGBA').save(GENERATOR_ROOT+prefix+archetype+"\\output\\Map.png")
+	
+def hsv_to_rgb(h,s,v):
+	r = h / (360/255)
+	g = s / (100/255)
+	b = v / (100/255)
+	return (int(r),int(g),int(b))
+def rgb_to_hsv(r, g, b):
+	h = r * (360/255)
+	s = g * (100/255)
+	v = b * (100/255)
+	return (h,s,v)
 
 def hue_in_degrees(hue):
     convert = int(hue / 255 * 360)
