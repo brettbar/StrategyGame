@@ -2,6 +2,7 @@
 
 from PIL import Image
 
+import math
 import colorsys
 
 
@@ -34,22 +35,24 @@ def gen_archetype_map(prefix, archetype):
 			'RightEquip': Image.open(path+ 'Silhouette-RightEquip.png').convert('RGBA'),
 			'RightArm': Image.open(path + 'Silhouette-RightArm.png').convert('RGBA'),
 		}
+
+		
 		# archetype_map = Image.new('RGBA', [256, 128])
 		hsv_map = Image.new('HSV', [256, 128])
+		rgba_map = Image.new('RGBA', [256, 128])
 		for body_part, silhouette in silhouettes.items():
 			width = 128
 			height = 128
 			hsv_silh = silhouette.convert('HSV')
+			rgba_silh = silhouette.convert('RGBA')
 
-			num_pixels = 0
-			for y in range(width):
-				for x in range(height):
+			opaque_pixels = []
+			for y in range(height):
+				for x in range(width):
 					h,s,v = hsv_silh.getpixel((x,y))
 					if v == 0: continue 
-					num_pixels+=1
+					opaque_pixels.append((x,y))
 
-					ns = s - (y*3)
-					nv = v - (x*3)
 
 					# @leftoff. Making progress, now we just need to make it work off of only
 		 			# opaque pixels, this will save us a lot of color space so we dont
@@ -57,12 +60,44 @@ def gen_archetype_map(prefix, archetype):
 		 			# basically need a 2d array without the transparent pixels?
 
 					# (nr, ng, nb) = hsv_to_rgb(h, ns, nv)
-					hsv_map.putpixel([x,y], (h,ns,nv))
 
 					# red = x % 256
 					# grn = y % 256
 					# # blu = (x + y) % 256
 					# archetype_map.putpixel([x,y], (red,grn, 0,255))
+
+
+
+			hue = 0
+			if body_part == 'Legs':
+				hue = 50
+			elif body_part == 'Head':
+				hue = 0
+			elif body_part == 'RightArm':
+				hue = 270
+
+			'Legs',
+			'Torso',
+			'LeftArm',
+			'Head',
+			'LeftEquip',
+			'RightEquip',
+			'RightArm',
+
+			for pixel in opaque_pixels:
+				(x,y) = pixel
+				_,s,v = hsv_silh.getpixel((x,y))
+				ns = s - (y*2)
+				nv = v - (x*2)
+				hsv_map.putpixel([x,y], (hue,ns,nv))
+
+
+				# h,s,v = hsv_silh.getpixel((x,y))
+				# ns = s - (y*2)
+				# nv = v - (x*2)
+				# hsv_map.putpixel([x,y], (h,ns,nv))
+
+					
 
 
 
@@ -109,6 +144,7 @@ def gen_archetype_map(prefix, archetype):
 
 
 		hsv_map.convert('RGBA').save(GENERATOR_ROOT+prefix+archetype+"\\output\\Map.png")
+		# rgba_map.save(GENERATOR_ROOT+prefix+archetype+"\\output\\Map.png")
 	
 def hsv_to_rgb(h,s,v):
 	r = h / (360/255)
