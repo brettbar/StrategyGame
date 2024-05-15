@@ -22,8 +22,6 @@ def main():
 		gen_archetype_map(prefix, archetype)
 		
 
-
-
 def gen_archetype_map(prefix, archetype):
 		path = GENERATOR_ROOT + prefix + archetype + "\\output\\"
 		silhouettes = {
@@ -31,8 +29,8 @@ def gen_archetype_map(prefix, archetype):
 			'Torso': Image.open( path+ 'Silhouette-Torso.png').convert('RGBA'),
 			'LeftArm': Image.open(path + 'Silhouette-LeftArm.png').convert('RGBA'),
 			'Head': Image.open(path+ 'Silhouette-Head.png').convert('RGBA'),
-			'LeftEquip': Image.open(path+ 'Silhouette-LeftEquip.png').convert('RGBA'),
-			'RightEquip': Image.open(path+ 'Silhouette-RightEquip.png').convert('RGBA'),
+			# 'LeftEquip': Image.open(path+ 'Silhouette-LeftEquip.png').convert('RGBA'),
+			# 'RightEquip': Image.open(path+ 'Silhouette-RightEquip.png').convert('RGBA'),
 			'RightArm': Image.open(path + 'Silhouette-RightArm.png').convert('RGBA'),
 		}
 
@@ -46,106 +44,62 @@ def gen_archetype_map(prefix, archetype):
 			hsv_silh = silhouette.convert('HSV')
 			rgba_silh = silhouette.convert('RGBA')
 
-			opaque_pixels = []
+			opaque_pixels = [[]]
 			for y in range(height):
+				new_row = []
 				for x in range(width):
 					h,s,v = hsv_silh.getpixel((x,y))
 					if v == 0: continue 
-					opaque_pixels.append((x,y))
-
-
-					# @leftoff. Making progress, now we just need to make it work off of only
-		 			# opaque pixels, this will save us a lot of color space so we dont
-					# have to go so desatured/devalued so quickly
-		 			# basically need a 2d array without the transparent pixels?
-
-					# (nr, ng, nb) = hsv_to_rgb(h, ns, nv)
-
-					# red = x % 256
-					# grn = y % 256
-					# # blu = (x + y) % 256
-					# archetype_map.putpixel([x,y], (red,grn, 0,255))
-
-
+					new_row.append((x,y))
+				if len(new_row) > 0:
+					opaque_pixels.append(new_row)
 
 			hue = 0
+
 			if body_part == 'Legs':
-				hue = 50
+				hue = 120
+			elif body_part == 'Torso':
+				hue = 60
+			elif body_part == 'LeftArm':
+				hue = 30
 			elif body_part == 'Head':
 				hue = 0
+			elif body_part == 'LeftEquip':
+				hue = 0
+			elif body_part == 'RightEquip':
+				hue = 0
 			elif body_part == 'RightArm':
-				hue = 270
-
-			'Legs',
-			'Torso',
-			'LeftArm',
-			'Head',
-			'LeftEquip',
-			'RightEquip',
-			'RightArm',
-
-			for pixel in opaque_pixels:
-				(x,y) = pixel
-				_,s,v = hsv_silh.getpixel((x,y))
-				ns = s - (y*2)
-				nv = v - (x*2)
-				hsv_map.putpixel([x,y], (hue,ns,nv))
+				hue = 200
 
 
-				# h,s,v = hsv_silh.getpixel((x,y))
-				# ns = s - (y*2)
-				# nv = v - (x*2)
-				# hsv_map.putpixel([x,y], (h,ns,nv))
+			max_row_width = len(opaque_pixels[0])
+			for j in range(len(opaque_pixels)):
+				w = len(opaque_pixels[j])
+				if w > max_row_width:
+					max_row_width = w
+			max_col_height = len(opaque_pixels)
 
-					
+			total_pixels = sum(len(row) for row in opaque_pixels)
+			print(body_part, total_pixels)
 
+			max_s = 255
+			max_v = 255
 
+			scaling_factor = max(int(255/ total_pixels), 1)
+			width_gap = int((max_s / max_row_width) / scaling_factor)
+			height_gap = int((max_v / max_col_height) / scaling_factor)
 
-		# for body_part, silhouette in silhouettes.items():
-		# 	left_bank = {}
-		# 	right_bank = {}
-		# 	unique_color_map = {}
-
-		# 	width = 128
-		# 	height = 128
-		# 	num_pixels = 0
-		# 	for y in range(0, width -1):
-		# 		for x in range(0, height-1):
-		# 			r,g,b,a = silhouette.getpixel((x,y))
-		# 			if a == 0: continue 
-		# 			num_pixels += 1
-		# 			h,s,v = rgb_to_hsv(r,g,b)
-		# 			hue = h - 2*num_pixels
-
-		# 			# archetype_map.putpixel([x, y], (r, g, b, 255))
-		# 			left_bank[(x,y)] = (hue, s, v)
-
-		# 	for x in range(width, (2*width)-1):
-		# 		for y in range(0, height-1):
-		# 			r,g,b,a = silhouette.getpixel((x,y))
-		# 			if a == 0: continue 
-		# 			h,s,v = rgb_to_hsv(r,g,b)
-		# 			right_bank[(x,y)] = (h, s, v)
-
-		# 	print(left_bank)
-		# 	print(right_bank)
-		# 	for pixel, color in left_bank.items():
-		# 		(h, s, v) = color
-		# 		r, g, b = hsv_to_rgb(h, s, v)
-		# 		if (r,g,b) in unique_color_map:
-		# 			print("ERROR: duplicate color found", (r,g,b))
-		# 			# return
-		# 		else:
-		# 			unique_color_map[(r,g,b)] = 1
-
-		# 		archetype_map.putpixel([pixel[0], pixel[1]], (r,g,b,255))
-
-		# 			# archetype_map.putpixel([x, y], (r, g, b, 255))
-
+			for j in range(len(opaque_pixels)):
+				for i in range(len(opaque_pixels[j])):
+					(x,y) = opaque_pixels[j][i]
+					ns = max_s - (j * width_gap)
+					nv = max_v - (i * height_gap)
+					hsv_map.putpixel([x,y], (hue,ns,nv))
 
 		hsv_map.convert('RGBA').save(GENERATOR_ROOT+prefix+archetype+"\\output\\Map.png")
 		# rgba_map.save(GENERATOR_ROOT+prefix+archetype+"\\output\\Map.png")
 	
+
 def hsv_to_rgb(h,s,v):
 	r = h / (360/255)
 	g = s / (100/255)
