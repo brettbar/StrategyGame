@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../../world/components/settlement.hpp"
-#include "../../../../world/managers/faction_manager.hpp"
+#include "../../../../world/components/faction.hpp"
 #include "../../../irongui/forge.hpp"
 #include "construction_tab.hpp"
 #include "military_tab.hpp"
@@ -68,7 +68,8 @@ namespace UI {
       } break;
       case 1: {
         // Construction
-        auto construction_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, YELLOW );
+        auto construction_g =
+          f->Grid( content_g->Cols( 1, 5 ), 4, 4, Color{ 33, 33, 33, 255 } );
         auto build_farm =
           f->TextButton( construction_g->Slot( 0 ), "Farm", RED );
 
@@ -76,10 +77,17 @@ namespace UI {
           return Action_SettlementContext::BuildFarm;
         }
 
+        for ( const auto building: settlement->buildings ) {
+          f->TextLabel(
+            construction_g->Rows( 2, 4 ), building.name_str, { 0, 0, 0, 255 }
+          );
+        }
+
       } break;
       case 2: {
         // Resources
-        auto resources_g = f->Grid( content_g->Cols( 1, 5 ), 4, 4, GREEN );
+        auto resources_g =
+          f->Grid( content_g->Cols( 1, 5 ), 4, 4, Color{ 33, 33, 33, 255 } );
 
         // @volatile
         u32 slot = 0;

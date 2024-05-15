@@ -11,6 +11,7 @@ namespace Commands {
     SpawnArmy,
     ClaimProvince,
     BuildSettlement,
+    ConstructBuilding,
   };
 
   struct Command {
@@ -75,6 +76,14 @@ namespace Commands {
       cmd.type = Type::TimeChange;
       cmd.player_e = player;
       cmd.msg = msg;
+      return cmd;
+    }
+
+    static Command construct_building( entt::entity player, str building ) {
+      auto cmd = Command();
+      cmd.type = Type::ConstructBuilding;
+      cmd.entity = player;
+      cmd.msg = building;
       return cmd;
     }
 

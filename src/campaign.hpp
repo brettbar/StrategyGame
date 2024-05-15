@@ -227,6 +227,8 @@ inline void Campaign::CheckForUIInteractions() {
         ) );
         break;
       case UI::Action_SettlementContext::BuildFarm:
+        PostCommand( Commands::Command::construct_building( player_e, "farm" )
+        );
         break;
       case UI::Action_SettlementContext::None:
         break;
@@ -423,6 +425,10 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }
+    case Commands::Type::ConstructBuilding: {
+      Settlement::ConstructBuilding( cmd.msg );
+      return;
+    };
   }
 }
 
