@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../shared/textures.hpp"
-#include "../components/selected.hpp"
 #include "map_system.hpp"
 #include "resource_system.hpp"
 

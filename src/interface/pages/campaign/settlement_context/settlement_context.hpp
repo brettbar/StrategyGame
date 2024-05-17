@@ -20,7 +20,6 @@ namespace UI {
     Faction::Component faction,
     Settlement::Component *settlement
   ) {
-
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
@@ -40,7 +39,6 @@ namespace UI {
     );
 
     auto content_g = f->Grid( context_g->Rows( 1, 5 ), 5, 4 );
-
 
     auto tabs_g = f->Grid( content_g->Col( 0 ), 1, 5 );
     auto tab_btns = {
@@ -79,7 +77,7 @@ namespace UI {
 
         for ( const auto building: settlement->buildings ) {
           f->TextLabel(
-            construction_g->Rows( 2, 4 ), building.name_str, { 0, 0, 0, 255 }
+            construction_g->Slot( 4 ), building.name_str, { 0, 0, 0, 255 }
           );
         }
 
@@ -96,7 +94,7 @@ namespace UI {
             f->TextureLabel(
               resources_g->Slot( slot ),
               hstr{
-                Resources::GetRawMaterialName( resource.first ).c_str(),
+                (Resources::GetRawMaterialName( resource.first ) + ".png").c_str(),
               }
             );
           }

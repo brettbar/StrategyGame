@@ -105,7 +105,7 @@ namespace Settlement {
   inline void TrainRegiment( UnitType type ) {
     Settlement::Component &settlement =
       Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
-      );
+    );
 
     settlement.garrison.push_back( Regiment{
       (u32) settlement.garrison.size(),
@@ -115,9 +115,9 @@ namespace Settlement {
   }
 
   inline void ConstructBuilding( std::string building_name ) {
-    Settlement::Component &settlement =
-      Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
-      );
+    Settlement::Component &settlement = Global::world.get<Settlement::Component>(
+      Selection::GetSelectedEntity()
+    );
 
     settlement.buildings.push_back( Buildings::Building{
       .name = Buildings::BuildingName::Farm,

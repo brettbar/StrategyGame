@@ -87,16 +87,14 @@ namespace ResourceSystem {
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
-      if (
-      prov.tile->position.x - TILE_WIDTH >
-        camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
-      prov.tile->position.x + TILE_WIDTH <
-        camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
-      prov.tile->position.y - TILE_WIDTH >
-        camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
-      prov.tile->position.y + TILE_WIDTH <
-        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 )
-      {
+      if ( prov.tile->position.x - TILE_WIDTH >
+             camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
+           prov.tile->position.x + TILE_WIDTH <
+             camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
+           prov.tile->position.y - TILE_WIDTH >
+             camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
+           prov.tile->position.y + TILE_WIDTH <
+             camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
         continue;
       }
 
