@@ -75,7 +75,7 @@ namespace UI {
           return Action_SettlementContext::BuildFarm;
         }
 
-        for ( const auto building: settlement->buildings ) {
+        for ( const auto &building: settlement->buildings ) {
           f->TextLabel(
             construction_g->Slot( 4 ), building.name_str, { 0, 0, 0, 255 }
           );
@@ -95,7 +95,9 @@ namespace UI {
               resources_g->Slot( slot ),
               hstr{
                 (Resources::GetRawMaterialName( resource.first ) + ".png").c_str(),
-              }
+              },
+              {0,0,0,0},
+              2.0f
             );
           }
         }
