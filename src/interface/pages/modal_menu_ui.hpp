@@ -10,18 +10,43 @@ namespace UI
 
 enum class Action_ModalMenu {
   None,
-  LoadGame,
   SaveGame,
+  LoadGame,
   Settings,
   ExitToMainMenu,
   ExitGame,
 };
 
-inline Action_ModalMenu ModalMenu() {
+inline Action_ModalMenu DrawModalMenu() {
   auto f = Iron::Forge();
   rect root_r = rect{0,0,(f32)GetScreenWidth(), (f32)GetScreenHeight()};
   auto root_g = f->Grid( root_r, 3, 3 );
 
+  auto grid = f->Grid( root_g->Slot( 4 ), 1, 5 );
+
+  bool save_pressed = f->TextButton( grid->Slot( 0 ), "Save Game", BLUE );
+  bool load_pressed = f->TextButton( grid->Slot( 1 ), "Load Game", BLUE );
+  bool settings_pressed = f->TextButton( grid->Slot( 2 ), "Settings", BLUE );
+  bool exit_main_pressed = f->TextButton( grid->Slot( 3 ), "Exit To Main Menu", BLUE );
+  bool exit_game_pressed = f->TextButton( grid->Slot( 4 ), "Exit Game", BLUE );
+
+  if (save_pressed) {
+    return Action_ModalMenu::SaveGame;
+  }
+  if (load_pressed) {
+    return Action_ModalMenu::LoadGame;
+  }
+  if (settings_pressed) {
+    return Action_ModalMenu::Settings;
+  }
+  if (exit_main_pressed) {
+    return Action_ModalMenu::ExitToMainMenu;
+  }
+  if (exit_game_pressed) {
+    return Action_ModalMenu::ExitGame;
+  }
+  
+  return Action_ModalMenu::None;
 }
   // inline sptr<Element> CreateModalMenuUI()
   // {

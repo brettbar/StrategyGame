@@ -4,6 +4,7 @@
 #include "interface/pages/editor.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
+#include "interface/pages/modal_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
@@ -230,9 +231,11 @@ class IGame {
     if ( _campaign )
       delete _campaign;
     _campaign = new struct Campaign( "output.dat" );
-    // UI::System::InitCampaignUI();
-
+    _campaign->Load();
     Game()->_mode = Scene::Campaign;
+    // // UI::System::InitCampaignUI();
+    //
+    // Game()->_mode = Scene::Campaign;
   }
 
   void SaveGame() {
@@ -243,15 +246,6 @@ class IGame {
     _hit_exit = true;
   }
 
-  void ToggleModalMenu() {
-    if ( _mode == Scene::Campaign ) {
-      _mode = Scene::ModalMenu;
-      // UI::System::SwitchPage( UI::ModalMenu );
-    } else if ( _mode == Scene::ModalMenu ) {
-      _mode = Scene::Campaign;
-      // UI::System::InitCampaignUI();
-    }
-  }
 
   void ReturnToMain() {
     // UI::System::SwitchPage( UI::MainMenu );
@@ -261,9 +255,14 @@ class IGame {
 
   inline void CheckMenuToggle() {
     if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-        InterfaceEvent::ID::ModalMenuToggle,
-      } );
+      // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+      //   InterfaceEvent::ID::ModalMenuToggle,
+      // } );
+      if (_mode == Scene::ModalMenu) {
+        _mode = Scene::Campaign;
+      } else {
+        _mode = Scene::ModalMenu;
+      }
     }
   }
   /*=============================================================
@@ -281,11 +280,14 @@ class IGame {
 
     switch ( _mode ) {
       case Scene::MainMenu: {
-        auto action = UI::MainMenu();
+        auto action = UI::DrawMainMenu();
 
         switch ( action ) {
           case UI::Action_MainMenu::StartGame:
             _mode = Scene::SinglePlayerLobby;
+            break;
+          case UI::Action_MainMenu::LoadGame:
+            LoadGame();
             break;
           case UI::Action_MainMenu::HostGame:
             break;
@@ -354,12 +356,31 @@ class IGame {
       case Scene::ModalMenu: {
         CheckMenuToggle();
 
+        switch(UI::DrawModalMenu()) {
+          case UI::Action_ModalMenu::None:
+          break;
+          case UI::Action_ModalMenu::SaveGame:
+            SaveGame();
+          break;
+          case UI::Action_ModalMenu::LoadGame:
+            LoadGame();
+          break;
+          case UI::Action_ModalMenu::Settings:
+          break;
+          case UI::Action_ModalMenu::ExitToMainMenu:
+            _mode = Scene::MainMenu;
+          break;
+          case UI::Action_ModalMenu::ExitGame:
+          break;
+        }
+
         BeginDrawing();
         {
           Renderer::draw_map( MapSystem::Manager()->mode );
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );
+          Iron::Forge()->DrawAll();
         }
         EndDrawing();
       } break;

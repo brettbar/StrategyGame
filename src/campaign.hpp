@@ -54,6 +54,7 @@ struct Campaign {
     // Start();
   }
 
+  // @todo delete this stuff
   Campaign( bool is_singleplayer, const char * ) {
     _is_singleplayer = is_singleplayer;
 
@@ -134,13 +135,23 @@ inline void Campaign::Load() {
   SaveSystem::Load();
   MapSystem::Manager()->Init();
   Renderer::Init();
-  Commands::Manager()->init();
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
       settlement.texture =
         LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
     }
   );
+  Global::world.view<Player::Component>().each(
+    []( entt::entity et, Player::Component &player) {
+      printf("Player %s\n", player.player_id.c_str());
+      if (player.player_id == "player_0" && player.is_human) {
+        printf("Assigning!!!!!!!!!!!!!!!!!!!!!!$$$$$$$$$$$$$$$$$$$$$$$\n");
+        Global::world.emplace<Player::LocalTag>(et);
+      }
+    }
+  );
+
+  Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
     .connect<&Campaign::EvaluteCommands>( this );
@@ -275,7 +286,6 @@ inline void Campaign::CheckForInput() {
               << " no local player was found" << '\n';
     return;
   }
-
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
     PostCommand(
