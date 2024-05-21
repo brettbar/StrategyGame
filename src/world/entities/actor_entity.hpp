@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../../shared/global.hpp"
-#include "../components/animated.hpp"
-#include "../components/faction.hpp"
-#include "../components/sight.hpp"
 
+#include "../components/animated_component.hpp"
+#include "../components/faction_component.hpp"
+#include "../components/sight_component.hpp"
 
 #include "../managers/actor_manager.hpp"
 

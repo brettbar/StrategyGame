@@ -3,15 +3,18 @@
 
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
-#include "../components/ai.hpp"
-#include "../components/player.hpp"
-
-#include "../components/faction.hpp"
-#include "../managers/faction_manager.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
+
+#include "../managers/faction_manager.hpp"
+
+#include "../components/ai_component.hpp"
+#include "../components/faction_component.hpp"
+#include "../components/player_component.hpp"
+
 #include "ai_system.hpp"
+
 
 namespace PlayerSystem {
   inline void create_players_for_sp( str player_faction ) {

@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "../components/faction.hpp"
+#include "../components/faction_component.hpp"
 
 namespace Faction {
   class Manager {

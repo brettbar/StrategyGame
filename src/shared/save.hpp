@@ -1,13 +1,17 @@
 #pragma once
 
 #include "../include/entt/entt.hpp"
-#include "../world/components/actor.hpp"
-#include "../world/components/animated.hpp"
-#include "../world/components/player.hpp"
-#include "../world/components/province.hpp"
-#include "../world/components/settlement.hpp"
-#include "../world/components/sight.hpp"
+
+#include "../world/components/actor_component.hpp"
+#include "../world/components/ai_component.hpp"
+#include "../world/components/animated_component.hpp"
+#include "../world/components/player_component.hpp"
+#include "../world/components/province_component.hpp"
+#include "../world/components/settlement_component.hpp"
+#include "../world/components/sight_component.hpp"
+
 #include "global.hpp"
+
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
@@ -49,7 +53,6 @@ namespace SaveSystem {
     {
       cereal::BinaryInputArchive input{ file };
 
-      Global::ClearRegistry();
 
       entt::snapshot_loader{ Global::world }
         .entities( input )

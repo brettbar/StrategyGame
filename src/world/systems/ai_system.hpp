@@ -2,17 +2,18 @@
 
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
-#include "../components/actor.hpp"
-#include "../components/ai.hpp"
-#include "../components/player.hpp"
-#include "../components/province.hpp"
-#include "../components/settlement.hpp"
-#include "../systems/actor.hpp"
-#include "commands.hpp"
+
+#include "../components/actor_component.hpp"
+#include "../components/ai_component.hpp"
+#include "../components/player_component.hpp"
+#include "../components/province_component.hpp"
+#include "../components/settlement_component.hpp"
+
+#include "actor_system.hpp"
+#include "commands_system.hpp"
 #include "movement_system.hpp"
 #include "province_system.hpp"
-#include "settlement.hpp"
-#include <condition_variable>
+#include "settlement_system.hpp"
 
 
 namespace AI {
@@ -60,7 +61,8 @@ namespace AI {
       case Condition::HasProvince:
         return ProvinceSystem::player_has_province( ai_player );
       case Condition::HasSettlement:
-        return Settlement::player_has_settlement( ai_player );
+        return Settlement::System::Manager()->player_has_settlement( ai_player
+        );
     }
 
     return false;
@@ -229,7 +231,8 @@ namespace AI {
 
     switch ( ai.current_goal ) {
       case Goal::None:
-        if ( !Settlement::player_has_settlement( ai_player ) )
+        if ( !Settlement::System::Manager()->player_has_settlement( ai_player
+             ) )
           ai.current_goal = Goal::EstablishSettlement;
 
         break;

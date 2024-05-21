@@ -2,7 +2,8 @@
 
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/province.hpp"
+
+#include "../components/province_component.hpp"
 
 namespace ResourceSystem {
 

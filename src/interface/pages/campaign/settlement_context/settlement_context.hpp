@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../../../../world/components/settlement.hpp"
-#include "../../../../world/components/faction.hpp"
+#include "../../../../world/components/faction_component.hpp"
+#include "../../../../world/components/settlement_component.hpp"
+
+
 #include "../../../irongui/forge.hpp"
 #include "construction_tab.hpp"
 #include "military_tab.hpp"
@@ -94,9 +96,10 @@ namespace UI {
             f->TextureLabel(
               resources_g->Slot( slot ),
               hstr{
-                (Resources::GetRawMaterialName( resource.first ) + ".png").c_str(),
+                ( Resources::GetRawMaterialName( resource.first ) + ".png" )
+                  .c_str(),
               },
-              {0,0,0,0},
+              { 0, 0, 0, 0 },
               2.0f
             );
           }

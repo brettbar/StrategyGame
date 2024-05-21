@@ -26,17 +26,19 @@
 
 #include "shared/common.hpp"
 
-#include "world/components/player.hpp"
-#include "world/systems/actor.hpp"
+
+#include "world/components/player_component.hpp"
+
+#include "world/systems/actor_system.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
-#include "world/systems/commands.hpp"
+#include "world/systems/commands_system.hpp"
 #include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
-#include "world/systems/selection.hpp"
-#include "world/systems/settlement.hpp"
+#include "world/systems/selection_system.hpp"
+#include "world/systems/settlement_system.hpp"
 
 
 #include "renderer/renderer.hpp"
@@ -109,6 +111,9 @@ inline str Campaign::GetLocalPlayerID() {
 inline void Campaign::Start( str player_faction ) {
   // Initialize manager singletons
   // Order matters here
+
+  Global::ClearRegistry();
+
   {
     Faction::Manager::Get();
     Actor::Manager::Get();
@@ -117,7 +122,9 @@ inline void Campaign::Start( str player_faction ) {
   PlayerSystem::create_players_for_sp( player_faction );
 
   MapSystem::Manager()->Init();
-  Settlement::Init();
+
+  Settlement::System::Manager()->on_start();
+  // Settlement::Init();
   ProvinceSystem::Init();
   Renderer::Init();
 
@@ -132,21 +139,34 @@ inline void Campaign::Start( str player_faction ) {
 }
 
 inline void Campaign::Load() {
+  // Initialize manager singletons
+  // Order matters here
+
+  Global::ClearRegistry();
+
+  {
+    Faction::Manager::Get();
+    Actor::Manager::Get();
+  }
+
   SaveSystem::Load();
+  Settlement::System::Manager()->on_load();
   MapSystem::Manager()->Init();
   Renderer::Init();
+
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
-      settlement.texture =
-        LoadTextureFromImage( Settlement::building_map.at( "roman_m1" ) );
+      settlement.texture = LoadTextureFromImage(
+        Settlement::System::Manager()->building_map.at( "roman_m1" )
+      );
     }
   );
   Global::world.view<Player::Component>().each(
-    []( entt::entity et, Player::Component &player) {
-      printf("Player %s\n", player.player_id.c_str());
-      if (player.player_id == "player_0" && player.is_human) {
-        printf("Assigning!!!!!!!!!!!!!!!!!!!!!!$$$$$$$$$$$$$$$$$$$$$$$\n");
-        Global::world.emplace<Player::LocalTag>(et);
+    []( entt::entity et, Player::Component &player ) {
+      printf( "Player %s\n", player.player_id.c_str() );
+      if ( player.player_id == "player_0" && player.is_human ) {
+        printf( "Assigning!!!!!!!!!!!!!!!!!!!!!!$$$$$$$$$$$$$$$$$$$$$$$\n" );
+        Global::world.emplace<Player::LocalTag>( et );
       }
     }
   );
@@ -177,9 +197,7 @@ inline void Campaign::Update60TPS() {
 }
 
 inline void Campaign::Update1TPS() {
-  Settlement::Update(
-    Global::world.view<Province::Component, Settlement::Component>()
-  );
+  Settlement::System::Manager()->update_1tps();
 
   Global::state.day++;
 
@@ -229,12 +247,12 @@ inline void Campaign::CheckForUIInteractions() {
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnColonist:
         PostCommand( Commands::Command::spawn_colonist(
-          player_e, Settlement::SettlementPosition( *prov )
+          player_e, Settlement::System::settlement_position( *prov )
         ) );
         break;
       case UI::Action_SettlementContext::SpawnArmy:
         PostCommand( Commands::Command::spawn_army(
-          player_e, Settlement::SettlementPosition( *prov )
+          player_e, Settlement::System::settlement_position( *prov )
         ) );
         break;
       case UI::Action_SettlementContext::BuildFarm:
@@ -412,7 +430,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
 inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
-      Settlement::spawn_settlement( cmd.entity );
+      Settlement::System::Manager()->spawn_settlement( cmd.entity );
       return;
     }
     case Commands::Type::ClaimProvince: {
@@ -436,7 +454,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::ConstructBuilding: {
-      Settlement::ConstructBuilding( cmd.msg );
+      Settlement::System::Manager()->construct_building( cmd.msg );
       return;
     };
   }

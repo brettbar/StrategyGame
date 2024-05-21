@@ -4,14 +4,13 @@
 #include "../../data/buildings.hpp"
 #include "../../data/resources.hpp"
 #include "../../data/settlement.hpp"
-#include "regiment.hpp"
 
-#include "unit.hpp"
+#include "regiment_component.hpp"
+#include "unit_component.hpp"
 
 #include <cereal/types/common.hpp>
 
 namespace Settlement {
-  inline std::map<std::string, Image> building_map;
 
 
   struct Component {

@@ -4,7 +4,7 @@
 
 #include "../../ui_utils.hpp"
 
-#include "../../../world/components/actor.hpp"
+#include "../../../world/components/actor_component.hpp"
 
 #include "../../irongui/forge.hpp"
 

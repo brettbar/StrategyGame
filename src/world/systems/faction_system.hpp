@@ -3,7 +3,6 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 
-#include "../components/faction.hpp"
 
 namespace Faction {
 

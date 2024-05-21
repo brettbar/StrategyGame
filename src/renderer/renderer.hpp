@@ -3,11 +3,13 @@
 #include "../shared/common.hpp"
 #include "../shared/fonts.hpp"
 #include "../shared/textures.hpp"
-#include "../world/components/animated.hpp"
+
+#include "../world/components/animated_component.hpp"
+
 #include "../world/systems/map_system.hpp"
 #include "../world/systems/overlay_system.hpp"
-#include "../world/systems/selection.hpp"
-#include "../world/systems/settlement.hpp"
+#include "../world/systems/selection_system.hpp"
+#include "../world/systems/settlement_system.hpp"
 
 #include <raylib.h>
 
@@ -105,16 +107,16 @@ namespace Renderer {
       {
         switch ( map_mode ) {
           case MapSystem::Mode::Default:
-            Settlement::Draw( Global::texture_cache, false );
+            Settlement::System::Manager()->draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Terrain:
-            Settlement::Draw( Global::texture_cache, false );
+            Settlement::System::Manager()->draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Political:
-            Settlement::Draw( Global::texture_cache, false );
+            Settlement::System::Manager()->draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Resources:
-            Settlement::Draw( Global::texture_cache, false );
+            Settlement::System::Manager()->draw( Global::texture_cache, false );
             break;
         }
 

@@ -16,9 +16,10 @@
 #include "renderer/renderer.hpp"
 
 #include "signals/updates.hpp"
+
 #include "world/systems/map_system.hpp"
 #include "world/systems/player_system.hpp"
-#include "world/systems/selection.hpp"
+#include "world/systems/selection_system.hpp"
 
 #include "campaign.hpp"
 #include <raylib.h>
@@ -142,15 +143,13 @@ class IGame {
                         Begin: Singleplayer
   =============================================================*/
   void StartSingleplayerCampaign( str player_faction ) {
-    printf( "pending new!!\n" );
+    _mode = Scene::Campaign;
 
     if ( _campaign )
       delete _campaign;
 
     _campaign = new struct Campaign( true );
     _campaign->Start( player_faction );
-
-    Game()->_mode = Scene::Campaign;
   }
   /*=============================================================
                         End: Singleplayer
@@ -227,20 +226,16 @@ class IGame {
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadGame() {
+  void LoadSinglePlayerCampaign() {
+    _mode = Scene::Campaign;
+
     if ( _campaign )
       delete _campaign;
+
     _campaign = new struct Campaign( "output.dat" );
     _campaign->Load();
-    Game()->_mode = Scene::Campaign;
-    // // UI::System::InitCampaignUI();
-    //
-    // Game()->_mode = Scene::Campaign;
   }
 
-  void SaveGame() {
-    SaveSystem::Save();
-  }
 
   void ExitGame() {
     _hit_exit = true;
@@ -258,7 +253,7 @@ class IGame {
       // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
       //   InterfaceEvent::ID::ModalMenuToggle,
       // } );
-      if (_mode == Scene::ModalMenu) {
+      if ( _mode == Scene::ModalMenu ) {
         _mode = Scene::Campaign;
       } else {
         _mode = Scene::ModalMenu;
@@ -287,7 +282,7 @@ class IGame {
             _mode = Scene::SinglePlayerLobby;
             break;
           case UI::Action_MainMenu::LoadGame:
-            LoadGame();
+            LoadSinglePlayerCampaign();
             break;
           case UI::Action_MainMenu::HostGame:
             break;
@@ -340,7 +335,6 @@ class IGame {
         // @volatile
         // TODO make this a faction enum
         if ( selection != "" ) {
-          _mode = Scene::Campaign;
           StartSingleplayerCampaign( selection );
         }
 
@@ -356,22 +350,22 @@ class IGame {
       case Scene::ModalMenu: {
         CheckMenuToggle();
 
-        switch(UI::DrawModalMenu()) {
+        switch ( UI::DrawModalMenu() ) {
           case UI::Action_ModalMenu::None:
-          break;
+            break;
           case UI::Action_ModalMenu::SaveGame:
-            SaveGame();
-          break;
+            SaveSystem::Save();
+            break;
           case UI::Action_ModalMenu::LoadGame:
-            LoadGame();
-          break;
+            LoadSinglePlayerCampaign();
+            break;
           case UI::Action_ModalMenu::Settings:
-          break;
+            break;
           case UI::Action_ModalMenu::ExitToMainMenu:
             _mode = Scene::MainMenu;
-          break;
+            break;
           case UI::Action_ModalMenu::ExitGame:
-          break;
+            break;
         }
 
         BeginDrawing();

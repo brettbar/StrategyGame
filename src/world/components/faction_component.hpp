@@ -2,7 +2,7 @@
 
 #include "../../shared/common.hpp"
 
-#include "actor.hpp"
+#include "actor_component.hpp"
 #include "cereal/details/helpers.hpp"
 
 namespace Faction {

@@ -7,10 +7,11 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/actor.hpp"
-#include "../components/province.hpp"
-#include "../components/settlement.hpp"
-#include "../components/sight.hpp"
+
+#include "../components/actor_component.hpp"
+#include "../components/province_component.hpp"
+#include "../components/settlement_component.hpp"
+#include "../components/sight_component.hpp"
 
 #include <chrono>
 #include <string>

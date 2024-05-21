@@ -4,11 +4,14 @@
 #include "../../shared/fonts.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
-#include "../components/faction.hpp"
-#include "../components/player.hpp"
-#include "../components/settlement.hpp"
+
+#include "../components/faction_component.hpp"
+#include "../components/player_component.hpp"
+#include "../components/settlement_component.hpp"
+
 #include "map_system.hpp"
 #include "province_system.hpp"
+
 #include <raylib.h>
 
 namespace OverlaySystem {

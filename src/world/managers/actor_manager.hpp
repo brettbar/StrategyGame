@@ -3,7 +3,7 @@
 
 #include "../../shared/global.hpp"
 
-#include "../components/actor.hpp"
+#include "../components/actor_component.hpp"
 
 #include "faction_manager.hpp"
 

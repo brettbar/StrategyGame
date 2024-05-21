@@ -30,6 +30,9 @@
     <ClInclude Include="app\src\world\components\ai.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\world\systems\abstract.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

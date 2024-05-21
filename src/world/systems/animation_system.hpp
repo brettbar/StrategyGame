@@ -1,9 +1,12 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../components/actor.hpp"
-#include "../components/animated.hpp"
+
+#include "../components/actor_component.hpp"
+#include "../components/animated_component.hpp"
+
 #include "movement_system.hpp"
+
 #include <raylib.h>
 
 namespace AnimationSystem {

@@ -4,15 +4,18 @@
 #pragma once
 
 #include "../../shared/global.hpp"
-#include "../components/player.hpp"
+
+#include "../entities/actor_entity.hpp"
+
+#include "../components/actor_component.hpp"
+#include "../components/player_component.hpp"
+
+
 #include "../systems/map_system.hpp"
 #include "../systems/movement_system.hpp"
 #include "../systems/province_system.hpp"
-#include "../systems/selection.hpp"
+#include "../systems/selection_system.hpp"
 
-
-#include "../components/actor.hpp"
-#include "../entities/actor.hpp"
 
 #include <filesystem>
 #include <fstream>

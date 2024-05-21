@@ -5,9 +5,10 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
-#include "../components/actor.hpp"
-#include "../components/animated.hpp"
-#include "../components/selected.hpp"
+
+#include "../components/actor_component.hpp"
+#include "../components/animated_component.hpp"
+#include "../components/selected_component.hpp"
 
 namespace MovementSystem {
 

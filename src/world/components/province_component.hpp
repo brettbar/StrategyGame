@@ -3,7 +3,7 @@
 #include "../../data/resources.hpp"
 #include "../../shared/common.hpp"
 #include "cereal/types/vector.hpp"
-#include "tile.hpp"
+#include "tile_component.hpp"
 
 namespace Province {
 
