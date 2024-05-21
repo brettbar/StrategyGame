@@ -2,7 +2,7 @@
 
 #include "../../shared/textures.hpp"
 
-#include "map_system.hpp"
+#include "../managers/map_manager.hpp"
 #include "resource_system.hpp"
 
 namespace ProvinceSystem {
@@ -17,7 +17,7 @@ namespace ProvinceSystem {
 
       Province::Component prov = {
         .selected = false,
-        .tile = MapSystem::Manager()->tile_map[i],
+        .tile = Map::Manager()->tile_map[i],
         .resources = {},
       };
 
@@ -126,10 +126,10 @@ namespace ProvinceSystem {
       return nullptr;
     }
 
-    auto neighbors = MapSystem::Manager()->get_neighbors( *prov->tile );
+    auto neighbors = Map::Manager()->get_neighbors( *prov->tile );
 
     for ( auto neighbor: neighbors ) {
-      if ( neighbor->owner == entt::null && MapSystem::biome_inhabitable( neighbor->biome ) )
+      if ( neighbor->owner == entt::null && Map::Manager()->biome_inhabitable( neighbor->biome ) )
         return std::make_shared<vec2f>( neighbor->position );
     }
 

@@ -7,11 +7,11 @@
 
 #include "../entities/actor_entity.hpp"
 
+#include "../managers/map_manager.hpp"
+
 #include "../components/actor_component.hpp"
 #include "../components/player_component.hpp"
 
-
-#include "../systems/map_system.hpp"
 #include "../systems/movement_system.hpp"
 #include "../systems/province_system.hpp"
 #include "../systems/selection_system.hpp"
@@ -98,7 +98,7 @@ public:
         if ( 
           prov.tile->id == closest_tile && 
           prov.tile->owner == entt::null && 
-          MapSystem::biome_inhabitable(prov.tile->biome)
+          Map::Manager()->biome_inhabitable(prov.tile->biome)
       ) {
           return true;
         }

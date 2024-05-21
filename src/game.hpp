@@ -13,13 +13,9 @@
 #include "shared/common.hpp"
 #include "shared/save.hpp"
 
-#include "renderer/renderer.hpp"
-
 #include "signals/updates.hpp"
 
-#include "world/systems/map_system.hpp"
 #include "world/systems/player_system.hpp"
-#include "world/systems/selection_system.hpp"
 
 #include "campaign.hpp"
 #include <raylib.h>
@@ -370,7 +366,7 @@ class IGame {
 
         BeginDrawing();
         {
-          Renderer::draw_map( MapSystem::Manager()->mode );
+          Renderer::draw_map( Map::Manager()->mode );
           DrawRectangle(
             0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
           );

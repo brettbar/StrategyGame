@@ -27,14 +27,13 @@
 
 
 #include "world/managers/settlement_manager.hpp"
+#include "world/managers/map_manager.hpp"
 
 #include "world/components/player_component.hpp"
 
-#include "world/systems/actor_system.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/commands_system.hpp"
-#include "world/systems/map_system.hpp"
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
@@ -122,9 +121,9 @@ inline void Campaign::Start( str player_faction ) {
 
   PlayerSystem::create_players_for_sp( player_faction );
 
-  MapSystem::Manager()->Init();
+  Map::Manager()->Init();
 
-  Settlement::Manager()->on_start();
+ Settlement::Manager()->on_start();
   // Settlement::Init();
   ProvinceSystem::Init();
   Renderer::Init();
@@ -152,7 +151,7 @@ inline void Campaign::Load() {
 
   SaveSystem::Load();
   Settlement::Manager()->on_load();
-  MapSystem::Manager()->Init();
+  Map::Manager()->Init();
   Renderer::Init();
 
   Global::world.view<Settlement::Component>().each(
@@ -211,23 +210,23 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::draw_map( MapSystem::Manager()->mode );
+  Renderer::draw_map( Map::Manager()->mode );
 }
 
 inline void Campaign::CheckForUIInteractions() {
   auto change_map_mode = UI::Minimap();
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:
-      MapSystem::Manager()->mode = MapSystem::Mode::Default;
+      Map::Manager()->mode = Map::Mode::Default;
       break;
     case UI::Action_MapModeChange::Terrain:
-      MapSystem::Manager()->mode = MapSystem::Mode::Terrain;
+      Map::Manager()->mode = Map::Mode::Terrain;
       break;
     case UI::Action_MapModeChange::Political:
-      MapSystem::Manager()->mode = MapSystem::Mode::Political;
+      Map::Manager()->mode = Map::Mode::Political;
       break;
     case UI::Action_MapModeChange::Resources:
-      MapSystem::Manager()->mode = MapSystem::Mode::Resources;
+      Map::Manager()->mode = Map::Mode::Resources;
       break;
     default:
       break;
@@ -353,11 +352,11 @@ inline void Campaign::CheckForInput() {
   }
 
   if ( IsKeyPressed( KEY_P ) ) {
-    MapSystem::Manager()->mode = MapSystem::Mode::Political;
+    Map::Manager()->mode = Map::Mode::Political;
   }
 
   if ( IsKeyPressed( KEY_T ) ) {
-    MapSystem::Manager()->mode = MapSystem::Mode::Terrain;
+    Map::Manager()->mode = Map::Mode::Terrain;
   }
 }
 

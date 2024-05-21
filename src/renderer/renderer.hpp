@@ -2,12 +2,14 @@
 
 #include "../shared/common.hpp"
 
+#include "../world/managers/map_manager.hpp"
+
 #include "../world/components/animated_component.hpp"
 
 #include "../world/systems/settlement_system.hpp"
-#include "../world/systems/map_system.hpp"
 #include "../world/systems/overlay_system.hpp"
 #include "../world/systems/selection_system.hpp"
+#include "../world/systems/province_system.hpp"
 
 #include <raylib.h>
 
@@ -17,7 +19,7 @@ namespace Renderer {
   inline Shader outline_shader;
 
   inline void DrawActors( bool debug );
-  inline void draw_map( MapSystem::Mode );
+  inline void draw_map( Map::Mode );
 
 
   inline void Init() {
@@ -42,7 +44,7 @@ namespace Renderer {
   }
 
 
-  inline void draw_map( MapSystem::Mode map_mode ) {
+  inline void draw_map( Map::Mode map_mode ) {
     ClearBackground( DARKGRAY );
 
     BeginMode2D( Global::state.camera );
@@ -61,7 +63,7 @@ namespace Renderer {
     EndBlendMode();
 
     switch ( map_mode ) {
-      case MapSystem::Mode::Default:
+      case Map::Mode::Default:
         // Draw TransparentOverlay
 
         OverlaySystem::draw_default();
@@ -74,10 +76,10 @@ namespace Renderer {
 
         OverlaySystem::draw_settlement_name();
         break;
-      case MapSystem::Mode::Terrain:
+      case Map::Mode::Terrain:
         // Do nothing
         break;
-      case MapSystem::Mode::Political:
+      case Map::Mode::Political:
         // Draw OpaqueOverlay
 
         OverlaySystem::draw_political();
@@ -89,7 +91,7 @@ namespace Renderer {
         OverlaySystem::draw_settlement_name();
         EndShaderMode();
         break;
-      case MapSystem::Mode::Resources:
+      case Map::Mode::Resources:
         // Draw Resources
         BeginShaderMode( shader );
         {
@@ -106,16 +108,16 @@ namespace Renderer {
       BeginShaderMode( shader );
       {
         switch ( map_mode ) {
-          case MapSystem::Mode::Default:
+          case Map::Mode::Default:
             Settlement::System::draw( Global::texture_cache, false );
             break;
-          case MapSystem::Mode::Terrain:
+          case Map::Mode::Terrain:
             Settlement::System::draw( Global::texture_cache, false );
             break;
-          case MapSystem::Mode::Political:
+          case Map::Mode::Political:
             Settlement::System::draw( Global::texture_cache, false );
             break;
-          case MapSystem::Mode::Resources:
+          case Map::Mode::Resources:
             Settlement::System::draw( Global::texture_cache, false );
             break;
         }

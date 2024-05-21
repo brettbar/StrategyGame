@@ -6,8 +6,6 @@
 #include "../components/actor_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/player_component.hpp"
-#include "../components/province_component.hpp"
-#include "../components/settlement_component.hpp"
 
 #include "actor_system.hpp"
 #include "commands_system.hpp"

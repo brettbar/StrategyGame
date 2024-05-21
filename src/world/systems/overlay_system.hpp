@@ -5,12 +5,12 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 
+#include "../managers/map_manager.hpp"
+
 #include "../components/faction_component.hpp"
 #include "../components/player_component.hpp"
 #include "../components/settlement_component.hpp"
-
-#include "map_system.hpp"
-#include "province_system.hpp"
+#include "../components/province_component.hpp"
 
 #include <raylib.h>
 
@@ -30,7 +30,7 @@ namespace OverlaySystem {
       Faction::Component faction =
         Global::world.get<Faction::Component>( prov.tile->owner );
 
-      auto neighbors = MapSystem::Manager()->get_neighbors( *prov.tile );
+      auto neighbors = Map::Manager()->get_neighbors( *prov.tile );
 
       str primary = faction.colors.primary;
 
