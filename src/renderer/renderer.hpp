@@ -1,15 +1,13 @@
 #pragma once
 
 #include "../shared/common.hpp"
-#include "../shared/fonts.hpp"
-#include "../shared/textures.hpp"
 
 #include "../world/components/animated_component.hpp"
 
+#include "../world/systems/settlement_system.hpp"
 #include "../world/systems/map_system.hpp"
 #include "../world/systems/overlay_system.hpp"
 #include "../world/systems/selection_system.hpp"
-#include "../world/systems/settlement_system.hpp"
 
 #include <raylib.h>
 
@@ -94,7 +92,9 @@ namespace Renderer {
       case MapSystem::Mode::Resources:
         // Draw Resources
         BeginShaderMode( shader );
-        ResourceSystem::Draw( Global::state.camera );
+        {
+          ResourceSystem::Draw( Global::state.camera );
+        }
         EndShaderMode();
         break;
     }
@@ -107,16 +107,16 @@ namespace Renderer {
       {
         switch ( map_mode ) {
           case MapSystem::Mode::Default:
-            Settlement::System::Manager()->draw( Global::texture_cache, false );
+            Settlement::System::draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Terrain:
-            Settlement::System::Manager()->draw( Global::texture_cache, false );
+            Settlement::System::draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Political:
-            Settlement::System::Manager()->draw( Global::texture_cache, false );
+            Settlement::System::draw( Global::texture_cache, false );
             break;
           case MapSystem::Mode::Resources:
-            Settlement::System::Manager()->draw( Global::texture_cache, false );
+            Settlement::System::draw( Global::texture_cache, false );
             break;
         }
 

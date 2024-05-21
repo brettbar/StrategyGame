@@ -17,7 +17,6 @@
 #include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
-#include "interface/pages/editor.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 #include "network/network.hpp"
@@ -26,6 +25,8 @@
 
 #include "shared/common.hpp"
 
+
+#include "world/managers/settlement_manager.hpp"
 
 #include "world/components/player_component.hpp"
 
@@ -123,7 +124,7 @@ inline void Campaign::Start( str player_faction ) {
 
   MapSystem::Manager()->Init();
 
-  Settlement::System::Manager()->on_start();
+  Settlement::Manager()->on_start();
   // Settlement::Init();
   ProvinceSystem::Init();
   Renderer::Init();
@@ -150,14 +151,14 @@ inline void Campaign::Load() {
   }
 
   SaveSystem::Load();
-  Settlement::System::Manager()->on_load();
+  Settlement::Manager()->on_load();
   MapSystem::Manager()->Init();
   Renderer::Init();
 
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
       settlement.texture = LoadTextureFromImage(
-        Settlement::System::Manager()->building_map.at( "roman_m1" )
+        Settlement::Manager()->building_map.at( "roman_m1" )
       );
     }
   );
@@ -197,7 +198,7 @@ inline void Campaign::Update60TPS() {
 }
 
 inline void Campaign::Update1TPS() {
-  Settlement::System::Manager()->update_1tps();
+  Settlement::System::update_1tps();
 
   Global::state.day++;
 
@@ -430,7 +431,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
 inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
   switch ( cmd.type ) {
     case Commands::Type::BuildSettlement: {
-      Settlement::System::Manager()->spawn_settlement( cmd.entity );
+      Settlement::System::spawn_settlement( cmd.entity );
       return;
     }
     case Commands::Type::ClaimProvince: {
@@ -454,7 +455,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::ConstructBuilding: {
-      Settlement::System::Manager()->construct_building( cmd.msg );
+      Settlement::System::construct_building( cmd.msg );
       return;
     };
   }

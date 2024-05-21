@@ -4,6 +4,8 @@
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
 
+#include "../managers/settlement_manager.hpp"
+
 #include "../components/faction_component.hpp"
 #include "../components/province_component.hpp"
 #include "../components/settlement_component.hpp"
@@ -13,48 +15,10 @@
 
 namespace Settlement {
 
-
   class System {
 
 public:
-    std::map<std::string, Image> building_map;
-
-    static System *Manager() {
-      static System instance;
-      return &instance;
-    }
-
-    void on_start() {
-      Image buildings = LoadImageFromTexture(
-        Global::texture_cache[hstr{ "buildings" }]->texture
-      );
-
-      Image roman_m1 = ImageFromImage( buildings, { 0, 0, 16, 16 } );
-      Image roman_m2 = ImageFromImage( buildings, { 0, 16, 16, 16 } );
-      Image roman_m3 = ImageFromImage( buildings, { 0, 32, 16, 16 } );
-      Image roman_m4 = ImageFromImage( buildings, { 0, 48, 16, 16 } );
-
-      Image roman_s1 = ImageFromImage( buildings, { 16, 0, 16, 16 } );
-      Image roman_s2 = ImageFromImage( buildings, { 32, 0, 16, 16 } );
-      Image roman_s3 = ImageFromImage( buildings, { 48, 0, 16, 16 } );
-      Image roman_s4 = ImageFromImage( buildings, { 64, 0, 16, 16 } );
-
-      building_map.insert_or_assign( "roman_m1", ( roman_m1 ) );
-      building_map.insert_or_assign( "roman_m2", ( roman_m2 ) );
-      building_map.insert_or_assign( "roman_m3", ( roman_m3 ) );
-      building_map.insert_or_assign( "roman_m4", ( roman_m4 ) );
-
-      building_map.insert_or_assign( "roman_s1", ( roman_s1 ) );
-      building_map.insert_or_assign( "roman_s2", ( roman_s2 ) );
-      building_map.insert_or_assign( "roman_s3", ( roman_s3 ) );
-      building_map.insert_or_assign( "roman_s4", ( roman_s4 ) );
-    }
-
-    void on_load() {
-      on_start();
-    }
-
-    void update_1tps() {
+   static void update_1tps() {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
 
@@ -66,7 +30,7 @@ public:
       }
     }
 
-    void draw( TextureCache &cache, bool showOverlays ) {
+    static void draw( TextureCache &cache, bool showOverlays ) {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
 
@@ -124,7 +88,7 @@ public:
       };
     }
 
-    void spawn_settlement( entt::entity colonist_e ) {
+    static void spawn_settlement( entt::entity colonist_e ) {
       Actor::Component unit = Global::world.get<Actor::Component>( colonist_e );
 
       vec2f pos = unit.position;
@@ -155,7 +119,7 @@ public:
                   .growthRate = ( 40.0f - 10.0f ) / 200,
                   .carryingCapacity = 1000,
                 },
-              .texture = LoadTextureFromImage( building_map.at( "roman_m1" ) ),
+              .texture = LoadTextureFromImage( Manager()->building_map.at( "roman_m1" ) ),
             };
 
             Global::world.emplace<Settlement::Component>( entity, settlement );
@@ -167,7 +131,7 @@ public:
       }
     }
 
-    void construct_building( std::string building_name ) {
+    static void construct_building( std::string building_name ) {
       Settlement::Component &settlement =
         Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
         );
@@ -180,7 +144,7 @@ public:
     }
 
 
-    bool player_has_settlement( entt::entity owner ) {
+    static bool player_has_settlement( entt::entity owner ) {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
 
@@ -196,7 +160,7 @@ public:
     }
 
 private:
-    void update_settlement( Settlement::Component &settlement ) {
+    static void update_settlement( Settlement::Component &settlement ) {
       bool needs_sprawl_update = update_population( settlement );
 
       // Update Sprawl
@@ -224,10 +188,10 @@ private:
 
       // TODO maybe expensive?
       settlement.texture =
-        LoadTextureFromImage( building_map.at( "roman_m1" ) );
+        LoadTextureFromImage( Manager()->building_map.at( "roman_m1" ) );
     }
 
-    void update_resources( Settlement::Component &settlement ) {
+    static void update_resources( Settlement::Component &settlement ) {
       for ( Buildings::Building &building: settlement.buildings ) {
         switch ( building.type ) {
           case Buildings::Type::Gathering: {
@@ -241,7 +205,7 @@ private:
       }
     }
 
-    bool update_population( Settlement::Component &settlement ) {
+    static bool update_population( Settlement::Component &settlement ) {
       Settlement::Population &pop = settlement.population;
 
       int before = settlement.population.current / 100;

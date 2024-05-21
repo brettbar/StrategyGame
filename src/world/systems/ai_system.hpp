@@ -61,7 +61,7 @@ namespace AI {
       case Condition::HasProvince:
         return ProvinceSystem::player_has_province( ai_player );
       case Condition::HasSettlement:
-        return Settlement::System::Manager()->player_has_settlement( ai_player
+        return Settlement::System::player_has_settlement( ai_player
         );
     }
 
@@ -231,7 +231,7 @@ namespace AI {
 
     switch ( ai.current_goal ) {
       case Goal::None:
-        if ( !Settlement::System::Manager()->player_has_settlement( ai_player
+        if ( !Settlement::System::player_has_settlement( ai_player
              ) )
           ai.current_goal = Goal::EstablishSettlement;
 
