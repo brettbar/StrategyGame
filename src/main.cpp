@@ -85,15 +85,16 @@ int main() {
   // This call will block and run until the game exists
   Game()->MainLoop();
 
+  CloseWindow();// Close window and OpenGL context
+
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever
   UnloadShader( Renderer::shader );
   for ( auto resource: Global::texture_cache ) {
     UnloadTexture( resource.second->texture );
   }
-  Global::texture_cache.clear();
+  // Global::texture_cache.clear();
   SteamAPI_Shutdown();
-  CloseWindow();// Close window and OpenGL context
 
   return EXIT_SUCCESS;
 }

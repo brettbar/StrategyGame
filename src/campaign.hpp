@@ -64,11 +64,6 @@ struct Campaign {
     // Load();
   }
 
-  ~Campaign() {
-    Global::ClearRegistry();
-    // delete _command_queue;
-  }
-
   str GetLocalPlayerID();
 
   entt::entity GetLocalPlayerE();

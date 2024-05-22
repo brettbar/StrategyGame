@@ -95,7 +95,7 @@ class IGame {
       }
     }
 
-    ExitGameLoopCleanup();
+    ExitCampaignCleanup();
   }
 
   Campaign *GetCampaign() {
@@ -141,8 +141,7 @@ class IGame {
   void StartSingleplayerCampaign( str player_faction ) {
     _mode = Scene::Campaign;
 
-    if ( _campaign )
-      delete _campaign;
+    assert(_campaign == nullptr);
 
     _campaign = new struct Campaign( true );
     _campaign->Start( player_faction );
@@ -151,8 +150,7 @@ class IGame {
   void LoadSinglePlayerCampaign() {
     _mode = Scene::Campaign;
 
-    if ( _campaign )
-      delete _campaign;
+    assert(_campaign == nullptr);
 
     _campaign = new struct Campaign( true, "output.dat" );
     _campaign->Load();
@@ -245,7 +243,7 @@ class IGame {
   }
 
 
-  inline void CheckMenuToggle() {
+  void CheckMenuToggle() {
     if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
       // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
       //   InterfaceEvent::ID::ModalMenuToggle,
@@ -256,6 +254,11 @@ class IGame {
         _mode = Scene::ModalMenu;
       }
     }
+  }
+
+  void ExitToMainMenu() {
+    _mode = Scene::MainMenu;
+    ExitCampaignCleanup();
   }
   /*=============================================================
                         End: Shared
@@ -288,9 +291,8 @@ class IGame {
           case UI::Action_MainMenu::Settings:
             break;
           case UI::Action_MainMenu::ExitGame:
-            // TODO probably dont wanna do this so brute force
-            CloseWindow();
-            break;
+            ExitGame();
+            return;
           case UI::Action_MainMenu::None:
             break;
         }
@@ -359,7 +361,7 @@ class IGame {
           case UI::Action_ModalMenu::Settings:
             break;
           case UI::Action_ModalMenu::ExitToMainMenu:
-            _mode = Scene::MainMenu;
+            ExitToMainMenu();
             break;
           case UI::Action_ModalMenu::ExitGame:
             break;
@@ -431,19 +433,15 @@ class IGame {
     }
   }
 
-  void ExitGameLoopCleanup() {
-    if ( Network::is_host )
-      Network::Host()->Delete();
-    else
-      Network::Client()->Delete();
+  void ExitCampaignCleanup() {
+    // if ( Network::is_host )
+    //   Network::Host()->Delete();
+    // else
+    //   Network::Client()->Delete();
 
     if ( _campaign )
       delete _campaign;
-
-    delete this;
   }
-
-  void RegisterEventListeners();
 };
 
 // inline void IGame::RegisterEventListeners() {

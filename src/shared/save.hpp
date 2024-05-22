@@ -40,7 +40,8 @@ namespace SaveSystem {
           Settlement::Component,
           Actor::Component,
           Animated::Component,
-          Sight::Component>( output );
+          Sight::Component
+        >( output );
 
       // printf( "%u\n", (int) source.size() );
     }
@@ -66,7 +67,8 @@ namespace SaveSystem {
           Settlement::Component,
           Actor::Component,
           Animated::Component,
-          Sight::Component>( input );
+          Sight::Component
+        >( input );
 
       // printf( "%u\n", (int) Global::world.size() );
     }
