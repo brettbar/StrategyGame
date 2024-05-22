@@ -11,7 +11,6 @@
 
 #include "network/network.hpp"
 #include "shared/common.hpp"
-#include "shared/save.hpp"
 
 #include "signals/updates.hpp"
 
@@ -136,7 +135,7 @@ class IGame {
     assert(_campaign == nullptr);
 
     _campaign = new struct Campaign( true );
-    _campaign->Start( player_faction );
+    _campaign->start( player_faction );
   }
 
   void LoadSinglePlayerCampaign() {
@@ -145,9 +144,8 @@ class IGame {
     assert(_campaign == nullptr);
 
     _campaign = new struct Campaign( true, "output.dat" );
-    _campaign->Load();
+    _campaign->load();
   }
-
   /*=============================================================
                         End: Singleplayer
   =============================================================*/
@@ -252,9 +250,6 @@ class IGame {
     _mode = Scene::MainMenu;
     ExitCampaignCleanup();
   }
-  /*=============================================================
-                        End: Shared
-  =============================================================*/
 
   void UpdateOnFrame() {
     if ( Network::is_host ) {
@@ -345,7 +340,7 @@ class IGame {
           case UI::Action_ModalMenu::None:
             break;
           case UI::Action_ModalMenu::SaveGame:
-            SaveSystem::Save();
+            _campaign->save();
             break;
           case UI::Action_ModalMenu::LoadGame:
             LoadSinglePlayerCampaign();
@@ -404,7 +399,7 @@ class IGame {
               // MapSystem::Init();
               if ( _campaign )
                 //@todo actualyl pass in the faction
-                _campaign->Start( "romans" );
+                _campaign->start( "romans" );
               break;
           }
         }
@@ -435,6 +430,9 @@ class IGame {
     if ( _campaign )
       delete _campaign;
   }
+  /*=============================================================
+                        End: Shared
+  =============================================================*/
 };
 
 // inline void IGame::RegisterEventListeners() {

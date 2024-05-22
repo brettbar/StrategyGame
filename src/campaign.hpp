@@ -14,6 +14,7 @@
 #pragma once
 
 
+#include <cereal/archives/binary.hpp>
 #include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
@@ -21,7 +22,6 @@
 #include "network/host.hpp"
 #include "network/network.hpp"
 #include "shared/global.hpp"
-#include "shared/save.hpp"
 
 #include "shared/common.hpp"
 
@@ -68,8 +68,9 @@ struct Campaign {
 
   entt::entity GetLocalPlayerE();
 
-  void Start( str );
-  void Load();
+  void start( str );
+  void save();
+  void load();
   void CheckForInput();
   void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
@@ -103,24 +104,50 @@ inline str Campaign::GetLocalPlayerID() {
   }
 }
 
-inline void Campaign::Start( str player_faction ) {
-  // Initialize manager singletons
-  // Order matters here
+inline void Campaign::save() {
+  printf( "Saving to output\n" );
 
+  std::ofstream file( "output.dat", std::ios::binary );
+  {
+    cereal::BinaryOutputArchive output{ file };
+
+    entt::snapshot{ Global::world }
+      .entities( output )
+      .component<
+        Player::Component,
+        Faction::Component,
+        Tile::Component,
+        Province::Component,
+        Settlement::Component,
+        Actor::Component,
+        Animated::Component,
+        Sight::Component
+      >( output );
+
+    // printf( "%u\n", (int) source.size() );
+  }
+  file.close();
+}
+
+inline void common_start() {
   Global::ClearRegistry();
   Renderer::Init();
 
-  {
-    Faction::Manager::Get();
-    Actor::Manager::Get();
-  }
-
-  PlayerSystem::create_players_for_sp( player_faction );
+  // Initialize manager singletons
+  // Order matters here
+  Faction::Manager::Get();
+  Actor::Manager::Get();
 
   Map::Manager()->Init();
   Settlement::Manager()->on_start();
-  ProvinceSystem::Init();
+}
 
+inline void Campaign::start( str player_faction ) {
+  common_start();
+
+
+  PlayerSystem::create_players_for_sp( player_faction );
+  ProvinceSystem::Init();
   Actor::System::Init();
   AI::Start();
 
@@ -130,21 +157,32 @@ inline void Campaign::Start( str player_faction ) {
     .connect<&Campaign::EvaluteCommands>( this );
 }
 
-inline void Campaign::Load() {
-  // Initialize manager singletons
-  // Order matters here
+inline void Campaign::load() {
+  common_start();
 
-  Global::ClearRegistry();
-  Renderer::Init();
+  printf( "Loading from output\n" );
 
+
+  std::ifstream file( "output.dat", std::ios::binary );
   {
-    Faction::Manager::Get();
-    Actor::Manager::Get();
-  }
+    cereal::BinaryInputArchive input{ file };
 
-  Map::Manager()->Init();
-  Settlement::Manager()->on_load();
-  SaveSystem::Load();
+    entt::snapshot_loader{ Global::world }
+      .entities( input )
+      .component<
+        // Player::Component,
+        // Faction::Component,
+        Tile::Component,
+        Province::Component,
+        // Settlement::Component,
+        Actor::Component,
+        Animated::Component,
+        Sight::Component
+      >( input );
+
+    // printf( "%u\n", (int) Global::world.size() );
+  }
+  file.close();
 
   // Actor::System::Init();
   // AI::Start();

@@ -4,6 +4,8 @@
 
 #include "actor_component.hpp"
 
+#include <cereal/types/vector.hpp>
+
 namespace Faction {
 
   enum class Mobility_t {
@@ -129,7 +131,7 @@ namespace Faction {
 
       template<class Archive>
       void serialize(Archive &ar) {
-        ar(CEREAL_NVP(actors));
+        ar( actors );
       }
     } roster;
 
