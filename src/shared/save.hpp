@@ -35,6 +35,7 @@ namespace SaveSystem {
         .component<
           Player::Component,
           Faction::Component,
+          Tile::Component,
           Province::Component,
           Settlement::Component,
           Actor::Component,
@@ -60,6 +61,7 @@ namespace SaveSystem {
         .component<
           Player::Component,
           Faction::Component,
+          Tile::Component,
           Province::Component,
           Settlement::Component,
           Actor::Component,

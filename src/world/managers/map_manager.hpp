@@ -77,7 +77,6 @@ public:
           position = { xPos, yPos };
 
         Tile::Component tile = {
-          .owner = entt::null,
           .id = i,
           .noise = elevation,
           .position = position,

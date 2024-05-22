@@ -30,6 +30,7 @@ namespace Tile {
     template<class Archive>
     void serialize( Archive &ar ) {
       ar(
+        owner,
         id,
         noise,
         position.x,
