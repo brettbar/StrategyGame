@@ -3,9 +3,9 @@
 #include "../include/entt/entt.hpp"
 
 #include "../world/components/actor_component.hpp"
-#include "../world/components/ai_component.hpp"
 #include "../world/components/animated_component.hpp"
 #include "../world/components/player_component.hpp"
+#include "../world/components/faction_component.hpp"
 #include "../world/components/province_component.hpp"
 #include "../world/components/settlement_component.hpp"
 #include "../world/components/sight_component.hpp"
@@ -34,6 +34,7 @@ namespace SaveSystem {
         .entities( output )
         .component<
           Player::Component,
+          Faction::Component,
           Province::Component,
           Settlement::Component,
           Actor::Component,
@@ -58,6 +59,7 @@ namespace SaveSystem {
         .entities( input )
         .component<
           Player::Component,
+          Faction::Component,
           Province::Component,
           Settlement::Component,
           Actor::Component,

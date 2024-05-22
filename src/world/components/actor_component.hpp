@@ -60,7 +60,7 @@ namespace Actor {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( type_as_str( type ), actor_id, name, faction_id, sprite_id );
+      ar( type, actor_id, name, faction_id, sprite_id );
     }
   };
 

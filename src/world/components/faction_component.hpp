@@ -3,7 +3,6 @@
 #include "../../shared/common.hpp"
 
 #include "actor_component.hpp"
-#include "cereal/details/helpers.hpp"
 
 namespace Faction {
 
@@ -103,7 +102,7 @@ namespace Faction {
       template<class Archive>
       void serialize( Archive &ar ) {
         ar(
-          gov_as_str( start_gov ),
+          start_gov,
           empire_name,
           empire_leader_title,
           republic_name,
@@ -120,13 +119,18 @@ namespace Faction {
 
       template<class Archive>
       void serialize( Archive &ar ) {
-        ar( as_str( type ) );
+        ar( type );
       }
 
     } mobility;
 
     struct Roster {
       map<Actor::Type, Actor::Data> actors;
+
+      template<class Archive>
+      void serialize(Archive &ar) {
+        ar(CEREAL_NVP(actors));
+      }
     } roster;
 
 
@@ -137,7 +141,7 @@ namespace Faction {
       culture.serialize( ar );
       government.serialize( ar );
       mobility.serialize( ar );
-      ar( CEREAL_NVP( roster.actors ) );
+      roster.serialize(ar);
     }
   };
 

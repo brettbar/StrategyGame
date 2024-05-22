@@ -147,6 +147,17 @@ class IGame {
     _campaign = new struct Campaign( true );
     _campaign->Start( player_faction );
   }
+
+  void LoadSinglePlayerCampaign() {
+    _mode = Scene::Campaign;
+
+    if ( _campaign )
+      delete _campaign;
+
+    _campaign = new struct Campaign( true, "output.dat" );
+    _campaign->Load();
+  }
+
   /*=============================================================
                         End: Singleplayer
   =============================================================*/
@@ -222,16 +233,6 @@ class IGame {
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadSinglePlayerCampaign() {
-    _mode = Scene::Campaign;
-
-    if ( _campaign )
-      delete _campaign;
-
-    _campaign = new struct Campaign( "output.dat" );
-    _campaign->Load();
-  }
-
 
   void ExitGame() {
     _hit_exit = true;

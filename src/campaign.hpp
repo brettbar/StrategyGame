@@ -113,6 +113,7 @@ inline void Campaign::Start( str player_faction ) {
   // Order matters here
 
   Global::ClearRegistry();
+  Renderer::Init();
 
   {
     Faction::Manager::Get();
@@ -122,17 +123,13 @@ inline void Campaign::Start( str player_faction ) {
   PlayerSystem::create_players_for_sp( player_faction );
 
   Map::Manager()->Init();
-
- Settlement::Manager()->on_start();
-  // Settlement::Init();
+  Settlement::Manager()->on_start();
   ProvinceSystem::Init();
-  Renderer::Init();
 
   Actor::System::Init();
   AI::Start();
 
   Commands::Manager()->init();
-
   Commands::Manager()
     ->queue.sink<Commands::Command>()
     .connect<&Campaign::EvaluteCommands>( this );
@@ -143,16 +140,19 @@ inline void Campaign::Load() {
   // Order matters here
 
   Global::ClearRegistry();
+  Renderer::Init();
 
   {
     Faction::Manager::Get();
     Actor::Manager::Get();
   }
 
-  SaveSystem::Load();
-  Settlement::Manager()->on_load();
   Map::Manager()->Init();
-  Renderer::Init();
+  Settlement::Manager()->on_load();
+  SaveSystem::Load();
+
+  // Actor::System::Init();
+  // AI::Start();
 
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
