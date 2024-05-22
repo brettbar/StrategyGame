@@ -122,14 +122,6 @@ class IGame {
   // TODO this should be set from networking
   // std::string player_id = "player_0";
 
-  IGame( IGame const & ) = delete;
-  void operator=( const IGame & ) = delete;
-
-  IGame() {}
-  ~IGame() {
-    delete _campaign;
-  }
-
   bool ShouldRun() {
     return !_hit_exit;
   }
@@ -364,7 +356,8 @@ class IGame {
             ExitToMainMenu();
             break;
           case UI::Action_ModalMenu::ExitGame:
-            break;
+            ExitGame();
+            return;
         }
 
         BeginDrawing();
