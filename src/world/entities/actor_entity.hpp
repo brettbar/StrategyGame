@@ -29,8 +29,7 @@ namespace Actor {
     };
 
     Animated::Component animated = {
-      .sprite =
-        Global::texture_cache[hstr{ actor.data.sprite_id.c_str() }]->texture,
+      .sprite_id = actor.data.sprite_id,
       .frameRec = { 0, 0, 128, 128 },
       .state = Animated::AnimState::IDLE_DR,
       .animations = animations,
@@ -72,8 +71,7 @@ namespace Actor {
     };
 
     Animated::Component animated = {
-      .sprite =
-        Global::texture_cache[hstr{ actor.data.sprite_id.c_str() }]->texture,
+      .sprite_id = actor.data.sprite_id,
       .frameRec = { 0, 0, 128, 128 },
       .state = Animated::AnimState::IDLE_DR,
       .animations = animations,

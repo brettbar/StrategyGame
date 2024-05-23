@@ -162,22 +162,30 @@ namespace Renderer {
 
 
       if ( actor.selected ) {
+        Texture2D texture = Global::texture_cache[hstr{anim.sprite_id.c_str()}]->texture;
+
         BeginShaderMode( outline_shader );
-        DrawTextureRec(
-          anim.sprite,
-          anim.frameRec,
-          { actor.position.x - 64.0f, actor.position.y - 64.0f },
-          WHITE
-        );
+        {
+          DrawTextureRec(
+            texture,
+            anim.frameRec,
+            { actor.position.x - 64.0f, actor.position.y - 64.0f },
+            WHITE
+          );
+        }
         EndShaderMode();
       } else {
+        Texture2D texture = Global::texture_cache[hstr{anim.sprite_id.c_str()}]->texture;
+
         BeginShaderMode( shader );
-        DrawTextureRec(
-          anim.sprite,
-          anim.frameRec,
-          { actor.position.x - 64.0f, actor.position.y - 64.0f },
-          WHITE
-        );
+        {
+          DrawTextureRec(
+            texture,
+            anim.frameRec,
+            { actor.position.x - 64.0f, actor.position.y - 64.0f },
+            WHITE
+          );
+        }
         EndShaderMode();
       }
 

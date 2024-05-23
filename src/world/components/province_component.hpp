@@ -3,6 +3,7 @@
 #include "../../data/resources.hpp"
 #include "../../shared/common.hpp"
 #include "tile_component.hpp"
+
 #include <cereal/types/vector.hpp>
 
 namespace Province {
@@ -15,8 +16,10 @@ namespace Province {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( selected, tile, CEREAL_NVP( resources ) );
+      ar( selected, CEREAL_NVP(tile), CEREAL_NVP( resources ) );
     }
   };
+
+
 
 }// namespace Province

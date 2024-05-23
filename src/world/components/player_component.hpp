@@ -2,6 +2,8 @@
 
 #include "../../shared/common.hpp"
 
+#include <cereal/types/common.hpp>
+
 namespace Player {
 
   struct LocalTag {};
@@ -14,7 +16,7 @@ namespace Player {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( id, player_id, is_human );
+      ar( CEREAL_NVP(id), CEREAL_NVP(player_id), is_human );
     }
   };
 

@@ -3,6 +3,8 @@
 #include "../../data/biomes.hpp"
 #include "../../shared/common.hpp"
 
+#include <cereal/types/common.hpp>
+
 namespace Tile {
 
   enum class Visibility {
@@ -30,8 +32,8 @@ namespace Tile {
     template<class Archive>
     void serialize( Archive &ar ) {
       ar(
-        owner,
-        id,
+        CEREAL_NVP(owner),
+        cereal::make_nvp("tile_id", id),
         noise,
         position.x,
         position.y,

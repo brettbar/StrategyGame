@@ -14,7 +14,6 @@
 #pragma once
 
 
-#include <cereal/archives/binary.hpp>
 #include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
@@ -49,6 +48,12 @@
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include <raylib.h>
 
+// If you ever get strange compile time errors from cereal
+// Its probably because you didnt include a type 
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/unordered_map.hpp>
 
 struct Campaign {
   Campaign( bool is_singleplayer ) {
@@ -107,24 +112,52 @@ inline str Campaign::GetLocalPlayerID() {
 inline void Campaign::save() {
   printf( "Saving to output\n" );
 
-  std::ofstream file( "output.dat", std::ios::binary );
+  std::ofstream jfile( "output.json" );
   {
-    cereal::BinaryOutputArchive output{ file };
+    cereal::JSONOutputArchive output{ jfile };
 
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<
-        Player::Component,
-        Faction::Component,
-        Tile::Component,
-        Province::Component,
-        Settlement::Component,
-        Actor::Component,
-        Animated::Component,
-        Sight::Component
-      >( output );
+      .component<Player::Component>(output)
+      .component<Faction::Component>(output)
+      .component<Actor::Component>(output)
+      .component<Animated::Component>(output)
+      .component<Tile::Component>(output)
+      .component<Province::Component>(output);
+      // .component<
+      //   Faction::Component,
+      //   Tile::Component
+      //   Province::Component
+      //   Settlement::Component,
+      //   Actor::Component,
+      //   Animated::Component,
+      //   Sight::Component
+      // >( output );
 
     // printf( "%u\n", (int) source.size() );
+  }
+  jfile.close();
+
+  std::ofstream file( "output.dat", std::ios::binary );
+  {
+    cereal::BinaryOutputArchive output{ file };
+    
+    entt::snapshot{ Global::world }
+      .entities( output )
+      .component<Player::Component>(output)
+      .component<Faction::Component>(output)
+      .component<Actor::Component>(output)
+      .component<Animated::Component>(output)
+      .component<Tile::Component>(output)
+      .component<Province::Component>(output);
+      //   Actor::Component,
+      // .component<
+      //   Tile::Component
+      //   Province::Component
+      //   Settlement::Component,
+      //   Animated::Component,
+      //   Sight::Component
+      // >( output );
   }
   file.close();
 }
@@ -145,7 +178,6 @@ inline void common_start() {
 inline void Campaign::start( str player_faction ) {
   common_start();
 
-
   PlayerSystem::create_players_for_sp( player_faction );
   ProvinceSystem::Init();
   Actor::System::Init();
@@ -162,23 +194,20 @@ inline void Campaign::load() {
 
   printf( "Loading from output\n" );
 
-
   std::ifstream file( "output.dat", std::ios::binary );
   {
     cereal::BinaryInputArchive input{ file };
 
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<
-        // Player::Component,
-        // Faction::Component,
-        Tile::Component,
-        Province::Component,
+      .component<Player::Component>(input)
+      .component<Faction::Component>(input)
+      .component<Actor::Component>(input)
+      .component<Animated::Component>(input)
+      .component<Tile::Component>(input)
+      .component<Province::Component>(input);
         // Settlement::Component,
-        Actor::Component,
-        Animated::Component,
-        Sight::Component
-      >( input );
+        // Sight::Component
 
     // printf( "%u\n", (int) Global::world.size() );
   }

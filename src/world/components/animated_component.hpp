@@ -28,7 +28,8 @@ struct Anim {
 using Animations = std::vector<Anim>;
 
 struct Component {
-  Texture2D sprite;
+  // Texture2D sprite;
+  str sprite_id;
   Rectangle frameRec;
   AnimState state;
   Animations animations;
@@ -40,28 +41,25 @@ struct Component {
   template<class Archive>
   void serialize( Archive &ar ) {
     ar(
-      sprite.id,
-      sprite.width,
-      sprite.height,
-      sprite.mipmaps,
-      sprite.format,
+      CEREAL_NVP(sprite_id),
+      // CEREAL_NVP(sprite.id),
+      // CEREAL_NVP(sprite.width),
+      // CEREAL_NVP(sprite.height),
+      // CEREAL_NVP(sprite.mipmaps),
+      // CEREAL_NVP(sprite.format),
       frameRec.x,
       frameRec.y,
       frameRec.width,
       frameRec.height,
       state,
-      animations,
       direction,
       currFrame,
       animTime,
       moving
     );
+    ar( CEREAL_NVP( animations ) );
   }
 
-  template<class Archive>
-  void serialize( Archive &ar, Animations &anims ) {
-    ar( CEREAL_NVP( anims ) );
-  }
 };
 
 }// namespace Animated

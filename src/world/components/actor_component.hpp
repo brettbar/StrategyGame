@@ -6,6 +6,8 @@
 
 #include "../../shared/common.hpp"
 
+#include <cereal/types/common.hpp>
+
 namespace Actor {
 
   enum class Type {
@@ -60,7 +62,7 @@ namespace Actor {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( type, actor_id, name, faction_id, sprite_id );
+      ar( type, CEREAL_NVP(actor_id), name, CEREAL_NVP(faction_id), CEREAL_NVP(sprite_id) );
     }
   };
 
@@ -75,7 +77,7 @@ namespace Actor {
 
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( owner, position.x, position.y, destination.x, destination.y, speed );
+      ar( CEREAL_NVP(owner), position.x, position.y, destination.x, destination.y, speed );
       data.serialize( ar );
     }
   };

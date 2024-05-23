@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
 
 #include "../components/actor_component.hpp"
 #include "../components/animated_component.hpp"
 
-#include "movement_system.hpp"
 
 #include <raylib.h>
 
@@ -26,8 +26,10 @@ namespace AnimationSystem {
     animated_actors.each( [debug](
                             Actor::Component &actor, Animated::Component &anim
                           ) {
+      Texture2D texture = Global::texture_cache[hstr{anim.sprite_id.c_str()}]->texture;
+
       DrawTextureRec(
-        anim.sprite,
+        texture,
         anim.frameRec,
         { actor.position.x - 64.0f, actor.position.y - 64.0f },
         WHITE
