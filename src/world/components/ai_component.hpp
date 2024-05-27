@@ -117,6 +117,11 @@ The ultimate final goal a player will have is to become the most
     bool executing_plan = false;
     // bool has_colonist = false;
     // bool has_settlement = false;
+
+    template<class Archive>
+    void serialize( Archive &ar ) {
+      ar( current_goal );
+    }
   };
 
   inline Action get_action( Action_t type ) {

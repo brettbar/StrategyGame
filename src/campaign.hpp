@@ -123,18 +123,9 @@ inline void Campaign::save() {
       .component<Actor::Component>(output)
       .component<Animated::Component>(output)
       .component<Tile::Component>(output)
-      .component<Province::Component>(output);
-      // .component<
-      //   Faction::Component,
-      //   Tile::Component
-      //   Province::Component
-      //   Settlement::Component,
-      //   Actor::Component,
-      //   Animated::Component,
-      //   Sight::Component
-      // >( output );
-
-    // printf( "%u\n", (int) source.size() );
+      .component<Province::Component>(output)
+      .component<Settlement::Component>(output)
+      .component<AI::Component>(output);
   }
   jfile.close();
 
@@ -149,15 +140,9 @@ inline void Campaign::save() {
       .component<Actor::Component>(output)
       .component<Animated::Component>(output)
       .component<Tile::Component>(output)
-      .component<Province::Component>(output);
-      //   Actor::Component,
-      // .component<
-      //   Tile::Component
-      //   Province::Component
-      //   Settlement::Component,
-      //   Animated::Component,
-      //   Sight::Component
-      // >( output );
+      .component<Province::Component>(output)
+      .component<Settlement::Component>(output)
+      .component<AI::Component>(output);
   }
   file.close();
 }
@@ -205,8 +190,9 @@ inline void Campaign::load() {
       .component<Actor::Component>(input)
       .component<Animated::Component>(input)
       .component<Tile::Component>(input)
-      .component<Province::Component>(input);
-        // Settlement::Component,
+      .component<Province::Component>(input)
+      .component<Settlement::Component>(input)
+      .component<AI::Component>(input);
         // Sight::Component
 
     // printf( "%u\n", (int) Global::world.size() );
