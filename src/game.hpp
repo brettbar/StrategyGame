@@ -132,16 +132,12 @@ class IGame {
   void StartSingleplayerCampaign( str player_faction ) {
     _mode = Scene::Campaign;
 
-    assert(_campaign == nullptr);
-
     _campaign = new struct Campaign( true );
     _campaign->start( player_faction );
   }
 
   void LoadSinglePlayerCampaign() {
     _mode = Scene::Campaign;
-
-    assert(_campaign == nullptr);
 
     _campaign = new struct Campaign( true, "output.dat" );
     _campaign->load();
