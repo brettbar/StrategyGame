@@ -3,16 +3,14 @@
 #pragma once
 
 #include "resources.hpp"
-#include "settlement.hpp"
+#include <cereal/types/vector.hpp>
 #include <map>
 #include <string>
 #include <vector>
 
-namespace Buildings
-{
+namespace Buildings {
 
-  enum class Type
-  {
+  enum class Type {
     Gathering,
     Processing,
     Producton,
@@ -20,8 +18,7 @@ namespace Buildings
 
   using Recipe = std::map<std::string, std::vector<std::string>>;
 
-  enum class BuildingName
-  {
+  enum class BuildingName {
     // Gathering
     WoodCutter,// nc
     Farm,
@@ -48,14 +45,18 @@ namespace Buildings
     Tailor,
   };
 
-  struct Building
-  {
+  struct Building {
     BuildingName name;
     Type type;
     std::string name_str;
 
     std::vector<Resources::RawMaterial> producing;
     std::vector<Resources::Natural> consuming;
+
+    template<class Archive>
+    void serialize( Archive &ar ) {
+      ar( name, type, name_str, producing, consuming );
+    }
   };
 
 };// namespace Buildings

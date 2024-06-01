@@ -6,9 +6,9 @@
 #include "../../data/settlement.hpp"
 
 #include "regiment_component.hpp"
-#include "unit_component.hpp"
 
 #include <cereal/types/common.hpp>
+#include <cereal/types/vector.hpp>
 
 namespace Settlement {
 
@@ -29,18 +29,13 @@ namespace Settlement {
     // TOOD might need separate save/load functions for this one
     template<class Archive>
     void serialize( Archive &ar ) {
-      ar( id, name, development, population );
+      ar( id, name, development, population, buildings );
     }
 
     template<class Archive>
     void serialize( Archive &ar, Population &pop ) {
       ar( pop );
     }
-
-    // template<class Archive>
-    // void serialize( Archive &ar, Texture2D &tex ) {
-    //   ar( tex.id, tex.width, tex.height, tex.mipmaps, tex.format );
-    // }
   };
 
 
