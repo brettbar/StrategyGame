@@ -4,6 +4,7 @@
 #include "../../shared/utils.hpp"
 
 #include "../components/province_component.hpp"
+#include "../components/settlement_component.hpp"
 
 namespace ResourceSystem {
 
@@ -82,6 +83,39 @@ namespace ResourceSystem {
       );
     }
   }
+
+  inline void DrawRawMaterial(
+    Province::Component &prov,
+    Settlement::Component &settlement
+  ) {
+    if ( settlement.raw_materials.size() == 0 )
+      return;
+
+    for ( auto raw_material_pair: settlement.raw_materials ) {
+      Resources::RawMaterial raw_material = raw_material_pair.first;
+
+      DrawCircle(
+        prov.tile->position.x + 32, prov.tile->position.y + 32, 16, BLACK
+      );
+
+      hstr id = {};
+      switch ( raw_material ) {
+        case Resources::RawMaterial::Wheat:
+          id = "wheat.png";
+          break;
+        default:
+          return;
+      }
+
+      DrawTexture(
+        Global::texture_cache[id]->texture,
+        prov.tile->position.x + 16,
+        prov.tile->position.y + 16,
+        WHITE
+      );
+    }
+  }
+
   inline void Draw( Camera2D &camera ) {
     // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
     for ( auto entity: Global::world.view<Province::Component>() ) {
@@ -97,6 +131,12 @@ namespace ResourceSystem {
            prov.tile->position.y + TILE_WIDTH <
              camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
         continue;
+      }
+
+      auto settlement = Global::world.try_get<Settlement::Component>( entity );
+
+      if ( settlement ) {
+        DrawRawMaterial( prov, *settlement );
       }
 
       DrawResource( prov );

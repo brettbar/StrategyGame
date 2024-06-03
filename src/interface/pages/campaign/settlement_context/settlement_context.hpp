@@ -19,15 +19,16 @@ namespace UI {
   };
 
   inline Action_SettlementContext SettlementContext(
+    // Element *root_g,
     Faction::Component faction,
     Settlement::Component *settlement
   ) {
     auto f = Iron::Forge();
 
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f->Grid( root_r, 4, 3 );
+    auto root_g = f->Grid( root_r, 4, 4 );
 
-    auto context_g = f->Grid( root_g->Slots( 9, 10 ), 1, 5 );
+    auto context_g = f->Grid( root_g->Slots( 13, 14 ), 1, 5 );
 
     auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
     f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );
@@ -44,11 +45,11 @@ namespace UI {
 
     auto tabs_g = f->Grid( content_g->Col( 0 ), 1, 5 );
     auto tab_btns = {
-      f->TextButton( tabs_g->Slot( 0 ), "Population", BLUE ),
-      f->TextButton( tabs_g->Slot( 1 ), "Construction", YELLOW ),
-      f->TextButton( tabs_g->Slot( 2 ), "Resources", GREEN ),
-      f->TextButton( tabs_g->Slot( 3 ), "Military", RED ),
-      f->TextButton( tabs_g->Slot( 4 ), "Agents", PURPLE ),
+      f->TextButton( tabs_g->Slot( 0 ), "Population", GRAY ),
+      f->TextButton( tabs_g->Slot( 1 ), "Construction", GRAY ),
+      f->TextButton( tabs_g->Slot( 2 ), "Resources", GRAY ),
+      f->TextButton( tabs_g->Slot( 3 ), "Military", GRAY ),
+      f->TextButton( tabs_g->Slot( 4 ), "Agents", GRAY ),
     };
 
     auto tabs = f->Tabs( tab_btns );

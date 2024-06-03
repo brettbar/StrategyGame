@@ -18,7 +18,7 @@ namespace Settlement {
   class System {
 
 public:
-   static void update_1tps() {
+    static void update_1tps() {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
 
@@ -119,7 +119,9 @@ public:
                   .growthRate = ( 40.0f - 10.0f ) / 200,
                   .carryingCapacity = 1000,
                 },
-              .texture = LoadTextureFromImage( Manager()->building_map.at( "roman_m1" ) ),
+              .texture =
+                LoadTextureFromImage( Manager()->building_map.at( "roman_m1" )
+                ),
             };
 
             Global::world.emplace<Settlement::Component>( entity, settlement );

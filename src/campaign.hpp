@@ -25,8 +25,8 @@
 #include "shared/common.hpp"
 
 
-#include "world/managers/settlement_manager.hpp"
 #include "world/managers/map_manager.hpp"
+#include "world/managers/settlement_manager.hpp"
 
 #include "world/components/player_component.hpp"
 
@@ -49,9 +49,9 @@
 #include <raylib.h>
 
 // If you ever get strange compile time errors from cereal
-// Its probably because you didnt include a type 
-#include <cereal/archives/json.hpp>
+// Its probably because you didnt include a type
 #include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/unordered_map.hpp>
 
@@ -118,31 +118,31 @@ inline void Campaign::save() {
 
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Player::Component>(output)
-      .component<Faction::Component>(output)
-      .component<Actor::Component>(output)
-      .component<Animated::Component>(output)
-      .component<Tile::Component>(output)
-      .component<Province::Component>(output)
-      .component<Settlement::Component>(output)
-      .component<AI::Component>(output);
+      .component<Player::Component>( output )
+      .component<Faction::Component>( output )
+      .component<Actor::Component>( output )
+      .component<Animated::Component>( output )
+      .component<Tile::Component>( output )
+      .component<Province::Component>( output )
+      .component<Settlement::Component>( output )
+      .component<AI::Component>( output );
   }
   jfile.close();
 
   std::ofstream file( "output.dat", std::ios::binary );
   {
     cereal::BinaryOutputArchive output{ file };
-    
+
     entt::snapshot{ Global::world }
       .entities( output )
-      .component<Player::Component>(output)
-      .component<Faction::Component>(output)
-      .component<Actor::Component>(output)
-      .component<Animated::Component>(output)
-      .component<Tile::Component>(output)
-      .component<Province::Component>(output)
-      .component<Settlement::Component>(output)
-      .component<AI::Component>(output);
+      .component<Player::Component>( output )
+      .component<Faction::Component>( output )
+      .component<Actor::Component>( output )
+      .component<Animated::Component>( output )
+      .component<Tile::Component>( output )
+      .component<Province::Component>( output )
+      .component<Settlement::Component>( output )
+      .component<AI::Component>( output );
   }
   file.close();
 }
@@ -185,15 +185,15 @@ inline void Campaign::load() {
 
     entt::snapshot_loader{ Global::world }
       .entities( input )
-      .component<Player::Component>(input)
-      .component<Faction::Component>(input)
-      .component<Actor::Component>(input)
-      .component<Animated::Component>(input)
-      .component<Tile::Component>(input)
-      .component<Province::Component>(input)
-      .component<Settlement::Component>(input)
-      .component<AI::Component>(input);
-        // Sight::Component
+      .component<Player::Component>( input )
+      .component<Faction::Component>( input )
+      .component<Actor::Component>( input )
+      .component<Animated::Component>( input )
+      .component<Tile::Component>( input )
+      .component<Province::Component>( input )
+      .component<Settlement::Component>( input )
+      .component<AI::Component>( input );
+    // Sight::Component
 
     // printf( "%u\n", (int) Global::world.size() );
   }
@@ -204,9 +204,9 @@ inline void Campaign::load() {
 
   Global::world.view<Settlement::Component>().each(
     []( Settlement::Component &settlement ) {
-      settlement.texture = LoadTextureFromImage(
-        Settlement::Manager()->building_map.at( "roman_m1" )
-      );
+      settlement.texture =
+        LoadTextureFromImage( Settlement::Manager()->building_map.at( "roman_m1"
+        ) );
     }
   );
   Global::world.view<Player::Component>().each(
@@ -262,6 +262,10 @@ inline void Campaign::Draw() {
 }
 
 inline void Campaign::CheckForUIInteractions() {
+  auto f = Iron::Forge();
+  rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+  auto root_g = f->Grid( root_r, 4, 4 );
+
   auto change_map_mode = UI::Minimap();
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:
@@ -348,8 +352,7 @@ inline void Campaign::CheckForInput() {
     Global::world.view<Player::Component, Player::LocalTag>().front();
 
   if ( player_e == entt::null ) {
-    std::cout << "ERROR"
-              << " no local player was found" << '\n';
+    std::cout << "ERROR" << " no local player was found" << '\n';
     return;
   }
 
@@ -528,7 +531,8 @@ inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
     if ( Global::state.timeScale < 0.0f )
       Global::state.timeScale = 0.0f;
 
-    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
+    if ( Global::state.timeScale == 0.0f &&
+         Global::state.prevTimeScale > 0.5f ) {
       Global::state.prevTimeScale -= 0.5f;
       Global::state.timeScale = Global::state.prevTimeScale;
     }
