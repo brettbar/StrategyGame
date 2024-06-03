@@ -266,7 +266,7 @@ inline void Campaign::CheckForUIInteractions() {
   rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
   auto root_g = f->Grid( root_r, 4, 4 );
 
-  auto change_map_mode = UI::Minimap();
+  auto change_map_mode = UI::Minimap( root_g );
   switch ( change_map_mode ) {
     case UI::Action_MapModeChange::Default:
       Map::Manager()->mode = Map::Mode::Default;
@@ -295,7 +295,7 @@ inline void Campaign::CheckForUIInteractions() {
       return;
     }
 
-    auto action = UI::SettlementContext( faction, settlement );
+    auto action = UI::SettlementContext( root_g, faction, settlement );
     switch ( action ) {
       case UI::Action_SettlementContext::SpawnColonist:
         PostCommand( Commands::Command::spawn_colonist(

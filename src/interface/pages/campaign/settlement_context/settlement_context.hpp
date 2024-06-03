@@ -19,14 +19,14 @@ namespace UI {
   };
 
   inline Action_SettlementContext SettlementContext(
-    // Element *root_g,
+    Iron::Element *root_g,
     Faction::Component faction,
     Settlement::Component *settlement
   ) {
     auto f = Iron::Forge();
 
-    rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    auto root_g = f->Grid( root_r, 4, 4 );
+    // rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
+    // auto root_g = f->Grid( root_r, 4, 4 );
 
     auto context_g = f->Grid( root_g->Slots( 13, 14 ), 1, 5 );
 
