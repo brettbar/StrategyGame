@@ -6,33 +6,24 @@ rights reserved.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
-#include "steam/isteamnetworkingutils.h"
 #include "steam/steam_api.h"
 
 
 #include "shared/common.hpp"
 #include "shared/global.hpp"
-#include "shared/textures.hpp"
 
 #include "assets.hpp"
 
 #include "steam/steam_api_common.h"
 
-#include "network/client.hpp"
-#include "network/host.hpp"
 #include "network/network.hpp"
 
 #include "game.hpp"
 
-#include "shared/utils.hpp"
 
-#include <chrono>
-#include <filesystem>
-#include <fstream>
 
 #include <nlohmann/json.hpp>
 #include <stdlib.h>
-#include <thread>
 
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
