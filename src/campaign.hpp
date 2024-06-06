@@ -16,6 +16,7 @@
 
 #include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
+#include "interface/pages/campaign/overview_panel.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
@@ -38,7 +39,6 @@
 #include "world/systems/province_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/settlement_system.hpp"
-
 
 #include "renderer/renderer.hpp"
 
@@ -283,6 +283,8 @@ inline void Campaign::CheckForUIInteractions() {
     default:
       break;
   }
+
+  UI::OverviewPanel();
 
   if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
     auto settlement = Selection::GetSelectedComponent<Settlement::Component>();
