@@ -20,7 +20,7 @@ inline Image InitTileOutline() {
 }
 
 inline void load_borders() {
-  std::string asset_folder = "src/assets/";
+  std::string asset_folder = "src/assets";
 
   for ( const auto &pair: color_map ) {
     Color color = pair.second;

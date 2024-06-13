@@ -225,27 +225,27 @@ private:
     str random_assign_sprite_from_biome( Biome biome ) {
       switch ( biome ) {
         case Biome::Desert:
-          return "sand1.bmp";
+          return "sand1.png";
         case Biome::Forest: {
           u32 r = random_u32_inclmax( 1, 10 );
-          return "forest" + std::to_string( r ) + ".bmp";
+          return "forest" + std::to_string( r ) + ".png";
         }
         case Biome::Hills: {
-          return "hills1.bmp";
+          return "hills1.png";
         }
         case Biome::Mountains:
-          return "mountains1.bmp";
+          return "mountains1.png";
         case Biome::Plains: {
           u32 r = random_u32_inclmax( 1, 14 );
-          return "grass" + std::to_string( r ) + ".bmp";
+          return "grass" + std::to_string( r ) + ".png";
         }
         case Biome::Sea:
-          return "water1.bmp";
+          return "water1.png";
         case Biome::Steppe:
-          return "hills1.bmp";
+          return "hills1.png";
         case Biome::Taiga:
         case Biome::Tundra:
-          return "snow1.bmp";
+          return "snow1.png";
       }
     }
 
