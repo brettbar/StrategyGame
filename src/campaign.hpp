@@ -117,15 +117,14 @@ inline void Campaign::save() {
     cereal::JSONOutputArchive output{ jfile };
 
     entt::snapshot{ Global::world }
-      .entities( output )
-      .component<Player::Component>( output )
-      .component<Faction::Component>( output )
-      .component<Actor::Component>( output )
-      .component<Animated::Component>( output )
-      .component<Tile::Component>( output )
-      .component<Province::Component>( output )
-      .component<Settlement::Component>( output )
-      .component<AI::Component>( output );
+      .get<Player::Component>( output )
+      .get<Faction::Component>( output )
+      .get<Actor::Component>( output )
+      .get<Animated::Component>( output )
+      .get<Tile::Component>( output )
+      .get<Province::Component>( output )
+      .get<Settlement::Component>( output )
+      .get<AI::Component>( output );
   }
   jfile.close();
 
@@ -134,15 +133,14 @@ inline void Campaign::save() {
     cereal::BinaryOutputArchive output{ file };
 
     entt::snapshot{ Global::world }
-      .entities( output )
-      .component<Player::Component>( output )
-      .component<Faction::Component>( output )
-      .component<Actor::Component>( output )
-      .component<Animated::Component>( output )
-      .component<Tile::Component>( output )
-      .component<Province::Component>( output )
-      .component<Settlement::Component>( output )
-      .component<AI::Component>( output );
+      .get<Player::Component>( output )
+      .get<Faction::Component>( output )
+      .get<Actor::Component>( output )
+      .get<Animated::Component>( output )
+      .get<Tile::Component>( output )
+      .get<Province::Component>( output )
+      .get<Settlement::Component>( output )
+      .get<AI::Component>( output );
   }
   file.close();
 }
@@ -184,15 +182,14 @@ inline void Campaign::load() {
     cereal::BinaryInputArchive input{ file };
 
     entt::snapshot_loader{ Global::world }
-      .entities( input )
-      .component<Player::Component>( input )
-      .component<Faction::Component>( input )
-      .component<Actor::Component>( input )
-      .component<Animated::Component>( input )
-      .component<Tile::Component>( input )
-      .component<Province::Component>( input )
-      .component<Settlement::Component>( input )
-      .component<AI::Component>( input );
+      .get<Player::Component>( input )
+      .get<Faction::Component>( input )
+      .get<Actor::Component>( input )
+      .get<Animated::Component>( input )
+      .get<Tile::Component>( input )
+      .get<Province::Component>( input )
+      .get<Settlement::Component>( input )
+      .get<AI::Component>( input );
     // Sight::Component
 
     // printf( "%u\n", (int) Global::world.size() );
