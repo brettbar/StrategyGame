@@ -67,7 +67,7 @@ private:
     }
 
     void load_actor_assets() {
-      str root = "src/assets/images/actors";
+      str root = "assets/images/actors";
 
       // for each faction
       for ( const auto &faction_folder: fs::directory_iterator( root ) ) {

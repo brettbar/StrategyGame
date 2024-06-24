@@ -20,7 +20,7 @@ inline Image InitTileOutline() {
 }
 
 inline void load_borders() {
-  std::string asset_folder = "src/assets";
+  std::string asset_folder = "assets";
 
   for ( const auto &pair: color_map ) {
     Color color = pair.second;
@@ -77,7 +77,7 @@ inline void load_all_in_folder( str path ) {
 
 
 inline void LoadAssets() {
-  std::string asset_folder = "src/assets/";
+  std::string asset_folder = "assets/";
 
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
   load_borders();
