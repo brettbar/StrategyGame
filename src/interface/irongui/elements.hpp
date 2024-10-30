@@ -126,14 +126,22 @@ namespace Iron {
           DrawRectangleRec( transform, background );
           // DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
 
+
+          f32 font_size = 28;
+          f32 text_w = MeasureText( t.text->text.c_str(), font_size );
+          f32 x_pos =
+            transform.x + ( transform.width * 0.5 ) - ( text_w * 0.5 );
+          f32 y_pos =
+            transform.y + ( transform.height * 0.5 ) - ( font_size * 0.5 );
+
           Font romulus = Global::font_cache[hstr{ "font_romulus" }]->font;
           DrawTextPro(
             romulus,
             t.text->text.c_str(),
-            vec2f{ transform.x, transform.y },
+            vec2f{ x_pos, y_pos },
             vec2f{ 0, 0 },
             0,
-            28,
+            font_size,
             2,
             WHITE
           );
@@ -172,9 +180,19 @@ namespace Iron {
           Texture texture = resource.get()->texture;
 
           if ( background.a > 0 ) {
-            DrawRectangleRec( rect{transform.x, transform.y, texture.width * scale, texture.height * scale}, background );
+            DrawRectangleRec(
+              rect{
+                transform.x,
+                transform.y,
+                texture.width * scale,
+                texture.height * scale
+              },
+              background
+            );
           }
-          DrawTextureEx( texture, vec2f{transform.x, transform.y}, 0, scale, WHITE );
+          DrawTextureEx(
+            texture, vec2f{ transform.x, transform.y }, 0, scale, WHITE
+          );
           break;
       }
     }
