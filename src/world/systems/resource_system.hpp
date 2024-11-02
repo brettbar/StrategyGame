@@ -66,7 +66,7 @@ namespace ResourceSystem {
           id = "clay.png";
           break;
         case Resources::Natural::Trees:
-          id = "lumber.png";
+          id = "timber.png";
           break;
         case Resources::Natural::Fish:
           id = "fish.png";

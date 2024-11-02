@@ -96,19 +96,19 @@ namespace Resources {
   inline std::vector<std::string> raw = {
     "timber",
     "wheat",
-    "olives",
+    //"olives",
     "fish",
     "clay",
-    "stone",
-    "wool",
-    "flax",
-    "hide",
+    //"stone",
+    //"wool",
+    //"flax",
+    //"hide",
     "silver_ore",
     "gold_ore",
     "iron_ore",
     "tin_ore",
     "copper_ore",
-    "gems",
+    //"gems",
   };
 
   inline std::vector<std::string> refined = {

@@ -3,6 +3,7 @@
 #include "../../shared/common.hpp"
 #include "elements.hpp"
 #include <raylib.h>
+#include <rlgl.h>
 
 namespace Iron {
 
@@ -183,6 +184,8 @@ public:
       e->background = color;
       e->t.texture = new ITexture( texture_id );
       auto texture = Global::texture_cache[e->t.texture->texture_id]->texture;
+      SetTextureFilter( texture, TEXTURE_FILTER_POINT );
+      
       e->transform = {t.x, t.y, (f32)texture.width * scale, (f32)texture.height *scale };
       queue.push_back( e );
       return e;

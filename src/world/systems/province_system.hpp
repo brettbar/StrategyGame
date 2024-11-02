@@ -49,7 +49,7 @@ namespace ProvinceSystem {
   }
 
   inline void Draw( Camera2D &camera ) {
-    // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
+    // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
     for ( auto entity: Global::world.view<Province::Component>() ) {
 
       auto &prov = Global::world.get<Province::Component>( entity );
