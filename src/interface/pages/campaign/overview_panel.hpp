@@ -22,13 +22,18 @@ namespace UI {
   inline void resource_overview( Iron::IForge *f, rect panel_g ) {
     auto panel = f->Grid(panel_g, 1, 10);
 
-    for ( u32 i = 0; i < Resources::raw.size(); i++) {
+    for ( u32 i = 0; i < 1+Resources::raw.size(); i++) {
       rect slot = panel->Slot(i);
 
       auto row = f->Grid(slot, 2, 1);
 
-      f->TextureLabel(row->Slot(0), hstr{(Resources::raw[i] + ".png").c_str()}, Color{0,0,0,0}, 3.0f);
-      f->TextLabel(row->Slot(1), "0");
+      if ( i == 0 ) {
+        f->TextLabel(row->Slot(0), "Resource", BLACK, 1.0, 1.0, WHITE);
+        f->TextLabel(row->Slot(1), "Amount", BLACK, 1.0, 1.0, WHITE);
+      } else {
+        f->TextureLabel(row->Slot(0), hstr{(Resources::raw[i-1] + ".png").c_str()}, Color{0,0,0,0}, 3.0f, 2.0f, WHITE);
+        f->TextLabel(row->Slot(1), "0", BLACK, 1.0, 1.0, WHITE);
+      }
     }
   }
 };// namespace UI

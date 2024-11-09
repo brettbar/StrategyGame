@@ -74,6 +74,8 @@ namespace Iron {
     rect transform;
     f32 scale;
     Color background;
+    f32 border = 0.0f;
+    Color border_color = WHITE;
     bool stateful = false;
     bool interactable = false;
 
@@ -179,22 +181,28 @@ namespace Iron {
           auto resource = Global::texture_cache[t.texture->texture_id].handle();
           Texture texture = resource.get()->texture;
 
+          f32 pos_x = transform.x + (transform.width * 0.5) - (texture.width * scale * 0.5);
+          f32 pos_y = transform.y + (transform.height * 0.5) - (texture.height * scale * 0.5);
+
           if ( background.a > 0 ) {
             DrawRectangleRec(
-              rect{
-                transform.x,
-                transform.y,
-                texture.width * scale,
-                texture.height * scale
-              },
+              transform,
+              //   rect{
+              //     transform.x,
+              //     transform.y,
+              //     texture.width * scale,
+              //     texture.height * scale
+              //   },
               background
             );
           }
+          
           DrawTextureEx(
-            texture, vec2f{ transform.x, transform.y }, 0, scale, WHITE
+            texture, vec2f{ pos_x, pos_y }, 0, scale, WHITE
           );
           break;
       }
+      DrawRectangleLinesEx(transform, border, border_color);
     }
 
     // @refactor Should probably find a way to fit all these functions into IGrid itself

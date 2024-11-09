@@ -158,7 +158,9 @@ public:
       rect t,
       str txt,
       Color c = { 0, 0, 0, 0 },
-      f32 s = 1.0f
+      f32 s = 1.0f,
+      f32 border = 0.0f,
+      Color border_color = WHITE
     ) {
       auto e = new Element();
       e->type = Type::Text;
@@ -167,6 +169,8 @@ public:
       e->transform = t;
       e->scale = s;
       e->t.text = new IText( txt );
+      e->border = border;
+      e->border_color = border_color;
       queue.push_back( e );
       return e;
     }
@@ -175,18 +179,22 @@ public:
       rect t,
       hstr texture_id,
       Color color = { 0, 0, 0, 0 },
-      f32 scale = 1.0f
+      f32 scale = 1.0f,
+      f32 border = 0.0f,
+      Color border_color = WHITE
     ) {
       auto e = new Element();
       e->type = Type::Texture;
       e->id = queue.size();
       e->scale = scale;
       e->background = color;
+      e->transform = t;
+      e->border = border;
+      e->border_color = border_color;
       e->t.texture = new ITexture( texture_id );
       auto texture = Global::texture_cache[e->t.texture->texture_id]->texture;
       SetTextureFilter( texture, TEXTURE_FILTER_POINT );
       
-      e->transform = {t.x, t.y, (f32)texture.width * scale, (f32)texture.height *scale };
       queue.push_back( e );
       return e;
     }
