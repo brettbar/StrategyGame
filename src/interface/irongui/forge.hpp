@@ -99,7 +99,6 @@ public:
       bool mouse_went_down = IsMouseButtonPressed( 0 );
       // bool mouse_held_down = IsMouseButtonDown( 0 );
 
-
       bool inside = CheckCollisionPointRec( mouse_pos, e.transform );
 
       if ( !inside )
@@ -157,13 +156,6 @@ public:
       e->scale = s;
       e->background = color;
       e->t.grid = new IGrid( c, r );
-      queue.push_back( e );
-      return e;
-    }
-
-    Element *TextLabel(
-      Element *e
-    ) {
       queue.push_back( e );
       return e;
     }

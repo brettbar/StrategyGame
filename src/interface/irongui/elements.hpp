@@ -2,9 +2,7 @@
 
 #include "../../shared/common.hpp"
 #include "../../shared/utils.hpp"
-#include "../ui_shared.hpp"
 #include <raylib.h>
-#include <stack>
 
 namespace Iron {
   enum class Type {
@@ -64,7 +62,6 @@ namespace Iron {
     ITexture() = delete;
     ITexture( hstr id ) : texture_id( id ) {}
   };
-
 
   struct ITabs {
     u32 current_tab;
