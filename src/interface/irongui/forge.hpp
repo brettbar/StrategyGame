@@ -160,7 +160,8 @@ public:
       Color c = { 0, 0, 0, 0 },
       f32 s = 1.0f,
       f32 border = 0.0f,
-      Color border_color = WHITE
+      Color border_color = WHITE,
+      f32 font_size = 28.f
     ) {
       auto e = new Element();
       e->type = Type::Text;
@@ -168,7 +169,7 @@ public:
       e->background = c;
       e->transform = t;
       e->scale = s;
-      e->t.text = new IText( txt );
+      e->t.text = new IText( txt, font_size );
       e->border = border;
       e->border_color = border_color;
       queue.push_back( e );

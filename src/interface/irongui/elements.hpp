@@ -30,8 +30,10 @@ namespace Iron {
 
   struct IText {
     str text;
+    f32 font_size = 28.0f;
     IText() = delete;
     IText( str t ) : text( t ) {}
+    IText( str t, f32 font_size ) : text( t ), font_size(font_size) {}
   };
 
   struct ITextInput {
@@ -129,7 +131,7 @@ namespace Iron {
           // DrawText( t.text->text.c_str(), transform.x, transform.y, 28, WHITE );
 
 
-          f32 font_size = 28;
+          f32 font_size = t.text->font_size;
           f32 text_w = MeasureText( t.text->text.c_str(), font_size );
           f32 x_pos =
             transform.x + ( transform.width * 0.5 ) - ( text_w * 0.5 );
