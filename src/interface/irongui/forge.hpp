@@ -135,6 +135,13 @@ public:
       return result;
     }
 
+    Element *Window(rect t) {
+      auto e = new Element();
+      e->transform = t;
+      queue.push_back( e );
+      return e;
+    }
+
     Element *Grid(
       rect t,
       u32 c,
@@ -150,6 +157,13 @@ public:
       e->scale = s;
       e->background = color;
       e->t.grid = new IGrid( c, r );
+      queue.push_back( e );
+      return e;
+    }
+
+    Element *TextLabel(
+      Element *e
+    ) {
       queue.push_back( e );
       return e;
     }
