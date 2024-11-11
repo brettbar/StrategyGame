@@ -2,7 +2,6 @@
 
 #include "../../src/data/resources.hpp"
 
-
 namespace UI {
   inline void resource_overview( Iron::IForge *f, rect panel_g );
 
@@ -20,29 +19,26 @@ namespace UI {
   }
 
   inline void resource_overview( Iron::IForge *f, rect panel_g ) {
-    auto window = f->Window({panel_g.x, panel_g.y, 400, 400});
 
-    auto panel = f->Grid(window->transform, 1, 10);
+    auto panel = f->Grid(panel_g, 2, 2+Resources::raw.size());
 
-    for ( u32 i = 0; i < 1+Resources::raw.size(); i++) {
-      rect slot = panel->Slot(i);
+    f->TextButton(panel->Slot(1), "Exit", RED);
 
-      auto row = f->Grid(slot, 2, 1);
+    f->TextLabel(panel->Slot(2), "Resource", BLACK, 1.0, 1.0, WHITE, 18);
+    f->TextLabel(panel->Slot(3), "Amount", BLACK, 1.0, 1.0, WHITE, 18);
 
-      if ( i == 0 ) {
-        f->TextLabel(row->Slot(0), "Resource", BLACK, 1.0, 1.0, WHITE, 18);
-        f->TextLabel(row->Slot(1), "Amount", BLACK, 1.0, 1.0, WHITE, 18);
-      } else {
-        f->TextureLabel(
-          row->Slot(0), 
-          hstr{(Resources::raw[i-1] + ".png").c_str()}, 
-          Color{0,0,0,0}, 
-          3.0f, 
-          2.0f, 
-          WHITE
-        );
-        f->TextLabel(row->Slot(1), "0", BLACK, 1.0, 1.0, WHITE);
-      }
+    for ( u32 i = 1; i < Resources::raw.size(); i++) {
+      auto row = f->Grid(panel->Row(i), 2, 1);
+
+      f->TextureLabel(
+        row->Slot(0), 
+        hstr{(Resources::raw[i-1] + ".png").c_str()}, 
+        BLACK, 
+        3.0f, 
+        2.0f, 
+        WHITE
+      );
+      f->TextLabel(row->Slot(1), "0", BLACK, 1.0, 1.0, WHITE);
     }
   }
-};// namespace UI
+}
