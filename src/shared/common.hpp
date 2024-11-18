@@ -19,6 +19,7 @@ using i32 = int;
 using f32 = float;
 using u64 = unsigned long long;
 using str = std::string;
+using cstr = const char *;
 using hstr = entt::hashed_string;
 using vec2f = Vector2;
 using rect = Rectangle;

@@ -6,6 +6,7 @@
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/modal_menu_ui.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
+#include "interface/pages/save_games.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -21,6 +22,7 @@
 
 enum class Scene {
   MainMenu,
+  LoadGames,
   SinglePlayerLobby,
   FactionSelect,
   ModalMenu,
@@ -136,11 +138,11 @@ class IGame {
     _campaign->start( player_faction );
   }
 
-  void LoadSinglePlayerCampaign() {
+  void LoadSinglePlayerCampaign(cstr file_path) {
     _mode = Scene::Campaign;
 
     _campaign = new struct Campaign( true, "output.dat" );
-    _campaign->load();
+    _campaign->load(file_path);
   }
   /*=============================================================
                         End: Singleplayer
@@ -265,7 +267,8 @@ class IGame {
             _mode = Scene::SinglePlayerLobby;
             break;
           case UI::Action_MainMenu::LoadGame:
-            LoadSinglePlayerCampaign();
+            // LoadSinglePlayerCampaign();
+            _mode = Scene::LoadGames;
             break;
           case UI::Action_MainMenu::HostGame:
             break;
@@ -288,7 +291,9 @@ class IGame {
         }
         EndDrawing();
       } break;
-
+      case Scene::LoadGames: {
+        UI::load_game_menu();
+      } break;
       case Scene::SinglePlayerLobby: {
         auto action = UI::SinglePlayerLobby();
 
@@ -339,7 +344,7 @@ class IGame {
             _campaign->save();
             break;
           case UI::Action_ModalMenu::LoadGame:
-            LoadSinglePlayerCampaign();
+            // LoadSinglePlayerCampaign();
             break;
           case UI::Action_ModalMenu::Settings:
             break;

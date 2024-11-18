@@ -75,7 +75,7 @@ struct Campaign {
 
   void start( str );
   void save();
-  void load();
+  void load(cstr);
   void CheckForInput();
   void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
@@ -172,12 +172,12 @@ inline void Campaign::start( str player_faction ) {
     .connect<&Campaign::EvaluteCommands>( this );
 }
 
-inline void Campaign::load() {
+inline void Campaign::load(cstr file_path) {
   common_start();
 
-  printf( "Loading from output\n" );
+  printf( "Loading from file: %s \n", file_path );
 
-  std::ifstream file( "output.dat", std::ios::binary );
+  std::ifstream file( file_path, std::ios::binary );
   {
     cereal::BinaryInputArchive input{ file };
 

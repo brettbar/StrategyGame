@@ -34,7 +34,7 @@ namespace UI {
         row->Slot(0), 
         hstr{(Resources::raw[i-1] + ".png").c_str()}, 
         BLACK, 
-        3.0f, 
+        3.0f,
         2.0f, 
         WHITE
       );
