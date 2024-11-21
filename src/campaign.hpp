@@ -74,8 +74,8 @@ struct Campaign {
   entt::entity GetLocalPlayerE();
 
   void start( str );
-  void save();
-  void load(cstr);
+  void save( str );
+  void load( cstr );
   void CheckForInput();
   void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
@@ -109,10 +109,12 @@ inline str Campaign::GetLocalPlayerID() {
   }
 }
 
-inline void Campaign::save() {
+inline void Campaign::save( str file_name ) {
   printf( "Saving to output\n" );
 
-  std::ofstream jfile( "output.json" );
+
+  // I think only needed for human readability??
+  std::ofstream jfile( "./saves/" + file_name + ".json" );
   {
     cereal::JSONOutputArchive output{ jfile };
 
@@ -128,7 +130,7 @@ inline void Campaign::save() {
   }
   jfile.close();
 
-  std::ofstream file( "output.dat", std::ios::binary );
+  std::ofstream file( "./saves/" + file_name + ".dat", std::ios::binary );
   {
     cereal::BinaryOutputArchive output{ file };
 
@@ -172,7 +174,7 @@ inline void Campaign::start( str player_faction ) {
     .connect<&Campaign::EvaluteCommands>( this );
 }
 
-inline void Campaign::load(cstr file_path) {
+inline void Campaign::load( cstr file_path ) {
   common_start();
 
   printf( "Loading from file: %s \n", file_path );
@@ -351,7 +353,8 @@ inline void Campaign::CheckForInput() {
     Global::world.view<Player::Component, Player::LocalTag>().front();
 
   if ( player_e == entt::null ) {
-    std::cout << "ERROR" << " no local player was found" << '\n';
+    std::cout << "ERROR"
+              << " no local player was found" << '\n';
     return;
   }
 
@@ -530,8 +533,7 @@ inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
     if ( Global::state.timeScale < 0.0f )
       Global::state.timeScale = 0.0f;
 
-    if ( Global::state.timeScale == 0.0f &&
-         Global::state.prevTimeScale > 0.5f ) {
+    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
       Global::state.prevTimeScale -= 0.5f;
       Global::state.timeScale = Global::state.prevTimeScale;
     }

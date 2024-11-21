@@ -1,7 +1,6 @@
 #pragma once
 
 // TODO see which of these includes can be removed
-#include <cstdio>
 #include <entt/entt.hpp>
 #include <fstream>
 #include <iostream>

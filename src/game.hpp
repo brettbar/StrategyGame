@@ -5,10 +5,11 @@
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/modal_menu_ui.hpp"
-#include "interface/pages/singleplayer_lobby.hpp"
 #include "interface/pages/save_games.hpp"
+#include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
+
 
 #include "network/network.hpp"
 #include "shared/common.hpp"
@@ -138,11 +139,11 @@ class IGame {
     _campaign->start( player_faction );
   }
 
-  void LoadSinglePlayerCampaign(cstr file_path) {
+  void LoadSinglePlayerCampaign( cstr file_path ) {
     _mode = Scene::Campaign;
 
     _campaign = new struct Campaign( true, "output.dat" );
-    _campaign->load(file_path);
+    _campaign->load( file_path );
   }
   /*=============================================================
                         End: Singleplayer
@@ -266,10 +267,9 @@ class IGame {
           case UI::Action_MainMenu::StartGame:
             _mode = Scene::SinglePlayerLobby;
             break;
-          case UI::Action_MainMenu::LoadGame:
-            // LoadSinglePlayerCampaign();
+          case UI::Action_MainMenu::LoadGame: {
             _mode = Scene::LoadGames;
-            break;
+          } break;
           case UI::Action_MainMenu::HostGame:
             break;
           case UI::Action_MainMenu::JoinGame:
@@ -287,12 +287,22 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
       case Scene::LoadGames: {
-        UI::load_game_menu();
+        auto file_to_load = UI::load_game_menu();
+
+        if ( file_to_load != "" ) {
+          LoadSinglePlayerCampaign( file_to_load.c_str() );
+        }
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+        }
+        EndDrawing();
       } break;
       case Scene::SinglePlayerLobby: {
         auto action = UI::SinglePlayerLobby();
@@ -311,7 +321,6 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
@@ -341,7 +350,8 @@ class IGame {
           case UI::Action_ModalMenu::None:
             break;
           case UI::Action_ModalMenu::SaveGame:
-            _campaign->save();
+            // @todo get actual user input for file name
+            _campaign->save( "output" );
             break;
           case UI::Action_ModalMenu::LoadGame:
             // LoadSinglePlayerCampaign();
