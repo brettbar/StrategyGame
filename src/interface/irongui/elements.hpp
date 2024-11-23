@@ -11,6 +11,7 @@ namespace Iron {
     TextInput,
     Texture,
     Tabs,
+    SelectMenu,
   };
 
   struct Element;
@@ -31,7 +32,7 @@ namespace Iron {
     f32 font_size = 28.0f;
     IText() = delete;
     IText( str t ) : text( t ) {}
-    IText( str t, f32 font_size ) : text( t ), font_size(font_size) {}
+    IText( str t, f32 font_size ) : text( t ), font_size( font_size ) {}
   };
 
   struct ITextInput {
@@ -180,8 +181,10 @@ namespace Iron {
           auto resource = Global::texture_cache[t.texture->texture_id].handle();
           Texture texture = resource.get()->texture;
 
-          f32 pos_x = transform.x + (transform.width * 0.5) - (texture.width * scale * 0.5);
-          f32 pos_y = transform.y + (transform.height * 0.5) - (texture.height * scale * 0.5);
+          f32 pos_x = transform.x + ( transform.width * 0.5 ) -
+                      ( texture.width * scale * 0.5 );
+          f32 pos_y = transform.y + ( transform.height * 0.5 ) -
+                      ( texture.height * scale * 0.5 );
 
           if ( background.a > 0 ) {
             DrawRectangleRec(
@@ -195,13 +198,11 @@ namespace Iron {
               background
             );
           }
-          
-          DrawTextureEx(
-            texture, vec2f{ pos_x, pos_y }, 0, scale, WHITE
-          );
+
+          DrawTextureEx( texture, vec2f{ pos_x, pos_y }, 0, scale, WHITE );
           break;
       }
-      DrawRectangleLinesEx(transform, border, border_color);
+      DrawRectangleLinesEx( transform, border, border_color );
     }
 
     // @refactor Should probably find a way to fit all these functions into IGrid itself

@@ -22,7 +22,7 @@ private:
       } tab_state;
 
       struct {
-        const char *edit_text;
+        cstr edit_text;
       } text_input_state;
     };
 
@@ -194,7 +194,7 @@ public:
       e->t.texture = new ITexture( texture_id );
       auto texture = Global::texture_cache[e->t.texture->texture_id]->texture;
       SetTextureFilter( texture, TEXTURE_FILTER_POINT );
-      
+
       queue.push_back( e );
       return e;
     }
@@ -225,6 +225,8 @@ public:
       return e;
     }
 
+    Element *SelectMenu() {}
+
     bool TextButton( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f ) {
       auto e = TextLabel( t, txt, c, s );
       e->interactable = true;
@@ -232,7 +234,7 @@ public:
     }
 
 
-    str *TextInput( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f  ) {
+    str *TextInput( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f ) {
       auto e = new Element();
       e->type = Type::TextInput;
       e->id = queue.size();
@@ -296,11 +298,9 @@ public:
 
       if ( !ui_state.contains( e->id ) ) {
         ui_state[e->id] = State{
-          .text_input_state =
-            {
-              .edit_text = e->t.text_input->edit_text.c_str(),
-            }
-        };
+          .text_input_state = {
+            .edit_text = e->t.text_input->edit_text.c_str(),
+          } };
       }
 
 
