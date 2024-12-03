@@ -199,20 +199,18 @@ public:
       return e;
     }
 
-    Element *Tabs( list<bool> tabs_clicked ) {
+    u32 Tabs( list<bool> tabs_clicked ) {
       auto e = new Element();
       e->type = Type::Tabs;
       e->id = queue.size();
       e->stateful = true;
       e->t.tabs = new ITabs();
 
-
       if ( !ui_state.contains( e->id ) ) {
         ui_state[e->id] = State{ .tab_state = { 0 } };
       } else {
         e->t.tabs->current_tab = ui_state[e->id].tab_state.index;
       }
-
 
       for ( u32 i = 0; i < tabs_clicked.size(); i++ ) {
         if ( tabs_clicked[i] ) {
@@ -222,17 +220,49 @@ public:
       }
 
       queue.push_back( e );
-      return e;
+      return e->t.tabs->current_tab;
     }
 
-    Element *SelectMenu() {}
+    str SelectMenu( rect outer_transform, list<str> options, u32 max_rows ) {
+      auto e = new Element();
+      e->type = Type::Tabs;
+      e->id = queue.size();
+      e->stateful = true;
+      e->t.tabs = new ITabs();
+
+      auto grid = Grid( outer_transform, 1, max_rows );
+      TextLabel( grid->Slot( 0 ), "Select File to Load" );
+
+      if ( !ui_state.contains( e->id ) ) {
+        ui_state[e->id] = State{ .tab_state = { 0 } };
+      } else {
+        e->t.tabs->current_tab = ui_state[e->id].tab_state.index;
+      }
+
+
+      for ( u32 i = 0; i < options.size(); i++ ) {
+        Color color = GRAY;
+        if ( ui_state[e->id].tab_state.index == i ) {
+          color = BLUE;
+        }
+
+        bool interacted = TextButton( grid->Slot( i ), options[i], color );
+
+        if ( interacted ) {
+          ui_state[e->id] = State{ .tab_state{ i } };
+          e->t.tabs->current_tab = i;
+        }
+      }
+
+      queue.push_back( e );
+      return options[e->t.tabs->current_tab];
+    }
 
     bool TextButton( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f ) {
       auto e = TextLabel( t, txt, c, s );
       e->interactable = true;
       return CheckInteract( *e );
     }
-
 
     str *TextInput( rect t, str txt, Color c = { 0, 0, 0, 0 }, f32 s = 1.0f ) {
       auto e = new Element();

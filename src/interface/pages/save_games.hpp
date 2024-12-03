@@ -15,20 +15,25 @@ namespace UI {
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 3, 3 );
 
-    auto menu_g = f->Grid( root_g->Slot( 4 ), 1, rows );
+    auto button_g = f->Grid( root_g->Slot( 7 ), 1, 4 );
 
-    f->TextLabel( menu_g->Slot( 0 ), "Select File to Load" );
 
     std::string path = "./saves";
     u32 i = 1;
+
+    list<str> options = {};
     for ( const auto &entry: fs::directory_iterator( path ) ) {
-      // std::cout << entry.path() << std::endl;
-      f->TextLabel( menu_g->Slot( i++ ), entry.path().string(), GRAY );
+      // options.push_back(
+      //   f->TextButton( menu_g->Slot( i++ ), entry.path().string(), GRAY, BLUE )
+      // );
+      options.push_back( entry.path().string() );
     }
 
-    if ( f->TextButton( menu_g->Slot( rows - 1 ), "Load", RED ) ) {
+    str selected_path = f->SelectMenu( root_g->Slot( 4 ), options, rows );
+
+    if ( ( selected_path.size() > 0 ) && f->TextButton( button_g->Slot( 0 ), "Load", RED ) ) {
       // @todo make actually really get the selected file
-      return "./saves/output.dat";
+      return selected_path;
     }
 
     return "";

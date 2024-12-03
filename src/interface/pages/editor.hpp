@@ -56,8 +56,8 @@ namespace UI {
       f->TextButton( mode_g->Slot( 2 ), "Tiles", GREEN ),
       f->TextButton( mode_g->Slot( 3 ), "Entities", RED ),
     };
-    auto tabs = f->Tabs( tab_btns );
-    Mode mode = (Mode) tabs->t.tabs->current_tab;
+    auto current_tab = f->Tabs( tab_btns );
+    Mode mode = (Mode) current_tab;
 
     // top bar
     {
@@ -111,8 +111,7 @@ namespace UI {
         WHITE
       );
       if ( new_water_lvl ) {
-        Map::Manager()->waterLevel =
-          (f32) atof( ( *new_water_lvl ).c_str() );
+        Map::Manager()->waterLevel = (f32) atof( ( *new_water_lvl ).c_str() );
       }
 
 
@@ -123,8 +122,7 @@ namespace UI {
         WHITE
       );
       if ( new_mtn_lvl ) {
-        Map::Manager()->mtnsLevel =
-          (f32) atof( ( *new_mtn_lvl ).c_str() );
+        Map::Manager()->mtnsLevel = (f32) atof( ( *new_mtn_lvl ).c_str() );
       }
 
 
@@ -135,8 +133,7 @@ namespace UI {
         WHITE
       );
       if ( new_hills_lvl ) {
-        Map::Manager()->hillsLevel =
-          (f32) atof( ( *new_hills_lvl ).c_str() );
+        Map::Manager()->hillsLevel = (f32) atof( ( *new_hills_lvl ).c_str() );
       }
     }
 
@@ -158,9 +155,7 @@ namespace UI {
 
     f->TextLabel( map_g->Slot( 12 ), "bias", GRAY );
     str *new_bias = f->TextInput(
-      map_g->Slot( 13 ),
-      std::to_string( Map::Manager()->scaling_bias ),
-      WHITE
+      map_g->Slot( 13 ), std::to_string( Map::Manager()->scaling_bias ), WHITE
     );
     if ( new_bias ) {
       Map::Manager()->scaling_bias = (f32) atof( ( *new_bias ).c_str() );

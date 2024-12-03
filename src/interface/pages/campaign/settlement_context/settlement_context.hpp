@@ -52,8 +52,8 @@ namespace UI {
       f->TextButton( tabs_g->Slot( 4 ), "Agents", GRAY ),
     };
 
-    auto tabs = f->Tabs( tab_btns );
-    switch ( tabs->t.tabs->current_tab ) {
+    auto current_tab = f->Tabs( tab_btns );
+    switch ( current_tab ) {
       case 0: {// Population
 
         auto population_g = f->Grid( content_g->Cols( 1, 5 ), 3, 1, BLUE );

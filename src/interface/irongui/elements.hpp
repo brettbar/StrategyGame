@@ -11,7 +11,6 @@ namespace Iron {
     TextInput,
     Texture,
     Tabs,
-    SelectMenu,
   };
 
   struct Element;
