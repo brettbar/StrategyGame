@@ -291,7 +291,12 @@ class IGame {
         EndDrawing();
       } break;
       case Scene::LoadGames: {
-        auto file_to_load = UI::load_game_menu();
+        bool pressed_back = false;
+        auto file_to_load = UI::load_game_menu( pressed_back );
+
+        if ( pressed_back ) {
+          _mode = Scene::MainMenu;
+        }
 
         if ( file_to_load != "" ) {
           LoadSinglePlayerCampaign( file_to_load.c_str() );
