@@ -23,6 +23,7 @@
 #include "network/network.hpp"
 #include "shared/global.hpp"
 
+
 #include "shared/common.hpp"
 
 
@@ -263,7 +264,7 @@ inline void Campaign::Draw() {
 inline void Campaign::CheckForUIInteractions() {
   auto f = Iron::Forge();
   rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-  auto root_g = f->Grid( root_r, 4, 4 );
+  auto root_g = f->Grid( root_r, 12, 12 );
 
   auto change_map_mode = UI::Minimap( root_g );
   switch ( change_map_mode ) {
@@ -283,7 +284,7 @@ inline void Campaign::CheckForUIInteractions() {
       break;
   }
 
-  UI::OverviewPanel();
+  UI::OverviewPanel( root_g );
 
   if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
     auto settlement = Selection::GetSelectedComponent<Settlement::Component>();
