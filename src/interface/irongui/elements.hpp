@@ -75,6 +75,7 @@ namespace Iron {
     Color background;
     f32 border = 0.0f;
     Color border_color = WHITE;
+
     bool stateful = false;
     bool interactable = false;
 

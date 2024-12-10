@@ -25,10 +25,7 @@ namespace UI {
   ) {
     auto f = Iron::Forge();
 
-    // rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
-    // auto root_g = f->Grid( root_r, 4, 4 );
-
-    auto context_g = f->Grid( root_g->Slots( 13, 14 ), 1, 5 );
+    auto context_g = f->Grid( root_g->ColsByRows( 0, 6, 6, 12 ), 1, 5 );
 
     auto header_g = f->Grid( context_g->Row( 0 ), 3, 1, BLACK );
     f->TextLabel( header_g->Slot( 0 ), settlement->name, BLACK );

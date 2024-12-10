@@ -16,7 +16,9 @@ namespace UI {
   inline Action_MapModeChange Minimap( Iron::Element *root_g ) {
     auto f = Iron::Forge();
 
-    auto minimap_g = f->Grid( root_g->Slot( 15 ), 4, 4, Color{ 0, 0, 0, 125 } );
+    auto minimap_g = f->Grid(
+      root_g->ColsByRows( 9, 12, 9, 12 ), 4, 4, Color{ 0, 0, 0, 125 }
+    );
 
     auto map_mode_g = f->Grid( minimap_g->Row( 3 ), 4, 1, GREEN );
 

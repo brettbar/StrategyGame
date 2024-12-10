@@ -160,7 +160,7 @@ public:
       f32 s = 1.0f,
       f32 border = 0.0f,
       Color border_color = WHITE,
-      f32 font_size = 28.f
+      f32 font_size = 18.f
     ) {
       auto e = new Element();
       e->type = Type::Text;
