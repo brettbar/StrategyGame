@@ -1,8 +1,6 @@
 #include "../../irongui/elements.hpp"
 #include "../../irongui/forge.hpp"
 
-#include "../../src/data/resources.hpp"
-
 namespace UI {
   inline void resource_overview( Iron::IForge *f, rect panel_g );
 
