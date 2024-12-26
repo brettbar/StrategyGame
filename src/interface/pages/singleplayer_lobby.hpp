@@ -5,11 +5,6 @@
 
 #include "../irongui/forge.hpp"
 
-#include "../../network/client.hpp"
-#include "../../network/host.hpp"
-#include "../../network/network.hpp"
-#include <raylib.h>
-
 namespace UI {
 
   enum class Action_SinglePlayerLobby {

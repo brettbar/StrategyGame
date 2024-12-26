@@ -6,24 +6,16 @@ rights reserved.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
-#include "steam/steam_api.h"
-
-
 #include "shared/common.hpp"
 #include "shared/global.hpp"
-
-#include "assets.hpp"
-
+#include "steam/steam_api.h"
 #include "steam/steam_api_common.h"
-
-#include "network/network.hpp"
-
-#include "game.hpp"
-
-
-
 #include <nlohmann/json.hpp>
 #include <stdlib.h>
+
+#include "assets.hpp"
+#include "game.hpp"
+#include "network/network.hpp"
 
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
@@ -40,7 +32,7 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
 int main() {
   Global::mp_capable = true;
 
-  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
+  if ( SteamAPI_RestartAppIfNecessary( 2296090 ) ) {
     Global::mp_capable = false;
   }
 
@@ -48,6 +40,8 @@ int main() {
     printf( "SteamAPI_Init() failed!\n" );
     Global::mp_capable = false;
   }
+
+  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
 
   if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
@@ -59,7 +53,6 @@ int main() {
     Global::mp_capable = false;
   }
 
-  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
 
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 

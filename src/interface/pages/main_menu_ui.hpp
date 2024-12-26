@@ -1,10 +1,7 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-
 #include "../irongui/forge.hpp"
-#include <raylib.h>
-
 
 namespace UI {
 

@@ -534,7 +534,8 @@ inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
     if ( Global::state.timeScale < 0.0f )
       Global::state.timeScale = 0.0f;
 
-    if ( Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f ) {
+    if ( Global::state.timeScale == 0.0f &&
+         Global::state.prevTimeScale > 0.5f ) {
       Global::state.prevTimeScale -= 0.5f;
       Global::state.timeScale = Global::state.prevTimeScale;
     }

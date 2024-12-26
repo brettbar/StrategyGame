@@ -3,8 +3,10 @@
 #include "interface/irongui/forge.hpp"
 #include "interface/pages/editor.hpp"
 #include "interface/pages/faction_select_menu.hpp"
+#include "interface/pages/lobby_browser.hpp"
 #include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/modal_menu_ui.hpp"
+#include "interface/pages/multiplayer_lobby.hpp"
 #include "interface/pages/save_games.hpp"
 #include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
@@ -25,6 +27,8 @@ enum class Scene {
   MainMenu,
   LoadGames,
   SinglePlayerLobby,
+  MultiPlayerLobby,
+  LobbyBrowser,
   FactionSelect,
   ModalMenu,
   Campaign,
@@ -157,7 +161,6 @@ class IGame {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
-    // UI::System::SwitchPage( UI::Lobby );
 
     InterfaceUpdate::Update{
       .id = InterfaceUpdate::ID::HostLobby,
@@ -172,9 +175,6 @@ class IGame {
 
     _campaign = new Campaign( false );
 
-    // UI::System::InitCampaignUI();
-
-
     PlayerSystem::HostStartMultiplayer();
 
     Game()->_mode = Scene::Campaign;
@@ -186,8 +186,6 @@ class IGame {
 
     _campaign = new struct Campaign( false );
 
-    // UI::System::InitCampaignUI();
-
     PlayerSystem::ClientStartMultiplayer();
 
     Game()->_mode = Scene::Campaign;
@@ -197,7 +195,6 @@ class IGame {
     _single_player = false;
     Network::is_host = false;
     Network::Client()->Init();
-    // UI::System::SwitchPage( UI::LobbyBrowser );
   }
 
   void JoinMultiplayerLobby( CSteamID lobby_id ) {
@@ -271,8 +268,11 @@ class IGame {
             _mode = Scene::LoadGames;
           } break;
           case UI::Action_MainMenu::HostGame:
+            HostMultiplayerLobby();
+            _mode = Scene::MultiPlayerLobby;
             break;
           case UI::Action_MainMenu::JoinGame:
+            _mode = Scene::LobbyBrowser;
             break;
           case UI::Action_MainMenu::Settings:
             break;
@@ -329,7 +329,28 @@ class IGame {
         }
         EndDrawing();
       } break;
+      case Scene::MultiPlayerLobby: {
+        UI::MultiPlayerLobby();
 
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+        }
+        EndDrawing();
+      } break;
+      case Scene::LobbyBrowser: {
+        LookForMultiplayerLobby();
+
+        str choice = UI::LobbyBrowser();
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+        }
+        EndDrawing();
+      } break;
       case Scene::FactionSelect: {
         auto selection = UI::DrawFactionSelectScreen();
 

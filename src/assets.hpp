@@ -77,7 +77,7 @@ inline void load_all_in_folder( str path ) {
 
 
 inline void LoadAssets() {
-  std::string asset_folder = "assets/";
+  std::string asset_folder = "assets";
 
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
   load_borders();

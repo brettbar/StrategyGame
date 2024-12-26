@@ -12,31 +12,40 @@ set(SOURCE_FILES
   )
 
 if (UNIX)
-     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-     project(game)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    project(game)
 
-     # find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED 
-  
-     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+    # find_package(raylib 4.2.0 REQUIRED) # QUIET or REQUIRED 
 
-     add_library(raylib SHARED IMPORTED)
-     set_target_properties(
-       raylib PROPERTIES
-       IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
-       INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
-     )
- 
-     add_library(steam_api SHARED IMPORTED)
-     set_target_properties(
-       steam_api PROPERTIES
-       IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
-       INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
-     )
+    add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-     # For compiler errors/warnings
-     # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-     target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api)
-     target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+    add_library(raylib SHARED IMPORTED)
+    set_target_properties(
+      raylib PROPERTIES
+      #IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
+      IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.dylib"
+      INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
+    )
+
+    add_library(steam_api SHARED IMPORTED)
+    set_target_properties(
+      steam_api PROPERTIES
+      #IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+      IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.dylib"
+      INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
+    )
+
+  # For compiler errors/warnings
+  # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+  target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api)
+  target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+
+  configure_file("steam_appid.txt" "steam_appid.txt")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/steam/lib/libsteam_api.dylib" "${CMAKE_CURRENT_BINARY_DIR}/libsteam_api.dylib")
+
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
+  "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${CMAKE_CURRENT_BINARY_DIR}/assets")
 endif(UNIX)
 
 

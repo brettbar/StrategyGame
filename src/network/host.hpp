@@ -12,44 +12,36 @@
 
 #include "../shared/utils.hpp"
 #include "network.hpp"
-#include <chrono>
 #include <steam/isteammatchmaking.h>
 
 #include "../signals/events.hpp"
 #include "../signals/updates.hpp"
 
-namespace Network
-{
+namespace Network {
 
-  namespace
-  {
-    struct ClientConnectionData
-    {
+  namespace {
+    struct ClientConnectionData {
       PeerData peer_data;
       HSteamNetConnection conn;
       long latest_timestamp;
       u32 ping_ms;
 
-      ClientConnectionData()
-      {
+      ClientConnectionData() {
         conn = 0;
         latest_timestamp = TimestampMS();
         ping_ms = 1000;
       }
     };
 
-    struct MessageQueue : entt::dispatcher
-    {
-      void Enqueue( const Message &msg )
-      {
+    struct MessageQueue : entt::dispatcher {
+      void Enqueue( const Message &msg ) {
         this->enqueue( msg );
       }
     };
   };// namespace
 
 
-  class IHost
-  {
+  class IHost {
 private:
     IHost( IHost const & ) = delete;
     void operator=( const IHost & ) = delete;
@@ -71,8 +63,7 @@ private:
       SteamNetConnectionStatusChangedCallback_t
     );
 
-    IHost()
-    {
+    IHost() {
       // zero the client connection data
       // memset( &_clients, 0, sizeof( _clients ) );
       _clients = {};
@@ -87,8 +78,7 @@ private:
         SetupUsingP2P();
     }
 
-    ~IHost()
-    {
+    ~IHost() {
       // Close connection
       printf( "~IHost()\n" );
 
@@ -97,8 +87,7 @@ private:
     }
 
     // This is useful for localhost testing on the same machine
-    void SetupUsingIP()
-    {
+    void SetupUsingIP() {
       SteamNetworkingIPAddr addr = SteamNetworkingIPAddr();
       addr.SetIPv6LocalHost( 10202 );
 
@@ -109,8 +98,7 @@ private:
     }
 
     // This is useful for real production, different machines
-    void SetupUsingP2P()
-    {
+    void SetupUsingP2P() {
       _socket =
         SteamNetworkingSockets()->CreateListenSocketP2P( 0, 0, nullptr );
       assert( _socket != k_HSteamListenSocket_Invalid );
@@ -126,14 +114,12 @@ public:
 
     MessageQueue _msg_queue;
 
-    static IHost *Host()
-    {
+    static IHost *Host() {
       static IHost instance;
       return &instance;
     }
 
-    void Init()
-    {
+    void Init() {
       Network::is_host = true;
 
       SteamAPICall_t steam_api_call = SteamMatchmaking()->CreateLobby(
@@ -152,22 +138,19 @@ public:
     // TODO(rf) this is a bit clunky
     // This is for the case where the host selected his faction
     // before any players connected
-    inline void SetHostFaction( std::string faction )
-    {
+    inline void SetHostFaction( std::string faction ) {
       _clients[0].peer_data.faction = faction;
     }
 
-    void Update()
-    {
+    void Update() {
       CheckForMessages();
       EvaluateMessages();
     }
 
-    void CheckForMessages()
-    {
-      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i )
-      {
-        if ( !_clients[i].peer_data.active || _clients[i].conn == k_HSteamNetConnection_Invalid )
+    void CheckForMessages() {
+      for ( uint32 i = 0; i < MAX_PLAYERS_PER_SERVER; ++i ) {
+        if ( !_clients[i].peer_data.active ||
+             _clients[i].conn == k_HSteamNetConnection_Invalid )
           continue;
 
         SteamNetworkingMessage_t *msg;
@@ -177,8 +160,7 @@ public:
 
         assert( r == 0 || r == 1 );
 
-        if ( r == 1 )
-        {
+        if ( r == 1 ) {
           // printf( "Received message: '%s'\n", (char *) msg->GetData() );
           char *raw_message = (char *) msg->GetData();
           nlohmann::json message = nlohmann::json::parse( raw_message );
@@ -196,17 +178,13 @@ public:
       }
     }
 
-    void EvaluateMessages()
-    {
+    void EvaluateMessages() {
       _msg_queue.update();
     }
 
-    void ProcessQueuedMessageSwitch( const Message msg )
-    {
-      switch ( msg.message_id )
-      {
-        case ClientPingResponse:
-        {
+    void ProcessQueuedMessageSwitch( const Message msg ) {
+      switch ( msg.message_id ) {
+        case ClientPingResponse: {
           // printf(
           //   "Got ping response from client! %s\n", msg.body.dump().c_str()
           // );
@@ -225,10 +203,8 @@ public:
 
           // TODO some condition on latency or if its been too long since last resp
           _clients[index].latest_timestamp = newest_timestamp;
-        }
-        break;
-        case PlayerFactionSelect:
-        {
+        } break;
+        case PlayerFactionSelect: {
           std::string player_id = msg.body["player_id"];
           std::string faction = msg.body["faction"];
           std::string target = player_id + "_select_faction";
@@ -237,8 +213,7 @@ public:
           _clients[index].peer_data.faction = faction;
 
           // Tell all the other clients about it
-          for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-          {
+          for ( u32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
             if ( !_clients[i].peer_data.active )
               continue;
 
@@ -249,7 +224,8 @@ public:
                 nlohmann::json{
                   { "player_id", player_id },
                   { "faction", faction },
-                } }
+                }
+              }
             );
           }
 
@@ -259,10 +235,8 @@ public:
             .player_id = player_id,
           }
             .Send();
-        }
-        break;
-        case PlayerToggledReady:
-        {
+        } break;
+        case PlayerToggledReady: {
           std::string player_id = msg.body["player_id"];
           bool ready = msg.body["ready"];
 
@@ -285,13 +259,10 @@ public:
           } );
 
           CheckIfAllPlayersReady();
-        }
-        break;
-        case Command:
-        {
+        } break;
+        case Command: {
 
-          for ( auto &client: _clients )
-          {
+          for ( auto &client: _clients ) {
             if ( !client.peer_data.active )
               continue;
 
@@ -311,8 +282,7 @@ public:
       }
     }
 
-    void ToggleReady()
-    {
+    void ToggleReady() {
       std::cout << "Host()->ToggleReady!!!" << '\n';
 
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
@@ -328,18 +298,17 @@ public:
         MessageID::PlayerToggledReady,
         nlohmann::json{
           { "player_id", _clients[0].peer_data.player_id },
-          { "ready", _clients[0].peer_data.readied_up } },
+          { "ready", _clients[0].peer_data.readied_up }
+        },
       } );
 
       CheckIfAllPlayersReady();
     }
 
-    void CheckIfAllPlayersReady()
-    {
+    void CheckIfAllPlayersReady() {
       u32 num_active = 0;
       u32 num_ready = 0;
-      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
+      for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( !_clients[i].peer_data.active )
           continue;
 
@@ -357,8 +326,7 @@ public:
         .Send();
     }
 
-    void StartHostedCampaign()
-    {
+    void StartHostedCampaign() {
       SendMessageToAllActiveClients( Message{
         MessageID::HostStartedCampaign,
       } );
@@ -384,11 +352,9 @@ public:
     //   }
     // }
 
-    void SendMessageToAllActiveClients( Message message )
-    {
+    void SendMessageToAllActiveClients( Message message ) {
       // We start at 1 since host is always i=0
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ )
-      {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; i++ ) {
         if ( !_clients[i].peer_data.active )
           continue;
 
@@ -396,16 +362,17 @@ public:
       }
     }
 
-    void Delete()
-    {
+    void Delete() {
       delete this;
+    }
+
+    PeerData ReadClientPeerData( u32 index ) {
+      return _clients[index].peer_data;
     }
   };
 
-  inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure )
-  {
-    if ( cb->m_eResult == k_EResultOK )
-    {
+  inline void IHost::OnLobbyCreated( LobbyCreated_t *cb, bool io_failure ) {
+    if ( cb->m_eResult == k_EResultOK ) {
       printf( "Lobby created successfully\n" );
 
       Network::lobby_id = cb->m_ulSteamIDLobby;
@@ -434,15 +401,12 @@ public:
       _clients[0].peer_data.active = true;
       _clients[0].peer_data.steam_user_id =
         SteamMatchmaking()->GetLobbyOwner( Network::lobby_id );
-    }
-    else
-    {
+    } else {
       printf( "Failed to create lobby, lost connection to steam back-end\n" );
     }
   }
 
-  inline void IHost::OnLobbyChatMsg( LobbyChatMsg_t *param )
-  {
+  inline void IHost::OnLobbyChatMsg( LobbyChatMsg_t *param ) {
     char buf[4 * 1024];
     SteamMatchmaking()->GetLobbyChatEntry(
       param->m_ulSteamIDLobby,
@@ -458,42 +422,37 @@ public:
 
   inline void IHost::OnNetConnectionStatusChanged(
     SteamNetConnectionStatusChangedCallback_t *cb
-  )
-  {
+  ) {
     SteamNetConnectionInfo_t info = cb->m_info;
     ESteamNetworkingConnectionState old_state = cb->m_eOldState;
 
-    if ( _socket == k_HSteamListenSocket_Invalid )
-    {
+    if ( _socket == k_HSteamListenSocket_Invalid ) {
       printf( "Invalid socket, bailing\n" );
       return;
     }
 
-    if ( info.m_hListenSocket != _socket )
-    {
+    if ( info.m_hListenSocket != _socket ) {
       printf( "Socket doesn't match?, bailing\n" );
       return;
     }
 
 
     // Check if a client has connected
-    if ( info.m_eState == k_ESteamNetworkingConnectionState_Connecting && old_state == k_ESteamNetworkingConnectionState_None )
-    {
+    if ( info.m_eState == k_ESteamNetworkingConnectionState_Connecting &&
+         old_state == k_ESteamNetworkingConnectionState_None ) {
       printf(
         "Accepting client connection %s\n", info.m_szConnectionDescription
       );
 
       // Connection from a new client
       // Search for an available slot
-      for ( int i = 1; i < MAX_PLAYERS_PER_SERVER; ++i )
-      {
+      for ( int i = 1; i < MAX_PLAYERS_PER_SERVER; ++i ) {
         if ( _clients[i].peer_data.active )
           continue;
 
         EResult res = SteamNetworkingSockets()->AcceptConnection( cb->m_hConn );
 
-        if ( res != k_EResultOK )
-        {
+        if ( res != k_EResultOK ) {
           char msg[256];
 #if _WINDLL
           sprintf_s( msg, "AcceptConnection returned %d", res );
@@ -535,8 +494,7 @@ public:
           .Send();
 
         // Tell the new client about all the current clients
-        for ( auto &client: _clients )
-        {
+        for ( auto &client: _clients ) {
           if ( !client.peer_data.active )
             continue;
 
@@ -582,9 +540,9 @@ public:
         };
 
         // We start at 1 since the host already knows
-        for ( uint32 j = 1; j < MAX_PLAYERS_PER_SERVER; j++ )
-        {
-          if ( !_clients[i].peer_data.active || i == j )// we don't need to tell ourselves
+        for ( uint32 j = 1; j < MAX_PLAYERS_PER_SERVER; j++ ) {
+          if ( !_clients[i].peer_data.active ||
+               i == j )// we don't need to tell ourselves
             continue;
 
           SendMessageOnConnection(
@@ -608,15 +566,16 @@ public:
       );
     }
     // check if client has disconnected
-    else if ( ( old_state == k_ESteamNetworkingConnectionState_Connecting || old_state == k_ESteamNetworkingConnectionState_Connected ) && info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
-    {
-      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; ++i )
-      {
+    else if ( ( old_state == k_ESteamNetworkingConnectionState_Connecting ||
+                old_state == k_ESteamNetworkingConnectionState_Connected ) &&
+              info.m_eState ==
+                k_ESteamNetworkingConnectionState_ClosedByPeer ) {
+      for ( uint32 i = 1; i < MAX_PLAYERS_PER_SERVER; ++i ) {
         if ( !_clients[i].peer_data.active )
           continue;
 
-        if ( _clients[i].peer_data.steam_user_id == info.m_identityRemote.GetSteamID() )
-        {
+        if ( _clients[i].peer_data.steam_user_id ==
+             info.m_identityRemote.GetSteamID() ) {
           printf( "Disconnected dropped user\n" );
 
           SteamNetworkingSockets()->CloseConnection(
@@ -636,9 +595,7 @@ public:
     }
   }
 
-
-  inline IHost *Host()
-  {
+  inline IHost *Host() {
     return IHost::Host();
   }
 
