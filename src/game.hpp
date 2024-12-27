@@ -31,7 +31,8 @@ enum class Scene {
   SinglePlayerLobby,
   MultiPlayerLobby,
   LobbyBrowser,
-  FactionSelect,
+  SPFactionSelect,
+  MPFactionSelect,
   ModalMenu,
   Campaign,
   Editor,
@@ -126,7 +127,6 @@ class IGame {
   const f32 _ONCE_A_SECOND = 1;
 
   // TODO move
-  std::string faction = "";
   // TODO this should be set from networking
   // std::string player_id = "player_0";
 
@@ -317,7 +317,7 @@ class IGame {
 
         switch ( action ) {
           case UI::Action_SinglePlayerLobby::SelectFaction:
-            _scene = Scene::FactionSelect;
+            _scene = Scene::SPFactionSelect;
             break;
           case UI::Action_SinglePlayerLobby::ExitPressed:
             _scene = Scene::MainMenu;
@@ -333,7 +333,18 @@ class IGame {
         EndDrawing();
       } break;
       case Scene::MultiPlayerLobby: {
-        UI::MultiPlayerLobby();
+        switch ( UI::MultiPlayerLobby() ) {
+          case UI::Action_MultiplayerLobby::None:
+            break;
+          case UI::Action_MultiplayerLobby::HitBack:
+            _scene = Scene::MainMenu;
+            break;
+          case UI::Action_MultiplayerLobby::PickFaction: {
+            _scene = Scene::MPFactionSelect;
+          } break;
+          case UI::Action_MultiplayerLobby::ToggleReady:
+            break;
+        }
 
         BeginDrawing();
         {
@@ -359,7 +370,7 @@ class IGame {
         }
         EndDrawing();
       } break;
-      case Scene::FactionSelect: {
+      case Scene::SPFactionSelect: {
         auto selection = UI::DrawFactionSelectScreen();
 
         // @volatile
@@ -372,11 +383,44 @@ class IGame {
         {
           ClearBackground( BLACK );
           Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
         }
         EndDrawing();
       } break;
+      case Scene::MPFactionSelect: {
+        auto selection = UI::DrawFactionSelectScreen();
 
+        if ( selection != "" ) {
+          if ( Network::is_host ) {
+            Network::Host()->SetHostFaction( selection );
+            Network::Host()->SendMessageToAllActiveClients( Network::Message{
+              Network::MessageID::PlayerFactionSelect,
+              nlohmann::json{
+                { "player_id", "player_0" },
+                { "faction", selection },
+              },
+            } );
+          } else {
+            auto player_id = Network::Client()->_local_player_id;
+            Network::Client()->SendMessageToHost( Network::Message{
+              Network::MessageID::PlayerFactionSelect,
+              nlohmann::json{
+                { "player_id", player_id },
+                { "faction", selection },
+              },
+            } );
+          }
+
+          _scene = Scene::MultiPlayerLobby;
+        }
+
+
+        BeginDrawing();
+        {
+          ClearBackground( BLACK );
+          Iron::Forge()->DrawAll();
+        }
+        EndDrawing();
+      } break;
       case Scene::ModalMenu: {
         CheckMenuToggle();
 
@@ -410,7 +454,6 @@ class IGame {
         }
         EndDrawing();
       } break;
-
       case Scene::Editor:
       case Scene::Campaign: {
         CheckMenuToggle();
