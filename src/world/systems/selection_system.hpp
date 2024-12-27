@@ -13,8 +13,6 @@
 #include "../components/selected_component.hpp"
 #include "../components/settlement_component.hpp"
 
-#include "../../signals/updates.hpp"
-
 
 namespace Selection {
 
@@ -90,11 +88,11 @@ namespace Selection {
         actor.selected = true;
         selected_entity = entity;
 
-        InterfaceUpdate::Update{
-          .id = InterfaceUpdate::ID::ActorContext,
-          .condition = true,
-        }
-          .Send();
+        // InterfaceUpdate::Update{
+        //   .id = InterfaceUpdate::ID::ActorContext,
+        //   .condition = true,
+        // }
+        //   .Send();
 
         return;
       }
@@ -138,31 +136,31 @@ namespace Selection {
           Settlement::Component settlement =
             Global::world.get<Settlement::Component>( selected_entity );
 
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::SettlementContext,
-            .condition = true,
-            .json =
-              {
-                { "name", settlement.name },
-                { "population",
-                  std::to_string( settlement.population.current ) },
-                { "development",
-                  Settlement::dev_names.at( settlement.development ) },
-              },
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::SettlementContext,
+          //   .condition = true,
+          //   .json =
+          //     {
+          //       { "name", settlement.name },
+          //       { "population", std::to_string( settlement.population.current )
+          //       },
+          //       { "development",
+          //         Settlement::dev_names.at( settlement.development ) },
+          //     },
+          // }
+          //   .Send();
         } else {
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::SettlementContext,
-            .condition = true,
-            .json =
-              {
-                { "name", "Uninhabited" },
-                { "population", "Uninhabited" },
-                { "development", "Uninhabited" },
-              },
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::SettlementContext,
+          //   .condition = true,
+          //   .json =
+          //     {
+          //       { "name", "Uninhabited" },
+          //       { "population", "Uninhabited" },
+          //       { "development", "Uninhabited" },
+          //     },
+          // }
+          //   .Send();
         }
 
         return;
@@ -179,16 +177,16 @@ namespace Selection {
     ClearSelection<Actor::Component>( actors_view );
     ClearSelection<Province::Component>( prov_view );
 
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::SettlementContext,
-      .condition = false,
-    }
-      .Send();
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::ActorContext,
-      .condition = false,
-    }
-      .Send();
+    // InterfaceUpdate::Update{
+    //   .id = InterfaceUpdate::ID::SettlementContext,
+    //   .condition = false,
+    // }
+    //   .Send();
+    // InterfaceUpdate::Update{
+    //   .id = InterfaceUpdate::ID::ActorContext,
+    //   .condition = false,
+    // }
+    //   .Send();
 
     CheckSelectActors( click_pos, player_id );
     CheckSelectProvince( click_pos, player_id );

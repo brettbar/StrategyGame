@@ -14,9 +14,6 @@
 #include "network.hpp"
 #include <steam/isteammatchmaking.h>
 
-#include "../signals/events.hpp"
-#include "../signals/updates.hpp"
-
 namespace Network {
 
   namespace {
@@ -229,12 +226,12 @@ public:
             );
           }
 
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::PlayerSelectedFaction,
-            .update_txt = faction,
-            .player_id = player_id,
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+          //   .update_txt = faction,
+          //   .player_id = player_id,
+          // }
+          //   .Send();
         } break;
         case PlayerToggledReady: {
           std::string player_id = msg.body["player_id"];
@@ -243,12 +240,12 @@ public:
           u32 index = player_id_index[player_id];
           _clients[index].peer_data.readied_up = ready;
 
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::PlayerToggledReady,
-            .player_id = player_id,
-            .condition = ready,
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::PlayerToggledReady,
+          //   .player_id = player_id,
+          //   .condition = ready,
+          // }
+          //   .Send();
 
           SendMessageToAllActiveClients( Message{
             MessageID::PlayerToggledReady,
@@ -272,10 +269,10 @@ public:
             SendMessageOnConnection( client.conn, msg );
           }
 
-          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-            InterfaceEvent::ID::ClientReceivedCommand,
-            msg.body.dump(),
-          } );
+          // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+          //   InterfaceEvent::ID::ClientReceivedCommand,
+          //   msg.body.dump(),
+          // } );
         };
         default:
           break;
@@ -287,12 +284,12 @@ public:
 
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
 
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::PlayerToggledReady,
-        .player_id = "player_0",
-        .condition = _clients[0].peer_data.readied_up,
-      }
-        .Send();
+      // InterfaceUpdate::Update{
+      //   .id = InterfaceUpdate::ID::PlayerToggledReady,
+      //   .player_id = "player_0",
+      //   .condition = _clients[0].peer_data.readied_up,
+      // }
+      //   .Send();
 
       SendMessageToAllActiveClients( Message{
         MessageID::PlayerToggledReady,
@@ -318,12 +315,12 @@ public:
       }
 
       // Update if all players are ready or not
-      InterfaceUpdate::Update{
-        .id = InterfaceUpdate::ID::AllPlayersReady,
-        .condition = num_active > 1// at least 2 players
-                     && ( num_active == num_ready ),
-      }
-        .Send();
+      // InterfaceUpdate::Update{
+      //   .id = InterfaceUpdate::ID::AllPlayersReady,
+      //   .condition = num_active > 1// at least 2 players
+      //                && ( num_active == num_ready ),
+      // }
+      //   .Send();
     }
 
     void StartHostedCampaign() {
@@ -487,11 +484,11 @@ public:
           Message{ MessageID::AssignedPlayerId, new_player_id_body }
         );
 
-        InterfaceUpdate::Update{
-          .id = InterfaceUpdate::ID::PlayerJoinedLobby,
-          .player_id = _clients[i].peer_data.player_id,
-        }
-          .Send();
+        // InterfaceUpdate::Update{
+        //   .id = InterfaceUpdate::ID::PlayerJoinedLobby,
+        //   .player_id = _clients[i].peer_data.player_id,
+        // }
+        //   .Send();
 
         // Tell the new client about all the current clients
         for ( auto &client: _clients ) {

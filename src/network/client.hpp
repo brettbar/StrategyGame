@@ -11,11 +11,6 @@
 #include "steam/steamclientpublic.h"
 #include "steam/steamnetworkingtypes.h"
 
-#include "../shared/utils.hpp"
-
-#include "../signals/events.hpp"
-#include "../signals/updates.hpp"
-
 namespace Network {
   class IClient {
 private:
@@ -145,25 +140,25 @@ public:
           };
 
           if ( new_player_id == _local_player_id ) {
-            InterfaceUpdate::Update{
-              .id = InterfaceUpdate::ID::JoinLobby,
-              .player_id = new_player_id,
-            }
-              .Send();
+            // InterfaceUpdate::Update{
+            //   .id = InterfaceUpdate::ID::JoinLobby,
+            //   .player_id = new_player_id,
+            // }
+            //   .Send();
           } else {
-            InterfaceUpdate::Update{
-              .id = InterfaceUpdate::PlayerJoinedLobby,
-              .player_id = new_player_id,
-            }
-              .Send();
+            // InterfaceUpdate::Update{
+            //   .id = InterfaceUpdate::PlayerJoinedLobby,
+            //   .player_id = new_player_id,
+            // }
+            //   .Send();
 
             if ( faction != "" ) {
-              InterfaceUpdate::Update{
-                .id = InterfaceUpdate::ID::PlayerSelectedFaction,
-                .update_txt = faction,
-                .player_id = new_player_id,
-              }
-                .Send();
+              // InterfaceUpdate::Update{
+              //   .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+              //   .update_txt = faction,
+              //   .player_id = new_player_id,
+              // }
+              //   .Send();
             }
           }
         } break;
@@ -177,12 +172,12 @@ public:
           u32 index = player_id_index[player_id];
           _peers[index].faction = faction;
 
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::PlayerSelectedFaction,
-            .update_txt = faction,
-            .player_id = player_id,
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::PlayerSelectedFaction,
+          //   .update_txt = faction,
+          //   .player_id = player_id,
+          // }
+          //   .Send();
         } break;
         case MessageID::PlayerToggledReady: {
 
@@ -193,24 +188,24 @@ public:
           u32 index = player_id_index[player_id];
           _peers[index].readied_up = ready;
 
-          InterfaceUpdate::Update{
-            .id = InterfaceUpdate::ID::PlayerToggledReady,
-            .player_id = player_id,
-            .condition = ready,
-          }
-            .Send();
+          // InterfaceUpdate::Update{
+          //   .id = InterfaceUpdate::ID::PlayerToggledReady,
+          //   .player_id = player_id,
+          //   .condition = ready,
+          // }
+          //   .Send();
         } break;
         case MessageID::HostStartedCampaign: {
           // TODO maybe a different event emitter?
-          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-            InterfaceEvent::ID::JoinHostedCampaign,
-          } );
+          // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+          //   InterfaceEvent::ID::JoinHostedCampaign,
+          // } );
         } break;
         case MessageID::Command: {
-          InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-            InterfaceEvent::ID::ClientReceivedCommand,
-            body.dump(),
-          } );
+          // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
+          //   InterfaceEvent::ID::ClientReceivedCommand,
+          //   body.dump(),
+          // } );
         } break;
         default:
           printf( "INVALID MESSAGE ID RECEIVED!!!\n" );

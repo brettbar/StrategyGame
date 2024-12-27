@@ -16,7 +16,6 @@
 #include "network/network.hpp"
 #include "shared/common.hpp"
 
-#include "signals/updates.hpp"
 
 #include "world/systems/player_system.hpp"
 
@@ -169,11 +168,11 @@ class IGame {
     Network::is_host = true;
     Network::Host()->Init();
 
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::HostLobby,
-      .player_id = Network::Host()->_player_id,
-    }
-      .Send();
+    // InterfaceUpdate::Update{
+    //   .id = InterfaceUpdate::ID::HostLobby,
+    //   .player_id = Network::Host()->_player_id,
+    // }
+    //   .Send();
   }
 
   void HostStartMultiplayerCampaign() {
@@ -205,11 +204,11 @@ class IGame {
   }
 
   void JoinMultiplayerLobby( CSteamID lobby_id ) {
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::JoinLobby,
-      .player_id = "player_0",
-    }
-      .Send();
+    // InterfaceUpdate::Update{
+    //   .id = InterfaceUpdate::ID::JoinLobby,
+    //   .player_id = "player_0",
+    // }
+    //   .Send();
 
     if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
       printf( "Sending joined lobby event!\n" );
