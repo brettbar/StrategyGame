@@ -61,6 +61,8 @@ public:
       return &instance;
     }
 
+    str GetClientFaction();
+
     void Init() {
       SteamAPICall_t steam_api_call = SteamMatchmaking()->RequestLobbyList();
       result_lobby_match_list.Set(
@@ -71,13 +73,14 @@ public:
       _local_player_id = "INVALID_ID";
     }
 
-    void Update() {
-      CheckForMessages();
-    }
+    enum class ReceivedMessage {
+      None,
+      StartMultiplayer,
+    };
 
-    void CheckForMessages() {
+    ReceivedMessage CheckForMessages() {
       if ( _server_conn == k_HSteamNetConnection_Invalid )
-        return;
+        return ReceivedMessage::None;
 
       SteamNetworkingMessage_t *msg;
       int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
@@ -92,14 +95,21 @@ public:
         MessageID message_id = message["message_id"];
         auto body = message["body"];
 
-        ProcessMessageSwitch( message_id, body );
+        auto received_msg = ProcessMessageSwitch( message_id, body );
 
         // printf( "Received message: '%s'\n", raw_message );
         msg->Release();
+
+        return received_msg;
       }
+
+      return ReceivedMessage::None;
     }
 
-    void ProcessMessageSwitch( MessageID message_id, nlohmann::json body ) {
+    ReceivedMessage ProcessMessageSwitch(
+      MessageID message_id,
+      nlohmann::json body
+    ) {
       switch ( message_id ) {
         case MessageID::HostPingRequest: {
           SendMessageOnConnection(
@@ -200,6 +210,7 @@ public:
           // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
           //   InterfaceEvent::ID::JoinHostedCampaign,
           // } );
+          return ReceivedMessage::StartMultiplayer;
         } break;
         case MessageID::Command: {
           // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
@@ -209,8 +220,9 @@ public:
         } break;
         default:
           printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
-          break;
+          return ReceivedMessage::None;
       }
+      return ReceivedMessage::None;
     }
 
     void Delete() {
@@ -249,6 +261,10 @@ public:
       }
 
       return false;
+    }
+
+    inline bool ClientIsReady() {
+      return _peers[player_id_index[_local_player_id]].readied_up;
     }
 
     void ToggleReady() {
@@ -400,5 +416,9 @@ public:
     // SteamMatchmaking()->LeaveLobby( _lobby_id );
   }
 
+  inline str IClient::GetClientFaction() {
+    u32 index = player_id_index[_local_player_id];
+    return _peers[index].faction;
+  }
 
 };// namespace Network

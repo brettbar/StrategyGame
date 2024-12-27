@@ -139,6 +139,14 @@ public:
       _clients[0].peer_data.faction = faction;
     }
 
+    inline str GetHostFaction() {
+      return _clients[0].peer_data.faction;
+    }
+
+    inline bool IsHostReady() {
+      return _clients[0].peer_data.readied_up;
+    }
+
     void Update() {
       CheckForMessages();
       EvaluateMessages();
@@ -279,7 +287,7 @@ public:
       }
     }
 
-    void ToggleReady() {
+    bool ToggleReady() {
       std::cout << "Host()->ToggleReady!!!" << '\n';
 
       _clients[0].peer_data.readied_up = !_clients[0].peer_data.readied_up;
@@ -299,10 +307,10 @@ public:
         },
       } );
 
-      CheckIfAllPlayersReady();
+      return CheckIfAllPlayersReady();
     }
 
-    void CheckIfAllPlayersReady() {
+    bool CheckIfAllPlayersReady() {
       u32 num_active = 0;
       u32 num_ready = 0;
       for ( u32 i = 0; i < MAX_PLAYERS_PER_SERVER; i++ ) {
@@ -321,6 +329,7 @@ public:
       //                && ( num_active == num_ready ),
       // }
       //   .Send();
+      return num_ready == num_active;
     }
 
     void StartHostedCampaign() {

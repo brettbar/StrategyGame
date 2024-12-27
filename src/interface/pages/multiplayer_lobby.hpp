@@ -10,15 +10,16 @@
 #include "../../world/managers/faction_manager.hpp"
 
 namespace UI {
-  void HostView( Iron::IForge *, Iron::Element * );
-  void ClientView( Iron::IForge *, Iron::Element * );
-
   enum class Action_MultiplayerLobby {
     None,
     HitBack,
     PickFaction,
     ToggleReady,
+    HostStartedGame,
   };
+
+  void HostView( Iron::IForge *, Iron::Element * );
+  void ClientView( Iron::IForge *, Iron::Element * );
 
   inline Action_MultiplayerLobby MultiPlayerLobby() {
     auto f = Iron::Forge();
@@ -47,6 +48,16 @@ namespace UI {
     }
 
     if ( Network::is_host ) {
+      bool all_players_ready = false;
+
+      if ( Network::Host()->CheckIfAllPlayersReady() ) {
+        if ( f->TextButton( buttons_g->Slot( 2 ), "Start Game", GREEN ) ) {
+          return Action_MultiplayerLobby::HostStartedGame;
+        }
+      } else {
+        f->TextLabel( buttons_g->Slot( 2 ), "Waiting on Clients", RED );
+      }
+
       HostView( f, slots_g );
     } else {
       ClientView( f, slots_g );
@@ -81,8 +92,12 @@ namespace UI {
           );
         }
 
+        if ( pd.readied_up ) {
+          f->TextLabel( slot_g->Slot( 2 ), "Ready", GREEN );
+        } else {
+          f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
+        }
 
-        f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
       } else {
         f->TextLabel( slots_g->Slot( i ), "Open Slot", GRAY );
       }
@@ -115,7 +130,13 @@ namespace UI {
             Faction::Manager::Get()->primary_colors[peer.faction]
           );
         }
-        f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
+
+        if ( peer.readied_up ) {
+          f->TextLabel( slot_g->Slot( 2 ), "Ready", GREEN );
+        } else {
+          f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
+        }
+
       } else {
         f->TextLabel( slots_g->Slot( i ), "Open Slot", GRAY );
       }

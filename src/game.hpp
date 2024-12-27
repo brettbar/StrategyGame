@@ -179,22 +179,20 @@ class IGame {
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new Campaign( false );
-
+    _scene = Scene::Campaign;
+    _campaign = new struct Campaign( false );
     PlayerSystem::HostStartMultiplayer();
-
-    Game()->_scene = Scene::Campaign;
+    _campaign->start( Network::Host()->GetHostFaction() );
   }
 
   void ClientStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
+    _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
-
     PlayerSystem::ClientStartMultiplayer();
-
-    Game()->_scene = Scene::Campaign;
+    _campaign->start( Network::Client()->GetClientFaction() );
   }
 
   void LookForMultiplayerLobby() {
@@ -257,7 +255,13 @@ class IGame {
     if ( Network::is_host ) {
       Network::Host()->Update();
     } else {
-      Network::Client()->Update();
+      switch ( Network::Client()->CheckForMessages() ) {
+        case Network::IClient::ReceivedMessage::None: {
+        } break;
+        case Network::IClient::ReceivedMessage::StartMultiplayer: {
+          ClientStartMultiplayerCampaign();
+        } break;
+      }
     }
 
     Iron::Forge()->over_any_elem = false;
@@ -347,7 +351,16 @@ class IGame {
             _scene = Scene::MPFactionSelect;
           } break;
           case UI::Action_MultiplayerLobby::ToggleReady:
+            if ( Network::is_host ) {
+              Network::Host()->ToggleReady();
+            } else {
+              Network::Client()->ToggleReady();
+            }
             break;
+          case UI::Action_MultiplayerLobby::HostStartedGame: {
+            Network::Host()->StartHostedCampaign();
+            HostStartMultiplayerCampaign();
+          } break;
         }
 
         BeginDrawing();
