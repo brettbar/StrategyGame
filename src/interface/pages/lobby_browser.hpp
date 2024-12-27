@@ -3,11 +3,12 @@
 #include "../../network/client.hpp"
 #include "../../shared/common.hpp"
 #include "../irongui/forge.hpp"
+#include <steamclientpublic.h>
 
 
 namespace UI {
 
-  inline str LobbyBrowser() {
+  inline CSteamID LobbyBrowser() {
     auto f = Iron::Forge();
     rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
     auto root_g = f->Grid( root_r, 3, 3 );
@@ -23,12 +24,13 @@ namespace UI {
 
       if ( lobby_name && lobby_name[0] ) {
         str button_id = "lobby_entry_" + str( lobby_name );
-        if ( f->TextButton( lobby_g->Slot( i++ ), str( lobby_name ) ) ) {
-          return lobby_name;
+        if ( f->TextButton( lobby_g->Slot( i++ ), str( lobby_name ), BLUE ) ) {
+          return lobby_id;
         }
       }
     }
-    return "";
+
+    return CSteamID{};
   }
 
   // inline std::vector<Element> CreateLobbyBrowser()

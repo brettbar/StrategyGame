@@ -21,6 +21,8 @@
 #include "world/systems/player_system.hpp"
 
 #include "campaign.hpp"
+#include <cstddef>
+#include <optional>
 #include <raylib.h>
 
 enum class Scene {
@@ -115,7 +117,7 @@ class IGame {
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
   bool _hit_exit = false;
-  Scene _mode = Scene::MainMenu;
+  Scene _scene = Scene::MainMenu;
 
   f32 _oncelag = 0.0f;
   f32 _lag = 0.0f;
@@ -137,14 +139,14 @@ class IGame {
                         Begin: Singleplayer
   =============================================================*/
   void StartSingleplayerCampaign( str player_faction ) {
-    _mode = Scene::Campaign;
+    _scene = Scene::Campaign;
 
     _campaign = new struct Campaign( true );
     _campaign->start( player_faction );
   }
 
   void LoadSinglePlayerCampaign( cstr file_path ) {
-    _mode = Scene::Campaign;
+    _scene = Scene::Campaign;
 
     _campaign = new struct Campaign( true, "output.dat" );
     _campaign->load( file_path );
@@ -177,7 +179,7 @@ class IGame {
 
     PlayerSystem::HostStartMultiplayer();
 
-    Game()->_mode = Scene::Campaign;
+    Game()->_scene = Scene::Campaign;
   }
 
   void ClientStartMultiplayerCampaign() {
@@ -188,7 +190,7 @@ class IGame {
 
     PlayerSystem::ClientStartMultiplayer();
 
-    Game()->_mode = Scene::Campaign;
+    Game()->_scene = Scene::Campaign;
   }
 
   void LookForMultiplayerLobby() {
@@ -225,7 +227,7 @@ class IGame {
 
   void ReturnToMain() {
     // UI::System::SwitchPage( UI::MainMenu );
-    _mode = Scene::MainMenu;
+    _scene = Scene::MainMenu;
   }
 
 
@@ -234,16 +236,16 @@ class IGame {
       // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
       //   InterfaceEvent::ID::ModalMenuToggle,
       // } );
-      if ( _mode == Scene::ModalMenu ) {
-        _mode = Scene::Campaign;
+      if ( _scene == Scene::ModalMenu ) {
+        _scene = Scene::Campaign;
       } else {
-        _mode = Scene::ModalMenu;
+        _scene = Scene::ModalMenu;
       }
     }
   }
 
   void ExitToMainMenu() {
-    _mode = Scene::MainMenu;
+    _scene = Scene::MainMenu;
     ExitCampaignCleanup();
   }
 
@@ -256,23 +258,24 @@ class IGame {
 
     Iron::Forge()->over_any_elem = false;
 
-    switch ( _mode ) {
+    switch ( _scene ) {
       case Scene::MainMenu: {
         auto action = UI::DrawMainMenu();
 
         switch ( action ) {
           case UI::Action_MainMenu::StartGame:
-            _mode = Scene::SinglePlayerLobby;
+            _scene = Scene::SinglePlayerLobby;
             break;
           case UI::Action_MainMenu::LoadGame: {
-            _mode = Scene::LoadGames;
+            _scene = Scene::LoadGames;
           } break;
           case UI::Action_MainMenu::HostGame:
             HostMultiplayerLobby();
-            _mode = Scene::MultiPlayerLobby;
+            _scene = Scene::MultiPlayerLobby;
             break;
           case UI::Action_MainMenu::JoinGame:
-            _mode = Scene::LobbyBrowser;
+            LookForMultiplayerLobby();
+            _scene = Scene::LobbyBrowser;
             break;
           case UI::Action_MainMenu::Settings:
             break;
@@ -295,7 +298,7 @@ class IGame {
         auto file_to_load = UI::load_game_menu( pressed_back );
 
         if ( pressed_back ) {
-          _mode = Scene::MainMenu;
+          _scene = Scene::MainMenu;
         }
 
         if ( file_to_load != "" ) {
@@ -314,10 +317,10 @@ class IGame {
 
         switch ( action ) {
           case UI::Action_SinglePlayerLobby::SelectFaction:
-            _mode = Scene::FactionSelect;
+            _scene = Scene::FactionSelect;
             break;
           case UI::Action_SinglePlayerLobby::ExitPressed:
-            _mode = Scene::MainMenu;
+            _scene = Scene::MainMenu;
             break;
           case UI::Action_SinglePlayerLobby::None:
             break;
@@ -340,9 +343,14 @@ class IGame {
         EndDrawing();
       } break;
       case Scene::LobbyBrowser: {
-        LookForMultiplayerLobby();
 
-        str choice = UI::LobbyBrowser();
+        CSteamID choice = UI::LobbyBrowser();
+        // dont know if this works
+        if ( choice.IsValid() ) {
+          if ( Network::Client()->AttemptJoinLobby( choice ) ) {
+            _scene = Scene::MultiPlayerLobby;
+          }
+        }
 
         BeginDrawing();
         {
@@ -418,14 +426,14 @@ class IGame {
         }
 
         if ( IsKeyPressed( KEY_GRAVE ) ) {
-          if ( _mode == Scene::Editor ) {
-            _mode = Scene::Campaign;
+          if ( _scene == Scene::Editor ) {
+            _scene = Scene::Campaign;
           } else {
-            _mode = Scene::Editor;
+            _scene = Scene::Editor;
           }
         }
 
-        if ( _mode == Scene::Editor ) {
+        if ( _scene == Scene::Editor ) {
 
           auto editor_action = UI::panel();
 

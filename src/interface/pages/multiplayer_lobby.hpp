@@ -8,6 +8,8 @@
 #include "../irongui/forge.hpp"
 
 namespace UI {
+  void HostView( Iron::IForge *, Iron::Element * );
+  void ClientView( Iron::IForge *, Iron::Element * );
 
   inline void MultiPlayerLobby() {
     auto f = Iron::Forge();
@@ -21,6 +23,14 @@ namespace UI {
 
     f->TextLabel( root_grid->Slot( 0 ), "Multiplayer Lobby", BLUE );
 
+    if ( Network::is_host ) {
+      HostView( f, slots_g );
+    } else {
+      ClientView( f, slots_g );
+    }
+  }
+
+  inline void HostView( Iron::IForge *f, Iron::Element *slots_g ) {
     for ( u32 i = 0; i < Network::MAX_PLAYERS_PER_SERVER; i++ ) {
       auto pd = Network::Host()->ReadClientPeerData( i );
       if ( pd.active ) {
@@ -29,6 +39,34 @@ namespace UI {
         auto name =
           std::string( SteamFriends()->GetFriendPersonaName( pd.steam_user_id )
           );
+
+        if ( pd.player_id == "player_0" )
+          name = name + " (Me)";
+
+        f->TextLabel( slot_g->Slot( 0 ), name, RED );
+        f->TextLabel( slot_g->Slot( 1 ), "Picking Faction", RED );
+        f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
+      } else {
+        f->TextLabel( slots_g->Slot( i ), "Open Slot", GRAY );
+      }
+    }
+  }
+
+  inline void ClientView( Iron::IForge *f, Iron::Element *slots_g ) {
+    f->TextLabel( slots_g->Slot( 0 ), "Im bob client" );
+
+    for ( u32 i = 0; i < Network::MAX_PLAYERS_PER_SERVER; i++ ) {
+      auto peer = Network::Client()->_peers[i];
+
+      if ( peer.active ) {
+        auto slot_g = f->Grid( slots_g->Slot( i ), 1, 3 );
+
+        auto name =
+          std::string( SteamFriends()->GetFriendPersonaName( peer.steam_user_id
+          ) );
+
+        if ( peer.player_id == Network::Client()->_local_player_id )
+          name = name + " (Me)";
 
         f->TextLabel( slot_g->Slot( 0 ), name, RED );
         f->TextLabel( slot_g->Slot( 1 ), "Picking Faction", RED );

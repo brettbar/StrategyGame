@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
@@ -22,6 +23,10 @@ using cstr = const char *;
 using hstr = entt::hashed_string;
 using vec2f = Vector2;
 using rect = Rectangle;
+
+template<typename T>
+using opt = std::optional<T>;
+
 struct vec2i {
   i32 x;
   i32 y;
