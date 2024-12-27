@@ -1,5 +1,6 @@
-{
-  "romans": {
+[
+  {
+    "faction": "romans",
     "colors": {
       "primary": "red",
       "secondary": "gold"
@@ -24,7 +25,8 @@
       "type": "settled"
     }
   },
-  "greeks": {
+  {
+    "faction": "greeks",
     "colors": {
       "primary": "cyan",
       "secondary": "gold"
@@ -49,7 +51,8 @@
       "type": "settled"
     }
   },
-  "celts": {
+  {
+    "faction": "celts",
     "colors": {
       "primary": "green",
       "secondary": "gold"
@@ -74,7 +77,8 @@
       "type": "tribal"
     }
   },
-  "carthaginians": {
+  {
+    "faction": "carthaginians",
     "colors": {
       "primary": "purple",
       "secondary": "white"
@@ -103,4 +107,4 @@
       "type": "settled"
     }
   }
-}
+]

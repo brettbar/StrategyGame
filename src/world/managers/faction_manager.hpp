@@ -58,17 +58,18 @@ private:
         std::cout << js << std::endl;
         // std::cout << js["romans"] << std::endl;
         // std::cout << js["romans"]["adjectival"] << std::endl;
-        for ( auto &element: js.items() ) {
-          std::cout << element.key() << std::endl;
-          std::cout << element.value() << std::endl;
+        for ( const auto &element: js ) {
+          // std::cout << element.key() << std::endl;
+          std::cout << "ELEMENT!!!! " << element << std::endl;
 
-          auto colors = element.value().at( "colors" );
-          auto culture = element.value().at( "culture" );
-          auto government = element.value().at( "government" );
-          auto mobility = element.value().at( "mobility" );
+          auto id = element.at( "faction" );
+          auto colors = element.at( "colors" );
+          auto culture = element.at( "culture" );
+          auto government = element.at( "government" );
+          auto mobility = element.at( "mobility" );
 
           Faction::Component faction =
-            { .id = element.key(),
+            { .id = id,
               .colors =
                 {
                   .primary = colors.at( "primary" ),
