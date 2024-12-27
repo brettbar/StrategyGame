@@ -46,6 +46,9 @@ if (UNIX)
 
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
   "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${CMAKE_CURRENT_BINARY_DIR}/assets")
+
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
+  "${CMAKE_CURRENT_SOURCE_DIR}/data" "${CMAKE_CURRENT_BINARY_DIR}/data")
 endif(UNIX)
 
 

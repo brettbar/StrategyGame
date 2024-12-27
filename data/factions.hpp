@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../shared/common.hpp"
+#include "../src/shared/common.hpp"
 
 namespace Factions {
   const int num_factions = 7;

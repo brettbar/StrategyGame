@@ -152,10 +152,6 @@ inline void common_start() {
   Global::ClearRegistry();
   Renderer::Init();
 
-  // Initialize manager singletons
-  // Order matters here
-  Faction::Manager::Get();
-  Actor::Manager::Get();
 
   Map::Manager()->Init();
   Settlement::Manager()->on_start();

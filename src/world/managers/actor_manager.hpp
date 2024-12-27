@@ -37,7 +37,7 @@ private:
     }
 
     void build_actors_from_data() {
-      std::ifstream f( "src/data/actors.json" );
+      std::ifstream f( "data/actors.json" );
       {
         nlohmann::json js = nlohmann::json::parse( f );
 
