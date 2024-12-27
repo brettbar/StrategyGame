@@ -20,6 +20,12 @@ public:
 
     std::map<str, Actor::Data> roster = {};
 
+    Actor::Data actor_from_faction_roster( Type type, str faction_id ) {
+      Faction::Component &faction =
+        Faction::Manager::Get()->factions.at( faction_id );
+      return faction.roster.actors.at( type );
+    }
+
 private:
     Manager() {
       init();
