@@ -5,6 +5,7 @@
 #include "../../world/managers/actor_manager.hpp"
 #include "../../world/managers/faction_manager.hpp"
 #include "../irongui/forge.hpp"
+#include <raylib.h>
 
 
 namespace UI {
@@ -28,11 +29,14 @@ namespace UI {
       );
 
       auto actor = Actor::Manager::Get()->actor_from_faction_roster(
-        Actor::Type::Colonist, faction
+        Actor::Type::ArmyTierI, faction
       );
 
       bool faction_character = f->TextureButton(
-        faction_g->Slot( 1 ), hstr{ ( actor.sprite_id + "_overview" ).c_str() }
+        faction_g->Slot( 1 ),
+        hstr{ ( actor.sprite_id + "_overview" ).c_str() },
+        BLACK,
+        2.0f
       );
 
       if ( faction_select || faction_character ) {
