@@ -5,9 +5,30 @@
 #include "../components/faction_component.hpp"
 
 namespace Faction {
+  inline Color color_from_str( str color_s ) {
+    map<str, Color> m = {
+      { "red", RED },
+      { "blue", BLUE },
+      { "green", GREEN },
+      { "purple", PURPLE },
+      { "orange", ORANGE },
+      { "pink", PINK },
+      { "gray", GRAY },
+      { "black", BLACK },
+      { "white", WHITE },
+      { "cyan", BLUE },
+      { "gold", GOLD },
+      { "yellow", YELLOW },
+    };
+    return m[color_s];
+  }
+
   class Manager {
 public:
     map<str, Faction::Component> factions = {};
+    list<str> ids = {};
+    map<str, Color> primary_colors = {};
+    u32 num_factions = 0;
 
     static Manager *Get() {
       static Manager instance;
@@ -76,7 +97,12 @@ private:
                 .type = Faction::from_str( mobility.at( "type" ) ),
               } };
 
-          factions.emplace( element.key(), faction );
+          factions.emplace( faction.id, faction );
+          ids.push_back( faction.id );
+          primary_colors.emplace(
+            faction.id, color_from_str( faction.colors.primary )
+          );
+          num_factions++;
         }
       }
       f.close();

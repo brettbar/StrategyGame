@@ -2,12 +2,12 @@
 
 #include "../../shared/common.hpp"
 
-#include "../../data/factions.hpp"
-
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
 #include "../../network/network.hpp"
 #include "../irongui/forge.hpp"
+
+#include "../../world/managers/faction_manager.hpp"
 
 namespace UI {
   void HostView( Iron::IForge *, Iron::Element * );
@@ -77,7 +77,7 @@ namespace UI {
           f->TextLabel(
             slot_g->Slot( 1 ),
             pd.faction,
-            Factions::faction_color_lookup[pd.faction]
+            Faction::Manager::Get()->primary_colors[pd.faction]
           );
         }
 
@@ -112,7 +112,7 @@ namespace UI {
           f->TextLabel(
             slot_g->Slot( 1 ),
             peer.faction,
-            Factions::faction_color_lookup[peer.faction]
+            Faction::Manager::Get()->primary_colors[peer.faction]
           );
         }
         f->TextLabel( slot_g->Slot( 2 ), "Not Ready", RED );
