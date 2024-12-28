@@ -9,6 +9,8 @@
 #include "steam/isteammatchmaking.h"
 #include "steam/isteamnetworkingsockets.h"
 #include "steam/steamclientpublic.h"
+
+#include "../world/systems/commands_system.hpp"
 #include "steam/steamnetworkingtypes.h"
 
 namespace Network {
@@ -217,6 +219,12 @@ public:
           //   InterfaceEvent::ID::ClientReceivedCommand,
           //   body.dump(),
           // } );
+
+          std::cout << "body " << body.dump() << '\n';
+          // @todo this is missing a step that is found in campaigns PostCommand
+          // Commands::Manager()->enqueue(
+
+          // );
         } break;
         default:
           printf( "INVALID MESSAGE ID RECEIVED!!!\n" );

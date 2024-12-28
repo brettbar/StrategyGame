@@ -167,12 +167,6 @@ class IGame {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
-
-    // InterfaceUpdate::Update{
-    //   .id = InterfaceUpdate::ID::HostLobby,
-    //   .player_id = Network::Host()->_player_id,
-    // }
-    //   .Send();
   }
 
   void HostStartMultiplayerCampaign() {
@@ -182,7 +176,7 @@ class IGame {
     _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
     PlayerSystem::HostStartMultiplayer();
-    _campaign->start( Network::Host()->GetHostFaction() );
+    // _campaign->start( Network::Host()->GetHostFaction() );
   }
 
   void ClientStartMultiplayerCampaign() {
@@ -192,7 +186,7 @@ class IGame {
     _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
     PlayerSystem::ClientStartMultiplayer();
-    _campaign->start( Network::Client()->GetClientFaction() );
+    // _campaign->start( Network::Client()->GetClientFaction() );
   }
 
   void LookForMultiplayerLobby() {
@@ -202,15 +196,8 @@ class IGame {
   }
 
   void JoinMultiplayerLobby( CSteamID lobby_id ) {
-    // InterfaceUpdate::Update{
-    //   .id = InterfaceUpdate::ID::JoinLobby,
-    //   .player_id = "player_0",
-    // }
-    //   .Send();
-
     if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
       printf( "Sending joined lobby event!\n" );
-      // UI::System::SwitchPage( UI::Lobby );
     }
   }
 
@@ -228,16 +215,11 @@ class IGame {
 
 
   void ReturnToMain() {
-    // UI::System::SwitchPage( UI::MainMenu );
     _scene = Scene::MainMenu;
   }
 
-
   void CheckMenuToggle() {
     if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-      //   InterfaceEvent::ID::ModalMenuToggle,
-      // } );
       if ( _scene == Scene::ModalMenu ) {
         _scene = Scene::Campaign;
       } else {
@@ -518,15 +500,7 @@ class IGame {
   void Scene_Campaign() {
     CheckMenuToggle();
 
-    if ( _single_player ) {
-      // Singleplayer Campaign
-      if ( _campaign )
-        _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
-    } else {
-      // Multiplayer Campaign
-      if ( _campaign )
-        _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
-    }
+    _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
 
     if ( IsKeyPressed( KEY_GRAVE ) ) {
       if ( _scene == Scene::Editor ) {
