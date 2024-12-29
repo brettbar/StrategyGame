@@ -441,39 +441,45 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
   entt::entity cmd_player_e = body["cmd_player_e"];
   Commands::Type cmd_type = body["cmd_type"];
   str cmd_msg = body["cmd_msg"];
+  // @todo the coords being a float is gonna cause issues
+  // since this is just movement to a tile, it can probably be ints,
+  // or even just the tile coord or something
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
+  vec2f click_pos = vec2f{ cmd_click_pos_x, cmd_click_pos_y };
   entt::entity entity = body["entity"];
 
 
+  // this switch is only necessary so that we dont incorrectly access
+  // missing keys from the json for commands that dont need certain values
+  // certainly protobufs or something would be better than json!
   switch ( cmd_type ) {
     case Commands::Type::Move: {
-      // @todo the coords being a float is gonna cause issues
-      // since this is just movement to a tile, it can probably be ints,
-      // or even just the tile coord or something
-
-      // {"cmd_msg":"Player request Faster",
-      // "cmd_player":"player_0",
-      // "cmd_pos.x":2.4366927009042875e+27,
-      // "cmd_pos.y":1.401298464324817e-45,
-      // "cmd_type":1,
-      // "entity":822356728
-      // }
-
-      // str cmd_msg = body["cmd_msg"];
-      // entt::entity cmd_player_e = body["cmd_player_e"];
-      // f32 x = body["cmd_pos.x"];
-      // f32 y = body["cmd_pos.y"];
-      // entt::entity e = body["entity"];
-
-
-      Commands::Manager()->enqueue( Commands::Command::move(
-        cmd_player_e, vec2f{ cmd_click_pos_x, cmd_click_pos_y }, entity
-      ) );
+      Commands::Manager()->enqueue(
+        Commands::Command::move( cmd_player_e, click_pos, entity )
+      );
     } break;
     case Commands::Type::TimeChange: {
       Commands::Manager()->enqueue(
         Commands::Command::time_change( cmd_player_e, cmd_msg )
+      );
+    } break;
+    case Commands::Type::ClaimProvince: {
+      Commands::Manager()->enqueue( Commands::Command::claim_province( entity )
+      );
+    } break;
+    case Commands::Type::BuildSettlement: {
+      Commands::Manager()->enqueue( Commands::Command::build_settlement( entity
+      ) );
+    } break;
+    case Commands::Type::SpawnArmy: {
+      Commands::Manager()->enqueue(
+        Commands::Command::spawn_army( cmd_player_e, click_pos )
+      );
+    } break;
+    case Commands::Type::SpawnColonist: {
+      Commands::Manager()->enqueue(
+        Commands::Command::spawn_colonist( cmd_player_e, click_pos )
       );
     } break;
   }
