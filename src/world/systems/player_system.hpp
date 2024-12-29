@@ -166,4 +166,19 @@ namespace PlayerSystem {
     }
   }
 
+  inline entt::entity GetEntityOfPlayer( str player_id ) {
+    auto v = Global::world.view<Player::Component>();
+
+    for ( auto p: v ) {
+      Player::Component pc = v.get<Player::Component>( p );
+
+      if ( pc.player_id == player_id ) {
+        return p;
+      }
+    }
+
+    // Should never get here
+    return entt::null;
+  }
+
 };// namespace PlayerSystem

@@ -169,23 +169,23 @@ class IGame {
     Network::Host()->Init();
   }
 
+  // @todo maybe can consolidate these
   void HostStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
     _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
-    PlayerSystem::HostStartMultiplayer();
+    _campaign->start_mp();
     // _campaign->start( Network::Host()->GetHostFaction() );
   }
-
   void ClientStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
     _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
-    PlayerSystem::ClientStartMultiplayer();
+    _campaign->start_mp();
     // _campaign->start( Network::Client()->GetClientFaction() );
   }
 

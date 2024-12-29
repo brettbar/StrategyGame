@@ -221,9 +221,40 @@ public:
           // } );
 
           std::cout << "body " << body.dump() << '\n';
+
+          Commands::Type type = body["cmd_type"];
+
+          switch ( type ) {
+            case Commands::Type::Move: {
+              // @todo the coords being a float is gonna cause issues
+              // since this is just movement to a tile, it can probably be ints,
+              // or even just the tile coord or something
+
+              // {"cmd_msg":"Player request Faster",
+              // "cmd_player":"player_0",
+              // "cmd_pos.x":2.4366927009042875e+27,
+              // "cmd_pos.y":1.401298464324817e-45,
+              // "cmd_type":1,
+              // "entity":822356728
+              // }
+
+              str cmd_msg = body["cmd_msg"];
+              entt::entity cmd_player_e = body["cmd_player_e"];
+              f32 x = body["cmd_pos.x"];
+              f32 y = body["cmd_pos.y"];
+              entt::entity e = body["entity"];
+
+              auto cmd =
+                Commands::Command::move( cmd_player_e, vec2f{ x, y }, e );
+
+              Commands::Manager()->enqueue( cmd );
+            } break;
+            default:
+              break;
+          }
+
           // @todo this is missing a step that is found in campaigns PostCommand
           // Commands::Manager()->enqueue(
-
           // );
         } break;
         default:

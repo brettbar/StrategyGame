@@ -76,6 +76,7 @@ struct Campaign {
 
   void start( str );
   void save( str );
+  void start_mp();
   void load( cstr );
   void CheckForInput();
   void CheckForUIInteractions();
@@ -108,6 +109,49 @@ inline str Campaign::GetLocalPlayerID() {
   } else {
     return Network::Client()->_local_player_id;
   }
+}
+
+
+inline void common_start() {
+  Global::ClearRegistry();
+  Renderer::Init();
+
+
+  Map::Manager()->Init();
+  Settlement::Manager()->on_start();
+}
+
+inline void Campaign::start( str player_faction ) {
+  common_start();
+
+  PlayerSystem::create_players_for_sp( player_faction );
+  ProvinceSystem::Init();
+  Actor::System::Init();
+  AI::Start();
+
+  Commands::Manager()->init();
+  Commands::Manager()
+    ->queue.sink<Commands::Command>()
+    .connect<&Campaign::EvaluteCommands>( this );
+}
+
+inline void Campaign::start_mp() {
+  common_start();
+
+  if ( Network::is_host ) {
+    PlayerSystem::HostStartMultiplayer();
+  } else {
+    PlayerSystem::ClientStartMultiplayer();
+  }
+
+  ProvinceSystem::Init();
+  Actor::System::Init();
+  AI::Start();
+
+  Commands::Manager()->init();
+  Commands::Manager()
+    ->queue.sink<Commands::Command>()
+    .connect<&Campaign::EvaluteCommands>( this );
 }
 
 inline void Campaign::save( str file_name ) {
@@ -146,29 +190,6 @@ inline void Campaign::save( str file_name ) {
       .get<AI::Component>( output );
   }
   file.close();
-}
-
-inline void common_start() {
-  Global::ClearRegistry();
-  Renderer::Init();
-
-
-  Map::Manager()->Init();
-  Settlement::Manager()->on_start();
-}
-
-inline void Campaign::start( str player_faction ) {
-  common_start();
-
-  PlayerSystem::create_players_for_sp( player_faction );
-  ProvinceSystem::Init();
-  Actor::System::Init();
-  AI::Start();
-
-  Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>( this );
 }
 
 inline void Campaign::load( cstr file_path ) {
@@ -453,6 +474,7 @@ inline void Campaign::PostCommand( Commands::Command cmd ) {
   } else {
     auto body = nlohmann::json{
       { "cmd_player", GetLocalPlayerID() },
+      { "cmd_player_e", cmd.player_e },
       { "cmd_type", cmd.type },
       { "cmd_msg", cmd.msg },
       { "cmd_pos.x", cmd.click_pos.x },
