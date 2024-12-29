@@ -87,8 +87,8 @@ namespace Commands {
       return cmd;
     }
 
-private:
-    Command() {}
+    // private:
+    //     Command() {}
   };
 
   class System {

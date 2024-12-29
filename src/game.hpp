@@ -237,11 +237,15 @@ class IGame {
     if ( Network::is_host ) {
       Network::Host()->Update();
     } else {
-      switch ( Network::Client()->CheckForMessages() ) {
-        case Network::IClient::ReceivedMessage::None: {
+      auto msg = Network::Client()->CheckForMessages();
+      switch ( msg.type ) {
+        case Network::IClient::ReceivedMessage_t::None: {
         } break;
-        case Network::IClient::ReceivedMessage::StartMultiplayer: {
+        case Network::IClient::ReceivedMessage_t::StartMultiplayer: {
           ClientStartMultiplayerCampaign();
+        } break;
+        case Network::IClient::ReceivedMessage_t::Command: {
+          _campaign->ConvertCommandRequest( msg.body.dump() );
         } break;
       }
     }

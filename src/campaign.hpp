@@ -435,36 +435,71 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
   nlohmann::json body = nlohmann::json::parse( cmd );
 
   std::cout << "BODY" << body << '\n';
+  // std::cout << "body " << body.dump() << '\n';
 
   str cmd_player_id = body["cmd_player"];
+  entt::entity cmd_player_e = body["cmd_player_e"];
   Commands::Type cmd_type = body["cmd_type"];
   str cmd_msg = body["cmd_msg"];
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
   entt::entity entity = body["entity"];
 
-  auto players = Global::world.view<Player::Component>();
 
-  for ( entt::entity player: players ) {
-    Player::Component pc = Global::world.get<Player::Component>( player );
+  switch ( cmd_type ) {
+    case Commands::Type::Move: {
+      // @todo the coords being a float is gonna cause issues
+      // since this is just movement to a tile, it can probably be ints,
+      // or even just the tile coord or something
 
-    std::cout << "pc.player_id: " << pc.player_id << '\n';
-    std::cout << "cmd_player_id: " << cmd_player_id << '\n';
+      // {"cmd_msg":"Player request Faster",
+      // "cmd_player":"player_0",
+      // "cmd_pos.x":2.4366927009042875e+27,
+      // "cmd_pos.y":1.401298464324817e-45,
+      // "cmd_type":1,
+      // "entity":822356728
+      // }
 
-    if ( pc.player_id == cmd_player_id ) {
-      // @todo Gonna need to redo converting net command requests to local again now that
-      // I changed how commands work
-      // auto cmd = Commands::Command{
-      //   .type = cmd_type,
-      //   .player_e = player,
-      //   .msg = cmd_msg,
-      //   .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
-      //   .entity = entity,
-      // };
+      // str cmd_msg = body["cmd_msg"];
+      // entt::entity cmd_player_e = body["cmd_player_e"];
+      // f32 x = body["cmd_pos.x"];
+      // f32 y = body["cmd_pos.y"];
+      // entt::entity e = body["entity"];
 
-      // Commands::Manager()->enqueue( cmd );
-    }
+
+      Commands::Manager()->enqueue( Commands::Command::move(
+        cmd_player_e, vec2f{ cmd_click_pos_x, cmd_click_pos_y }, entity
+      ) );
+    } break;
+    case Commands::Type::TimeChange: {
+      Commands::Manager()->enqueue(
+        Commands::Command::time_change( cmd_player_e, cmd_msg )
+      );
+    } break;
   }
+
+  // auto players = Global::world.view<Player::Component>();
+
+  // for ( entt::entity player: players ) {
+  //   Player::Component pc = Global::world.get<Player::Component>( player );
+
+  //   std::cout << "pc.player_id: " << pc.player_id << '\n';
+  //   std::cout << "cmd_player_id: " << cmd_player_id << '\n';
+
+  //   if ( pc.player_id == cmd_player_id ) {
+  //     // @todo Gonna need to redo converting net command requests to local again now that
+  //     // I changed how commands work
+  //     // auto cmd = Commands::Command{
+  //     //   .type = cmd_type,
+  //     //   .player_e = player,
+  //     //   .msg = cmd_msg,
+  //     //   .click_pos = { cmd_click_pos_x, cmd_click_pos_y },
+  //     //   .entity = entity,
+  //     // };
+
+  //     // Commands::Manager()->enqueue( cmd );
+  //   }
+  // }
 }
 
 
