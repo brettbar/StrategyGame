@@ -229,9 +229,6 @@ public:
             body,
           };
         } break;
-        default:
-          printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
-          return Message{ MessageID::None };
       }
       return Message{ MessageID::None };
     }

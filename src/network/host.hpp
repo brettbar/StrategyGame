@@ -12,6 +12,7 @@
 
 #include "../shared/utils.hpp"
 #include "network.hpp"
+#include <queue>
 #include <steam/isteammatchmaking.h>
 
 namespace Network {
@@ -30,7 +31,7 @@ namespace Network {
       }
     };
 
-    struct MessageQueue : entt::dispatcher {
+    struct MessageDispatch : entt::dispatcher {
       void Enqueue( const Message &msg ) {
         this->enqueue( msg );
       }
@@ -109,7 +110,8 @@ public:
     // ClientConnectionData _clients[MAX_PLAYERS_PER_SERVER];
     std::array<ClientConnectionData, MAX_PLAYERS_PER_SERVER> _clients;
 
-    MessageQueue _msg_queue;
+    MessageDispatch _msg_dispatch;
+    std::queue<Message> _msg_queue;
 
     static IHost *Host() {
       static IHost instance;
@@ -125,9 +127,9 @@ public:
 
       result_lobby_created.Set( steam_api_call, this, &IHost::OnLobbyCreated );
 
-      _msg_queue = {};
+      _msg_dispatch = {};
 
-      _msg_queue.sink<Message>().connect<&IHost::ProcessQueuedMessageSwitch>(
+      _msg_dispatch.sink<Message>().connect<&IHost::ProcessQueuedMessageSwitch>(
         this
       );
     }
@@ -147,9 +149,17 @@ public:
       return _clients[0].peer_data.readied_up;
     }
 
-    void Update() {
-      // CheckForMessages();
-      _msg_queue.update();
+    Message ProcessNextMsg() {
+      CheckForMessages();
+      _msg_dispatch.update();
+
+      if ( !_msg_queue.empty() ) {
+        auto msg = _msg_queue.front();
+        _msg_queue.pop();
+        return msg;
+      }
+
+      return Message{ MessageID::None };
     }
 
     void CheckForMessages() {
@@ -172,11 +182,12 @@ public:
           MessageID message_id = message["message_id"];
           auto body = message["body"];
 
-
-          _msg_queue.Enqueue( Message{
+          Message foo = Message{
             message_id,
             body,
-          } );
+          };
+
+          _msg_dispatch.Enqueue( foo );
 
           msg->Release();
         }
@@ -273,14 +284,14 @@ public:
             SendMessageOnConnection( client.conn, msg );
           }
 
+
           // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
           //   InterfaceEvent::ID::ClientReceivedCommand,
           //   msg.body.dump(),
           // } );
         };
-        default:
-          break;
       }
+      _msg_queue.push( msg );
     }
 
     bool ToggleReady() {

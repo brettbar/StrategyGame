@@ -235,8 +235,14 @@ class IGame {
 
   void UpdateOnFrame() {
     if ( Network::is_host ) {
-      Network::Host()->Update();
-      Network::Host()->CheckForMessages();
+      auto msg = Network::Host()->ProcessNextMsg();
+      switch ( msg.message_id ) {
+        case Network::MessageID::Command: {
+          _campaign->ConvertCommandRequest( msg.body.dump() );
+        } break;
+      }
+
+      // auto msg = Network::Host()->CheckForMessages();
     } else {
       auto msg = Network::Client()->CheckForMessages();
       switch ( msg.message_id ) {
