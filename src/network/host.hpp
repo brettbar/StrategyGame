@@ -148,8 +148,8 @@ public:
     }
 
     void Update() {
-      CheckForMessages();
-      EvaluateMessages();
+      // CheckForMessages();
+      _msg_queue.update();
     }
 
     void CheckForMessages() {
@@ -183,13 +183,9 @@ public:
       }
     }
 
-    void EvaluateMessages() {
-      _msg_queue.update();
-    }
-
     void ProcessQueuedMessageSwitch( const Message msg ) {
       switch ( msg.message_id ) {
-        case ClientPingResponse: {
+        case MessageID::ClientPingResponse: {
           // printf(
           //   "Got ping response from client! %s\n", msg.body.dump().c_str()
           // );
@@ -209,7 +205,7 @@ public:
           // TODO some condition on latency or if its been too long since last resp
           _clients[index].latest_timestamp = newest_timestamp;
         } break;
-        case PlayerFactionSelect: {
+        case MessageID::PlayerFactionSelect: {
           std::string player_id = msg.body["player_id"];
           std::string faction = msg.body["faction"];
           std::string target = player_id + "_select_faction";
@@ -241,7 +237,7 @@ public:
           // }
           //   .Send();
         } break;
-        case PlayerToggledReady: {
+        case MessageID::PlayerToggledReady: {
           std::string player_id = msg.body["player_id"];
           bool ready = msg.body["ready"];
 
@@ -265,7 +261,7 @@ public:
 
           CheckIfAllPlayersReady();
         } break;
-        case Command: {
+        case MessageID::Command: {
 
           for ( auto &client: _clients ) {
             if ( !client.peer_data.active )

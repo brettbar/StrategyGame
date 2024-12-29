@@ -75,20 +75,20 @@ public:
       _local_player_id = "INVALID_ID";
     }
 
-    enum class ReceivedMessage_t {
-      None,
-      StartMultiplayer,
-      Command,
-    };
+    // enum class ReceivedMessage_t {
+    //   None,
+    //   StartMultiplayer,
+    //   Command,
+    // };
 
-    struct ReceivedMessage {
-      ReceivedMessage_t type;
-      nlohmann::json body;
-    };
+    // struct ReceivedMessage {
+    //   ReceivedMessage_t type;
+    //   nlohmann::json body;
+    // };
 
-    ReceivedMessage CheckForMessages() {
+    Message CheckForMessages() {
       if ( _server_conn == k_HSteamNetConnection_Invalid )
-        return ReceivedMessage{ ReceivedMessage_t::None };
+        return Message{ MessageID::None };
 
       SteamNetworkingMessage_t *msg;
       int r = SteamNetworkingSockets()->ReceiveMessagesOnConnection(
@@ -111,13 +111,10 @@ public:
         return received_msg;
       }
 
-      return ReceivedMessage{ ReceivedMessage_t::None };
+      return Message{ MessageID::None };
     }
 
-    ReceivedMessage ProcessMessageSwitch(
-      MessageID message_id,
-      nlohmann::json body
-    ) {
+    Message ProcessMessageSwitch( MessageID message_id, nlohmann::json body ) {
       switch ( message_id ) {
         case MessageID::HostPingRequest: {
           SendMessageOnConnection(
@@ -218,7 +215,7 @@ public:
           // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
           //   InterfaceEvent::ID::JoinHostedCampaign,
           // } );
-          return ReceivedMessage{ ReceivedMessage_t::StartMultiplayer };
+          return Message{ MessageID::HostStartedCampaign };
         } break;
         case MessageID::Command: {
           // InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
@@ -227,16 +224,16 @@ public:
           // } );
 
 
-          return ReceivedMessage{
-            ReceivedMessage_t::Command,
+          return Message{
+            MessageID::Command,
             body,
           };
         } break;
         default:
           printf( "INVALID MESSAGE ID RECEIVED!!!\n" );
-          return ReceivedMessage{ ReceivedMessage_t::None };
+          return Message{ MessageID::None };
       }
-      return ReceivedMessage{ ReceivedMessage_t::None };
+      return Message{ MessageID::None };
     }
 
     void Delete() {

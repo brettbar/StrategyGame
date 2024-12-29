@@ -42,7 +42,8 @@ namespace Network {
     { "player_7", 7 },
   };
 
-  enum MessageID : u32 {
+  enum class MessageID : u32 {
+    None,
     InitiateContact,
     AssignedPlayerId,
     HostPingRequest,

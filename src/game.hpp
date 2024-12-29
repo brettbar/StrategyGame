@@ -236,15 +236,16 @@ class IGame {
   void UpdateOnFrame() {
     if ( Network::is_host ) {
       Network::Host()->Update();
+      Network::Host()->CheckForMessages();
     } else {
       auto msg = Network::Client()->CheckForMessages();
-      switch ( msg.type ) {
-        case Network::IClient::ReceivedMessage_t::None: {
+      switch ( msg.message_id ) {
+        case Network::MessageID::None: {
         } break;
-        case Network::IClient::ReceivedMessage_t::StartMultiplayer: {
+        case Network::MessageID::HostStartedCampaign: {
           ClientStartMultiplayerCampaign();
         } break;
-        case Network::IClient::ReceivedMessage_t::Command: {
+        case Network::MessageID::Command: {
           _campaign->ConvertCommandRequest( msg.body.dump() );
         } break;
       }
