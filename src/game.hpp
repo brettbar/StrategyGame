@@ -195,11 +195,11 @@ class IGame {
     Network::Client()->Init();
   }
 
-  void JoinMultiplayerLobby( CSteamID lobby_id ) {
-    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
-      printf( "Sending joined lobby event!\n" );
-    }
-  }
+  // void JoinMultiplayerLobby( CSteamID lobby_id ) {
+  //   if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
+  //     printf( "Sending joined lobby event!\n" );
+  //   }
+  // }
 
   /*=============================================================
                         End: Multiplayer
@@ -407,9 +407,12 @@ class IGame {
   void Scene_LobbyBrowser() {
     CSteamID choice = UI::LobbyBrowser();
     // dont know if this works
+
     if ( choice.IsValid() ) {
+      std::cout << "1." << '\n';
       if ( Network::Client()->AttemptJoinLobby( choice ) ) {
         _scene = Scene::MultiPlayerLobby;
+        std::cout << "2." << '\n';
       }
     }
 

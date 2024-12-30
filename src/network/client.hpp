@@ -252,18 +252,18 @@ public:
         SteamMatchmaking()->GetLobbyData( lobby_id, "name" );
 
       if ( lobby_name && lobby_name[0] ) {
-        if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
-          printf( "IClient >> Found %s, attempting join\n", lobby_name );
+        // if ( strcmp( lobby_name, "Conquistador's lobby" ) == 0 ) {
+        printf( "IClient >> Found %s, attempting join\n", lobby_name );
 
-          SteamAPICall_t steam_api_call =
-            SteamMatchmaking()->JoinLobby( lobby_id );
+        SteamAPICall_t steam_api_call =
+          SteamMatchmaking()->JoinLobby( lobby_id );
 
-          result_lobby_entered.Set(
-            steam_api_call, this, &IClient::OnLobbyEntered
-          );
+        result_lobby_entered.Set(
+          steam_api_call, this, &IClient::OnLobbyEntered
+        );
 
-          return true;
-        }
+        return true;
+        // }
       } else {
         SteamMatchmaking()->RequestLobbyData( lobby_id );
       }
@@ -379,6 +379,9 @@ public:
         printf( "IClient >> Connected!...\n" );
         break;
       }
+      default:
+        std::cout << cb->m_info.m_eState;
+        break;
     }
   }
 
