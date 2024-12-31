@@ -7,7 +7,6 @@
 #include "interface/pages/modal_menu_ui.hpp"
 #include "interface/pages/multiplayer_lobby.hpp"
 #include "interface/pages/save_games.hpp"
-#include "interface/pages/singleplayer_lobby.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -24,6 +23,7 @@
 
 #include "clay/clay.h"
 #include "clay/clay_renderer_raylib.c"
+#include "ui/scenes/singleplayer_lobby.hpp"
 
 enum class Scene {
   MainMenu,
@@ -260,6 +260,23 @@ class IGame {
 
     Iron::Forge()->over_any_elem = false;
 
+    Clay_SetLayoutDimensions( (Clay_Dimensions) {
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    } );
+    Vector2 mouse_pos = GetMousePosition();
+    Vector2 scroll_delta = GetMouseWheelMoveV();
+    Clay_SetPointerState(
+      Clay_Vector2{
+        mouse_pos.x,
+        mouse_pos.y,
+      },
+      IsMouseButtonDown( 0 )
+    );
+    Clay_UpdateScrollContainers(
+      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
+    );
+
     switch ( _scene ) {
       case Scene::MainMenu:
         Scene_MainMenu();
@@ -299,29 +316,9 @@ class IGame {
 
 
   void Scene_MainMenu() {
-    Clay_SetLayoutDimensions( (Clay_Dimensions) {
-      .width = (f32) GetScreenWidth(),
-      .height = (f32) GetScreenHeight(),
-    } );
-
-    Vector2 mouse_pos = GetMousePosition();
-    Vector2 scroll_delta = GetMouseWheelMoveV();
-    Clay_SetPointerState(
-      Clay_Vector2{
-        mouse_pos.x,
-        mouse_pos.y,
-      },
-      IsMouseButtonDown( 0 )
-    );
-    Clay_UpdateScrollContainers(
-      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
-    );
-
 
     Clay_BeginLayout();
     auto action = UI::main_menu();
-
-    // auto action = UI::DrawMainMenu();––
 
     switch ( action ) {
       case UI::Action_MainMenu::StartGame:
@@ -354,8 +351,6 @@ class IGame {
       ClearBackground( BLACK );
 
       Clay_Raylib_Render( render_cmds );
-
-      // Iron::Forge()->DrawAll();
     }
     EndDrawing();
   }
@@ -381,22 +376,26 @@ class IGame {
   }
 
   void Scene_SinglePlayerLobby() {
-    auto action = UI::SinglePlayerLobby();
+    Clay_BeginLayout();
+    auto action = UI::singleplayer_lobby();
 
     switch ( action ) {
       case UI::Action_SinglePlayerLobby::SelectFaction:
         _scene = Scene::SPFactionSelect;
         break;
-      case UI::Action_SinglePlayerLobby::ExitPressed:
+      case UI::Action_SinglePlayerLobby::ReturnToMain:
         _scene = Scene::MainMenu;
         break;
       case UI::Action_SinglePlayerLobby::None:
         break;
     }
+
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
+      Clay_Raylib_Render( render_cmds );
     }
     EndDrawing();
   }

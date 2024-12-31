@@ -1,0 +1,40 @@
+#pragma once
+
+#include "../../shared/common.hpp"
+#include "clay/clay.h"
+
+inline void RenderMenuButton( Clay_String text, u32 i ) {
+  CLAY(
+    CLAY_IDI( "MainMenuButton", i ),
+    CLAY_LAYOUT( {
+      .padding = { 16, 16 },
+      .sizing =
+        {
+          .width = CLAY_SIZING_FIXED( 240 ),
+        },
+      .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+    } ),
+    CLAY_RECTANGLE( {
+      .color{ 140, 140, 140, 255 },
+    } )
+  ) {
+    CLAY_TEXT(
+      text,
+      CLAY_TEXT_CONFIG( {
+        .fontId = 0,
+        .fontSize = 32,
+        .textColor = { 255, 255, 255, 255 },
+      } )
+    );
+  }
+}
+
+inline bool ButtonWasClicked( u32 index ) {
+  auto id =
+    Clay_GetElementIdWithIndex( CLAY_STRING( "MainMenuButton" ), index );
+  bool buttonIsHovered = Clay_PointerOver( id );
+  if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
+    return true;
+  }
+  return false;
+}
