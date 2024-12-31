@@ -5,7 +5,7 @@
 
 inline void RenderMenuButton( Clay_String text, u32 i ) {
   CLAY(
-    CLAY_IDI( "MainMenuButton", i ),
+    CLAY_IDI( "Button", i ),
     CLAY_LAYOUT( {
       .padding = { 16, 16 },
       .sizing =
@@ -30,8 +30,7 @@ inline void RenderMenuButton( Clay_String text, u32 i ) {
 }
 
 inline bool ButtonWasClicked( u32 index ) {
-  auto id =
-    Clay_GetElementIdWithIndex( CLAY_STRING( "MainMenuButton" ), index );
+  auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "Button" ), index );
   bool buttonIsHovered = Clay_PointerOver( id );
   if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
     return true;

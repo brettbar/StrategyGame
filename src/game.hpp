@@ -24,6 +24,7 @@
 #include "clay/clay.h"
 #include "clay/clay_renderer_raylib.c"
 #include "ui/scenes/singleplayer_lobby.hpp"
+#include "ui/scenes/sp_faction_select.hpp"
 
 enum class Scene {
   MainMenu,
@@ -452,7 +453,9 @@ class IGame {
   }
 
   void Scene_SPFactionSelect() {
-    auto selection = UI::DrawFactionSelectScreen();
+    // auto selection = UI::DrawFactionSelectScreen();
+    Clay_BeginLayout();
+    auto selection = UI::faction_settlement_screen();
 
     // @volatile
     // TODO make this a faction enum
@@ -460,10 +463,12 @@ class IGame {
       StartSingleplayerCampaign( selection );
     }
 
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
+      Clay_Raylib_Render( render_cmds );
+      // Iron::Forge()->DrawAll();
     }
     EndDrawing();
   }

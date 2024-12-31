@@ -3,7 +3,7 @@
 #include "../../shared/common.hpp"
 #include "clay/clay.h"
 
-#include "../components/text_button.hpp"
+#include "../library/text_button.hpp"
 
 namespace UI {
   enum class Action_MainMenu {
