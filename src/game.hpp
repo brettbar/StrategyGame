@@ -4,7 +4,6 @@
 #include "interface/pages/editor.hpp"
 #include "interface/pages/faction_select_menu.hpp"
 #include "interface/pages/lobby_browser.hpp"
-#include "interface/pages/main_menu_ui.hpp"
 #include "interface/pages/modal_menu_ui.hpp"
 #include "interface/pages/multiplayer_lobby.hpp"
 #include "interface/pages/save_games.hpp"
@@ -13,16 +12,18 @@
 #include "network/host.hpp"
 
 
+#include "ui/scenes/main_menu.hpp"
+
+
 #include "network/network.hpp"
 #include "shared/common.hpp"
 
 
-#include "world/systems/player_system.hpp"
-
 #include "campaign.hpp"
-#include <cstddef>
-#include <optional>
 #include <raylib.h>
+
+#include "clay/clay.h"
+#include "clay/clay_renderer_raylib.c"
 
 enum class Scene {
   MainMenu,
@@ -298,15 +299,38 @@ class IGame {
 
 
   void Scene_MainMenu() {
-    auto action = UI::DrawMainMenu();
+    Clay_SetLayoutDimensions( (Clay_Dimensions) {
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    } );
+
+    Vector2 mouse_pos = GetMousePosition();
+    Vector2 scroll_delta = GetMouseWheelMoveV();
+    Clay_SetPointerState(
+      Clay_Vector2{
+        mouse_pos.x,
+        mouse_pos.y,
+      },
+      IsMouseButtonDown( 0 )
+    );
+    Clay_UpdateScrollContainers(
+      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
+    );
+
+
+    Clay_BeginLayout();
+    auto action = UI::main_menu();
+
+    // auto action = UI::DrawMainMenu();––
 
     switch ( action ) {
       case UI::Action_MainMenu::StartGame:
+        printf( "Hit Start Game in game.hpp\n" );
         _scene = Scene::SinglePlayerLobby;
         break;
-      case UI::Action_MainMenu::LoadGame: {
+      case UI::Action_MainMenu::LoadGame:
         _scene = Scene::LoadGames;
-      } break;
+        break;
       case UI::Action_MainMenu::HostGame:
         HostMultiplayerLobby();
         _scene = Scene::MultiPlayerLobby;
@@ -323,11 +347,15 @@ class IGame {
       case UI::Action_MainMenu::None:
         break;
     }
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
 
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
+
+      Clay_Raylib_Render( render_cmds );
+
+      // Iron::Forge()->DrawAll();
     }
     EndDrawing();
   }

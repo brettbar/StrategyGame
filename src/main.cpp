@@ -3,6 +3,7 @@
 rights reserved.
 */
 
+#include <raylib.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
@@ -16,6 +17,9 @@ rights reserved.
 #include "assets.hpp"
 #include "game.hpp"
 #include "network/network.hpp"
+
+#define CLAY_IMPLEMENTATION
+#include "clay/clay.h"
 
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
@@ -56,9 +60,33 @@ int main() {
 
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
-  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  // SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
-  InitWindow( 1920, 1080, "FieldsOfMars" );
+
+  Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
+  // InitWindow( 1920, 1080, "FieldsOfMars" );
+  u64 clay_required_memory = Clay_MinMemorySize();
+  Clay_Arena clay_memory = (Clay_Arena) {
+    .memory = (char *) malloc( clay_required_memory ),
+    .capacity = clay_required_memory,
+  };
+
+  Clay_Initialize(
+    clay_memory,
+    (Clay_Dimensions) {
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    },
+    {}
+  );
+
+  Clay_SetMeasureTextFunction( Raylib_MeasureText );
+  const int FONT_ID_BODY_16 = 0;
+  Raylib_fonts[FONT_ID_BODY_16] = (Raylib_Font) {
+    .font = LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 ),
+    .fontId = FONT_ID_BODY_16,
+  };
+
   LoadAssets();
 
   SetExitKey( KEY_NULL );
