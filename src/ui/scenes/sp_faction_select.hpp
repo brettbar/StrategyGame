@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
 
 #include "../../world/managers/actor_manager.hpp"
 #include "../../world/managers/faction_manager.hpp"
 
 #include "../library/text_button.hpp"
+#include "../library/texture_button.hpp"
 #include <raylib.h>
 
 namespace UI {
@@ -58,11 +58,6 @@ namespace UI {
 
         CLAY( CLAY_LAYOUT( {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_GROW(),
-            },
           .padding = { 16, 16 },
           .childGap = 8,
           .childAlignment =
@@ -73,17 +68,9 @@ namespace UI {
         } ) ) {
           RenderMenuButton( cs, i, fc );
 
-          CLAY(
-            CLAY_LAYOUT(
-              { .sizing =
-                  { .width = CLAY_SIZING_FIXED( 128 ),
-                    .height = CLAY_SIZING_FIXED( 128 ) } }
-            ),
-            CLAY_IMAGE(
-              { .texture_id = hstr{ ( actor.sprite_id + "_overview" ).c_str() },
-                .sourceDimensions = { 128, 128 } }
-            )
-          ) {}
+          TextureButton(
+            hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }
+          );
         }
       }
     }
