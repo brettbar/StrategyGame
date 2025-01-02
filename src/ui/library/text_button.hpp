@@ -3,7 +3,11 @@
 #include "../../shared/common.hpp"
 #include "clay/clay.h"
 
-inline void RenderMenuButton( Clay_String text, u32 i ) {
+inline void RenderMenuButton(
+  Clay_String text,
+  u32 i,
+  Clay_Color color = { 140, 140, 140, 255 }
+) {
   CLAY(
     CLAY_IDI( "Button", i ),
     CLAY_LAYOUT( {
@@ -15,7 +19,7 @@ inline void RenderMenuButton( Clay_String text, u32 i ) {
       .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
     } ),
     CLAY_RECTANGLE( {
-      .color{ 140, 140, 140, 255 },
+      .color = color,
     } )
   ) {
     CLAY_TEXT(

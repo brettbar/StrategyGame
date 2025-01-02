@@ -18,9 +18,6 @@ rights reserved.
 #include "game.hpp"
 #include "network/network.hpp"
 
-#define CLAY_IMPLEMENTATION
-#include "clay/clay.h"
-
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "S::%d", severity );

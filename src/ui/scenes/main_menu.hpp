@@ -1,9 +1,11 @@
 #pragma once
 
 #include "../../shared/common.hpp"
+#include "../../shared/global.hpp"
 #include "clay/clay.h"
 
 #include "../library/text_button.hpp"
+#include <raylib.h>
 
 namespace UI {
   enum class Action_MainMenu {
@@ -70,7 +72,6 @@ namespace UI {
           },
       } )
     ) {
-
       for ( u32 i = 0; i < num_buttons; i++ ) {
         RenderMenuButton( buttons[i].text, i );
       }

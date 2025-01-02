@@ -34,8 +34,7 @@ namespace Global {
   }
 
 
-#define CR_AQUA                                                                \
-  CLITERAL( Color ) { 11, 115, 98, 255 }
+#define CR_AQUA CLITERAL( Color ){ 11, 115, 98, 255 }
   // #define GRAY       CLITERAL(Color){ 130, 130, 130, 255 }   // Gray
   // #define DARKGRAY   CLITERAL(Color){ 80, 80, 80, 255 }      // Dark Gray
   // #define YELLOW     CLITERAL(Color){ 253, 249, 0, 255 }     // Yellow

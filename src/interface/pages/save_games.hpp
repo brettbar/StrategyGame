@@ -18,6 +18,7 @@ namespace UI {
     auto button_g = f->Grid( root_g->Slot( 7 ), 2, 4 );
 
 
+    // @todo probably make this absolute like paradox games do, in documents for example
     std::string path = "./saves";
 
     list<str> options = {};
@@ -36,7 +37,8 @@ namespace UI {
       return "";
     }
 
-    if ( ( selected_path.size() > 0 ) && f->TextButton( button_g->Slot( 1 ), "Load", RED ) ) {
+    if ( ( selected_path.size() > 0 ) &&
+         f->TextButton( button_g->Slot( 1 ), "Load", RED ) ) {
       // @todo make actually really get the selected file
       return selected_path;
     }

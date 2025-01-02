@@ -1,11 +1,14 @@
 #pragma once
 
 #include "../../shared/common.hpp"
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
 
+#include "../../world/managers/actor_manager.hpp"
 #include "../../world/managers/faction_manager.hpp"
 
 #include "../library/text_button.hpp"
+#include <raylib.h>
 
 namespace UI {
   inline str faction_settlement_screen() {
@@ -32,27 +35,62 @@ namespace UI {
       } )
     ) {
       for ( u32 i = 0; i < num_factions; i++ ) {
-        str faction = fm->ids[i];
-        const char *faction_cstr = faction.c_str();
+        // Clay_String poop = CLAY_STRING( "romans" );
+        const char *faction = fm->ids[i].c_str();
 
-        u32 len = strlen( faction_cstr ) + 1;
-        char fixedArray[len];
-        strncpy( fixedArray, faction_cstr, len - 1 );
-        fixedArray[len - 1] = '\0';
-
-        // Clay_String cs = (Clay_String) {
-        //   .chars = faction_cstr,
-        //   .length = strlen( faction_cstr ),
-        // };
-
-        Clay_String poop = CLAY_STRING( "romans" );
+        auto actor = Actor::Manager::Get()->actor_from_faction_roster(
+          Actor::Type::ArmyTierI, faction
+        );
 
         Clay_String cs = (Clay_String) {
-          .chars = fixedArray,
-          .length = len - 1,
+          .chars = faction,
+          .length = strlen( faction ),
         };
 
-        RenderMenuButton( cs, i );
+        Color faction_color = fm->primary_colors[faction];
+        Clay_Color fc = {
+          .r = (f32) faction_color.r,
+          .g = (f32) faction_color.g,
+          .b = (f32) faction_color.b,
+          .a = (f32) faction_color.a
+        };
+
+
+        CLAY( CLAY_LAYOUT( {
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .padding = { 16, 16 },
+          .childGap = 8,
+          .childAlignment =
+            {
+              .y = CLAY_ALIGN_Y_CENTER,
+              .x = CLAY_ALIGN_X_CENTER,
+            },
+        } ) ) {
+          RenderMenuButton( cs, i, fc );
+
+          CLAY(
+            CLAY_LAYOUT(
+              { .sizing =
+                  { .width = CLAY_SIZING_FIXED( 128 ),
+                    .height = CLAY_SIZING_FIXED( 128 ) } }
+            ),
+            CLAY_IMAGE(
+              { .texture_id = hstr{ ( actor.sprite_id + "_overview" ).c_str() },
+                .sourceDimensions = { 128, 128 } }
+            )
+          ) {}
+        }
+      }
+    }
+
+    for ( u32 i = 0; i < num_factions; i++ ) {
+      if ( ButtonWasClicked( i ) ) {
+        return fm->ids[i];
       }
     }
 

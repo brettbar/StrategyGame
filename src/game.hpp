@@ -11,18 +11,21 @@
 #include "network/host.hpp"
 
 
-#include "ui/scenes/main_menu.hpp"
-
-
 #include "network/network.hpp"
 #include "shared/common.hpp"
 
+#include "renderer/renderer.hpp"
+
 
 #include "campaign.hpp"
+#include "shared/global.hpp"
 #include <raylib.h>
 
+#define CLAY_IMPLEMENTATION
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
-#include "clay/clay_renderer_raylib.c"
+
+#include "ui/scenes/main_menu.hpp"
 #include "ui/scenes/singleplayer_lobby.hpp"
 #include "ui/scenes/sp_faction_select.hpp"
 
@@ -38,6 +41,7 @@ enum class Scene {
   Campaign,
   Editor,
 };
+
 
 class IGame {
   public:
@@ -390,7 +394,6 @@ class IGame {
       case UI::Action_SinglePlayerLobby::None:
         break;
     }
-
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
 
     BeginDrawing();
@@ -452,6 +455,7 @@ class IGame {
     EndDrawing();
   }
 
+
   void Scene_SPFactionSelect() {
     // auto selection = UI::DrawFactionSelectScreen();
     Clay_BeginLayout();
@@ -467,7 +471,7 @@ class IGame {
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds );
+      Renderer::Custom_Clay_Raylib_Render( render_cmds );
       // Iron::Forge()->DrawAll();
     }
     EndDrawing();
@@ -595,6 +599,7 @@ class IGame {
                         End: Shared
   =============================================================*/
 };
+
 
 // inline void IGame::RegisterEventListeners() {
 //   InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(
