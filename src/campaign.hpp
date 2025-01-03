@@ -27,6 +27,7 @@
 #include "shared/common.hpp"
 
 
+#include "ui/scenes/campaign/campaign.hpp"
 #include "world/managers/map_manager.hpp"
 #include "world/managers/settlement_manager.hpp"
 
@@ -301,7 +302,8 @@ inline void Campaign::CheckForUIInteractions() {
       break;
   }
 
-  UI::OverviewPanel( root_g );
+  // UI::OverviewPanel( root_g );
+  UI::campaign_panels();
 
   if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
     auto settlement = Selection::GetSelectedComponent<Settlement::Component>();

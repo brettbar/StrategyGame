@@ -548,6 +548,8 @@ class IGame {
   }
 
   void Scene_Campaign() {
+    Clay_BeginLayout();
+
     CheckMenuToggle();
 
     _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
@@ -576,11 +578,14 @@ class IGame {
       }
     }
 
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
     // 6. Draw everything
     BeginDrawing();
     {
       _campaign->Draw();
-      Iron::Forge()->DrawAll();
+      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      // Iron::Forge()->DrawAll();
       // Iron::Forge()->DrawDebug();
     }
     EndDrawing();

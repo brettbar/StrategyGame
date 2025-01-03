@@ -14,7 +14,7 @@ inline void RenderMenuButton(
       .padding = { 16, 16 },
       .sizing =
         {
-          .width = CLAY_SIZING_FIXED( 240 ),
+          .width = CLAY_SIZING_FIT( 240 ),
         },
       .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
     } ),

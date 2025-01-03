@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "../../shared/global.hpp"
 #include "clay/clay.h"
 
 #include "../library/text_button.hpp"
