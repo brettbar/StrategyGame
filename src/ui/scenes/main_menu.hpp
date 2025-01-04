@@ -72,13 +72,15 @@ namespace UI {
       } )
     ) {
       for ( u32 i = 0; i < num_buttons; i++ ) {
-        RenderMenuButton( buttons[i].text, i );
+        RenderMenuButton(
+          CLAY_STRING( "MainMenu::Button" ), buttons[i].text, i
+        );
       }
     }
 
     for ( u32 i = 0; i < num_buttons; i++ ) {
       Button button = buttons[i];
-      if ( ButtonWasClicked( i ) ) {
+      if ( ButtonWasClicked( CLAY_STRING( "MainMenu::Button" ), i ) ) {
         return button.action;
       }
     }

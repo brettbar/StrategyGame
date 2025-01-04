@@ -39,15 +39,27 @@ namespace UI {
           },
       } )
     ) {
-      RenderMenuButton( CLAY_STRING( "Select Faction" ), 0 );
-      RenderMenuButton( CLAY_STRING( "Return to Main" ), 1 );
+      RenderMenuButton(
+        CLAY_STRING( "SinglePlayerLobby::SelectFaction" ),
+        CLAY_STRING( "Select Faction" ),
+        0
+      );
+      RenderMenuButton(
+        CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ),
+        CLAY_STRING( "Return to Main" ),
+        1
+      );
     }
 
-    if ( ButtonWasClicked( 0 ) ) {
+    if ( ButtonWasClicked(
+           CLAY_STRING( "SinglePlayerLobby::SelectFaction" ), 0
+         ) ) {
       return Action_SinglePlayerLobby::SelectFaction;
     }
 
-    if ( ButtonWasClicked( 1 ) ) {
+    if ( ButtonWasClicked(
+           CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ), 1
+         ) ) {
       return Action_SinglePlayerLobby::ReturnToMain;
     }
 

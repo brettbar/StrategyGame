@@ -66,7 +66,7 @@ namespace UI {
               .x = CLAY_ALIGN_X_CENTER,
             },
         } ) ) {
-          RenderMenuButton( cs, i, fc );
+          RenderMenuButton( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
 
           TextureButton(
             hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }
@@ -76,7 +76,7 @@ namespace UI {
     }
 
     for ( u32 i = 0; i < num_factions; i++ ) {
-      if ( ButtonWasClicked( i ) ) {
+      if ( ButtonWasClicked( CLAY_STRING( "FactionSelect::Button" ), i ) ) {
         return fm->ids[i];
       }
     }

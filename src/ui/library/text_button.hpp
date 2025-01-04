@@ -4,12 +4,15 @@
 #include "clay/clay.h"
 
 inline void RenderMenuButton(
+  Clay_String id_str,
   Clay_String text,
   u32 i,
   Clay_Color color = { 140, 140, 140, 255 }
 ) {
+
+
   CLAY(
-    CLAY_IDI( "Button", i ),
+    Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
     CLAY_LAYOUT( {
       .padding = { 16, 16 },
       .sizing =
@@ -33,8 +36,8 @@ inline void RenderMenuButton(
   }
 }
 
-inline bool ButtonWasClicked( u32 index ) {
-  auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "Button" ), index );
+inline bool ButtonWasClicked( Clay_String id_str, u32 index ) {
+  auto id = Clay_GetElementIdWithIndex( id_str, index );
   bool buttonIsHovered = Clay_PointerOver( id );
   if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
     return true;

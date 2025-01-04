@@ -6,6 +6,8 @@
 
 namespace UI {
 
+  inline int _overview_panel_i = 0;
+
   inline void overview_panel() {
     struct Button {
       Clay_String text;
@@ -58,7 +60,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
           .sizing =
             {
-              .width = CLAY_SIZING_FIT(),
+              .width = CLAY_SIZING_FIT( 128 ),
               .height = CLAY_SIZING_GROW(),
             },
           .childGap = 8,
@@ -100,13 +102,14 @@ namespace UI {
         CLAY_LAYOUT( {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( 271 ),
-              .height = CLAY_SIZING_FIXED( 295 ),
+              .width = CLAY_SIZING_FIXED( 256 ),
+              .height = CLAY_SIZING_FIXED( 512 ),
             },
+          .padding = { 16, 16 },
         } )
       ) {
         CLAY( CLAY_TEXT(
-          CLAY_STRING( "foo" ),
+          ( buttons[_overview_panel_i].text ),
           CLAY_TEXT_CONFIG(
             { .fontSize = 16, .textColor = { 255, 255, 255, 255 } }
           )
@@ -115,12 +118,13 @@ namespace UI {
     }
 
 
-    // for ( u32 i = 0; i < num_buttons; i++ ) {
-    //   Button button = buttons[i];
-    //   if ( ButtonWasClicked( i ) ) {
-    //     // return button.action;
-    //   }
-    // }
+    for ( u32 i = 0; i < num_buttons; i++ ) {
+      Button button = buttons[i];
+      if ( ButtonWasClicked( CLAY_STRING( "OverviewPanel::Button" ), i ) ) {
+        // return button.action;
+        _overview_panel_i = i;
+      }
+    }
 
     // return Action_MainMenu::None;
   }
