@@ -245,8 +245,8 @@ inline void Campaign::load( cstr file_path ) {
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
-  CheckForInput();
   CheckForUIInteractions();
+  CheckForInput();
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame
@@ -401,14 +401,22 @@ inline void Campaign::CheckForInput() {
   }
 
 
+  bool hovered = false;
+  const Clay_String foos[1] = { CLAY_STRING( "OverviewPanel" ) };
+  for ( u32 i = 0; i < 1; i++ ) {
+    Clay_ElementId id = Clay_GetElementId( foos[i] );
+    hovered = hovered || Clay_PointerOver( id );
+  }
+
+
   if ( IsMouseButtonPressed( 0 ) ) {
-    if ( !Iron::Forge()->MouseIsOverUI() ) {
+    if ( !hovered ) {
       Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
   if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !Iron::Forge()->MouseIsOverUI() ) {
+    if ( !hovered ) {
       auto selected_e =
         Global::world
           .view<Actor::Component, Animated::Component, Selected::Component>()

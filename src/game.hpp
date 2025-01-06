@@ -269,15 +269,14 @@ class IGame {
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
     } );
+
     Vector2 mouse_pos = GetMousePosition();
     Vector2 scroll_delta = GetMouseWheelMoveV();
+
     Clay_SetPointerState(
-      Clay_Vector2{
-        mouse_pos.x,
-        mouse_pos.y,
-      },
-      IsMouseButtonDown( 0 )
+      Clay_Vector2{ mouse_pos.x, mouse_pos.y }, IsMouseButtonDown( 0 )
     );
+
     Clay_UpdateScrollContainers(
       true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
     );
