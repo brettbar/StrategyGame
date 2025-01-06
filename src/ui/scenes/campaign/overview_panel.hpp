@@ -7,6 +7,7 @@
 namespace UI {
 
   inline int _overview_panel_i = 0;
+  inline bool _show_panel = false;
 
   inline void overview_panel() {
     struct Button {
@@ -49,18 +50,17 @@ namespace UI {
     CLAY(
       CLAY_ID( "OverviewPanel" ),
       CLAY_LAYOUT( {
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-        .childGap = 8,
         .padding = { 16, 16 },
+        .childGap = 8,
+        .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } )
     ) {
       CLAY(
         CLAY_ID( "OverviewPanel::Buttons" ),
         CLAY_LAYOUT( {
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 128 ),
+              .width = CLAY_SIZING_FIT( { 128 } ),
               .height = CLAY_SIZING_GROW(),
             },
           .childGap = 8,
@@ -68,52 +68,89 @@ namespace UI {
             {
               .x = CLAY_ALIGN_X_CENTER,
             },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } )
       ) {
         for ( u32 i = 0; i < num_buttons; i++ ) {
           CLAY(
             CLAY_IDI( "OverviewPanel::Button", i ),
             CLAY_LAYOUT( {
-              .padding = { 16, 16 },
               .sizing =
                 {
                   .width = CLAY_SIZING_FIXED( 240 ),
                 },
+              .padding = { 16, 16 },
               .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
             } ),
-            CLAY_RECTANGLE( { .color = { 41, 41, 41, 255 }, .cornerRadius = 5 }
-            )
+            CLAY_RECTANGLE( {
+              .color = { 41, 41, 41, 255 },
+              .cornerRadius = { 5 },
+            } )
           ) {
             CLAY_TEXT(
               buttons[i].text,
               CLAY_TEXT_CONFIG( {
+                .textColor = { 255, 255, 255, 255 },
                 .fontId = 0,
                 .fontSize = 18,
-                .textColor = { 255, 255, 255, 255 },
               } )
             );
           }
         }
       }
 
-      CLAY(
-        CLAY_ID( "OverviewPanel::Content" ),
-        CLAY_RECTANGLE( { .color = { 41, 41, 41, 255 }, .cornerRadius = 5 } ),
-        CLAY_LAYOUT( {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED( 256 ),
-              .height = CLAY_SIZING_FIXED( 512 ),
-            },
-          .padding = { 16, 16 },
-        } )
-      ) {
-        CLAY( CLAY_TEXT(
-          ( buttons[_overview_panel_i].text ),
-          CLAY_TEXT_CONFIG(
-            { .fontSize = 16, .textColor = { 255, 255, 255, 255 } }
-          )
-        ) );
+      if ( _show_panel ) {
+        CLAY(
+          CLAY_ID( "OverviewPanel::Content" ),
+          CLAY_RECTANGLE(
+            { .color = { 41, 41, 41, 255 }, .cornerRadius = { 5 } }
+          ),
+          CLAY_LAYOUT( {
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( 256 ),
+                .height = CLAY_SIZING_FIXED( 512 ),
+              },
+            .padding = { 16, 16 },
+          } )
+        ) {
+          CLAY(
+            CLAY_ID( "OverviewPanel::Content::Banner" ),
+            CLAY_LAYOUT( {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_GROW(),
+                },
+              .childAlignment =
+                {
+                  .x = CLAY_ALIGN_X_RIGHT,
+                },
+            } )
+          ) {
+            CLAY( CLAY_TEXT(
+              buttons[_overview_panel_i].text,
+              CLAY_TEXT_CONFIG( {
+                .textColor = { 255, 255, 255, 255 },
+                .fontSize = 16,
+              } )
+            ) );
+
+            CLAY( CLAY_LAYOUT( {
+              .sizing = { CLAY_SIZING_GROW() },
+            } ) );
+
+            CLAY(
+              CLAY_ID( "X" ),
+              CLAY_TEXT(
+                CLAY_STRING( "X" ),
+                CLAY_TEXT_CONFIG( {
+                  .textColor = { 255, 255, 255, 255 },
+                  .fontSize = 16,
+                } )
+              )
+            );
+          }
+        }
       }
     }
 
@@ -123,7 +160,12 @@ namespace UI {
       if ( ButtonWasClicked( CLAY_STRING( "OverviewPanel::Button" ), i ) ) {
         // return button.action;
         _overview_panel_i = i;
+        _show_panel = true;
       }
+    }
+
+    if ( ButtonWasClicked( CLAY_STRING( "X" ) ) ) {
+      _show_panel = false;
     }
 
     // return Action_MainMenu::None;

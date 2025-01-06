@@ -14,11 +14,11 @@ inline void RenderMenuButton(
   CLAY(
     Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
     CLAY_LAYOUT( {
-      .padding = { 16, 16 },
       .sizing =
         {
-          .width = CLAY_SIZING_FIT( 240 ),
+          .width = CLAY_SIZING_FIT( { 240 } ),
         },
+      .padding = { 16, 16 },
       .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
     } ),
     CLAY_RECTANGLE( {
@@ -28,9 +28,9 @@ inline void RenderMenuButton(
     CLAY_TEXT(
       text,
       CLAY_TEXT_CONFIG( {
+        .textColor = { 255, 255, 255, 255 },
         .fontId = 0,
         .fontSize = 32,
-        .textColor = { 255, 255, 255, 255 },
       } )
     );
   }
@@ -38,6 +38,15 @@ inline void RenderMenuButton(
 
 inline bool ButtonWasClicked( Clay_String id_str, u32 index ) {
   auto id = Clay_GetElementIdWithIndex( id_str, index );
+  bool buttonIsHovered = Clay_PointerOver( id );
+  if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
+    return true;
+  }
+  return false;
+}
+
+inline bool ButtonWasClicked( Clay_String id_str ) {
+  auto id = Clay_GetElementId( id_str );
   bool buttonIsHovered = Clay_PointerOver( id );
   if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
     return true;
