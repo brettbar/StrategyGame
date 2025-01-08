@@ -100,6 +100,8 @@ namespace UI {
       }
 
       if ( _show_panel ) {
+        Clay_Color white = { 255, 255, 255, 255 };
+
         CLAY(
           CLAY_ID( "OverviewPanel::Content" ),
           CLAY_RECTANGLE(
@@ -114,7 +116,8 @@ namespace UI {
             .padding = { 16, 16 },
             .childGap = 8,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          } )
+          } ),
+          CLAY_BORDER_OUTSIDE_RADIUS( 2, white, 5 )
         ) {
           CLAY(
             CLAY_ID( "OverviewPanel::Content::Banner" ),
@@ -128,6 +131,14 @@ namespace UI {
                   .x = CLAY_ALIGN_X_RIGHT,
                 },
             } )
+            // CLAY_BORDER( {
+            //   .bottom =
+            //     {
+            //       .width = 2,
+            //       .color = { 255, 255, 255, 255 },
+            //     },
+            // } )
+
           ) {
             CLAY( CLAY_TEXT(
               tabs[_overview_panel_i].text,

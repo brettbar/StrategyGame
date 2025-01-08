@@ -56,7 +56,6 @@ namespace UI {
       CLAY_ID( "MainMenu" ),
       CLAY_RECTANGLE( { .color = { 43, 41, 51, 255 } } ),
       CLAY_LAYOUT( {
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
         .sizing =
           {
             .width = CLAY_SIZING_GROW(),
@@ -66,9 +65,10 @@ namespace UI {
         .childGap = 8,
         .childAlignment =
           {
-            .y = CLAY_ALIGN_Y_CENTER,
             .x = CLAY_ALIGN_X_CENTER,
+            .y = CLAY_ALIGN_Y_CENTER,
           },
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
       for ( u32 i = 0; i < num_buttons; i++ ) {

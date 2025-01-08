@@ -1,14 +1,61 @@
 
 #include "../../../../shared/common.hpp"
-#include "../../../library/texture_button.hpp"
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
 
 namespace UI {
+  inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
+    vec2f dimensions = { 64, 64 };
+    CLAY(
+      CLAY_IDI( "BuildingIcon", i ),
+      CLAY_LAYOUT(
+        { .sizing =
+            { .width = CLAY_SIZING_FIXED( dimensions.x ),
+              .height = CLAY_SIZING_FIXED( dimensions.y ) } }
+      ),
+      CLAY_IMAGE( {
+        .sourceDimensions =
+          {
+            dimensions.x,
+            dimensions.y,
+          },
+        .texture_id = texture_id,
+      } )
+    ) {
+      auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "BuildingIcon" ), i );
+
+      if ( Clay_PointerOver( id ) ) {
+        CLAY(
+          CLAY_IDI( "BuildingIcon::Tooltip", i ),
+          CLAY_FLOATING(
+            { .attachment = { .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM } }
+          ),
+          CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 }, .cornerRadius = { 5 } }
+          ),
+          CLAY_LAYOUT( { .padding = { 8, 8 } } )
+        ) {
+          CLAY_TEXT(
+            label,
+            CLAY_TEXT_CONFIG( {
+              .textColor = { 255, 255, 255, 255 },
+              .fontId = 0,
+              .fontSize = 16,
+            } )
+          );
+        }
+      }
+    }
+  }
+
   inline void construction_tab() {
-    list<str> buildings = {
-      "farm_icon.png",
-      "lumber_mill_icon.png",
-      "mine_icon.png",
+    struct Building {
+      Clay_String label;
+      str path;
+    };
+    list<Building> buildings = {
+      { .label = CLAY_STRING( "Farm" ), .path = "farm_icon.png" },
+      { .label = CLAY_STRING( "Lumber Mill" ), .path = "lumber_mill_icon.png" },
+      { .label = CLAY_STRING( "Mine" ), .path = "mine_icon.png" },
     };
 
     CLAY(
@@ -18,7 +65,8 @@ namespace UI {
       } )
     ) {
       for ( u32 i = 0; i < buildings.size(); i++ ) {
-        texture_button( hstr{ buildings[i].c_str() }, { 64, 64 } );
+        Building building = buildings[i];
+        building_icon( building.label, hstr{ building.path.c_str() }, i );
       }
     }
   }
