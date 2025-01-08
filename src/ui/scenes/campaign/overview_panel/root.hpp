@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../shared/common.hpp"
-#include "../../library/text_button.hpp"
-#include "clay/clay.h"
+#include "../../../../shared/common.hpp"
+#include "../../../library/text_button.hpp"
+#include "construction_tab.hpp"
 
 namespace UI {
 
@@ -10,42 +10,42 @@ namespace UI {
   inline bool _show_panel = false;
 
   inline void overview_panel() {
-    struct Button {
+    struct Tab {
       Clay_String text;
       // Action_MainMenu action;
     };
 
-    Button buttons[] = {
-      Button{
+    Tab tabs[] = {
+      Tab{
         .text = CLAY_STRING( "Faction" ),
         // .action = Action_MainMenu::StartGame
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Missions" ),
         // .action = Action_MainMenu::LoadGame,
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Diplomacy" ),
         // .action = Action_MainMenu::HostGame,
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Resources" ),
         // .action = Action_MainMenu::JoinGame,
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Construction" ),
         // .action = Action_MainMenu::Settings,
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Recruitment" ),
         // .action = Action_MainMenu::ExitGame,
       },
-      Button{
+      Tab{
         .text = CLAY_STRING( "Agents" ),
         // .action = Action_MainMenu::ExitGame,
       },
     };
-    u32 num_buttons = LEN( buttons );
+    u32 num_tabs = LEN( tabs );
 
     CLAY(
       CLAY_ID( "OverviewPanel" ),
@@ -56,7 +56,7 @@ namespace UI {
       } )
     ) {
       CLAY(
-        CLAY_ID( "OverviewPanel::Buttons" ),
+        CLAY_ID( "OverviewPanel::tabs" ),
         CLAY_LAYOUT( {
           .sizing =
             {
@@ -71,9 +71,9 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } )
       ) {
-        for ( u32 i = 0; i < num_buttons; i++ ) {
+        for ( u32 i = 0; i < num_tabs; i++ ) {
           CLAY(
-            CLAY_IDI( "OverviewPanel::Button", i ),
+            CLAY_IDI( "OverviewPanel::tab", i ),
             CLAY_LAYOUT( {
               .sizing =
                 {
@@ -88,7 +88,7 @@ namespace UI {
             } )
           ) {
             CLAY_TEXT(
-              buttons[i].text,
+              tabs[i].text,
               CLAY_TEXT_CONFIG( {
                 .textColor = { 255, 255, 255, 255 },
                 .fontId = 0,
@@ -108,10 +108,12 @@ namespace UI {
           CLAY_LAYOUT( {
             .sizing =
               {
-                .width = CLAY_SIZING_FIXED( 256 ),
+                .width = CLAY_SIZING_FIXED( 384 ),
                 .height = CLAY_SIZING_FIXED( 512 ),
               },
             .padding = { 16, 16 },
+            .childGap = 8,
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
           } )
         ) {
           CLAY(
@@ -128,7 +130,7 @@ namespace UI {
             } )
           ) {
             CLAY( CLAY_TEXT(
-              buttons[_overview_panel_i].text,
+              tabs[_overview_panel_i].text,
               CLAY_TEXT_CONFIG( {
                 .textColor = { 255, 255, 255, 255 },
                 .fontSize = 16,
@@ -150,15 +152,19 @@ namespace UI {
               )
             );
           }
+
+          Tab current_tab = tabs[_overview_panel_i];
+          if ( std::string( current_tab.text.chars ) == "Construction" )
+            UI::construction_tab();
         }
       }
     }
 
 
-    for ( u32 i = 0; i < num_buttons; i++ ) {
-      Button button = buttons[i];
-      if ( ButtonWasClicked( CLAY_STRING( "OverviewPanel::Button" ), i ) ) {
-        // return button.action;
+    for ( u32 i = 0; i < num_tabs; i++ ) {
+      Tab tab = tabs[i];
+      if ( ButtonWasClicked( CLAY_STRING( "OverviewPanel::tab" ), i ) ) {
+        // return tab.action;
         _overview_panel_i = i;
         _show_panel = true;
       }

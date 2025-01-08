@@ -67,7 +67,13 @@ inline void load_all_in_folder( str path ) {
 
     // std::cout << filename << '\n';
 
-    LoadAsset(
+    // LoadAsset(
+    //   hstr{ filename.c_str() },
+    //   LoadImage( ( path + "/" + filename ).c_str() ),
+    //   Global::texture_cache
+    // );
+
+    LoadTexturePointFilter(
       hstr{ filename.c_str() },
       LoadImage( ( path + "/" + filename ).c_str() ),
       Global::texture_cache
@@ -165,4 +171,6 @@ inline void LoadAssets() {
   );
 
   load_all_in_folder( asset_folder + "/images/resources" );
+
+  load_all_in_folder( asset_folder + "/images/buildings" );
 }

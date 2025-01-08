@@ -68,7 +68,7 @@ namespace UI {
         } ) ) {
           RenderMenuButton( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
 
-          TextureButton(
+          texture_button(
             hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }
           );
         }

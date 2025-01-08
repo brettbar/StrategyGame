@@ -4,7 +4,7 @@
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
 
-inline void TextureButton( hstr id, vec2f dimensions ) {
+inline void texture_button( hstr id, vec2f dimensions ) {
   CLAY(
     CLAY_LAYOUT(
       { .sizing =
