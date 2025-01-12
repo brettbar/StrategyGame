@@ -12,37 +12,37 @@ namespace UI {
   inline void overview_panel() {
     struct Tab {
       Clay_String text;
-      // Action_MainMenu action;
+      Clay_Color color;
     };
 
     Tab tabs[] = {
       Tab{
         .text = CLAY_STRING( "Faction" ),
-        // .action = Action_MainMenu::StartGame
+        .color = COLOR_RED,
       },
       Tab{
         .text = CLAY_STRING( "Missions" ),
-        // .action = Action_MainMenu::LoadGame,
+        .color = COLOR_ORANGE,
       },
       Tab{
         .text = CLAY_STRING( "Diplomacy" ),
-        // .action = Action_MainMenu::HostGame,
+        .color = COLOR_BLUE,
       },
       Tab{
         .text = CLAY_STRING( "Resources" ),
-        // .action = Action_MainMenu::JoinGame,
+        .color = COLOR_GREEN,
       },
       Tab{
         .text = CLAY_STRING( "Construction" ),
-        // .action = Action_MainMenu::Settings,
+        .color = COLOR_SLATE,
       },
       Tab{
         .text = CLAY_STRING( "Recruitment" ),
-        // .action = Action_MainMenu::ExitGame,
+        .color = COLOR_SLATE,
       },
       Tab{
         .text = CLAY_STRING( "Agents" ),
-        // .action = Action_MainMenu::ExitGame,
+        .color = COLOR_SLATE,
       },
     };
     u32 num_tabs = LEN( tabs );
@@ -83,14 +83,14 @@ namespace UI {
               .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
             } ),
             CLAY_RECTANGLE( {
-              .color = { 41, 41, 41, 255 },
+              .color = tabs[i].color,
               .cornerRadius = { 5 },
             } )
           ) {
             CLAY_TEXT(
               tabs[i].text,
               CLAY_TEXT_CONFIG( {
-                .textColor = { 255, 255, 255, 255 },
+                .textColor = COLOR_WHITE,
                 .fontId = 0,
                 .fontSize = 18,
               } )

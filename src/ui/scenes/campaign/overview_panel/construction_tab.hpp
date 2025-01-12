@@ -1,7 +1,7 @@
 
 #include "../../../../shared/common.hpp"
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
-#include "clay/clay.h"
+#include "../../../common.h"
 
 namespace UI {
   inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
@@ -27,9 +27,14 @@ namespace UI {
       if ( Clay_PointerOver( id ) ) {
         CLAY(
           CLAY_IDI( "BuildingIcon::Tooltip", i ),
-          CLAY_FLOATING(
-            { .attachment = { .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM } }
-          ),
+          CLAY_FLOATING( {
+            .attachment =
+              {
+                .element = CLAY_ATTACH_POINT_LEFT_TOP,
+                .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+              },
+            .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+          } ),
           CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 }, .cornerRadius = { 5 } }
           ),
           CLAY_LAYOUT( { .padding = { 8, 8 } } )
@@ -37,7 +42,7 @@ namespace UI {
           CLAY_TEXT(
             label,
             CLAY_TEXT_CONFIG( {
-              .textColor = { 255, 255, 255, 255 },
+              .textColor = COLOR_WHITE,
               .fontId = 0,
               .fontSize = 16,
             } )
