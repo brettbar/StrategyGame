@@ -37,35 +37,35 @@ inline void load_borders() {
     Color color = pair.second;
     str color_str = pair.first;
 
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "ne_border_" + color_str ).c_str() },
-      create_border( { 32, 0 }, { 63, 16 }, color, Global::texture_cache ),
+      create_border( { 31, 0 }, { 64, 17 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "e_border_" + color_str ).c_str() },
-      create_border( { 63, 16 }, { 63, 47 }, color, Global::texture_cache ),
+      create_border( { 63, 16 }, { 63, 48 }, color, Global::texture_cache ),
       // LoadImage( ( asset_folder + "/images/overlays-E.png" ).c_str() ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "se_border_" + color_str ).c_str() },
-      create_border( { 63, 47 }, { 32, 63 }, color, Global::texture_cache ),
+      create_border( { 32, 63 }, { 64, 47 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "sw_border_" + color_str ).c_str() },
-      create_border( { 31, 63 }, { 0, 47 }, color, Global::texture_cache ),
+      create_border( { 31, 63 }, { 0, 48 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "w_border_" + color_str ).c_str() },
-      create_border( { 0, 47 }, { 0, 16 }, color, Global::texture_cache ),
+      create_border( { 0, 16 }, { 0, 48 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "nw_border_" + color_str ).c_str() },
-      create_border( { 0, 16 }, { 31, 0 }, color, Global::texture_cache ),
+      create_border( { 0, 16 }, { 32, 0 }, color, Global::texture_cache ),
       Global::texture_cache
     );
   }
