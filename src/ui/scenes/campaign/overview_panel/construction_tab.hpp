@@ -1,5 +1,6 @@
 
 #include "../../../../shared/common.hpp"
+#include "../../../library/texture_button.hpp"
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../common.h"
 
@@ -15,14 +16,7 @@ namespace UI {
             .height = CLAY_SIZING_FIXED( dimensions.y ),
           },
       } ),
-      CLAY_IMAGE( {
-        .sourceDimensions =
-          {
-            dimensions.x,
-            dimensions.y,
-          },
-        .texture_id = texture_id,
-      } )
+      texture_button( texture_id, dimensions )
     ) {
       auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "BuildingIcon" ), i );
 

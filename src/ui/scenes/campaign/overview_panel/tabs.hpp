@@ -11,7 +11,14 @@ namespace UI {
   inline int _overview_panel_i = 0;
   inline bool _show_panel = false;
 
-  inline void overview_panel() {
+  enum class Action_Overview {
+    None,
+    ConstructBuilding,
+  };
+
+  inline void overview_content( Clay_String current_tab );
+
+  inline Action_Overview overview_panel() {
     struct Tab {
       Clay_String ref;
       hstr icon;
@@ -86,83 +93,12 @@ namespace UI {
             } )
           ) {
             texture_button( tabs[i].icon, dims );
-            // CLAY_TEXT(
-            //   tabs[i].ref,
-            //   CLAY_TEXT_CONFIG( {
-            //     .textColor = COLOR_WHITE,
-            //     .fontId = 0,
-            //     .fontSize = 18,
-            //   } )
-            // );
           }
         }
       }
 
       if ( _show_panel ) {
-        CLAY(
-          CLAY_ID( "OverviewPanel::Content" ),
-          CLAY_RECTANGLE( { .color = COLOR_SLATE, .cornerRadius = { 5 } } ),
-          CLAY_LAYOUT( {
-            .sizing =
-              {
-                .width = CLAY_SIZING_FIXED( 384 ),
-                .height = CLAY_SIZING_FIXED( 512 ),
-              },
-            .padding = { 16, 16 },
-            .childGap = 8,
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          } ),
-          CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
-        ) {
-          CLAY(
-            CLAY_ID( "OverviewPanel::Content::Banner" ),
-            CLAY_LAYOUT( {
-              .sizing =
-                {
-                  .width = CLAY_SIZING_GROW(),
-                },
-              .childAlignment =
-                {
-                  .x = CLAY_ALIGN_X_RIGHT,
-                },
-            } )
-            // CLAY_BORDER( {
-            //   .bottom =
-            //     {
-            //       .width = 2,
-            //       .color = { 255, 255, 255, 255 },
-            //     },
-            // } )
-
-          ) {
-            CLAY( CLAY_TEXT(
-              tabs[_overview_panel_i].ref,
-              CLAY_TEXT_CONFIG( {
-                .textColor = COLOR_WHITE,
-                .fontSize = 16,
-              } )
-            ) );
-
-            CLAY( CLAY_LAYOUT( {
-              .sizing = { CLAY_SIZING_GROW() },
-            } ) );
-
-            CLAY(
-              CLAY_ID( "X" ),
-              CLAY_TEXT(
-                CLAY_STRING( "X" ),
-                CLAY_TEXT_CONFIG( {
-                  .textColor = COLOR_WHITE,
-                  .fontSize = 16,
-                } )
-              )
-            );
-          }
-
-          Tab current_tab = tabs[_overview_panel_i];
-          if ( std::string( current_tab.ref.chars ) == "Construction" )
-            UI::construction_tab();
-        }
+        overview_content( tabs[_overview_panel_i].ref );
       }
     }
 
@@ -180,6 +116,64 @@ namespace UI {
       _show_panel = false;
     }
 
-    // return Action_MainMenu::None;
+    return Action_Overview::None;
+  }
+
+  inline void overview_content( Clay_String current_tab ) {
+    CLAY(
+      CLAY_ID( "OverviewPanel::Content" ),
+      CLAY_RECTANGLE( { .color = COLOR_SLATE, .cornerRadius = { 5 } } ),
+      CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIXED( 384 ),
+            .height = CLAY_SIZING_FIXED( 512 ),
+          },
+        .padding = { 16, 16 },
+        .childGap = 8,
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
+      } ),
+      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
+    ) {
+      CLAY(
+        CLAY_ID( "OverviewPanel::Content::Banner" ),
+        CLAY_LAYOUT( {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+            },
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_RIGHT,
+            },
+        } )
+      ) {
+        CLAY( CLAY_TEXT(
+          current_tab,
+          CLAY_TEXT_CONFIG( {
+            .textColor = COLOR_WHITE,
+            .fontSize = 16,
+          } )
+        ) );
+
+        CLAY( CLAY_LAYOUT( {
+          .sizing = { CLAY_SIZING_GROW() },
+        } ) );
+
+        CLAY(
+          CLAY_ID( "X" ),
+          CLAY_TEXT(
+            CLAY_STRING( "X" ),
+            CLAY_TEXT_CONFIG( {
+              .textColor = COLOR_WHITE,
+              .fontSize = 16,
+            } )
+          )
+        );
+      }
+
+      if ( std::string( current_tab.chars ) == "Construction" )
+        UI::construction_tab();
+    }
   }
 };// namespace UI
