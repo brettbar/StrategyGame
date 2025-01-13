@@ -1,5 +1,6 @@
 #pragma once
 
+#include "resources_tab.hpp"
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../shared/common.hpp"
 #include "../../../library/text_button.hpp"
@@ -174,6 +175,8 @@ namespace UI {
 
       if ( std::string( current_tab.chars ) == "Construction" )
         UI::construction_tab();
+      else if ( std::string( current_tab.chars ) == "Resources" )
+        UI::resources_tab();
     }
   }
 };// namespace UI

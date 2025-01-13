@@ -26,44 +26,35 @@ namespace Resources {
   enum class RawMaterial {
     Timber,
     Wheat,
-    Olives,
+    // Olives,
     Fish,
     Clay,
-    Stone,
-    Wool,
-    Flax,
-    Hide,
+    // Stone,
+    // Wool,
+    // Flax,
+    // Hide,
     SilverOre,
     GoldOre,
     IronOre,
     TinOre,
     CopperOre,
-    Gems,
+    // Gems,
+    COUNT,
   };
 
-  inline std::string GetRawMaterialName( RawMaterial mat ) {
-    switch ( mat ) {
-      case RawMaterial::Wheat:
-        return "wheat";
-      default:
-        return "INVALID";
-    }
-  }
-
-  // enum class ProcessedMaterial {
-  //   Lumber,
-  //   Flour,
-  //   Bricks,
-  //   StoneBricks,
-  //   Pottery,
-  //   Cloth,
-  //   Linen,
-  //   Leather,
-  //   Silver,
-  //   Gold,
-  //   Iron,
-  //   Bronze,
-  // };
+  enum class ProcessedMaterial {
+    // Flour,
+    // Bricks,
+    // StoneBricks,
+    // Pottery,
+    // Cloth,
+    // Linen,
+    // Leather,
+    // Silver,
+    GoldIngots,
+    IronIngots,
+    BronzeIngots,
+  };
 
   // enum class Product {
   //   OliveOil,
@@ -75,6 +66,44 @@ namespace Resources {
   //   Clothing,
   //   Jewelry,
   // };
+
+  inline const char *GetRawMaterialName( RawMaterial mat ) {
+    switch ( mat ) {
+      case RawMaterial::Timber:
+        return "timber";
+      case RawMaterial::Wheat:
+        return "wheat";
+      // case RawMaterial::Olives:
+      //   return "olives";
+      case RawMaterial::Fish:
+        return "fish";
+      case RawMaterial::Clay:
+        return "clay";
+      // case RawMaterial::Stone:
+      //   return "stone";
+      // case RawMaterial::Wool:
+      //   return "wool";
+      // case RawMaterial::Flax:
+      //   return "flax";
+      // case RawMaterial::Hide:
+      //   return "hide";
+      case RawMaterial::SilverOre:
+        return "silver ore";
+      case RawMaterial::GoldOre:
+        return "gold ore";
+      case RawMaterial::IronOre:
+        return "iron ore";
+      case RawMaterial::TinOre:
+        return "tin ore";
+      case RawMaterial::CopperOre:
+        return "copper ore";
+      // case RawMaterial::Gems:
+      //   return "gems";
+      default:
+        return "INVALID";
+    }
+  }
+
 
   // inline std::vector<std::string> natural = {
   //   "soil",
@@ -92,7 +121,7 @@ namespace Resources {
   //   "gemstones",
   // };
 
-  inline std::vector<std::string> raw = {
+  inline std::vector<const char *> raw = {
     "timber",
     "wheat",
     //"olives",
@@ -102,38 +131,37 @@ namespace Resources {
     //"wool",
     //"flax",
     //"hide",
-    "silver_ore",
-    "gold_ore",
-    "iron_ore",
-    "tin_ore",
-    "copper_ore",
+    "silver ore",
+    "gold ore",
+    "iron ore",
+    "tin ore",
+    "copper ore",
     //"gems",
   };
 
-  inline std::vector<std::string> refined = {
-    "lumber",
-    "flour",
-    "bricks",
-    "stone_bricks",
-    "pottery",
-    "cloth",
-    "linen",
-    "leather",
-    "silver",
-    "gold",
-    "iron",
-    "bronze",
+  inline std::vector<const char *> refined = {
+    // "flour",
+    // "bricks",
+    // "stone_bricks",
+    // "pottery",
+    // "cloth",
+    // "linen",
+    // "leather",
+    // "silver",
+    "gold ingots",
+    "iron ingots",
+    "bronze ingots",
   };
 
-  inline std::vector<std::string> products = {
-    "olive_oil",
-    "swords",
-    "spears",
-    "shields",
-    "helmets",
-    "armour",
-    "clothing",
-    "jewelry",
+  inline std::vector<const char *> products = {
+    "olive oil",
+    // "swords",
+    // "spears",
+    // "shields",
+    // "helmets",
+    // "armour",
+    // "clothing",
+    // "jewelry",
   };
 
 };// namespace Resources
