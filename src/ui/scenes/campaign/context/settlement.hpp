@@ -27,8 +27,7 @@ namespace UI {
             .width = CLAY_SIZING_GROW( { 250 } ),
             .height = CLAY_SIZING_GROW(),
           },
-        .childAlignment =
-          { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_BOTTOM },
+        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_TOP },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
@@ -49,10 +48,10 @@ namespace UI {
         } )
       );
 
-      // for ( u32 i = 0; i < selected_settlement.buildings.size(); i++ ) {
-      //   auto building = selected_settlement.buildings[i];
-      //   // printf( "building %s\n", building.name );
-      // }
+      for ( u32 i = 0; i < selected_settlement->buildings.size(); i++ ) {
+        auto building = selected_settlement->buildings[i];
+        printf( "building %s\n", building.name );
+      }
     }
 
     return Action_SettlementContext::None;

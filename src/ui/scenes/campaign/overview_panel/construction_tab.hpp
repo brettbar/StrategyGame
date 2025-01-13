@@ -8,11 +8,13 @@ namespace UI {
     vec2f dimensions = { 64, 64 };
     CLAY(
       CLAY_IDI( "BuildingIcon", i ),
-      CLAY_LAYOUT(
-        { .sizing =
-            { .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ) } }
-      ),
+      CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIXED( dimensions.x ),
+            .height = CLAY_SIZING_FIXED( dimensions.y ),
+          },
+      } ),
       CLAY_IMAGE( {
         .sourceDimensions =
           {

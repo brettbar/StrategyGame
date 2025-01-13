@@ -145,43 +145,9 @@ inline void LoadAssets() {
     Global::texture_cache
   );
 
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_overview" },
-    LoadImage( ( asset_folder + "/images/ui/Overview.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_population" },
-    LoadImage( ( asset_folder + "/images/ui/Population.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_culture" },
-    LoadImage( ( asset_folder + "/images/ui/Culture.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_religion" },
-    LoadImage( ( asset_folder + "/images/ui/Religion.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_resources" },
-    LoadImage( ( asset_folder + "/images/ui/Resources.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_construction" },
-    LoadImage( ( asset_folder + "/images/ui/Construction.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_garrison" },
-    LoadImage( ( asset_folder + "/images/ui/Garrison.png" ).c_str() ),
-    Global::texture_cache
-  );
-
   load_all_in_folder( asset_folder + "/images/resources" );
+
+  load_all_in_folder( asset_folder + "/images/ui" );
 
   load_all_in_folder( asset_folder + "/images/buildings" );
 }

@@ -439,8 +439,13 @@ inline void Campaign::CheckForInput() {
 
 
   bool hovered = false;
-  const Clay_String foos[1] = { CLAY_STRING( "OverviewPanel" ) };
-  for ( u32 i = 0; i < 1; i++ ) {
+  const u32 items = 3;
+  const Clay_String foos[items] = {
+    CLAY_STRING( "OverviewPanel" ),
+    CLAY_STRING( "SettlementContext" ),
+    CLAY_STRING( "ActorContext" )
+  };
+  for ( u32 i = 0; i < items; i++ ) {
     Clay_ElementId id = Clay_GetElementId( foos[i] );
     hovered = hovered || Clay_PointerOver( id );
   }

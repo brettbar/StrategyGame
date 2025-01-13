@@ -1,7 +1,9 @@
 #pragma once
 
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../shared/common.hpp"
 #include "../../../library/text_button.hpp"
+#include "../../../library/texture_button.hpp"
 #include "construction_tab.hpp"
 
 namespace UI {
@@ -11,38 +13,34 @@ namespace UI {
 
   inline void overview_panel() {
     struct Tab {
-      Clay_String text;
-      Clay_Color color;
+      Clay_String ref;
+      hstr icon;
     };
 
     Tab tabs[] = {
       Tab{
-        .text = CLAY_STRING( "Faction" ),
-        .color = COLOR_RED,
+        .ref = CLAY_STRING( "Overview" ),
+        .icon = hstr{ "rome_banner.png" },
       },
       Tab{
-        .text = CLAY_STRING( "Missions" ),
-        .color = COLOR_ORANGE,
+        .ref = CLAY_STRING( "Diplomacy" ),
+        .icon = hstr{ "diplomacy_tab.png" },
       },
       Tab{
-        .text = CLAY_STRING( "Diplomacy" ),
-        .color = COLOR_BLUE,
+        .ref = CLAY_STRING( "Resources" ),
+        .icon = hstr{ "resources_tab.png" },
       },
       Tab{
-        .text = CLAY_STRING( "Resources" ),
-        .color = COLOR_GREEN,
+        .ref = CLAY_STRING( "Construction" ),
+        .icon = hstr{ "construction_tab.png" },
       },
       Tab{
-        .text = CLAY_STRING( "Construction" ),
-        .color = COLOR_SLATE,
+        .ref = CLAY_STRING( "Agents" ),
+        .icon = hstr{ "agents_tab.png" },
       },
       Tab{
-        .text = CLAY_STRING( "Recruitment" ),
-        .color = COLOR_SLATE,
-      },
-      Tab{
-        .text = CLAY_STRING( "Agents" ),
-        .color = COLOR_SLATE,
+        .ref = CLAY_STRING( "Military" ),
+        .icon = hstr{ "military_tab.png" },
       },
     };
     u32 num_tabs = LEN( tabs );
@@ -72,29 +70,30 @@ namespace UI {
         } )
       ) {
         for ( u32 i = 0; i < num_tabs; i++ ) {
+          vec2f dims = { 132, 64 };
+          if ( std::string( tabs[i].ref.chars ) == "Overview" ) {
+            dims = { 132, 128 };
+          }
+
           CLAY(
             CLAY_IDI( "OverviewPanel::tab", i ),
             CLAY_LAYOUT( {
               .sizing =
                 {
-                  .width = CLAY_SIZING_FIXED( 240 ),
+                  .width = CLAY_SIZING_FIXED( dims.x ),
                 },
-              .padding = { 16, 16 },
               .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
-            } ),
-            CLAY_RECTANGLE( {
-              .color = tabs[i].color,
-              .cornerRadius = { 5 },
             } )
           ) {
-            CLAY_TEXT(
-              tabs[i].text,
-              CLAY_TEXT_CONFIG( {
-                .textColor = COLOR_WHITE,
-                .fontId = 0,
-                .fontSize = 18,
-              } )
-            );
+            texture_button( tabs[i].icon, dims );
+            // CLAY_TEXT(
+            //   tabs[i].ref,
+            //   CLAY_TEXT_CONFIG( {
+            //     .textColor = COLOR_WHITE,
+            //     .fontId = 0,
+            //     .fontSize = 18,
+            //   } )
+            // );
           }
         }
       }
@@ -137,7 +136,7 @@ namespace UI {
 
           ) {
             CLAY( CLAY_TEXT(
-              tabs[_overview_panel_i].text,
+              tabs[_overview_panel_i].ref,
               CLAY_TEXT_CONFIG( {
                 .textColor = COLOR_WHITE,
                 .fontSize = 16,
@@ -161,7 +160,7 @@ namespace UI {
           }
 
           Tab current_tab = tabs[_overview_panel_i];
-          if ( std::string( current_tab.text.chars ) == "Construction" )
+          if ( std::string( current_tab.ref.chars ) == "Construction" )
             UI::construction_tab();
         }
       }
