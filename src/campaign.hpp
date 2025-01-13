@@ -26,6 +26,7 @@
 #include "shared/common.hpp"
 
 
+#include "ui/common.h"
 #include "ui/scenes/campaign/context/actor.hpp"
 #include "ui/scenes/campaign/context/settlement.hpp"
 #include "ui/scenes/campaign/overview_panel/root.hpp"
@@ -304,71 +305,100 @@ inline void Campaign::CheckForUIInteractions() {
   }
 
   // UI::OverviewPanel( root_g );
-  CLAY( CLAY_LAYOUT( {
-    .layoutDirection = CLAY_LEFT_TO_RIGHT,
-  } ) ) {
-    UI::overview_panel();
+  CLAY(
+    CLAY_ID( "Campaign" ),
+    CLAY_LAYOUT( {
+      .sizing =
+        {
+          .width = CLAY_SIZING_GROW(),
+          .height = CLAY_SIZING_GROW(),
+        },
+      .childAlignment =
+        {
+          .x = CLAY_ALIGN_X_CENTER,
+          .y = CLAY_ALIGN_Y_CENTER,
+        },
+      .layoutDirection = CLAY_LEFT_TO_RIGHT,
+    } )
+  ) {
 
-    if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
-      auto settlement =
-        Selection::GetSelectedComponent<Settlement::Component>();
-      auto prov = Selection::GetSelectedComponent<Province::Component>();
-      entt::entity player_e = GetLocalPlayerE();
-      auto faction = Global::world.get<Faction::Component>( player_e );
+    CLAY(
+      CLAY_ID( "Campaign::LeftCol" ),
+      CLAY_LAYOUT( {
+        .sizing =
+          { .width = CLAY_SIZING_PERCENT( 0.33 ), .height = CLAY_SIZING_GROW()
+          },
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
+      } )
+    ) {
+      UI::overview_panel();
 
-      if ( !settlement || !prov ) {
-        printf( "Got null prov/settlement??\n" );
-        return;
+      UI::spacer();
+
+      if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
+        auto settlement =
+          Selection::GetSelectedComponent<Settlement::Component>();
+        auto prov = Selection::GetSelectedComponent<Province::Component>();
+        entt::entity player_e = GetLocalPlayerE();
+        auto faction = Global::world.get<Faction::Component>( player_e );
+
+        if ( !settlement || !prov ) {
+          printf( "Got null prov/settlement??\n" );
+          return;
+        }
+
+        auto action = UI::settlement_context( settlement );
+        switch ( action ) {
+          case UI::Action_SettlementContext::SpawnColonist:
+            PostCommand( Commands::Command::spawn_colonist(
+              player_e, Settlement::System::settlement_position( *prov )
+            ) );
+            break;
+          case UI::Action_SettlementContext::SpawnArmy:
+            PostCommand( Commands::Command::spawn_army(
+              player_e, Settlement::System::settlement_position( *prov )
+            ) );
+            break;
+          case UI::Action_SettlementContext::BuildFarm:
+            PostCommand(
+              Commands::Command::construct_building( player_e, "farm" )
+            );
+            break;
+          case UI::Action_SettlementContext::None:
+            break;
+        }
       }
 
-      auto action = UI::settlement_context( *settlement );
-      switch ( action ) {
-        case UI::Action_SettlementContext::SpawnColonist:
-          PostCommand( Commands::Command::spawn_colonist(
-            player_e, Settlement::System::settlement_position( *prov )
-          ) );
-          break;
-        case UI::Action_SettlementContext::SpawnArmy:
-          PostCommand( Commands::Command::spawn_army(
-            player_e, Settlement::System::settlement_position( *prov )
-          ) );
-          break;
-        case UI::Action_SettlementContext::BuildFarm:
-          PostCommand( Commands::Command::construct_building( player_e, "farm" )
-          );
-          break;
-        case UI::Action_SettlementContext::None:
-          break;
+      if ( Selection::Selected<Actor::Component>() ) {
+        auto actor = Selection::GetSelectedComponent<Actor::Component>();
+        // entt::entity player_e = GetLocalPlayerE();
+
+        if ( !actor ) {
+          printf( "Got null actor??\n" );
+          return;
+        }
+
+        // auto action = UI::ActorContext( actor );
+        auto action = UI::actor_context( actor );
+
+        switch ( action ) {
+          case UI::Action_ActorContext::ClaimProvince: {
+            PostCommand( Commands::Command::claim_province(
+              Selection::GetSelectedEntity()
+            ) );
+          } break;
+          case UI::Action_ActorContext::SpawnSettlement: {
+            PostCommand( Commands::Command::build_settlement(
+              Selection::GetSelectedEntity()
+            ) );
+          } break;
+          case UI::Action_ActorContext::None:
+            break;
+        }
       }
     }
-
-    if ( Selection::Selected<Actor::Component>() ) {
-      auto actor = Selection::GetSelectedComponent<Actor::Component>();
-      // entt::entity player_e = GetLocalPlayerE();
-
-      if ( !actor ) {
-        printf( "Got null actor??\n" );
-        return;
-      }
-
-      // auto action = UI::ActorContext( actor );
-      auto action = UI::actor_context( actor );
-
-      switch ( action ) {
-        case UI::Action_ActorContext::ClaimProvince: {
-          PostCommand(
-            Commands::Command::claim_province( Selection::GetSelectedEntity() )
-          );
-        } break;
-        case UI::Action_ActorContext::SpawnSettlement: {
-          PostCommand( Commands::Command::build_settlement(
-            Selection::GetSelectedEntity()
-          ) );
-        } break;
-        case UI::Action_ActorContext::None:
-          break;
-      }
-    }
+    UI::spacer();
+    CLAY( CLAY_ID( "Minimap" ) ) {}
   }
 }
 

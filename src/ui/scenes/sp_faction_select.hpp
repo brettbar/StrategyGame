@@ -19,7 +19,6 @@ namespace UI {
       CLAY_ID( "SPFactionSelect" ),
       CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 } } ),
       CLAY_LAYOUT( {
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
         .sizing =
           {
             .width = CLAY_SIZING_GROW(),
@@ -29,9 +28,10 @@ namespace UI {
         .childGap = 8,
         .childAlignment =
           {
-            .y = CLAY_ALIGN_Y_CENTER,
             .x = CLAY_ALIGN_X_CENTER,
+            .y = CLAY_ALIGN_Y_CENTER,
           },
+        .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } )
     ) {
       for ( u32 i = 0; i < num_factions; i++ ) {
@@ -43,8 +43,8 @@ namespace UI {
         );
 
         Clay_String cs = (Clay_String) {
-          .chars = faction,
           .length = strlen( faction ),
+          .chars = faction,
         };
 
         Color faction_color = fm->primary_colors[faction];
@@ -57,14 +57,14 @@ namespace UI {
 
 
         CLAY( CLAY_LAYOUT( {
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
           .padding = { 16, 16 },
           .childGap = 8,
           .childAlignment =
             {
-              .y = CLAY_ALIGN_Y_CENTER,
               .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
             },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } ) ) {
           RenderMenuButton( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
 

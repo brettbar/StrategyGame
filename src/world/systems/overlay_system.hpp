@@ -9,8 +9,8 @@
 
 #include "../components/faction_component.hpp"
 #include "../components/player_component.hpp"
-#include "../components/settlement_component.hpp"
 #include "../components/province_component.hpp"
+#include "../components/settlement_component.hpp"
 
 #include <raylib.h>
 
