@@ -6,11 +6,13 @@
 
 inline void texture_button( hstr id, vec2f dimensions ) {
   CLAY(
-    CLAY_LAYOUT(
-      { .sizing =
-          { .width = CLAY_SIZING_FIXED( dimensions.x ),
-            .height = CLAY_SIZING_FIXED( dimensions.y ) } }
-    ),
+    CLAY_LAYOUT( {
+      .sizing =
+        {
+          .width = CLAY_SIZING_FIXED( dimensions.x ),
+          .height = CLAY_SIZING_FIXED( dimensions.y ),
+        },
+    } ),
     CLAY_IMAGE( {
       .sourceDimensions =
         {
