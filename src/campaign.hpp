@@ -14,7 +14,6 @@
 #pragma once
 
 
-#include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/map_mode_menu.hpp"
 #include "interface/pages/campaign/overview_panel.hpp"
 #include "network/client.hpp"
@@ -62,6 +61,7 @@
 struct Campaign {
   Campaign( bool is_singleplayer ) {
     _is_singleplayer = is_singleplayer;
+
     // Start();
   }
 
@@ -81,8 +81,6 @@ struct Campaign {
   void save( str );
   void start_mp();
   void load( cstr );
-  void CheckForInput();
-  void CheckForUIInteractions();
   void UpdateOnFrame( f32 &, f32 &, f32 & );
   void Update60TPS();
   void Update1TPS();
@@ -247,41 +245,8 @@ inline void Campaign::load( cstr file_path ) {
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
-  CheckForUIInteractions();
-  CheckForInput();
-}
 
-// TODO: look at all of these and see if any belong in UpdateOnFrame
-inline void Campaign::Update60TPS() {
-  auto animated_actors =
-    Global::world.view<Actor::Component, Animated::Component>();
-  auto players = Global::world.view<Player::Component>();
-
-  MovementSystem::Update( animated_actors, Global::state.timeScale );
-  AnimationSystem::Update( animated_actors, Global::state.timeScale );
-  Commands::Manager()->poll();
-  PlayerSystem::Update( players );
-  //  Terrain::UpdateFOW(reg);
-}
-
-inline void Campaign::Update1TPS() {
-  Settlement::System::update_1tps();
-
-  Global::state.day++;
-
-  if ( Global::state.month < 12 )
-    Global::state.month++;
-  else {
-    Global::state.year++;
-    Global::state.month = 1;
-  }
-}
-
-inline void Campaign::Draw() {
-  Renderer::draw_map( Map::Manager()->mode );
-}
-
-inline void Campaign::CheckForUIInteractions() {
+  f32 cameraSpeed = 500.0f;
   auto f = Iron::Forge();
   rect root_r = rect{ 0, 0, (f32) GetScreenWidth(), (f32) GetScreenHeight() };
   auto root_g = f->Grid( root_r, 12, 12 );
@@ -400,9 +365,7 @@ inline void Campaign::CheckForUIInteractions() {
     UI::spacer();
     CLAY( CLAY_ID( "Minimap" ) ) {}
   }
-}
 
-inline void Campaign::CheckForInput() {
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
 
@@ -413,6 +376,19 @@ inline void Campaign::CheckForInput() {
     std::cout << "ERROR"
               << " no local player was found" << '\n';
     return;
+  }
+
+
+  bool hovered = false;
+  const u32 items = 3;
+  const Clay_String foos[items] = {
+    CLAY_STRING( "OverviewPanel" ),
+    CLAY_STRING( "SettlementContext" ),
+    CLAY_STRING( "ActorContext" )
+  };
+  for ( u32 i = 0; i < items; i++ ) {
+    Clay_ElementId id = Clay_GetElementId( foos[i] );
+    hovered = hovered || Clay_PointerOver( id );
   }
 
   if ( IsKeyPressed( KEY_SPACE ) ) {
@@ -437,43 +413,6 @@ inline void Campaign::CheckForInput() {
     PostCommand( Commands::Command::spawn_colonist( player_e, click_pos ) );
   }
 
-
-  bool hovered = false;
-  const u32 items = 3;
-  const Clay_String foos[items] = {
-    CLAY_STRING( "OverviewPanel" ),
-    CLAY_STRING( "SettlementContext" ),
-    CLAY_STRING( "ActorContext" )
-  };
-  for ( u32 i = 0; i < items; i++ ) {
-    Clay_ElementId id = Clay_GetElementId( foos[i] );
-    hovered = hovered || Clay_PointerOver( id );
-  }
-
-
-  if ( IsMouseButtonPressed( 0 ) ) {
-    if ( !hovered ) {
-      Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
-    }
-  }
-
-  if ( IsMouseButtonPressed( 1 ) ) {
-    if ( !hovered ) {
-      auto selected_e =
-        Global::world
-          .view<Actor::Component, Animated::Component, Selected::Component>()
-          .front();
-
-      if ( selected_e != entt::null ) {
-        std::cout << "Moving entity: " << EntityIdToString( selected_e )
-                  << '\n';
-        PostCommand( Commands::Command::move( player_e, click_pos, selected_e )
-
-        );
-      }
-    }
-  }
-
   if ( IsKeyPressed( KEY_P ) ) {
     Map::Manager()->mode = Map::Mode::Political;
   }
@@ -481,6 +420,96 @@ inline void Campaign::CheckForInput() {
   if ( IsKeyPressed( KEY_T ) ) {
     Map::Manager()->mode = Map::Mode::Terrain;
   }
+
+  if ( IsKeyDown( KEY_D ) )
+    Global::state.camera.target.x +=
+      dt * cameraSpeed / Global::state.camera.zoom;
+  if ( IsKeyDown( KEY_A ) )
+    Global::state.camera.target.x -=
+      dt * cameraSpeed / Global::state.camera.zoom;
+  if ( IsKeyDown( KEY_W ) )
+    Global::state.camera.target.y -=
+      dt * cameraSpeed / Global::state.camera.zoom;
+  if ( IsKeyDown( KEY_S ) )
+    Global::state.camera.target.y +=
+      dt * cameraSpeed / Global::state.camera.zoom;
+
+  if ( hovered ) {
+    return;
+  }
+
+  if ( IsMouseButtonPressed( 0 ) ) {
+    Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
+  }
+
+  if ( IsMouseButtonPressed( 1 ) ) {
+    auto selected_e =
+      Global::world
+        .view<Actor::Component, Animated::Component, Selected::Component>()
+        .front();
+
+    if ( selected_e != entt::null ) {
+      std::cout << "Moving entity: " << EntityIdToString( selected_e ) << '\n';
+      PostCommand( Commands::Command::move( player_e, click_pos, selected_e )
+
+      );
+    }
+  }
+
+
+  // Vector2 screenCenter = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  // Vector2 target = GetScreenToWorld2D(screenCenter, camera);
+  // PrintVec2(target);
+
+  // camera.offset = target;
+
+
+  if ( IsKeyDown( KEY_Z ) )
+    Global::state.camera.zoom -= 0.05f;
+  if ( IsKeyDown( KEY_X ) )
+    Global::state.camera.zoom += 0.05f;
+
+  f32 mouseWheelDelta = GetMouseWheelMove();
+
+  Global::state.camera.zoom += ( mouseWheelDelta * 0.2f );
+  if ( Global::state.camera.zoom > 8.0f )
+    Global::state.camera.zoom = 8.0f;
+  else if ( Global::state.camera.zoom < 0.08f )
+    Global::state.camera.zoom = 0.08f;
+
+  Global::state.camera.offset = {
+    (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2
+  };
+}
+
+// TODO: look at all of these and see if any belong in UpdateOnFrame
+inline void Campaign::Update60TPS() {
+  auto animated_actors =
+    Global::world.view<Actor::Component, Animated::Component>();
+  auto players = Global::world.view<Player::Component>();
+
+  MovementSystem::Update( animated_actors, Global::state.timeScale );
+  AnimationSystem::Update( animated_actors, Global::state.timeScale );
+  Commands::Manager()->poll();
+  PlayerSystem::Update( players );
+  //  Terrain::UpdateFOW(reg);
+}
+
+inline void Campaign::Update1TPS() {
+  Settlement::System::update_1tps();
+
+  Global::state.day++;
+
+  if ( Global::state.month < 12 )
+    Global::state.month++;
+  else {
+    Global::state.year++;
+    Global::state.month = 1;
+  }
+}
+
+inline void Campaign::Draw() {
+  Renderer::draw_map( Map::Manager()->mode );
 }
 
 inline void Campaign::ConvertCommandRequest( str cmd ) {

@@ -26,6 +26,7 @@ namespace UI {
       file += ".png";
 
       CLAY(
+        Clay__AttachId( Clay__HashString( cs, i, 0 ) ),
         CLAY_LAYOUT( {
           .sizing =
             {
@@ -59,6 +60,36 @@ namespace UI {
             .texture_id = hstr{ file.c_str() },
           } )
         );
+
+        CLAY_FLOATING( {} );
+
+        auto id = Clay_GetElementIdWithIndex( cs, i );
+
+        if ( Clay_PointerOver( id ) ) {
+          CLAY(
+            CLAY_IDI( "ResourceIcon::Tooltip", i ),
+            CLAY_FLOATING( {
+              .attachment =
+                {
+                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
+                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+                },
+              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+            } ),
+            CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 }, .cornerRadius = { 5 } }
+            ),
+            CLAY_LAYOUT( { .padding = { 8, 8 } } )
+          ) {
+            CLAY_TEXT(
+              cs,
+              CLAY_TEXT_CONFIG( {
+                .textColor = COLOR_WHITE,
+                .fontId = 0,
+                .fontSize = 16,
+              } )
+            );
+          }
+        }
       }
     }
   }
@@ -66,6 +97,7 @@ namespace UI {
   inline void resources_tab() {
     CLAY(
       CLAY_ID( "ResourcesPanel" ),
+      CLAY_SCROLL( { .vertical = true } ),
       CLAY_LAYOUT( { .childGap = 8, .layoutDirection = CLAY_TOP_TO_BOTTOM } )
     ) {
 

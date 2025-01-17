@@ -1,4 +1,3 @@
-#pragma once
 
 #include "../../../../shared/common.hpp"
 #include "../../../library/texture_button.hpp"

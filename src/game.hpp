@@ -108,9 +108,6 @@ class IGame {
 
         // Update once per frame
         UpdateOnFrame();
-
-        // Update Camera
-        CameraUpdate( Global::state.camera, _dt );
       }
     }
 
