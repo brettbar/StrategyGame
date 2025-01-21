@@ -35,7 +35,15 @@ namespace UI {
         .icon = hstr{ "long_slot.png" },
       },
       Tab{
+        .ref = CLAY_STRING( "Objectives" ),
+        .icon = hstr{ "long_slot.png" },
+      },
+      Tab{
         .ref = CLAY_STRING( "Innovations" ),
+        .icon = hstr{ "long_slot.png" },
+      },
+      Tab{
+        .ref = CLAY_STRING( "Laws & Customs" ),
         .icon = hstr{ "long_slot.png" },
       },
       Tab{

@@ -61,8 +61,6 @@ namespace UI {
         } )
       );
 
-      // CLAY_FLOATING( {} );
-
       auto id = Clay_GetElementIdWithIndex( cs, i );
 
       if ( Clay_PointerOver( id ) ) {
