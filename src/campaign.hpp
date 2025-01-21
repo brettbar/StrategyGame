@@ -28,7 +28,7 @@
 #include "ui/common.h"
 #include "ui/scenes/campaign/context/actor.hpp"
 #include "ui/scenes/campaign/context/settlement.hpp"
-#include "ui/scenes/campaign/overview_panel/tabs.hpp"
+#include "ui/scenes/campaign/overview_panel/root.hpp"
 #include "world/managers/map_manager.hpp"
 #include "world/managers/settlement_manager.hpp"
 
@@ -298,7 +298,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
     ) {
       UI::overview_panel();
 
-      UI::spacer();
+      // UI::spacer();
 
       if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
         auto settlement =

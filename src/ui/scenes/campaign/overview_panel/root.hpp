@@ -1,11 +1,11 @@
 #pragma once
 
-#include "resources_tab.hpp"
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../shared/common.hpp"
 #include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
 #include "construction_tab.hpp"
+#include "resources_tab.hpp"
 
 namespace UI {
 
@@ -29,6 +29,14 @@ namespace UI {
       Tab{
         .ref = CLAY_STRING( "Overview" ),
         .icon = hstr{ "rome_banner.png" },
+      },
+      Tab{
+        .ref = CLAY_STRING( "Missions" ),
+        .icon = hstr{ "long_slot.png" },
+      },
+      Tab{
+        .ref = CLAY_STRING( "Innovations" ),
+        .icon = hstr{ "long_slot.png" },
       },
       Tab{
         .ref = CLAY_STRING( "Diplomacy" ),
@@ -56,8 +64,8 @@ namespace UI {
     CLAY(
       CLAY_ID( "OverviewPanel" ),
       CLAY_LAYOUT( {
-        .padding = { 16, 16 },
-        .childGap = 8,
+        .padding = { 4, 4 },
+        .childGap = 4,
         .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } )
     ) {
@@ -69,7 +77,7 @@ namespace UI {
               .width = CLAY_SIZING_FIT( { 128 } ),
               .height = CLAY_SIZING_GROW(),
             },
-          .childGap = 8,
+          .childGap = 4,
           .childAlignment =
             {
               .x = CLAY_ALIGN_X_CENTER,
@@ -123,12 +131,12 @@ namespace UI {
   inline void overview_content( Clay_String current_tab ) {
     CLAY(
       CLAY_ID( "OverviewPanel::Content" ),
-      CLAY_RECTANGLE( { .color = COLOR_SLATE, .cornerRadius = { 5 } } ),
+      CLAY_RECTANGLE( { .color = { 0, 0, 0, 200 }, .cornerRadius = { 5 } } ),
       CLAY_LAYOUT( {
         .sizing =
           {
-            .width = CLAY_SIZING_FIXED( 384 ),
-            .height = CLAY_SIZING_FIXED( 512 ),
+            .width = CLAY_SIZING_FIT( { 384 } ),
+            .height = CLAY_SIZING_FIXED( 604 ),
           },
         .padding = { 16, 16 },
         .childGap = 8,

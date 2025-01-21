@@ -9,8 +9,6 @@ inline void RenderMenuButton(
   u32 i,
   Clay_Color color = { 140, 140, 140, 255 }
 ) {
-
-
   CLAY(
     Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
     CLAY_LAYOUT( {

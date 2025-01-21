@@ -21,5 +21,5 @@ inline void texture_button( hstr id, vec2f dimensions ) {
         },
       .texture_id = id,
     } )
-  ) {}
+  );
 }
