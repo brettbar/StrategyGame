@@ -47,21 +47,21 @@ namespace UI {
         CLAY_LAYOUT( {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
+              .width = CLAY_SIZING_FIXED( 64 ),
+              .height = CLAY_SIZING_FIXED( 64 ),
             },
         } ),
         CLAY_IMAGE( {
           .sourceDimensions =
             {
-              dimensions.x,
-              dimensions.y,
+              32,
+              32,
             },
           .texture_id = hstr{ file.c_str() },
         } )
       );
 
-      CLAY_FLOATING( {} );
+      // CLAY_FLOATING( {} );
 
       auto id = Clay_GetElementIdWithIndex( cs, i );
 
