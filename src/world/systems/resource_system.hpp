@@ -14,19 +14,19 @@ namespace ResourceSystem {
     switch ( prov.tile->biome ) {
       case Biome::Mountains: {
         if ( randomFloat > 8 ) {
-          prov.resources.push_back( Resources::Natural::IronVein );
+          prov.natural_resources.push_back( Resources::Natural::IronVein );
         } else if ( randomFloat > 7 ) {
-          prov.resources.push_back( Resources::Natural::TinVein );
+          prov.natural_resources.push_back( Resources::Natural::TinVein );
         } else if ( randomFloat > 6 ) {
-          prov.resources.push_back( Resources::Natural::CopperVein );
+          prov.natural_resources.push_back( Resources::Natural::CopperVein );
         }
       } break;
       case Biome::Hills:
         if ( randomFloat > 7 )
-          prov.resources.push_back( Resources::Natural::Clay );
+          prov.natural_resources.push_back( Resources::Natural::Clay );
         break;
       case Biome::Forest:
-        prov.resources.push_back( Resources::Natural::Trees );
+        prov.natural_resources.push_back( Resources::Natural::Trees );
         break;
       case Biome::Plains:
         break;
@@ -34,7 +34,7 @@ namespace ResourceSystem {
         break;
       case Biome::Sea: {
         if ( randomFloat > 7 )
-          prov.resources.push_back( Resources::Natural::Fish );
+          prov.natural_resources.push_back( Resources::Natural::Fish );
       } break;
       default:
         break;
@@ -46,7 +46,7 @@ namespace ResourceSystem {
     if ( prov.resources.size() == 0 )
       return;
 
-    for ( auto resource: prov.resources ) {
+    for ( auto resource: prov.natural_resources ) {
       DrawCircle(
         prov.tile->position.x + 32, prov.tile->position.y + 32, 16, BLACK
       );
@@ -88,19 +88,19 @@ namespace ResourceSystem {
     Province::Component &prov,
     Settlement::Component &settlement
   ) {
-    if ( settlement.raw_materials.size() == 0 )
+    if ( settlement.resources.size() == 0 )
       return;
 
-    for ( auto raw_material_pair: settlement.raw_materials ) {
-      Resources::RawMaterial raw_material = raw_material_pair.first;
+    for ( auto resource_pair: settlement.resources ) {
+      Resources::Type resource = resource_pair.first;
 
       DrawCircle(
         prov.tile->position.x + 32, prov.tile->position.y + 32, 16, BLACK
       );
 
       hstr id = {};
-      switch ( raw_material ) {
-        case Resources::RawMaterial::Wheat:
+      switch ( resource ) {
+        case Resources::Type::Wheat:
           id = "wheat.png";
           break;
         default:

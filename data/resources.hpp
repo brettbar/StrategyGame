@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <string>
 #include <vector>
 
 namespace Resources {
@@ -23,7 +22,7 @@ namespace Resources {
     Gemstones,
   };
 
-  enum class RawMaterial {
+  enum class Type {
     Timber,
     Wheat,
     // Olives,
@@ -39,10 +38,7 @@ namespace Resources {
     TinOre,
     CopperOre,
     // Gems,
-    COUNT,
-  };
-
-  enum class ProcessedMaterial {
+    //////////////////
     // Flour,
     // Bricks,
     // StoneBricks,
@@ -54,48 +50,48 @@ namespace Resources {
     GoldIngots,
     IronIngots,
     BronzeIngots,
+    //////////////////
+    //   OliveOil,
+    //   Swords,
+    //   Spears,
+    //   Shields,
+    //   Helmets,
+    //   Armour,
+    //   Clothing,
+    //   Jewelry,
+    COUNT,
   };
 
-  // enum class Product {
-  //   OliveOil,
-  //   Swords,
-  //   Spears,
-  //   Shields,
-  //   Helmets,
-  //   Armour,
-  //   Clothing,
-  //   Jewelry,
-  // };
 
-  inline const char *GetRawMaterialName( RawMaterial mat ) {
-    switch ( mat ) {
-      case RawMaterial::Timber:
+  inline const char *ResourceStr( Type r ) {
+    switch ( r ) {
+      case Type::Timber:
         return "timber";
-      case RawMaterial::Wheat:
+      case Type::Wheat:
         return "wheat";
-      // case RawMaterial::Olives:
+      // case Type::Olives:
       //   return "olives";
-      case RawMaterial::Fish:
+      case Type::Fish:
         return "fish";
-      case RawMaterial::Clay:
+      case Type::Clay:
         return "clay";
-      // case RawMaterial::Stone:
+      // case Type::Stone:
       //   return "stone";
-      // case RawMaterial::Wool:
+      // case Type::Wool:
       //   return "wool";
-      // case RawMaterial::Flax:
+      // case Type::Flax:
       //   return "flax";
-      // case RawMaterial::Hide:
+      // case Type::Hide:
       //   return "hide";
-      case RawMaterial::SilverOre:
+      case Type::SilverOre:
         return "silver ore";
-      case RawMaterial::GoldOre:
+      case Type::GoldOre:
         return "gold ore";
-      case RawMaterial::IronOre:
+      case Type::IronOre:
         return "iron ore";
-      case RawMaterial::TinOre:
+      case Type::TinOre:
         return "tin ore";
-      case RawMaterial::CopperOre:
+      case Type::CopperOre:
         return "copper ore";
       // case RawMaterial::Gems:
       //   return "gems";
@@ -121,7 +117,7 @@ namespace Resources {
   //   "gemstones",
   // };
 
-  inline std::vector<const char *> raw = {
+  inline std::vector<const char *> resources = {
     "timber",
     "wheat",
     //"olives",
@@ -137,9 +133,7 @@ namespace Resources {
     "tin ore",
     "copper ore",
     //"gems",
-  };
-
-  inline std::vector<const char *> refined = {
+    //////////////////
     // "flour",
     // "bricks",
     // "stone_bricks",
@@ -151,9 +145,7 @@ namespace Resources {
     "gold ingots",
     "iron ingots",
     "bronze ingots",
-  };
-
-  inline std::vector<const char *> products = {
+    ///////////////////
     "olive oil",
     // "swords",
     // "spears",
@@ -163,5 +155,4 @@ namespace Resources {
     // "clothing",
     // "jewelry",
   };
-
 };// namespace Resources

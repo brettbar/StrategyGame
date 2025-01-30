@@ -24,8 +24,8 @@ namespace UI {
       CLAY_LAYOUT( {
         .sizing =
           {
-            .width = CLAY_SIZING_GROW( { 250 } ),
-            .height = CLAY_SIZING_GROW(),
+            .width = CLAY_SIZING_FIT( { 512 } ),
+            .height = CLAY_SIZING_PERCENT( 0.5 ),
           },
         .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_TOP },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,

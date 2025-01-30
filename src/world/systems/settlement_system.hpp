@@ -198,7 +198,7 @@ private:
         switch ( building.type ) {
           case Buildings::Type::Gathering: {
             if ( building.name == Buildings::BuildingName::Farm ) {
-              settlement.raw_materials[Resources::RawMaterial::Wheat] = 1;
+              settlement.resources[Resources::Type::Wheat] = 1;
             }
           } break;
           default:

@@ -19,7 +19,7 @@ namespace Settlement {
     Development development;
     Population population;
     Texture2D texture;
-    std::map<Resources::RawMaterial, u32> raw_materials = {};
+    std::map<Resources::Type, u32> resources = {};
 
     // Building
     std::vector<Buildings::Building> buildings = {};

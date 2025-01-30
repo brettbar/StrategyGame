@@ -28,6 +28,7 @@
 #include "ui/common.h"
 #include "ui/scenes/campaign/context/actor.hpp"
 #include "ui/scenes/campaign/context/settlement.hpp"
+#include "ui/scenes/campaign/overview_panel/content.hpp"
 #include "ui/scenes/campaign/overview_panel/root.hpp"
 #include "world/managers/map_manager.hpp"
 #include "world/managers/settlement_manager.hpp"
@@ -269,6 +270,8 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       break;
   }
 
+  bool show_content = false;
+
   // UI::OverviewPanel( root_g );
   CLAY(
     CLAY_ID( "Campaign" ),
@@ -289,14 +292,20 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
 
     CLAY(
       CLAY_ID( "Campaign::LeftCol" ),
+      // CLAY_RECTANGLE( { .color = UI::COLOR_ORANGE, .cornerRadius = { 5 } } ),
       CLAY_LAYOUT( {
         .sizing =
-          { .width = CLAY_SIZING_PERCENT( 0.33 ), .height = CLAY_SIZING_GROW()
+          {
+            .height = CLAY_SIZING_GROW(),
           },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
-      UI::overview_panel();
+      auto tab = UI::overview_panel();
+
+      if ( std::string( tab.chars ) != "" ) {
+        UI::overview_content( tab );
+      }
 
       // UI::spacer();
 
@@ -362,6 +371,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         }
       }
     }
+
     UI::spacer();
     CLAY( CLAY_ID( "Minimap" ) ) {}
   }
@@ -380,9 +390,10 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
 
 
   bool hovered = false;
-  const u32 items = 3;
+  const u32 items = 4;
   const Clay_String foos[items] = {
     CLAY_STRING( "OverviewPanel" ),
+    CLAY_STRING( "OverviewPanel::Content" ),
     CLAY_STRING( "SettlementContext" ),
     CLAY_STRING( "ActorContext" )
   };

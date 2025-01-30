@@ -50,7 +50,7 @@ namespace Buildings {
     Type type;
     std::string name_str;
 
-    std::vector<Resources::RawMaterial> producing;
+    std::vector<Resources::Type> producing;
     std::vector<Resources::Natural> consuming;
 
     template<class Archive>

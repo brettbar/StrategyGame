@@ -62,7 +62,7 @@ namespace UI {
     CLAY(
       CLAY_ID( "ConstructionPanel" ),
       CLAY_LAYOUT( {
-        .childGap = 8,
+        .childGap = 4,
       } )
     ) {
       for ( u32 i = 0; i < buildings.size(); i++ ) {

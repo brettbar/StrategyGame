@@ -4,6 +4,7 @@
 
 
 namespace UI {
+  const Clay_Color COLOR_BLACK = Clay_Color{ 0, 0, 0, 255 };
   const Clay_Color COLOR_WHITE = Clay_Color{ 255, 255, 255, 255 };
   const Clay_Color COLOR_SLATE = Clay_Color{ 41, 41, 41, 255 };
   const Clay_Color COLOR_LIGHT = Clay_Color{ 224, 215, 210, 255 };

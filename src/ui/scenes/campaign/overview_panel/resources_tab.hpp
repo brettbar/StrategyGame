@@ -9,12 +9,10 @@
 namespace UI {
 
   inline void resource_icon( const char *resource, vec2f dimensions, u32 i ) {
-
     Clay_String cs = {
       .length = strlen( resource ),
       .chars = resource,
     };
-
 
     str file = std::string( resource );
 
@@ -118,7 +116,29 @@ namespace UI {
                 },
               .texture_id = hstr{ "slot.png" },
             } )
-          );
+          ) {
+            CLAY( CLAY_LAYOUT( {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_FIXED( dimensions.x ),
+                  .height = CLAY_SIZING_FIXED( dimensions.y ),
+                },
+              .childAlignment =
+                {
+                  .x = CLAY_ALIGN_X_CENTER,
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
+            } ) ) {
+              CLAY_TEXT(
+                CLAY_STRING( "0" ),
+                CLAY_TEXT_CONFIG( {
+                  .textColor = COLOR_WHITE,
+                  .fontId = 0,
+                  .fontSize = 24,
+                } )
+              );
+            }
+          }
         }
       }
     }
@@ -158,6 +178,7 @@ namespace UI {
       .layoutDirection = CLAY_TOP_TO_BOTTOM,
     } ) ) {
       resources_headers();
+
       CLAY(
         CLAY_ID( "ResourceRows" ),
         CLAY_SCROLL( { .vertical = true } ),
@@ -170,9 +191,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } )
       ) {
-        resource_rows( Resources::raw );
-        resource_rows( Resources::refined );
-        resource_rows( Resources::products );
+        resource_rows( Resources::resources );
       }
     }
   }
