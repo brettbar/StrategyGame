@@ -234,3 +234,11 @@ inline static std::string EntityIdToString( entt::entity entity ) {
 inline Texture2D GetTexture( str id ) {
   return Global::texture_cache[hstr{ id.c_str() }]->texture;
 }
+
+inline const char *u32_to_cstr( u32 num ) {
+  int numLength = snprintf( nullptr, 0, "%u", num );
+  char *buffer = new char[numLength + 1];// +1 for the null terminator
+  snprintf( buffer, numLength + 1, "%u", num );
+  const char *num_s = buffer;
+  return num_s;
+}

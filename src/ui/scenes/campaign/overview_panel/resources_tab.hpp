@@ -6,6 +6,9 @@
 #include "../../../common.h"
 #include "../../../library/texture_button.hpp"
 
+#include "../../../../world/systems/player_system.hpp"
+#include "../../../../world/systems/province_system.hpp"
+
 namespace UI {
 
   inline void resource_icon( const char *resource, vec2f dimensions, u32 i ) {
@@ -92,7 +95,24 @@ namespace UI {
 
   inline void resource_rows( list<const char *> resources ) {
     vec2f dimensions = { 68, 68 };
+
+    entt::entity local_player = PlayerSystem::GetEntityOfPlayer( "player_0" );
+
     for ( u32 i = 0; i < resources.size(); i++ ) {
+      Resources::Type resource_t = (Resources::Type) i;
+
+      // this is too slow
+      // u32 amount =
+      //   ProvinceSystem::get_resources_for_player( resource_t, local_player );
+      u32 amount = 42;
+
+      cstr amount_s = u32_to_cstr( amount );
+
+      Clay_String amount_cs = {
+        .length = strlen( amount_s ),
+        .chars = amount_s,
+      };
+
       CLAY( CLAY_LAYOUT( {
         .childGap = 4,
         .layoutDirection = CLAY_LEFT_TO_RIGHT,
@@ -130,7 +150,7 @@ namespace UI {
                 },
             } ) ) {
               CLAY_TEXT(
-                CLAY_STRING( "0" ),
+                amount_cs,
                 CLAY_TEXT_CONFIG( {
                   .textColor = COLOR_WHITE,
                   .fontId = 0,

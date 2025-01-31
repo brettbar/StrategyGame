@@ -54,16 +54,14 @@ namespace ProvinceSystem {
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
-      if (
-      prov.tile->position.x - TILE_WIDTH >
-        camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
-      prov.tile->position.x + TILE_WIDTH <
-        camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
-      prov.tile->position.y - TILE_WIDTH >
-        camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
-      prov.tile->position.y + TILE_WIDTH <
-        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 )
-      {
+      if ( prov.tile->position.x - TILE_WIDTH >
+             camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
+           prov.tile->position.x + TILE_WIDTH <
+             camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
+           prov.tile->position.y - TILE_WIDTH >
+             camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
+           prov.tile->position.y + TILE_WIDTH <
+             camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
         continue;
       }
 
@@ -127,11 +125,33 @@ namespace ProvinceSystem {
     auto neighbors = Map::Manager()->get_neighbors( *prov->tile );
 
     for ( auto neighbor: neighbors ) {
-      if ( neighbor->owner == entt::null && Map::Manager()->biome_inhabitable( neighbor->biome ) )
+      if ( neighbor->owner == entt::null &&
+           Map::Manager()->biome_inhabitable( neighbor->biome ) )
         return std::make_shared<vec2f>( neighbor->position );
     }
 
     return nullptr;
+  }
+
+  // temp, probably want a better way to do this
+  inline static u32 get_resources_for_player(
+    Resources::Type resource,
+    entt::entity player_e
+  ) {
+    auto provinces = Global::world.view<Province::Component>();
+
+    u32 total = 0;
+
+    for ( const auto &province: provinces ) {
+      Province::Component pc = provinces.get<Province::Component>( province );
+
+      if ( pc.tile->owner == player_e ) {
+        u32 amount = pc.resources[resource];
+        total += amount;
+      }
+    }
+
+    return total;
   }
 
 };// namespace ProvinceSystem
