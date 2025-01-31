@@ -64,8 +64,8 @@ int main() {
   // InitWindow( 1920, 1080, "FieldsOfMars" );
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = (Clay_Arena) {
-    .memory = (char *) malloc( clay_required_memory ),
     .capacity = clay_required_memory,
+    .memory = (char *) malloc( clay_required_memory ),
   };
 
   Clay_Initialize(
@@ -80,8 +80,8 @@ int main() {
   Clay_SetMeasureTextFunction( Raylib_MeasureText );
   const int FONT_ID_BODY_16 = 0;
   Raylib_fonts[FONT_ID_BODY_16] = (Raylib_Font) {
-    .font = LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 ),
     .fontId = FONT_ID_BODY_16,
+    .font = LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 ),
   };
 
   LoadAssets();

@@ -26,10 +26,10 @@
 
 
 #include "ui/common.h"
-#include "ui/scenes/campaign/context/actor.hpp"
-#include "ui/scenes/campaign/context/settlement.hpp"
-#include "ui/scenes/campaign/overview_panel/content.hpp"
-#include "ui/scenes/campaign/overview_panel/root.hpp"
+#include "ui/scenes/campaign/context/actor_context.hpp"
+#include "ui/scenes/campaign/context/settlement_context.hpp"
+#include "ui/scenes/campaign/overview_panel/overview_content.hpp"
+#include "ui/scenes/campaign/overview_panel/overview_panel.hpp"
 #include "world/managers/map_manager.hpp"
 #include "world/managers/settlement_manager.hpp"
 
@@ -283,12 +283,13 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         },
       .childAlignment =
         {
-          .x = CLAY_ALIGN_X_CENTER,
-          .y = CLAY_ALIGN_Y_CENTER,
+          .x = CLAY_ALIGN_X_LEFT,
+          .y = CLAY_ALIGN_Y_TOP,
         },
-      .layoutDirection = CLAY_LEFT_TO_RIGHT,
+      .layoutDirection = CLAY_TOP_TO_BOTTOM,
     } )
   ) {
+    auto tab = UI::overview_panel();
 
     CLAY(
       CLAY_ID( "Campaign::LeftCol" ),
@@ -301,13 +302,13 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
-      auto tab = UI::overview_panel();
 
       if ( std::string( tab.chars ) != "" ) {
         UI::overview_content( tab );
       }
 
-      // UI::spacer();
+
+      UI::spacer();
 
       if ( Selection::Selected<Province::Component, Settlement::Component>() ) {
         auto settlement =
@@ -372,8 +373,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       }
     }
 
-    UI::spacer();
-    CLAY( CLAY_ID( "Minimap" ) ) {}
+    // CLAY( CLAY_ID( "Minimap" ) ) {}
   }
 
   Vector2 click_pos =

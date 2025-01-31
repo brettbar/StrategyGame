@@ -5,7 +5,8 @@
 #include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
 
-#include "content.hpp"
+#include "../../../common.h"
+
 
 namespace UI {
 
@@ -63,18 +64,23 @@ namespace UI {
     };
     u32 num_tabs = LEN( tabs );
 
+    f32 scale = 2.0;
+
     CLAY(
       CLAY_ID( "OverviewPanel" ),
       CLAY_LAYOUT( {
-        .sizing = { .width = CLAY_SIZING_FIT( { 128 } ) },
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIT( { 128 } ),
+          },
         .childGap = 4,
         .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } )
     ) {
       for ( u32 i = 0; i < num_tabs; i++ ) {
-        vec2f dims = { 132, 64 };
+        vec2f dims = { 66 * UI_SCALE, 32 * UI_SCALE };
         if ( std::string( tabs[i].ref.chars ) == "Overview" ) {
-          dims = { 132, 128 };
+          dims = { 66 * UI_SCALE, 64 * UI_SCALE };
         }
 
         CLAY(

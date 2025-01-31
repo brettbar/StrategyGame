@@ -121,6 +121,7 @@ class IGame {
   private:
   Campaign *_campaign;
   bool _single_player = true;
+  bool _ui_debug = false;
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
@@ -277,6 +278,14 @@ class IGame {
     Clay_UpdateScrollContainers(
       true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
     );
+
+
+    if ( IsKeyDown( KEY_LEFT_CONTROL ) && IsKeyDown( KEY_LEFT_SHIFT ) &&
+         IsKeyPressed( KEY_I ) ) {
+      _ui_debug = !_ui_debug;
+      Clay_SetDebugModeEnabled( _ui_debug );
+    }
+
 
     switch ( _scene ) {
       case Scene::MainMenu:

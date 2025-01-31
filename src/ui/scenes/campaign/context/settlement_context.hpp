@@ -18,7 +18,7 @@ namespace UI {
     CLAY(
       CLAY_ID( "SettlementContext" ),
       CLAY_RECTANGLE( {
-        .color = COLOR_SLATE,
+        .color = { 0, 0, 0, 200 },
         .cornerRadius = { 5 },
       } ),
       CLAY_LAYOUT( {
@@ -27,9 +27,11 @@ namespace UI {
             .width = CLAY_SIZING_FIT( { 512 } ),
             .height = CLAY_SIZING_PERCENT( 0.5 ),
           },
-        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_TOP },
+        .padding = { 16, 16 },
+        .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } )
+      } ),
+      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
     ) {
 
       // printf( "Name: %s\n", selected_settlement.name.c_str() );
