@@ -79,6 +79,7 @@ struct Campaign {
 
   entt::entity GetLocalPlayerE();
 
+  void common_start();
   void start( str );
   void save( str );
   void start_mp();
@@ -115,7 +116,7 @@ inline str Campaign::GetLocalPlayerID() {
 }
 
 
-inline void common_start() {
+inline void Campaign::common_start() {
   Global::ClearRegistry();
   Renderer::Init();
 

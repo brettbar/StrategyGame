@@ -6,6 +6,20 @@
 #include "../../../common.h"
 
 namespace UI {
+  inline bool _constructing = false;
+  inline str _selected_building = "";
+
+  struct Building {
+    Clay_String label;
+    str path;
+  };
+
+  inline list<Building> buildings = {
+    { .label = CLAY_STRING( "Farm" ), .path = "farm_icon.png" },
+    { .label = CLAY_STRING( "Lumber Mill" ), .path = "lumber_mill_icon.png" },
+    { .label = CLAY_STRING( "Mine" ), .path = "mine_icon.png" },
+  };
+
   inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
     vec2f dimensions = { 64, 64 };
     CLAY(
@@ -49,37 +63,68 @@ namespace UI {
     }
   }
 
-  inline str construction_tab() {
-    struct Building {
-      Clay_String label;
-      str path;
-    };
-    list<Building> buildings = {
-      { .label = CLAY_STRING( "Farm" ), .path = "farm_icon.png" },
-      { .label = CLAY_STRING( "Lumber Mill" ), .path = "lumber_mill_icon.png" },
-      { .label = CLAY_STRING( "Mine" ), .path = "mine_icon.png" },
-    };
+  inline str construction_browser() {
 
-    CLAY(
-      CLAY_ID( "ConstructionPanel" ),
-      CLAY_LAYOUT( {
-        .childGap = 4,
-      } )
-    ) {
+    CLAY( CLAY_LAYOUT( {
+      .childGap = 4,
+    } ) ) {
       for ( u32 i = 0; i < buildings.size(); i++ ) {
         Building building = buildings[i];
         building_icon( building.label, hstr{ building.path.c_str() }, i );
       }
     }
 
-    // @leftoff This is failing for some reason
-    // for ( u32 i = 0; i < buildings.size(); i++ ) {
-    //   Building building = buildings[i];
-    //
-    //   if ( ButtonWasClicked( CLAY_STRING( "BuildingIcon" ), i ) ) {
-    //     return std::string( building.label.chars );
-    //   }
-    // }
+    for ( u32 i = 0; i < buildings.size(); i++ ) {
+      Building building = buildings[i];
+
+      if ( ButtonWasClicked( CLAY_STRING( "BuildingIcon" ), i ) ) {
+        return std::string( building.label.chars );
+      }
+    }
+
+    return "";
+  }
+
+  inline bool construction_preview() {
+    printf( "construction_preview\n" );
+    //@left off add a back button
+    CLAY( CLAY_LAYOUT( {
+      .sizing =
+        {
+          .width = CLAY_SIZING_GROW(),
+          .height = CLAY_SIZING_GROW(),
+        },
+    } ) ) {
+
+
+      auto cs = Clay_String{
+        .length = strlen( _selected_building.c_str() ),
+        .chars = _selected_building.c_str(),
+      };
+
+      CLAY_TEXT(
+        cs,
+        CLAY_TEXT_CONFIG( {
+          .textColor = { 255, 255, 255, 255 },
+          .fontId = 0,
+          .fontSize = 32,
+        } )
+      );
+    }
+
+    return false;
+  }
+
+  inline str construction_tab() {
+    if ( _constructing && _selected_building != "" ) {
+      if ( construction_preview() ) {
+        return _selected_building;
+      }
+    } else {
+      _selected_building = construction_browser();
+      if ( _selected_building != "" )
+        _constructing = true;
+    }
 
     return "";
   }
