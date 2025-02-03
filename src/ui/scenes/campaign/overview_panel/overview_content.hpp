@@ -15,6 +15,8 @@ namespace UI {
   };
 
   inline OverviewAction overview_content( Clay_String current_tab ) {
+    str building_to_build = "";
+
     CLAY(
       CLAY_ID( "OverviewPanel::Content" ),
       CLAY_RECTANGLE( { .color = { 0, 0, 0, 200 }, .cornerRadius = { 5 } } ),
@@ -68,17 +70,18 @@ namespace UI {
       }
 
       if ( std::string( current_tab.chars ) == "Construction" ) {
-        str building = UI::construction_tab();
-
-        if ( building != "" ) {
-          return OverviewAction{
-            .type = OverviewAction_t::Construction,
-            .value = building,
-          };
-        }
+        building_to_build = UI::construction_tab();
       } else if ( std::string( current_tab.chars ) == "Resources" ) {
         UI::resources_tab();
       }
+    }
+
+
+    if ( building_to_build != "" ) {
+      return OverviewAction{
+        .type = OverviewAction_t::Construction,
+        .value = building_to_build,
+      };
     }
 
     return { .type = OverviewAction_t::None, .value = "" };

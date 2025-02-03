@@ -7,7 +7,7 @@
 
 namespace UI {
   inline bool _constructing = false;
-  inline str _selected_building = "";
+  inline i32 _selected_building = -1;
 
   struct Building {
     Clay_String label;
@@ -63,7 +63,7 @@ namespace UI {
     }
   }
 
-  inline str construction_browser() {
+  inline u32 construction_browser() {
 
     CLAY( CLAY_LAYOUT( {
       .childGap = 4,
@@ -78,32 +78,27 @@ namespace UI {
       Building building = buildings[i];
 
       if ( ButtonWasClicked( CLAY_STRING( "BuildingIcon" ), i ) ) {
-        return std::string( building.label.chars );
+        return i;
       }
     }
 
-    return "";
+    return -1;
   }
 
-  inline bool construction_preview() {
-    printf( "construction_preview\n" );
+  inline bool construction_preview( Building building ) {
     //@left off add a back button
-    CLAY( CLAY_LAYOUT( {
-      .sizing =
-        {
-          .width = CLAY_SIZING_GROW(),
-          .height = CLAY_SIZING_GROW(),
-        },
-    } ) ) {
-
-
-      auto cs = Clay_String{
-        .length = strlen( _selected_building.c_str() ),
-        .chars = _selected_building.c_str(),
-      };
-
+    CLAY(
+      CLAY_ID( "Construction::Preview" ),
+      CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_GROW(),
+            .height = CLAY_SIZING_GROW(),
+          },
+      } )
+    ) {
       CLAY_TEXT(
-        cs,
+        building.label,
         CLAY_TEXT_CONFIG( {
           .textColor = { 255, 255, 255, 255 },
           .fontId = 0,
@@ -112,18 +107,34 @@ namespace UI {
       );
     }
 
+    RenderMenuButton(
+      CLAY_STRING( "Construction::Build" ), CLAY_STRING( "Build" ), 0
+    );
+
+    if ( ButtonWasClicked( CLAY_STRING( "Construction::Build" ) ) ) {
+      return true;
+    }
+
     return false;
   }
 
   inline str construction_tab() {
-    if ( _constructing && _selected_building != "" ) {
-      if ( construction_preview() ) {
-        return _selected_building;
+
+    if ( _constructing ) {
+      Building building = buildings[_selected_building];
+
+      bool clicked = construction_preview( building );
+      if ( clicked ) {
+        _constructing = false;
+        _selected_building = -1;
+        return std::string( building.label.chars );
       }
     } else {
       _selected_building = construction_browser();
-      if ( _selected_building != "" )
+
+      if ( _selected_building > -1 ) {
         _constructing = true;
+      }
     }
 
     return "";
