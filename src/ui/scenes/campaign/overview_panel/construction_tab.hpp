@@ -1,5 +1,6 @@
 
 #include "../../../../shared/common.hpp"
+#include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../common.h"
@@ -48,7 +49,7 @@ namespace UI {
     }
   }
 
-  inline void construction_tab() {
+  inline str construction_tab() {
     struct Building {
       Clay_String label;
       str path;
@@ -70,5 +71,16 @@ namespace UI {
         building_icon( building.label, hstr{ building.path.c_str() }, i );
       }
     }
+
+    // @leftoff This is failing for some reason
+    // for ( u32 i = 0; i < buildings.size(); i++ ) {
+    //   Building building = buildings[i];
+    //
+    //   if ( ButtonWasClicked( CLAY_STRING( "BuildingIcon" ), i ) ) {
+    //     return std::string( building.label.chars );
+    //   }
+    // }
+
+    return "";
   }
 };// namespace UI

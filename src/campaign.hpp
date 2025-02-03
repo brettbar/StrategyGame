@@ -310,7 +310,15 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
     ) {
 
       if ( std::string( tab.chars ) != "" ) {
-        UI::overview_content( tab );
+        UI::OverviewAction action = UI::overview_content( tab );
+
+        switch ( action.type ) {
+          case UI::OverviewAction_t::None:
+            break;
+          case UI::OverviewAction_t::Construction:
+            printf( "%s\n", action.value.c_str() );
+            break;
+        }
       }
 
 

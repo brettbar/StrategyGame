@@ -6,7 +6,16 @@
 #include "resources_tab.hpp"
 
 namespace UI {
-  inline void overview_content( Clay_String current_tab ) {
+  enum class OverviewAction_t {
+    None,
+    Construction,
+  };
+  struct OverviewAction {
+    OverviewAction_t type;
+    str value;
+  };
+
+  inline OverviewAction overview_content( Clay_String current_tab ) {
     CLAY(
       CLAY_ID( "OverviewPanel::Content" ),
       CLAY_RECTANGLE( { .color = { 0, 0, 0, 200 }, .cornerRadius = { 5 } } ),
@@ -59,10 +68,20 @@ namespace UI {
         );
       }
 
-      if ( std::string( current_tab.chars ) == "Construction" )
-        UI::construction_tab();
-      else if ( std::string( current_tab.chars ) == "Resources" )
+      if ( std::string( current_tab.chars ) == "Construction" ) {
+        str building = UI::construction_tab();
+
+        if ( building != "" ) {
+          return OverviewAction{
+            .type = OverviewAction_t::Construction,
+            .value = building,
+          };
+        }
+      } else if ( std::string( current_tab.chars ) == "Resources" ) {
         UI::resources_tab();
+      }
     }
+
+    return { .type = OverviewAction_t::None, .value = "" };
   }
 }// namespace UI
