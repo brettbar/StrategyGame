@@ -3,10 +3,75 @@
 #include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
 
+#include "../components/player_component.hpp"
 #include "../components/province_component.hpp"
 #include "../components/settlement_component.hpp"
+#include "../components/stockpile_component.hpp"
+#include "province_system.hpp"
 
 namespace ResourceSystem {
+
+  inline void init_stockpiles() {
+    auto player_v = Global::world.view<Player::Component>();
+
+    for ( const auto &player_e: player_v ) {
+
+      Global::world.emplace<Stockpile::Component>(
+        player_e, Stockpile::Component()
+      );
+    }
+  }
+
+
+  inline void update_stockpiles() {
+    auto provinces_v = Global::world.view<Province::Component>();
+
+    for ( const auto &province_e: provinces_v ) {
+      Province::Component province =
+        provinces_v.get<Province::Component>( province_e );
+
+      entt::entity owner_e = province.tile->owner;
+
+      if ( owner_e == entt::null ) {
+        continue;
+      }
+
+      Stockpile::Component *stockpile =
+        Global::world.try_get<Stockpile::Component>( owner_e );
+
+      for ( u32 i = 0; i < (u32) Resources::Type::COUNT; i++ ) {
+        Resources::Type rt = (Resources::Type) i;
+
+        stockpile->resources[rt] += province.resources[rt];
+      }
+    }
+  }
+
+  // temp, probably want a better way to do this
+  inline static map<Resources::Type, u32> get_resources_for_player(
+    entt::entity player_e
+  ) {
+    auto stockpiles =
+      Global::world.view<Stockpile::Component, Player::Component>();
+
+    u32 total = 0;
+
+    for ( entt::entity stockpile_e: stockpiles ) {
+      auto stockpile = stockpiles.get<Stockpile::Component>( stockpile_e );
+      auto player = stockpiles.get<Player::Component>( stockpile_e );
+
+      if ( player.id == player_e ) {
+        return stockpile.resources;
+      }
+    }
+
+    return {};
+  }
+
+
+  inline void update_1tps() {
+    update_stockpiles();
+  }
 
   inline void SpawnResource( Province::Component &prov ) {
     f32 randomFloat = random_u32_inclmax( 0, 10 );
@@ -141,6 +206,10 @@ namespace ResourceSystem {
 
       DrawResource( prov );
     }
+  }
+
+  inline void init() {
+    init_stockpiles();
   }
 
   // struct Really {

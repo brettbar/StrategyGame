@@ -98,13 +98,13 @@ namespace UI {
 
     entt::entity local_player = PlayerSystem::GetEntityOfPlayer( "player_0" );
 
+    auto resource_map =
+      ResourceSystem::get_resources_for_player( local_player );
+
     for ( u32 i = 0; i < resources.size(); i++ ) {
       Resources::Type resource_t = (Resources::Type) i;
 
-      // this is too slow
-      // u32 amount =
-      //   ProvinceSystem::get_resources_for_player( resource_t, local_player );
-      u32 amount = 42;
+      u32 amount = resource_map[resource_t];
 
       cstr amount_s = u32_to_cstr( amount );
 

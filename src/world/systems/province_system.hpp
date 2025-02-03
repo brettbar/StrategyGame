@@ -133,25 +133,4 @@ namespace ProvinceSystem {
     return nullptr;
   }
 
-  // temp, probably want a better way to do this
-  inline static u32 get_resources_for_player(
-    Resources::Type resource,
-    entt::entity player_e
-  ) {
-    auto provinces = Global::world.view<Province::Component>();
-
-    u32 total = 0;
-
-    for ( const auto &province: provinces ) {
-      Province::Component pc = provinces.get<Province::Component>( province );
-
-      if ( pc.tile->owner == player_e ) {
-        u32 amount = pc.resources[resource];
-        total += amount;
-      }
-    }
-
-    return total;
-  }
-
 };// namespace ProvinceSystem

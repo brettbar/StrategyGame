@@ -41,6 +41,7 @@
 #include "world/systems/movement_system.hpp"
 #include "world/systems/player_system.hpp"
 #include "world/systems/province_system.hpp"
+#include "world/systems/resource_system.hpp"
 #include "world/systems/selection_system.hpp"
 #include "world/systems/settlement_system.hpp"
 
@@ -128,6 +129,7 @@ inline void Campaign::start( str player_faction ) {
 
   PlayerSystem::create_players_for_sp( player_faction );
   ProvinceSystem::Init();
+  ResourceSystem::init();
   Actor::System::Init();
   AI::Start();
 
@@ -147,6 +149,7 @@ inline void Campaign::start_mp() {
   }
 
   ProvinceSystem::Init();
+  ResourceSystem::init();
   Actor::System::Init();
   AI::Start();
 
@@ -170,6 +173,7 @@ inline void Campaign::save( str file_name ) {
       .get<Faction::Component>( output )
       .get<Actor::Component>( output )
       .get<Animated::Component>( output )
+      .get<Stockpile::Component>( output )
       .get<Tile::Component>( output )
       .get<Province::Component>( output )
       .get<Settlement::Component>( output )
@@ -186,6 +190,7 @@ inline void Campaign::save( str file_name ) {
       .get<Faction::Component>( output )
       .get<Actor::Component>( output )
       .get<Animated::Component>( output )
+      .get<Stockpile::Component>( output )
       .get<Tile::Component>( output )
       .get<Province::Component>( output )
       .get<Settlement::Component>( output )
@@ -208,6 +213,7 @@ inline void Campaign::load( cstr file_path ) {
       .get<Faction::Component>( input )
       .get<Actor::Component>( input )
       .get<Animated::Component>( input )
+      .get<Stockpile::Component>( input )
       .get<Tile::Component>( input )
       .get<Province::Component>( input )
       .get<Settlement::Component>( input )
@@ -508,6 +514,7 @@ inline void Campaign::Update60TPS() {
 
 inline void Campaign::Update1TPS() {
   Settlement::System::update_1tps();
+  ResourceSystem::update_1tps();
 
   Global::state.day++;
 
