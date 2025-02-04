@@ -22,6 +22,7 @@ namespace Map {
     Terrain,
     Political,
     Resources,
+    BuildPreview,
   };
 
   class IManager {
@@ -111,7 +112,7 @@ public:
       }
     }
 
-   std::array<sptr<Tile::Component>, 6> get_neighbors( Tile::Component tile ) {
+    std::array<sptr<Tile::Component>, 6> get_neighbors( Tile::Component tile ) {
       u32 x = tile.coords.x;
       u32 y = tile.coords.y;
       sptr<Tile::Component> ne_tile = nullptr;
@@ -165,7 +166,8 @@ public:
 
 
       return std::array<sptr<Tile::Component>, 6>{
-        ne_tile, e_tile, se_tile, sw_tile, w_tile, nw_tile };
+        ne_tile, e_tile, se_tile, sw_tile, w_tile, nw_tile
+      };
     }
 
     f32 get_noise( vec2u coords ) {
@@ -177,8 +179,8 @@ public:
 
       return tile_map[i]->noise;
     }
-private:
 
+private:
     u32 map_index( u32 x, u32 y ) {
       if ( x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT ) {
         return -1;
@@ -290,7 +292,9 @@ private:
 
           for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
             vec2u coords = coords_from_index( i, MAP_WIDTH );
-            if ( out_of_bounds( coords, top_left ) && out_of_bounds( coords, top_right ) && out_of_bounds( coords, bottom ) ) {
+            if ( out_of_bounds( coords, top_left ) &&
+                 out_of_bounds( coords, top_right ) &&
+                 out_of_bounds( coords, bottom ) ) {
               noise[i] = 0;
             }
           }
@@ -305,7 +309,9 @@ private:
 
           for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
             vec2u coords = coords_from_index( i, MAP_WIDTH );
-            if ( out_of_bounds( coords, top ) && out_of_bounds( coords, bottom_left ) && out_of_bounds( coords, bottom_right ) ) {
+            if ( out_of_bounds( coords, top ) &&
+                 out_of_bounds( coords, bottom_left ) &&
+                 out_of_bounds( coords, bottom_right ) ) {
               noise[i] = 0;
             }
           }
@@ -324,9 +330,6 @@ private:
         apply_radial_gradient( noise, bottom_right );
       }
     }
-
-
-   
 
 
     void UpdateFOW() {
@@ -467,8 +470,8 @@ private:
         sum += fOutput[n];
       }
 
-      std::cout << "Avg after normalization: " << sum / ( MAP_WIDTH * MAP_HEIGHT )
-                << "\n";
+      std::cout << "Avg after normalization: "
+                << sum / ( MAP_WIDTH * MAP_HEIGHT ) << "\n";
 
       return fOutput;
     }
@@ -539,4 +542,4 @@ private:
     static IManager instance;
     return &instance;
   }
-};
+};// namespace Map

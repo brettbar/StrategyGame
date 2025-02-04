@@ -125,8 +125,8 @@ namespace UI {
 
       bool clicked = construction_preview( building );
       if ( clicked ) {
-        _constructing = false;
-        _selected_building = -1;
+        // _constructing = false;
+        // _selected_building = -1;
         return std::string( building.label.chars );
       }
     } else {

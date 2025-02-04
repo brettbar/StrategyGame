@@ -65,6 +65,7 @@ namespace Renderer {
     EndBlendMode();
 
     switch ( map_mode ) {
+      case Map::Mode::BuildPreview://@todo
       case Map::Mode::Default:
         // Draw TransparentOverlay
 

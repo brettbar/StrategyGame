@@ -49,7 +49,6 @@
 
 #include "interface/irongui/forge.hpp"
 
-#include "interface/pages/campaign/actor_context.hpp"
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include <raylib.h>
 
@@ -317,7 +316,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           case UI::OverviewAction_t::None:
             break;
           case UI::OverviewAction_t::Construction:
-            printf( "%s\n", action.value.c_str() );
+            Map::Manager()->mode = Map::Mode::BuildPreview;
             break;
         }
       }
@@ -350,9 +349,9 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             ) );
             break;
           case UI::Action_SettlementContext::BuildFarm:
-            PostCommand(
-              Commands::Command::construct_building( player_e, "farm" )
-            );
+            PostCommand( Commands::Command::construct_building(
+              Selection::GetSelectedEntity(), "farm"
+            ) );
             break;
           case UI::Action_SettlementContext::None:
             break;
@@ -465,7 +464,20 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   }
 
   if ( IsMouseButtonPressed( 0 ) ) {
-    Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
+    if ( Map::Manager()->mode == Map::Mode::BuildPreview ) {
+      // if we click on a valid province, post a build command
+
+      entt::entity local_player = GetLocalPlayerE();
+
+      auto sc = Selection::CheckClickOnSettlement( local_player, click_pos );
+
+      if ( sc != entt::null ) {
+        printf( "%d\n", sc );
+        PostCommand( Commands::Command::construct_building( sc, "farm" ) );
+      }
+    } else {
+      Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
+    }
   }
 
   if ( IsMouseButtonPressed( 1 ) ) {
@@ -675,7 +687,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::ConstructBuilding: {
-      Settlement::System::construct_building( cmd.msg );
+      Settlement::System::construct_building( cmd.entity, cmd.msg );
       return;
     };
   }

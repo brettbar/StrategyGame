@@ -133,10 +133,24 @@ public:
       }
     }
 
-    static void construct_building( std::string building_name ) {
+    // static void construct_building( std::string building_name ) {
+    //   Settlement::Component &settlement =
+    //     Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
+    //     );
+    //
+    //   settlement.buildings.push_back( Buildings::Building{
+    //     .name = Buildings::BuildingName::Farm,
+    //     .type = Buildings::Type::Gathering,
+    //     .name_str = building_name,
+    //   } );
+    // }
+
+    static void construct_building(
+      entt::entity settlement_e,
+      std::string building_name
+    ) {
       Settlement::Component &settlement =
-        Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
-        );
+        Global::world.get<Settlement::Component>( settlement_e );
 
       settlement.buildings.push_back( Buildings::Building{
         .name = Buildings::BuildingName::Farm,

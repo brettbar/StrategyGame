@@ -192,4 +192,29 @@ namespace Selection {
     CheckSelectProvince( click_pos, player_id );
   }
 
+  inline entt::entity CheckClickOnSettlement(
+    entt::entity local_player_e,
+    vec2f click_pos
+  ) {
+    i32 tile_pos_id = DetermineTileIdFromPosition( click_pos );
+    auto prov_view =
+      Global::world.view<Province::Component, Settlement::Component>();
+
+    if ( tile_pos_id == -1 )
+      return entt::null;
+
+    for ( auto &prov_e: prov_view ) {
+      auto &prov = prov_view.get<Province::Component>( prov_e );
+
+      if ( prov.tile->owner != local_player_e )
+        continue;
+
+      if ( tile_pos_id == prov.tile->id ) {
+        return prov_e;
+      }
+    }
+
+    return entt::null;
+  }
+
 };// namespace Selection
