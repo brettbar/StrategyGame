@@ -79,10 +79,13 @@ namespace Commands {
       return cmd;
     }
 
-    static Command construct_building( entt::entity player, str building ) {
+    static Command construct_building(
+      entt::entity settlement_e,
+      str building
+    ) {
       auto cmd = Command();
       cmd.type = Type::ConstructBuilding;
-      cmd.entity = player;
+      cmd.entity = settlement_e;
       cmd.msg = building;
       return cmd;
     }

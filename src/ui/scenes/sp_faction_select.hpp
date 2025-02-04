@@ -66,7 +66,7 @@ namespace UI {
             },
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } ) ) {
-          RenderMenuButton( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
+          text_button_lrg( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
 
           texture_button(
             hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }

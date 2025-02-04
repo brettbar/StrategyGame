@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../shared/common.hpp"
 #include "clay/clay.h"
 
 #include "../library/text_button.hpp"
@@ -39,12 +38,12 @@ namespace UI {
           },
       } )
     ) {
-      RenderMenuButton(
+      text_button_lrg(
         CLAY_STRING( "SinglePlayerLobby::SelectFaction" ),
         CLAY_STRING( "Select Faction" ),
         0
       );
-      RenderMenuButton(
+      text_button_lrg(
         CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ),
         CLAY_STRING( "Return to Main" ),
         1

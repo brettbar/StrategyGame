@@ -72,7 +72,7 @@ namespace UI {
       } )
     ) {
       for ( u32 i = 0; i < num_buttons; i++ ) {
-        RenderMenuButton(
+        text_button_lrg(
           CLAY_STRING( "MainMenu::Button" ), buttons[i].text, i
         );
       }

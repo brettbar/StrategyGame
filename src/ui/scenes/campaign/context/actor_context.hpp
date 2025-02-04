@@ -15,11 +15,11 @@ namespace UI {
     CLAY( CLAY_LAYOUT( { .layoutDirection = CLAY_LEFT_TO_RIGHT } ) ) {
       switch ( actor->data.type ) {
         case Actor::Type::Colonist: {
-          RenderMenuButton(
+          text_button_small(
             CLAY_STRING( "Colonist::ClaimProvince" ), CLAY_STRING( "Claim" ), 0
           );
 
-          RenderMenuButton(
+          text_button_small(
             CLAY_STRING( "Colonist::SpawnSettlement" ),
             CLAY_STRING( "Settlement" ),
             0

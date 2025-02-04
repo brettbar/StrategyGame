@@ -7,7 +7,6 @@
 #include "../components/province_component.hpp"
 #include "../components/settlement_component.hpp"
 #include "../components/stockpile_component.hpp"
-#include "province_system.hpp"
 
 namespace ResourceSystem {
 
@@ -24,11 +23,16 @@ namespace ResourceSystem {
 
 
   inline void update_stockpiles() {
-    auto provinces_v = Global::world.view<Province::Component>();
+    auto settlement_v =
+      Global::world.view<Province::Component, Settlement::Component>();
+    auto stockpile_v = Global::world.view<Stockpile::Component>();
 
-    for ( const auto &province_e: provinces_v ) {
+    for ( const auto &settlement_e: settlement_v ) {
+      Settlement::Component settlement =
+        settlement_v.get<Settlement::Component>( settlement_e );
+
       Province::Component province =
-        provinces_v.get<Province::Component>( province_e );
+        settlement_v.get<Province::Component>( settlement_e );
 
       entt::entity owner_e = province.tile->owner;
 
@@ -36,13 +40,15 @@ namespace ResourceSystem {
         continue;
       }
 
-      Stockpile::Component *stockpile =
-        Global::world.try_get<Stockpile::Component>( owner_e );
+      Stockpile::Component &stockpile =
+        stockpile_v.get<Stockpile::Component>( owner_e );
 
       for ( u32 i = 0; i < (u32) Resources::Type::COUNT; i++ ) {
         Resources::Type rt = (Resources::Type) i;
 
-        stockpile->resources[rt] += province.resources[rt];
+        u32 num_in_province = settlement.resources[rt];
+
+        stockpile.resources[rt] += num_in_province;
       }
     }
   }
@@ -59,6 +65,10 @@ namespace ResourceSystem {
     for ( entt::entity stockpile_e: stockpiles ) {
       auto stockpile = stockpiles.get<Stockpile::Component>( stockpile_e );
       auto player = stockpiles.get<Player::Component>( stockpile_e );
+
+      printf(
+        "Stockpile wheat: %d\n", stockpile.resources[Resources::Type::Wheat]
+      );
 
       if ( player.id == player_e ) {
         return stockpile.resources;

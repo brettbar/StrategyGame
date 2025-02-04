@@ -108,6 +108,10 @@ namespace UI {
 
       cstr amount_s = u32_to_cstr( amount );
 
+      if ( resource_t == Resources::Type::Wheat ) {
+        printf( "Amount wheat: %s\n", amount_s );
+      }
+
       Clay_String amount_cs = {
         .length = strlen( amount_s ),
         .chars = amount_s,

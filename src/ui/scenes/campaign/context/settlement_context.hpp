@@ -51,8 +51,22 @@ namespace UI {
       );
 
       for ( u32 i = 0; i < selected_settlement->buildings.size(); i++ ) {
-        auto building = selected_settlement->buildings[i];
-        printf( "building %s\n", building.name );
+        Clay_String sn = (Clay_String) {
+          .length =
+            strlen( selected_settlement->buildings[i].name_str.c_str() ),
+          .chars = selected_settlement->buildings[i].name_str.c_str(),
+        };
+
+        CLAY() {
+          CLAY_TEXT(
+            sn,
+            CLAY_TEXT_CONFIG( {
+              .textColor = COLOR_WHITE,
+              .fontId = 0,
+              .fontSize = 32,
+            } )
+          );
+        }
       }
     }
 

@@ -107,7 +107,7 @@ namespace UI {
       );
     }
 
-    RenderMenuButton(
+    text_button_small(
       CLAY_STRING( "Construction::Build" ), CLAY_STRING( "Build" ), 0
     );
 
