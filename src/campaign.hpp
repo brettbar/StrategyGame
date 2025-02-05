@@ -31,6 +31,7 @@
 #include "ui/scenes/campaign/minimap.hpp"
 #include "ui/scenes/campaign/overview_panel/overview_content.hpp"
 #include "ui/scenes/campaign/overview_panel/overview_panel.hpp"
+#include "ui/scenes/campaign/time_panel.hpp"
 #include "world/managers/map_manager.hpp"
 #include "world/managers/settlement_manager.hpp"
 
@@ -380,9 +381,12 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       CLAY_ID( "Campaign::RightCol" ),
       CLAY_LAYOUT( {
         .sizing = { .height = CLAY_SIZING_GROW() },
+        .childAlignment = { .x = CLAY_ALIGN_X_RIGHT },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
+      UI::time_panel( Global::state.timeScale );
+
       UI::spacer();
       switch ( UI::minimap() ) {
         case UI::Action_Minimap::Default:
