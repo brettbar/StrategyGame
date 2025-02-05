@@ -44,7 +44,7 @@ namespace UI {
       CLAY_TEXT(
         cs,
         CLAY_TEXT_CONFIG( {
-          .textColor = { 255, 255, 255, 255 },
+          .textColor = COLOR_WHITE,
           .fontId = 0,
           .fontSize = 32,
         } )
