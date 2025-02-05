@@ -66,10 +66,6 @@ namespace ResourceSystem {
       auto stockpile = stockpiles.get<Stockpile::Component>( stockpile_e );
       auto player = stockpiles.get<Player::Component>( stockpile_e );
 
-      printf(
-        "Stockpile wheat: %d\n", stockpile.resources[Resources::Type::Wheat]
-      );
-
       if ( player.id == player_e ) {
         return stockpile.resources;
       }

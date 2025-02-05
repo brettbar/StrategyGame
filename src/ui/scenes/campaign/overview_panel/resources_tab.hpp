@@ -93,6 +93,48 @@ namespace UI {
     }
   }
 
+  inline void resource_quantity( Clay_String amount_cs, vec2f dimensions ) {
+    CLAY(
+      CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIXED( dimensions.x ),
+            .height = CLAY_SIZING_FIXED( dimensions.y ),
+          },
+      } ),
+      CLAY_IMAGE( {
+        .sourceDimensions =
+          {
+            dimensions.x,
+            dimensions.y,
+          },
+        .texture_id = hstr{ "slot.png" },
+      } )
+    ) {
+      CLAY( CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIXED( dimensions.x ),
+            .height = CLAY_SIZING_FIXED( dimensions.y ),
+          },
+        .childAlignment =
+          {
+            .x = CLAY_ALIGN_X_CENTER,
+            .y = CLAY_ALIGN_Y_CENTER,
+          },
+      } ) ) {
+        CLAY_TEXT(
+          amount_cs,
+          CLAY_TEXT_CONFIG( {
+            .textColor = COLOR_WHITE,
+            .fontId = 0,
+            .fontSize = 24,
+          } )
+        );
+      }
+    }
+  }
+
   inline void resource_rows( list<const char *> resources ) {
     vec2f dimensions = { 68, 68 };
 
@@ -104,66 +146,37 @@ namespace UI {
     for ( u32 i = 0; i < resources.size(); i++ ) {
       Resources::Type resource_t = (Resources::Type) i;
 
-      u32 amount = resource_map[resource_t];
+      u32 amount_stored = resource_map[resource_t];
 
-      cstr amount_s = u32_to_cstr( amount );
-
-      if ( resource_t == Resources::Type::Wheat ) {
-        printf( "Amount wheat: %s\n", amount_s );
-      }
+      cstr amount_stored_s = u32_to_cstr( amount_stored );
 
       Clay_String amount_cs = {
-        .length = strlen( amount_s ),
-        .chars = amount_s,
+        .length = strlen( amount_stored_s ),
+        .chars = amount_stored_s,
       };
+
+      Clay_String temp_else = {
+        .length = strlen( "0" ),
+        .chars = "0",
+      };
+
 
       CLAY( CLAY_LAYOUT( {
         .childGap = 4,
         .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } ) ) {
+        // 1. Icon
         resource_icon( resources[i], dimensions, i );
-
-        for ( u32 j = 0; j < 5; j++ ) {
-          CLAY(
-            CLAY_LAYOUT( {
-              .sizing =
-                {
-                  .width = CLAY_SIZING_FIXED( dimensions.x ),
-                  .height = CLAY_SIZING_FIXED( dimensions.y ),
-                },
-            } ),
-            CLAY_IMAGE( {
-              .sourceDimensions =
-                {
-                  dimensions.x,
-                  dimensions.y,
-                },
-              .texture_id = hstr{ "slot.png" },
-            } )
-          ) {
-            CLAY( CLAY_LAYOUT( {
-              .sizing =
-                {
-                  .width = CLAY_SIZING_FIXED( dimensions.x ),
-                  .height = CLAY_SIZING_FIXED( dimensions.y ),
-                },
-              .childAlignment =
-                {
-                  .x = CLAY_ALIGN_X_CENTER,
-                  .y = CLAY_ALIGN_Y_CENTER,
-                },
-            } ) ) {
-              CLAY_TEXT(
-                amount_cs,
-                CLAY_TEXT_CONFIG( {
-                  .textColor = COLOR_WHITE,
-                  .fontId = 0,
-                  .fontSize = 24,
-                } )
-              );
-            }
-          }
-        }
+        // 2. Stored
+        resource_quantity( amount_cs, dimensions );
+        // 3. Increase Per Tick
+        resource_quantity( temp_else, dimensions );
+        // 4. Decrease Per Tick
+        resource_quantity( temp_else, dimensions );
+        // 5. Importing Per Tick
+        resource_quantity( temp_else, dimensions );
+        // 6. Exporting Per Tick
+        resource_quantity( temp_else, dimensions );
       }
     }
   }
