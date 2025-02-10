@@ -1,17 +1,19 @@
 #pragma once
 
 // TODO see which of these includes can be removed
-#include <cstdio>
 #include <entt/entt.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
 #include <vector>
 
+
+#define LEN( arr ) sizeof( arr ) / sizeof( arr[0] )
 
 using ECS = entt::registry;
 using u32 = unsigned int;
@@ -19,9 +21,14 @@ using i32 = int;
 using f32 = float;
 using u64 = unsigned long long;
 using str = std::string;
+using cstr = const char *;
 using hstr = entt::hashed_string;
 using vec2f = Vector2;
 using rect = Rectangle;
+
+template<typename T>
+using opt = std::optional<T>;
+
 struct vec2i {
   i32 x;
   i32 y;

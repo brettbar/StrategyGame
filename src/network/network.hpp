@@ -19,8 +19,7 @@
 #include <string>
 #include <thread>
 
-namespace Network
-{
+namespace Network {
 
   inline const uint32 MAX_PLAYERS_PER_SERVER = 8;
 
@@ -43,8 +42,8 @@ namespace Network
     { "player_7", 7 },
   };
 
-  enum MessageID : u32
-  {
+  enum class MessageID : u32 {
+    None,
     InitiateContact,
     AssignedPlayerId,
     HostPingRequest,
@@ -62,14 +61,12 @@ namespace Network
     NumMessageIDs,
   };
 
-  struct Message
-  {
+  struct Message {
     MessageID message_id;
     nlohmann::json body;
   };
 
-  struct PeerData
-  {
+  struct PeerData {
     std::string player_id;
     std::string faction = "";
     bool active = false;
@@ -82,13 +79,11 @@ namespace Network
   inline void DebugOutput(
     ESteamNetworkingSocketsDebugOutputType eType,
     const char *pszMsg
-  )
-  {
+  ) {
     printf( "%s\n", pszMsg );
   }
 
-  inline void Setup()
-  {
+  inline void Setup() {
     SteamNetworkingUtils()->SetDebugOutputFunction(
       k_ESteamNetworkingSocketsDebugOutputType_Debug, DebugOutput
     );
@@ -97,17 +92,16 @@ namespace Network
 
     // TODO see if I can remove this
     // Remove auth
-    // SteamNetworkingUtils()->SetGlobalConfigValueInt32(
-    //   k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
-    // );
+    SteamNetworkingUtils()->SetGlobalConfigValueInt32(
+      k_ESteamNetworkingConfig_IP_AllowWithoutAuth, 2
+    );
   }
 
   inline void SendMessageOnConnection(
     HSteamNetConnection conn,
     Message message
     // const char *msg
-  )
-  {
+  ) {
     // printf( "Sending msg '%s'\n", payload );
 
     nlohmann::json message_payload = {

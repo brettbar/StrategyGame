@@ -3,15 +3,18 @@
 
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
-#include "../components/ai.hpp"
-#include "../components/player.hpp"
-
-#include "../components/faction.hpp"
-#include "../managers/faction.hpp"
 
 #include "../../network/client.hpp"
 #include "../../network/host.hpp"
+
+#include "../managers/faction_manager.hpp"
+
+#include "../components/ai_component.hpp"
+#include "../components/faction_component.hpp"
+#include "../components/player_component.hpp"
+
 #include "ai_system.hpp"
+
 
 namespace PlayerSystem {
   inline void create_players_for_sp( str player_faction ) {
@@ -58,7 +61,7 @@ namespace PlayerSystem {
         ai_player, ai_player, "player_3", true
       );
       Global::world.emplace<Faction::Component>(
-        ai_player, Faction::Manager::Get()->factions.at( "celts" )
+        ai_player, Faction::Manager::Get()->factions.at( "carthaginians" )
       );
 
       AI::Create( ai_player );
@@ -161,6 +164,21 @@ namespace PlayerSystem {
         AI::execute_goals( ai_player );
       }
     }
+  }
+
+  inline entt::entity GetEntityOfPlayer( str player_id ) {
+    auto v = Global::world.view<Player::Component>();
+
+    for ( auto p: v ) {
+      Player::Component pc = v.get<Player::Component>( p );
+
+      if ( pc.player_id == player_id ) {
+        return p;
+      }
+    }
+
+    // Should never get here
+    return entt::null;
   }
 
 };// namespace PlayerSystem

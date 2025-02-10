@@ -3,33 +3,45 @@
 #include "interface/irongui/forge.hpp"
 #include "interface/pages/editor.hpp"
 #include "interface/pages/faction_select_menu.hpp"
-#include "interface/pages/main_menu_ui.hpp"
-#include "interface/pages/singleplayer_lobby.hpp"
+#include "interface/pages/lobby_browser.hpp"
+#include "interface/pages/modal_menu_ui.hpp"
+#include "interface/pages/multiplayer_lobby.hpp"
+#include "interface/pages/save_games.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
+
 #include "network/network.hpp"
 #include "shared/common.hpp"
-#include "shared/save.hpp"
 
 #include "renderer/renderer.hpp"
 
-#include "signals/updates.hpp"
-#include "world/systems/map_system.hpp"
-#include "world/systems/player_system.hpp"
-#include "world/systems/selection.hpp"
 
 #include "campaign.hpp"
+#include "shared/global.hpp"
 #include <raylib.h>
+
+#define CLAY_IMPLEMENTATION
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
+#include "clay/clay.h"
+
+#include "ui/scenes/main_menu.hpp"
+#include "ui/scenes/singleplayer_lobby.hpp"
+#include "ui/scenes/sp_faction_select.hpp"
 
 enum class Scene {
   MainMenu,
+  LoadGames,
   SinglePlayerLobby,
-  FactionSelect,
+  MultiPlayerLobby,
+  LobbyBrowser,
+  SPFactionSelect,
+  MPFactionSelect,
   ModalMenu,
   Campaign,
   Editor,
 };
+
 
 class IGame {
   public:
@@ -49,6 +61,11 @@ class IGame {
       .rotation = 0,
       .zoom = 2.0f,
     };
+
+    // Initialize manager singletons
+    // Order matters here
+    Faction::Manager::Get();
+    Actor::Manager::Get();
 
     while ( !WindowShouldClose() && ShouldRun() ) {
       SteamAPI_RunCallbacks();
@@ -91,13 +108,10 @@ class IGame {
 
         // Update once per frame
         UpdateOnFrame();
-
-        // Update Camera
-        CameraUpdate( Global::state.camera, _dt );
       }
     }
 
-    ExitGameLoopCleanup();
+    ExitCampaignCleanup();
   }
 
   Campaign *GetCampaign() {
@@ -107,11 +121,12 @@ class IGame {
   private:
   Campaign *_campaign;
   bool _single_player = true;
+  bool _ui_debug = false;
   // bool _creating_lobby = false;
   // bool _looking_for_lobby = false;
   // bool _in_lobby = false;
   bool _hit_exit = false;
-  Scene _mode = Scene::MainMenu;
+  Scene _scene = Scene::MainMenu;
 
   f32 _oncelag = 0.0f;
   f32 _lag = 0.0f;
@@ -120,17 +135,8 @@ class IGame {
   const f32 _ONCE_A_SECOND = 1;
 
   // TODO move
-  std::string faction = "";
   // TODO this should be set from networking
   // std::string player_id = "player_0";
-
-  IGame( IGame const & ) = delete;
-  void operator=( const IGame & ) = delete;
-
-  IGame() {}
-  ~IGame() {
-    delete _campaign;
-  }
 
   bool ShouldRun() {
     return !_hit_exit;
@@ -141,15 +147,17 @@ class IGame {
                         Begin: Singleplayer
   =============================================================*/
   void StartSingleplayerCampaign( str player_faction ) {
-    printf( "pending new!!\n" );
-
-    if ( _campaign )
-      delete _campaign;
+    _scene = Scene::Campaign;
 
     _campaign = new struct Campaign( true );
-    _campaign->Start( player_faction );
+    _campaign->start( player_faction );
+  }
 
-    Game()->_mode = Scene::Campaign;
+  void LoadSinglePlayerCampaign( cstr file_path ) {
+    _scene = Scene::Campaign;
+
+    _campaign = new struct Campaign( true, "output.dat" );
+    _campaign->load( file_path );
   }
   /*=============================================================
                         End: Singleplayer
@@ -163,61 +171,39 @@ class IGame {
     _single_player = false;
     Network::is_host = true;
     Network::Host()->Init();
-    // UI::System::SwitchPage( UI::Lobby );
-
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::HostLobby,
-      .player_id = Network::Host()->_player_id,
-    }
-      .Send();
   }
 
+  // @todo maybe can consolidate these
   void HostStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
-    _campaign = new Campaign( false );
-
-    // UI::System::InitCampaignUI();
-
-
-    PlayerSystem::HostStartMultiplayer();
-
-    Game()->_mode = Scene::Campaign;
+    _scene = Scene::Campaign;
+    _campaign = new struct Campaign( false );
+    _campaign->start_mp();
+    // _campaign->start( Network::Host()->GetHostFaction() );
   }
-
   void ClientStartMultiplayerCampaign() {
     if ( _campaign )
       delete _campaign;
 
+    _scene = Scene::Campaign;
     _campaign = new struct Campaign( false );
-
-    // UI::System::InitCampaignUI();
-
-    PlayerSystem::ClientStartMultiplayer();
-
-    Game()->_mode = Scene::Campaign;
+    _campaign->start_mp();
+    // _campaign->start( Network::Client()->GetClientFaction() );
   }
 
   void LookForMultiplayerLobby() {
     _single_player = false;
     Network::is_host = false;
     Network::Client()->Init();
-    // UI::System::SwitchPage( UI::LobbyBrowser );
   }
 
-  void JoinMultiplayerLobby( CSteamID lobby_id ) {
-    InterfaceUpdate::Update{
-      .id = InterfaceUpdate::ID::JoinLobby,
-      .player_id = "player_0",
-    }
-      .Send();
-
-    if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
-      printf( "Sending joined lobby event!\n" );
-      // UI::System::SwitchPage( UI::Lobby );
-    }
-  }
+  // void JoinMultiplayerLobby( CSteamID lobby_id ) {
+  //   if ( Network::Client()->AttemptJoinLobby( lobby_id ) ) {
+  //     printf( "Sending joined lobby event!\n" );
+  //   }
+  // }
 
   /*=============================================================
                         End: Multiplayer
@@ -226,191 +212,110 @@ class IGame {
   /*=============================================================
                         Begin: Shared
   =============================================================*/
-  void LoadGame() {
-    if ( _campaign )
-      delete _campaign;
-    _campaign = new struct Campaign( "output.dat" );
-    // UI::System::InitCampaignUI();
-
-    Game()->_mode = Scene::Campaign;
-  }
-
-  void SaveGame() {
-    SaveSystem::Save();
-  }
 
   void ExitGame() {
     _hit_exit = true;
   }
 
-  void ToggleModalMenu() {
-    if ( _mode == Scene::Campaign ) {
-      _mode = Scene::ModalMenu;
-      // UI::System::SwitchPage( UI::ModalMenu );
-    } else if ( _mode == Scene::ModalMenu ) {
-      _mode = Scene::Campaign;
-      // UI::System::InitCampaignUI();
-    }
-  }
 
   void ReturnToMain() {
-    // UI::System::SwitchPage( UI::MainMenu );
-    _mode = Scene::MainMenu;
+    _scene = Scene::MainMenu;
   }
 
-
-  inline void CheckMenuToggle() {
+  void CheckMenuToggle() {
     if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      InterfaceEvent::event_emitter.publish( InterfaceEvent::Data{
-        InterfaceEvent::ID::ModalMenuToggle,
-      } );
+      if ( _scene == Scene::ModalMenu ) {
+        _scene = Scene::Campaign;
+      } else {
+        _scene = Scene::ModalMenu;
+      }
     }
   }
-  /*=============================================================
-                        End: Shared
-  =============================================================*/
+
+  void ExitToMainMenu() {
+    _scene = Scene::MainMenu;
+    ExitCampaignCleanup();
+  }
 
   void UpdateOnFrame() {
     if ( Network::is_host ) {
-      Network::Host()->Update();
+      auto msg = Network::Host()->ProcessNextMsg();
+      switch ( msg.message_id ) {
+        case Network::MessageID::Command: {
+          _campaign->ConvertCommandRequest( msg.body.dump() );
+        } break;
+      }
+
+      // auto msg = Network::Host()->CheckForMessages();
     } else {
-      Network::Client()->Update();
+      auto msg = Network::Client()->CheckForMessages();
+      switch ( msg.message_id ) {
+        case Network::MessageID::None: {
+        } break;
+        case Network::MessageID::HostStartedCampaign: {
+          ClientStartMultiplayerCampaign();
+        } break;
+        case Network::MessageID::Command: {
+          _campaign->ConvertCommandRequest( msg.body.dump() );
+        } break;
+      }
     }
 
     Iron::Forge()->over_any_elem = false;
 
-    switch ( _mode ) {
-      case Scene::MainMenu: {
-        auto action = UI::MainMenu();
+    Clay_SetLayoutDimensions( (Clay_Dimensions) {
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    } );
 
-        switch ( action ) {
-          case UI::Action_MainMenu::StartGame:
-            _mode = Scene::SinglePlayerLobby;
-            break;
-          case UI::Action_MainMenu::HostGame:
-            break;
-          case UI::Action_MainMenu::JoinGame:
-            break;
-          case UI::Action_MainMenu::Settings:
-            break;
-          case UI::Action_MainMenu::ExitGame:
-            // TODO probably dont wanna do this so brute force
-            CloseWindow();
-            break;
-          case UI::Action_MainMenu::None:
-            break;
-        }
+    Vector2 mouse_pos = GetMousePosition();
+    Vector2 scroll_delta = GetMouseWheelMoveV();
 
-        BeginDrawing();
-        {
-          ClearBackground( BLACK );
-          Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
-        }
-        EndDrawing();
-      } break;
+    Clay_SetPointerState(
+      Clay_Vector2{ mouse_pos.x, mouse_pos.y }, IsMouseButtonDown( 0 )
+    );
 
-      case Scene::SinglePlayerLobby: {
-        auto action = UI::SinglePlayerLobby();
+    Clay_UpdateScrollContainers(
+      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
+    );
 
-        switch ( action ) {
-          case UI::Action_SinglePlayerLobby::SelectFaction:
-            _mode = Scene::FactionSelect;
-            break;
-          case UI::Action_SinglePlayerLobby::ExitPressed:
-            _mode = Scene::MainMenu;
-            break;
-          case UI::Action_SinglePlayerLobby::None:
-            break;
-        }
-        BeginDrawing();
-        {
-          ClearBackground( BLACK );
-          Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
-        }
-        EndDrawing();
-      } break;
 
-      case Scene::FactionSelect: {
-        auto selection = UI::DrawFactionSelectScreen();
+    if ( IsKeyDown( KEY_LEFT_CONTROL ) && IsKeyDown( KEY_LEFT_SHIFT ) &&
+         IsKeyPressed( KEY_I ) ) {
+      _ui_debug = !_ui_debug;
+      Clay_SetDebugModeEnabled( _ui_debug );
+    }
 
-        // @volatile
-        // TODO make this a faction enum
-        if ( selection != "" ) {
-          _mode = Scene::Campaign;
-          StartSingleplayerCampaign( selection );
-        }
 
-        BeginDrawing();
-        {
-          ClearBackground( BLACK );
-          Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
-        }
-        EndDrawing();
-      } break;
-
-      case Scene::ModalMenu: {
-        CheckMenuToggle();
-
-        BeginDrawing();
-        {
-          Renderer::draw_map( MapSystem::Manager()->mode );
-          DrawRectangle(
-            0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-          );
-        }
-        EndDrawing();
-      } break;
-
+    switch ( _scene ) {
+      case Scene::MainMenu:
+        Scene_MainMenu();
+        break;
+      case Scene::LoadGames:
+        Scene_LoadGames();
+        break;
+      case Scene::SinglePlayerLobby:
+        Scene_SinglePlayerLobby();
+        break;
+      case Scene::MultiPlayerLobby:
+        Scene_MultiplayerLobby();
+        break;
+      case Scene::LobbyBrowser:
+        Scene_LobbyBrowser();
+        break;
+      case Scene::SPFactionSelect:
+        Scene_SPFactionSelect();
+        break;
+      case Scene::MPFactionSelect:
+        Scene_MPFactionSelect();
+        break;
+      case Scene::ModalMenu:
+        Scene_ModalMenu();
+        break;
       case Scene::Editor:
-      case Scene::Campaign: {
-        CheckMenuToggle();
-
-        if ( _single_player ) {
-          // Singleplayer Campaign
-          if ( _campaign )
-            _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
-        } else {
-          // Multiplayer Campaign
-          if ( _campaign )
-            _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
-        }
-
-        if ( IsKeyPressed( KEY_GRAVE ) ) {
-          if ( _mode == Scene::Editor ) {
-            _mode = Scene::Campaign;
-          } else {
-            _mode = Scene::Editor;
-          }
-        }
-
-        if ( _mode == Scene::Editor ) {
-
-          auto editor_action = UI::panel();
-
-          switch ( editor_action ) {
-            case UI::EditorAction::None:
-              break;
-            case UI::EditorAction::GenerateMap:
-              // MapSystem::Init();
-              if ( _campaign )
-                //@todo actualyl pass in the faction
-                _campaign->Start( "romans" );
-              break;
-          }
-        }
-
-        // 6. Draw everything
-        BeginDrawing();
-        {
-          _campaign->Draw();
-          Iron::Forge()->DrawAll();
-          // Iron::Forge()->DrawDebug();
-        }
-        EndDrawing();
-      } break;
+      case Scene::Campaign:
+        Scene_Campaign();
+        break;
     }
 
     if ( !Iron::Forge()->over_any_elem ) {
@@ -419,20 +324,292 @@ class IGame {
     }
   }
 
-  void ExitGameLoopCleanup() {
-    if ( Network::is_host )
-      Network::Host()->Delete();
-    else
-      Network::Client()->Delete();
+
+  void Scene_MainMenu() {
+
+    Clay_BeginLayout();
+    auto action = UI::main_menu();
+
+    switch ( action ) {
+      case UI::Action_MainMenu::StartGame:
+        printf( "Hit Start Game in game.hpp\n" );
+        _scene = Scene::SinglePlayerLobby;
+        break;
+      case UI::Action_MainMenu::LoadGame:
+        _scene = Scene::LoadGames;
+        break;
+      case UI::Action_MainMenu::HostGame:
+        HostMultiplayerLobby();
+        _scene = Scene::MultiPlayerLobby;
+        break;
+      case UI::Action_MainMenu::JoinGame:
+        LookForMultiplayerLobby();
+        _scene = Scene::LobbyBrowser;
+        break;
+      case UI::Action_MainMenu::Settings:
+        break;
+      case UI::Action_MainMenu::ExitGame:
+        ExitGame();
+        return;
+      case UI::Action_MainMenu::None:
+        break;
+    }
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+
+      Clay_Raylib_Render( render_cmds );
+    }
+    EndDrawing();
+  }
+
+  void Scene_LoadGames() {
+    bool pressed_back = false;
+    auto file_to_load = UI::load_game_menu( pressed_back );
+
+    if ( pressed_back ) {
+      _scene = Scene::MainMenu;
+    }
+
+    if ( file_to_load != "" ) {
+      LoadSinglePlayerCampaign( file_to_load.c_str() );
+    }
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+  void Scene_SinglePlayerLobby() {
+    Clay_BeginLayout();
+    auto action = UI::singleplayer_lobby();
+
+    switch ( action ) {
+      case UI::Action_SinglePlayerLobby::SelectFaction:
+        _scene = Scene::SPFactionSelect;
+        break;
+      case UI::Action_SinglePlayerLobby::ReturnToMain:
+        _scene = Scene::MainMenu;
+        break;
+      case UI::Action_SinglePlayerLobby::None:
+        break;
+    }
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Clay_Raylib_Render( render_cmds );
+    }
+    EndDrawing();
+  }
+
+  void Scene_MultiplayerLobby() {
+    switch ( UI::MultiPlayerLobby() ) {
+      case UI::Action_MultiplayerLobby::None:
+        break;
+      case UI::Action_MultiplayerLobby::HitBack:
+        _scene = Scene::MainMenu;
+        break;
+      case UI::Action_MultiplayerLobby::PickFaction: {
+        _scene = Scene::MPFactionSelect;
+      } break;
+      case UI::Action_MultiplayerLobby::ToggleReady:
+        if ( Network::is_host ) {
+          Network::Host()->ToggleReady();
+        } else {
+          Network::Client()->ToggleReady();
+        }
+        break;
+      case UI::Action_MultiplayerLobby::HostStartedGame: {
+        Network::Host()->StartHostedCampaign();
+        HostStartMultiplayerCampaign();
+      } break;
+    }
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+  void Scene_LobbyBrowser() {
+    CSteamID choice = UI::LobbyBrowser();
+    // dont know if this works
+
+    if ( choice.IsValid() ) {
+      std::cout << "1." << '\n';
+      if ( Network::Client()->AttemptJoinLobby( choice ) ) {
+        _scene = Scene::MultiPlayerLobby;
+        std::cout << "2." << '\n';
+      }
+    }
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+
+  void Scene_SPFactionSelect() {
+    // auto selection = UI::DrawFactionSelectScreen();
+    Clay_BeginLayout();
+    auto selection = UI::faction_settlement_screen();
+
+    // @volatile
+    // TODO make this a faction enum
+    if ( selection != "" ) {
+      StartSingleplayerCampaign( selection );
+    }
+
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      // Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+  void Scene_MPFactionSelect() {
+    auto selection = UI::DrawFactionSelectScreen();
+
+    if ( selection != "" ) {
+      if ( Network::is_host ) {
+        Network::Host()->SetHostFaction( selection );
+        Network::Host()->SendMessageToAllActiveClients( Network::Message{
+          Network::MessageID::PlayerFactionSelect,
+          nlohmann::json{
+            { "player_id", "player_0" },
+            { "faction", selection },
+          },
+        } );
+      } else {
+        auto player_id = Network::Client()->_local_player_id;
+        Network::Client()->SendMessageToHost( Network::Message{
+          Network::MessageID::PlayerFactionSelect,
+          nlohmann::json{
+            { "player_id", player_id },
+            { "faction", selection },
+          },
+        } );
+      }
+
+      _scene = Scene::MultiPlayerLobby;
+    }
+
+
+    BeginDrawing();
+    {
+      ClearBackground( BLACK );
+      Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+  void Scene_ModalMenu() {
+    CheckMenuToggle();
+
+    switch ( UI::DrawModalMenu() ) {
+      case UI::Action_ModalMenu::None:
+        break;
+      case UI::Action_ModalMenu::SaveGame:
+        // @todo get actual user input for file name
+        _campaign->save( "output" );
+        break;
+      case UI::Action_ModalMenu::LoadGame:
+        // LoadSinglePlayerCampaign();
+        break;
+      case UI::Action_ModalMenu::Settings:
+        break;
+      case UI::Action_ModalMenu::ExitToMainMenu:
+        ExitToMainMenu();
+        break;
+      case UI::Action_ModalMenu::ExitGame:
+        ExitGame();
+        return;
+    }
+
+    BeginDrawing();
+    {
+      Renderer::draw_map( Map::Manager()->mode );
+      DrawRectangle(
+        0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
+      );
+      Iron::Forge()->DrawAll();
+    }
+    EndDrawing();
+  }
+
+  void Scene_Campaign() {
+    Clay_BeginLayout();
+
+    CheckMenuToggle();
+
+    _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
+
+    if ( IsKeyPressed( KEY_GRAVE ) ) {
+      if ( _scene == Scene::Editor ) {
+        _scene = Scene::Campaign;
+      } else {
+        _scene = Scene::Editor;
+      }
+    }
+
+    if ( _scene == Scene::Editor ) {
+
+      auto editor_action = UI::panel();
+
+      switch ( editor_action ) {
+        case UI::EditorAction::None:
+          break;
+        case UI::EditorAction::GenerateMap:
+          // MapSystem::Init();
+          if ( _campaign )
+            //@todo actualyl pass in the faction
+            _campaign->start( "romans" );
+          break;
+      }
+    }
+
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
+    // 6. Draw everything
+    BeginDrawing();
+    {
+      _campaign->Draw();
+      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      // Iron::Forge()->DrawAll();
+      // Iron::Forge()->DrawDebug();
+    }
+    EndDrawing();
+  }
+
+  void ExitCampaignCleanup() {
+    // if ( Network::is_host )
+    //   Network::Host()->Delete();
+    // else
+    //   Network::Client()->Delete();
 
     if ( _campaign )
       delete _campaign;
-
-    delete this;
   }
-
-  void RegisterEventListeners();
+  /*=============================================================
+                        End: Shared
+  =============================================================*/
 };
+
 
 // inline void IGame::RegisterEventListeners() {
 //   InterfaceEvent::event_emitter.on<InterfaceEvent::Data>(

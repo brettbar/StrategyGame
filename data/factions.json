@@ -1,0 +1,110 @@
+[
+  {
+    "faction": "romans",
+    "colors": {
+      "primary": "red",
+      "secondary": "gold"
+    },
+    "culture": {
+      "adjective": "roman",
+      "denonym": "romans",
+      "settlement_names": [
+        "rome"
+      ]
+    },
+    "government": {
+      "start_gov": "republic",
+      "empire_name": "Roman Empire",
+      "empire_leader_title": "Imperator",
+      "republic_name": "Roman republic",
+      "republic_leader_title": "Consul",
+      "federation_name": "Italic Tribes",
+      "federation_leader_title": "Rex"
+    },
+    "mobility": {
+      "type": "settled"
+    }
+  },
+  {
+    "faction": "greeks",
+    "colors": {
+      "primary": "cyan",
+      "secondary": "gold"
+    },
+    "culture": {
+      "adjective": "greek",
+      "denonym": "greeks",
+      "settlement_names": [
+        "athens"
+      ]
+    },
+    "government": {
+      "start_gov": "federation",
+      "empire_name": "Hellenic Kingdom",
+      "empire_leader_title": "Basileus",
+      "republic_name": "Hellenic Republic",
+      "republic_leader_title": "Archon",
+      "federation_name": "Greek Cities",
+      "federation_leader_title": "Polemarchos"
+    },
+    "mobility": {
+      "type": "settled"
+    }
+  },
+  {
+    "faction": "celts",
+    "colors": {
+      "primary": "green",
+      "secondary": "gold"
+    },
+    "culture": {
+      "adjective": "celtic",
+      "denonym": "celts",
+      "settlement_names": [
+        "lugudunon"
+      ]
+    },
+    "government": {
+      "start_gov": "federation",
+      "empire_name": "Celtic Kingdom",
+      "empire_leader_title": "Katurigja",
+      "republic_name": "Celtic Republic",
+      "republic_leader_title": "Katuwiro",
+      "federation_name": "Celtic Tribes",
+      "federation_leader_title": "Katuwalo"
+    },
+    "mobility": {
+      "type": "tribal"
+    }
+  },
+  {
+    "faction": "carthaginians",
+    "colors": {
+      "primary": "purple",
+      "secondary": "white"
+    },
+    "culture": {
+      "adjective": "punic",
+      "denonym": "carthaginians",
+      "settlement_names": [
+        "carthage",
+        "utica",
+        "tyre",
+        "byblos",
+        "sidon"
+      ]
+    },
+    "government": {
+      "start_gov": "republic",
+      "empire_name": "Phoenician Empire",
+      "empire_leader_title": "Melech",
+      "republic_name": "Punic Colonies",
+      "republic_leader_title": "Shophetim",
+      "federation_name": "Phoenician Cities",
+      "federation_leader_title": "Nagid"
+    },
+    "mobility": {
+      "type": "settled"
+    }
+  }
+]

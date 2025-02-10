@@ -4,11 +4,14 @@
 #include "../../shared/fonts.hpp"
 #include "../../shared/global.hpp"
 #include "../../shared/textures.hpp"
-#include "../components/faction.hpp"
-#include "../components/player.hpp"
-#include "../components/settlement.hpp"
-#include "map_system.hpp"
-#include "province_system.hpp"
+
+#include "../managers/map_manager.hpp"
+
+#include "../components/faction_component.hpp"
+#include "../components/player_component.hpp"
+#include "../components/province_component.hpp"
+#include "../components/settlement_component.hpp"
+
 #include <raylib.h>
 
 namespace OverlaySystem {
@@ -27,7 +30,7 @@ namespace OverlaySystem {
       Faction::Component faction =
         Global::world.get<Faction::Component>( prov.tile->owner );
 
-      auto neighbors = MapSystem::Manager()->get_neighbors( *prov.tile );
+      auto neighbors = Map::Manager()->get_neighbors( *prov.tile );
 
       str primary = faction.colors.primary;
 
@@ -176,6 +179,35 @@ namespace OverlaySystem {
       //   14,
       //   WHITE );
     }
+  }
+
+  inline void draw_buildable() {
+    // auto provinces = Global::world.view<Province::Component>();
+    //
+    // for ( auto entity: provinces ) {
+    //   auto &prov = provinces.get<Province::Component>( entity );
+    //
+    //
+    //   if ( prov.tile->owner != entt::null ) {
+    //     Player::Component player =
+    //       Global::world.get<Player::Component>( prov.tile->owner );
+    //     Faction::Component faction =
+    //       Global::world.get<Faction::Component>( prov.tile->owner );
+    //
+    //     Rectangle frameRec = { 0.0, 0.0, TILE_WIDTH, TILE_HEIGHT };
+    //
+    //     Color color = color_map[faction.colors.primary];
+    //
+    //     DrawTextureRec(
+    //       Global::texture_cache[hstr{ ( faction.colors.primary + "_overlay" )
+    //                                     .c_str() }]
+    //         ->texture,
+    //       frameRec,
+    //       prov.tile->position,
+    //       Fade( color, 0.5 )
+    //     );
+    //   }
+    // }
   }
 
 }// namespace OverlaySystem

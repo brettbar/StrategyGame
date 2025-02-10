@@ -1,0 +1,42 @@
+{
+  "romans": [
+    {
+      "type": "colonist",
+      "name": "plebeian"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "hastati"
+    }
+  ],
+  "greeks": [
+    {
+      "type": "colonist",
+      "name": "colonist"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "perioikoi"
+    }
+  ],
+  "celts": [
+    {
+      "type": "colonist",
+      "name": "villager"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "warrior"
+    }
+  ],
+  "carthaginians": [
+    {
+      "type": "colonist",
+      "name": "colonist"
+    },
+    {
+      "type": "army_tier_i",
+      "name": "hoplite"
+    }
+  ]
+}

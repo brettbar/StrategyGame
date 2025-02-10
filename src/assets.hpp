@@ -9,52 +9,63 @@ namespace fs = std::filesystem;
 inline Image InitTileOutline() {
   Image base = GenImageColor( 65, 65, ColorAlpha( WHITE, 0.0 ) );
 
-  ImageDrawLineV( &base, { 0, 16 }, { 31, 0 }, YELLOW );
-  ImageDrawLineV( &base, { 63, 16 }, { 63, 47 }, YELLOW );
-  ImageDrawLineV( &base, { 32, 0 }, { 63, 16 }, YELLOW );
-  ImageDrawLineV( &base, { 63, 47 }, { 32, 63 }, YELLOW );
-  ImageDrawLineV( &base, { 31, 63 }, { 0, 47 }, YELLOW );
-  ImageDrawLineV( &base, { 0, 47 }, { 0, 16 }, YELLOW );
+  // ne border
+  ImageDrawLineV( &base, { 31, 0 }, { 64, 17 }, YELLOW );
+
+  // e border
+  ImageDrawLineV( &base, { 63, 16 }, { 63, 48 }, YELLOW );
+
+  // se border
+  ImageDrawLineV( &base, { 32, 63 }, { 64, 47 }, YELLOW );
+
+  // sw border
+  ImageDrawLineV( &base, { 31, 63 }, { 0, 48 }, YELLOW );
+
+  // w border
+  ImageDrawLineV( &base, { 0, 16 }, { 0, 48 }, YELLOW );
+
+  // nw border
+  ImageDrawLineV( &base, { 0, 16 }, { 32, 0 }, YELLOW );
 
   return base;
 }
 
 inline void load_borders() {
-  std::string asset_folder = "src/assets/";
+  std::string asset_folder = "assets";
 
   for ( const auto &pair: color_map ) {
     Color color = pair.second;
     str color_str = pair.first;
 
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "ne_border_" + color_str ).c_str() },
-      create_border( { 32, 0 }, { 63, 16 }, color, Global::texture_cache ),
+      create_border( { 31, 0 }, { 64, 17 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "e_border_" + color_str ).c_str() },
-      create_border( { 63, 16 }, { 63, 47 }, color, Global::texture_cache ),
+      create_border( { 63, 16 }, { 63, 48 }, color, Global::texture_cache ),
       // LoadImage( ( asset_folder + "/images/overlays-E.png" ).c_str() ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "se_border_" + color_str ).c_str() },
-      create_border( { 63, 47 }, { 32, 63 }, color, Global::texture_cache ),
+      create_border( { 32, 63 }, { 64, 47 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "sw_border_" + color_str ).c_str() },
-      create_border( { 31, 63 }, { 0, 47 }, color, Global::texture_cache ),
+      create_border( { 31, 63 }, { 0, 48 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "w_border_" + color_str ).c_str() },
-      create_border( { 0, 47 }, { 0, 16 }, color, Global::texture_cache ),
+      create_border( { 0, 16 }, { 0, 48 }, color, Global::texture_cache ),
       Global::texture_cache
     );
-    LoadAsset(
+    LoadTexturePointFilter(
       hstr{ ( "nw_border_" + color_str ).c_str() },
-      create_border( { 0, 16 }, { 31, 0 }, color, Global::texture_cache ),
+      create_border( { 0, 16 }, { 32, 0 }, color, Global::texture_cache ),
       Global::texture_cache
     );
   }
@@ -67,7 +78,13 @@ inline void load_all_in_folder( str path ) {
 
     // std::cout << filename << '\n';
 
-    LoadAsset(
+    // LoadAsset(
+    //   hstr{ filename.c_str() },
+    //   LoadImage( ( path + "/" + filename ).c_str() ),
+    //   Global::texture_cache
+    // );
+
+    LoadTexturePointFilter(
       hstr{ filename.c_str() },
       LoadImage( ( path + "/" + filename ).c_str() ),
       Global::texture_cache
@@ -77,7 +94,7 @@ inline void load_all_in_folder( str path ) {
 
 
 inline void LoadAssets() {
-  std::string asset_folder = "src/assets/";
+  std::string asset_folder = "assets";
 
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
   load_borders();
@@ -128,41 +145,9 @@ inline void LoadAssets() {
     Global::texture_cache
   );
 
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_overview" },
-    LoadImage( ( asset_folder + "/images/ui/Overview.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_population" },
-    LoadImage( ( asset_folder + "/images/ui/Population.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_culture" },
-    LoadImage( ( asset_folder + "/images/ui/Culture.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_religion" },
-    LoadImage( ( asset_folder + "/images/ui/Religion.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_resources" },
-    LoadImage( ( asset_folder + "/images/ui/Resources.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_construction" },
-    LoadImage( ( asset_folder + "/images/ui/Construction.png" ).c_str() ),
-    Global::texture_cache
-  );
-  LoadTexturePointFilter(
-    hstr{ "settlement_context_tab_garrison" },
-    LoadImage( ( asset_folder + "/images/ui/Garrison.png" ).c_str() ),
-    Global::texture_cache
-  );
-
   load_all_in_folder( asset_folder + "/images/resources" );
+
+  load_all_in_folder( asset_folder + "/images/ui" );
+
+  load_all_in_folder( asset_folder + "/images/buildings" );
 }

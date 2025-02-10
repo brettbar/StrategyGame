@@ -1,0 +1,89 @@
+#pragma once
+
+#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
+#include "construction_tab.hpp"
+#include "resources_tab.hpp"
+
+namespace UI {
+  enum class OverviewAction_t {
+    None,
+    Construction,
+  };
+  struct OverviewAction {
+    OverviewAction_t type;
+    str value;
+  };
+
+  inline OverviewAction overview_content( Clay_String current_tab ) {
+    str building_to_build = "";
+
+    CLAY(
+      CLAY_ID( "OverviewPanel::Content" ),
+      CLAY_RECTANGLE( { .color = { 0, 0, 0, 200 }, .cornerRadius = { 5 } } ),
+      CLAY_LAYOUT( {
+        .sizing =
+          {
+            .width = CLAY_SIZING_FIT( { 384 } ),
+            .height = CLAY_SIZING_PERCENT( 0.5 ),
+          },
+        .padding = { 16, 16 },
+        .childGap = 8,
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
+      } ),
+      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
+    ) {
+      CLAY(
+        CLAY_ID( "OverviewPanel::Content::Banner" ),
+        CLAY_LAYOUT( {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+            },
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_RIGHT,
+            },
+        } )
+      ) {
+        CLAY( CLAY_TEXT(
+          current_tab,
+          CLAY_TEXT_CONFIG( {
+            .textColor = COLOR_WHITE,
+            .fontSize = 16,
+          } )
+        ) );
+
+        CLAY( CLAY_LAYOUT( {
+          .sizing = { CLAY_SIZING_GROW() },
+        } ) );
+
+        CLAY(
+          CLAY_ID( "X" ),
+          CLAY_TEXT(
+            CLAY_STRING( "X" ),
+            CLAY_TEXT_CONFIG( {
+              .textColor = COLOR_WHITE,
+              .fontSize = 16,
+            } )
+          )
+        );
+      }
+
+      if ( std::string( current_tab.chars ) == "Construction" ) {
+        building_to_build = UI::construction_tab();
+      } else if ( std::string( current_tab.chars ) == "Resources" ) {
+        UI::resources_tab();
+      }
+    }
+
+
+    if ( building_to_build != "" ) {
+      return OverviewAction{
+        .type = OverviewAction_t::Construction,
+        .value = building_to_build,
+      };
+    }
+
+    return { .type = OverviewAction_t::None, .value = "" };
+  }
+}// namespace UI

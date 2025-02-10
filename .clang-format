@@ -64,7 +64,10 @@ SpacesBeforeTrailingComments: 0
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
-SpacesInParentheses: true
+SpacesInParens: Custom
+SpacesInParensOptions:
+   Other: true 
+
 SpacesInSquareBrackets: false
 TabWidth: 2
 UseTab: Never

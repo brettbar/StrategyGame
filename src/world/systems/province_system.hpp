@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../../shared/textures.hpp"
-#include "../components/selected.hpp"
-#include "map_system.hpp"
+
+#include "../managers/map_manager.hpp"
 #include "resource_system.hpp"
 
 namespace ProvinceSystem {
@@ -10,14 +10,12 @@ namespace ProvinceSystem {
   inline void SetProvinceOwner( u32 owner );
 
   inline void Init() {
-    Global::world.clear<Province::Component>();
-
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       entt::entity prov_entity = Global::world.create();
 
       Province::Component prov = {
         .selected = false,
-        .tile = MapSystem::Manager()->tile_map[i],
+        .tile = Map::Manager()->tile_map[i],
         .resources = {},
       };
 
@@ -51,21 +49,19 @@ namespace ProvinceSystem {
   }
 
   inline void Draw( Camera2D &camera ) {
-    // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
+    // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
     for ( auto entity: Global::world.view<Province::Component>() ) {
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
-      if (
-      prov.tile->position.x - TILE_WIDTH >
-        camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
-      prov.tile->position.x + TILE_WIDTH <
-        camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
-      prov.tile->position.y - TILE_WIDTH >
-        camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
-      prov.tile->position.y + TILE_WIDTH <
-        camera.target.y - ( camera.offset.y / camera.zoom ) - 32 )
-      {
+      if ( prov.tile->position.x - TILE_WIDTH >
+             camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
+           prov.tile->position.x + TILE_WIDTH <
+             camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
+           prov.tile->position.y - TILE_WIDTH >
+             camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
+           prov.tile->position.y + TILE_WIDTH <
+             camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
         continue;
       }
 
@@ -126,10 +122,11 @@ namespace ProvinceSystem {
       return nullptr;
     }
 
-    auto neighbors = MapSystem::Manager()->get_neighbors( *prov->tile );
+    auto neighbors = Map::Manager()->get_neighbors( *prov->tile );
 
     for ( auto neighbor: neighbors ) {
-      if ( neighbor->owner == entt::null && MapSystem::biome_inhabitable( neighbor->biome ) )
+      if ( neighbor->owner == entt::null &&
+           Map::Manager()->biome_inhabitable( neighbor->biome ) )
         return std::make_shared<vec2f>( neighbor->position );
     }
 

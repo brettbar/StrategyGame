@@ -3,36 +3,20 @@
 rights reserved.
 */
 
+#include <raylib.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 
-#include "steam/isteamnetworkingutils.h"
-#include "steam/steam_api.h"
-
-
 #include "shared/common.hpp"
 #include "shared/global.hpp"
-#include "shared/textures.hpp"
-
-#include "assets.hpp"
-
+#include "steam/steam_api.h"
 #include "steam/steam_api_common.h"
-
-#include "network/client.hpp"
-#include "network/host.hpp"
-#include "network/network.hpp"
-
-#include "game.hpp"
-
-#include "shared/utils.hpp"
-
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-
 #include <nlohmann/json.hpp>
 #include <stdlib.h>
-#include <thread>
+
+#include "assets.hpp"
+#include "game.hpp"
+#include "network/network.hpp"
 
 
 void SteamAPIDebugTextHook( int severity, const char *msg ) {
@@ -49,7 +33,7 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
 int main() {
   Global::mp_capable = true;
 
-  if ( SteamAPI_RestartAppIfNecessary( 480 ) ) {
+  if ( SteamAPI_RestartAppIfNecessary( 2296090 ) ) {
     Global::mp_capable = false;
   }
 
@@ -57,6 +41,8 @@ int main() {
     printf( "SteamAPI_Init() failed!\n" );
     Global::mp_capable = false;
   }
+
+  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
 
   if ( !SteamUser()->BLoggedOn() ) {
     printf( "Steam user is not logged in\n" );
@@ -68,15 +54,37 @@ int main() {
     Global::mp_capable = false;
   }
 
-  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
 
   printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
 
-  SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+  // SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
-  InitWindow( 1920, 1080, "FieldsOfMars" );
+
+  Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
+  // InitWindow( 1920, 1080, "FieldsOfMars" );
+  u64 clay_required_memory = Clay_MinMemorySize();
+  Clay_Arena clay_memory = (Clay_Arena) {
+    .capacity = clay_required_memory,
+    .memory = (char *) malloc( clay_required_memory ),
+  };
+
+  Clay_Initialize(
+    clay_memory,
+    (Clay_Dimensions) {
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    },
+    {}
+  );
+
+  Clay_SetMeasureTextFunction( Raylib_MeasureText );
+  const int FONT_ID_BODY_16 = 0;
+  Raylib_fonts[FONT_ID_BODY_16] = (Raylib_Font) {
+    .fontId = FONT_ID_BODY_16,
+    .font = LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 ),
+  };
+
   LoadAssets();
-  // UI::System::Init();
 
   SetExitKey( KEY_NULL );
 
@@ -85,15 +93,16 @@ int main() {
   // This call will block and run until the game exists
   Game()->MainLoop();
 
+  CloseWindow();// Close window and OpenGL context
+
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever
   UnloadShader( Renderer::shader );
   for ( auto resource: Global::texture_cache ) {
     UnloadTexture( resource.second->texture );
   }
-  Global::texture_cache.clear();
+  // Global::texture_cache.clear();
   SteamAPI_Shutdown();
-  CloseWindow();// Close window and OpenGL context
 
   return EXIT_SUCCESS;
 }
