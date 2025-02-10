@@ -93,7 +93,7 @@ namespace UI {
             .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
           } )
         ) {
-          texture_button( tabs[i].icon, dims );
+          texture_label( tabs[i].icon, dims );
         }
       }
     }

@@ -31,7 +31,7 @@ namespace UI {
             .height = CLAY_SIZING_FIXED( dimensions.y ),
           },
       } ),
-      texture_button( texture_id, dimensions )
+      texture_label( texture_id, dimensions )
     ) {
       auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "BuildingIcon" ), i );
 
@@ -85,8 +85,14 @@ namespace UI {
     return -1;
   }
 
-  inline bool construction_preview( Building building ) {
-    //@left off add a back button
+  enum class Action_ConstructionPreview {
+    None,
+    Back,
+    Build
+  };
+
+  inline Action_ConstructionPreview construction_preview( Building building
+  ) {//@left off add a back button
     CLAY(
       CLAY_ID( "Construction::Preview" ),
       CLAY_LAYOUT( {
@@ -95,27 +101,72 @@ namespace UI {
             .width = CLAY_SIZING_GROW(),
             .height = CLAY_SIZING_GROW(),
           },
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } )
     ) {
-      CLAY_TEXT(
-        building.label,
-        CLAY_TEXT_CONFIG( {
-          .textColor = { 255, 255, 255, 255 },
-          .fontId = 0,
-          .fontSize = 32,
+
+      CLAY(
+        CLAY_ID( "Construction::Preview::TopRow" ),
+        CLAY_LAYOUT( { .childGap = 8 } )
+      ) {
+        texture_button(
+          CLAY_STRING( "Construction::Preview::Back" ),
+          hstr{ "back_button.png" },
+          { 30, 30 }
+        );
+
+        CLAY( CLAY_LAYOUT(
+          { .childGap = 8, .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } }
+        ) ) {
+          building_icon( building.label, hstr{ building.path.c_str() }, 0 );
+
+          CLAY_TEXT(
+            building.label,
+            CLAY_TEXT_CONFIG( {
+              .textColor = { 255, 255, 255, 255 },
+              .fontId = 0,
+              .fontSize = 32,
+            } )
+          );
+        }
+      }
+
+      CLAY(
+        CLAY_ID( "Construction::Preview::Desc" ),
+        CLAY_LAYOUT( {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIXED( 350 ),
+            },
         } )
-      );
+      ) {
+        CLAY_TEXT(
+          CLAY_STRING( "Description of a farm. Description of a farm. "
+                       "Description of a farm." ),
+          CLAY_TEXT_CONFIG( {
+            .textColor = COLOR_WHITE,
+            .fontId = 0,
+            .fontSize = 16,
+          } )
+        );
+      }
+      CLAY( CLAY_ID( "Construction::Preview::MiddleRow" ) ) {}
+      CLAY( CLAY_ID( "Construction::Preview::BottomRow" ) ) {}
     }
 
     text_button_small(
       CLAY_STRING( "Construction::Build" ), CLAY_STRING( "Build" ), 0
     );
 
-    if ( ButtonWasClicked( CLAY_STRING( "Construction::Build" ) ) ) {
-      return true;
+    if ( ButtonWasClicked( CLAY_STRING( "Construction::Preview::Back" ) ) ) {
+      return Action_ConstructionPreview::Back;
     }
 
-    return false;
+    if ( ButtonWasClicked( CLAY_STRING( "Construction::Build" ) ) ) {
+      return Action_ConstructionPreview::Build;
+    }
+
+    return Action_ConstructionPreview::None;
   }
 
   inline str construction_tab() {
@@ -123,11 +174,18 @@ namespace UI {
     if ( _constructing ) {
       Building building = buildings[_selected_building];
 
-      bool clicked = construction_preview( building );
-      if ( clicked ) {
-        // _constructing = false;
-        // _selected_building = -1;
-        return std::string( building.label.chars );
+      auto action = construction_preview( building );
+
+      // _constructing = false;
+      // _selected_building = -1;
+      switch ( action ) {
+        case UI::Action_ConstructionPreview::None:
+          break;
+        case UI::Action_ConstructionPreview::Back:
+          _constructing = false;
+          break;
+        case UI::Action_ConstructionPreview::Build:
+          return std::string( building.label.chars );
       }
     } else {
       _selected_building = construction_browser();

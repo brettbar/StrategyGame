@@ -204,7 +204,7 @@ namespace UI {
       } )
     ) {
       for ( u32 i = 0; i < resource_headers.size(); i++ ) {
-        texture_button( resource_headers[i], { 68, 36 } );
+        texture_label( resource_headers[i], { 68, 36 } );
       }
     }
   }

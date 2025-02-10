@@ -68,7 +68,7 @@ namespace UI {
         } ) ) {
           text_button_lrg( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
 
-          texture_button(
+          texture_label(
             hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }
           );
         }

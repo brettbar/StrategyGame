@@ -2,6 +2,7 @@
 
 #include "../../../../world/components/settlement_component.hpp"
 #include "../../../common.h"
+#include "../../../library/texture_button.hpp"
 
 namespace UI {
   enum class Action_SettlementContext {
@@ -57,15 +58,38 @@ namespace UI {
           .chars = selected_settlement->buildings[i].name_str.c_str(),
         };
 
-        CLAY() {
-          CLAY_TEXT(
-            sn,
-            CLAY_TEXT_CONFIG( {
-              .textColor = COLOR_WHITE,
-              .fontId = 0,
-              .fontSize = 32,
-            } )
+
+        CLAY( CLAY_LAYOUT( {
+          .sizing = { .width = CLAY_SIZING_GROW() },
+          .childGap = 4,
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
+            },
+        } ) ) {
+          texture_label( hstr{ "slot.png" }, { 64, 64 } );
+
+          texture_label( hstr{ "arrow.png" }, { 26, 26 } );
+
+          texture_label(
+            hstr{ ( selected_settlement->buildings[i].name_str + "_icon.png" )
+                    .c_str() },
+            { 64, 64 }
           );
+
+          texture_label( hstr{ "arrow.png" }, { 26, 26 } );
+
+          texture_label( hstr{ "slot.png" }, { 64, 64 } );
+
+          // CLAY_TEXT(
+          //   sn,
+          //   CLAY_TEXT_CONFIG( {
+          //     .textColor = COLOR_WHITE,
+          //     .fontId = 0,
+          //     .fontSize = 32,
+          //   } )
+          // );
         }
       }
     }
