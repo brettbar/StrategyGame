@@ -9,7 +9,6 @@ namespace UI {
     None,
     SpawnColonist,
     SpawnArmy,
-    BuildFarm,
   };
 
   inline Action_SettlementContext settlement_context(

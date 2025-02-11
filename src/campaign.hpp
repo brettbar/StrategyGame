@@ -52,6 +52,7 @@
 #include "interface/irongui/forge.hpp"
 
 #include "interface/pages/campaign/settlement_context/settlement_context.hpp"
+#include <optional>
 #include <raylib.h>
 
 // If you ever get strange compile time errors from cereal
@@ -252,11 +253,16 @@ inline void Campaign::load( cstr file_path ) {
     .connect<&Campaign::EvaluteCommands>( this );
 }
 
+
+// @todo refactor this shit
+inline opt<Buildings::BuildingName> building_to_build = std::nullopt;
+
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   f32 cameraSpeed = 500.0f;
 
   bool show_content = false;
+
 
   CLAY(
     CLAY_ID( "Campaign" ),
@@ -302,6 +308,8 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             case UI::OverviewAction_t::None:
               break;
             case UI::OverviewAction_t::Construction:
+              if ( !building_to_build.has_value() )
+                building_to_build = action.building;
               Map::Manager()->mode = Map::Mode::BuildPreview;
               break;
           }
@@ -335,11 +343,11 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
                 player_e, Settlement::System::settlement_position( *prov )
               ) );
               break;
-            case UI::Action_SettlementContext::BuildFarm:
-              PostCommand( Commands::Command::construct_building(
-                Selection::GetSelectedEntity(), "farm"
-              ) );
-              break;
+            // case UI::Action_SettlementContext::BuildFarm:
+            //   PostCommand( Commands::Command::construct_building(
+            //     Selection::GetSelectedEntity(), "farm"
+            //   ) );
+            //   break;
             case UI::Action_SettlementContext::None:
               break;
           }
@@ -489,10 +497,13 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       auto sc = Selection::CheckClickOnSettlement( local_player, click_pos );
 
       if ( sc != entt::null ) {
-        printf( "%d\n", sc );
-        PostCommand( Commands::Command::construct_building( sc, "farm" ) );
-
-        Map::Manager()->mode = Map::Mode::Default;
+        if ( building_to_build.has_value() ) {
+          PostCommand( Commands::Command::construct_building(
+            sc, building_to_build.value()
+          ) );
+          building_to_build = std::nullopt;
+          Map::Manager()->mode = Map::Mode::Default;
+        }
       }
     } else {
       Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
@@ -705,7 +716,9 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::ConstructBuilding: {
-      Settlement::System::construct_building( cmd.entity, cmd.msg );
+      Settlement::System::construct_building(
+        cmd.entity, cmd.building, Buildings::building_name_str( cmd.building )
+      );
       return;
     };
   }

@@ -147,14 +147,14 @@ public:
 
     static void construct_building(
       entt::entity settlement_e,
+      Buildings::BuildingName building,
       std::string building_name
     ) {
       Settlement::Component &settlement =
         Global::world.get<Settlement::Component>( settlement_e );
 
       settlement.buildings.push_back( Buildings::Building{
-        .name = Buildings::BuildingName::Farm,
-        .type = Buildings::Type::Gathering,
+        .name = building,
         .name_str = building_name,
       } );
     }
@@ -209,14 +209,11 @@ private:
 
     static void update_resources( Settlement::Component &settlement ) {
       for ( Buildings::Building &building: settlement.buildings ) {
-        switch ( building.type ) {
-          case Buildings::Type::Gathering: {
-            if ( building.name == Buildings::BuildingName::Farm ) {
-              settlement.resources[Resources::Type::Wheat] = 1;
-            }
-          } break;
-          default:
-            break;
+        auto recipes = Buildings::recipes_for_building( building.name );
+        auto current_recipe = recipes[building.current_recipe];
+
+        for ( const auto &recipe_item: current_recipe.outputs ) {
+          settlement.resources[recipe_item.resource] = recipe_item.quantity;
         }
       }
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../data/buildings.hpp"
 #include "../../shared/common.hpp"
 
 namespace Commands {
@@ -23,6 +24,7 @@ namespace Commands {
     entt::entity player_e;
     str msg;
     Vector2 click_pos;
+    Buildings::BuildingName building;
 
     entt::entity entity;
 
@@ -81,12 +83,12 @@ namespace Commands {
 
     static Command construct_building(
       entt::entity settlement_e,
-      str building
+      Buildings::BuildingName building
     ) {
       auto cmd = Command();
       cmd.type = Type::ConstructBuilding;
       cmd.entity = settlement_e;
-      cmd.msg = building;
+      cmd.building = building;
       return cmd;
     }
 

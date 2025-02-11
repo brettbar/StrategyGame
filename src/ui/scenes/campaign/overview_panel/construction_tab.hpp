@@ -2,7 +2,9 @@
 #include "../../../../shared/common.hpp"
 #include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
+#include <optional>
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
+#include "../../../../../data/buildings.hpp"
 #include "../../../common.h"
 
 namespace UI {
@@ -10,14 +12,27 @@ namespace UI {
   inline i32 _selected_building = -1;
 
   struct Building {
+    Buildings::BuildingName name;
     Clay_String label;
     str path;
   };
 
   inline list<Building> buildings = {
-    { .label = CLAY_STRING( "Farm" ), .path = "farm_icon.png" },
-    { .label = CLAY_STRING( "Lumber Mill" ), .path = "lumber_mill_icon.png" },
-    { .label = CLAY_STRING( "Mine" ), .path = "mine_icon.png" },
+    {
+      .name = Buildings::BuildingName::Farm,
+      .label = CLAY_STRING( "Farm" ),
+      .path = "farm_icon.png",
+    },
+    {
+      .name = Buildings::BuildingName::LumberMill,
+      .label = CLAY_STRING( "Lumber Mill" ),
+      .path = "lumber_mill_icon.png",
+    },
+    {
+      .name = Buildings::BuildingName::Mine,
+      .label = CLAY_STRING( "Mine" ),
+      .path = "mine_icon.png",
+    },
   };
 
   inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
@@ -169,7 +184,7 @@ namespace UI {
     return Action_ConstructionPreview::None;
   }
 
-  inline str construction_tab() {
+  inline opt<Buildings::BuildingName> construction_tab() {
 
     if ( _constructing ) {
       Building building = buildings[_selected_building];
@@ -185,7 +200,7 @@ namespace UI {
           _constructing = false;
           break;
         case UI::Action_ConstructionPreview::Build:
-          return std::string( building.label.chars );
+          return building.name;
       }
     } else {
       _selected_building = construction_browser();
@@ -195,6 +210,6 @@ namespace UI {
       }
     }
 
-    return "";
+    return std::nullopt;
   }
-};// namespace UI
+}// namespace UI

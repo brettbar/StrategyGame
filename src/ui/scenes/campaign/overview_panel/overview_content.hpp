@@ -11,11 +11,11 @@ namespace UI {
   };
   struct OverviewAction {
     OverviewAction_t type;
-    str value;
+    Buildings::BuildingName building;
   };
 
   inline OverviewAction overview_content( Clay_String current_tab ) {
-    str building_to_build = "";
+    opt<Buildings::BuildingName> building_to_build = std::nullopt;
 
     CLAY(
       CLAY_ID( "OverviewPanel::Content" ),
@@ -77,13 +77,13 @@ namespace UI {
     }
 
 
-    if ( building_to_build != "" ) {
+    if ( building_to_build.has_value() ) {
       return OverviewAction{
         .type = OverviewAction_t::Construction,
-        .value = building_to_build,
+        .building = building_to_build.value(),
       };
     }
 
-    return { .type = OverviewAction_t::None, .value = "" };
+    return { .type = OverviewAction_t::None };
   }
 }// namespace UI
