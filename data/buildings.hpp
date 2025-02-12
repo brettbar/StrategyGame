@@ -7,6 +7,7 @@
 #include <cereal/types/vector.hpp>
 
 namespace Buildings {
+
   struct RecipeItem {
     u32 quantity = 1;// typically 1 at a time, but can be overloaded
     Resources::Type resource;
@@ -16,7 +17,8 @@ namespace Buildings {
     list<RecipeItem> outputs;// usually just one
   };
 
-  enum class BuildingName {
+
+  enum class BuildingType {
     // Gathering
     LumberMill,// nc
     Farm,
@@ -42,94 +44,94 @@ namespace Buildings {
     Tailor,
   };
 
-  inline str building_name_str( BuildingName building ) {
+
+  inline str building_name_str( BuildingType building ) {
     switch ( building ) {
-      case BuildingName::LumberMill:
+      case BuildingType::LumberMill:
         return "lumber_mill";
-      case BuildingName::Farm:
+      case BuildingType::Farm:
         return "farm";
-      case BuildingName::Fisherman:
+      case BuildingType::Fisherman:
         return "fisherman";
-      case BuildingName::Quarry:
+      case BuildingType::Quarry:
         return "quarry";
-      case BuildingName::Shepherd:
+      case BuildingType::Shepherd:
         return "shepherd";
-      case BuildingName::Mine:
+      case BuildingType::Mine:
         return "mine";
-      case BuildingName::Mill:
+      case BuildingType::Mill:
         return "mill";
-      case BuildingName::Kiln:
+      case BuildingType::Kiln:
         return "kiln";
-      case BuildingName::Stonemason:
+      case BuildingType::Stonemason:
         return "stonemason";
-      case BuildingName::Spinner:
+      case BuildingType::Spinner:
         return "spinner";
-      case BuildingName::Tanner:
+      case BuildingType::Tanner:
         return "tanner";
-      case BuildingName::Smithy:
+      case BuildingType::Smithy:
         return "smithy";
-      case BuildingName::OlivePress:
+      case BuildingType::OlivePress:
         return "olive_press";
-      case BuildingName::SwordSmith:
+      case BuildingType::SwordSmith:
         return "sword_smith";
-      case BuildingName::Poleturner:
+      case BuildingType::Poleturner:
         return "poleturner";
-      case BuildingName::Armourer:
+      case BuildingType::Armourer:
         return "armourer";
-      case BuildingName::Jeweler:
+      case BuildingType::Jeweler:
         return "jeweler";
-      case BuildingName::Tailor:
+      case BuildingType::Tailor:
         return "tailor";
       default:
         return "unknown_building";
     }
   }
 
-  inline map<str, BuildingName> building_lookup = {
-    { "lumber_mill", BuildingName::LumberMill },
-    { "farm", BuildingName::Farm },
-    { "fisherman", BuildingName::Fisherman },
-    { "quarry", BuildingName::Quarry },
-    { "shepherd", BuildingName::Shepherd },
-    { "mine", BuildingName::Mine },
-    { "mill", BuildingName::Mill },
-    { "kiln", BuildingName::Kiln },
-    { "stone_mason", BuildingName::Stonemason },
-    { "spinner", BuildingName::Spinner },
-    { "tanner", BuildingName::Tanner },
-    { "smithy", BuildingName::Smithy },
-    { "olive_press", BuildingName::OlivePress },
-    { "sword_smith", BuildingName::SwordSmith },
-    { "poleturner", BuildingName::Poleturner },
-    { "armourer", BuildingName::Armourer },
-    { "jeweler", BuildingName::Jeweler },
-    { "tailor", BuildingName::Tailor },
+  inline map<str, BuildingType> building_lookup = {
+    { "lumber_mill", BuildingType::LumberMill },
+    { "farm", BuildingType::Farm },
+    { "fisherman", BuildingType::Fisherman },
+    { "quarry", BuildingType::Quarry },
+    { "shepherd", BuildingType::Shepherd },
+    { "mine", BuildingType::Mine },
+    { "mill", BuildingType::Mill },
+    { "kiln", BuildingType::Kiln },
+    { "stone_mason", BuildingType::Stonemason },
+    { "spinner", BuildingType::Spinner },
+    { "tanner", BuildingType::Tanner },
+    { "smithy", BuildingType::Smithy },
+    { "olive_press", BuildingType::OlivePress },
+    { "sword_smith", BuildingType::SwordSmith },
+    { "poleturner", BuildingType::Poleturner },
+    { "armourer", BuildingType::Armourer },
+    { "jeweler", BuildingType::Jeweler },
+    { "tailor", BuildingType::Tailor },
   };
 
-
-  inline list<Recipe> recipes_for_building( BuildingName building ) {
+  inline list<Recipe> recipes_for_building( BuildingType building ) {
     switch ( building ) {
-      case BuildingName::LumberMill:
+      case BuildingType::LumberMill:
         return {
           Recipe{
             .inputs = {},
             .outputs = { RecipeItem{ .resource = Resources::Type::Timber } },
           },
         };
-      case BuildingName::Farm:
+      case BuildingType::Farm:
         return {
           Recipe{
             .inputs = {},
             .outputs = { RecipeItem{ .resource = Resources::Type::Wheat } },
           },
         };
-      case BuildingName::Fisherman:
+      case BuildingType::Fisherman:
         break;
-      case BuildingName::Quarry:
+      case BuildingType::Quarry:
         break;
-      case BuildingName::Shepherd:
+      case BuildingType::Shepherd:
         break;
-      case BuildingName::Mine:
+      case BuildingType::Mine:
         return {
           Recipe{
             .inputs = {},
@@ -156,45 +158,38 @@ namespace Buildings {
             .outputs = { RecipeItem{ .resource = Resources::Type::GoldOre } },
           },
         };
-      case BuildingName::Mill:
+      case BuildingType::Mill:
         break;
-      case BuildingName::Kiln:
+      case BuildingType::Kiln:
         break;
-      case BuildingName::Stonemason:
+      case BuildingType::Stonemason:
         break;
-      case BuildingName::Spinner:
+      case BuildingType::Spinner:
         break;
-      case BuildingName::Tanner:
+      case BuildingType::Tanner:
         break;
-      case BuildingName::Smithy:
+      case BuildingType::Smithy:
         break;
-      case BuildingName::OlivePress:
+      case BuildingType::OlivePress:
         break;
-      case BuildingName::SwordSmith:
+      case BuildingType::SwordSmith:
         break;
-      case BuildingName::Poleturner:
+      case BuildingType::Poleturner:
         break;
-      case BuildingName::Armourer:
+      case BuildingType::Armourer:
         break;
-      case BuildingName::Jeweler:
+      case BuildingType::Jeweler:
         break;
-      case BuildingName::Tailor:
+      case BuildingType::Tailor:
         break;
     }
 
     return {};
   }
 
-
-  struct Building {
-    BuildingName name;
-    std::string name_str;
-    u32 current_recipe = 0;
-
-    template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( name, name_str, current_recipe );
-    }
-  };
+  inline hstr building_icon_path( BuildingType type ) {
+    return hstr{ ( Buildings::building_name_str( type ) + "_icon.png" ).c_str()
+    };
+  }
 
 };// namespace Buildings

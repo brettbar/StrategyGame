@@ -11,11 +11,11 @@ namespace UI {
   };
   struct OverviewAction {
     OverviewAction_t type;
-    Buildings::BuildingName building;
+    Buildings::BuildingType building;
   };
 
   inline OverviewAction overview_content( Clay_String current_tab ) {
-    opt<Buildings::BuildingName> building_to_build = std::nullopt;
+    opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
     CLAY(
       CLAY_ID( "OverviewPanel::Content" ),

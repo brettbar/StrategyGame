@@ -3,6 +3,7 @@
 #include "../../../../world/components/settlement_component.hpp"
 #include "../../../common.h"
 #include "../../../library/texture_button.hpp"
+#include "../overview_panel/resources_tab.hpp"
 
 namespace UI {
   enum class Action_SettlementContext {
@@ -51,10 +52,18 @@ namespace UI {
       );
 
       for ( u32 i = 0; i < selected_settlement->buildings.size(); i++ ) {
+
+
         Clay_String sn = (Clay_String) {
-          .length =
-            strlen( selected_settlement->buildings[i].name_str.c_str() ),
-          .chars = selected_settlement->buildings[i].name_str.c_str(),
+          .length = strlen( Buildings::building_name_str(
+                              selected_settlement->buildings[i].type
+          )
+                              .c_str() ),
+
+          .chars = ( Buildings::building_name_str(
+                       selected_settlement->buildings[i].type
+          )
+                       .c_str() ),
         };
 
 
@@ -72,14 +81,25 @@ namespace UI {
           texture_label( hstr{ "arrow.png" }, { 26, 26 } );
 
           texture_label(
-            hstr{ ( selected_settlement->buildings[i].name_str + "_icon.png" )
-                    .c_str() },
+            Buildings::building_icon_path(
+              selected_settlement->buildings[i].type
+            ),
             { 64, 64 }
           );
 
           texture_label( hstr{ "arrow.png" }, { 26, 26 } );
 
-          texture_label( hstr{ "slot.png" }, { 64, 64 } );
+          auto recipes = Buildings::recipes_for_building(
+            selected_settlement->buildings[i].type
+          );
+
+          auto current_recipe =
+            recipes[selected_settlement->buildings[i].current_recipe];
+
+          for ( const auto &output: current_recipe.outputs ) {
+            resource_icon( output.resource, { 64, 64 } );
+          }
+
 
           // CLAY_TEXT(
           //   sn,

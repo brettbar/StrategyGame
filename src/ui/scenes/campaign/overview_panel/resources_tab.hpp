@@ -7,24 +7,21 @@
 #include "../../../library/texture_button.hpp"
 
 #include "../../../../world/systems/player_system.hpp"
-#include "../../../../world/systems/province_system.hpp"
 
 namespace UI {
 
-  inline void resource_icon( const char *resource, vec2f dimensions, u32 i ) {
+  inline void resource_icon(
+    Resources::Type type,
+    vec2f dimensions,
+    u32 i = 0
+  ) {
+    // @leftoff probably want to conver this to the file path function we made
+    const char *resource = Resources::ResourceStr( type );
+
     Clay_String cs = {
       .length = strlen( resource ),
       .chars = resource,
     };
-
-    str file = std::string( resource );
-
-    for ( u32 j = 0; j < file.length(); j++ ) {
-      if ( file[j] == ' ' )
-        file[j] = '_';
-    }
-
-    file += ".png";
 
     CLAY(
       Clay__AttachId( Clay__HashString( cs, i, 0 ) ),
@@ -58,7 +55,7 @@ namespace UI {
               32,
               32,
             },
-          .texture_id = hstr{ file.c_str() },
+          .texture_id = resource_icon_path( type ),
         } )
       );
 
@@ -135,7 +132,7 @@ namespace UI {
     }
   }
 
-  inline void resource_rows( list<const char *> resources ) {
+  inline void resource_rows( Resources::Type resources_count ) {
     vec2f dimensions = { 68, 68 };
 
     entt::entity local_player = PlayerSystem::GetEntityOfPlayer( "player_0" );
@@ -143,7 +140,7 @@ namespace UI {
     auto resource_map =
       ResourceSystem::get_resources_for_player( local_player );
 
-    for ( u32 i = 0; i < resources.size(); i++ ) {
+    for ( u32 i = 0; i < (u32) resources_count; i++ ) {
       Resources::Type resource_t = (Resources::Type) i;
 
       u32 amount_stored = resource_map[resource_t];
@@ -166,7 +163,7 @@ namespace UI {
         .layoutDirection = CLAY_LEFT_TO_RIGHT,
       } ) ) {
         // 1. Icon
-        resource_icon( resources[i], dimensions, i );
+        resource_icon( resource_t, dimensions, i );
         // 2. Stored
         resource_quantity( amount_cs, dimensions );
         // 3. Increase Per Tick
@@ -228,7 +225,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         } )
       ) {
-        resource_rows( Resources::resources );
+        resource_rows( Resources::Type::COUNT );
       }
     }
   }

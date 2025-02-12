@@ -24,7 +24,7 @@ namespace Commands {
     entt::entity player_e;
     str msg;
     Vector2 click_pos;
-    Buildings::BuildingName building;
+    Buildings::BuildingType building;
 
     entt::entity entity;
 
@@ -83,7 +83,7 @@ namespace Commands {
 
     static Command construct_building(
       entt::entity settlement_e,
-      Buildings::BuildingName building
+      Buildings::BuildingType building
     ) {
       auto cmd = Command();
       cmd.type = Type::ConstructBuilding;

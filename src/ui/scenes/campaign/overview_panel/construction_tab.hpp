@@ -12,24 +12,24 @@ namespace UI {
   inline i32 _selected_building = -1;
 
   struct Building {
-    Buildings::BuildingName name;
+    Buildings::BuildingType name;
     Clay_String label;
     str path;
   };
 
   inline list<Building> buildings = {
     {
-      .name = Buildings::BuildingName::Farm,
+      .name = Buildings::BuildingType::Farm,
       .label = CLAY_STRING( "Farm" ),
       .path = "farm_icon.png",
     },
     {
-      .name = Buildings::BuildingName::LumberMill,
+      .name = Buildings::BuildingType::LumberMill,
       .label = CLAY_STRING( "Lumber Mill" ),
       .path = "lumber_mill_icon.png",
     },
     {
-      .name = Buildings::BuildingName::Mine,
+      .name = Buildings::BuildingType::Mine,
       .label = CLAY_STRING( "Mine" ),
       .path = "mine_icon.png",
     },
@@ -184,7 +184,7 @@ namespace UI {
     return Action_ConstructionPreview::None;
   }
 
-  inline opt<Buildings::BuildingName> construction_tab() {
+  inline opt<Buildings::BuildingType> construction_tab() {
 
     if ( _constructing ) {
       Building building = buildings[_selected_building];

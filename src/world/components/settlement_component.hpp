@@ -12,6 +12,16 @@
 
 namespace Settlement {
 
+  struct Building {
+    Buildings::BuildingType type;
+    u32 current_recipe = 0;
+
+    template<class Archive>
+    void serialize( Archive &ar ) {
+      ar( type, current_recipe );
+    }
+  };
+
 
   struct Component {
     u32 id;
@@ -22,7 +32,7 @@ namespace Settlement {
     std::map<Resources::Type, u32> resources = {};
 
     // Building
-    std::vector<Buildings::Building> buildings = {};
+    std::vector<Building> buildings = {};
 
     std::vector<Regiment> garrison = {};
 

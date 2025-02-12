@@ -255,7 +255,7 @@ inline void Campaign::load( cstr file_path ) {
 
 
 // @todo refactor this shit
-inline opt<Buildings::BuildingName> building_to_build = std::nullopt;
+inline opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {

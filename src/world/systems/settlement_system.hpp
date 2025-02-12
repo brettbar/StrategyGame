@@ -139,7 +139,7 @@ public:
     //     );
     //
     //   settlement.buildings.push_back( Buildings::Building{
-    //     .name = Buildings::BuildingName::Farm,
+    //     .name = Buildings::BuildingType::Farm,
     //     .type = Buildings::Type::Gathering,
     //     .name_str = building_name,
     //   } );
@@ -147,15 +147,14 @@ public:
 
     static void construct_building(
       entt::entity settlement_e,
-      Buildings::BuildingName building,
+      Buildings::BuildingType building,
       std::string building_name
     ) {
       Settlement::Component &settlement =
         Global::world.get<Settlement::Component>( settlement_e );
 
-      settlement.buildings.push_back( Buildings::Building{
-        .name = building,
-        .name_str = building_name,
+      settlement.buildings.push_back( Settlement::Building{
+        .type = building,
       } );
     }
 
@@ -208,8 +207,8 @@ private:
     }
 
     static void update_resources( Settlement::Component &settlement ) {
-      for ( Buildings::Building &building: settlement.buildings ) {
-        auto recipes = Buildings::recipes_for_building( building.name );
+      for ( Settlement::Building &building: settlement.buildings ) {
+        auto recipes = Buildings::recipes_for_building( building.type );
         auto current_recipe = recipes[building.current_recipe];
 
         for ( const auto &recipe_item: current_recipe.outputs ) {
@@ -286,7 +285,7 @@ private:
     }
 
 
-    std::vector<Buildings::Building> SelectedSettlementBuildingList() {
+    std::vector<Settlement::Building> SelectedSettlementBuildingList() {
       Settlement::Component *settlement =
         Global::world.try_get<Settlement::Component>(
           Selection::GetSelectedEntity()

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "../src/shared/common.hpp"
 #include <vector>
 
 namespace Resources {
@@ -93,6 +94,13 @@ namespace Resources {
         return "tin ore";
       case Type::CopperOre:
         return "copper ore";
+
+      case Type::GoldIngots:
+        return "gold ingots";
+      case Type::IronIngots:
+        return "iron ingots";
+      case Type::BronzeIngots:
+        return "bronze ingots";
       // case RawMaterial::Gems:
       //   return "gems";
       default:
@@ -117,42 +125,56 @@ namespace Resources {
   //   "gemstones",
   // };
 
-  inline std::vector<const char *> resources = {
-    "timber",
-    "wheat",
-    //"olives",
-    "fish",
-    "clay",
-    //"stone",
-    //"wool",
-    //"flax",
-    //"hide",
-    "silver ore",
-    "gold ore",
-    "iron ore",
-    "tin ore",
-    "copper ore",
-    //"gems",
-    //////////////////
-    // "flour",
-    // "bricks",
-    // "stone_bricks",
-    // "pottery",
-    // "cloth",
-    // "linen",
-    // "leather",
-    // "silver",
-    "gold ingots",
-    "iron ingots",
-    "bronze ingots",
-    ///////////////////
-    "olive oil",
-    // "swords",
-    // "spears",
-    // "shields",
-    // "helmets",
-    // "armour",
-    // "clothing",
-    // "jewelry",
-  };
+  // inline std::vector<const char *> resources = {
+  //   "timber",
+  //   "wheat",
+  //   //"olives",
+  //   "fish",
+  //   "clay",
+  //   //"stone",
+  //   //"wool",
+  //   //"flax",
+  //   //"hide",
+  //   "silver ore",
+  //   "gold ore",
+  //   "iron ore",
+  //   "tin ore",
+  //   "copper ore",
+  //   //"gems",
+  //   //////////////////
+  //   // "flour",
+  //   // "bricks",
+  //   // "stone_bricks",
+  //   // "pottery",
+  //   // "cloth",
+  //   // "linen",
+  //   // "leather",
+  //   // "silver",
+  //   "gold ingots",
+  //   "iron ingots",
+  //   "bronze ingots",
+  //   ///////////////////
+  //   "olive oil",
+  //   // "swords",
+  //   // "spears",
+  //   // "shields",
+  //   // "helmets",
+  //   // "armour",
+  //   // "clothing",
+  //   // "jewelry",
+  // };
+
+  inline hstr resource_icon_path( Type type ) {
+    str file = std::string( ResourceStr( type ) );
+
+    for ( u32 j = 0; j < file.length(); j++ ) {
+      if ( file[j] == ' ' )
+        file[j] = '_';
+    }
+
+    file += ".png";
+
+    return hstr{ ( file ).c_str() };
+  }
+
 };// namespace Resources
