@@ -10,12 +10,7 @@
 
 namespace UI {
 
-  inline void resource_icon(
-    Resources::Type type,
-    vec2f dimensions,
-    u32 i = 0
-  ) {
-    // @leftoff probably want to conver this to the file path function we made
+  inline void resource_icon( Resources::Type type, vec2f dimensions, u32 i ) {
     const char *resource = Resources::ResourceStr( type );
 
     Clay_String cs = {

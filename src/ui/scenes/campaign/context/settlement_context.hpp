@@ -29,6 +29,7 @@ namespace UI {
             .height = CLAY_SIZING_PERCENT( 0.5 ),
           },
         .padding = { 16, 16 },
+        .childGap = 4,
         .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
         .layoutDirection = CLAY_TOP_TO_BOTTOM,
       } ),
@@ -97,7 +98,7 @@ namespace UI {
             recipes[selected_settlement->buildings[i].current_recipe];
 
           for ( const auto &output: current_recipe.outputs ) {
-            resource_icon( output.resource, { 64, 64 } );
+            resource_icon( output.resource, { 64, 64 }, i );
           }
 
 
