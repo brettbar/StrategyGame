@@ -9,7 +9,7 @@ namespace UI {
   inline void text_button_lrg(
     Clay_String id_str,
     Clay_String text,
-    u32 i,
+    u32 i = 0,
     Clay_Color color = { 140, 140, 140, 255 }
   ) {
     CLAY(
@@ -40,7 +40,7 @@ namespace UI {
   inline void text_button_small(
     Clay_String id_str,
     Clay_String text,
-    u32 i,
+    u32 i = 0,
     Clay_Color color = { 140, 140, 140, 255 }
   ) {
     CLAY(
@@ -60,7 +60,7 @@ namespace UI {
       CLAY_TEXT(
         text,
         CLAY_TEXT_CONFIG( {
-          .textColor = { 255, 255, 255, 255 },
+          .textColor = COLOR_WHITE,
           .fontId = 0,
           .fontSize = 16,
         } )

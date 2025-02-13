@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../../shared/common.hpp"
-#include "clay/clay.h"
-
 #include "../library/text_button.hpp"
+#include "clay/clay.h"
 #include <raylib.h>
 
 namespace UI {

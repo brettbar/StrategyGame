@@ -14,8 +14,6 @@
 #pragma once
 
 
-#include "interface/pages/campaign/map_mode_menu.hpp"
-#include "interface/pages/campaign/overview_panel.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 #include "network/network.hpp"
@@ -49,9 +47,6 @@
 
 #include "renderer/renderer.hpp"
 
-#include "interface/irongui/forge.hpp"
-
-#include "interface/pages/campaign/settlement_context/settlement_context.hpp"
 #include <optional>
 #include <raylib.h>
 

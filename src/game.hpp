@@ -1,12 +1,5 @@
 #pragma once
 
-#include "interface/irongui/forge.hpp"
-#include "interface/pages/editor.hpp"
-#include "interface/pages/faction_select_menu.hpp"
-#include "interface/pages/lobby_browser.hpp"
-#include "interface/pages/modal_menu_ui.hpp"
-#include "interface/pages/multiplayer_lobby.hpp"
-#include "interface/pages/save_games.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -25,6 +18,7 @@
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
 
+#include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
 #include "ui/scenes/singleplayer_lobby.hpp"
 #include "ui/scenes/sp_faction_select.hpp"
@@ -261,8 +255,6 @@ class IGame {
       }
     }
 
-    Iron::Forge()->over_any_elem = false;
-
     Clay_SetLayoutDimensions( (Clay_Dimensions) {
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
@@ -317,11 +309,6 @@ class IGame {
         Scene_Campaign();
         break;
     }
-
-    if ( !Iron::Forge()->over_any_elem ) {
-      Iron::Forge()->context.hot = -1;
-      Iron::Forge()->context.active = -1;
-    }
   }
 
 
@@ -366,8 +353,21 @@ class IGame {
   }
 
   void Scene_LoadGames() {
+    list<str> paths = {};
+
+    // @todo probably make this absolute like paradox games do, in documents for example
+    str path = "./saves";
+    for ( const auto &entry: fs::directory_iterator( path ) ) {
+      if ( entry.path().extension() == ".dat" ) {
+        paths.push_back( entry.path().c_str() );
+      }
+    }
+
+
+    Clay_BeginLayout();
     bool pressed_back = false;
-    auto file_to_load = UI::load_game_menu( pressed_back );
+
+    auto file_to_load = UI::load_game_menu( paths, pressed_back );
 
     if ( pressed_back ) {
       _scene = Scene::MainMenu;
@@ -377,10 +377,12 @@ class IGame {
       LoadSinglePlayerCampaign( file_to_load.c_str() );
     }
 
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+
     BeginDrawing();
     {
       ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
+      Clay_Raylib_Render( render_cmds );
     }
     EndDrawing();
   }
@@ -410,59 +412,58 @@ class IGame {
   }
 
   void Scene_MultiplayerLobby() {
-    switch ( UI::MultiPlayerLobby() ) {
-      case UI::Action_MultiplayerLobby::None:
-        break;
-      case UI::Action_MultiplayerLobby::HitBack:
-        _scene = Scene::MainMenu;
-        break;
-      case UI::Action_MultiplayerLobby::PickFaction: {
-        _scene = Scene::MPFactionSelect;
-      } break;
-      case UI::Action_MultiplayerLobby::ToggleReady:
-        if ( Network::is_host ) {
-          Network::Host()->ToggleReady();
-        } else {
-          Network::Client()->ToggleReady();
-        }
-        break;
-      case UI::Action_MultiplayerLobby::HostStartedGame: {
-        Network::Host()->StartHostedCampaign();
-        HostStartMultiplayerCampaign();
-      } break;
-    }
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // switch ( UI::MultiPlayerLobby() ) {
+    //   case UI::Action_MultiplayerLobby::None:
+    //     break;
+    //   case UI::Action_MultiplayerLobby::HitBack:
+    //     _scene = Scene::MainMenu;
+    //     break;
+    //   case UI::Action_MultiplayerLobby::PickFaction: {
+    //     _scene = Scene::MPFactionSelect;
+    //   } break;
+    //   case UI::Action_MultiplayerLobby::ToggleReady:
+    //     if ( Network::is_host ) {
+    //       Network::Host()->ToggleReady();
+    //     } else {
+    //       Network::Client()->ToggleReady();
+    //     }
+    //     break;
+    //   case UI::Action_MultiplayerLobby::HostStartedGame: {
+    //     Network::Host()->StartHostedCampaign();
+    //     HostStartMultiplayerCampaign();
+    //   } break;
+    // }
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_LobbyBrowser() {
-    CSteamID choice = UI::LobbyBrowser();
-    // dont know if this works
-
-    if ( choice.IsValid() ) {
-      std::cout << "1." << '\n';
-      if ( Network::Client()->AttemptJoinLobby( choice ) ) {
-        _scene = Scene::MultiPlayerLobby;
-        std::cout << "2." << '\n';
-      }
-    }
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // CSteamID choice = UI::LobbyBrowser();
+    // // dont know if this works
+    //
+    // if ( choice.IsValid() ) {
+    //   std::cout << "1." << '\n';
+    //   if ( Network::Client()->AttemptJoinLobby( choice ) ) {
+    //     _scene = Scene::MultiPlayerLobby;
+    //     std::cout << "2." << '\n';
+    //   }
+    // }
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing
   }
 
 
   void Scene_SPFactionSelect() {
-    // auto selection = UI::DrawFactionSelectScreen();
     Clay_BeginLayout();
     auto selection = UI::faction_settlement_screen();
 
@@ -483,73 +484,73 @@ class IGame {
   }
 
   void Scene_MPFactionSelect() {
-    auto selection = UI::DrawFactionSelectScreen();
-
-    if ( selection != "" ) {
-      if ( Network::is_host ) {
-        Network::Host()->SetHostFaction( selection );
-        Network::Host()->SendMessageToAllActiveClients( Network::Message{
-          Network::MessageID::PlayerFactionSelect,
-          nlohmann::json{
-            { "player_id", "player_0" },
-            { "faction", selection },
-          },
-        } );
-      } else {
-        auto player_id = Network::Client()->_local_player_id;
-        Network::Client()->SendMessageToHost( Network::Message{
-          Network::MessageID::PlayerFactionSelect,
-          nlohmann::json{
-            { "player_id", player_id },
-            { "faction", selection },
-          },
-        } );
-      }
-
-      _scene = Scene::MultiPlayerLobby;
-    }
-
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // auto selection = UI::DrawFactionSelectScreen();
+    //
+    // if ( selection != "" ) {
+    //   if ( Network::is_host ) {
+    //     Network::Host()->SetHostFaction( selection );
+    //     Network::Host()->SendMessageToAllActiveClients( Network::Message{
+    //       Network::MessageID::PlayerFactionSelect,
+    //       nlohmann::json{
+    //         { "player_id", "player_0" },
+    //         { "faction", selection },
+    //       },
+    //     } );
+    //   } else {
+    //     auto player_id = Network::Client()->_local_player_id;
+    //     Network::Client()->SendMessageToHost( Network::Message{
+    //       Network::MessageID::PlayerFactionSelect,
+    //       nlohmann::json{
+    //         { "player_id", player_id },
+    //         { "faction", selection },
+    //       },
+    //     } );
+    //   }
+    //
+    //   _scene = Scene::MultiPlayerLobby;
+    // }
+    //
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_ModalMenu() {
-    CheckMenuToggle();
-
-    switch ( UI::DrawModalMenu() ) {
-      case UI::Action_ModalMenu::None:
-        break;
-      case UI::Action_ModalMenu::SaveGame:
-        // @todo get actual user input for file name
-        _campaign->save( "output" );
-        break;
-      case UI::Action_ModalMenu::LoadGame:
-        // LoadSinglePlayerCampaign();
-        break;
-      case UI::Action_ModalMenu::Settings:
-        break;
-      case UI::Action_ModalMenu::ExitToMainMenu:
-        ExitToMainMenu();
-        break;
-      case UI::Action_ModalMenu::ExitGame:
-        ExitGame();
-        return;
-    }
-
-    BeginDrawing();
-    {
-      Renderer::draw_map( Map::Manager()->mode );
-      DrawRectangle(
-        0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-      );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // CheckMenuToggle();
+    //
+    // switch ( UI::DrawModalMenu() ) {
+    //   case UI::Action_ModalMenu::None:
+    //     break;
+    //   case UI::Action_ModalMenu::SaveGame:
+    //     // @todo get actual user input for file name
+    //     _campaign->save( "output" );
+    //     break;
+    //   case UI::Action_ModalMenu::LoadGame:
+    //     // LoadSinglePlayerCampaign();
+    //     break;
+    //   case UI::Action_ModalMenu::Settings:
+    //     break;
+    //   case UI::Action_ModalMenu::ExitToMainMenu:
+    //     ExitToMainMenu();
+    //     break;
+    //   case UI::Action_ModalMenu::ExitGame:
+    //     ExitGame();
+    //     return;
+    // }
+    //
+    // BeginDrawing();
+    // {
+    //   Renderer::draw_map( Map::Manager()->mode );
+    //   DrawRectangle(
+    //     0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
+    //   );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_Campaign() {
@@ -569,18 +570,18 @@ class IGame {
 
     if ( _scene == Scene::Editor ) {
 
-      auto editor_action = UI::panel();
-
-      switch ( editor_action ) {
-        case UI::EditorAction::None:
-          break;
-        case UI::EditorAction::GenerateMap:
-          // MapSystem::Init();
-          if ( _campaign )
-            //@todo actualyl pass in the faction
-            _campaign->start( "romans" );
-          break;
-      }
+      // auto editor_action = UI::panel();
+      //
+      // switch ( editor_action ) {
+      //   case UI::EditorAction::None:
+      //     break;
+      //   case UI::EditorAction::GenerateMap:
+      //     // MapSystem::Init();
+      //     if ( _campaign )
+      //       //@todo actualyl pass in the faction
+      //       _campaign->start( "romans" );
+      //     break;
+      // }
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
