@@ -49,9 +49,10 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIT( 128 ),
+              .height = CLAY_SIZING_FIT( 36 ),
             },
           .padding = { 16, 16 },
-          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+          .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
         },
       .backgroundColor = color,
     } ) {

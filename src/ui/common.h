@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../shared/common.hpp"
 #include "clay/clay.h"
 
 
@@ -27,5 +28,12 @@ namespace UI {
             },
         },
     } );
+  }
+
+  inline Clay_String str_to_cs( str input ) {
+    return Clay_String{
+      .length = static_cast<int32_t>( strlen( input.c_str() ) ),
+      .chars = input.c_str(),
+    };
   }
 };// namespace UI

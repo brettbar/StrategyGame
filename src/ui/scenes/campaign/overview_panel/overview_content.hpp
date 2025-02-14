@@ -31,11 +31,11 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = { 0, 0, 0, 200 },
-      .cornerRadius = { 5 },
+      .cornerRadius = { 5, 5, 5, 5 },
       .border =
         {
           .color = COLOR_WHITE,
-          .width = { 2 },
+          .width = { 2, 2, 2, 2 },
         },
     } ) {
       CLAY( {
@@ -45,10 +45,12 @@ namespace UI {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_FIT( 48 ),
               },
             .childAlignment =
               {
                 .x = CLAY_ALIGN_X_RIGHT,
+                .y = CLAY_ALIGN_Y_CENTER,
               },
           },
       } ) {

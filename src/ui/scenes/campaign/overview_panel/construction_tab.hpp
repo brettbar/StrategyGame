@@ -35,53 +35,8 @@ namespace UI {
     },
   };
 
-  inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
-    vec2f dimensions = { 64, 64 };
-    CLAY( {
-      .id = CLAY_IDI( "BuildingIcon", i ),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
-            },
-        },
-      .image = image( texture_id, dimensions ),
-    } ) {
-      auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "BuildingIcon" ), i );
-
-      if ( Clay_PointerOver( id ) ) {
-        CLAY( {
-          .id = CLAY_IDI( "BuildingIcon::Tooltip", i ),
-          .layout = { .padding = { 8, 8 } },
-          .backgroundColor = { 0, 0, 0, 255 },
-          .cornerRadius = { 5 },
-          .floating =
-            {
-              .attachPoints =
-                {
-                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
-                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
-                },
-              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-            },
-        } ) {
-          CLAY_TEXT(
-            label,
-            CLAY_TEXT_CONFIG( {
-              .textColor = COLOR_WHITE,
-              .fontId = 0,
-              .fontSize = 16,
-            } )
-          );
-        }
-      }
-    }
-  }
 
   inline u32 construction_browser() {
-
     CLAY( {
       .layout =
         {
@@ -90,7 +45,15 @@ namespace UI {
     } ) {
       for ( u32 i = 0; i < buildings.size(); i++ ) {
         Building building = buildings[i];
-        building_icon( building.label, hstr{ building.path.c_str() }, i );
+
+        texture_w_tooltip(
+          str_to_cs( "BuildingIcon" ),
+          str_to_cs( "BuildingIcon::Tooltip" ),
+          building.label,
+          hstr{ building.path.c_str() },
+          { 64, 64 },
+          i
+        );
       }
     }
 
@@ -146,7 +109,8 @@ namespace UI {
                 },
             },
         } ) {
-          building_icon( building.label, hstr{ building.path.c_str() }, 0 );
+
+          texture_label( hstr{ building.path.c_str() }, { 64, 64 } );
 
           CLAY_TEXT(
             building.label,
