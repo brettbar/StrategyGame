@@ -17,27 +17,26 @@ namespace UI {
       Action_SinglePlayerLobby action;
     };
 
-    CLAY(
-      CLAY_ID( "SingleplayerLobby" ),
-      CLAY_RECTANGLE( {
-        .color = { 43, 41, 51, 255 },
-      } ),
-      CLAY_LAYOUT( {
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          },
-        .padding = { 16, 16 },
-        .childGap = 8,
-        .childAlignment =
-          {
-            .y = CLAY_ALIGN_Y_CENTER,
-            .x = CLAY_ALIGN_X_CENTER,
-          },
-      } )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "SingleplayerLobby" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .padding = { 16, 16 },
+          .childGap = 8,
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
+            },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+      .backgroundColor = { 43, 41, 51, 255 },
+    } ) {
       text_button_lrg(
         CLAY_STRING( "SinglePlayerLobby::SelectFaction" ),
         CLAY_STRING( "Select Faction" ),

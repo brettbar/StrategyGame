@@ -17,56 +17,67 @@ namespace UI {
   inline OverviewAction overview_content( Clay_String current_tab ) {
     opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
-    CLAY(
-      CLAY_ID( "OverviewPanel::Content" ),
-      CLAY_RECTANGLE( { .color = { 0, 0, 0, 200 }, .cornerRadius = { 5 } } ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 384 } ),
-            .height = CLAY_SIZING_PERCENT( 0.5 ),
-          },
-        .padding = { 16, 16 },
-        .childGap = 8,
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } ),
-      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
-    ) {
-      CLAY(
-        CLAY_ID( "OverviewPanel::Content::Banner" ),
-        CLAY_LAYOUT( {
+    CLAY( {
+      .id = CLAY_ID( "OverviewPanel::Content" ),
+      .layout =
+        {
           .sizing =
             {
-              .width = CLAY_SIZING_GROW(),
+              .width = CLAY_SIZING_FIT( 384 ),
+              .height = CLAY_SIZING_PERCENT( 0.5 ),
             },
-          .childAlignment =
+          .padding = { 16, 16 },
+          .childGap = 8,
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+      .backgroundColor = { 0, 0, 0, 200 },
+      .cornerRadius = { 5 },
+      .border =
+        {
+          .color = COLOR_WHITE,
+          .width = { 2 },
+        },
+    } ) {
+      CLAY( {
+        .id = CLAY_ID( "OverviewPanel::Content::Banner" ),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+              },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_RIGHT,
+              },
+          },
+      } ) {
+        CLAY() {
+          CLAY_TEXT(
+            current_tab,
+            CLAY_TEXT_CONFIG( {
+              .textColor = COLOR_WHITE,
+              .fontSize = 16,
+            } )
+          );
+        }
+
+        CLAY( {
+          .layout =
             {
-              .x = CLAY_ALIGN_X_RIGHT,
+              .sizing = { CLAY_SIZING_GROW() },
             },
-        } )
-      ) {
-        CLAY( CLAY_TEXT(
-          current_tab,
-          CLAY_TEXT_CONFIG( {
-            .textColor = COLOR_WHITE,
-            .fontSize = 16,
-          } )
-        ) );
+        } );
 
-        CLAY( CLAY_LAYOUT( {
-          .sizing = { CLAY_SIZING_GROW() },
-        } ) );
-
-        CLAY(
-          CLAY_ID( "X" ),
+        CLAY( CLAY_ID( "X" ), ) {
           CLAY_TEXT(
             CLAY_STRING( "X" ),
             CLAY_TEXT_CONFIG( {
               .textColor = COLOR_WHITE,
               .fontSize = 16,
             } )
-          )
-        );
+          );
+        }
       }
 
       if ( std::string( current_tab.chars ) == "Construction" ) {

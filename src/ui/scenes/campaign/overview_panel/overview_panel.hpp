@@ -66,33 +66,32 @@ namespace UI {
 
     f32 scale = 2.0;
 
-    CLAY(
-      CLAY_ID( "OverviewPanel" ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 128 } ),
-          },
-        .childGap = 4,
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-      } )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "OverviewPanel" ),
+      .layout =
+        {
+          .sizing = { .width = CLAY_SIZING_FIT( 128 ) },
+          .childGap = 4,
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        },
+    } ) {
       for ( u32 i = 0; i < num_tabs; i++ ) {
         vec2f dims = { 66 * UI_SCALE, 32 * UI_SCALE };
         if ( std::string( tabs[i].ref.chars ) == "Overview" ) {
           dims = { 66 * UI_SCALE, 64 * UI_SCALE };
         }
 
-        CLAY(
-          CLAY_IDI( "OverviewPanel::tab", i ),
-          CLAY_LAYOUT( {
-            .sizing =
-              {
-                .width = CLAY_SIZING_FIXED( dims.x ),
-              },
-            .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
-          } )
-        ) {
+        CLAY( {
+          .id = CLAY_IDI( "OverviewPanel::tab", i ),
+          .layout =
+            {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_FIXED( dims.x ),
+                },
+              .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+            },
+        } ) {
           texture_label( tabs[i].icon, dims );
         }
       }

@@ -12,20 +12,16 @@ namespace UI {
     Clay_Color text_color = COLOR_WHITE,
     u32 i = 0
   ) {
-    CLAY(
-      Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 64 } ),
-          },
-        .padding = { 16, 16 },
-        .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
-      } ),
-      CLAY_RECTANGLE( {
-        .color = COLOR_BLACK,
-      } )
-    ) {
+    CLAY( {
+      .id = Clay__HashString( id_str, i, 0 ),
+      .layout =
+        {
+          .sizing = { .width = CLAY_SIZING_FIT( 64 ) },
+          .padding = { 16, 16 },
+          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+        },
+      .backgroundColor = COLOR_BLACK,
+    } ) {
       CLAY_TEXT(
         text,
         CLAY_TEXT_CONFIG( {

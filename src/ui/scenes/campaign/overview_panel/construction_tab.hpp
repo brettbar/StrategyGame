@@ -37,34 +37,36 @@ namespace UI {
 
   inline void building_icon( Clay_String label, hstr texture_id, u32 i ) {
     vec2f dimensions = { 64, 64 };
-    CLAY(
-      CLAY_IDI( "BuildingIcon", i ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIXED( dimensions.x ),
-            .height = CLAY_SIZING_FIXED( dimensions.y ),
-          },
-      } ),
-      texture_label( texture_id, dimensions )
-    ) {
+    CLAY( {
+      .id = CLAY_IDI( "BuildingIcon", i ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIXED( dimensions.x ),
+              .height = CLAY_SIZING_FIXED( dimensions.y ),
+            },
+        },
+      .image = image( texture_id, dimensions ),
+    } ) {
       auto id = Clay_GetElementIdWithIndex( CLAY_STRING( "BuildingIcon" ), i );
 
       if ( Clay_PointerOver( id ) ) {
-        CLAY(
-          CLAY_IDI( "BuildingIcon::Tooltip", i ),
-          CLAY_FLOATING( {
-            .attachment =
-              {
-                .element = CLAY_ATTACH_POINT_LEFT_TOP,
-                .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
-              },
-            .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-          } ),
-          CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 }, .cornerRadius = { 5 } }
-          ),
-          CLAY_LAYOUT( { .padding = { 8, 8 } } )
-        ) {
+        CLAY( {
+          .id = CLAY_IDI( "BuildingIcon::Tooltip", i ),
+          .layout = { .padding = { 8, 8 } },
+          .backgroundColor = { 0, 0, 0, 255 },
+          .cornerRadius = { 5 },
+          .floating =
+            {
+              .attachPoints =
+                {
+                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
+                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+                },
+              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+            },
+        } ) {
           CLAY_TEXT(
             label,
             CLAY_TEXT_CONFIG( {
@@ -80,9 +82,12 @@ namespace UI {
 
   inline u32 construction_browser() {
 
-    CLAY( CLAY_LAYOUT( {
-      .childGap = 4,
-    } ) ) {
+    CLAY( {
+      .layout =
+        {
+          .childGap = 4,
+        },
+    } ) {
       for ( u32 i = 0; i < buildings.size(); i++ ) {
         Building building = buildings[i];
         building_icon( building.label, hstr{ building.path.c_str() }, i );
@@ -108,31 +113,39 @@ namespace UI {
 
   inline Action_ConstructionPreview construction_preview( Building building
   ) {//@left off add a back button
-    CLAY(
-      CLAY_ID( "Construction::Preview" ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "Construction::Preview" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+    } ) {
 
-      CLAY(
-        CLAY_ID( "Construction::Preview::TopRow" ),
-        CLAY_LAYOUT( { .childGap = 8 } )
-      ) {
+      CLAY( {
+        .id = CLAY_ID( "Construction::Preview::TopRow" ),
+        .layout = { .childGap = 8 },
+      } ) {
         texture_button(
           CLAY_STRING( "Construction::Preview::Back" ),
           hstr{ "back_button.png" },
           { 30, 30 }
         );
 
-        CLAY( CLAY_LAYOUT(
-          { .childGap = 8, .childAlignment = { .y = CLAY_ALIGN_Y_CENTER } }
-        ) ) {
+        CLAY( {
+          .layout =
+            {
+              .childGap = 8,
+              .childAlignment =
+                {
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
+            },
+        } ) {
           building_icon( building.label, hstr{ building.path.c_str() }, 0 );
 
           CLAY_TEXT(
@@ -146,15 +159,16 @@ namespace UI {
         }
       }
 
-      CLAY(
-        CLAY_ID( "Construction::Preview::Desc" ),
-        CLAY_LAYOUT( {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED( 350 ),
-            },
-        } )
-      ) {
+      CLAY( {
+        .id = CLAY_ID( "Construction::Preview::Desc" ),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( 350 ),
+              },
+          },
+      } ) {
         CLAY_TEXT(
           CLAY_STRING( "Description of a farm. Description of a farm. "
                        "Description of a farm." ),

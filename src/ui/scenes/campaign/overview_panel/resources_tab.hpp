@@ -14,64 +14,72 @@ namespace UI {
     const char *resource = Resources::ResourceStr( type );
 
     Clay_String cs = {
-      .length = strlen( resource ),
+      .length = static_cast<int32_t>( strlen( resource ) ),
       .chars = resource,
     };
 
-    CLAY(
-      Clay__AttachId( Clay__HashString( cs, i, 0 ) ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIXED( dimensions.x ),
-            .height = CLAY_SIZING_FIXED( dimensions.y ),
-          },
-      } ),
-      CLAY_IMAGE( {
-        .sourceDimensions =
-          {
-            dimensions.x,
-            dimensions.y,
-          },
-        .texture_id = hstr{ "slot.png" },
-      } )
-    ) {
-      CLAY(
-        CLAY_LAYOUT( {
+    CLAY( {
+      .id = Clay__HashString( cs, i, 0 ),
+      .layout =
+        {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( 64 ),
-              .height = CLAY_SIZING_FIXED( 64 ),
+              .width = CLAY_SIZING_FIXED( dimensions.x ),
+              .height = CLAY_SIZING_FIXED( dimensions.y ),
             },
-        } ),
-        CLAY_IMAGE( {
+        },
+      .image =
+        {
+          .imageData =
+            (void *) &Global::texture_cache[hstr{ "slot.png" }]->texture,
           .sourceDimensions =
             {
-              32,
-              32,
+              dimensions.x,
+              dimensions.y,
             },
-          .texture_id = resource_icon_path( type ),
-        } )
-      );
+        },
+    } ) {
+      CLAY( {
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( 64 ),
+                .height = CLAY_SIZING_FIXED( 64 ),
+              },
+          },
+        .image =
+          {
+            .imageData =
+              (void *) &Global::texture_cache[resource_icon_path( type )]
+                ->texture,
+            .sourceDimensions =
+              {
+                32,
+                32,
+              },
+          },
+      } );
 
       auto id = Clay_GetElementIdWithIndex( cs, i );
 
       if ( Clay_PointerOver( id ) ) {
-        CLAY(
-          CLAY_IDI( "ResourceIcon::Tooltip", i ),
-          CLAY_FLOATING( {
-            .attachment =
-              {
-                .element = CLAY_ATTACH_POINT_LEFT_TOP,
-                .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
-
-              },
-            .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-          } ),
-          CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 }, .cornerRadius = { 5 } }
-          ),
-          CLAY_LAYOUT( { .padding = { 8, 8 } } )
-        ) {
+        CLAY( {
+          .id = CLAY_IDI( "ResourceIcon::Tooltip", i ),
+          .layout = { .padding = { 8, 8 } },
+          .backgroundColor = COLOR_BLACK,
+          .cornerRadius = { 5 },
+          .floating =
+            {
+              .attachPoints =
+                {
+                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
+                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+                },
+              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+              .attachTo = CLAY_ATTACH_TO_PARENT,
+            },
+        } ) {
           CLAY_TEXT(
             cs,
             CLAY_TEXT_CONFIG( {
@@ -86,35 +94,32 @@ namespace UI {
   }
 
   inline void resource_quantity( Clay_String amount_cs, vec2f dimensions ) {
-    CLAY(
-      CLAY_LAYOUT( {
-        .sizing =
+    CLAY( {
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIXED( dimensions.x ),
+              .height = CLAY_SIZING_FIXED( dimensions.y ),
+            },
+        },
+      .image = image( hstr{ "slot.png" }, dimensions ),
+    } ) {
+      CLAY( {
+        .layout =
           {
-            .width = CLAY_SIZING_FIXED( dimensions.x ),
-            .height = CLAY_SIZING_FIXED( dimensions.y ),
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( dimensions.x ),
+                .height = CLAY_SIZING_FIXED( dimensions.y ),
+              },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_CENTER,
+              },
           },
-      } ),
-      CLAY_IMAGE( {
-        .sourceDimensions =
-          {
-            dimensions.x,
-            dimensions.y,
-          },
-        .texture_id = hstr{ "slot.png" },
-      } )
-    ) {
-      CLAY( CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIXED( dimensions.x ),
-            .height = CLAY_SIZING_FIXED( dimensions.y ),
-          },
-        .childAlignment =
-          {
-            .x = CLAY_ALIGN_X_CENTER,
-            .y = CLAY_ALIGN_Y_CENTER,
-          },
-      } ) ) {
+      } ) {
         CLAY_TEXT(
           amount_cs,
           CLAY_TEXT_CONFIG( {
@@ -143,20 +148,23 @@ namespace UI {
       cstr amount_stored_s = u32_to_cstr( amount_stored );
 
       Clay_String amount_cs = {
-        .length = strlen( amount_stored_s ),
+        .length = static_cast<int32_t>( strlen( amount_stored_s ) ),
         .chars = amount_stored_s,
       };
 
       Clay_String temp_else = {
-        .length = strlen( "0" ),
+        .length = static_cast<int32_t>( strlen( "0" ) ),
         .chars = "0",
       };
 
 
-      CLAY( CLAY_LAYOUT( {
-        .childGap = 4,
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-      } ) ) {
+      CLAY( {
+        .layout =
+          {
+            .childGap = 4,
+            .layoutDirection = CLAY_LEFT_TO_RIGHT,
+          },
+      } ) {
         // 1. Icon
         resource_icon( resource_t, dimensions, i );
         // 2. Stored
@@ -183,18 +191,19 @@ namespace UI {
       "resources_header_outgoing.png",
     };
 
-    CLAY(
-      CLAY_ID( "ResourceHeaders" ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_FIXED( 36 ),
-          },
-        .childGap = 4,
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-      } )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "ResourceHeaders" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_FIXED( 36 ),
+            },
+          .childGap = 4,
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        },
+    } ) {
       for ( u32 i = 0; i < resource_headers.size(); i++ ) {
         texture_label( resource_headers[i], { 68, 36 } );
       }
@@ -202,24 +211,28 @@ namespace UI {
   }
 
   inline void resources_tab() {
-    CLAY( CLAY_LAYOUT( {
-      .childGap = 4,
-      .layoutDirection = CLAY_TOP_TO_BOTTOM,
-    } ) ) {
-      resources_headers();
-
-      CLAY(
-        CLAY_ID( "ResourceRows" ),
-        CLAY_SCROLL( { .vertical = true } ),
-        CLAY_LAYOUT( {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-            },
+    CLAY( {
+      .layout =
+        {
           .childGap = 4,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        } )
-      ) {
+        },
+    } ) {
+      resources_headers();
+
+      CLAY( {
+        .id = CLAY_ID( "ResourceRows" ),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+              },
+            .childGap = 4,
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+        .scroll = { .vertical = true },
+      } ) {
         resource_rows( Resources::Type::COUNT );
       }
     }

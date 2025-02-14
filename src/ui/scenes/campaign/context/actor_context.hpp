@@ -13,27 +13,29 @@ namespace UI {
 
   inline Action_ActorContext actor_context( Actor::Component *actor ) {
 
-    CLAY(
-      CLAY_ID( "ActorContext" ),
-      CLAY_RECTANGLE( {
-        .color = { 0, 0, 0, 200 },
-        .cornerRadius = { 5 },
-      } ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 512 } ),
-            .height = CLAY_SIZING_PERCENT( 0.5 ),
-          },
-        .padding = { 16, 16 },
-        .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } ),
-      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "ActorContext" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIT( 512 ),
+              .height = CLAY_SIZING_PERCENT( 0.5 ),
+            },
+          .padding = { 16, 16 },
+          .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+      .backgroundColor = { 0, 0, 0, 200 },
+      .cornerRadius = { 5 },
+      .border{
+        .color = COLOR_WHITE,
+        .width = { 2 },
+      },
+    } ) {
 
       Clay_String cs = (Clay_String) {
-        .length = strlen( actor->data.name.c_str() ),
+        .length = static_cast<int32_t>( strlen( actor->data.name.c_str() ) ),
         .chars = actor->data.name.c_str(),
       };
 
@@ -46,7 +48,7 @@ namespace UI {
         } )
       );
 
-      CLAY( CLAY_LAYOUT( { .layoutDirection = CLAY_LEFT_TO_RIGHT } ) ) {
+      CLAY( { .layout = { .layoutDirection = CLAY_LEFT_TO_RIGHT } } ) {
         switch ( actor->data.type ) {
           case Actor::Type::Colonist: {
             text_button_small(

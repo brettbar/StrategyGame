@@ -16,30 +16,34 @@ namespace UI {
     Settlement::Component *selected_settlement
   ) {
 
-    CLAY(
-      CLAY_ID( "SettlementContext" ),
-      CLAY_RECTANGLE( {
-        .color = { 0, 0, 0, 200 },
-        .cornerRadius = { 5 },
-      } ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 512 } ),
-            .height = CLAY_SIZING_PERCENT( 0.5 ),
-          },
-        .padding = { 16, 16 },
-        .childGap = 4,
-        .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } ),
-      CLAY_BORDER_OUTSIDE_RADIUS( 2, COLOR_WHITE, 5 )
-    ) {
+    CLAY( {
+      .id = CLAY_ID( "SettlementContext" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIT( 512 ),
+              .height = CLAY_SIZING_PERCENT( 0.5 ),
+            },
+          .padding = { 16, 16 },
+          .childGap = 4,
+          .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+      .backgroundColor = { 0, 0, 0, 200 },
+      .cornerRadius = { 5 },
+      .border =
+        {
+          .color = COLOR_WHITE,
+          .width = { 2 },
+        },
+    } ) {
 
       // printf( "Name: %s\n", selected_settlement.name.c_str() );
 
       Clay_String cs = (Clay_String) {
-        .length = strlen( selected_settlement->name.c_str() ),
+        .length =
+          static_cast<int32_t>( strlen( selected_settlement->name.c_str() ) ),
         .chars = selected_settlement->name.c_str(),
       };
 
@@ -56,10 +60,11 @@ namespace UI {
 
 
         Clay_String sn = (Clay_String) {
-          .length = strlen( Buildings::building_name_str(
-                              selected_settlement->buildings[i].type
-          )
-                              .c_str() ),
+          .length = static_cast<int32_t>( strlen(
+            Buildings::building_name_str( selected_settlement->buildings[i].type
+            )
+              .c_str()
+          ) ),
 
           .chars = ( Buildings::building_name_str(
                        selected_settlement->buildings[i].type
@@ -68,15 +73,18 @@ namespace UI {
         };
 
 
-        CLAY( CLAY_LAYOUT( {
-          .sizing = { .width = CLAY_SIZING_GROW() },
-          .childGap = 4,
-          .childAlignment =
+        CLAY( {
+          .layout =
             {
-              .x = CLAY_ALIGN_X_CENTER,
-              .y = CLAY_ALIGN_Y_CENTER,
+              .sizing = { .width = CLAY_SIZING_GROW() },
+              .childGap = 4,
+              .childAlignment =
+                {
+                  .x = CLAY_ALIGN_X_CENTER,
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
             },
-        } ) ) {
+        } ) {
           texture_label( hstr{ "slot.png" }, { 64, 64 } );
 
           texture_label( hstr{ "arrow.png" }, { 26, 26 } );
