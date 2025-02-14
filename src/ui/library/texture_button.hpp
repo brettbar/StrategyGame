@@ -9,42 +9,42 @@ inline void texture_button(
   hstr texture_id,
   vec2f dimensions
 ) {
-  CLAY(
-    Clay__AttachId( Clay__HashString( id, 0, 0 ) ),
-    CLAY_LAYOUT( {
-      .sizing =
-        {
-          .width = CLAY_SIZING_FIXED( dimensions.x ),
-          .height = CLAY_SIZING_FIXED( dimensions.y ),
-        },
-    } ),
-    CLAY_IMAGE( {
-      .sourceDimensions =
-        {
-          dimensions.x,
-          dimensions.y,
-        },
-      .texture_id = texture_id,
-    } )
-  );
+  // CLAY(
+  //   Clay__AttachId( Clay__HashString( id, 0, 0 ) ),
+  //   CLAY_LAYOUT( {
+  //     .sizing =
+  //       {
+  //         .width = CLAY_SIZING_FIXED( dimensions.x ),
+  //         .height = CLAY_SIZING_FIXED( dimensions.y ),
+  //       },
+  //   } ),
+  //   CLAY_IMAGE( {
+  //     .sourceDimensions =
+  //       {
+  //         dimensions.x,
+  //         dimensions.y,
+  //       },
+  //     .texture_id = texture_id,
+  //   } )
+  // );
 }
 
 inline void texture_label( hstr id, vec2f dimensions ) {
-  CLAY(
-    CLAY_LAYOUT( {
-      .sizing =
-        {
-          .width = CLAY_SIZING_FIXED( dimensions.x ),
-          .height = CLAY_SIZING_FIXED( dimensions.y ),
-        },
-    } ),
-    CLAY_IMAGE( {
-      .sourceDimensions =
-        {
-          dimensions.x,
-          dimensions.y,
-        },
-      .texture_id = id,
-    } )
-  );
+  // CLAY(
+  //   CLAY_LAYOUT( {
+  //     .sizing =
+  //       {
+  //         .width = CLAY_SIZING_FIXED( dimensions.x ),
+  //         .height = CLAY_SIZING_FIXED( dimensions.y ),
+  //       },
+  //   } ),
+  //   CLAY_IMAGE( {
+  //     .sourceDimensions =
+  //       {
+  //         dimensions.x,
+  //         dimensions.y,
+  //       },
+  //     .texture_id = id,
+  //   } )
+  // );
 }

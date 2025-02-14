@@ -24,6 +24,19 @@ void SteamAPIDebugTextHook( int severity, const char *msg ) {
   printf( "%s\n", msg );
 }
 
+void HandleClayErrors( Clay_ErrorData errorData ) {
+  printf( "%s", errorData.errorText.chars );
+  if ( errorData.errorType == CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED ) {
+    // reinitializeClay = true;
+    Clay_SetMaxElementCount( Clay_GetMaxElementCount() * 2 );
+  } else if ( errorData.errorType ==
+              CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED ) {
+    // reinitializeClay = true;
+    Clay_SetMaxMeasureTextCacheWordCount(
+      Clay_GetMaxMeasureTextCacheWordCount() * 2
+    );
+  }
+}
 
 /*
 ========================================================
@@ -60,31 +73,28 @@ int main() {
   // SetConfigFlags( FLAG_WINDOW_RESIZABLE );
   SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
 
-  Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
   // InitWindow( 1920, 1080, "FieldsOfMars" );
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = (Clay_Arena) {
     .capacity = clay_required_memory,
     .memory = (char *) malloc( clay_required_memory ),
   };
-
   Clay_Initialize(
     clay_memory,
     (Clay_Dimensions) {
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
     },
-    {}
+    (Clay_ErrorHandler) { HandleClayErrors, 0 }
   );
+  Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
 
-  Clay_SetMeasureTextFunction( Raylib_MeasureText );
-  const int FONT_ID_BODY_16 = 0;
-  Raylib_fonts[FONT_ID_BODY_16] = (Raylib_Font) {
-    .fontId = FONT_ID_BODY_16,
-    .font = LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 ),
-  };
 
   LoadAssets();
+
+  Global::fonts.push_back( Global::font_cache[hstr{ "font_default" }]->font );
+
+  Clay_SetMeasureTextFunction( Raylib_MeasureText, Global::fonts.data() );
 
   SetExitKey( KEY_NULL );
 

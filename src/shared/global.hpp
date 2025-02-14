@@ -25,6 +25,8 @@ namespace Global {
   inline TextureCache texture_cache = {};
   inline entt::registry world;
 
+  inline list<Font> fonts;
+
   // TODO temporary
   // inline entt::entity host_player;
 

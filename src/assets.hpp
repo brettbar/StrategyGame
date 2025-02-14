@@ -99,15 +99,22 @@ inline void LoadAssets() {
   LoadAsset( hstr{ "tile_outline" }, InitTileOutline(), Global::texture_cache );
   load_borders();
 
+
+  Global::font_cache.load(
+    hstr{ "font_default" },
+    // LoadFont( ( asset_folder + "/fonts/romulus.png" ).c_str() )
+    LoadFontEx( "assets/fonts/ONESIZE_.TTF", 48, 0, 0 )
+  );
+
   Global::font_cache.load(
     hstr{ "font_romulus" },
     LoadFont( ( asset_folder + "/fonts/romulus.png" ).c_str() )
   );
 
-  Global::font_cache.load(
-    hstr{ "font_default" },
-    LoadFont( ( asset_folder + "/fonts/Perfect-DOS-VGA-437.png" ).c_str() )
-  );
+  // Global::font_cache.load(
+  //   hstr{ "font_default" },
+  //   LoadFont( ( asset_folder + "/fonts/Perfect-DOS-VGA-437.png" ).c_str() )
+  // );
 
   load_all_in_folder( asset_folder + "/images/hexagons" );
 

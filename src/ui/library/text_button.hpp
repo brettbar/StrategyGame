@@ -12,20 +12,19 @@ namespace UI {
     u32 i = 0,
     Clay_Color color = { 140, 140, 140, 255 }
   ) {
-    CLAY(
-      Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 256 } ),
-          },
-        .padding = { 16, 16 },
-        .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
-      } ),
-      CLAY_RECTANGLE( {
-        .color = color,
-      } )
-    ) {
+    CLAY( {
+      .id = ( Clay__HashString( id_str, i, 0 ) ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIT( 256 ),
+            },
+          .padding = { 16, 16 },
+          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+        },
+      .backgroundColor = color,
+    } ) {
       CLAY_TEXT(
         text,
         CLAY_TEXT_CONFIG( {
@@ -43,20 +42,19 @@ namespace UI {
     u32 i = 0,
     Clay_Color color = { 140, 140, 140, 255 }
   ) {
-    CLAY(
-      Clay__AttachId( Clay__HashString( id_str, i, 0 ) ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_FIT( { 128 } ),
-          },
-        .padding = { 16, 16 },
-        .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
-      } ),
-      CLAY_RECTANGLE( {
-        .color = color,
-      } )
-    ) {
+    CLAY( {
+      .id = ( Clay__HashString( id_str, i, 0 ) ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIT( 128 ),
+            },
+          .padding = { 16, 16 },
+          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+        },
+      .backgroundColor = color,
+    } ) {
       CLAY_TEXT(
         text,
         CLAY_TEXT_CONFIG( {

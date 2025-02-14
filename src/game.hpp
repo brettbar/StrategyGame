@@ -7,21 +7,18 @@
 #include "network/network.hpp"
 #include "shared/common.hpp"
 
-#include "renderer/renderer.hpp"
-
-
 #include "campaign.hpp"
 #include "shared/global.hpp"
 #include <raylib.h>
 
 #define CLAY_IMPLEMENTATION
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "clay/clay.h"
+#include "clay/clay_renderer_raylib.c"
 
-#include "ui/scenes/load_game_menu.hpp"
+// #include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
-#include "ui/scenes/singleplayer_lobby.hpp"
-#include "ui/scenes/sp_faction_select.hpp"
+// #include "ui/scenes/singleplayer_lobby.hpp"
+// #include "ui/scenes/sp_faction_select.hpp"
 
 enum class Scene {
   MainMenu,
@@ -347,68 +344,68 @@ class IGame {
     {
       ClearBackground( BLACK );
 
-      Clay_Raylib_Render( render_cmds );
+      Clay_Raylib_Render( render_cmds, Global::fonts.data() );
     }
     EndDrawing();
   }
 
   void Scene_LoadGames() {
-    list<str> paths = {};
-
-    // @todo probably make this absolute like paradox games do, in documents for example
-    str path = "./saves";
-    for ( const auto &entry: fs::directory_iterator( path ) ) {
-      if ( entry.path().extension() == ".dat" ) {
-        paths.push_back( entry.path().c_str() );
-      }
-    }
-
-
-    Clay_BeginLayout();
-    bool pressed_back = false;
-
-    auto file_to_load = UI::load_game_menu( paths, pressed_back );
-
-    if ( pressed_back ) {
-      _scene = Scene::MainMenu;
-    }
-
-    if ( file_to_load != "" ) {
-      LoadSinglePlayerCampaign( file_to_load.c_str() );
-    }
-
-    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds );
-    }
-    EndDrawing();
+    // list<str> paths = {};
+    //
+    // // @todo probably make this absolute like paradox games do, in documents for example
+    // str path = "./saves";
+    // for ( const auto &entry: fs::directory_iterator( path ) ) {
+    //   if ( entry.path().extension() == ".dat" ) {
+    //     paths.push_back( entry.path().c_str() );
+    //   }
+    // }
+    //
+    //
+    // Clay_BeginLayout();
+    // bool pressed_back = false;
+    //
+    // auto file_to_load = UI::load_game_menu( paths, pressed_back );
+    //
+    // if ( pressed_back ) {
+    //   _scene = Scene::MainMenu;
+    // }
+    //
+    // if ( file_to_load != "" ) {
+    //   LoadSinglePlayerCampaign( file_to_load.c_str() );
+    // }
+    //
+    // Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Clay_Raylib_Render( render_cmds );
+    // }
+    // EndDrawing();
   }
 
   void Scene_SinglePlayerLobby() {
-    Clay_BeginLayout();
-    auto action = UI::singleplayer_lobby();
-
-    switch ( action ) {
-      case UI::Action_SinglePlayerLobby::SelectFaction:
-        _scene = Scene::SPFactionSelect;
-        break;
-      case UI::Action_SinglePlayerLobby::ReturnToMain:
-        _scene = Scene::MainMenu;
-        break;
-      case UI::Action_SinglePlayerLobby::None:
-        break;
-    }
-    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds );
-    }
-    EndDrawing();
+    // Clay_BeginLayout();
+    // auto action = UI::singleplayer_lobby();
+    //
+    // switch ( action ) {
+    //   case UI::Action_SinglePlayerLobby::SelectFaction:
+    //     _scene = Scene::SPFactionSelect;
+    //     break;
+    //   case UI::Action_SinglePlayerLobby::ReturnToMain:
+    //     _scene = Scene::MainMenu;
+    //     break;
+    //   case UI::Action_SinglePlayerLobby::None:
+    //     break;
+    // }
+    // Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Clay_Raylib_Render( render_cmds );
+    // }
+    // EndDrawing();
   }
 
   void Scene_MultiplayerLobby() {
@@ -464,23 +461,23 @@ class IGame {
 
 
   void Scene_SPFactionSelect() {
-    Clay_BeginLayout();
-    auto selection = UI::faction_settlement_screen();
-
-    // @volatile
-    // TODO make this a faction enum
-    if ( selection != "" ) {
-      StartSingleplayerCampaign( selection );
-    }
-
-    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Renderer::Custom_Clay_Raylib_Render( render_cmds );
-      // Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // Clay_BeginLayout();
+    // auto selection = UI::faction_settlement_screen();
+    //
+    // // @volatile
+    // // TODO make this a faction enum
+    // if ( selection != "" ) {
+    //   StartSingleplayerCampaign( selection );
+    // }
+    //
+    // Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Renderer::Custom_Clay_Raylib_Render( render_cmds );
+    //   // Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_MPFactionSelect() {
@@ -590,7 +587,7 @@ class IGame {
     BeginDrawing();
     {
       _campaign->Draw();
-      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      // Renderer::Custom_Clay_Raylib_Render( render_cmds );
       // Iron::Forge()->DrawAll();
       // Iron::Forge()->DrawDebug();
     }

@@ -52,23 +52,26 @@ namespace UI {
     u32 num_buttons = LEN( buttons );
 
     CLAY(
-      CLAY_ID( "MainMenu" ),
-      CLAY_RECTANGLE( { .color = { 43, 41, 51, 255 } } ),
-      CLAY_LAYOUT( {
-        .sizing =
+      {
+        .id = CLAY_ID( "MainMenu" ),
+        .layout =
           {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_GROW(),
+              },
+            .padding = { 16, 16 },
+            .childGap = 8,
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_CENTER,
+              },
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
-        .padding = { 16, 16 },
-        .childGap = 8,
-        .childAlignment =
-          {
-            .x = CLAY_ALIGN_X_CENTER,
-            .y = CLAY_ALIGN_Y_CENTER,
-          },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } )
+        .backgroundColor = { 43, 41, 51, 255 },
+      },
     ) {
       for ( u32 i = 0; i < num_buttons; i++ ) {
         text_button_lrg(

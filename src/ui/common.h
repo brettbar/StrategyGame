@@ -17,12 +17,15 @@ namespace UI {
   const Clay_Color COLOR_ORANGE = Clay_Color{ 225, 138, 50, 255 };
 
   inline void spacer() {
-    CLAY( CLAY_LAYOUT(
-      { .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          } }
-    ) );
+    CLAY( {
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+        },
+    } );
   }
 };// namespace UI

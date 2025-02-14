@@ -13,9 +13,6 @@
 
 #include <raylib.h>
 
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
-#include "clay/clay.h"
-#include "clay/clay_renderer_raylib.c"
 
 namespace Renderer {
 
@@ -212,263 +209,263 @@ namespace Renderer {
     } );
   }
 
-  inline void Custom_Clay_Raylib_Render( Clay_RenderCommandArray renderCommands
-  ) {
-    measureCalls = 0;
-    for ( int j = 0; j < renderCommands.length; j++ ) {
-      Clay_RenderCommand *renderCommand =
-        Clay_RenderCommandArray_Get( &renderCommands, j );
-      Clay_BoundingBox boundingBox = renderCommand->boundingBox;
-      switch ( renderCommand->commandType ) {
-        case CLAY_RENDER_COMMAND_TYPE_TEXT: {
-          // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
-          Clay_String text = renderCommand->text;
-          char *cloned = (char *) malloc( text.length + 1 );
-          memcpy( cloned, text.chars, text.length );
-          cloned[text.length] = '\0';
-          Font fontToUse =
-            Raylib_fonts[renderCommand->config.textElementConfig->fontId].font;
-          DrawTextEx(
-            fontToUse,
-            cloned,
-            (Vector2) { boundingBox.x, boundingBox.y },
-            (float) renderCommand->config.textElementConfig->fontSize,
-            (float) renderCommand->config.textElementConfig->letterSpacing,
-            CLAY_COLOR_TO_RAYLIB_COLOR(
-              renderCommand->config.textElementConfig->textColor
-            )
-          );
-          free( cloned );
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
-          // Texture2D imageTexture =
-          //   *(Texture2D *) renderCommand->config.imageElementConfig->imageData;
-          Texture2D imageTexture =
-            Global::texture_cache[renderCommand->config.imageElementConfig
-                                    ->texture_id]
-              ->texture;
-          DrawTextureEx(
-            imageTexture,
-            (Vector2) { boundingBox.x, boundingBox.y },
-            0,
-            boundingBox.width / (float) imageTexture.width,
-            WHITE
-          );
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START: {
-          BeginScissorMode(
-            (int) roundf( boundingBox.x ),
-            (int) roundf( boundingBox.y ),
-            (int) roundf( boundingBox.width ),
-            (int) roundf( boundingBox.height )
-          );
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END: {
-          EndScissorMode();
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
-          Clay_RectangleElementConfig *config =
-            renderCommand->config.rectangleElementConfig;
-          if ( config->cornerRadius.topLeft > 0 ) {
-            float radius = ( config->cornerRadius.topLeft * 2 ) /
-                           (float) ( ( boundingBox.width > boundingBox.height )
-                                       ? boundingBox.height
-                                       : boundingBox.width );
-            DrawRectangleRounded(
-              (Rectangle) { boundingBox.x,
-                            boundingBox.y,
-                            boundingBox.width,
-                            boundingBox.height },
-              radius,
-              8,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->color )
-            );
-          } else {
-            DrawRectangle(
-              boundingBox.x,
-              boundingBox.y,
-              boundingBox.width,
-              boundingBox.height,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->color )
-            );
-          }
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_BORDER: {
-          Clay_BorderElementConfig *config =
-            renderCommand->config.borderElementConfig;
-          // Left border
-          if ( config->left.width > 0 ) {
-            DrawRectangle(
-              (int) roundf( boundingBox.x ),
-              (int) roundf( boundingBox.y + config->cornerRadius.topLeft ),
-              (int) config->left.width,
-              (int) roundf(
-                boundingBox.height - config->cornerRadius.topLeft -
-                config->cornerRadius.bottomLeft
-              ),
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->left.color )
-            );
-          }
-          // Right border
-          if ( config->right.width > 0 ) {
-            DrawRectangle(
-              (int) roundf(
-                boundingBox.x + boundingBox.width - config->right.width
-              ),
-              (int) roundf( boundingBox.y + config->cornerRadius.topRight ),
-              (int) config->right.width,
-              (int) roundf(
-                boundingBox.height - config->cornerRadius.topRight -
-                config->cornerRadius.bottomRight
-              ),
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->right.color )
-            );
-          }
-          // Top border
-          if ( config->top.width > 0 ) {
-            DrawRectangle(
-              (int) roundf( boundingBox.x + config->cornerRadius.topLeft ),
-              (int) roundf( boundingBox.y ),
-              (int) roundf(
-                boundingBox.width - config->cornerRadius.topLeft -
-                config->cornerRadius.topRight
-              ),
-              (int) config->top.width,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
-            );
-          }
-          // Bottom border
-          if ( config->bottom.width > 0 ) {
-            DrawRectangle(
-              (int) roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
-              (int) roundf(
-                boundingBox.y + boundingBox.height - config->bottom.width
-              ),
-              (int) roundf(
-                boundingBox.width - config->cornerRadius.bottomLeft -
-                config->cornerRadius.bottomRight
-              ),
-              (int) config->bottom.width,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
-            );
-          }
-          if ( config->cornerRadius.topLeft > 0 ) {
-            DrawRing(
-              (Vector2
-              ) { roundf( boundingBox.x + config->cornerRadius.topLeft ),
-                  roundf( boundingBox.y + config->cornerRadius.topLeft ) },
-              roundf( config->cornerRadius.topLeft - config->top.width ),
-              config->cornerRadius.topLeft,
-              180,
-              270,
-              10,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
-            );
-          }
-          if ( config->cornerRadius.topRight > 0 ) {
-            DrawRing(
-              (Vector2
-              ) { roundf(
-                    boundingBox.x + boundingBox.width -
-                    config->cornerRadius.topRight
-                  ),
-                  roundf( boundingBox.y + config->cornerRadius.topRight ) },
-              roundf( config->cornerRadius.topRight - config->top.width ),
-              config->cornerRadius.topRight,
-              270,
-              360,
-              10,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
-            );
-          }
-          if ( config->cornerRadius.bottomLeft > 0 ) {
-            DrawRing(
-              (Vector2
-              ) { roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
-                  roundf(
-                    boundingBox.y + boundingBox.height -
-                    config->cornerRadius.bottomLeft
-                  ) },
-              roundf( config->cornerRadius.bottomLeft - config->top.width ),
-              config->cornerRadius.bottomLeft,
-              90,
-              180,
-              10,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
-            );
-          }
-          if ( config->cornerRadius.bottomRight > 0 ) {
-            DrawRing(
-              (Vector2) { roundf(
-                            boundingBox.x + boundingBox.width -
-                            config->cornerRadius.bottomRight
-                          ),
-                          roundf(
-                            boundingBox.y + boundingBox.height -
-                            config->cornerRadius.bottomRight
-                          ) },
-              roundf( config->cornerRadius.bottomRight - config->bottom.width ),
-              config->cornerRadius.bottomRight,
-              0.1,
-              90,
-              10,
-              CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
-            );
-          }
-          break;
-        }
-        case CLAY_RENDER_COMMAND_TYPE_CUSTOM: {
-          CustomLayoutElement *customElement =
-            (CustomLayoutElement *)
-              renderCommand->config.customElementConfig->customData;
-          if ( !customElement )
-            continue;
-          switch ( customElement->type ) {
-            case CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL: {
-              Clay_BoundingBox rootBox =
-                renderCommands.internalArray[0].boundingBox;
-              float scaleValue = CLAY__MIN(
-                CLAY__MIN( 1, 768 / rootBox.height ) *
-                  CLAY__MAX( 1, rootBox.width / 1024 ),
-                1.5f
-              );
-              Ray positionRay = GetScreenToWorldPointWithZDistance(
-                (Vector2) { renderCommand->boundingBox.x +
-                              renderCommand->boundingBox.width / 2,
-                            renderCommand->boundingBox.y +
-                              ( renderCommand->boundingBox.height / 2 ) + 20 },
-                Raylib_camera,
-                (int) roundf( rootBox.width ),
-                (int) roundf( rootBox.height ),
-                140
-              );
-              BeginMode3D( Raylib_camera );
-              DrawModel(
-                customElement->model.model,
-                positionRay.position,
-                customElement->model.scale * scaleValue,
-                WHITE
-              );// Draw 3d model with texture
-              EndMode3D();
-              break;
-            }
-            default:
-              break;
-          }
-          break;
-        }
-        default: {
-          printf( "Error: unhandled render command." );
-          exit( 1 );
-        }
-      }
-    }
-  }
+  // inline void Custom_Clay_Raylib_Render( Clay_RenderCommandArray renderCommands
+  // ) {
+  //   measureCalls = 0;
+  //   for ( int j = 0; j < renderCommands.length; j++ ) {
+  //     Clay_RenderCommand *renderCommand =
+  //       Clay_RenderCommandArray_Get( &renderCommands, j );
+  //     Clay_BoundingBox boundingBox = renderCommand->boundingBox;
+  //     switch ( renderCommand->commandType ) {
+  //       case CLAY_RENDER_COMMAND_TYPE_TEXT: {
+  //         // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
+  //         Clay_String text = renderCommand->text;
+  //         char *cloned = (char *) malloc( text.length + 1 );
+  //         memcpy( cloned, text.chars, text.length );
+  //         cloned[text.length] = '\0';
+  //         Font fontToUse =
+  //           Raylib_fonts[renderCommand->config.textElementConfig->fontId].font;
+  //         DrawTextEx(
+  //           fontToUse,
+  //           cloned,
+  //           (Vector2) { boundingBox.x, boundingBox.y },
+  //           (float) renderCommand->config.textElementConfig->fontSize,
+  //           (float) renderCommand->config.textElementConfig->letterSpacing,
+  //           CLAY_COLOR_TO_RAYLIB_COLOR(
+  //             renderCommand->config.textElementConfig->textColor
+  //           )
+  //         );
+  //         free( cloned );
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
+  //         // Texture2D imageTexture =
+  //         //   *(Texture2D *) renderCommand->config.imageElementConfig->imageData;
+  //         Texture2D imageTexture =
+  //           Global::texture_cache[renderCommand->config.imageElementConfig
+  //                                   ->texture_id]
+  //             ->texture;
+  //         DrawTextureEx(
+  //           imageTexture,
+  //           (Vector2) { boundingBox.x, boundingBox.y },
+  //           0,
+  //           boundingBox.width / (float) imageTexture.width,
+  //           WHITE
+  //         );
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_SCISSOR_START: {
+  //         BeginScissorMode(
+  //           (int) roundf( boundingBox.x ),
+  //           (int) roundf( boundingBox.y ),
+  //           (int) roundf( boundingBox.width ),
+  //           (int) roundf( boundingBox.height )
+  //         );
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_SCISSOR_END: {
+  //         EndScissorMode();
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
+  //         Clay_RectangleElementConfig *config =
+  //           renderCommand->config.rectangleElementConfig;
+  //         if ( config->cornerRadius.topLeft > 0 ) {
+  //           float radius = ( config->cornerRadius.topLeft * 2 ) /
+  //                          (float) ( ( boundingBox.width > boundingBox.height )
+  //                                      ? boundingBox.height
+  //                                      : boundingBox.width );
+  //           DrawRectangleRounded(
+  //             (Rectangle) { boundingBox.x,
+  //                           boundingBox.y,
+  //                           boundingBox.width,
+  //                           boundingBox.height },
+  //             radius,
+  //             8,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->color )
+  //           );
+  //         } else {
+  //           DrawRectangle(
+  //             boundingBox.x,
+  //             boundingBox.y,
+  //             boundingBox.width,
+  //             boundingBox.height,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->color )
+  //           );
+  //         }
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_BORDER: {
+  //         Clay_BorderElementConfig *config =
+  //           renderCommand->config.borderElementConfig;
+  //         // Left border
+  //         if ( config->left.width > 0 ) {
+  //           DrawRectangle(
+  //             (int) roundf( boundingBox.x ),
+  //             (int) roundf( boundingBox.y + config->cornerRadius.topLeft ),
+  //             (int) config->left.width,
+  //             (int) roundf(
+  //               boundingBox.height - config->cornerRadius.topLeft -
+  //               config->cornerRadius.bottomLeft
+  //             ),
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->left.color )
+  //           );
+  //         }
+  //         // Right border
+  //         if ( config->right.width > 0 ) {
+  //           DrawRectangle(
+  //             (int) roundf(
+  //               boundingBox.x + boundingBox.width - config->right.width
+  //             ),
+  //             (int) roundf( boundingBox.y + config->cornerRadius.topRight ),
+  //             (int) config->right.width,
+  //             (int) roundf(
+  //               boundingBox.height - config->cornerRadius.topRight -
+  //               config->cornerRadius.bottomRight
+  //             ),
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->right.color )
+  //           );
+  //         }
+  //         // Top border
+  //         if ( config->top.width > 0 ) {
+  //           DrawRectangle(
+  //             (int) roundf( boundingBox.x + config->cornerRadius.topLeft ),
+  //             (int) roundf( boundingBox.y ),
+  //             (int) roundf(
+  //               boundingBox.width - config->cornerRadius.topLeft -
+  //               config->cornerRadius.topRight
+  //             ),
+  //             (int) config->top.width,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
+  //           );
+  //         }
+  //         // Bottom border
+  //         if ( config->bottom.width > 0 ) {
+  //           DrawRectangle(
+  //             (int) roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
+  //             (int) roundf(
+  //               boundingBox.y + boundingBox.height - config->bottom.width
+  //             ),
+  //             (int) roundf(
+  //               boundingBox.width - config->cornerRadius.bottomLeft -
+  //               config->cornerRadius.bottomRight
+  //             ),
+  //             (int) config->bottom.width,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
+  //           );
+  //         }
+  //         if ( config->cornerRadius.topLeft > 0 ) {
+  //           DrawRing(
+  //             (Vector2
+  //             ) { roundf( boundingBox.x + config->cornerRadius.topLeft ),
+  //                 roundf( boundingBox.y + config->cornerRadius.topLeft ) },
+  //             roundf( config->cornerRadius.topLeft - config->top.width ),
+  //             config->cornerRadius.topLeft,
+  //             180,
+  //             270,
+  //             10,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
+  //           );
+  //         }
+  //         if ( config->cornerRadius.topRight > 0 ) {
+  //           DrawRing(
+  //             (Vector2
+  //             ) { roundf(
+  //                   boundingBox.x + boundingBox.width -
+  //                   config->cornerRadius.topRight
+  //                 ),
+  //                 roundf( boundingBox.y + config->cornerRadius.topRight ) },
+  //             roundf( config->cornerRadius.topRight - config->top.width ),
+  //             config->cornerRadius.topRight,
+  //             270,
+  //             360,
+  //             10,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->top.color )
+  //           );
+  //         }
+  //         if ( config->cornerRadius.bottomLeft > 0 ) {
+  //           DrawRing(
+  //             (Vector2
+  //             ) { roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
+  //                 roundf(
+  //                   boundingBox.y + boundingBox.height -
+  //                   config->cornerRadius.bottomLeft
+  //                 ) },
+  //             roundf( config->cornerRadius.bottomLeft - config->top.width ),
+  //             config->cornerRadius.bottomLeft,
+  //             90,
+  //             180,
+  //             10,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
+  //           );
+  //         }
+  //         if ( config->cornerRadius.bottomRight > 0 ) {
+  //           DrawRing(
+  //             (Vector2) { roundf(
+  //                           boundingBox.x + boundingBox.width -
+  //                           config->cornerRadius.bottomRight
+  //                         ),
+  //                         roundf(
+  //                           boundingBox.y + boundingBox.height -
+  //                           config->cornerRadius.bottomRight
+  //                         ) },
+  //             roundf( config->cornerRadius.bottomRight - config->bottom.width ),
+  //             config->cornerRadius.bottomRight,
+  //             0.1,
+  //             90,
+  //             10,
+  //             CLAY_COLOR_TO_RAYLIB_COLOR( config->bottom.color )
+  //           );
+  //         }
+  //         break;
+  //       }
+  //       case CLAY_RENDER_COMMAND_TYPE_CUSTOM: {
+  //         CustomLayoutElement *customElement =
+  //           (CustomLayoutElement *)
+  //             renderCommand->config.customElementConfig->customData;
+  //         if ( !customElement )
+  //           continue;
+  //         switch ( customElement->type ) {
+  //           case CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL: {
+  //             Clay_BoundingBox rootBox =
+  //               renderCommands.internalArray[0].boundingBox;
+  //             float scaleValue = CLAY__MIN(
+  //               CLAY__MIN( 1, 768 / rootBox.height ) *
+  //                 CLAY__MAX( 1, rootBox.width / 1024 ),
+  //               1.5f
+  //             );
+  //             Ray positionRay = GetScreenToWorldPointWithZDistance(
+  //               (Vector2) { renderCommand->boundingBox.x +
+  //                             renderCommand->boundingBox.width / 2,
+  //                           renderCommand->boundingBox.y +
+  //                             ( renderCommand->boundingBox.height / 2 ) + 20 },
+  //               Raylib_camera,
+  //               (int) roundf( rootBox.width ),
+  //               (int) roundf( rootBox.height ),
+  //               140
+  //             );
+  //             BeginMode3D( Raylib_camera );
+  //             DrawModel(
+  //               customElement->model.model,
+  //               positionRay.position,
+  //               customElement->model.scale * scaleValue,
+  //               WHITE
+  //             );// Draw 3d model with texture
+  //             EndMode3D();
+  //             break;
+  //           }
+  //           default:
+  //             break;
+  //         }
+  //         break;
+  //       }
+  //       default: {
+  //         printf( "Error: unhandled render command." );
+  //         exit( 1 );
+  //       }
+  //     }
+  //   }
+  // }
 
 
 };// namespace Renderer
