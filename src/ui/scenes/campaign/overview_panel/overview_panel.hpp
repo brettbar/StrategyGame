@@ -2,7 +2,6 @@
 
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../shared/common.hpp"
-#include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
 
 #include "../../../common.h"

@@ -267,6 +267,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             .width = CLAY_SIZING_GROW(),
             .height = CLAY_SIZING_GROW(),
           },
+        .padding = { 8, 8, 8, 8 },
         .childAlignment =
           {
             .x = CLAY_ALIGN_X_LEFT,
@@ -281,6 +282,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       .layout =
         {
           .sizing = { .height = CLAY_SIZING_GROW() },
+          .childGap = 8,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
     } ) {
@@ -294,6 +296,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
               {
                 .height = CLAY_SIZING_GROW(),
               },
+            .childGap = 4,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
       } ) {

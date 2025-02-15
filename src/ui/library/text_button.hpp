@@ -19,11 +19,13 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIT( 256 ),
+              .height = CLAY_SIZING_FIT( 48 ),
             },
           .padding = { 16, 16 },
-          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+          .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
         },
       .backgroundColor = color,
+      .cornerRadius = { 5, 5, 5, 5 },
     } ) {
       CLAY_TEXT(
         text,
@@ -55,6 +57,7 @@ namespace UI {
           .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
         },
       .backgroundColor = color,
+      .cornerRadius = { 5, 5, 5, 5 },
     } ) {
       CLAY_TEXT(
         text,
@@ -67,22 +70,5 @@ namespace UI {
     }
   }
 
-  inline bool ButtonWasClicked( Clay_String id_str, u32 index ) {
-    auto id = Clay_GetElementIdWithIndex( id_str, index );
-    bool buttonIsHovered = Clay_PointerOver( id );
-    if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
-      return true;
-    }
-    return false;
-  }
-
-  inline bool ButtonWasClicked( Clay_String id_str ) {
-    auto id = Clay_GetElementId( id_str );
-    bool buttonIsHovered = Clay_PointerOver( id );
-    if ( buttonIsHovered && IsMouseButtonPressed( 0 ) ) {
-      return true;
-    }
-    return false;
-  }
 
 }// namespace UI

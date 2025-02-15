@@ -37,7 +37,12 @@ namespace UI {
       }
 
 
-      CLAY() {
+      CLAY( {
+        .layout =
+          {
+            .childGap = 4,
+          },
+      } ) {
         text_button_small(
           CLAY_STRING( "LoadGameMenu::Back" ), CLAY_STRING( "Back" )
         );
