@@ -13,7 +13,7 @@ namespace UI {
   inline Clay_String tab = CLAY_STRING( "" );
 
 
-  inline Clay_String overview_panel() {
+  inline Clay_String overview_tabs() {
     struct Tab {
       Clay_String ref;
       hstr icon;

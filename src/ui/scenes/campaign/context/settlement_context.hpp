@@ -22,8 +22,9 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 512 ),
-              .height = CLAY_SIZING_PERCENT( 0.5 ),
+              .width = CLAY_SIZING_FIT( 768 ),
+              // .height = CLAY_SIZING_PERCENT( 0.5 ),
+              .height = CLAY_SIZING_FIT( 256 ),
             },
           .padding = { 16, 16 },
           .childGap = 4,
@@ -108,16 +109,6 @@ namespace UI {
           for ( const auto &output: current_recipe.outputs ) {
             resource_icon( output.resource, { 64, 64 }, i );
           }
-
-
-          // CLAY_TEXT(
-          //   sn,
-          //   CLAY_TEXT_CONFIG( {
-          //     .textColor = COLOR_WHITE,
-          //     .fontId = 0,
-          //     .fontSize = 32,
-          //   } )
-          // );
         }
       }
     }

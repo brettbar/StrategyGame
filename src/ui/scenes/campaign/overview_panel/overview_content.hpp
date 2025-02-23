@@ -24,7 +24,8 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIT( 384 ),
-              .height = CLAY_SIZING_PERCENT( 0.5 ),
+              // .height = CLAY_SIZING_PERCENT( 0.5 ),
+              .height = CLAY_SIZING_FIT( 786 ),
             },
           .padding = { 16, 16 },
           .childGap = 8,

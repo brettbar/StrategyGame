@@ -588,6 +588,7 @@ class IGame {
     {
       _campaign->Draw();
       Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      DrawFPS( GetScreenWidth() - 128, 128 );
       // Iron::Forge()->DrawAll();
       // Iron::Forge()->DrawDebug();
     }

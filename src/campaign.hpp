@@ -24,11 +24,12 @@
 
 
 // #include "ui/common.h"
+#include "ui/common.h"
 #include "ui/scenes/campaign/context/actor_context.hpp"
 #include "ui/scenes/campaign/context/settlement_context.hpp"
 #include "ui/scenes/campaign/minimap.hpp"
 #include "ui/scenes/campaign/overview_panel/overview_content.hpp"
-#include "ui/scenes/campaign/overview_panel/overview_panel.hpp"
+#include "ui/scenes/campaign/overview_panel/overview_tabs.hpp"
 #include "ui/scenes/campaign/time_panel.hpp"
 
 #include "world/components/player_component.hpp"
@@ -256,6 +257,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   f32 cameraSpeed = 500.0f;
 
   bool show_content = false;
+  Clay_String tab = CLAY_STRING( "" );
 
 
   CLAY( {
@@ -273,30 +275,51 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             .x = CLAY_ALIGN_X_LEFT,
             .y = CLAY_ALIGN_Y_TOP,
           },
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        .layoutDirection = CLAY_TOP_TO_BOTTOM,
       },
   } ) {
-
     CLAY( {
-      .id = CLAY_ID( "Campaign::LeftCol" ),
+      .id = CLAY_ID( "Campaign::TopRow" ),
       .layout =
         {
-          .sizing = { .height = CLAY_SIZING_GROW() },
-          .childGap = 8,
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+            },
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_LEFT,
+              .y = CLAY_ALIGN_Y_TOP,
+            },
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
     } ) {
-      auto tab = UI::overview_panel();
+      tab = UI::overview_tabs();
+    }
 
+    CLAY( {
+      .id = CLAY_ID( "Campaign::BottomRow" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_TOP,
+            },
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        },
+    } ) {
       CLAY( {
-        // CLAY_RECTANGLE( { .color = UI::COLOR_ORANGE, .cornerRadius = { 5 } } ),
+        .id = CLAY_ID( "Campaign::LeftCol" ),
         .layout =
           {
-            .sizing =
-              {
-                .height = CLAY_SIZING_GROW(),
-              },
-            .childGap = 4,
+            .sizing = { .height = CLAY_SIZING_GROW() },
+            .childGap = 8,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
       } ) {
@@ -314,10 +337,23 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
               break;
           }
         }
+      }
 
+      UI::spacer();
 
-        UI::spacer();
-
+      CLAY( {
+        .id = CLAY_ID( "Campaign::Center:Col" ),
+        .layout =
+          {
+            .sizing = { .height = CLAY_SIZING_GROW() },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_RIGHT,
+                .y = CLAY_ALIGN_Y_BOTTOM,
+              },
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+      } ) {
         if ( Selection::Selected<Province::Component, Settlement::Component>(
              ) ) {
           auto settlement =
@@ -381,40 +417,44 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           }
         }
       }
-    }
-
-    UI::spacer();
-
-    CLAY( {
-      .id = CLAY_ID( "Campaign::RightCol" ),
-      .layout =
-        {
-          .sizing = { .height = CLAY_SIZING_GROW() },
-          .childAlignment = { .x = CLAY_ALIGN_X_RIGHT },
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        },
-    } ) {
-      UI::time_panel( Global::state.timeScale );
 
       UI::spacer();
-      switch ( UI::minimap() ) {
-        case UI::Action_Minimap::Default:
-          Map::Manager()->mode = Map::Mode::Default;
-          break;
-        case UI::Action_Minimap::Terrain:
-          Map::Manager()->mode = Map::Mode::Terrain;
-          break;
-        case UI::Action_Minimap::Political:
-          Map::Manager()->mode = Map::Mode::Political;
-          break;
-        case UI::Action_Minimap::Resources:
-          Map::Manager()->mode = Map::Mode::Resources;
-          break;
-        default:
-          break;
+
+      CLAY( {
+        .id = CLAY_ID( "Campaign::RightCol" ),
+        .layout =
+          {
+            .sizing = { .height = CLAY_SIZING_GROW() },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_RIGHT,
+                .y = CLAY_ALIGN_Y_BOTTOM,
+              },
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+      } ) {
+        UI::time_panel( Global::state.timeScale );
+
+        switch ( UI::minimap() ) {
+          case UI::Action_Minimap::Default:
+            Map::Manager()->mode = Map::Mode::Default;
+            break;
+          case UI::Action_Minimap::Terrain:
+            Map::Manager()->mode = Map::Mode::Terrain;
+            break;
+          case UI::Action_Minimap::Political:
+            Map::Manager()->mode = Map::Mode::Political;
+            break;
+          case UI::Action_Minimap::Resources:
+            Map::Manager()->mode = Map::Mode::Resources;
+            break;
+          default:
+            break;
+        }
       }
     }
   }
+
 
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
