@@ -18,6 +18,7 @@
     <ClInclude Include="app\src\world\components\ai.hpp" />
     <ClInclude Include="app\src\world\systems\ai_system.hpp" />
     <ClInclude Include="app\src\world\systems\overlay_system.hpp" />
+    <ClInclude Include="include\clay\clay.h" />
     <ClInclude Include="src\world\systems\abstract.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

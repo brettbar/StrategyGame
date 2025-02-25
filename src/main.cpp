@@ -3,6 +3,7 @@
 rights reserved.
 */
 
+
 #include <raylib.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
@@ -75,17 +76,17 @@ int main() {
 
   // InitWindow( 1920, 1080, "FieldsOfMars" );
   u64 clay_required_memory = Clay_MinMemorySize();
-  Clay_Arena clay_memory = (Clay_Arena) {
+  Clay_Arena clay_memory = Clay_Arena{
     .capacity = clay_required_memory,
     .memory = (char *) malloc( clay_required_memory ),
   };
   Clay_Initialize(
     clay_memory,
-    (Clay_Dimensions) {
+    Clay_Dimensions{
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
     },
-    (Clay_ErrorHandler) { HandleClayErrors, 0 }
+    Clay_ErrorHandler{ HandleClayErrors, 0 }
   );
   Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
 

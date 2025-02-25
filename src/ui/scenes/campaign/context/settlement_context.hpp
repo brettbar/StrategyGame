@@ -42,7 +42,7 @@ namespace UI {
 
       // printf( "Name: %s\n", selected_settlement.name.c_str() );
 
-      Clay_String cs = (Clay_String) {
+      Clay_String cs = Clay_String{
         .length =
           static_cast<int32_t>( strlen( selected_settlement->name.c_str() ) ),
         .chars = selected_settlement->name.c_str(),
@@ -60,7 +60,7 @@ namespace UI {
       for ( u32 i = 0; i < selected_settlement->buildings.size(); i++ ) {
 
 
-        Clay_String sn = (Clay_String) {
+        Clay_String sn = Clay_String{
           .length = static_cast<int32_t>( strlen(
             Buildings::building_name_str( selected_settlement->buildings[i].type
             )

@@ -34,7 +34,7 @@ namespace UI {
       },
     } ) {
 
-      Clay_String cs = (Clay_String) {
+      Clay_String cs = Clay_String{
         .length = static_cast<int32_t>( strlen( actor->data.name.c_str() ) ),
         .chars = actor->data.name.c_str(),
       };

@@ -43,7 +43,7 @@ namespace UI {
           Actor::Type::ArmyTierI, faction
         );
 
-        Clay_String cs = (Clay_String) {
+        Clay_String cs = Clay_String{
           .length = static_cast<int32_t>( strlen( faction ) ),
           .chars = faction,
         };

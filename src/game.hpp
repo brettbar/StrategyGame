@@ -249,7 +249,7 @@ class IGame {
       }
     }
 
-    Clay_SetLayoutDimensions( (Clay_Dimensions) {
+    Clay_SetLayoutDimensions( Clay_Dimensions{
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
     } );
@@ -262,7 +262,7 @@ class IGame {
     );
 
     Clay_UpdateScrollContainers(
-      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
+      true, Clay_Vector2{ scroll_delta.x, scroll_delta.y }, GetFrameTime()
     );
 
 
@@ -353,7 +353,7 @@ class IGame {
     str path = "./saves";
     for ( const auto &entry: fs::directory_iterator( path ) ) {
       if ( entry.path().extension() == ".dat" ) {
-        paths.push_back( entry.path().c_str() );
+        paths.push_back( entry.path().string() );
       }
     }
 

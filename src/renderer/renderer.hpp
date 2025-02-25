@@ -236,7 +236,7 @@ namespace Renderer {
           DrawTextEx(
             fontToUse,
             cloned,
-            (Vector2) { boundingBox.x, boundingBox.y },
+            Vector2{ boundingBox.x, boundingBox.y },
             (float) textData->fontSize,
             (float) textData->letterSpacing,
             CLAY_COLOR_TO_RAYLIB_COLOR( textData->textColor )
@@ -252,11 +252,11 @@ namespace Renderer {
             renderCommand->renderData.image.backgroundColor;
           if ( tintColor.r == 0 && tintColor.g == 0 && tintColor.b == 0 &&
                tintColor.a == 0 ) {
-            tintColor = (Clay_Color) { 255, 255, 255, 255 };
+            tintColor = Clay_Color{ 255, 255, 255, 255 };
           }
           DrawTextureEx(
             imageTexture,
-            (Vector2) { boundingBox.x, boundingBox.y },
+            Vector2{ boundingBox.x, boundingBox.y },
             0,
             boundingBox.width / (float) imageTexture.width,
             CLAY_COLOR_TO_RAYLIB_COLOR( tintColor )
@@ -285,7 +285,7 @@ namespace Renderer {
                                        ? boundingBox.height
                                        : boundingBox.width );
             DrawRectangleRounded(
-              (Rectangle) { boundingBox.x,
+              Rectangle{ boundingBox.x,
                             boundingBox.y,
                             boundingBox.width,
                             boundingBox.height },
@@ -364,8 +364,7 @@ namespace Renderer {
           }
           if ( config->cornerRadius.topLeft > 0 ) {
             DrawRing(
-              (Vector2
-              ) { roundf( boundingBox.x + config->cornerRadius.topLeft ),
+              Vector2{ roundf( boundingBox.x + config->cornerRadius.topLeft ),
                   roundf( boundingBox.y + config->cornerRadius.topLeft ) },
               roundf( config->cornerRadius.topLeft - config->width.top ),
               config->cornerRadius.topLeft,
@@ -377,8 +376,7 @@ namespace Renderer {
           }
           if ( config->cornerRadius.topRight > 0 ) {
             DrawRing(
-              (Vector2
-              ) { roundf(
+              Vector2{ roundf(
                     boundingBox.x + boundingBox.width -
                     config->cornerRadius.topRight
                   ),
@@ -393,8 +391,8 @@ namespace Renderer {
           }
           if ( config->cornerRadius.bottomLeft > 0 ) {
             DrawRing(
-              (Vector2
-              ) { roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
+              Vector2
+               { roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
                   roundf(
                     boundingBox.y + boundingBox.height -
                     config->cornerRadius.bottomLeft
@@ -409,7 +407,7 @@ namespace Renderer {
           }
           if ( config->cornerRadius.bottomRight > 0 ) {
             DrawRing(
-              (Vector2) { roundf(
+              Vector2{ roundf(
                             boundingBox.x + boundingBox.width -
                             config->cornerRadius.bottomRight
                           ),
@@ -443,7 +441,7 @@ namespace Renderer {
                 1.5f
               );
               Ray positionRay = GetScreenToWorldPointWithZDistance(
-                (Vector2) { renderCommand->boundingBox.x +
+                Vector2{ renderCommand->boundingBox.x +
                               renderCommand->boundingBox.width / 2,
                             renderCommand->boundingBox.y +
                               ( renderCommand->boundingBox.height / 2 ) + 20 },
