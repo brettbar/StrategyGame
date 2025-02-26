@@ -116,7 +116,13 @@ inline void LoadAssets() {
   //   LoadFont( ( asset_folder + "/fonts/Perfect-DOS-VGA-437.png" ).c_str() )
   // );
 
-  load_all_in_folder( asset_folder + "/images/hexagons" );
+  // load_all_in_folder( asset_folder + "/images/hexagons" );
+
+  LoadAsset(
+    hstr{ "terrain.png" },
+    LoadImage( ( asset_folder + "/images/terrain.png" ).c_str() ),
+    Global::texture_cache
+  );
 
   create_hex_texture( hstr{ "red_overlay" }, RED, Global::texture_cache );
   create_hex_texture( hstr{ "cyan_overlay" }, BLUE, Global::texture_cache );

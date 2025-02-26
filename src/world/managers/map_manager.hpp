@@ -89,7 +89,7 @@ public:
           .coords = { x, y },
           .biome = biome,
           .visibility = Tile::Visibility::UNEXPLORED,
-          .texture_key = random_assign_sprite_from_biome( biome ),
+          .texture_i = random_assign_sprite_from_biome( biome ),
         };
 
         tile_map[map_index( x, y )] = std::make_shared<Tile::Component>( tile );
@@ -222,34 +222,59 @@ private:
       }
     }
 
-    // @todo fix this shit
-    // @volatile right now i totally hardcode how many of each terrain sprites there are
-    str random_assign_sprite_from_biome( Biome biome ) {
+    u32 random_assign_sprite_from_biome( Biome biome ) {
       switch ( biome ) {
         case Biome::Desert:
-          return "sand1.png";
-        case Biome::Forest: {
-          u32 r = random_u32_inclmax( 1, 10 );
-          return "forest" + std::to_string( r ) + ".png";
-        }
-        case Biome::Hills: {
-          return "hills1.png";
-        }
+          return 18;
+        case Biome::Hills:
+          return 17;
         case Biome::Mountains:
-          return "mountains1.png";
+          return 14;
         case Biome::Plains: {
-          u32 r = random_u32_inclmax( 1, 14 );
-          return "grass" + std::to_string( r ) + ".png";
+          u32 r = random_u32_inclmax( 0, 13 );
+          return r;
         }
+        case Biome::Forest:
+          return 15;
         case Biome::Sea:
-          return "water1.png";
+          return 16;
         case Biome::Steppe:
-          return "hills1.png";
+          return 19;
         case Biome::Taiga:
+          return 19;
         case Biome::Tundra:
-          return "snow1.png";
+          return 19;
       }
     }
+
+    // @todo fix this shit
+    // @volatile right now i totally hardcode how many of each terrain sprites there are
+    // str random_assign_sprite_from_biome( Biome biome ) {
+    //   switch ( biome ) {
+    //     case Biome::Desert:
+    //       return "sand1.png";
+    //     case Biome::Forest: {
+    //       u32 r = random_u32_inclmax( 1, 10 );
+    //       return "forest" + std::to_string( r ) + ".png";
+    //     }
+    //     case Biome::Hills: {
+    //       return "hills1.png";
+    //     }
+    //     case Biome::Mountains:
+    //       return "mountains1.png";
+    //     case Biome::Plains: {
+    //       u32 r = random_u32_inclmax( 1, 14 );
+    //       return "grass" + std::to_string( r ) + ".png";
+    //     }
+    //     case Biome::Sea:
+    //       return "water1.png";
+    //     case Biome::Steppe:
+    //       return "hills1.png";
+    //     case Biome::Taiga:
+    //     case Biome::Tundra:
+    //       return "snow1.png";
+    //   }
+    // }
 
     Biome determine_biome( f32 elevation, f32 flora ) {
       // else if ( noise >= 0.7f )

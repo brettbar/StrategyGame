@@ -9,6 +9,49 @@ namespace ProvinceSystem {
 
   inline void SetProvinceOwner( u32 owner );
 
+  inline rect GetTileTextureRect( u32 texture_i ) {
+    f32 offset = 2.0f;
+
+    f32 atlas_slot_w = TILE_WIDTH + ( offset * 2 );
+    f32 atlas_slot_h = TILE_HEIGHT + ( offset * 2 );
+
+    // plains
+    if ( texture_i >= 0 && texture_i <= 13 ) {
+      return {
+        offset + (atlas_slot_w) *texture_i, offset, TILE_WIDTH, TILE_HEIGHT
+      };
+    }
+    // mtns
+    else if ( texture_i == 14 ) {
+      return { offset, offset + atlas_slot_h, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // forrest
+    else if ( texture_i == 15 ) {
+      return { offset, offset + atlas_slot_h * 2, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // sea
+    else if ( texture_i == 16 ) {
+      return { offset, offset + atlas_slot_h * 3, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // hills
+    else if ( texture_i == 17 ) {
+      return { offset, offset + atlas_slot_h * 4, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // desert
+    else if ( texture_i == 18 ) {
+      return { offset, offset + atlas_slot_h * 5, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // tundra
+    else if ( texture_i == 19 ) {
+      return { offset, offset + atlas_slot_h * 6, TILE_WIDTH, TILE_HEIGHT };
+    }
+    // invalid
+    else {
+      // placeholder empty
+      return { 2048.0f, 2048.0f, TILE_WIDTH, TILE_HEIGHT };
+    }
+  }
+
   inline void Init() {
     for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
       entt::entity prov_entity = Global::world.create();
@@ -36,10 +79,12 @@ namespace ProvinceSystem {
   }
 
   inline void DrawTileTerrain( Tile::Component tile ) {
-    Texture2D texture =
-      Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
-
-    Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+    // Texture2D texture =
+    //   Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
+    // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+    Texture2D texture = Global::texture_cache[hstr{ "terrain.png" }]->texture;
+    // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+    Rectangle frameRec = GetTileTextureRect( tile.texture_i );
 
     // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
     // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
