@@ -285,10 +285,12 @@ namespace Renderer {
                                        ? boundingBox.height
                                        : boundingBox.width );
             DrawRectangleRounded(
-              Rectangle{ boundingBox.x,
-                            boundingBox.y,
-                            boundingBox.width,
-                            boundingBox.height },
+              Rectangle{
+                boundingBox.x,
+                boundingBox.y,
+                boundingBox.width,
+                boundingBox.height
+              },
               radius,
               8,
               CLAY_COLOR_TO_RAYLIB_COLOR( config->backgroundColor )
@@ -364,8 +366,10 @@ namespace Renderer {
           }
           if ( config->cornerRadius.topLeft > 0 ) {
             DrawRing(
-              Vector2{ roundf( boundingBox.x + config->cornerRadius.topLeft ),
-                  roundf( boundingBox.y + config->cornerRadius.topLeft ) },
+              Vector2{
+                roundf( boundingBox.x + config->cornerRadius.topLeft ),
+                roundf( boundingBox.y + config->cornerRadius.topLeft )
+              },
               roundf( config->cornerRadius.topLeft - config->width.top ),
               config->cornerRadius.topLeft,
               180,
@@ -376,11 +380,13 @@ namespace Renderer {
           }
           if ( config->cornerRadius.topRight > 0 ) {
             DrawRing(
-              Vector2{ roundf(
-                    boundingBox.x + boundingBox.width -
-                    config->cornerRadius.topRight
-                  ),
-                  roundf( boundingBox.y + config->cornerRadius.topRight ) },
+              Vector2{
+                roundf(
+                  boundingBox.x + boundingBox.width -
+                  config->cornerRadius.topRight
+                ),
+                roundf( boundingBox.y + config->cornerRadius.topRight )
+              },
               roundf( config->cornerRadius.topRight - config->width.top ),
               config->cornerRadius.topRight,
               270,
@@ -391,12 +397,13 @@ namespace Renderer {
           }
           if ( config->cornerRadius.bottomLeft > 0 ) {
             DrawRing(
-              Vector2
-               { roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
-                  roundf(
-                    boundingBox.y + boundingBox.height -
-                    config->cornerRadius.bottomLeft
-                  ) },
+              Vector2{
+                roundf( boundingBox.x + config->cornerRadius.bottomLeft ),
+                roundf(
+                  boundingBox.y + boundingBox.height -
+                  config->cornerRadius.bottomLeft
+                )
+              },
               roundf( config->cornerRadius.bottomLeft - config->width.top ),
               config->cornerRadius.bottomLeft,
               90,
@@ -407,14 +414,16 @@ namespace Renderer {
           }
           if ( config->cornerRadius.bottomRight > 0 ) {
             DrawRing(
-              Vector2{ roundf(
-                            boundingBox.x + boundingBox.width -
-                            config->cornerRadius.bottomRight
-                          ),
-                          roundf(
-                            boundingBox.y + boundingBox.height -
-                            config->cornerRadius.bottomRight
-                          ) },
+              Vector2{
+                roundf(
+                  boundingBox.x + boundingBox.width -
+                  config->cornerRadius.bottomRight
+                ),
+                roundf(
+                  boundingBox.y + boundingBox.height -
+                  config->cornerRadius.bottomRight
+                )
+              },
               roundf( config->cornerRadius.bottomRight - config->width.bottom ),
               config->cornerRadius.bottomRight,
               0.1,
@@ -441,10 +450,12 @@ namespace Renderer {
                 1.5f
               );
               Ray positionRay = GetScreenToWorldPointWithZDistance(
-                Vector2{ renderCommand->boundingBox.x +
-                              renderCommand->boundingBox.width / 2,
-                            renderCommand->boundingBox.y +
-                              ( renderCommand->boundingBox.height / 2 ) + 20 },
+                Vector2{
+                  renderCommand->boundingBox.x +
+                    renderCommand->boundingBox.width / 2,
+                  renderCommand->boundingBox.y +
+                    ( renderCommand->boundingBox.height / 2 ) + 20
+                },
                 Raylib_camera,
                 (int) roundf( rootBox.width ),
                 (int) roundf( rootBox.height ),

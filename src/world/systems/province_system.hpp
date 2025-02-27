@@ -64,16 +64,6 @@ namespace ProvinceSystem {
 
       ResourceSystem::SpawnResource( prov );
 
-
-      // switch ( prov.tile->biome )
-      // {
-      //   case Biome::Plains:
-      //   {
-      //     prov.resources.push_back( Resources::Natural::Trees );
-      //   }
-      //   break;
-      // }
-
       Global::world.emplace<Province::Component>( prov_entity, prov );
     }
   }

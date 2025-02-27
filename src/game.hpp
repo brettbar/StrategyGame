@@ -14,6 +14,7 @@
 
 #include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
+#include "ui/scenes/modal_menu.hpp"
 #include "ui/scenes/singleplayer_lobby.hpp"
 #include "ui/scenes/sp_faction_select.hpp"
 
@@ -517,37 +518,36 @@ class IGame {
   }
 
   void Scene_ModalMenu() {
-    // CheckMenuToggle();
-    //
-    // switch ( UI::DrawModalMenu() ) {
-    //   case UI::Action_ModalMenu::None:
-    //     break;
-    //   case UI::Action_ModalMenu::SaveGame:
-    //     // @todo get actual user input for file name
-    //     _campaign->save( "output" );
-    //     break;
-    //   case UI::Action_ModalMenu::LoadGame:
-    //     // LoadSinglePlayerCampaign();
-    //     break;
-    //   case UI::Action_ModalMenu::Settings:
-    //     break;
-    //   case UI::Action_ModalMenu::ExitToMainMenu:
-    //     ExitToMainMenu();
-    //     break;
-    //   case UI::Action_ModalMenu::ExitGame:
-    //     ExitGame();
-    //     return;
-    // }
-    //
-    // BeginDrawing();
-    // {
-    //   Renderer::draw_map( Map::Manager()->mode );
-    //   DrawRectangle(
-    //     0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-    //   );
-    //   Iron::Forge()->DrawAll();
-    // }
-    // EndDrawing();
+    Clay_BeginLayout();
+    CheckMenuToggle();
+
+    switch ( UI::modal_menu() ) {
+      case UI::Action_ModalMenu::None:
+        break;
+      case UI::Action_ModalMenu::SaveGame:
+        // @todo get actual user input for file name
+        _campaign->save( "output" );
+        break;
+      case UI::Action_ModalMenu::LoadGame:
+        // LoadSinglePlayerCampaign();
+        break;
+      case UI::Action_ModalMenu::Settings:
+        break;
+      case UI::Action_ModalMenu::ExitMainMenu:
+        ExitToMainMenu();
+        break;
+      case UI::Action_ModalMenu::ExitGame:
+        ExitGame();
+        return;
+    }
+
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
+    BeginDrawing();
+    {
+      Renderer::draw_map( Map::Manager()->mode );
+      Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+    }
+    EndDrawing();
   }
 
   void Scene_Campaign() {
