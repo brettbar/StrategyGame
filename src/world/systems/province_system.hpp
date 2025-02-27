@@ -95,7 +95,12 @@ namespace ProvinceSystem {
 
   inline void Draw( Camera2D &camera ) {
     // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
-    for ( auto entity: Global::world.view<Province::Component>() ) {
+
+    auto view = Global::world.view<Province::Component>();
+
+    // Draw backwards to make sure out-of-hex overlaps work
+    for ( auto it = view.rbegin(), last = view.rend(); it != last; ++it ) {
+      entt::entity entity = *it;
 
       auto &prov = Global::world.get<Province::Component>( entity );
 
