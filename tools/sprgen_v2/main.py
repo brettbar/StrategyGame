@@ -2,9 +2,9 @@
 
 from PIL import Image, ImageDraw
 
-archetypes_dir = './Archetypes/'
-sprite_w = 128
-sprite_h = 128
+ARCHETYPES_DIR = './Archetypes/'
+SPRITE_W = 128
+SPRITE_H = 128
 
 
 def main():
@@ -14,10 +14,15 @@ def main():
 
     for archetype in archetypes:
         gen_archetype_gradient(archetype)
+        gen_archetype_animations(archetype)
+
+
+def gen_archetype_animations(archetype):
+    pass
 
 
 def gen_archetype_gradient(archetype):
-    silhouette_layers_dir = archetypes_dir + archetype + '/' + '2_SilhouetteLayers/'
+    silhouette_layers_dir = ARCHETYPES_DIR + archetype + '/' + '3_SilhouetteLayers/'
 
     # @future might replace this
     supported_layers= [
@@ -43,16 +48,16 @@ def gen_archetype_gradient(archetype):
 	    ).convert('RGBA')
 
     start_x = 0
-    end_x = sprite_w
+    end_x = SPRITE_W
     start_y = 0
-    end_y = sprite_h
+    end_y = SPRITE_H
 
 
     # right
-    generate("right", archetype, silhouettes, start_x=0, end_x=sprite_w, start_y=0, end_y=sprite_h)
+    generate("right", archetype, silhouettes, start_x=0, end_x=SPRITE_W, start_y=0, end_y=SPRITE_H)
 
     # left
-    generate("left", archetype, silhouettes, start_x=sprite_w+1, end_x=sprite_w*2, start_y=0, end_y=sprite_h)
+    generate("left", archetype, silhouettes, start_x=SPRITE_W+1, end_x=SPRITE_W*2, start_y=0, end_y=SPRITE_H)
 
 
 def generate(side, archetype, silhouettes, start_x, end_x, start_y, end_y):
@@ -65,9 +70,9 @@ def generate(side, archetype, silhouettes, start_x, end_x, start_y, end_y):
         num_pixels = len(silhouette_arr)
         gradient = gen_gradient_arr(original_color, num_pixels)
 
-        gradient_img = Image.new('RGBA', (sprite_w*2, sprite_h*2), (0, 0, 0, 0))
+        gradient_img = Image.new('RGBA', (SPRITE_W*2, SPRITE_H*2), (0, 0, 0, 0))
         gen_gradient_img(gradient_img, img, gradient, start_x, end_x, start_y, end_y)
-        gradient_layer_output = archetypes_dir + archetype + '/' + '3_GradientLayers/'
+        gradient_layer_output = ARCHETYPES_DIR + archetype + '/' + '4_GradientLayers/'
         gradient_img.save(gradient_layer_output + side + '_' + silhouette + '.png')
 
 def gen_silhouette_arr(img, start_x, end_x, start_y, end_y):
