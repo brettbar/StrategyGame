@@ -5,37 +5,54 @@ from PIL import Image, ImageDraw
 ARCHETYPES_DIR = './Archetypes/'
 SPRITE_W = 128
 SPRITE_H = 128
+supported_layers= [
+    'Cape',
+    'Head',
+    'LeftArm',
+    'LeftEquip',
+    'RightLeg',
+    'LeftLeg',
+    'RightArm',
+    'RightEquip',
+    'Torso',
+]
 
 
 def main():
 
     # @future eventually just read the folder directly
-    archetypes = ['1HSpearman']
+    archetypes = {
+        '1HSpearman': [
+            'Greek_Spartan_Perioikoi',
+        ],
+    }
 
-    for archetype in archetypes:
+    for archetype, sprites in archetypes.items():
         gen_archetype_gradient(archetype)
-        gen_archetype_animations(archetype)
+        gen_archetype_animations(archetype, sprites)
 
 
-def gen_archetype_animations(archetype):
-    pass
+def gen_archetype_animations(archetype, sprites):
+    gradient_animations_spritesheet = Image.open(ARCHETYPES_DIR + archetype + '/6_GradientAnimations.png')
+
+    final_animations_spritesheet = Image.new('RGBA', gradient_animations_spritesheet.size, (0, 0, 0, 0))
+
+    sprites_dir = ARCHETYPES_DIR + archetype + '/7_Sprites/'
+
+    for sprite in sprites:
+        sprite_dir = sprites_dir + sprite
+
+        for layer in supported_layers:
+            layer_img = Image.open(sprite_dir + '/' + layer + '.png')
+            
+
+
 
 
 def gen_archetype_gradient(archetype):
     silhouette_layers_dir = ARCHETYPES_DIR + archetype + '/' + '3_SilhouetteLayers/'
 
     # @future might replace this
-    supported_layers= [
-        'Cape',
-        'Head',
-        'LeftArm',
-        'LeftEquip',
-        'RightLeg',
-        'LeftLeg',
-        'RightArm',
-        'RightEquip',
-        'Torso',
-    ]
 
     silhouettes = {}
 
@@ -60,6 +77,8 @@ def gen_archetype_gradient(archetype):
     generate("left", archetype, silhouettes, start_x=SPRITE_W+1, end_x=SPRITE_W*2, start_y=0, end_y=SPRITE_H)
 
 
+
+
 def generate(side, archetype, silhouettes, start_x, end_x, start_y, end_y):
     # gen gradient for each individual layer of the silhouette
     for silhouette, img in silhouettes.items():
@@ -74,6 +93,26 @@ def generate(side, archetype, silhouettes, start_x, end_x, start_y, end_y):
         gen_gradient_img(gradient_img, img, gradient, start_x, end_x, start_y, end_y)
         gradient_layer_output = ARCHETYPES_DIR + archetype + '/' + '4_GradientLayers/'
         gradient_img.save(gradient_layer_output + side + '_' + silhouette + '.png')
+
+
+    ensure_no_duplicate_gradient_pixels(gradient_img, start_x, end_x, start_y, end_y)
+
+                
+def ensure_no_duplicate_gradient_pixels(gradient_img, start_x, end_x, start_y, end_y):
+    color_dict = {}
+    for y in range(start_y, end_y):
+        for x in range(start_x, end_x):
+            color = gradient_img.getpixel((x,y))
+
+            # dont care about transparent pixels
+            if color[3] < 255: continue
+
+            if color in color_dict:
+                raise ValueError('DUPLICATE GRADIENT PIXEL IDENTIFIED: ', color)
+                return
+            else:
+                color_dict[color] = 1
+
 
 def gen_silhouette_arr(img, start_x, end_x, start_y, end_y):
     silhouette_arr = []
