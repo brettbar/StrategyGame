@@ -3,6 +3,8 @@
 from PIL import Image, ImageDraw
 
 archetypes_dir = './Archetypes/'
+sprite_w = 128
+sprite_h = 128
 
 
 def main():
@@ -23,7 +25,8 @@ def gen_archetype_gradient(archetype):
         'Head',
         'LeftArm',
         'LeftEquip',
-        'Legs',
+        'RightLeg',
+        'LeftLeg',
         'RightArm',
         'RightEquip',
         'Torso',
@@ -39,25 +42,33 @@ def gen_archetype_gradient(archetype):
 	        silhouette_layers_dir + supported_layer + '.png'
 	    ).convert('RGBA')
 
-    sprite_w = 128
-    sprite_h = 128
     start_x = 0
     end_x = sprite_w
     start_y = 0
     end_y = sprite_h
 
+
+    # right
+    generate("right", archetype, silhouettes, start_x=0, end_x=sprite_w, start_y=0, end_y=sprite_h)
+
+    # left
+    generate("left", archetype, silhouettes, start_x=sprite_w+1, end_x=sprite_w*2, start_y=0, end_y=sprite_h)
+
+
+def generate(side, archetype, silhouettes, start_x, end_x, start_y, end_y):
     # gen gradient for each individual layer of the silhouette
     for silhouette, img in silhouettes.items():
-        silhouette_arr = gen_silhouette_arr(img, 0, sprite_w, 0, sprite_h)
+        silhouette_arr = gen_silhouette_arr(img, start_x, end_x, start_y, end_y)
 
         original_color = silhouette_arr[0]
 
         num_pixels = len(silhouette_arr)
         gradient = gen_gradient_arr(original_color, num_pixels)
 
-        gradient_img = gen_gradient_img(img, gradient, start_x, end_x, start_y, end_y)
+        gradient_img = Image.new('RGBA', (sprite_w*2, sprite_h*2), (0, 0, 0, 0))
+        gen_gradient_img(gradient_img, img, gradient, start_x, end_x, start_y, end_y)
         gradient_layer_output = archetypes_dir + archetype + '/' + '3_GradientLayers/'
-        gradient_img.save(gradient_layer_output + silhouette + '.png')
+        gradient_img.save(gradient_layer_output + side + '_' + silhouette + '.png')
 
 def gen_silhouette_arr(img, start_x, end_x, start_y, end_y):
     silhouette_arr = []
@@ -91,16 +102,15 @@ def gen_gradient_arr(original_color, num_pixels):
     return gradient
 
 
-def gen_gradient_img(img, gradient, start_x, end_x, start_y, end_y):
-    gradient_img = Image.new('RGBA', (end_x - start_x, end_y - start_y), (0, 0, 0, 0))
+def gen_gradient_img(gradient_img, img, gradient, start_x, end_x, start_y, end_y):
     index = 0
+
     for y in range(start_y, end_y):
         for x in range(start_x, end_x):
             pixel = img.getpixel((x, y))
             if pixel[3] == 255: 
                 gradient_img.putpixel((x,y), gradient[index])
                 index += 1
-    return gradient_img
 
 
 if __name__ == "__main__":
