@@ -12,38 +12,38 @@ SPRITE_W = 128
 SPRITE_H = 128
 SUPPORTED_LAYERS = [
     'Cape',
-    'Head',
-    'LeftArm',
-    'LeftEquip',
-    'RightLeg',
     'LeftLeg',
+    'RightLeg',
+    'LeftArm',
+    'Torso',
+    'Head',
+    'LeftEquip',
     'RightArm',
     'RightEquip',
-    'Torso',
 ]
 
 LAYER_HUES_DEGREES = {
     'Cape': 160,
-    'Head': 0,
-    'LeftArm': 30,
-    'LeftEquip': 300,
-    'RightLeg': 120,
     'LeftLeg': 240,
+    'RightLeg': 120,
+    'LeftArm': 30,
+    'Torso': 60,
+    'Head': 0,
+    'LeftEquip': 300,
     'RightArm': 270,
     'RightEquip': 190,
-    'Torso': 60,
 }
 
 LAYER_MAX_DIMS = {
     'Cape': (32, 48),
-    'Head': (16, 32),
-    'LeftArm': (16, 32),
-    'LeftEquip': (16, 32),
-    'RightLeg': (32, 32),
     'LeftLeg': (32, 32),
+    'RightLeg': (32, 32),
+    'LeftArm': (16, 32),
+    'Torso': (32, 32),
+    'Head': (16, 32),
+    'LeftEquip': (16, 32),
     'RightArm': (16, 32),
     'RightEquip': (16, 32),
-    'Torso': (32, 32),
 }
 
 def main():
@@ -75,27 +75,34 @@ def gen_archetype_animations(archetype, sprites):
 
 
 def gen_animations(archetype, sprite, left_color_map, right_color_map):
-    gradient_animations_spritesheet_dir = ARCHETYPES_DIR + archetype + '/6_GradientAnimations.png'
-    gradient_animations_spritesheet = Image.open(gradient_animations_spritesheet_dir)
+    gradient_animations_dir= ARCHETYPES_DIR + archetype + '/6_GradientAnimations/'
+    dims = Image.open(gradient_animations_dir + 'Cape.png').size
 
-    final_animations_spritesheet = Image.new('RGBA', gradient_animations_spritesheet.size, (0, 0, 0, 0))
+    final_animations_spritesheet = Image.new('RGBA', dims, (0, 0, 0, 0))
+
+    for layer in SUPPORTED_LAYERS:
+        apply_layer(layer, gradient_animations_dir, left_color_map, right_color_map, final_animations_spritesheet)
+
     final_animations_spritesheet_dir = ARCHETYPES_DIR + archetype + '/' + sprite + '_Animations.png'
+    final_animations_spritesheet.save(final_animations_spritesheet_dir)
 
+def apply_layer(layer, gradient_animations_dir, left_color_map, right_color_map, final_animations_spritesheet):
+    gradient_layer = gradient_animations_dir + layer + '.png'
+    gradient_layer_img = Image.open(gradient_layer)
 
-    for y in range(gradient_animations_spritesheet.size[1]):
-        for x in range(gradient_animations_spritesheet.size[0]):
-            gradient_pixel = gradient_animations_spritesheet.getpixel((x,y))
+    for y in range(gradient_layer_img.size[1]):
+        for x in range(gradient_layer_img.size[0]):
+            gradient_pixel = gradient_layer_img.getpixel((x,y))
             if gradient_pixel[3] < 255: continue
 
             color_map = left_color_map
             row = math.floor(y / SPRITE_H)
-            if row % 2 == 1: 
+            if row % 2 == 0: 
                 color_map = right_color_map
                 
             if gradient_pixel in color_map:
                 final_animations_spritesheet.putpixel((x,y), color_map[gradient_pixel])
 
-    final_animations_spritesheet.save(final_animations_spritesheet_dir)
 
 def build_color_map(side, gradient_layer_dir, sprite_dir, start_x, start_y):
     color_map = {}
