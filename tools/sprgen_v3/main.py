@@ -48,10 +48,11 @@ LAYER_MAX_DIMS = {
 
 def main():
 
-    # @future eventually just read the folder directly
+    # comment when done
     archetypes = {
         '1HSpearman': [
-            'Greek_Spartan_Perioikoi',
+            # 'Greek_Spartan_Perioikoi',
+            'Celtic_Spearband',
         ],
     }
 
@@ -71,10 +72,10 @@ def gen_archetype_animations(archetype, sprites):
 
         right_color_map = build_color_map('right', gradient_layer_dir, sprite_dir, 0, 0)
         left_color_map = build_color_map('left', gradient_layer_dir, sprite_dir, SPRITE_W, 0)
-        gen_animations(archetype, sprite, left_color_map, right_color_map)
+        gen_animations(archetype, sprite, sprite_dir, left_color_map, right_color_map)
 
 
-def gen_animations(archetype, sprite, left_color_map, right_color_map):
+def gen_animations(archetype, sprite, sprite_dir, left_color_map, right_color_map):
     gradient_animations_dir= ARCHETYPES_DIR + archetype + '/6_GradientAnimations/'
     dims = Image.open(gradient_animations_dir + 'Cape.png').size
 
@@ -83,7 +84,7 @@ def gen_animations(archetype, sprite, left_color_map, right_color_map):
     for layer in SUPPORTED_LAYERS:
         apply_layer(layer, gradient_animations_dir, left_color_map, right_color_map, final_animations_spritesheet)
 
-    final_animations_spritesheet_dir = ARCHETYPES_DIR + archetype + '/' + sprite + '_Animations.png'
+    final_animations_spritesheet_dir = sprite_dir + '/' + sprite + '.png'
     final_animations_spritesheet.save(final_animations_spritesheet_dir)
 
 def apply_layer(layer, gradient_animations_dir, left_color_map, right_color_map, final_animations_spritesheet):
