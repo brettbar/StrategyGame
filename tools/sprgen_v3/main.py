@@ -90,6 +90,7 @@ def apply_layer(layer, gradient_animations_dir, left_color_map, right_color_map,
     gradient_layer = gradient_animations_dir + layer + '.png'
     gradient_layer_img = Image.open(gradient_layer)
 
+
     for y in range(gradient_layer_img.size[1]):
         for x in range(gradient_layer_img.size[0]):
             gradient_pixel = gradient_layer_img.getpixel((x,y))
@@ -115,11 +116,12 @@ def build_color_map(side, gradient_layer_dir, sprite_dir, start_x, start_y):
 
         grad_size_x, grad_size_y = gradient_layer_img.size
 
+
         # maps a pixel in the sprite to a unique pixel in the gradient
         for y in range(start_y, grad_size_y):
             for x in range(start_x, grad_size_x):
                 gradient_pixel = gradient_layer_img.getpixel((x,y))
-                if gradient_pixel[3] > 255: continue
+                if gradient_pixel[3] < 255: continue
                 
                 sprite_pixel = sprite_layer_img.getpixel((x, y))
                 if sprite_pixel[3] < 255: continue
