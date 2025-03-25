@@ -20,7 +20,7 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIT( 512 ),
-              .height = CLAY_SIZING_PERCENT( 0.5 ),
+              .height = CLAY_SIZING_PERCENT( 0.3 ),
             },
           .padding = { 16, 16 },
           .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },

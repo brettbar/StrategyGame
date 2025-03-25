@@ -318,7 +318,11 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         .id = CLAY_ID( "Campaign::LeftCol" ),
         .layout =
           {
-            .sizing = { .height = CLAY_SIZING_GROW() },
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( 486 ),
+                .height = CLAY_SIZING_FIT( 512, 768 ),
+              },
             .childGap = 8,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
@@ -342,10 +346,14 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
       UI::spacer();
 
       CLAY( {
-        .id = CLAY_ID( "Campaign::Center:Col" ),
+        .id = CLAY_ID( "Campaign::CenterCol" ),
         .layout =
           {
-            .sizing = { .height = CLAY_SIZING_GROW() },
+            .sizing =
+              {
+                .width = CLAY_SIZING_PERCENT( 0.33 ),
+                .height = CLAY_SIZING_GROW(),
+              },
             .childAlignment =
               {
                 .x = CLAY_ALIGN_X_RIGHT,
@@ -424,7 +432,9 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         .id = CLAY_ID( "Campaign::RightCol" ),
         .layout =
           {
-            .sizing = { .height = CLAY_SIZING_GROW() },
+            .sizing =
+              { .width = CLAY_SIZING_PERCENT( 0.33 ),
+                .height = CLAY_SIZING_GROW() },
             .childAlignment =
               {
                 .x = CLAY_ALIGN_X_RIGHT,

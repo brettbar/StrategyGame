@@ -22,7 +22,7 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 768 ),
+              .width = CLAY_SIZING_GROW(),
               // .height = CLAY_SIZING_PERCENT( 0.5 ),
               .height = CLAY_SIZING_FIT( 256 ),
             },
