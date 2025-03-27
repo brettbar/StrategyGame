@@ -24,22 +24,6 @@ namespace UI {
         .ref = CLAY_STRING( "Overview" ),
         .icon = hstr{ "rome_banner.png" },
       },
-      // Tab{
-      //   .ref = CLAY_STRING( "Missions" ),
-      //   .icon = hstr{ "long_slot.png" },
-      // },
-      // Tab{
-      //   .ref = CLAY_STRING( "Objectives" ),
-      //   .icon = hstr{ "long_slot.png" },
-      // },
-      Tab{
-        .ref = CLAY_STRING( "Innovations" ),
-        .icon = hstr{ "long_slot.png" },
-      },
-      Tab{
-        .ref = CLAY_STRING( "Laws & Customs" ),
-        .icon = hstr{ "long_slot.png" },
-      },
       Tab{
         .ref = CLAY_STRING( "Diplomacy" ),
         .icon = hstr{ "diplomacy_tab.png" },
@@ -60,6 +44,22 @@ namespace UI {
         .ref = CLAY_STRING( "Military" ),
         .icon = hstr{ "military_tab.png" },
       },
+      Tab{
+        .ref = CLAY_STRING( "Innovations" ),
+        .icon = hstr{ "long_slot.png" },
+      },
+      Tab{
+        .ref = CLAY_STRING( "Laws & Customs" ),
+        .icon = hstr{ "long_slot.png" },
+      },
+      // Tab{
+      //   .ref = CLAY_STRING( "Missions" ),
+      //   .icon = hstr{ "long_slot.png" },
+      // },
+      // Tab{
+      //   .ref = CLAY_STRING( "Objectives" ),
+      //   .icon = hstr{ "long_slot.png" },
+      // },
     };
     u32 num_tabs = LEN( tabs );
 
@@ -71,7 +71,7 @@ namespace UI {
         {
           .sizing = { .width = CLAY_SIZING_FIT( 128 ) },
           .childGap = 4,
-          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
     } ) {
       for ( u32 i = 0; i < num_tabs; i++ ) {

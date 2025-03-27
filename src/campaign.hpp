@@ -285,6 +285,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           .sizing =
             {
               .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_PERCENT( 0.6 ),
             },
           .childAlignment =
             {
@@ -295,33 +296,14 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         },
     } ) {
       tab = UI::overview_tabs();
-    }
-
-    CLAY( {
-      .id = CLAY_ID( "Campaign::BottomRow" ),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_GROW(),
-            },
-          .childAlignment =
-            {
-              .x = CLAY_ALIGN_X_CENTER,
-              .y = CLAY_ALIGN_Y_TOP,
-            },
-          .layoutDirection = CLAY_LEFT_TO_RIGHT,
-        },
-    } ) {
       CLAY( {
-        .id = CLAY_ID( "Campaign::LeftCol" ),
+        .id = CLAY_ID( "Campaign::TopRow::LeftCol" ),
         .layout =
           {
             .sizing =
               {
                 .width = CLAY_SIZING_FIXED( 486 ),
-                .height = CLAY_SIZING_FIT( 512, 768 ),
+                .height = CLAY_SIZING_GROW(),
               },
             .childGap = 8,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
@@ -342,11 +324,27 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           }
         }
       }
+    }
 
-      UI::spacer();
-
+    CLAY( {
+      .id = CLAY_ID( "Campaign::BottomRow" ),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_TOP,
+            },
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        },
+    } ) {
       CLAY( {
-        .id = CLAY_ID( "Campaign::CenterCol" ),
+        .id = CLAY_ID( "Campaign::BottomRow::LeftCol" ),
         .layout =
           {
             .sizing =
