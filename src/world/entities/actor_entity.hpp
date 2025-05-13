@@ -67,7 +67,7 @@ namespace Actor {
       { Animated::AnimState::IDLE_DR, 2, 0.2f },
       { Animated::AnimState::IDLE_DL, 2, 0.2f },
       { Animated::AnimState::WALK_DL, 8, 0.8f },
-      { Animated::AnimState::WALK_DL, 8, 0.8f },
+      { Animated::AnimState::WALK_DR, 8, 0.8f },
     };
 
     Animated::Component animated = {

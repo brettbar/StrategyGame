@@ -28,10 +28,10 @@ namespace ResourceSystem {
     auto stockpile_v = Global::world.view<Stockpile::Component>();
 
     for ( const auto &settlement_e: settlement_v ) {
-      Settlement::Component settlement =
+      Settlement::Component &settlement =
         settlement_v.get<Settlement::Component>( settlement_e );
 
-      Province::Component province =
+      Province::Component &province =
         settlement_v.get<Province::Component>( settlement_e );
 
       entt::entity owner_e = province.tile->owner;
