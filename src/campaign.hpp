@@ -45,7 +45,7 @@
 #include "world/systems/selection_system.hpp"
 #include "world/systems/settlement_system.hpp"
 
-#include "renderer/renderer.hpp"
+#include "renderer.hpp"
 
 #include <optional>
 #include <raylib.h>
@@ -115,7 +115,7 @@ inline str Campaign::GetLocalPlayerID() {
 
 inline void Campaign::common_start() {
   Global::ClearRegistry();
-  Renderer::Init();
+  Renderer::Get()->Init();
 
 
   Map::Manager()->Init();
@@ -628,7 +628,7 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::draw_map( Map::Manager()->mode );
+  Renderer::Get()->draw_map( Map::Manager()->mode );
 }
 
 // @todo retire this, I think?

@@ -546,7 +546,7 @@ class IGame {
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      Renderer::draw_map( Map::Manager()->mode );
+      Renderer::Get()->draw_map( Map::Manager()->mode );
       Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
     }
     EndDrawing();

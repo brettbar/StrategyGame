@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../shared/common.hpp"
+#include "shared/common.hpp"
 
-#include "../world/managers/map_manager.hpp"
+#include "world/managers/map_manager.hpp"
 
-#include "../world/components/animated_component.hpp"
+#include "world/components/animated_component.hpp"
 
-#include "../world/systems/overlay_system.hpp"
-#include "../world/systems/province_system.hpp"
-#include "../world/systems/selection_system.hpp"
-#include "../world/systems/settlement_system.hpp"
+#include "world/systems/overlay_system.hpp"
+#include "world/systems/province_system.hpp"
+#include "world/systems/selection_system.hpp"
+#include "world/systems/settlement_system.hpp"
 
 #define CLAY_IMPLEMENTATION
 #include "clay/clay.h"
@@ -18,16 +18,16 @@
 #include <raylib.h>
 
 
-namespace Renderer {
+struct Renderer {
+  Shader shader;
+  Shader outline_shader;
 
-  inline Shader shader;
-  inline Shader outline_shader;
+  static Renderer *Get() {
+    static Renderer instance;
+    return &instance;
+  }
 
-  inline void DrawActors( bool debug );
-  inline void draw_map( Map::Mode );
-
-
-  inline void Init() {
+  void Init() {
     shader = LoadShader( "assets/shaders/pixel.vs", "assets/shaders/pixel.fs" );
     // LoadShader( 0, 0 );
     outline_shader = LoadShader( 0, "assets/shaders/outline.fs" );
@@ -46,8 +46,7 @@ namespace Renderer {
     );
   }
 
-
-  inline void draw_map( Map::Mode map_mode ) {
+  void draw_map( Map::Mode map_mode ) {
     ClearBackground( DARKGRAY );
 
     BeginMode2D( Global::state.camera );
@@ -139,7 +138,7 @@ namespace Renderer {
     EndMode2D();
   }
 
-  inline void DrawUI() {
+  void DrawUI() {
     // TODO right now alpha issues are cropping up with the shader
     // BeginShaderMode( shader );
 
@@ -147,7 +146,7 @@ namespace Renderer {
     // EndShaderMode();
   }
 
-  inline void DrawActors( bool debug ) {
+  void DrawActors( bool debug ) {
     entt::basic_view actors =
       Global::world.view<Actor::Component, Animated::Component>();
 
@@ -159,7 +158,7 @@ namespace Renderer {
       }
     );
 
-    actors.each( [debug]( Actor::Component &actor, Animated::Component &anim ) {
+    actors.each( [debug, this]( Actor::Component &actor, Animated::Component &anim ) {
       //    DrawTextureV(
       //        actor.sprite,
       //        {actor.position.x - 64.0f, actor.position.y - 64.0f},
@@ -174,7 +173,7 @@ namespace Renderer {
         Texture2D texture =
           Global::texture_cache[hstr{ anim.sprite_id.c_str() }]->texture;
 
-        BeginShaderMode( outline_shader );
+        BeginShaderMode( this->outline_shader );
         {
           DrawTextureRec(
             texture,
@@ -188,7 +187,7 @@ namespace Renderer {
         Texture2D texture =
           Global::texture_cache[hstr{ anim.sprite_id.c_str() }]->texture;
 
-        BeginShaderMode( shader );
+        BeginShaderMode( this->shader );
         {
           DrawTextureRec(
             texture,
@@ -220,7 +219,15 @@ namespace Renderer {
     } );
   }
 
-  inline void Custom_Clay_Raylib_Render(
+  void Shutdown() {
+    UnloadShader( Renderer::Get()->shader );
+    for ( auto resource: Global::texture_cache ) {
+      UnloadTexture( resource.second->texture );
+    }
+  // Global::texture_cache.clear();
+  }
+
+  static void Custom_Clay_Raylib_Render(
     Clay_RenderCommandArray renderCommands,
     Font *fonts
   ) {

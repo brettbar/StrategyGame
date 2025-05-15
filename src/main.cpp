@@ -108,11 +108,8 @@ int main() {
 
   // Perform clean up and teardown
   // @TODO figure out all deallocs or whatever
-  UnloadShader( Renderer::shader );
-  for ( auto resource: Global::texture_cache ) {
-    UnloadTexture( resource.second->texture );
-  }
-  // Global::texture_cache.clear();
+  Renderer::Get()->Shutdown();
+
   SteamAPI_Shutdown();
 
   return EXIT_SUCCESS;
