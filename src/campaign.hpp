@@ -311,7 +311,8 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
       } ) {
-        UI::top_bar();
+        UI::top_bar(1, 0);
+
         if ( std::string( tab.chars ) != "" ) {
           UI::OverviewAction action = UI::overview_content( tab );
 
