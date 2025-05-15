@@ -9,6 +9,7 @@ inline std::unique_ptr<Vector2> DetermineTilePos( Vector2 );
 inline std::unique_ptr<vec2u> DetermineTileCoords( Vector2 );
 inline std::unique_ptr<Vector2> DeterminePosFromTileCoords( vec2u );
 
+
 // i = x + W * y;
 inline u32 index( u32 x, u32 y, u32 w ) {
   return x + w * y;
@@ -28,6 +29,15 @@ inline long TimestampMS() {
   )
     .count();
 }
+
+#define TIME_FUNCTION( func )                                                  \
+  do {                                                                         \
+    auto start = std::chrono::high_resolution_clock::now();                    \
+    func;                                                                      \
+    auto end = std::chrono::high_resolution_clock::now();                      \
+    std::chrono::duration<double, std::milli> duration = end - start;          \
+    std::cout << #func << " took " << duration.count() << " ms to run.\n";     \
+  } while ( 0 )
 
 
 inline void PrintVec2( Vector2 vec ) {

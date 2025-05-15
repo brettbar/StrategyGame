@@ -11,6 +11,8 @@
 #include "shared/global.hpp"
 #include <raylib.h>
 
+#include "shared/utils.hpp"
+
 
 #include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
