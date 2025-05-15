@@ -252,3 +252,16 @@ inline const char *u32_to_cstr( u32 num ) {
   const char *num_s = buffer;
   return num_s;
 }
+
+inline bool out_of_camera_bounds( Camera2D camera, vec2f position ) {
+  return (
+    position.x - TILE_WIDTH >
+      camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
+    position.x + TILE_WIDTH <
+      camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
+    position.y - TILE_WIDTH >
+      camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
+    position.y + TILE_WIDTH <
+      camera.target.y - ( camera.offset.y / camera.zoom ) - 32
+  );
+}

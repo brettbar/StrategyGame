@@ -151,6 +151,8 @@ namespace Renderer {
     entt::basic_view actors =
       Global::world.view<Actor::Component, Animated::Component>();
 
+    // @todo for sorting this, lets put only the visible ones (ie in bounds)
+    // into a temp array first, then sort them, that way the batch is smaller
     Global::world.sort<Actor::Component>(
       []( const Actor::Component &lhs, const Actor::Component &rhs ) {
         return rhs.position.y > lhs.position.y;
@@ -162,6 +164,10 @@ namespace Renderer {
       //        actor.sprite,
       //        {actor.position.x - 64.0f, actor.position.y - 64.0f},
       //        WHITE);
+
+      if ( out_of_camera_bounds( Global::state.camera, actor.position ) ) {
+        return;
+      }
 
 
       if ( actor.selected ) {
