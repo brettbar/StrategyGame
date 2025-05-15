@@ -69,11 +69,10 @@ namespace Province {
       }
     }
 
-    static void DrawTileTerrain( Tile::Component tile ) {
+    static void DrawTileTerrain( Tile::Component tile, Texture2D texture ) {
       // Texture2D texture =
       //   Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
       // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
-      Texture2D texture = Global::texture_cache[hstr{ "terrain.png" }]->texture;
       // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
       Rectangle frameRec = GetTileTextureRect( tile.texture_i );
 
@@ -88,6 +87,7 @@ namespace Province {
       // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
 
       auto view = Global::world.view<Province::Component>();
+      Texture2D texture = Global::texture_cache[hstr{ "terrain.png" }]->texture;
 
       // Draw backwards to make sure out-of-hex overlaps work
       for ( auto it = view.rbegin(), last = view.rend(); it != last; ++it ) {
@@ -106,7 +106,7 @@ namespace Province {
           continue;
         }
 
-        DrawTileTerrain( *prov.tile );
+        DrawTileTerrain( *prov.tile, texture );
       }
     }
 

@@ -125,10 +125,11 @@ namespace Renderer {
         }
 
         // AnimationSystem::Draw( reg, state.gameState == GameState::EDITOR );
-        DrawActors(
-          // Global::state.gameState == GameState::EDITOR
-          true
-        );
+        // DrawActors(
+        //   Global::state.gameState == GameState::EDITOR
+        // );
+
+        DrawActors( true );
       }
       EndShaderMode();
     }
