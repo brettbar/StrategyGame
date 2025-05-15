@@ -267,7 +267,8 @@ private:
 
     void TrainRegiment( UnitType type ) {
       Settlement::Component &settlement =
-        Global::world.get<Settlement::Component>( Selection::GetSelectedEntity()
+        Global::world.get<Settlement::Component>(
+          Selection::System::GetSelectedEntity()
         );
 
       settlement.garrison.push_back( Regiment{
@@ -280,7 +281,7 @@ private:
 
     Settlement::Component ReadSelectedComponent() {
       return Global::world.get<Settlement::Component>(
-        Selection::GetSelectedEntity()
+        Selection::System::GetSelectedEntity()
       );
     }
 
@@ -288,7 +289,7 @@ private:
     std::vector<Settlement::Building> SelectedSettlementBuildingList() {
       Settlement::Component *settlement =
         Global::world.try_get<Settlement::Component>(
-          Selection::GetSelectedEntity()
+          Selection::System::GetSelectedEntity()
         );
 
       if ( settlement == nullptr ) {
@@ -301,7 +302,7 @@ private:
     std::vector<Regiment> SelectedSettlementGarrisonList() {
       Settlement::Component *settlement =
         Global::world.try_get<Settlement::Component>(
-          Selection::GetSelectedEntity()
+          Selection::System::GetSelectedEntity()
         );
 
       if ( settlement == nullptr ) {

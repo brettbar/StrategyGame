@@ -70,15 +70,15 @@ namespace Renderer {
       case Map::Mode::Default:
         // Draw TransparentOverlay
 
-        OverlaySystem::draw_default();
+        Overlay::System::draw_default();
         BeginShaderMode( shader );
         {
-          OverlaySystem::draw_borders();
-          Selection::Draw( Global::texture_cache, true );
+          Overlay::System::draw_borders();
+          Selection::System::Draw( Global::texture_cache, true );
         }
         EndShaderMode();
 
-        OverlaySystem::draw_settlement_name();
+        Overlay::System::draw_settlement_name();
         break;
       case Map::Mode::Terrain:
         // Do nothing
@@ -86,13 +86,13 @@ namespace Renderer {
       case Map::Mode::Political:
         // Draw OpaqueOverlay
 
-        OverlaySystem::draw_political();
+        Overlay::System::draw_political();
         BeginShaderMode( shader );
         {
-          OverlaySystem::draw_borders();
-          Selection::Draw( Global::texture_cache, true );
+          Overlay::System::draw_borders();
+          Selection::System::Draw( Global::texture_cache, true );
         }
-        OverlaySystem::draw_settlement_name();
+        Overlay::System::draw_settlement_name();
         EndShaderMode();
         break;
       case Map::Mode::Resources:

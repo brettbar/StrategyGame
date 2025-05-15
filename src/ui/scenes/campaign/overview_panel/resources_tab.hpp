@@ -135,7 +135,7 @@ namespace UI {
   inline void resource_rows( Resources::Type resources_count ) {
     vec2f dimensions = { 68, 68 };
 
-    entt::entity local_player = PlayerSystem::GetEntityOfPlayer( "player_0" );
+    entt::entity local_player = Player::System::GetEntityOfPlayer( "player_0" );
 
     auto resource_map =
       Resource::System::get_resources_for_player( local_player );

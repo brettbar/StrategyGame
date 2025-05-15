@@ -125,7 +125,7 @@ inline void Campaign::common_start() {
 inline void Campaign::start( str player_faction ) {
   common_start();
 
-  PlayerSystem::create_players_for_sp( player_faction );
+  Player::System::create_players_for_sp( player_faction );
   Province::System::Init();
   Resource::System::init();
   Actor::System::Init();
@@ -141,9 +141,9 @@ inline void Campaign::start_mp() {
   common_start();
 
   if ( Network::is_host ) {
-    PlayerSystem::HostStartMultiplayer();
+    Player::System::HostStartMultiplayer();
   } else {
-    PlayerSystem::ClientStartMultiplayer();
+    Player::System::ClientStartMultiplayer();
   }
 
   Province::System::Init();
@@ -360,11 +360,12 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
       } ) {
-        if ( Selection::Selected<Province::Component, Settlement::Component>(
-             ) ) {
+        if ( Selection::System::
+               Selected<Province::Component, Settlement::Component>() ) {
           auto settlement =
-            Selection::GetSelectedComponent<Settlement::Component>();
-          auto prov = Selection::GetSelectedComponent<Province::Component>();
+            Selection::System::GetSelectedComponent<Settlement::Component>();
+          auto prov =
+            Selection::System::GetSelectedComponent<Province::Component>();
           entt::entity player_e = GetLocalPlayerE();
           auto faction = Global::world.get<Faction::Component>( player_e );
 
@@ -395,8 +396,9 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           }
         }
 
-        if ( Selection::Selected<Actor::Component>() ) {
-          auto actor = Selection::GetSelectedComponent<Actor::Component>();
+        if ( Selection::System::Selected<Actor::Component>() ) {
+          auto actor =
+            Selection::System::GetSelectedComponent<Actor::Component>();
           // entt::entity player_e = GetLocalPlayerE();
 
           if ( !actor ) {
@@ -410,12 +412,12 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
           switch ( action ) {
             case UI::Action_ActorContext::ClaimProvince: {
               PostCommand( Commands::Command::claim_province(
-                Selection::GetSelectedEntity()
+                Selection::System::GetSelectedEntity()
               ) );
             } break;
             case UI::Action_ActorContext::SpawnSettlement: {
               PostCommand( Commands::Command::build_settlement(
-                Selection::GetSelectedEntity()
+                Selection::System::GetSelectedEntity()
               ) );
             } break;
             case UI::Action_ActorContext::None:
@@ -543,7 +545,8 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
 
       entt::entity local_player = GetLocalPlayerE();
 
-      auto sc = Selection::CheckClickOnSettlement( local_player, click_pos );
+      auto sc =
+        Selection::System::CheckClickOnSettlement( local_player, click_pos );
 
       if ( sc != entt::null ) {
         if ( building_to_build.has_value() ) {
@@ -555,7 +558,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         }
       }
     } else {
-      Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
+      Selection::System::UpdateSelection( click_pos, GetLocalPlayerID() );
     }
   }
 
@@ -604,9 +607,9 @@ inline void Campaign::Update60TPS() {
   auto players = Global::world.view<Player::Component>();
 
   Movement::System::Update( animated_actors, Global::state.timeScale );
-  AnimationSystem::Update( animated_actors, Global::state.timeScale );
+  Animation::System::Update( animated_actors, Global::state.timeScale );
   Commands::Manager()->poll();
-  PlayerSystem::Update( players );
+  Player::System::Update( players );
   //  Terrain::UpdateFOW(reg);
 }
 

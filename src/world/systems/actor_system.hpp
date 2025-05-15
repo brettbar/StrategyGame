@@ -174,7 +174,7 @@ private:
     // 2. The colonist is in a province owned by their faction
     // 3. The province does not already contain a settlement
     bool selected_colonist_can_place_settlement() {
-      entt::entity selected_entity = Selection::GetSelectedEntity();
+      entt::entity selected_entity = Selection::System::GetSelectedEntity();
       // 0. if the colonist isnt selected, bail
       if ( selected_entity == entt::null ||
            !Global::world.all_of<Actor::Component>( selected_entity ) )
