@@ -138,7 +138,7 @@ namespace UI {
     entt::entity local_player = PlayerSystem::GetEntityOfPlayer( "player_0" );
 
     auto resource_map =
-      ResourceSystem::get_resources_for_player( local_player );
+      Resource::System::get_resources_for_player( local_player );
 
     for ( u32 i = 0; i < (u32) resources_count; i++ ) {
       Resources::Type resource_t = (Resources::Type) i;

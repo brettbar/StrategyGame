@@ -127,7 +127,7 @@ inline void Campaign::start( str player_faction ) {
 
   PlayerSystem::create_players_for_sp( player_faction );
   ProvinceSystem::Init();
-  ResourceSystem::init();
+  Resource::System::init();
   Actor::System::Init();
   AI::Start();
 
@@ -147,7 +147,7 @@ inline void Campaign::start_mp() {
   }
 
   ProvinceSystem::Init();
-  ResourceSystem::init();
+  Resource::System::init();
   Actor::System::Init();
   AI::Start();
 
@@ -612,7 +612,7 @@ inline void Campaign::Update60TPS() {
 
 inline void Campaign::Update1TPS() {
   Settlement::System::update_1tps();
-  ResourceSystem::update_1tps();
+  Resource::System::update_1tps();
 
   Global::state.day++;
 

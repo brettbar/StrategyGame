@@ -62,7 +62,7 @@ namespace ProvinceSystem {
         .resources = {},
       };
 
-      ResourceSystem::SpawnResource( prov );
+      Resource::System::SpawnResource( prov );
 
       Global::world.emplace<Province::Component>( prov_entity, prov );
     }
