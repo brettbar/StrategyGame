@@ -59,7 +59,7 @@ namespace Renderer {
       BeginShaderMode( shader );
       {
         // Draw Terrain
-        ProvinceSystem::Draw( Global::state.camera );
+        Province::System::Draw( Global::state.camera );
       }
       EndShaderMode();
     }

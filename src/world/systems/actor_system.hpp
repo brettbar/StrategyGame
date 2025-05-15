@@ -71,7 +71,8 @@ public:
       for ( auto actor_e: actors ) {
         Actor::Component actor = actors.get<Actor::Component>( actor_e );
 
-        if ( actor.data.type == Actor::Type::Colonist && actor.owner == owner ) {
+        if ( actor.data.type == Actor::Type::Colonist &&
+             actor.owner == owner ) {
           return actor_e;
         }
       }
@@ -81,7 +82,7 @@ public:
 
 
     static bool colonist_can_claim_province( entt::entity colonist ) {
-      if ( MovementSystem::ActorIsMoving( colonist ) )
+      if ( Movement::System::ActorIsMoving( colonist ) )
         return false;
 
       Actor::Component actor = Global::world.get<Actor::Component>( colonist );
@@ -95,11 +96,8 @@ public:
         auto &prov = Global::world.get<Province::Component>( entity );
 
         // 3. if the closest tile is unowned and of a valid biome
-        if ( 
-          prov.tile->id == closest_tile && 
-          prov.tile->owner == entt::null && 
-          Map::Manager()->biome_inhabitable(prov.tile->biome)
-      ) {
+        if ( prov.tile->id == closest_tile && prov.tile->owner == entt::null &&
+             Map::Manager()->biome_inhabitable( prov.tile->biome ) ) {
           return true;
         }
       }
@@ -125,13 +123,13 @@ public:
       if ( closest_tile == -1 )
         return;
 
-      ProvinceSystem::colonist_claim_province( colonist );
+      Province::System::colonist_claim_province( colonist );
     }
 
 
     static bool colonist_can_place_settlement( entt::entity colonist ) {
       // 1. if the colonist is moving, bail
-      if ( MovementSystem::ActorIsMoving( colonist ) )
+      if ( Movement::System::ActorIsMoving( colonist ) )
         return false;
 
       Actor::Component actor = Global::world.get<Actor::Component>( colonist );
@@ -146,7 +144,8 @@ public:
         auto &prov = Global::world.get<Province::Component>( entity );
 
         // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
-        if ( prov.tile->id == closest_tile && prov.tile->owner == actor.owner && !Global::world.any_of<Settlement::Component>( entity ) ) {
+        if ( prov.tile->id == closest_tile && prov.tile->owner == actor.owner &&
+             !Global::world.any_of<Settlement::Component>( entity ) ) {
           return true;
         }
       }
@@ -177,7 +176,8 @@ private:
     bool selected_colonist_can_place_settlement() {
       entt::entity selected_entity = Selection::GetSelectedEntity();
       // 0. if the colonist isnt selected, bail
-      if ( selected_entity == entt::null || !Global::world.all_of<Actor::Component>( selected_entity ) )
+      if ( selected_entity == entt::null ||
+           !Global::world.all_of<Actor::Component>( selected_entity ) )
         return false;
 
       return colonist_can_place_settlement( selected_entity );

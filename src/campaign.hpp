@@ -126,10 +126,10 @@ inline void Campaign::start( str player_faction ) {
   common_start();
 
   PlayerSystem::create_players_for_sp( player_faction );
-  ProvinceSystem::Init();
+  Province::System::Init();
   Resource::System::init();
   Actor::System::Init();
-  AI::Start();
+  AI::System::Start();
 
   Commands::Manager()->init();
   Commands::Manager()
@@ -146,10 +146,10 @@ inline void Campaign::start_mp() {
     PlayerSystem::ClientStartMultiplayer();
   }
 
-  ProvinceSystem::Init();
+  Province::System::Init();
   Resource::System::init();
   Actor::System::Init();
-  AI::Start();
+  AI::System::Start();
 
   Commands::Manager()->init();
   Commands::Manager()
@@ -603,7 +603,7 @@ inline void Campaign::Update60TPS() {
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
-  MovementSystem::Update( animated_actors, Global::state.timeScale );
+  Movement::System::Update( animated_actors, Global::state.timeScale );
   AnimationSystem::Update( animated_actors, Global::state.timeScale );
   Commands::Manager()->poll();
   PlayerSystem::Update( players );
@@ -745,7 +745,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::ClaimProvince: {
-      ProvinceSystem::colonist_claim_province( cmd.entity );
+      Province::System::colonist_claim_province( cmd.entity );
       return;
     }
     case Commands::Type::TimeChange: {
@@ -761,7 +761,7 @@ inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
       return;
     }
     case Commands::Type::Move: {
-      MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
+      Movement::System::SetDestinations( cmd.entity, cmd.click_pos );
       return;
     }
     case Commands::Type::ConstructBuilding: {

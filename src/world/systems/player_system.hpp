@@ -39,7 +39,7 @@ namespace PlayerSystem {
         ai_player, Faction::Manager::Get()->factions.at( "greeks" )
       );
 
-      AI::Create( ai_player );
+      AI::System::Create( ai_player );
     }
 
     {
@@ -51,7 +51,7 @@ namespace PlayerSystem {
         ai_player, Faction::Manager::Get()->factions.at( "celts" )
       );
 
-      AI::Create( ai_player );
+      AI::System::Create( ai_player );
     }
 
 
@@ -64,7 +64,7 @@ namespace PlayerSystem {
         ai_player, Faction::Manager::Get()->factions.at( "carthaginians" )
       );
 
-      AI::Create( ai_player );
+      AI::System::Create( ai_player );
     }
   }
 
@@ -161,7 +161,7 @@ namespace PlayerSystem {
 
       if ( Global::state.timeScale <= 0 ) {
       } else {
-        AI::execute_goals( ai_player );
+        AI::System::execute_goals( ai_player );
       }
     }
   }
