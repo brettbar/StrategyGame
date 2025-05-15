@@ -28,6 +28,7 @@
 #include "ui/scenes/campaign/context/actor_context.hpp"
 #include "ui/scenes/campaign/context/settlement_context.hpp"
 #include "ui/scenes/campaign/minimap.hpp"
+#include "ui/scenes/campaign/overview_panel/top_bar.hpp"
 #include "ui/scenes/campaign/overview_panel/overview_content.hpp"
 #include "ui/scenes/campaign/overview_panel/overview_tabs.hpp"
 #include "ui/scenes/campaign/time_panel.hpp"
@@ -269,7 +270,7 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
             .width = CLAY_SIZING_GROW(),
             .height = CLAY_SIZING_GROW(),
           },
-        .padding = { 8, 8, 8, 8 },
+        // .padding = { 2, 2, 2, 2 },
         .childAlignment =
           {
             .x = CLAY_ALIGN_X_LEFT,
@@ -296,20 +297,21 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
         },
     } ) {
       tab = UI::overview_tabs();
+
       CLAY( {
         .id = CLAY_ID( "Campaign::TopRow::LeftCol" ),
         .layout =
           {
             .sizing =
               {
-                .width = CLAY_SIZING_FIXED( 486 ),
+                .width = CLAY_SIZING_GROW(),
                 .height = CLAY_SIZING_GROW(),
               },
             .childGap = 8,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
       } ) {
-
+        UI::top_bar();
         if ( std::string( tab.chars ) != "" ) {
           UI::OverviewAction action = UI::overview_content( tab );
 

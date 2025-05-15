@@ -73,6 +73,7 @@ namespace UI {
           .childGap = 4,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
+        .backgroundColor = COLOR_BLACK,
     } ) {
       for ( u32 i = 0; i < num_tabs; i++ ) {
         vec2f dims = { 66 * UI_SCALE, 32 * UI_SCALE };
@@ -88,7 +89,7 @@ namespace UI {
                 {
                   .width = CLAY_SIZING_FIXED( dims.x ),
                 },
-              .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+              .childAlignment = { CLAY_ALIGN_X_CENTER },
             },
         } ) {
           texture_label( tabs[i].icon, dims );
