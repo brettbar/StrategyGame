@@ -252,6 +252,8 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   Clay_String tab = CLAY_STRING( "" );
 
 
+  // @todo this is broken
+  // need to make campaign_ui actually do something with it
   opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
   auto cmd = UI::campaign_ui( GetLocalPlayerE() );
