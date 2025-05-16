@@ -6,6 +6,7 @@
 namespace Commands {
 
   enum class Type {
+    None,
     Move,
     TimeChange,
     SpawnColonist,
@@ -28,6 +29,11 @@ namespace Commands {
 
     entt::entity entity;
 
+    static Command none() {
+      auto cmd = Command();
+      cmd.type = Type::None;
+      return cmd;
+    }
 
     static Command move(
       entt::entity player,

@@ -25,13 +25,7 @@
 
 // #include "ui/common.h"
 #include "ui/common.h"
-#include "ui/scenes/campaign/context/actor_context.hpp"
-#include "ui/scenes/campaign/context/settlement_context.hpp"
-#include "ui/scenes/campaign/minimap.hpp"
-#include "ui/scenes/campaign/overview_panel/top_bar.hpp"
-#include "ui/scenes/campaign/overview_panel/overview_content.hpp"
-#include "ui/scenes/campaign/overview_panel/overview_tabs.hpp"
-#include "ui/scenes/campaign/time_panel.hpp"
+#include "ui/scenes/campaign/campaign_ui.hpp"
 
 #include "world/components/player_component.hpp"
 #include "world/managers/map_manager.hpp"
@@ -250,9 +244,6 @@ inline void Campaign::load( cstr file_path ) {
 }
 
 
-// @todo refactor this shit
-inline opt<Buildings::BuildingType> building_to_build = std::nullopt;
-
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   f32 cameraSpeed = 500.0f;
@@ -261,213 +252,12 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   Clay_String tab = CLAY_STRING( "" );
 
 
-  CLAY( {
-    .id = CLAY_ID( "Campaign" ),
-    .layout =
-      {
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          },
-        // .padding = { 2, 2, 2, 2 },
-        .childAlignment =
-          {
-            .x = CLAY_ALIGN_X_LEFT,
-            .y = CLAY_ALIGN_Y_TOP,
-          },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      },
-  } ) {
-    CLAY( {
-      .id = CLAY_ID( "Campaign::TopRow" ),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_PERCENT( 0.6 ),
-            },
-          .childAlignment =
-            {
-              .x = CLAY_ALIGN_X_LEFT,
-              .y = CLAY_ALIGN_Y_TOP,
-            },
-          .layoutDirection = CLAY_LEFT_TO_RIGHT,
-        },
-    } ) {
-      tab = UI::overview_tabs();
+  opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
-      CLAY( {
-        .id = CLAY_ID( "Campaign::TopRow::LeftCol" ),
-        .layout =
-          {
-            .sizing =
-              {
-                .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_GROW(),
-              },
-            .childGap = 8,
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          },
-      } ) {
-        UI::top_bar(1, 0);
-
-        if ( std::string( tab.chars ) != "" ) {
-          UI::OverviewAction action = UI::overview_content( tab );
-
-          switch ( action.type ) {
-            case UI::OverviewAction_t::None:
-              break;
-            case UI::OverviewAction_t::Construction:
-              if ( !building_to_build.has_value() )
-                building_to_build = action.building;
-              Map::Manager()->mode = Map::Mode::BuildPreview;
-              break;
-          }
-        }
-      }
-    }
-
-    CLAY( {
-      .id = CLAY_ID( "Campaign::BottomRow" ),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_GROW(),
-            },
-          .childAlignment =
-            {
-              .x = CLAY_ALIGN_X_CENTER,
-              .y = CLAY_ALIGN_Y_TOP,
-            },
-          .layoutDirection = CLAY_LEFT_TO_RIGHT,
-        },
-    } ) {
-      CLAY( {
-        .id = CLAY_ID( "Campaign::BottomRow::LeftCol" ),
-        .layout =
-          {
-            .sizing =
-              {
-                .width = CLAY_SIZING_PERCENT( 0.33 ),
-                .height = CLAY_SIZING_GROW(),
-              },
-            .childAlignment =
-              {
-                .x = CLAY_ALIGN_X_RIGHT,
-                .y = CLAY_ALIGN_Y_BOTTOM,
-              },
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          },
-      } ) {
-        if ( Selection::System::
-               Selected<Province::Component, Settlement::Component>() ) {
-          auto settlement =
-            Selection::System::GetSelectedComponent<Settlement::Component>();
-          auto prov =
-            Selection::System::GetSelectedComponent<Province::Component>();
-          entt::entity player_e = GetLocalPlayerE();
-          auto faction = Global::world.get<Faction::Component>( player_e );
-
-          if ( !settlement || !prov ) {
-            printf( "Got null prov/settlement??\n" );
-            return;
-          }
-
-          auto action = UI::settlement_context( settlement );
-          switch ( action ) {
-            case UI::Action_SettlementContext::SpawnColonist:
-              PostCommand( Commands::Command::spawn_colonist(
-                player_e, Settlement::System::settlement_position( *prov )
-              ) );
-              break;
-            case UI::Action_SettlementContext::SpawnArmy:
-              PostCommand( Commands::Command::spawn_army(
-                player_e, Settlement::System::settlement_position( *prov )
-              ) );
-              break;
-            // case UI::Action_SettlementContext::BuildFarm:
-            //   PostCommand( Commands::Command::construct_building(
-            //     Selection::GetSelectedEntity(), "farm"
-            //   ) );
-            //   break;
-            case UI::Action_SettlementContext::None:
-              break;
-          }
-        }
-
-        if ( Selection::System::Selected<Actor::Component>() ) {
-          auto actor =
-            Selection::System::GetSelectedComponent<Actor::Component>();
-          // entt::entity player_e = GetLocalPlayerE();
-
-          if ( !actor ) {
-            printf( "Got null actor??\n" );
-            return;
-          }
-
-          // auto action = UI::ActorContext( actor );
-          auto action = UI::actor_context( actor );
-
-          switch ( action ) {
-            case UI::Action_ActorContext::ClaimProvince: {
-              PostCommand( Commands::Command::claim_province(
-                Selection::System::GetSelectedEntity()
-              ) );
-            } break;
-            case UI::Action_ActorContext::SpawnSettlement: {
-              PostCommand( Commands::Command::build_settlement(
-                Selection::System::GetSelectedEntity()
-              ) );
-            } break;
-            case UI::Action_ActorContext::None:
-              break;
-          }
-        }
-      }
-
-      UI::spacer();
-
-      CLAY( {
-        .id = CLAY_ID( "Campaign::RightCol" ),
-        .layout =
-          {
-            .sizing =
-              { .width = CLAY_SIZING_PERCENT( 0.33 ),
-                .height = CLAY_SIZING_GROW() },
-            .childAlignment =
-              {
-                .x = CLAY_ALIGN_X_RIGHT,
-                .y = CLAY_ALIGN_Y_BOTTOM,
-              },
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          },
-      } ) {
-        UI::time_panel( Global::state.timeScale );
-
-        switch ( UI::minimap() ) {
-          case UI::Action_Minimap::Default:
-            Map::Manager()->mode = Map::Mode::Default;
-            break;
-          case UI::Action_Minimap::Terrain:
-            Map::Manager()->mode = Map::Mode::Terrain;
-            break;
-          case UI::Action_Minimap::Political:
-            Map::Manager()->mode = Map::Mode::Political;
-            break;
-          case UI::Action_Minimap::Resources:
-            Map::Manager()->mode = Map::Mode::Resources;
-            break;
-          default:
-            break;
-        }
-      }
-    }
+  auto cmd = UI::campaign_ui( GetLocalPlayerE() );
+  if ( cmd.type != Commands::Type::None ) {
+    PostCommand( cmd );
   }
-
 
   Vector2 click_pos =
     GetScreenToWorld2D( GetMousePosition(), Global::state.camera );

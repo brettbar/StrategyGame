@@ -8,7 +8,7 @@ set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
 set(SOURCE_FILES 
   src/main.cpp
   src/shared/common.hpp
-  src/renderer/renderer.hpp
+  src/renderer.hpp
   )
 
 if (UNIX)
