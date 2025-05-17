@@ -3,6 +3,7 @@
 #include "../../shared/common.hpp"
 
 #include "../common.h"
+#include <cstdint>
 
 namespace UI {
 
@@ -18,8 +19,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 256 ),
-              .height = CLAY_SIZING_FIT( 48 ),
+              .width = CLAY_SIZING_FIT( 128 * UI_SCALE ),
+              .height = CLAY_SIZING_FIT( 24 * UI_SCALE ),
             },
           .padding = { 16, 16 },
           .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
@@ -32,7 +33,7 @@ namespace UI {
         CLAY_TEXT_CONFIG( {
           .textColor = COLOR_WHITE,
           .fontId = 0,
-          .fontSize = 32,
+          .fontSize = uint16_t(16.0 * UI_SCALE),
         } )
       );
     }
@@ -50,8 +51,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 128 ),
-              .height = CLAY_SIZING_FIT( 36 ),
+              .width = CLAY_SIZING_FIT( 128 * UI_SCALE ),
+              .height = CLAY_SIZING_FIT( 36 * UI_SCALE ),
             },
           .padding = { 16, 16 },
           .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
@@ -64,7 +65,7 @@ namespace UI {
         CLAY_TEXT_CONFIG( {
           .textColor = COLOR_WHITE,
           .fontId = 0,
-          .fontSize = 16,
+          .fontSize = uint16_t(8 * UI_SCALE),
         } )
       );
     }

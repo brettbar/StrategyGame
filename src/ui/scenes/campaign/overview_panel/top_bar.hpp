@@ -24,7 +24,7 @@ namespace UI {
             },
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
-      .backgroundColor = COLOR_BLACK,
+      .backgroundColor = COLOR_TRANSPARENT_BLACK,
     } ) {
       CLAY( {
         .id = CLAY_ID( "TopBar::SettlementsCount" ),
@@ -46,7 +46,7 @@ namespace UI {
         texture_button(
           CLAY_STRING( "TopBar::SettlementsCount::Icon" ),
           hstr{ "settlements_count.png" },
-          { 28, 26 }
+          { 14, 13 }
         );
         CLAY_TEXT(
           amount_cs,
@@ -68,7 +68,7 @@ namespace UI {
         texture_button(
           CLAY_STRING( "TopBar::ArmiesCount::Icon" ),
           hstr{ "armies_count.png" },
-          { 18, 24 }
+          { 9, 12 }
         );
         CLAY_TEXT(
           CLAY_STRING( "0" ),

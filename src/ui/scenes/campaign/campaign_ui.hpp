@@ -178,7 +178,6 @@ namespace UI {
                 },
               .childAlignment =
                 {
-                  .x = CLAY_ALIGN_X_RIGHT,
                   .y = CLAY_ALIGN_Y_BOTTOM,
                 },
               .layoutDirection = CLAY_TOP_TO_BOTTOM,

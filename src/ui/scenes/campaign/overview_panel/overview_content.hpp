@@ -30,7 +30,7 @@ namespace UI {
           .childGap = 8,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
-      .backgroundColor = { 0, 0, 0, 200 },
+      .backgroundColor = COLOR_TRANSPARENT_BLACK,
       .cornerRadius = { 5, 5, 5, 5 },
     } ) {
       CLAY( {

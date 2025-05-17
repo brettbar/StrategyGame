@@ -29,8 +29,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
+              .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+              .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
             },
         },
       .image = image( texture_id, dimensions ),
@@ -43,8 +43,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
+              .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+              .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
             },
         },
       .image = image( texture_id, dimensions ),
@@ -67,8 +67,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
+              .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+              .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
             },
         },
       .image = image( texture_id, dimensions ),
@@ -95,7 +95,7 @@ namespace UI {
             CLAY_TEXT_CONFIG( {
               .textColor = COLOR_WHITE,
               .fontId = 0,
-              .fontSize = 16,
+              .fontSize = uint16_t(8 * UI_SCALE),
             } )
           );
         }

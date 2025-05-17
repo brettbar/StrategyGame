@@ -19,14 +19,14 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 512 ),
-              .height = CLAY_SIZING_PERCENT( 0.3 ),
+              .width = CLAY_SIZING_FIT( 256 * UI_SCALE ),
+              .height = CLAY_SIZING_GROW( ),
             },
           .padding = { 16, 16 },
           .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
-      .backgroundColor = { 0, 0, 0, 200 },
+      .backgroundColor = COLOR_TRANSPARENT_BLACK,
       // .cornerRadius = { 5 },
     } ) {
 

@@ -65,7 +65,7 @@ namespace UI {
               },
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
-        .backgroundColor = { 0, 0, 0, 200 },
+        .backgroundColor = COLOR_TRANSPARENT_BLACK,
       },
     ) {
       for ( u32 i = 0; i < num_buttons; i++ ) {

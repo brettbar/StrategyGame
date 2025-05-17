@@ -63,8 +63,6 @@ namespace UI {
     };
     u32 num_tabs = LEN( tabs );
 
-    f32 scale = 2.0;
-
     CLAY( {
       .id = CLAY_ID( "OverviewPanel" ),
       .layout =
@@ -76,9 +74,9 @@ namespace UI {
         .backgroundColor = COLOR_BLACK,
     } ) {
       for ( u32 i = 0; i < num_tabs; i++ ) {
-        vec2f dims = { 66 * UI_SCALE, 32 * UI_SCALE };
+        vec2f dims = { 66 , 32 };
         if ( std::string( tabs[i].ref.chars ) == "Overview" ) {
-          dims = { 66 * UI_SCALE, 64 * UI_SCALE };
+          dims = { 66, 64 };
         }
 
         CLAY( {
@@ -87,7 +85,7 @@ namespace UI {
             {
               .sizing =
                 {
-                  .width = CLAY_SIZING_FIXED( dims.x ),
+                  .width = CLAY_SIZING_FIXED( dims.x * UI_SCALE ),
                 },
               .childAlignment = { CLAY_ALIGN_X_CENTER },
             },
