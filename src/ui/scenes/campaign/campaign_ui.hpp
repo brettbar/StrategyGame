@@ -128,7 +128,7 @@ namespace UI {
                   .width = CLAY_SIZING_GROW(),
                   .height = CLAY_SIZING_GROW(),
                 },
-              .childGap = 8,
+              // .childGap = 8,
               .layoutDirection = CLAY_TOP_TO_BOTTOM,
             },
         } ) {

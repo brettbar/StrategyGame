@@ -27,11 +27,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = { 0, 0, 0, 200 },
-      .cornerRadius = { 5 },
-      .border{
-        .color = COLOR_WHITE,
-        .width = { 2 },
-      },
+      // .cornerRadius = { 5 },
     } ) {
 
       Clay_String cs = Clay_String{

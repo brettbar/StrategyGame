@@ -32,11 +32,6 @@ namespace UI {
         },
       .backgroundColor = { 0, 0, 0, 200 },
       .cornerRadius = { 5, 5, 5, 5 },
-      .border =
-        {
-          .color = COLOR_WHITE,
-          .width = { 2, 2, 2, 2 },
-        },
     } ) {
       CLAY( {
         .id = CLAY_ID( "OverviewPanel::Content::Banner" ),

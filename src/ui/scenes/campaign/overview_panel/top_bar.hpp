@@ -9,32 +9,45 @@
 #include "../../../common.h"
 
 namespace UI {
-  inline void top_bar(u32 num_settlements, u32 num_armies) {
-    CLAY({
+  inline void top_bar( u32 num_settlements, u32 num_armies ) {
+    CLAY( {
       .id = CLAY_ID( "TopBar" ),
       .layout =
         {
-          .sizing = { .width = CLAY_SIZING_GROW(), .height = CLAY_SIZING_FIT( 42) },
+          .sizing =
+            { .width = CLAY_SIZING_GROW(), .height = CLAY_SIZING_FIT( 42 ) },
+          .padding = { 4, 4, 4, 4 },
           .childGap = 4,
+          .childAlignment =
+            {
+              .y = CLAY_ALIGN_Y_CENTER,
+            },
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
-        .backgroundColor = COLOR_BLACK,
-    }){
-      CLAY({
-        .id = CLAY_ID("TopBar::SettlementsCount"),
-        .layout = {
-            .layoutDirection = CLAY_LEFT_TO_RIGHT
-        },
-      }) {
+      .backgroundColor = COLOR_BLACK,
+    } ) {
+      CLAY( {
+        .id = CLAY_ID( "TopBar::SettlementsCount" ),
+        .layout =
+          {
+            .childGap = 2,
+            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+            .layoutDirection = CLAY_LEFT_TO_RIGHT,
+          },
+      } ) {
 
-      cstr num_settlements_s = u32_to_cstr( num_settlements);
+        cstr num_settlements_s = u32_to_cstr( num_settlements );
 
-      Clay_String amount_cs = {
-        .length = static_cast<int32_t>( strlen( num_settlements_s) ),
-        .chars = num_settlements_s ,
-      };
+        Clay_String amount_cs = {
+          .length = static_cast<int32_t>( strlen( num_settlements_s ) ),
+          .chars = num_settlements_s,
+        };
 
-        texture_button(CLAY_STRING("TopBar::SettlementsCount::Icon"), hstr{"settlements_count.png"}, {28, 26});
+        texture_button(
+          CLAY_STRING( "TopBar::SettlementsCount::Icon" ),
+          hstr{ "settlements_count.png" },
+          { 28, 26 }
+        );
         CLAY_TEXT(
           amount_cs,
           CLAY_TEXT_CONFIG( {
@@ -45,15 +58,20 @@ namespace UI {
         );
       }
 
-      CLAY({
-        .id = CLAY_ID("TopBar::ArmiesCount"),
-        .layout = {
-            .layoutDirection = CLAY_LEFT_TO_RIGHT
-        },
-      }) {
-        texture_button(CLAY_STRING("TopBar::ArmiesCount::Icon"), hstr{"armies_count.png"}, {18, 24});
+      CLAY( {
+        .id = CLAY_ID( "TopBar::ArmiesCount" ),
+        .layout =
+          { .childGap = 2,
+            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+            .layoutDirection = CLAY_LEFT_TO_RIGHT },
+      } ) {
+        texture_button(
+          CLAY_STRING( "TopBar::ArmiesCount::Icon" ),
+          hstr{ "armies_count.png" },
+          { 18, 24 }
+        );
         CLAY_TEXT(
-          CLAY_STRING("0"),
+          CLAY_STRING( "0" ),
           CLAY_TEXT_CONFIG( {
             .textColor = COLOR_WHITE,
             .fontId = 0,
@@ -61,9 +79,7 @@ namespace UI {
           } )
         );
       }
-
     }
-
   }
 
-};
+};// namespace UI
