@@ -6,7 +6,7 @@
 
 namespace UI {
   // @TODO make this configurable and based on screen resolution
-  const float UI_SCALE = 4.0;
+  const float UI_SCALE = 2.0;
 
   const Clay_Color COLOR_TRANSPARENT_BLACK = Clay_Color{ 0, 0, 0, 200 };
   const Clay_Color COLOR_BLACK = Clay_Color{ 0, 0, 0, 255 };

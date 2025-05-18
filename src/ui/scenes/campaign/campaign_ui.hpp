@@ -7,7 +7,6 @@
 #include "overview_panel/overview_content.hpp"
 #include "overview_panel/overview_tabs.hpp"
 #include "overview_panel/top_bar.hpp"
-#include "time_panel.hpp"
 
 namespace UI {
 
@@ -210,7 +209,6 @@ namespace UI {
               .layoutDirection = CLAY_TOP_TO_BOTTOM,
             },
         } ) {
-          UI::time_panel( Global::state.timeScale );
 
           switch ( UI::minimap() ) {
             case UI::Action_Minimap::Default:

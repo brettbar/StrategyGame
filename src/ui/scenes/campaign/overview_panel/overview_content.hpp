@@ -23,7 +23,7 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( 486 ),
+              .width = CLAY_SIZING_FIXED( 243 * UI_SCALE ),
               .height = CLAY_SIZING_GROW(),
             },
           .padding = { 16, 16 },
@@ -31,7 +31,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      .cornerRadius = { 5, 5, 5, 5 },
+      // .cornerRadius = { 5, 5, 5, 5 },
     } ) {
       CLAY( {
         .id = CLAY_ID( "OverviewPanel::Content::Banner" ),
@@ -40,7 +40,7 @@ namespace UI {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_FIT( 48 ),
+                .height = CLAY_SIZING_FIT( 24 * UI_SCALE ),
               },
             .childAlignment =
               {
@@ -54,7 +54,7 @@ namespace UI {
             current_tab,
             CLAY_TEXT_CONFIG( {
               .textColor = COLOR_WHITE,
-              .fontSize = 16,
+              .fontSize = uint16_t( 12 * UI_SCALE ),
             } )
           );
         }
@@ -71,7 +71,7 @@ namespace UI {
             CLAY_STRING( "X" ),
             CLAY_TEXT_CONFIG( {
               .textColor = COLOR_WHITE,
-              .fontSize = 16,
+              .fontSize = uint16_t( 12 * UI_SCALE ),
             } )
           );
         }

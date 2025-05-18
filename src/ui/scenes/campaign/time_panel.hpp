@@ -16,7 +16,7 @@ namespace UI {
       .id = Clay__HashString( id_str, i, 0 ),
       .layout =
         {
-          .sizing = { .width = CLAY_SIZING_FIT( 64 ) },
+          .sizing = { .width = CLAY_SIZING_FIT( 32 * UI_SCALE ) },
           .padding = { 16, 16 },
           .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
         },
@@ -27,7 +27,7 @@ namespace UI {
         CLAY_TEXT_CONFIG( {
           .textColor = text_color,
           .fontId = 0,
-          .fontSize = 24,
+          .fontSize = uint16_t( 12 * UI_SCALE ),
         } )
       );
     }
