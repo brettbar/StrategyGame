@@ -12,7 +12,7 @@
 
 namespace UI {
   inline void settlements_count( u32 );
-  inline void armies_count();
+  inline void overview_count( Clay_String, hstr, vec2f );
 
   inline void top_bar( u32 num_settlements, u32 num_armies ) {
     CLAY( {
@@ -20,9 +20,13 @@ namespace UI {
       .layout =
         {
           .sizing =
-            { .width = CLAY_SIZING_GROW(), .height = CLAY_SIZING_FIT( 42 ) },
-          .padding = { 4, 4, 4, 4 },
-          .childGap = 4,
+            { .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_FIT( 21 * UI_SCALE ) },
+          .padding =
+            {
+              uint16_t( 4 * UI_SCALE ),
+            },
+          .childGap = uint16_t( 12 * UI_SCALE ),
           .childAlignment =
             {
               .y = CLAY_ALIGN_Y_CENTER,
@@ -32,7 +36,19 @@ namespace UI {
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
     } ) {
       settlements_count( num_settlements );
-      armies_count();
+      overview_count(
+        CLAY_STRING( "TopBar::ArmiesCount" ),
+        hstr{ "armies_count.png" },
+        { 9, 12 }
+      );
+      overview_count(
+        CLAY_STRING( "TopBar::PopulationCount" ),
+        hstr{ "population_count.png" },
+        { 18, 12 }
+      );
+      overview_count(
+        CLAY_STRING( "TopBar::FoodCount" ), hstr{ "food_count.png" }, { 14, 8 }
+      );
 
       UI::spacer();
 
@@ -74,19 +90,15 @@ namespace UI {
     }
   }
 
-  inline void armies_count() {
+  inline void overview_count( Clay_String id, hstr icon, vec2f dims ) {
     CLAY( {
-      .id = CLAY_ID( "TopBar::ArmiesCount" ),
       .layout =
-        { .childGap = 2,
+        { .childGap = uint16_t( 2 * UI_SCALE ),
           .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
           .layoutDirection = CLAY_LEFT_TO_RIGHT },
     } ) {
-      texture_button(
-        CLAY_STRING( "TopBar::ArmiesCount::Icon" ),
-        hstr{ "armies_count.png" },
-        { 9, 12 }
-      );
+      texture_button( id, icon, dims );
+
       CLAY_TEXT(
         CLAY_STRING( "0" ),
         CLAY_TEXT_CONFIG( {

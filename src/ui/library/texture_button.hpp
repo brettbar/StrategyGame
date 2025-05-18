@@ -77,7 +77,7 @@ namespace UI {
         CLAY( {
           .id = Clay__HashString( tooltip_id, i, 0 ),
           .layout = { .padding = { 16, 16 } },
-          .backgroundColor = { 0, 0, 0, 255 },
+          .backgroundColor = COLOR_BLACK,
           .cornerRadius = { 5 },
           .floating =
             {
@@ -95,7 +95,7 @@ namespace UI {
             CLAY_TEXT_CONFIG( {
               .textColor = COLOR_WHITE,
               .fontId = 0,
-              .fontSize = uint16_t(8 * UI_SCALE),
+              .fontSize = uint16_t( 12 * UI_SCALE ),
             } )
           );
         }

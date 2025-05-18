@@ -51,7 +51,7 @@ namespace UI {
           str_to_cs( "BuildingIcon::Tooltip" ),
           building.label,
           hstr{ building.path.c_str() },
-          { 64, 64 },
+          { 32, 32 },
           i
         );
       }

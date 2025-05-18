@@ -33,7 +33,7 @@ namespace UI {
         CLAY_TEXT_CONFIG( {
           .textColor = COLOR_WHITE,
           .fontId = 0,
-          .fontSize = uint16_t(16.0 * UI_SCALE),
+          .fontSize = uint16_t( 16.0 * UI_SCALE ),
         } )
       );
     }
@@ -51,8 +51,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 128 * UI_SCALE ),
-              .height = CLAY_SIZING_FIT( 36 * UI_SCALE ),
+              .width = CLAY_SIZING_FIT( 64 * UI_SCALE ),
+              .height = CLAY_SIZING_FIT( 18 * UI_SCALE ),
             },
           .padding = { 16, 16 },
           .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
@@ -65,7 +65,7 @@ namespace UI {
         CLAY_TEXT_CONFIG( {
           .textColor = COLOR_WHITE,
           .fontId = 0,
-          .fontSize = uint16_t(8 * UI_SCALE),
+          .fontSize = uint16_t( 8 * UI_SCALE ),
         } )
       );
     }
