@@ -11,8 +11,8 @@ namespace UI {
       .imageData = (void *) &Global::texture_cache[texture_id]->texture,
       .sourceDimensions =
         {
-          dimensions.x,
-          dimensions.y,
+          dimensions.x * UI_SCALE,
+          dimensions.y * UI_SCALE,
         },
     };
   }

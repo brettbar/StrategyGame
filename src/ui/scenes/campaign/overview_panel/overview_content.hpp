@@ -3,6 +3,7 @@
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "construction_tab.hpp"
 #include "resources_tab.hpp"
+#include "../../../library/texture_button.hpp"
 
 namespace UI {
   enum class OverviewAction_t {
@@ -65,16 +66,8 @@ namespace UI {
               .sizing = { CLAY_SIZING_GROW() },
             },
         } );
-
-        CLAY( CLAY_ID( "X" ), ) {
-          CLAY_TEXT(
-            CLAY_STRING( "X" ),
-            CLAY_TEXT_CONFIG( {
-              .textColor = COLOR_WHITE,
-              .fontSize = uint16_t( 12 * UI_SCALE ),
-            } )
-          );
-        }
+        
+        texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15});
       }
 
       if ( std::string( current_tab.chars ) == "Construction" ) {

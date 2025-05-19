@@ -5,6 +5,7 @@
 #include "../../../../shared/common.hpp"
 #include "../../../common.h"
 #include "../../../library/texture_button.hpp"
+#include "../../../library/text_label.hpp"
 
 #include "../../../../world/systems/player_system.hpp"
 
@@ -24,18 +25,8 @@ namespace UI {
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
-            },
-        },
-      .image =
-        {
-          .imageData =
-            (void *) &Global::texture_cache[hstr{ "slot.png" }]->texture,
-          .sourceDimensions =
-            {
-              dimensions.x,
-              dimensions.y,
+              .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+              .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
             },
         },
     } ) {
@@ -44,21 +35,11 @@ namespace UI {
           {
             .sizing =
               {
-                .width = CLAY_SIZING_FIXED( 64 ),
-                .height = CLAY_SIZING_FIXED( 64 ),
+                .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
+                .height = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
               },
           },
-        .image =
-          {
-            .imageData =
-              (void *) &Global::texture_cache[resource_icon_path( type )]
-                ->texture,
-            .sourceDimensions =
-              {
-                32,
-                32,
-              },
-          },
+        .image = image(resource_icon_path(type), { 32, 32 })
       } );
 
       auto id = Clay_GetElementIdWithIndex( cs, i );
@@ -80,60 +61,29 @@ namespace UI {
               .attachTo = CLAY_ATTACH_TO_PARENT,
             },
         } ) {
-          CLAY_TEXT(
-            cs,
-            CLAY_TEXT_CONFIG( {
-              .textColor = COLOR_WHITE,
-              .fontId = 0,
-              .fontSize = 16,
-            } )
-          );
+
+          text_label(cs, 12);
         }
       }
     }
   }
 
   inline void resource_quantity( Clay_String amount_cs, vec2f dimensions ) {
-    CLAY( {
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED( dimensions.x ),
-              .height = CLAY_SIZING_FIXED( dimensions.y ),
-            },
+    CLAY({
+      .layout = {
+        .sizing = {
+          .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+          .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
         },
-      .image = image( hstr{ "slot.png" }, dimensions ),
-    } ) {
-      CLAY( {
-        .layout =
-          {
-            .sizing =
-              {
-                .width = CLAY_SIZING_FIXED( dimensions.x ),
-                .height = CLAY_SIZING_FIXED( dimensions.y ),
-              },
-            .childAlignment =
-              {
-                .x = CLAY_ALIGN_X_CENTER,
-                .y = CLAY_ALIGN_Y_CENTER,
-              },
-          },
-      } ) {
-        CLAY_TEXT(
-          amount_cs,
-          CLAY_TEXT_CONFIG( {
-            .textColor = COLOR_WHITE,
-            .fontId = 0,
-            .fontSize = 24,
-          } )
-        );
+        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
       }
+    }) {
+      text_label(amount_cs, 12);
     }
   }
 
   inline void resource_rows( Resources::Type resources_count ) {
-    vec2f dimensions = { 68, 68 };
+    vec2f dimensions = { 32, 32 };
 
     entt::entity local_player = Player::System::GetEntityOfPlayer( "player_0" );
 
@@ -170,13 +120,13 @@ namespace UI {
         // 2. Stored
         resource_quantity( amount_cs, dimensions );
         // 3. Increase Per Tick
-        resource_quantity( temp_else, dimensions );
+        // resource_quantity( temp_else, dimensions );
         // 4. Decrease Per Tick
-        resource_quantity( temp_else, dimensions );
+        // resource_quantity( temp_else, dimensions );
         // 5. Importing Per Tick
-        resource_quantity( temp_else, dimensions );
+        // resource_quantity( temp_else, dimensions );
         // 6. Exporting Per Tick
-        resource_quantity( temp_else, dimensions );
+        // resource_quantity( temp_else, dimensions );
       }
     }
   }
@@ -198,14 +148,14 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_FIXED( 36 ),
+              .height = CLAY_SIZING_FIXED(18 * UI_SCALE),
             },
           .childGap = 4,
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
     } ) {
       for ( u32 i = 0; i < resource_headers.size(); i++ ) {
-        texture_label( resource_headers[i], { 68, 36 } );
+        texture_label( resource_headers[i], { 34 , 18} );
       }
     }
   }
