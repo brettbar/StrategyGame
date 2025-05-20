@@ -4,8 +4,8 @@
 #include "../../../../../data/resources.hpp"
 #include "../../../../shared/common.hpp"
 #include "../../../common.h"
-#include "../../../library/texture_button.hpp"
 #include "../../../library/text_label.hpp"
+#include "../../../library/texture_button.hpp"
 
 #include "../../../../world/systems/player_system.hpp"
 
@@ -30,17 +30,17 @@ namespace UI {
             },
         },
     } ) {
-      CLAY( {
-        .layout =
-          {
-            .sizing =
-              {
-                .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
-                .height = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
-              },
-          },
-        .image = image(resource_icon_path(type), { 32, 32 })
-      } );
+      CLAY(
+        { .layout =
+            {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
+                  .height = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
+                },
+            },
+          .image = image( resource_icon_path( type ), { 32, 32 } ) }
+      );
 
       auto id = Clay_GetElementIdWithIndex( cs, i );
 
@@ -62,23 +62,26 @@ namespace UI {
             },
         } ) {
 
-          text_label(cs, 12);
+          text_label( cs, 12 );
         }
       }
     }
   }
 
   inline void resource_quantity( Clay_String amount_cs, vec2f dimensions ) {
-    CLAY({
-      .layout = {
-        .sizing = {
-          .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
-          .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
-        },
-        .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-      }
-    }) {
-      text_label(amount_cs, 12);
+    CLAY(
+      { .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
+                .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
+              },
+            .childAlignment =
+              { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
+          } }
+    ) {
+      text_label( amount_cs, 12 );
     }
   }
 
@@ -119,14 +122,12 @@ namespace UI {
         resource_icon( resource_t, dimensions, i );
         // 2. Stored
         resource_quantity( amount_cs, dimensions );
-        // 3. Increase Per Tick
-        // resource_quantity( temp_else, dimensions );
-        // 4. Decrease Per Tick
-        // resource_quantity( temp_else, dimensions );
-        // 5. Importing Per Tick
-        // resource_quantity( temp_else, dimensions );
-        // 6. Exporting Per Tick
-        // resource_quantity( temp_else, dimensions );
+        // 3.  Net Change
+        resource_quantity( temp_else, dimensions );
+        // 4. Usage
+        resource_quantity( temp_else, dimensions );
+        // 5. Imports
+        resource_quantity( temp_else, dimensions );
       }
     }
   }
@@ -135,10 +136,17 @@ namespace UI {
     list<hstr> resource_headers = {
       "resources_header_icons.png",
       "resources_header_stockpile.png",
-      "resources_header_increase.png",
-      "resources_header_decrease.png",
-      "resources_header_incoming.png",
-      "resources_header_outgoing.png",
+      "resources_header_net_change.png",
+      "resources_header_usage.png",
+      "resources_header_imports.png",
+    };
+
+    list<vec2f> dimensions = {
+      { 9, 12 },
+      { 17, 7 },
+      { 16, 7 },
+      { 13, 7 },
+      { 29, 7 },
     };
 
     CLAY( {
@@ -148,14 +156,30 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_FIXED(18 * UI_SCALE),
+              // .height = CLAY_SIZING_FIXED( 18 * UI_SCALE ),
             },
           .childGap = 4,
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
     } ) {
       for ( u32 i = 0; i < resource_headers.size(); i++ ) {
-        texture_label( resource_headers[i], { 34 , 18} );
+        CLAY( {
+          .layout =
+            {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
+                  .height = CLAY_SIZING_FIXED( 18 * UI_SCALE ),
+                },
+              .childAlignment =
+                {
+                  .x = CLAY_ALIGN_X_CENTER,
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
+            },
+        } ) {
+          texture_label( resource_headers[i], dimensions[i] );
+        }
       }
     }
   }
