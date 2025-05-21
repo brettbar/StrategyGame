@@ -243,6 +243,9 @@ inline void Campaign::load( cstr file_path ) {
     .connect<&Campaign::EvaluteCommands>( this );
 }
 
+// @todo this is broken
+// need to make campaign_ui actually do something with it
+inline opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
@@ -251,10 +254,6 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   bool show_content = false;
   Clay_String tab = CLAY_STRING( "" );
 
-
-  // @todo this is broken
-  // need to make campaign_ui actually do something with it
-  opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
   auto action = UI::campaign_ui( GetLocalPlayerE() );
   switch ( action.type ) {
