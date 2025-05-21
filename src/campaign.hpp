@@ -256,9 +256,18 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   // need to make campaign_ui actually do something with it
   opt<Buildings::BuildingType> building_to_build = std::nullopt;
 
-  auto cmd = UI::campaign_ui( GetLocalPlayerE() );
-  if ( cmd.type != Commands::Type::None ) {
-    PostCommand( cmd );
+  auto action = UI::campaign_ui( GetLocalPlayerE() );
+  switch ( action.type ) {
+    case UI::Action_Campaign_t::None:
+      break;
+    case UI::Action_Campaign_t::Command:
+      if ( action.cmd.type != Commands::Type::None ) {
+        PostCommand( action.cmd );
+      }
+      break;
+    case UI::Action_Campaign_t::SelectBuilding:
+      building_to_build = action.building;
+      break;
   }
 
   Vector2 click_pos =

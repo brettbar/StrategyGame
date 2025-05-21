@@ -24,6 +24,8 @@ namespace UI {
 
     auto action = UI::settlement_context( settlement );
     switch ( action ) {
+      case UI::Action_SettlementContext::None:
+        break;
       case UI::Action_SettlementContext::SpawnColonist:
         return Commands::Command::spawn_colonist(
           player_e, Settlement::System::settlement_position( *prov )
@@ -34,13 +36,11 @@ namespace UI {
           player_e, Settlement::System::settlement_position( *prov )
         );
         break;
-      // case UI::Action_SettlementContext::BuildFarm:
-      //   PostCommand( Commands::Command::construct_building(
-      //     Selection::GetSelectedEntity(), "farm"
-      //   ) );
-      //   break;
-      case UI::Action_SettlementContext::None:
-        break;
+        // case UI::Action_SettlementContext::BuildFarm:
+        //   PostCommand( Commands::Command::construct_building(
+        //     Selection::GetSelectedEntity(), "farm"
+        //   ) );
+        //   break;
     }
 
     return Commands::Command::none();
@@ -58,6 +58,8 @@ namespace UI {
     auto action = UI::actor_context( actor );
 
     switch ( action ) {
+      case UI::Action_ActorContext::None:
+        break;
       case UI::Action_ActorContext::ClaimProvince: {
         return Commands::Command::claim_province(
           Selection::System::GetSelectedEntity()
@@ -68,14 +70,24 @@ namespace UI {
           Selection::System::GetSelectedEntity()
         );
       } break;
-      case UI::Action_ActorContext::None:
-        break;
     }
 
     return Commands::Command::none();
   }
 
-  inline Commands::Command campaign_ui( entt::entity player_e ) {
+  enum class Action_Campaign_t {
+    None,
+    Command,
+    SelectBuilding
+  };
+
+  struct Action_Campaign {
+    Action_Campaign_t type;
+    Commands::Command cmd;
+    Buildings::BuildingType building;
+  };
+
+  inline Action_Campaign campaign_ui( entt::entity player_e ) {
 
     // @todo refactor this shit
     opt<Buildings::BuildingType> building_to_build = std::nullopt;
@@ -140,8 +152,7 @@ namespace UI {
               case UI::OverviewAction_t::None:
                 break;
               case UI::OverviewAction_t::Construction:
-                if ( !building_to_build.has_value() )
-                  building_to_build = action.building;
+                building_to_build = action.building;
                 Map::Manager()->mode = Map::Mode::BuildPreview;
                 break;
             }
@@ -230,6 +241,15 @@ namespace UI {
       }
     }
 
-    return cmd;
+    if ( cmd.type != Commands::Type::None ) {
+      return Action_Campaign{ .type = Action_Campaign_t::Command, .cmd = cmd };
+    } else if ( building_to_build.has_value() ) {
+      return Action_Campaign{
+        .type = Action_Campaign_t::SelectBuilding,
+        .building = building_to_build.value()
+      };
+    }
+
+    return Action_Campaign{ .type = Action_Campaign_t::None };
   }
 }// namespace UI
