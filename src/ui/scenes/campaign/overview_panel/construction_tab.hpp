@@ -62,6 +62,8 @@ namespace UI {
       Building building = buildings[i];
 
       if (ButtonWasClicked(CLAY_STRING("BuildingIcon"), i)) {
+        printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+               "AAAAAAA\n");
         return i;
       }
     }

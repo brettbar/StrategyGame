@@ -4,6 +4,7 @@ rights reserved.
 */
 
 
+#include "ui/common.h"
 #include <raylib.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
@@ -20,18 +21,17 @@ rights reserved.
 #include "network/network.hpp"
 
 
-void SteamAPIDebugTextHook( int severity, const char *msg ) {
-  printf( "S::%d", severity );
-  printf( "%s\n", msg );
+void SteamAPIDebugTextHook(int severity, const char *msg) {
+  printf("S::%d", severity);
+  printf("%s\n", msg);
 }
 
-void HandleClayErrors( Clay_ErrorData errorData ) {
-  printf( "%s", errorData.errorText.chars );
-  if ( errorData.errorType == CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED ) {
+void HandleClayErrors(Clay_ErrorData errorData) {
+  printf("%s", errorData.errorText.chars);
+  if (errorData.errorType == CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED) {
     // reinitializeClay = true;
-    Clay_SetMaxElementCount( Clay_GetMaxElementCount() * 2 );
-  } else if ( errorData.errorType ==
-              CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED ) {
+    Clay_SetMaxElementCount(Clay_GetMaxElementCount() * 2);
+  } else if (errorData.errorType == CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED) {
     // reinitializeClay = true;
     Clay_SetMaxMeasureTextCacheWordCount(
       Clay_GetMaxMeasureTextCacheWordCount() * 2
@@ -47,57 +47,67 @@ void HandleClayErrors( Clay_ErrorData errorData ) {
 int main() {
   Global::mp_capable = true;
 
-  if ( SteamAPI_RestartAppIfNecessary( 2296090 ) ) {
+  if (SteamAPI_RestartAppIfNecessary(2296090)) {
     Global::mp_capable = false;
   }
 
-  if ( !SteamAPI_Init() ) {
-    printf( "SteamAPI_Init() failed!\n" );
+  if (!SteamAPI_Init()) {
+    printf("SteamAPI_Init() failed!\n");
     Global::mp_capable = false;
   }
 
-  SteamClient()->SetWarningMessageHook( &SteamAPIDebugTextHook );
+  SteamClient()->SetWarningMessageHook(&SteamAPIDebugTextHook);
 
-  if ( !SteamUser()->BLoggedOn() ) {
-    printf( "Steam user is not logged in\n" );
+  if (!SteamUser()->BLoggedOn()) {
+    printf("Steam user is not logged in\n");
     Global::mp_capable = false;
   }
 
-  if ( !SteamInput()->Init( false ) ) {
-    printf( "SteamInput()->Init failed.\n" );
+  if (!SteamInput()->Init(false)) {
+    printf("SteamInput()->Init failed.\n");
     Global::mp_capable = false;
   }
 
 
-  printf( "Starting game as %s.\n", SteamFriends()->GetPersonaName() );
+  printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
-  // SetConfigFlags( FLAG_WINDOW_RESIZABLE );
-  SetTargetFPS( 200 );// Set our game to run at 60 frames-per-second
+  SetTargetFPS(200);// Set our game to run at 60 frames-per-second
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
-  // InitWindow( 1920, 1080, "FieldsOfMars" );
+  InitWindow(1920, 1080, "FieldsOfMars");
+
+  u32 monitor_w = GetMonitorWidth(GetCurrentMonitor());
+  u32 monitor_h = GetMonitorHeight(GetCurrentMonitor());
+
+  // Resize monitor
+  SetWindowSize(monitor_w, monitor_h);
+  UI::set_ui_scale(monitor_w);
+
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = Clay_Arena{
     .capacity = clay_required_memory,
-    .memory = (char *) malloc( clay_required_memory ),
+    .memory = (char *) malloc(clay_required_memory),
   };
   Clay_Initialize(
     clay_memory,
     Clay_Dimensions{
-      .width = (f32) GetScreenWidth(),
-      .height = (f32) GetScreenHeight(),
+      .width = (f32) monitor_w,
+      .height = (f32) monitor_h,
     },
-    Clay_ErrorHandler{ HandleClayErrors, 0 }
+    Clay_ErrorHandler{HandleClayErrors, 0}
   );
-  Clay_Raylib_Initialize( 1920, 1080, "FieldsOfMars", FLAG_WINDOW_RESIZABLE );
+  // Clay_Raylib_Initialize(
+  //   monitor_w, monitor_h, "FieldsOfMars", FLAG_WINDOW_RESIZABLE
+  // );
 
 
   LoadAssets();
 
-  Global::fonts.push_back( Global::font_cache[hstr{ "font_default" }]->font );
+  Global::fonts.push_back(Global::font_cache[hstr{"font_default"}]->font);
 
-  Clay_SetMeasureTextFunction( Raylib_MeasureText, Global::fonts.data() );
+  Clay_SetMeasureTextFunction(Raylib_MeasureText, Global::fonts.data());
 
-  SetExitKey( KEY_NULL );
+  SetExitKey(KEY_NULL);
 
   Network::Setup();
 

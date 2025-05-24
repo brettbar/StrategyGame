@@ -14,6 +14,7 @@
 #include "shared/utils.hpp"
 
 
+#include "ui/common.h"
 #include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
 #include "ui/scenes/modal_menu.hpp"
@@ -45,10 +46,10 @@ class IGame {
     // RegisterEventListeners();
 
     Global::state.camera = Camera2D{
-      .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
+      .offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2},
       .target =
-        { ( Global::state.mapWidth * 64.0f ) / 2,
-          ( Global::state.mapHeight * 64.0f ) / 2 },
+        {(Global::state.mapWidth * 64.0f) / 2,
+         (Global::state.mapHeight * 64.0f) / 2},
       .rotation = 0,
       .zoom = 2.0f,
     };
@@ -58,7 +59,7 @@ class IGame {
     Faction::Manager::Get();
     Actor::Manager::Get();
 
-    while ( !WindowShouldClose() && ShouldRun() ) {
+    while (!WindowShouldClose() && ShouldRun()) {
       SteamAPI_RunCallbacks();
 
       // 1. Update Time
@@ -69,8 +70,8 @@ class IGame {
       // 5. Run all Updates
       {
         // Update 60 times a second
-        while ( _lag >= _MS_PER_UPDATE ) {
-          if ( _campaign )
+        while (_lag >= _MS_PER_UPDATE) {
+          if (_campaign)
             _campaign->Update60TPS();
           _lag -= _MS_PER_UPDATE;
         }
@@ -91,8 +92,8 @@ class IGame {
         // Update once per second but modified by timeScale
         // TODO? Do we want to fold this timescale business into campaign itself
         // Since we dont care about timescale in other program_modes
-        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-          if ( _campaign )
+        while (_oncelag >= _ONCE_A_SECOND * (1 / Global::state.timeScale)) {
+          if (_campaign)
             _campaign->Update1TPS();
           _oncelag = 0.0f;
         }
@@ -137,18 +138,18 @@ class IGame {
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartSingleplayerCampaign( str player_faction ) {
+  void StartSingleplayerCampaign(str player_faction) {
     _scene = Scene::Campaign;
 
-    _campaign = new struct Campaign( true );
-    _campaign->start( player_faction );
+    _campaign = new struct Campaign(true);
+    _campaign->start(player_faction);
   }
 
-  void LoadSinglePlayerCampaign( cstr file_path ) {
+  void LoadSinglePlayerCampaign(cstr file_path) {
     _scene = Scene::Campaign;
 
-    _campaign = new struct Campaign( true, "output.dat" );
-    _campaign->load( file_path );
+    _campaign = new struct Campaign(true, "output.dat");
+    _campaign->load(file_path);
   }
   /*=============================================================
                         End: Singleplayer
@@ -166,20 +167,20 @@ class IGame {
 
   // @todo maybe can consolidate these
   void HostStartMultiplayerCampaign() {
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
 
     _scene = Scene::Campaign;
-    _campaign = new struct Campaign( false );
+    _campaign = new struct Campaign(false);
     _campaign->start_mp();
     // _campaign->start( Network::Host()->GetHostFaction() );
   }
   void ClientStartMultiplayerCampaign() {
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
 
     _scene = Scene::Campaign;
-    _campaign = new struct Campaign( false );
+    _campaign = new struct Campaign(false);
     _campaign->start_mp();
     // _campaign->start( Network::Client()->GetClientFaction() );
   }
@@ -214,8 +215,8 @@ class IGame {
   }
 
   void CheckMenuToggle() {
-    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      if ( _scene == Scene::ModalMenu ) {
+    if (IsKeyPressed(KEY_CAPS_LOCK) || IsKeyPressed(KEY_ESCAPE)) {
+      if (_scene == Scene::ModalMenu) {
         _scene = Scene::Campaign;
       } else {
         _scene = Scene::ModalMenu;
@@ -229,54 +230,53 @@ class IGame {
   }
 
   void UpdateOnFrame() {
-    if ( Network::is_host ) {
+    if (Network::is_host) {
       auto msg = Network::Host()->ProcessNextMsg();
-      switch ( msg.message_id ) {
+      switch (msg.message_id) {
         case Network::MessageID::Command: {
-          _campaign->ConvertCommandRequest( msg.body.dump() );
+          _campaign->ConvertCommandRequest(msg.body.dump());
         } break;
       }
 
       // auto msg = Network::Host()->CheckForMessages();
     } else {
       auto msg = Network::Client()->CheckForMessages();
-      switch ( msg.message_id ) {
+      switch (msg.message_id) {
         case Network::MessageID::None: {
         } break;
         case Network::MessageID::HostStartedCampaign: {
           ClientStartMultiplayerCampaign();
         } break;
         case Network::MessageID::Command: {
-          _campaign->ConvertCommandRequest( msg.body.dump() );
+          _campaign->ConvertCommandRequest(msg.body.dump());
         } break;
       }
     }
 
-    Clay_SetLayoutDimensions( Clay_Dimensions{
+    Clay_SetLayoutDimensions(Clay_Dimensions{
       .width = (f32) GetScreenWidth(),
       .height = (f32) GetScreenHeight(),
-    } );
+    });
 
     Vector2 mouse_pos = GetMousePosition();
     Vector2 scroll_delta = GetMouseWheelMoveV();
 
     Clay_SetPointerState(
-      Clay_Vector2{ mouse_pos.x, mouse_pos.y }, IsMouseButtonDown( 0 )
+      Clay_Vector2{mouse_pos.x, mouse_pos.y}, IsMouseButtonDown(0)
     );
 
     Clay_UpdateScrollContainers(
-      true, Clay_Vector2{ scroll_delta.x, scroll_delta.y }, GetFrameTime()
+      true, Clay_Vector2{scroll_delta.x, scroll_delta.y}, GetFrameTime()
     );
 
 
-    if ( IsKeyDown( KEY_LEFT_CONTROL ) && IsKeyDown( KEY_LEFT_SHIFT ) &&
-         IsKeyPressed( KEY_I ) ) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
       _ui_debug = !_ui_debug;
-      Clay_SetDebugModeEnabled( _ui_debug );
+      Clay_SetDebugModeEnabled(_ui_debug);
     }
 
 
-    switch ( _scene ) {
+    switch (_scene) {
       case Scene::MainMenu:
         Scene_MainMenu();
         break;
@@ -314,9 +314,9 @@ class IGame {
     Clay_BeginLayout();
     auto action = UI::main_menu();
 
-    switch ( action ) {
+    switch (action) {
       case UI::Action_MainMenu::StartGame:
-        printf( "Hit Start Game in game.hpp\n" );
+        printf("Hit Start Game in game.hpp\n");
         _scene = Scene::SinglePlayerLobby;
         break;
       case UI::Action_MainMenu::LoadGame:
@@ -342,9 +342,9 @@ class IGame {
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
+      ClearBackground(BLACK);
 
-      Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -354,9 +354,9 @@ class IGame {
 
     // @todo probably make this absolute like paradox games do, in documents for example
     str path = "./saves";
-    for ( const auto &entry: fs::directory_iterator( path ) ) {
-      if ( entry.path().extension() == ".dat" ) {
-        paths.push_back( entry.path().string() );
+    for (const auto &entry: fs::directory_iterator(path)) {
+      if (entry.path().extension() == ".dat") {
+        paths.push_back(entry.path().string());
       }
     }
 
@@ -364,22 +364,22 @@ class IGame {
     Clay_BeginLayout();
     bool pressed_back = false;
 
-    auto file_to_load = UI::load_game_menu( paths, pressed_back );
+    auto file_to_load = UI::load_game_menu(paths, pressed_back);
 
-    if ( pressed_back ) {
+    if (pressed_back) {
       _scene = Scene::MainMenu;
     }
 
-    if ( file_to_load != "" ) {
-      LoadSinglePlayerCampaign( file_to_load.c_str() );
+    if (file_to_load != "") {
+      LoadSinglePlayerCampaign(file_to_load.c_str());
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      ClearBackground(BLACK);
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -388,7 +388,7 @@ class IGame {
     Clay_BeginLayout();
     auto action = UI::singleplayer_lobby();
 
-    switch ( action ) {
+    switch (action) {
       case UI::Action_SinglePlayerLobby::SelectFaction:
         _scene = Scene::SPFactionSelect;
         break;
@@ -402,8 +402,8 @@ class IGame {
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      ClearBackground(BLACK);
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -466,17 +466,17 @@ class IGame {
 
     // @volatile
     // TODO make this a faction enum
-    if ( selection != "" ) {
-      StartSingleplayerCampaign( selection );
+    if (selection != "") {
+      StartSingleplayerCampaign(selection);
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      ClearBackground( BLACK );
+      ClearBackground(BLACK);
 
       // Clay_Raylib_Render( render_cmds, Global::fonts.data() );
-      Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
 
       // Iron::Forge()->DrawAll();
     }
@@ -523,12 +523,12 @@ class IGame {
     Clay_BeginLayout();
     CheckMenuToggle();
 
-    switch ( UI::modal_menu() ) {
+    switch (UI::modal_menu()) {
       case UI::Action_ModalMenu::None:
         break;
       case UI::Action_ModalMenu::SaveGame:
         // @todo get actual user input for file name
-        _campaign->save( "output" );
+        _campaign->save("output");
         break;
       case UI::Action_ModalMenu::LoadGame:
         // LoadSinglePlayerCampaign();
@@ -546,8 +546,8 @@ class IGame {
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      Renderer::Get()->draw_map( Map::Manager()->mode );
-      Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      Renderer::Get()->draw_map(Map::Manager()->mode);
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -557,17 +557,17 @@ class IGame {
 
     CheckMenuToggle();
 
-    _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
+    _campaign->UpdateOnFrame(_dt, _lag, _oncelag);
 
-    if ( IsKeyPressed( KEY_GRAVE ) ) {
-      if ( _scene == Scene::Editor ) {
+    if (IsKeyPressed(KEY_GRAVE)) {
+      if (_scene == Scene::Editor) {
         _scene = Scene::Campaign;
       } else {
         _scene = Scene::Editor;
       }
     }
 
-    if ( _scene == Scene::Editor ) {
+    if (_scene == Scene::Editor) {
 
       // auto editor_action = UI::panel();
       //
@@ -589,8 +589,8 @@ class IGame {
     BeginDrawing();
     {
       _campaign->Draw();
-      Renderer::Custom_Clay_Raylib_Render( render_cmds, Global::fonts.data() );
-      DrawFPS( GetScreenWidth() - 128, 128 );
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
+      DrawFPS(GetScreenWidth() - 128, 128);
       // Iron::Forge()->DrawAll();
       // Iron::Forge()->DrawDebug();
     }
@@ -603,7 +603,7 @@ class IGame {
     // else
     //   Network::Client()->Delete();
 
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
   }
   /*=============================================================
