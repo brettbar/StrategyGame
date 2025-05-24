@@ -96,10 +96,6 @@ int main() {
     },
     Clay_ErrorHandler{HandleClayErrors, 0}
   );
-  // Clay_Raylib_Initialize(
-  //   monitor_w, monitor_h, "FieldsOfMars", FLAG_WINDOW_RESIZABLE
-  // );
-
 
   LoadAssets();
 

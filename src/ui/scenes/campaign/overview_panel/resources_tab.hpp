@@ -11,45 +11,37 @@
 
 namespace UI {
 
-  inline void resource_icon( Resources::Type type, vec2f dimensions, u32 i ) {
-    const char *resource = Resources::ResourceStr( type );
+  inline void resource_icon(Resources::Type type, u32 i) {
+    const char *resource = Resources::ResourceStr(type);
 
     Clay_String cs = {
-      .length = static_cast<int32_t>( strlen( resource ) ),
+      .length = static_cast<int32_t>(strlen(resource)),
       .chars = resource,
     };
 
-    CLAY( {
-      .id = Clay__HashString( cs, i, 0 ),
+    CLAY({
+      .id = Clay__HashString(cs, i, 0),
       .layout =
         {
-          .sizing =
+          .childAlignment =
             {
-              .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
-              .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
             },
         },
-    } ) {
-      CLAY(
-        { .layout =
-            {
-              .sizing =
-                {
-                  .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
-                  .height = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
-                },
-            },
-          .image = image( resource_icon_path( type ), { 32, 32 } ) }
-      );
+      .image = image(hstr{"slot.png"}, {32, 32}),
+    }) {
 
-      auto id = Clay_GetElementIdWithIndex( cs, i );
+      texture_label(resource_icon_path(type), {32, 32});
 
-      if ( Clay_PointerOver( id ) ) {
-        CLAY( {
-          .id = CLAY_IDI( "ResourceIcon::Tooltip", i ),
-          .layout = { .padding = { 8, 8 } },
+      auto id = Clay_GetElementIdWithIndex(cs, i);
+
+      if (Clay_PointerOver(id)) {
+        CLAY({
+          .id = CLAY_IDI("ResourceIcon::Tooltip", i),
+          .layout = {.padding = {8, 8}},
           .backgroundColor = COLOR_BLACK,
-          .cornerRadius = { 5 },
+          .cornerRadius = {5},
           .floating =
             {
               .attachPoints =
@@ -60,74 +52,75 @@ namespace UI {
               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
               .attachTo = CLAY_ATTACH_TO_PARENT,
             },
-        } ) {
+        }) {
 
-          text_label( cs, 12 );
+          text_label(cs, 12);
         }
       }
     }
   }
 
-  inline void resource_quantity( Clay_String amount_cs, vec2f dimensions ) {
+  inline void resource_quantity(Clay_String amount_cs, vec2f dimensions) {
     CLAY(
-      { .layout =
-          {
-            .sizing =
-              {
-                .width = CLAY_SIZING_FIXED( dimensions.x * UI_SCALE ),
-                .height = CLAY_SIZING_FIXED( dimensions.y * UI_SCALE ),
-              },
-            .childAlignment =
-              { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER },
-          } }
+      {.layout =
+         {
+           .sizing =
+             {
+               .width = CLAY_SIZING_FIXED(dimensions.x * UI_SCALE),
+               .height = CLAY_SIZING_FIXED(dimensions.y * UI_SCALE),
+             },
+           .childAlignment =
+             {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER},
+         }}
     ) {
-      text_label( amount_cs, 12 );
+      text_label(amount_cs, 12);
     }
   }
 
-  inline void resource_rows( Resources::Type resources_count ) {
-    vec2f dimensions = { 32, 32 };
+  inline void resource_rows(Resources::Type resources_count) {
+    vec2f dimensions = {32, 32};
 
-    entt::entity local_player = Player::System::GetEntityOfPlayer( "player_0" );
+    entt::entity local_player = Player::System::GetEntityOfPlayer("player_0");
 
     auto resource_map =
-      Resource::System::get_resources_for_player( local_player );
+      Resource::System::get_resources_for_player(local_player);
 
-    for ( u32 i = 0; i < (u32) resources_count; i++ ) {
+    for (u32 i = 0; i < (u32) resources_count; i++) {
       Resources::Type resource_t = (Resources::Type) i;
 
       u32 amount_stored = resource_map[resource_t];
 
-      cstr amount_stored_s = u32_to_cstr( amount_stored );
+      cstr amount_stored_s = u32_to_cstr(amount_stored);
 
       Clay_String amount_cs = {
-        .length = static_cast<int32_t>( strlen( amount_stored_s ) ),
+        .length = static_cast<int32_t>(strlen(amount_stored_s)),
         .chars = amount_stored_s,
       };
 
       Clay_String temp_else = {
-        .length = static_cast<int32_t>( strlen( "0" ) ),
+        .length = static_cast<int32_t>(strlen("0")),
         .chars = "0",
       };
 
 
-      CLAY( {
+      CLAY({
         .layout =
           {
             .childGap = 4,
             .layoutDirection = CLAY_LEFT_TO_RIGHT,
           },
-      } ) {
+      }) {
         // 1. Icon
-        resource_icon( resource_t, dimensions, i );
+        texture_label(resource_icon_path(resource_t), {32, 32});
+
         // 2. Stored
-        resource_quantity( amount_cs, dimensions );
+        resource_quantity(amount_cs, dimensions);
         // 3.  Net Change
-        resource_quantity( temp_else, dimensions );
+        resource_quantity(temp_else, dimensions);
         // 4. Usage
-        resource_quantity( temp_else, dimensions );
+        resource_quantity(temp_else, dimensions);
         // 5. Imports
-        resource_quantity( temp_else, dimensions );
+        resource_quantity(temp_else, dimensions);
       }
     }
   }
@@ -142,15 +135,15 @@ namespace UI {
     };
 
     list<vec2f> dimensions = {
-      { 9, 12 },
-      { 17, 7 },
-      { 16, 7 },
-      { 13, 7 },
-      { 29, 7 },
+      {9, 12},
+      {17, 7},
+      {16, 7},
+      {13, 7},
+      {29, 7},
     };
 
-    CLAY( {
-      .id = CLAY_ID( "ResourceHeaders" ),
+    CLAY({
+      .id = CLAY_ID("ResourceHeaders"),
       .layout =
         {
           .sizing =
@@ -161,15 +154,15 @@ namespace UI {
           .childGap = 4,
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
-    } ) {
-      for ( u32 i = 0; i < resource_headers.size(); i++ ) {
-        CLAY( {
+    }) {
+      for (u32 i = 0; i < resource_headers.size(); i++) {
+        CLAY({
           .layout =
             {
               .sizing =
                 {
-                  .width = CLAY_SIZING_FIXED( 32 * UI_SCALE ),
-                  .height = CLAY_SIZING_FIXED( 18 * UI_SCALE ),
+                  .width = CLAY_SIZING_FIXED(32 * UI_SCALE),
+                  .height = CLAY_SIZING_FIXED(18 * UI_SCALE),
                 },
               .childAlignment =
                 {
@@ -177,25 +170,25 @@ namespace UI {
                   .y = CLAY_ALIGN_Y_CENTER,
                 },
             },
-        } ) {
-          texture_label( resource_headers[i], dimensions[i] );
+        }) {
+          texture_label(resource_headers[i], dimensions[i]);
         }
       }
     }
   }
 
   inline void resources_tab() {
-    CLAY( {
+    CLAY({
       .layout =
         {
           .childGap = 4,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
-    } ) {
+    }) {
       resources_headers();
 
-      CLAY( {
-        .id = CLAY_ID( "ResourceRows" ),
+      CLAY({
+        .id = CLAY_ID("ResourceRows"),
         .layout =
           {
             .sizing =
@@ -205,9 +198,9 @@ namespace UI {
             .childGap = 4,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
-        .scroll = { .vertical = true },
-      } ) {
-        resource_rows( Resources::Type::COUNT );
+        .scroll = {.vertical = true},
+      }) {
+        resource_rows(Resources::Type::COUNT);
       }
     }
   }

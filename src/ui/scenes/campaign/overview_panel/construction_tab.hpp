@@ -48,12 +48,11 @@ namespace UI {
         Building building = buildings[i];
 
         texture_w_tooltip(
-          str_to_cs("BuildingIcon"),
-          str_to_cs("BuildingIcon::Tooltip"),
+          CLAY_IDI("BuildingIcon", i),
+          CLAY_IDI("BuildingIcon::Tooltip", i),
           building.label,
           hstr{building.path.c_str()},
-          {32, 32},
-          i
+          {32, 32}
         );
       }
     }
@@ -62,8 +61,6 @@ namespace UI {
       Building building = buildings[i];
 
       if (ButtonWasClicked(CLAY_STRING("BuildingIcon"), i)) {
-        printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-               "AAAAAAA\n");
         return i;
       }
     }
