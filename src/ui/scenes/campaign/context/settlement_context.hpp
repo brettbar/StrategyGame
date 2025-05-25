@@ -12,6 +12,8 @@ namespace UI {
     SpawnArmy,
   };
 
+  inline void buildings_list(list<Settlement::Building>);
+
   inline Action_SettlementContext settlement_context(
     Settlement::Component *selected_settlement
   ) {
@@ -51,58 +53,53 @@ namespace UI {
         })
       );
 
-      for (u32 i = 0; i < selected_settlement->buildings.size(); i++) {
-        Clay_String sn = Clay_String{
-          .length = static_cast<int32_t>(strlen(
-            Buildings::building_name_str(selected_settlement->buildings[i].type)
-              .c_str()
-          )),
-
-          .chars =
-            (Buildings::building_name_str(selected_settlement->buildings[i].type
-            )
-               .c_str()),
-        };
-
-
-        CLAY({
-          .layout =
-            {
-              .sizing = {.width = CLAY_SIZING_GROW()},
-              .childGap = 4,
-              .childAlignment =
-                {
-                  .x = CLAY_ALIGN_X_CENTER,
-                  .y = CLAY_ALIGN_Y_CENTER,
-                },
-            },
-        }) {
-          texture_label(hstr{"slot.png"}, {32, 32});
-
-          texture_label(hstr{"arrow.png"}, {13, 13});
-
-          texture_label(
-            Buildings::building_icon_path(selected_settlement->buildings[i].type
-            ),
-            {32, 32}
-          );
-
-          texture_label(hstr{"arrow.png"}, {26, 26});
-
-          auto recipes = Buildings::recipes_for_building(
-            selected_settlement->buildings[i].type
-          );
-
-          auto current_recipe =
-            recipes[selected_settlement->buildings[i].current_recipe];
-
-          for (const auto &output: current_recipe.outputs) {
-            resource_icon(output.resource, i);
-          }
-        }
-      }
+      buildings_list(selected_settlement->buildings);
     }
 
     return Action_SettlementContext::None;
+  }
+
+  inline void buildings_list(list<Settlement::Building> buildings) {
+    for (u32 i = 0; i < buildings.size(); i++) {
+      Clay_String sn = Clay_String{
+        .length = static_cast<int32_t>(
+          strlen(Buildings::building_name_str(buildings[i].type).c_str())
+        ),
+
+        .chars = (Buildings::building_name_str(buildings[i].type).c_str()),
+      };
+
+
+      CLAY({
+        .layout =
+          {
+            .sizing = {.width = CLAY_SIZING_GROW()},
+            .childGap = 4,
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_CENTER,
+              },
+          },
+      }) {
+        texture_label(hstr{"slot.png"}, {32, 32});
+
+        texture_label(hstr{"arrow.png"}, {13, 13});
+
+        texture_label(
+          Buildings::building_icon_path(buildings[i].type), {32, 32}
+        );
+
+        texture_label(hstr{"arrow.png"}, {13, 13});
+
+        auto recipes = Buildings::recipes_for_building(buildings[i].type);
+
+        auto current_recipe = recipes[buildings[i].current_recipe];
+
+        for (const auto &output: current_recipe.outputs) {
+          resource_icon(output.resource, i);
+        }
+      }
+    }
   }
 }// namespace UI

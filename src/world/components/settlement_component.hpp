@@ -17,8 +17,8 @@ namespace Settlement {
     u32 current_recipe = 0;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( type, current_recipe );
+    void serialize(Archive &ar) {
+      ar(type, current_recipe);
     }
   };
 
@@ -32,19 +32,19 @@ namespace Settlement {
     std::map<Resources::Type, u32> resources = {};
 
     // Building
-    std::vector<Building> buildings = {};
+    list<Building> buildings = {};
 
-    std::vector<Regiment> garrison = {};
+    list<Regiment> garrison = {};
 
     // TOOD might need separate save/load functions for this one
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( id, name, development, population, buildings );
+    void serialize(Archive &ar) {
+      ar(id, name, development, population, buildings);
     }
 
     template<class Archive>
-    void serialize( Archive &ar, Population &pop ) {
-      ar( pop );
+    void serialize(Archive &ar, Population &pop) {
+      ar(pop);
     }
   };
 

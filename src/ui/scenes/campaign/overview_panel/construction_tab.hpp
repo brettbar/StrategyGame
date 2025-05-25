@@ -12,8 +12,10 @@ namespace UI {
   inline bool _constructing = false;
   inline i32 _selected_building = -1;
 
+  // @todo this should be coming from data/ at somepoint
   struct Building {
     Buildings::BuildingType name;
+    Buildings::BuildingCategory category;
     Clay_String label;
     str path;
   };
@@ -21,29 +23,62 @@ namespace UI {
   inline list<Building> buildings = {
     {
       .name = Buildings::BuildingType::Farm,
+      .category = Buildings::BuildingCategory::Agricultural,
       .label = CLAY_STRING("Farm"),
       .path = "farm_icon.png",
     },
     {
       .name = Buildings::BuildingType::LumberMill,
+      .category = Buildings::BuildingCategory::Gathering,
       .label = CLAY_STRING("Lumber Mill"),
       .path = "lumber_mill_icon.png",
     },
     {
       .name = Buildings::BuildingType::Mine,
+      .category = Buildings::BuildingCategory::Gathering,
       .label = CLAY_STRING("Mine"),
       .path = "mine_icon.png",
     },
   };
 
+  inline list<Buildings::BuildingCategory> left_col = {
+    Buildings::BuildingCategory::Agricultural,
+    Buildings::BuildingCategory::Gathering,
+    Buildings::BuildingCategory::Refinement,
+    Buildings::BuildingCategory::Production,
+    Buildings::BuildingCategory::Diplomatic,
+  };
+
+  inline list<Buildings::BuildingCategory> right_col = {
+    Buildings::BuildingCategory::Martial,
+    Buildings::BuildingCategory::Naval,
+    Buildings::BuildingCategory::Civic,
+    Buildings::BuildingCategory::Religious,
+  };
+
 
   inline u32 construction_browser() {
     CLAY({
-      .layout =
-        {
-          .childGap = 4,
-        },
+      .layout = {.childGap = 4},
     }) {
+      // left column
+      CLAY({
+        .id = CLAY_ID("Construction::LeftCol"),
+        .layout =
+          {
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+      }) {
+        for (u32 i = 0; i < left_col.size(); i++) {
+          text_label(
+            str_to_cs(Buildings::building_category_str(left_col[i])), 12
+          );
+        }
+      }
+
+      // right column
+      CLAY({.id = CLAY_ID("Construction::RightCol")}) {}
+
       for (u32 i = 0; i < buildings.size(); i++) {
         Building building = buildings[i];
 
@@ -74,8 +109,7 @@ namespace UI {
     Build
   };
 
-  inline Action_ConstructionPreview construction_preview(Building building
-  ) {//@left off add a back button
+  inline Action_ConstructionPreview construction_preview(Building building) {
     CLAY({
       .id = CLAY_ID("Construction::Preview"),
       .layout =

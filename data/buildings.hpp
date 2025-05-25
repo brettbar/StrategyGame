@@ -17,6 +17,40 @@ namespace Buildings {
     list<RecipeItem> outputs;// usually just one
   };
 
+  enum class BuildingCategory {
+    Agricultural,
+    Gathering,
+    Refinement,
+    Production,
+    Diplomatic,
+    Martial,
+    Naval,
+    Civic,
+    Religious
+  };
+
+  inline str building_category_str(BuildingCategory category) {
+    switch (category) {
+      case BuildingCategory::Agricultural:
+        return "Agricultural";
+      case BuildingCategory::Gathering:
+        return "Gathering";
+      case BuildingCategory::Refinement:
+        return "Refinement";
+      case BuildingCategory::Production:
+        return "Production";
+      case BuildingCategory::Diplomatic:
+        return "Diplomatic";
+      case BuildingCategory::Martial:
+        return "Martial";
+      case BuildingCategory::Naval:
+        return "Naval";
+      case BuildingCategory::Civic:
+        return "Civic";
+      case BuildingCategory::Religious:
+        return "Religious";
+    }
+  }
 
   enum class BuildingType {
     // Gathering
@@ -44,9 +78,8 @@ namespace Buildings {
     Tailor,
   };
 
-
-  inline str building_name_str( BuildingType building ) {
-    switch ( building ) {
+  inline str building_name_str(BuildingType building) {
+    switch (building) {
       case BuildingType::LumberMill:
         return "lumber_mill";
       case BuildingType::Farm:
@@ -89,40 +122,40 @@ namespace Buildings {
   }
 
   inline map<str, BuildingType> building_lookup = {
-    { "lumber_mill", BuildingType::LumberMill },
-    { "farm", BuildingType::Farm },
-    { "fisherman", BuildingType::Fisherman },
-    { "quarry", BuildingType::Quarry },
-    { "shepherd", BuildingType::Shepherd },
-    { "mine", BuildingType::Mine },
-    { "mill", BuildingType::Mill },
-    { "kiln", BuildingType::Kiln },
-    { "stone_mason", BuildingType::Stonemason },
-    { "spinner", BuildingType::Spinner },
-    { "tanner", BuildingType::Tanner },
-    { "smithy", BuildingType::Smithy },
-    { "olive_press", BuildingType::OlivePress },
-    { "sword_smith", BuildingType::SwordSmith },
-    { "poleturner", BuildingType::Poleturner },
-    { "armourer", BuildingType::Armourer },
-    { "jeweler", BuildingType::Jeweler },
-    { "tailor", BuildingType::Tailor },
+    {"lumber_mill", BuildingType::LumberMill},
+    {"farm", BuildingType::Farm},
+    {"fisherman", BuildingType::Fisherman},
+    {"quarry", BuildingType::Quarry},
+    {"shepherd", BuildingType::Shepherd},
+    {"mine", BuildingType::Mine},
+    {"mill", BuildingType::Mill},
+    {"kiln", BuildingType::Kiln},
+    {"stone_mason", BuildingType::Stonemason},
+    {"spinner", BuildingType::Spinner},
+    {"tanner", BuildingType::Tanner},
+    {"smithy", BuildingType::Smithy},
+    {"olive_press", BuildingType::OlivePress},
+    {"sword_smith", BuildingType::SwordSmith},
+    {"poleturner", BuildingType::Poleturner},
+    {"armourer", BuildingType::Armourer},
+    {"jeweler", BuildingType::Jeweler},
+    {"tailor", BuildingType::Tailor},
   };
 
-  inline list<Recipe> recipes_for_building( BuildingType building ) {
-    switch ( building ) {
+  inline list<Recipe> recipes_for_building(BuildingType building) {
+    switch (building) {
       case BuildingType::LumberMill:
         return {
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::Timber } },
+            .outputs = {RecipeItem{.resource = Resources::Type::Timber}},
           },
         };
       case BuildingType::Farm:
         return {
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::Wheat } },
+            .outputs = {RecipeItem{.resource = Resources::Type::Wheat}},
           },
         };
       case BuildingType::Fisherman:
@@ -135,27 +168,27 @@ namespace Buildings {
         return {
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::TinOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::TinOre}},
           },
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::CopperOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::CopperOre}},
           },
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::IronOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::IronOre}},
           },
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::TinOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::TinOre}},
           },
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::SilverOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::SilverOre}},
           },
           Recipe{
             .inputs = {},
-            .outputs = { RecipeItem{ .resource = Resources::Type::GoldOre } },
+            .outputs = {RecipeItem{.resource = Resources::Type::GoldOre}},
           },
         };
       case BuildingType::Mill:
@@ -187,9 +220,8 @@ namespace Buildings {
     return {};
   }
 
-  inline hstr building_icon_path( BuildingType type ) {
-    return hstr{ ( Buildings::building_name_str( type ) + "_icon.png" ).c_str()
-    };
+  inline hstr building_icon_path(BuildingType type) {
+    return hstr{(Buildings::building_name_str(type) + "_icon.png").c_str()};
   }
 
 };// namespace Buildings
