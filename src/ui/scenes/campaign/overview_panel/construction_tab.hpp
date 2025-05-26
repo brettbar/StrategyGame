@@ -3,6 +3,7 @@
 #include "../../../library/text_button.hpp"
 #include "../../../library/text_label.hpp"
 #include "../../../library/texture_button.hpp"
+#include <cstdint>
 #include <optional>
 #define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../../data/buildings.hpp"
@@ -11,6 +12,31 @@
 namespace UI {
   inline bool _constructing = false;
   inline i32 _selected_building = -1;
+
+  inline Clay_String building_category_str(Buildings::BuildingCategory category
+  ) {
+    switch (category) {
+      case Buildings::BuildingCategory::Agricultural:
+        return CLAY_STRING("Agricultural");
+      case Buildings::BuildingCategory::Gathering:
+        return CLAY_STRING("Gathering");
+      case Buildings::BuildingCategory::Refinement:
+        return CLAY_STRING("Refinement");
+      case Buildings::BuildingCategory::Production:
+        return CLAY_STRING("Production");
+      case Buildings::BuildingCategory::Diplomatic:
+        return CLAY_STRING("Diplomatic");
+      case Buildings::BuildingCategory::Martial:
+        return CLAY_STRING("Martial");
+      case Buildings::BuildingCategory::Naval:
+        return CLAY_STRING("Naval");
+      case Buildings::BuildingCategory::Civic:
+        return CLAY_STRING("Civic");
+      case Buildings::BuildingCategory::Religious:
+        return CLAY_STRING("Religious");
+    }
+  }
+
 
   // @todo this should be coming from data/ at somepoint
   struct Building {
@@ -41,56 +67,65 @@ namespace UI {
     },
   };
 
-  inline list<Buildings::BuildingCategory> left_col = {
-    Buildings::BuildingCategory::Agricultural,
-    Buildings::BuildingCategory::Gathering,
-    Buildings::BuildingCategory::Refinement,
-    Buildings::BuildingCategory::Production,
-    Buildings::BuildingCategory::Diplomatic,
-  };
-
-  inline list<Buildings::BuildingCategory> right_col = {
-    Buildings::BuildingCategory::Martial,
-    Buildings::BuildingCategory::Naval,
-    Buildings::BuildingCategory::Civic,
-    Buildings::BuildingCategory::Religious,
-  };
-
-
-  inline u32 construction_browser() {
+  inline void show_building_column(
+    Clay_ElementId id,
+    list<Buildings::BuildingCategory> col
+  ) {
     CLAY({
-      .layout = {.childGap = 4},
+      .id = id,
+      .layout =
+        {
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
     }) {
-      // left column
-      CLAY({
-        .id = CLAY_ID("Construction::LeftCol"),
-        .layout =
-          {
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
-          },
-      }) {
-        for (u32 i = 0; i < left_col.size(); i++) {
-          text_label(
-            str_to_cs(Buildings::building_category_str(left_col[i])), 12
-          );
+      for (u32 i = 0; i < col.size(); i++) {
+
+        text_label(building_category_str(col[i]), 12);
+
+        CLAY({
+          .layout = {.childGap = uint16_t(3 * UI_SCALE)},
+        }) {
+          for (u32 j = 0; j < buildings.size(); j++) {
+            Building building = buildings[j];
+
+            if (building.category != col[i]) {
+              continue;
+            }
+
+            texture_w_tooltip(
+              CLAY_IDI("BuildingIcon", j),
+              CLAY_IDI("BuildingIcon::Tooltip", j),
+              building.label,
+              hstr{building.path.c_str()},
+              {32, 32}
+            );
+          }
         }
       }
-
-      // right column
-      CLAY({.id = CLAY_ID("Construction::RightCol")}) {}
-
-      for (u32 i = 0; i < buildings.size(); i++) {
-        Building building = buildings[i];
-
-        texture_w_tooltip(
-          CLAY_IDI("BuildingIcon", i),
-          CLAY_IDI("BuildingIcon::Tooltip", i),
-          building.label,
-          hstr{building.path.c_str()},
-          {32, 32}
-        );
-      }
     }
+  }
+
+  inline u32 construction_browser() {
+    list<Buildings::BuildingCategory> left_col = {
+      Buildings::BuildingCategory::Agricultural,
+      Buildings::BuildingCategory::Gathering,
+      Buildings::BuildingCategory::Refinement,
+      Buildings::BuildingCategory::Production,
+      Buildings::BuildingCategory::Diplomatic,
+    };
+
+    list<Buildings::BuildingCategory> right_col = {
+      Buildings::BuildingCategory::Martial,
+      Buildings::BuildingCategory::Naval,
+      Buildings::BuildingCategory::Civic,
+      Buildings::BuildingCategory::Religious,
+    };
+
+    CLAY({.layout = {.childGap = uint16_t(12 * UI_SCALE)}}) {
+      show_building_column(CLAY_ID("Construction::LeftCol"), left_col);
+      show_building_column(CLAY_ID("Construction::RightCol"), right_col);
+    }
+
 
     for (u32 i = 0; i < buildings.size(); i++) {
       Building building = buildings[i];

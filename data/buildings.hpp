@@ -29,29 +29,6 @@ namespace Buildings {
     Religious
   };
 
-  inline str building_category_str(BuildingCategory category) {
-    switch (category) {
-      case BuildingCategory::Agricultural:
-        return "Agricultural";
-      case BuildingCategory::Gathering:
-        return "Gathering";
-      case BuildingCategory::Refinement:
-        return "Refinement";
-      case BuildingCategory::Production:
-        return "Production";
-      case BuildingCategory::Diplomatic:
-        return "Diplomatic";
-      case BuildingCategory::Martial:
-        return "Martial";
-      case BuildingCategory::Naval:
-        return "Naval";
-      case BuildingCategory::Civic:
-        return "Civic";
-      case BuildingCategory::Religious:
-        return "Religious";
-    }
-  }
-
   enum class BuildingType {
     // Gathering
     LumberMill,// nc
