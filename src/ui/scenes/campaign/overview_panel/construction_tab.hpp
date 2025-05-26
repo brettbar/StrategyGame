@@ -198,7 +198,7 @@ namespace UI {
         text_label(
           CLAY_STRING("Description of a farm. Description of a farm. "
                       "Description of a farm."),
-          16
+          8
         );
       }
       CLAY(CLAY_ID("Construction::Preview::MiddleRow")) {}
