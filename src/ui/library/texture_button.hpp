@@ -4,6 +4,7 @@
 #include "../../shared/global.hpp"
 #include "../common.h"
 #include "text_label.hpp"
+#include <cstdint>
 
 
 namespace UI {
@@ -74,9 +75,20 @@ namespace UI {
       if (Clay_PointerOver(hid)) {
         CLAY({
           .id = tooltip_id,
-          .layout = {.padding = {16, 16}},
+          .layout =
+            {
+              .sizing =
+                {
+                  .width = CLAY_SIZING_GROW(32 * UI_SCALE),
+                },
+              .padding = CLAY_PADDING_ALL(uint16_t(4 * UI_SCALE)),
+              .childAlignment =
+                {
+                  .x = CLAY_ALIGN_X_CENTER,
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
+            },
           .backgroundColor = COLOR_BLACK,
-          .cornerRadius = {5},
           .floating =
             {
               .attachPoints =
@@ -87,56 +99,60 @@ namespace UI {
               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
               .attachTo = CLAY_ATTACH_TO_PARENT,
             },
+          .border =
+            {
+              .color = COLOR_WHITE,
+              .width = CLAY_BORDER_ALL(uint16_t(1 * UI_SCALE)),
+            },
         }) {
-          text_label(label, 12);
+          text_label(label, 6);
         }
       }
     }
   }
 
   // @todo this might be broken on windows
-  inline void texture_w_tooltip(
-    Clay_String id,
-    Clay_String tooltip_id,
-    Clay_String label,
-    hstr texture_id,
-    vec2f dimensions,
-    u32 i
-  ) {
-    auto hid = Clay__HashString(id, i, 0);
+  // inline void texture_w_tooltip(
+  //   Clay_String id,
+  //   Clay_String tooltip_id,
+  //   Clay_String label,
+  //   hstr texture_id,
+  //   vec2f dimensions,
+  //   u32 i
+  // ) {
+  //   auto hid = Clay__HashString(id, i, 0);
 
-    CLAY({
-      .id = hid,
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED(dimensions.x * UI_SCALE),
-              .height = CLAY_SIZING_FIXED(dimensions.y * UI_SCALE),
-            },
-        },
-      .image = image(texture_id, dimensions),
-    }) {
-      if (Clay_PointerOver(hid)) {
-        CLAY({
-          .id = Clay__HashString(tooltip_id, i, 0),
-          .layout = {.padding = {16, 16}},
-          .backgroundColor = COLOR_BLACK,
-          .cornerRadius = {5},
-          .floating =
-            {
-              .attachPoints =
-                {
-                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
-                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
-                },
-              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-              .attachTo = CLAY_ATTACH_TO_PARENT,
-            },
-        }) {
-          text_label(label, 12);
-        }
-      }
-    }
-  }
+  //   CLAY({
+  //     .id = hid,
+  //     .layout =
+  //       {
+  //         .sizing =
+  //           {
+  //             .width = CLAY_SIZING_FIXED(dimensions.x * UI_SCALE),
+  //             .height = CLAY_SIZING_FIXED(dimensions.y * UI_SCALE),
+  //           },
+  //       },
+  //     .image = image(texture_id, dimensions),
+  //   }) {
+  //     if (Clay_PointerOver(hid)) {
+  //       CLAY({
+  //         .id = Clay__HashString(tooltip_id, i, 0),
+  //         .layout = {.padding = {16, 16}},
+  //         .backgroundColor = COLOR_BLACK,
+  //         .floating =
+  //           {
+  //             .attachPoints =
+  //               {
+  //                 .element = CLAY_ATTACH_POINT_LEFT_TOP,
+  //                 .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+  //               },
+  //             .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+  //             .attachTo = CLAY_ATTACH_TO_PARENT,
+  //           },
+  //       }) {
+  //         text_label(label, 12);
+  //       }
+  //     }
+  //   }
+  // }
 }// namespace UI

@@ -80,7 +80,7 @@ namespace UI {
     }) {
       for (u32 i = 0; i < col.size(); i++) {
 
-        text_label(building_category_str(col[i]), 12);
+        text_label(building_category_str(col[i]), 8);
 
         CLAY({
           .layout = {.childGap = uint16_t(3 * UI_SCALE)},
