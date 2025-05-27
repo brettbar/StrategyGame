@@ -31,7 +31,8 @@ void HandleClayErrors(Clay_ErrorData errorData) {
   if (errorData.errorType == CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED) {
     // reinitializeClay = true;
     Clay_SetMaxElementCount(Clay_GetMaxElementCount() * 2);
-  } else if (errorData.errorType == CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED) {
+  } else if (errorData.errorType ==
+             CLAY_ERROR_TYPE_TEXT_MEASUREMENT_CAPACITY_EXCEEDED) {
     // reinitializeClay = true;
     Clay_SetMaxMeasureTextCacheWordCount(
       Clay_GetMaxMeasureTextCacheWordCount() * 2
@@ -76,12 +77,26 @@ int main() {
 
   InitWindow(1920, 1080, "FieldsOfMars");
 
-  u32 monitor_w = GetMonitorWidth(GetCurrentMonitor());
-  u32 monitor_h = GetMonitorHeight(GetCurrentMonitor());
+  u32 monitor = GetCurrentMonitor();
+  u32 monitor_w = GetMonitorWidth(monitor);
+  u32 monitor_h = GetMonitorHeight(monitor);
+
+  u32 physical_w = GetMonitorPhysicalWidth(monitor);
+  u32 physical_h = GetMonitorPhysicalHeight(monitor);
+
+  u32 diagonal = sqrt((physical_w * physical_w) + (physical_h * physical_h));
+
+  f32 diagonal_in = diagonal / 25.4;
+
+  printf(
+    "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd %f\n",
+    diagonal_in
+  );
 
   // Resize monitor
   SetWindowSize(monitor_w, monitor_h);
-  UI::set_ui_scale(monitor_w);
+  // UI::set_ui_scale(monitor_w);
+  UI::set_ui_scale(diagonal_in);
 
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = Clay_Arena{
