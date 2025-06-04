@@ -1,6 +1,3 @@
-# @leftoff Need to make the equip gradient colors consistent with what objects they reprent
-# ie, the spear should always be purple and the shield always blue regardless ofthe direction
-
 #!/usr/bin/env python
 
 from PIL import Image, ImageDraw

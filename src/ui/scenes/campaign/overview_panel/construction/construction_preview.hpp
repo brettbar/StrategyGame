@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../../../data/buildings.hpp"
+#include "../../../../library/resource_icon.hpp"
 #include "../../../../library/text_button.hpp"
 #include "../../../../library/text_label.hpp"
 #include "../../../../library/texture_button.hpp"
@@ -80,8 +81,14 @@ namespace UI {
 
         for (const Buildings::Recipe &recipe: recipes) {
           CLAY() {
-            for (const Buildings::RecipeItem &item: recipe.outputs) {
-              texture_label(hstr{ResourceStr(item.resource)}, {32, 32});
+            for (u32 i = 0; i < recipe.outputs.size(); i++) {
+              const Buildings::RecipeItem item = recipe.outputs[i];
+              printf("resource %s\n", item.resource);
+
+
+              // texture_label(hstr{"arrow.png"}, {13, 13});
+
+              // resource_icon(item.resource, i);
             }
           }
         }
@@ -130,11 +137,11 @@ namespace UI {
 
       construction_preview_top_row(building);
 
-      construction_preview_middle_row(building);
+      // construction_preview_middle_row(building);
 
       UI::spacer();
 
-      construction_preview_bottom_row();
+      // construction_preview_bottom_row();
     }
 
 

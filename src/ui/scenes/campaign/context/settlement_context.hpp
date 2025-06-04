@@ -2,8 +2,8 @@
 
 #include "../../../../world/components/settlement_component.hpp"
 #include "../../../common.h"
+#include "../../../library/resource_icon.hpp"
 #include "../../../library/texture_button.hpp"
-#include "../overview_panel/resources_tab.hpp"
 
 namespace UI {
   enum class Action_SettlementContext {
