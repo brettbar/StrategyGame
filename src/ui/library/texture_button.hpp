@@ -11,11 +11,6 @@ namespace UI {
   inline Clay_ImageElementConfig image(hstr texture_id, vec2f dimensions) {
     return {
       .imageData = (void *) &Global::texture_cache[texture_id]->texture,
-      // .sourceDimensions =
-      //   {
-      //     dimensions.x * UI_SCALE,
-      //     dimensions.y * UI_SCALE,
-      //   },
     };
   }
 
@@ -26,7 +21,7 @@ namespace UI {
     u32 i = 0
   ) {
     CLAY({
-      .id = Clay__HashString(id, i, Clay__GetParentElementId()),
+      .id = Clay__HashString(id, i, 0),
       .layout =
         {
           .sizing =
