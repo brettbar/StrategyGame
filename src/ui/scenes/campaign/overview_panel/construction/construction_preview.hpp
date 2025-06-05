@@ -59,13 +59,6 @@ namespace UI {
 
     CLAY({
       .id = CLAY_ID("Construction::Preview::Desc"),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_FIXED(256 * UI_SCALE),
-            },
-        },
     }) {
       text_label(
         CLAY_STRING("Description of a farm. Description of a farm. "
@@ -75,32 +68,51 @@ namespace UI {
     }
 
 
-    CLAY({.id = CLAY_ID("Construction::Preview::MiddleRow")}) {
-      CLAY() {
+    CLAY({
+      .id = CLAY_ID("Construction::Preview::MiddleRow"),
+      .layout =
+        {
+          .childGap = uint16_t(16 * UI_SCALE),
+        },
+    }) {
+      CLAY({
+        .layout =
+          {
+            .childGap = uint16_t(4 * UI_SCALE),
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+        .clip = {.vertical = true, .childOffset = Clay_GetScrollOffset()},
+      }) {
         text_label(CLAY_STRING("Produce:"), 12);
 
         for (const Buildings::Recipe &recipe: recipes) {
 
-          CLAY() {
-            printf(
-              "Ok dude, what is going on here: %d\n",
-              (int) recipe.outputs.size()
-            );
+          CLAY({
+            .layout =
+              {
+                .childGap = uint16_t(8 * UI_SCALE),
+                .childAlignment =
+                  {
+                    .y = CLAY_ALIGN_Y_CENTER,
+                  },
 
+              },
+          }) {
             for (u32 i = 0; i < recipe.outputs.size(); i++) {
               Buildings::RecipeItem item = recipe.outputs[i];
-              printf("resource %d\n", item.resource);
-
 
               texture_label(hstr{"arrow.png"}, {13, 13});
 
               resource_icon(item.resource, i);
+
+              texture_label(hstr{"checkbox_empty.png"}, {15, 15});
             }
           }
         }
       }
 
-      CLAY() {
+
+      CLAY({.layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM}}) {
         text_label(CLAY_STRING("Requires:"), 12);
       }
     }
@@ -137,6 +149,7 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
+          .childGap = uint16_t(4 * UI_SCALE),
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
     }) {
@@ -147,7 +160,7 @@ namespace UI {
 
       UI::spacer();
 
-      // construction_preview_bottom_row();
+      construction_preview_bottom_row();
     }
 
 
