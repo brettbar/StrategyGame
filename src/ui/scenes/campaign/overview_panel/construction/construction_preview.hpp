@@ -80,15 +80,21 @@ namespace UI {
         text_label(CLAY_STRING("Produce:"), 12);
 
         for (const Buildings::Recipe &recipe: recipes) {
+
           CLAY() {
+            printf(
+              "Ok dude, what is going on here: %d\n",
+              (int) recipe.outputs.size()
+            );
+
             for (u32 i = 0; i < recipe.outputs.size(); i++) {
-              const Buildings::RecipeItem item = recipe.outputs[i];
-              printf("resource %s\n", item.resource);
+              Buildings::RecipeItem item = recipe.outputs[i];
+              printf("resource %d\n", item.resource);
 
 
-              // texture_label(hstr{"arrow.png"}, {13, 13});
+              texture_label(hstr{"arrow.png"}, {13, 13});
 
-              // resource_icon(item.resource, i);
+              resource_icon(item.resource, i);
             }
           }
         }
@@ -137,7 +143,7 @@ namespace UI {
 
       construction_preview_top_row(building);
 
-      // construction_preview_middle_row(building);
+      construction_preview_middle_row(building);
 
       UI::spacer();
 

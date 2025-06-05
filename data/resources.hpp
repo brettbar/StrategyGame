@@ -64,8 +64,8 @@ namespace Resources {
   };
 
 
-  inline const char *ResourceStr( Type r ) {
-    switch ( r ) {
+  inline const char *ResourceStr(Type r) {
+    switch (r) {
       case Type::Timber:
         return "timber";
       case Type::Wheat:
@@ -164,17 +164,17 @@ namespace Resources {
   //   // "jewelry",
   // };
 
-  inline hstr resource_icon_path( Type type ) {
-    str file = std::string( ResourceStr( type ) );
+  inline hstr resource_icon_path(Type type) {
+    str file = std::string(ResourceStr(type));
 
-    for ( u32 j = 0; j < file.length(); j++ ) {
-      if ( file[j] == ' ' )
+    for (u32 j = 0; j < file.length(); j++) {
+      if (file[j] == ' ')
         file[j] = '_';
     }
 
     file += ".png";
 
-    return hstr{ ( file ).c_str() };
+    return hstr{(file).c_str()};
   }
 
 };// namespace Resources
