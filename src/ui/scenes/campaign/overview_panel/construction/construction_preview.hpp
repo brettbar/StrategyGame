@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../../../data/buildings.hpp"
+#include "../../../../library/checkbox.hpp"
 #include "../../../../library/resource_icon.hpp"
 #include "../../../../library/text_button.hpp"
 #include "../../../../library/text_label.hpp"
@@ -23,156 +24,166 @@ namespace UI {
     Build
   };
 
-  inline void construction_preview_top_row(Building building) {
-    CLAY({
-      .id = CLAY_ID("Construction::Preview::TopRow"),
-      .layout = {.childGap = 8},
-    }) {
-      texture_button(
-        CLAY_STRING("Construction::Preview::Back"),
-        hstr{"back_button.png"},
-        {15, 15}
-      );
+  struct ConstructionPreview {
+    opt<Resources::Type> selected_resource = std::nullopt;
 
+    inline void construction_preview_top_row(Building building) {
       CLAY({
-        .layout =
-          {
-            .childGap = 8,
-            .childAlignment =
-              {
-                .y = CLAY_ALIGN_Y_CENTER,
-              },
-          },
+        .id = CLAY_ID("Construction::Preview::TopRow"),
+        .layout = {.childGap = 8},
       }) {
+        texture_button(
+          CLAY_STRING("Construction::Preview::Back"),
+          hstr{"back_button.png"},
+          {15, 15}
+        );
 
-        texture_label(hstr{building.path.c_str()}, {32, 32});
+        CLAY({
+          .layout =
+            {
+              .childGap = 8,
+              .childAlignment =
+                {
+                  .y = CLAY_ALIGN_Y_CENTER,
+                },
+            },
+        }) {
 
-        text_label(building.label, 16);
+          texture_label(hstr{building.path.c_str()}, {32, 32});
+
+          text_label(building.label, 16);
+        }
       }
     }
-  }
 
-  inline void construction_preview_middle_row(Building building) {
+    inline void construction_preview_middle_row(Building building) {
 
-    list<Buildings::Recipe> recipes =
-      Buildings::recipes_for_building(building.name);
+      list<Buildings::Recipe> recipes =
+        Buildings::recipes_for_building(building.name);
 
-    CLAY({
-      .id = CLAY_ID("Construction::Preview::Desc"),
-    }) {
-      text_label(
-        CLAY_STRING("Description of a farm. Description of a farm. "
-                    "Description of a farm."),
-        8
-      );
-    }
-
-
-    CLAY({
-      .id = CLAY_ID("Construction::Preview::MiddleRow"),
-      .layout =
-        {
-          .childGap = uint16_t(16 * UI_SCALE),
-        },
-    }) {
       CLAY({
+        .id = CLAY_ID("Construction::Preview::Desc"),
+      }) {
+        text_label(
+          CLAY_STRING("Description of a farm. Description of a farm. "
+                      "Description of a farm."),
+          8
+        );
+      }
+
+
+      CLAY({
+        .id = CLAY_ID("Construction::Preview::MiddleRow"),
         .layout =
           {
-            .childGap = uint16_t(4 * UI_SCALE),
-            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+            .childGap = uint16_t(16 * UI_SCALE),
           },
-        .clip = {.vertical = true, .childOffset = Clay_GetScrollOffset()},
       }) {
-        text_label(CLAY_STRING("Produce:"), 12);
+        CLAY({
+          .layout =
+            {
+              .childGap = uint16_t(4 * UI_SCALE),
+              .layoutDirection = CLAY_TOP_TO_BOTTOM,
+            },
+          .clip = {.vertical = true, .childOffset = Clay_GetScrollOffset()},
+        }) {
+          text_label(CLAY_STRING("Produce:"), 12);
 
-        for (const Buildings::Recipe &recipe: recipes) {
+          for (const Buildings::Recipe &recipe: recipes) {
 
-          CLAY({
-            .layout =
-              {
-                .childGap = uint16_t(8 * UI_SCALE),
-                .childAlignment =
-                  {
-                    .y = CLAY_ALIGN_Y_CENTER,
-                  },
+            CLAY({
+              .layout =
+                {
+                  .childGap = uint16_t(8 * UI_SCALE),
+                  .childAlignment =
+                    {
+                      .y = CLAY_ALIGN_Y_CENTER,
+                    },
 
-              },
-          }) {
-            for (u32 i = 0; i < recipe.outputs.size(); i++) {
-              Buildings::RecipeItem item = recipe.outputs[i];
+                },
+            }) {
+              for (u32 i = 0; i < recipe.outputs.size(); i++) {
+                Buildings::RecipeItem item = recipe.outputs[i];
 
-              texture_label(hstr{"arrow.png"}, {13, 13});
+                texture_label(hstr{"arrow.png"}, {13, 13});
 
-              resource_icon(item.resource, i);
+                resource_icon(item.resource, i);
 
-              texture_label(hstr{"checkbox_empty.png"}, {15, 15});
+                if (!selected_resource.has_value()) {
+                  selected_resource = item.resource;
+                }
+
+                // @todo make this a button where you can change whats selected
+                checkbox(selected_resource == item.resource);
+              }
             }
           }
         }
+
+
+        CLAY({.layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM}}) {
+          text_label(CLAY_STRING("Requires:"), 12);
+        }
+      }
+    }
+
+    inline void construction_preview_bottom_row() {
+      CLAY({
+        .id = CLAY_ID("Construction::Preview::BottomRow"),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+              },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_RIGHT,
+              },
+          },
+      }) {
+        text_button_small(
+          CLAY_STRING("Construction::Build"), CLAY_STRING("Build"), 0
+        );
+      }
+    }
+
+    inline Action_ConstructionPreview construction_preview(Building building) {
+      CLAY({
+        .id = CLAY_ID("Construction::Preview"),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_GROW(),
+              },
+            .childGap = uint16_t(4 * UI_SCALE),
+            .layoutDirection = CLAY_TOP_TO_BOTTOM,
+          },
+      }) {
+
+        construction_preview_top_row(building);
+
+        construction_preview_middle_row(building);
+
+        UI::spacer();
+
+        construction_preview_bottom_row();
       }
 
 
-      CLAY({.layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM}}) {
-        text_label(CLAY_STRING("Requires:"), 12);
+      if (ButtonWasClicked(CLAY_STRING("Construction::Preview::Back"))) {
+        return Action_ConstructionPreview::Back;
       }
+
+      if (ButtonWasClicked(CLAY_STRING("Construction::Build"))) {
+        return Action_ConstructionPreview::Build;
+      }
+
+      return Action_ConstructionPreview::None;
     }
-  }
+  };
 
-  inline void construction_preview_bottom_row() {
-    CLAY({
-      .id = CLAY_ID("Construction::Preview::BottomRow"),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-            },
-          .childAlignment =
-            {
-              .x = CLAY_ALIGN_X_RIGHT,
-            },
-        },
-    }) {
-      text_button_small(
-        CLAY_STRING("Construction::Build"), CLAY_STRING("Build"), 0
-      );
-    }
-  }
-
-  inline Action_ConstructionPreview construction_preview(Building building) {
-    CLAY({
-      .id = CLAY_ID("Construction::Preview"),
-      .layout =
-        {
-          .sizing =
-            {
-              .width = CLAY_SIZING_GROW(),
-              .height = CLAY_SIZING_GROW(),
-            },
-          .childGap = uint16_t(4 * UI_SCALE),
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        },
-    }) {
-
-      construction_preview_top_row(building);
-
-      construction_preview_middle_row(building);
-
-      UI::spacer();
-
-      construction_preview_bottom_row();
-    }
-
-
-    if (ButtonWasClicked(CLAY_STRING("Construction::Preview::Back"))) {
-      return Action_ConstructionPreview::Back;
-    }
-
-    if (ButtonWasClicked(CLAY_STRING("Construction::Build"))) {
-      return Action_ConstructionPreview::Build;
-    }
-
-    return Action_ConstructionPreview::None;
-  }
 
 }// namespace UI

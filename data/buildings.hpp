@@ -157,10 +157,6 @@ namespace Buildings {
           },
           Recipe{
             .inputs = {},
-            .outputs = {RecipeItem{.resource = Resources::Type::TinOre}},
-          },
-          Recipe{
-            .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::SilverOre}},
           },
           Recipe{

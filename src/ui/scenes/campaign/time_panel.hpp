@@ -12,29 +12,28 @@ namespace UI {
     Clay_Color text_color = COLOR_WHITE,
     u32 i = 0
   ) {
-    CLAY( {
-      .id = Clay__HashString( id_str, i, 0 ),
+    CLAY({
+      .id = Clay__HashString(id_str, i, 0),
       .layout =
         {
-          .sizing = { .width = CLAY_SIZING_FIT( 32 * UI_SCALE ) },
-          .padding = { 16, 16 },
-          .childAlignment = Clay_ChildAlignment( CLAY_ALIGN_X_CENTER ),
+          .sizing = {.width = CLAY_SIZING_FIT(32 * UI_SCALE)},
+          .padding = {16, 16},
+          .childAlignment = Clay_ChildAlignment(CLAY_ALIGN_X_CENTER),
         },
-      .backgroundColor = COLOR_BLACK,
-    } ) {
+    }) {
       CLAY_TEXT(
         text,
-        CLAY_TEXT_CONFIG( {
+        CLAY_TEXT_CONFIG({
           .textColor = text_color,
           .fontId = 0,
-          .fontSize = uint16_t( 12 * UI_SCALE ),
-        } )
+          .fontSize = uint16_t(12 * UI_SCALE),
+        })
       );
     }
   }
 
 
-  inline void time_panel( f32 timescale ) {
+  inline void time_panel(f32 timescale) {
     CLAY() {
 
       Clay_Color paused_color = COLOR_WHITE;
@@ -42,23 +41,21 @@ namespace UI {
       Clay_Color faster_color = COLOR_WHITE;
       Clay_Color fastest_color = COLOR_WHITE;
 
-      if ( timescale == 0.0f ) {
+      if (timescale == 0.0f) {
         paused_color = COLOR_CYAN;
-      } else if ( timescale == 0.5f ) {
+      } else if (timescale == 0.5f) {
         fast_color = COLOR_CYAN;
-      } else if ( timescale == 1.0f ) {
+      } else if (timescale == 1.0f) {
         faster_color = COLOR_CYAN;
-      } else if ( timescale == 1.5f ) {
+      } else if (timescale == 1.5f) {
         fastest_color = COLOR_CYAN;
       }
 
 
-      time_button( CLAY_STRING( "Paused" ), CLAY_STRING( "||" ), paused_color );
-      time_button( CLAY_STRING( "Fast" ), CLAY_STRING( ">" ), fast_color );
-      time_button( CLAY_STRING( "Faster" ), CLAY_STRING( ">>" ), faster_color );
-      time_button(
-        CLAY_STRING( "Fastest" ), CLAY_STRING( ">|" ), fastest_color
-      );
+      time_button(CLAY_STRING("Paused"), CLAY_STRING("||"), paused_color);
+      time_button(CLAY_STRING("Fast"), CLAY_STRING(">"), fast_color);
+      time_button(CLAY_STRING("Faster"), CLAY_STRING(">>"), faster_color);
+      time_button(CLAY_STRING("Fastest"), CLAY_STRING(">|"), fastest_color);
     }
   }
 }// namespace UI
