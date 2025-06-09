@@ -123,6 +123,9 @@ namespace UI {
       Building building = buildings[i];
 
       if (ButtonWasClicked(CLAY_STRING("BuildingIcon"), i)) {
+        // @todo this is extreme code smell, figure out proper state management
+        // for UI
+        selected_resource = std::nullopt;
         return i;
       }
     }
