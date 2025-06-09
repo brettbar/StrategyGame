@@ -17,8 +17,8 @@ namespace UI {
       Action_SinglePlayerLobby action;
     };
 
-    CLAY( {
-      .id = CLAY_ID( "SingleplayerLobby" ),
+    CLAY({
+      .id = CLAY_ID("SingleplayerLobby"),
       .layout =
         {
           .sizing =
@@ -26,7 +26,7 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
-          .padding = { 16, 16 },
+          .padding = {16, 16},
           .childGap = 8,
           .childAlignment =
             {
@@ -35,29 +35,24 @@ namespace UI {
             },
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
-      .backgroundColor = { 43, 41, 51, 255 },
-    } ) {
+    }) {
       text_button_lrg(
-        CLAY_STRING( "SinglePlayerLobby::SelectFaction" ),
-        CLAY_STRING( "Select Faction" ),
+        CLAY_STRING("SinglePlayerLobby::SelectFaction"),
+        CLAY_STRING("Select Faction"),
         0
       );
       text_button_lrg(
-        CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ),
-        CLAY_STRING( "Return to Main" ),
+        CLAY_STRING("SinglePlayerLobby::ReturnToMain"),
+        CLAY_STRING("Return to Main"),
         1
       );
     }
 
-    if ( ButtonWasClicked(
-           CLAY_STRING( "SinglePlayerLobby::SelectFaction" ), 0
-         ) ) {
+    if (ButtonWasClicked(CLAY_STRING("SinglePlayerLobby::SelectFaction"), 0)) {
       return Action_SinglePlayerLobby::SelectFaction;
     }
 
-    if ( ButtonWasClicked(
-           CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ), 1
-         ) ) {
+    if (ButtonWasClicked(CLAY_STRING("SinglePlayerLobby::ReturnToMain"), 1)) {
       return Action_SinglePlayerLobby::ReturnToMain;
     }
 

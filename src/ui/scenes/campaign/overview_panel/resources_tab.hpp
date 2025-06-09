@@ -1,6 +1,5 @@
 #pragma once
 
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../../data/resources.hpp"
 #include "../../../../shared/common.hpp"
 #include "../../../common.h"
@@ -13,18 +12,18 @@ namespace UI {
 
 
   inline void resource_quantity(Clay_String amount_cs, vec2f dimensions) {
-    CLAY(
-      {.layout =
-         {
-           .sizing =
-             {
-               .width = CLAY_SIZING_FIXED(dimensions.x * UI_SCALE),
-               .height = CLAY_SIZING_FIXED(dimensions.y * UI_SCALE),
-             },
-           .childAlignment =
-             {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER},
-         }}
-    ) {
+    CLAY({
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIXED(dimensions.x * UI_SCALE),
+              .height = CLAY_SIZING_FIXED(dimensions.y * UI_SCALE),
+            },
+          .childAlignment =
+            {.x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER},
+        },
+    }) {
       text_label(amount_cs, 12);
     }
   }

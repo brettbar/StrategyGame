@@ -1,6 +1,5 @@
 #pragma once
 
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
 #include "../../../../shared/common.hpp"
 #include "../../../library/texture_button.hpp"
 

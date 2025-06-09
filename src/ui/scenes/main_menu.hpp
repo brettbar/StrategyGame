@@ -25,35 +25,34 @@ namespace UI {
 
     Button buttons[] = {
       Button{
-        .text = CLAY_STRING( "Start Game" ),
-        .action = Action_MainMenu::StartGame
+        .text = CLAY_STRING("Start Game"), .action = Action_MainMenu::StartGame
       },
       Button{
-        .text = CLAY_STRING( "Load Game" ),
+        .text = CLAY_STRING("Load Game"),
         .action = Action_MainMenu::LoadGame,
       },
       Button{
-        .text = CLAY_STRING( "Host Game" ),
+        .text = CLAY_STRING("Host Game"),
         .action = Action_MainMenu::HostGame,
       },
       Button{
-        .text = CLAY_STRING( "Join Game" ),
+        .text = CLAY_STRING("Join Game"),
         .action = Action_MainMenu::JoinGame,
       },
       Button{
-        .text = CLAY_STRING( "Settings" ),
+        .text = CLAY_STRING("Settings"),
         .action = Action_MainMenu::Settings,
       },
       Button{
-        .text = CLAY_STRING( "Exit Game" ),
+        .text = CLAY_STRING("Exit Game"),
         .action = Action_MainMenu::ExitGame,
       },
     };
-    u32 num_buttons = LEN( buttons );
+    u32 num_buttons = LEN(buttons);
 
     CLAY(
       {
-        .id = CLAY_ID( "MainMenu" ),
+        .id = CLAY_ID("MainMenu"),
         .layout =
           {
             .sizing =
@@ -61,7 +60,7 @@ namespace UI {
                 .width = CLAY_SIZING_GROW(),
                 .height = CLAY_SIZING_GROW(),
               },
-            .padding = { 16, 16 },
+            .padding = {16, 16},
             .childGap = 8,
             .childAlignment =
               {
@@ -73,16 +72,14 @@ namespace UI {
         .backgroundColor = COLOR_BLACK,
       },
     ) {
-      for ( u32 i = 0; i < num_buttons; i++ ) {
-        text_button_lrg(
-          CLAY_STRING( "MainMenu::Button" ), buttons[i].text, i
-        );
+      for (u32 i = 0; i < num_buttons; i++) {
+        text_button_lrg(CLAY_STRING("MainMenu::Button"), buttons[i].text, i);
       }
     }
 
-    for ( u32 i = 0; i < num_buttons; i++ ) {
+    for (u32 i = 0; i < num_buttons; i++) {
       Button button = buttons[i];
-      if ( ButtonWasClicked( CLAY_STRING( "MainMenu::Button" ), i ) ) {
+      if (ButtonWasClicked(CLAY_STRING("MainMenu::Button"), i)) {
         return button.action;
       }
     }

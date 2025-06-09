@@ -4,27 +4,8 @@
 #include "clay/clay.h"
 #include <raylib.h>
 
-// #define CLAY_HSTRING(input)                                                    \
-//   Clay_String {                                                                \
-//     .length = static_cast<int32_t>(strlen(input.c_str())),                     \
-//     .chars = input.c_str(),                                                    \
-//   }
-
-
 namespace UI {
   inline float UI_SCALE = 1.0f;
-
-  // inline void set_ui_scale(f32 screen_w) {
-  //   printf("screen w %f\n", screen_w);
-  //
-  //   if (screen_w > 2560) {
-  //     UI::UI_SCALE = 4.0f;
-  //   } else if (screen_w > 1920) {
-  //     UI::UI_SCALE = 2.0f;
-  //   } else {
-  //     UI::UI_SCALE = 1.0f;
-  //   }
-  // }
 
   inline void set_ui_scale(f32 screen_diagonal_inches) {
     // @todo find something that works for these
@@ -62,14 +43,6 @@ namespace UI {
     });
   }
 
-  // @todo probably get rid of this
-  inline Clay_String str_to_cs(str input) {
-    return Clay_String{
-      .isStaticallyAllocated = false,
-      .length = static_cast<int32_t>(strlen(input.c_str())),
-      .chars = input.c_str(),
-    };
-  }
 
   inline bool ButtonWasClicked(Clay_String id_str, u32 index) {
     auto id = Clay_GetElementIdWithIndex(id_str, index);
