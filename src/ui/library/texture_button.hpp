@@ -15,13 +15,13 @@ namespace UI {
   }
 
   inline void texture_button(
-    Clay_String id,
+    Clay_String cs,
     hstr texture_id,
     vec2f dimensions,
     u32 i = 0
   ) {
     CLAY({
-      .id = Clay__HashString(id, i, 0),
+      .id = Clay__HashString(cs, i, 0),
       .layout =
         {
           .sizing =

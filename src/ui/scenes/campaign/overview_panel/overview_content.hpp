@@ -9,6 +9,7 @@
 namespace UI {
   enum class OverviewAction_t {
     None,
+    CloseTab,
     Construction,
   };
   struct OverviewAction {
@@ -76,6 +77,13 @@ namespace UI {
       } else if (std::string(current_tab.chars) == "Resources") {
         UI::resources_tab();
       }
+    }
+
+    if (ButtonWasClicked(CLAY_STRING("Exit"))) {
+      printf("CLICKED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+      return OverviewAction{
+        .type = OverviewAction_t::CloseTab,
+      };
     }
 
 

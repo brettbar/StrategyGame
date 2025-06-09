@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../../../data/buildings.hpp"
+#include "../../../../common.h"
 #include "../../../../library/checkbox.hpp"
 #include "../../../../library/resource_icon.hpp"
 #include "../../../../library/text_button.hpp"
@@ -113,8 +114,17 @@ namespace UI {
                   selected_resource = item.resource;
                 }
 
-                // @todo make this a button where you can change whats selected
-                checkbox(selected_resource == item.resource);
+                str resource_name = Resources::ResourceStr(item.resource);
+                str building_name = Buildings::building_name_str(building.name);
+                str wtf = building_name + "::Checkbox::" + resource_name;
+
+                Clay_String cs = str_to_cs(wtf);
+
+                if (selected_resource == item.resource) {
+                  texture_button(cs, hstr{"checkbox_checked.png"}, {15, 15});
+                } else {
+                  texture_button(cs, hstr{"checkbox_empty.png"}, {15, 15});
+                }
               }
             }
           }
@@ -125,6 +135,24 @@ namespace UI {
           text_label(CLAY_STRING("Requires:"), 12);
         }
       }
+
+      for (const Buildings::Recipe &recipe: recipes) {
+        for (u32 i = 0; i < recipe.outputs.size(); i++) {
+          Buildings::RecipeItem item = recipe.outputs[i];
+
+          str resource_name = Resources::ResourceStr(item.resource);
+          str building_name = Buildings::building_name_str(building.name);
+          str wtf = building_name + "::Checkbox::" + resource_name;
+          Clay_String cs = str_to_cs(wtf);
+
+          if (ButtonWasClicked(cs)) {
+            selected_resource = item.resource;
+            printf("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+                   "OOOOOO\n");
+          }
+        }
+      }
+      //
     }
 
     inline void construction_preview_bottom_row() {

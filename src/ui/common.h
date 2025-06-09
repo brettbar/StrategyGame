@@ -4,6 +4,12 @@
 #include "clay/clay.h"
 #include <raylib.h>
 
+// #define CLAY_HSTRING(input)                                                    \
+//   Clay_String {                                                                \
+//     .length = static_cast<int32_t>(strlen(input.c_str())),                     \
+//     .chars = input.c_str(),                                                    \
+//   }
+
 
 namespace UI {
   inline float UI_SCALE = 1.0f;
@@ -56,8 +62,10 @@ namespace UI {
     });
   }
 
+  // @todo probably get rid of this
   inline Clay_String str_to_cs(str input) {
     return Clay_String{
+      .isStaticallyAllocated = false,
       .length = static_cast<int32_t>(strlen(input.c_str())),
       .chars = input.c_str(),
     };

@@ -151,6 +151,9 @@ namespace UI {
             switch (action.type) {
               case UI::OverviewAction_t::None:
                 break;
+              case UI::OverviewAction_t::CloseTab:
+                tab = CLAY_STRING("");
+                break;
               case UI::OverviewAction_t::Construction:
                 building_to_build = action.building;
                 Map::Manager()->mode = Map::Mode::BuildPreview;

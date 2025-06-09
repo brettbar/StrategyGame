@@ -6,12 +6,11 @@
 
 namespace UI {
   inline void resource_icon(Resources::Type type, u32 i) {
-    const char *resource = Resources::ResourceStr(type);
+    str resource = Resources::ResourceStr(type);
 
-    Clay_String cs = {
-      .length = static_cast<int32_t>(strlen(resource)),
-      .chars = resource,
-    };
+    auto cs = str_to_cs(resource);
+
+    // printf("klajhsdflkjh %s\n", cs.chars);
 
     CLAY({
       .id = Clay__HashString(cs, i, Clay__GetParentElementId()),

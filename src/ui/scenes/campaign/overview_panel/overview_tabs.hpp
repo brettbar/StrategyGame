@@ -105,9 +105,6 @@ namespace UI {
       }
     }
 
-    if (ButtonWasClicked(CLAY_STRING("Exit"))) {
-      tab = CLAY_STRING("");
-    }
 
     return tab;
   }
