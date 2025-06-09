@@ -136,7 +136,7 @@ namespace UI {
     if (_constructing) {
       Building building = buildings[_selected_building];
 
-      auto action = ConstructionPreview().construction_preview(building);
+      auto action = construction_preview(building);
 
       // _constructing = false;
       // _selected_building = -1;

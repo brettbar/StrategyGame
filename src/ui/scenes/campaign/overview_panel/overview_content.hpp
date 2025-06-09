@@ -80,7 +80,6 @@ namespace UI {
     }
 
     if (ButtonWasClicked(CLAY_STRING("Exit"))) {
-      printf("CLICKED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
       return OverviewAction{
         .type = OverviewAction_t::CloseTab,
       };
