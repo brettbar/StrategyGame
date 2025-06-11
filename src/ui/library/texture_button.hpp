@@ -14,7 +14,7 @@ namespace UI {
     };
   }
 
-  inline void texture_button(
+  inline bool texture_button(
     Clay_String cs,
     hstr texture_id,
     vec2f dimensions,
@@ -32,6 +32,8 @@ namespace UI {
         },
       .image = image(texture_id, dimensions),
     });
+
+    return ButtonWasClicked(cs, i);
   }
 
   inline void texture_label(hstr texture_id, vec2f dimensions) {

@@ -23,6 +23,8 @@ namespace UI {
       Action_MainMenu action;
     };
 
+    Action_MainMenu action = Action_MainMenu::None;
+
     Button buttons[] = {
       Button{
         .text = CLAY_STRING("Start Game"), .action = Action_MainMenu::StartGame
@@ -73,18 +75,15 @@ namespace UI {
       },
     ) {
       for (u32 i = 0; i < num_buttons; i++) {
-        text_button_lrg(CLAY_STRING("MainMenu::Button"), buttons[i].text, i);
+        if (text_button_lrg(
+              CLAY_STRING("MainMenu::Button"), buttons[i].text, i
+            )) {
+          action = buttons[i].action;
+        }
       }
     }
 
-    for (u32 i = 0; i < num_buttons; i++) {
-      Button button = buttons[i];
-      if (ButtonWasClicked(CLAY_STRING("MainMenu::Button"), i)) {
-        return button.action;
-      }
-    }
-
-    return Action_MainMenu::None;
+    return action;
   }
 
 

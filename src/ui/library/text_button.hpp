@@ -7,7 +7,7 @@
 
 namespace UI {
 
-  inline void text_button_lrg(
+  inline bool text_button_lrg(
     Clay_String id_str,
     Clay_String text,
     u32 i = 0,
@@ -37,9 +37,11 @@ namespace UI {
         })
       );
     }
+
+    return ButtonWasClicked(id_str, i);
   }
 
-  inline void text_button_small(
+  inline bool text_button_small(
     Clay_String id_str,
     Clay_String text,
     u32 i = 0,
@@ -69,6 +71,8 @@ namespace UI {
         })
       );
     }
+
+    return ButtonWasClicked(id_str, i);
   }
 
 

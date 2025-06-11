@@ -13,53 +13,53 @@ namespace UI {
   };
 
   inline Action_Minimap minimap() {
-    CLAY( CLAY_ID( "Minimap" ) ) {
-      text_button_small(
-        CLAY_STRING( "MapMode::Default" ),
-        CLAY_STRING( "Default" ),
-        0,
-        COLOR_SLATE
-      );
+    struct Button {
+      Clay_String text;
+      Action_Minimap action;
+      Clay_Color color;
+    };
 
-      text_button_small(
-        CLAY_STRING( "MapMode::Terrain" ),
-        CLAY_STRING( "Terrain" ),
-        0,
-        COLOR_GREEN
-      );
+    Action_Minimap action = Action_Minimap::None;
 
-      text_button_small(
-        CLAY_STRING( "MapMode::Political" ),
-        CLAY_STRING( "Political" ),
-        0,
-        COLOR_RED
-      );
+    Button buttons[] = {
+      {
+        .text = CLAY_STRING("Default"),
+        .action = Action_Minimap::Default,
+        .color = COLOR_SLATE,
+      },
+      {
+        .text = CLAY_STRING("Terrain"),
+        .action = Action_Minimap::Terrain,
+        .color = COLOR_GREEN,
+      },
+      {
+        .text = CLAY_STRING("Political"),
+        .action = Action_Minimap::Political,
+        .color = COLOR_RED,
+      },
+      {
+        .text = CLAY_STRING("Resources"),
+        .action = Action_Minimap::Resources,
+        .color = COLOR_ORANGE,
+      },
+    };
 
-      text_button_small(
-        CLAY_STRING( "MapMode::Resources" ),
-        CLAY_STRING( "Resources" ),
-        0,
-        COLOR_ORANGE
-      );
+    u32 num_buttons = LEN(buttons);
+
+    CLAY(CLAY_ID("Minimap")) {
+      for (u32 i = 0; i < num_buttons; i++) {
+        if (text_button_small(
+              CLAY_STRING("MapMode::Button"),
+              buttons[i].text,
+              i,
+              buttons[i].color
+            )) {
+          action = buttons[i].action;
+        }
+      }
     }
 
-    if ( ButtonWasClicked( CLAY_STRING( "MapMode::Default" ) ) ) {
-      return Action_Minimap::Default;
-    }
-
-    if ( ButtonWasClicked( CLAY_STRING( "MapMode::Terrain" ) ) ) {
-      return Action_Minimap::Terrain;
-    }
-
-    if ( ButtonWasClicked( CLAY_STRING( "MapMode::Political" ) ) ) {
-      return Action_Minimap::Political;
-    }
-
-    if ( ButtonWasClicked( CLAY_STRING( "MapMode::Resources" ) ) ) {
-      return Action_Minimap::Resources;
-    }
-
-    return Action_Minimap::None;
+    return action;
   }
 
 };// namespace UI

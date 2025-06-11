@@ -143,13 +143,13 @@ namespace UI {
 
       // _constructing = false;
       // _selected_building = -1;
-      switch (action) {
-        case UI::Action_ConstructionPreview::None:
+      switch (action.type) {
+        case UI::Action_ConstructionPreview_t::None:
           break;
-        case UI::Action_ConstructionPreview::Back:
+        case UI::Action_ConstructionPreview_t::Back:
           _constructing = false;
           break;
-        case UI::Action_ConstructionPreview::Build:
+        case UI::Action_ConstructionPreview_t::Build:
           return building.name;
       }
     } else {

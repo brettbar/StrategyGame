@@ -18,24 +18,34 @@ namespace UI {
     str path;
   };
 
-  enum class Action_ConstructionPreview {
+  enum class Action_ConstructionPreview_t {
     None,
     Back,
     Build
   };
 
+  struct Action_ConstructionPreview {
+    Action_ConstructionPreview_t type;
+    Resources::Type resource;
+  };
+
   inline opt<Resources::Type> selected_resource = std::nullopt;
 
-  inline void construction_preview_top_row(Building building) {
+  inline bool construction_preview_top_row(Building building) {
+    bool hit_back = false;
+
     CLAY({
       .id = CLAY_ID("Construction::Preview::TopRow"),
       .layout = {.childGap = 8},
     }) {
-      texture_button(
-        CLAY_STRING("Construction::Preview::Back"),
-        hstr{"back_button.png"},
-        {15, 15}
-      );
+
+      if (texture_button(
+            CLAY_STRING("Construction::Preview::Back"),
+            hstr{"back_button.png"},
+            {15, 15}
+          )) {
+        hit_back = true;
+      }
 
       CLAY({
         .layout =
@@ -53,10 +63,11 @@ namespace UI {
         text_label(building.label, 16);
       }
     }
+
+    return hit_back;
   }
 
   inline void construction_preview_middle_row(Building building) {
-
     list<Buildings::Recipe> recipes =
       Buildings::recipes_for_building(building.name);
 
@@ -69,7 +80,6 @@ namespace UI {
         8
       );
     }
-
 
     CLAY({
       .id = CLAY_ID("Construction::Preview::MiddleRow"),
@@ -89,7 +99,6 @@ namespace UI {
         text_label(CLAY_STRING("Produce:"), 12);
 
         for (const Buildings::Recipe &recipe: recipes) {
-
           CLAY({
             .layout =
               {
@@ -114,17 +123,23 @@ namespace UI {
 
               str resource_name = Resources::ResourceStr(item.resource);
               str building_name = Buildings::building_name_str(building.name);
-              str wtf = building_name + "::Checkbox::" + resource_name;
+              str label = building_name + "::Checkbox::" + resource_name;
 
               Clay_String cs = Clay_String{
-                .length = static_cast<int32_t>(strlen(wtf.c_str())),
-                .chars = wtf.c_str(),
+                .length = static_cast<int32_t>(strlen(label.c_str())),
+                .chars = label.c_str(),
               };
 
+              hstr icon = hstr{"checkbox_empty.png"};
+
               if (selected_resource == item.resource) {
-                texture_button(cs, hstr{"checkbox_checked.png"}, {15, 15});
+                icon = hstr{"checkbox_checked.png"};
               } else {
-                texture_button(cs, hstr{"checkbox_empty.png"}, {15, 15});
+                icon = hstr{"checkbox_empty.png"};
+              }
+
+              if (texture_button(cs, icon, {15, 15})) {
+                selected_resource = item.resource;
               }
             }
           }
@@ -136,29 +151,11 @@ namespace UI {
         text_label(CLAY_STRING("Requires:"), 12);
       }
     }
-
-    for (const Buildings::Recipe &recipe: recipes) {
-      for (u32 i = 0; i < recipe.outputs.size(); i++) {
-        Buildings::RecipeItem item = recipe.outputs[i];
-
-        str resource_name = Resources::ResourceStr(item.resource);
-        str building_name = Buildings::building_name_str(building.name);
-        str wtf = building_name + "::Checkbox::" + resource_name;
-
-        Clay_String cs = Clay_String{
-          .length = static_cast<int32_t>(strlen(wtf.c_str())),
-          .chars = wtf.c_str(),
-        };
-
-        if (ButtonWasClicked(cs)) {
-          selected_resource = item.resource;
-          printf("YOOOOOOOOOOOO %d\n", selected_resource.value());
-        }
-      }
-    }
   }
 
-  inline void construction_preview_bottom_row() {
+  inline bool construction_preview_bottom_row() {
+    bool clicked_build = false;
+
     CLAY({
       .id = CLAY_ID("Construction::Preview::BottomRow"),
       .layout =
@@ -173,13 +170,17 @@ namespace UI {
             },
         },
     }) {
-      text_button_small(
+      clicked_build = text_button_small(
         CLAY_STRING("Construction::Build"), CLAY_STRING("Build"), 0
       );
     }
+
+    return clicked_build;
   }
 
   inline Action_ConstructionPreview construction_preview(Building building) {
+    Action_ConstructionPreview action = {Action_ConstructionPreview_t::None};
+
     CLAY({
       .id = CLAY_ID("Construction::Preview"),
       .layout =
@@ -194,25 +195,32 @@ namespace UI {
         },
     }) {
 
-      construction_preview_top_row(building);
+      if (construction_preview_top_row(building)) {
+        action = {Action_ConstructionPreview_t::Back};
+      }
 
       construction_preview_middle_row(building);
 
       UI::spacer();
 
-      construction_preview_bottom_row();
+      if (construction_preview_bottom_row()) {
+        action = {
+          .type = Action_ConstructionPreview_t::Build,
+          .resource = selected_resource.value()
+        };
+      }
     }
 
 
-    if (ButtonWasClicked(CLAY_STRING("Construction::Preview::Back"))) {
-      return Action_ConstructionPreview::Back;
-    }
+    // if (ButtonWasClicked(CLAY_STRING("Construction::Preview::Back"))) {
+    //   return Action_ConstructionPreview::Back;
+    // }
 
-    if (ButtonWasClicked(CLAY_STRING("Construction::Build"))) {
-      return Action_ConstructionPreview::Build;
-    }
+    // if (ButtonWasClicked(CLAY_STRING("Construction::Build"))) {
+    //   return Action_ConstructionPreview::Build;
+    // }
 
-    return Action_ConstructionPreview::None;
+    return action;
   }
 
 

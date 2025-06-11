@@ -5,9 +5,9 @@
 namespace UI {
   inline str _selected_path = "";
 
-  inline str load_game_menu( list<str> &paths, bool &pressed_back ) {
-    CLAY( {
-      .id = CLAY_ID( "LoadGameMenu" ),
+  inline str load_game_menu(list<str> &paths, bool &pressed_back) {
+    CLAY({
+      .id = CLAY_ID("LoadGameMenu"),
       .layout =
         {
           .sizing =
@@ -15,7 +15,7 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
-          .padding = { 16, 16 },
+          .padding = {16, 16},
           .childGap = 8,
           .childAlignment =
             {
@@ -24,54 +24,54 @@ namespace UI {
             },
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
-      .backgroundColor = { 43, 41, 51, 255 },
-    } ) {
+      .backgroundColor = {43, 41, 51, 255},
+    }) {
 
-      for ( u32 i = 0; i < paths.size(); i++ ) {
+      for (u32 i = 0; i < paths.size(); i++) {
         Clay_String cs = Clay_String{
-          .length = static_cast<int32_t>( strlen( paths[i].c_str() ) ),
+          .length = static_cast<int32_t>(strlen(paths[i].c_str())),
           .chars = paths[i].c_str()
         };
 
-        text_button_small( cs, cs, 0, COLOR_BLUE );
+        text_button_small(cs, cs, 0, COLOR_BLUE);
       }
 
 
-      CLAY( {
+      CLAY({
         .layout =
           {
             .childGap = 4,
           },
-      } ) {
+      }) {
         text_button_small(
-          CLAY_STRING( "LoadGameMenu::Back" ), CLAY_STRING( "Back" )
+          CLAY_STRING("LoadGameMenu::Back"), CLAY_STRING("Back")
         );
 
         text_button_small(
-          CLAY_STRING( "LoadGameMenu::Load" ), CLAY_STRING( "Load" )
+          CLAY_STRING("LoadGameMenu::Load"), CLAY_STRING("Load")
         );
       }
     }
 
-    for ( u32 i = 0; i < paths.size(); i++ ) {
+    for (u32 i = 0; i < paths.size(); i++) {
       Clay_String cs = Clay_String{
-        .length = static_cast<int32_t>( strlen( paths[i].c_str() ) ),
+        .length = static_cast<int32_t>(strlen(paths[i].c_str())),
         .chars = paths[i].c_str()
       };
 
-      if ( ButtonWasClicked( cs ) ) {
+      if (ButtonWasClicked(cs)) {
         // @todo
         _selected_path = cs.chars;
       }
     }
 
-    if ( ButtonWasClicked( CLAY_STRING( "LoadGameMenu::Back" ) ) ) {
+    if (ButtonWasClicked(CLAY_STRING("LoadGameMenu::Back"))) {
       pressed_back = true;
       return "";
     }
 
-    if ( _selected_path != "" &&
-         ButtonWasClicked( CLAY_STRING( "LoadGameMenu::Load" ) ) ) {
+    if (_selected_path != "" &&
+        ButtonWasClicked(CLAY_STRING("LoadGameMenu::Load"))) {
       // @todo make actually really get the selected file
       return _selected_path;
     }
