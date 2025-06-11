@@ -84,13 +84,13 @@ namespace UI {
   struct Action_Campaign {
     Action_Campaign_t type;
     Commands::Command cmd;
-    Buildings::BuildingType building;
+    Buildings::Building building;
   };
 
   inline Action_Campaign campaign_ui(entt::entity player_e) {
 
     // @todo refactor this shit
-    opt<Buildings::BuildingType> building_to_build = std::nullopt;
+    opt<Buildings::Building> building_to_build = std::nullopt;
     Commands::Command cmd = Commands::Command::none();
 
     CLAY({

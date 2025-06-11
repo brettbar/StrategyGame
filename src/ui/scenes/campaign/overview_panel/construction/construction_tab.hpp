@@ -38,21 +38,21 @@ namespace UI {
   }
 
 
-  inline list<Building> buildings = {
+  inline list<Buildings::Building> buildings = {
     {
-      .name = Buildings::BuildingType::Farm,
+      .type = Buildings::BuildingType::Farm,
       .category = Buildings::BuildingCategory::Agricultural,
       .label = CLAY_STRING("Farm"),
       .path = "farm_icon.png",
     },
     {
-      .name = Buildings::BuildingType::LumberMill,
+      .type = Buildings::BuildingType::LumberMill,
       .category = Buildings::BuildingCategory::Gathering,
       .label = CLAY_STRING("Lumber Mill"),
       .path = "lumber_mill_icon.png",
     },
     {
-      .name = Buildings::BuildingType::Mine,
+      .type = Buildings::BuildingType::Mine,
       .category = Buildings::BuildingCategory::Gathering,
       .label = CLAY_STRING("Mine"),
       .path = "mine_icon.png",
@@ -78,7 +78,7 @@ namespace UI {
           .layout = {.childGap = uint16_t(3 * UI_SCALE)},
         }) {
           for (u32 j = 0; j < buildings.size(); j++) {
-            Building building = buildings[j];
+            Buildings::Building building = buildings[j];
 
             if (building.category != col[i]) {
               continue;
@@ -120,12 +120,9 @@ namespace UI {
 
 
     for (u32 i = 0; i < buildings.size(); i++) {
-      Building building = buildings[i];
+      Buildings::Building building = buildings[i];
 
       if (ButtonWasClicked(CLAY_STRING("BuildingIcon"), i)) {
-        // @todo this is extreme code smell, figure out proper state management
-        // for UI
-        selected_resource = std::nullopt;
         return i;
       }
     }
@@ -134,10 +131,10 @@ namespace UI {
   }
 
 
-  inline opt<Buildings::BuildingType> construction_tab() {
+  inline opt<Buildings::Building> construction_tab() {
 
     if (_constructing) {
-      Building building = buildings[_selected_building];
+      Buildings::Building building = buildings[_selected_building];
 
       auto action = construction_preview(building);
 
@@ -150,7 +147,8 @@ namespace UI {
           _constructing = false;
           break;
         case UI::Action_ConstructionPreview_t::Build:
-          return building.name;
+          building.current_recipe = action.recipe;
+          return building;
       }
     } else {
       _selected_building = construction_browser();

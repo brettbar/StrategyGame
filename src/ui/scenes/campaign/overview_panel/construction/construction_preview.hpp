@@ -10,14 +10,6 @@
 
 namespace UI {
 
-  // @todo this should be coming from data/ at somepoint
-  struct Building {
-    Buildings::BuildingType name;
-    Buildings::BuildingCategory category;
-    Clay_String label;
-    str path;
-  };
-
   enum class Action_ConstructionPreview_t {
     None,
     Back,
@@ -26,12 +18,12 @@ namespace UI {
 
   struct Action_ConstructionPreview {
     Action_ConstructionPreview_t type;
-    Resources::Type resource;
+    Buildings::Recipe recipe;
   };
 
-  inline opt<Resources::Type> selected_resource = std::nullopt;
+  inline opt<Buildings::Recipe> selected_recipe = std::nullopt;
 
-  inline bool construction_preview_top_row(Building building) {
+  inline bool construction_preview_top_row(Buildings::Building building) {
     bool hit_back = false;
 
     CLAY({
@@ -45,6 +37,7 @@ namespace UI {
             {15, 15}
           )) {
         hit_back = true;
+        selected_recipe = std::nullopt;
       }
 
       CLAY({
@@ -67,9 +60,9 @@ namespace UI {
     return hit_back;
   }
 
-  inline void construction_preview_middle_row(Building building) {
+  inline void construction_preview_middle_row(Buildings::Building building) {
     list<Buildings::Recipe> recipes =
-      Buildings::recipes_for_building(building.name);
+      Buildings::recipes_for_building(building.type);
 
     CLAY({
       .id = CLAY_ID("Construction::Preview::Desc"),
@@ -98,49 +91,46 @@ namespace UI {
       }) {
         text_label(CLAY_STRING("Produce:"), 12);
 
-        for (const Buildings::Recipe &recipe: recipes) {
+        // for (const Buildings::Recipe &recipe: recipes) {
+        for (u32 i = 0; i < recipes.size(); i++) {
+          auto recipe = recipes[i];
           CLAY({
             .layout =
               {
                 .childGap = uint16_t(8 * UI_SCALE),
-                .childAlignment =
-                  {
-                    .y = CLAY_ALIGN_Y_CENTER,
-                  },
-
+                .childAlignment = {.y = CLAY_ALIGN_Y_CENTER},
               },
           }) {
-            for (u32 i = 0; i < recipe.outputs.size(); i++) {
-              Buildings::RecipeItem item = recipe.outputs[i];
+            for (u32 j = 0; j < recipe.outputs.size(); j++) {
+              Buildings::RecipeItem item = recipe.outputs[j];
 
               texture_label(hstr{"arrow.png"}, {13, 13});
 
-              resource_icon(item.resource, i);
+              resource_icon(item.resource, j);
+            }
 
-              if (!selected_resource.has_value()) {
-                selected_resource = item.resource;
-              }
+            if (!selected_recipe.has_value()) {
+              selected_recipe = recipe;
+            }
 
-              str resource_name = Resources::ResourceStr(item.resource);
-              str building_name = Buildings::building_name_str(building.name);
-              str label = building_name + "::Checkbox::" + resource_name;
+            str building_name = Buildings::building_name_str(building.type);
+            str label = building_name + "::Checkbox";
 
-              Clay_String cs = Clay_String{
-                .length = static_cast<int32_t>(strlen(label.c_str())),
-                .chars = label.c_str(),
-              };
+            Clay_String cs = Clay_String{
+              .length = static_cast<int32_t>(strlen(label.c_str())),
+              .chars = label.c_str(),
+            };
 
-              hstr icon = hstr{"checkbox_empty.png"};
+            hstr icon = hstr{"checkbox_empty.png"};
 
-              if (selected_resource == item.resource) {
-                icon = hstr{"checkbox_checked.png"};
-              } else {
-                icon = hstr{"checkbox_empty.png"};
-              }
+            if (selected_recipe == recipe) {
+              icon = hstr{"checkbox_checked.png"};
+            } else {
+              icon = hstr{"checkbox_empty.png"};
+            }
 
-              if (texture_button(cs, icon, {15, 15})) {
-                selected_resource = item.resource;
-              }
+            if (texture_button(cs, icon, {15, 15}, i)) {
+              selected_recipe = recipe;
             }
           }
         }
@@ -178,7 +168,9 @@ namespace UI {
     return clicked_build;
   }
 
-  inline Action_ConstructionPreview construction_preview(Building building) {
+  inline Action_ConstructionPreview construction_preview(
+    Buildings::Building building
+  ) {
     Action_ConstructionPreview action = {Action_ConstructionPreview_t::None};
 
     CLAY({
@@ -196,6 +188,7 @@ namespace UI {
     }) {
 
       if (construction_preview_top_row(building)) {
+        selected_recipe = std::nullopt;
         action = {Action_ConstructionPreview_t::Back};
       }
 
@@ -206,7 +199,7 @@ namespace UI {
       if (construction_preview_bottom_row()) {
         action = {
           .type = Action_ConstructionPreview_t::Build,
-          .resource = selected_resource.value()
+          .recipe = selected_recipe.value()
         };
       }
     }

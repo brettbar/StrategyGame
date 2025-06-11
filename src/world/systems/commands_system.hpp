@@ -25,7 +25,7 @@ namespace Commands {
     entt::entity player_e;
     str msg;
     Vector2 click_pos;
-    Buildings::BuildingType building;
+    Buildings::Building building;
 
     entt::entity entity;
 
@@ -49,21 +49,21 @@ namespace Commands {
     }
 
 
-    static Command build_settlement( entt::entity entity ) {
+    static Command build_settlement(entt::entity entity) {
       auto cmd = Command();
       cmd.type = Type::BuildSettlement;
       cmd.entity = entity;
       return cmd;
     }
 
-    static Command claim_province( entt::entity entity ) {
+    static Command claim_province(entt::entity entity) {
       auto cmd = Command();
       cmd.type = Type::ClaimProvince;
       cmd.entity = entity;
       return cmd;
     }
 
-    static Command spawn_colonist( entt::entity player, vec2f click_pos ) {
+    static Command spawn_colonist(entt::entity player, vec2f click_pos) {
       auto cmd = Command();
       cmd.type = Type::SpawnColonist;
       cmd.player_e = player;
@@ -71,7 +71,7 @@ namespace Commands {
       return cmd;
     }
 
-    static Command spawn_army( entt::entity player, vec2f click_pos ) {
+    static Command spawn_army(entt::entity player, vec2f click_pos) {
       auto cmd = Command();
       cmd.type = Type::SpawnArmy;
       cmd.player_e = player;
@@ -79,7 +79,7 @@ namespace Commands {
       return cmd;
     }
 
-    static Command time_change( entt::entity player, str msg ) {
+    static Command time_change(entt::entity player, str msg) {
       auto cmd = Command();
       cmd.type = Type::TimeChange;
       cmd.player_e = player;
@@ -89,7 +89,7 @@ namespace Commands {
 
     static Command construct_building(
       entt::entity settlement_e,
-      Buildings::BuildingType building
+      Buildings::Building building
     ) {
       auto cmd = Command();
       cmd.type = Type::ConstructBuilding;
@@ -114,8 +114,8 @@ public:
       queue.update();
     }
 
-    void enqueue( const Command &cmd ) {
-      queue.enqueue( cmd );
+    void enqueue(const Command &cmd) {
+      queue.enqueue(cmd);
     }
 
     static System *Singleton() {
@@ -127,8 +127,8 @@ private:
     System() {}
     ~System() {}
 
-    System( System const & ) = delete;
-    void operator=( const System & ) = delete;
+    System(System const &) = delete;
+    void operator=(const System &) = delete;
   };
 
   inline System *Manager() {

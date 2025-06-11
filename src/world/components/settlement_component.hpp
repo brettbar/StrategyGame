@@ -14,7 +14,7 @@ namespace Settlement {
 
   struct Building {
     Buildings::BuildingType type;
-    u32 current_recipe = 0;
+    Buildings::Recipe current_recipe;
 
     template<class Archive>
     void serialize(Archive &ar) {
@@ -29,7 +29,7 @@ namespace Settlement {
     Development development;
     Population population;
     Texture2D texture;
-    std::map<Resources::Type, u32> resources = {};
+    std::map<Resources::Type, u32> resources_quantities = {};
 
     // Building
     list<Building> buildings = {};

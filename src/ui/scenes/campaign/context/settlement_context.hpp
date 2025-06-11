@@ -94,7 +94,7 @@ namespace UI {
 
         auto recipes = Buildings::recipes_for_building(buildings[i].type);
 
-        auto current_recipe = recipes[buildings[i].current_recipe];
+        auto current_recipe = buildings[i].current_recipe;
 
         for (const auto &output: current_recipe.outputs) {
           resource_icon(output.resource, i);

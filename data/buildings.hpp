@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../src/shared/common.hpp"
+#include "clay/clay.h"
 #include "resources.hpp"
 #include <cereal/types/vector.hpp>
 
@@ -11,10 +12,26 @@ namespace Buildings {
   struct RecipeItem {
     u32 quantity = 1;// typically 1 at a time, but can be overloaded
     Resources::Type resource;
+
+    template<class Archive>
+    void serialize(Archive &ar) {
+      ar(quantity, resource);
+    }
   };
+
   struct Recipe {
+    u32 id;
     list<RecipeItem> inputs;
     list<RecipeItem> outputs;// usually just one
+
+    bool operator==(const Recipe &other) const {
+      return id == other.id;
+    }
+
+    template<class Archive>
+    void serialize(Archive &ar) {
+      ar(id, inputs, outputs);
+    }
   };
 
   enum class BuildingCategory {
@@ -54,6 +71,15 @@ namespace Buildings {
     Jeweler,
     Tailor,
   };
+
+  struct Building {
+    BuildingType type;
+    BuildingCategory category;
+    Clay_String label;
+    str path;
+    Recipe current_recipe;
+  };
+
 
   inline str building_name_str(BuildingType building) {
     switch (building) {
@@ -124,6 +150,7 @@ namespace Buildings {
       case BuildingType::LumberMill:
         return {
           Recipe{
+            .id = 0,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::Timber}},
           },
@@ -131,6 +158,7 @@ namespace Buildings {
       case BuildingType::Farm:
         return {
           Recipe{
+            .id = 0,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::Wheat}},
           },
@@ -144,22 +172,27 @@ namespace Buildings {
       case BuildingType::Mine:
         return {
           Recipe{
+            .id = 0,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::TinOre}},
           },
           Recipe{
+            .id = 1,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::CopperOre}},
           },
           Recipe{
+            .id = 2,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::IronOre}},
           },
           Recipe{
+            .id = 3,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::SilverOre}},
           },
           Recipe{
+            .id = 4,
             .inputs = {},
             .outputs = {RecipeItem{.resource = Resources::Type::GoldOre}},
           },
