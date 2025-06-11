@@ -5,18 +5,27 @@
 #include <raylib.h>
 
 namespace UI {
-  inline float UI_SCALE = 1.0f;
+  inline float UI_SCALE = 2.0f;
 
-  inline void set_ui_scale(f32 screen_diagonal_inches) {
-    // @todo find something that works for these
-    if (screen_diagonal_inches > 22) {
-      UI_SCALE = 4.0f;
-    } else if (screen_diagonal_inches > 14) {
+  inline void set_ui_scale(f32 height_dpi) {
+    f32 base_dpi = 96.0f;
+
+    UI_SCALE = height_dpi / base_dpi;
+
+    if (UI_SCALE < 2.0f)
       UI_SCALE = 2.0f;
-    } else {
-      UI_SCALE = 1.0f;
-    }
   }
+
+  // inline void set_ui_scale(f32 screen_diagonal_inches) {
+  //   // @todo find something that works for these
+  //   if (screen_diagonal_inches > 22) {
+  //     UI_SCALE = 4.0f;
+  //   } else if (screen_diagonal_inches > 14) {
+  //     UI_SCALE = 2.0f;
+  //   } else {
+  //     UI_SCALE = 1.0f;
+  //   }
+  // }
 
 
   const Clay_Color COLOR_TRANSPARENT_BLACK = Clay_Color{0, 0, 0, 200};
