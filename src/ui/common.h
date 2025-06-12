@@ -8,7 +8,8 @@ namespace UI {
   inline float UI_SCALE = 2.0f;
 
   inline void set_ui_scale(f32 height_dpi) {
-    f32 base_dpi = 96.0f;
+    // f32 base_dpi = 96.0f;
+    f32 base_dpi = 48.0f;
 
     UI_SCALE = height_dpi / base_dpi;
 
