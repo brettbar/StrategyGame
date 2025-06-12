@@ -2,6 +2,7 @@
 
 #include "../../../library/texture_button.hpp"
 #include "construction/construction_tab.hpp"
+#include "overview_tabs.hpp"
 #include "resources_tab.hpp"
 
 
@@ -19,6 +20,10 @@ namespace UI {
   inline OverviewAction overview_content(Clay_String current_tab) {
     opt<Buildings::Building> building_to_build = std::nullopt;
 
+    // @todo refactor this shit
+    // coming from overview_tabs overall height
+    f32 max_height = ((32 * 8) + 64 - 21) * UI_SCALE;
+
     CLAY({
       .id = CLAY_ID("OverviewPanel::Content"),
       .layout =
@@ -26,14 +31,14 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIXED(243 * UI_SCALE),
-              .height = CLAY_SIZING_GROW(),
+              // .height = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_FIXED(max_height),
             },
-          .padding = {16, 16},
-          .childGap = 8,
+          .padding = CLAY_PADDING_ALL(uint16_t(8 * UI_SCALE)),
+          .childGap = uint16_t(8 * UI_SCALE),
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      // .cornerRadius = { 5, 5, 5, 5 },
     }) {
       CLAY({
         .id = CLAY_ID("OverviewPanel::Content::Banner"),
@@ -51,22 +56,15 @@ namespace UI {
               },
           },
       }) {
-        CLAY() {
-          CLAY_TEXT(
-            current_tab,
-            CLAY_TEXT_CONFIG({
-              .textColor = COLOR_WHITE,
-              .fontSize = uint16_t(12 * UI_SCALE),
-            })
-          );
-        }
+        CLAY_TEXT(
+          current_tab,
+          CLAY_TEXT_CONFIG({
+            .textColor = COLOR_WHITE,
+            .fontSize = uint16_t(12 * UI_SCALE),
+          })
+        );
 
-        CLAY({
-          .layout =
-            {
-              .sizing = {CLAY_SIZING_GROW()},
-            },
-        });
+        spacer();
 
         texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15});
       }

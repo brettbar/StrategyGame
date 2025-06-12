@@ -80,7 +80,6 @@ namespace Buildings {
     Recipe current_recipe;
   };
 
-
   inline const char *building_name_str(BuildingType building) {
     switch (building) {
       case BuildingType::LumberMill:

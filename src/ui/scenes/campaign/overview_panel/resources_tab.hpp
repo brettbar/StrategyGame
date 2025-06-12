@@ -130,8 +130,14 @@ namespace UI {
 
   inline void resources_tab() {
     CLAY({
+      .id = CLAY_ID("ResourcesTab"),
       .layout =
         {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
           .childGap = 4,
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
@@ -139,12 +145,13 @@ namespace UI {
       resources_headers();
 
       CLAY({
-        .id = CLAY_ID("ResourceRows"),
+        .id = CLAY_ID("ResourcesRows"),
         .layout =
           {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_GROW(),
               },
             .childGap = 4,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,

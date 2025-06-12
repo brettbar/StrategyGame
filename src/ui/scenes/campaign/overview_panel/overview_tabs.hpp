@@ -63,11 +63,14 @@ namespace UI {
     u32 num_tabs = LEN(tabs);
 
     CLAY({
-      .id = CLAY_ID("OverviewPanel"),
+      .id = CLAY_ID("OverviewPanel::Tabs"),
       .layout =
         {
-          .sizing = {.width = CLAY_SIZING_FIT(128)},
-          .childGap = 4,
+          .sizing =
+            {
+              .width = CLAY_SIZING_FIXED(66 * UI_SCALE),
+              .height = CLAY_SIZING_FIT(),
+            },
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_BLACK,
@@ -78,6 +81,7 @@ namespace UI {
           dims = {66, 64};
         }
 
+        // @todo replace with texture_button
         CLAY({
           .id = CLAY_IDI("OverviewPanel::tab", i),
           .layout =

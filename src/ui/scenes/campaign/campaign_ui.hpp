@@ -102,7 +102,6 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
-          // .padding = { 2, 2, 2, 2 },
           .childAlignment =
             {
               .x = CLAY_ALIGN_X_LEFT,
@@ -118,7 +117,7 @@ namespace UI {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_PERCENT(0.6),
+                .height = CLAY_SIZING_GROW(),
               },
             .childAlignment =
               {
@@ -139,7 +138,6 @@ namespace UI {
                   .width = CLAY_SIZING_GROW(),
                   .height = CLAY_SIZING_GROW(),
                 },
-              // .childGap = 8,
               .layoutDirection = CLAY_TOP_TO_BOTTOM,
             },
         }) {
@@ -213,8 +211,10 @@ namespace UI {
           .layout =
             {
               .sizing =
-                {.width = CLAY_SIZING_PERCENT(0.33),
-                 .height = CLAY_SIZING_GROW()},
+                {
+                  .width = CLAY_SIZING_PERCENT(0.33),
+                  .height = CLAY_SIZING_GROW(),
+                },
               .childAlignment =
                 {
                   .x = CLAY_ALIGN_X_RIGHT,
@@ -249,8 +249,7 @@ namespace UI {
     } else if (building_to_build.has_value()) {
       return Action_Campaign{
         .type = Action_Campaign_t::SelectBuilding,
-        .building = building_to_build.value()
-      };
+        .building = building_to_build.value()};
     }
 
     return Action_Campaign{.type = Action_Campaign_t::None};
