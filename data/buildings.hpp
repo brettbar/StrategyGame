@@ -81,7 +81,7 @@ namespace Buildings {
   };
 
 
-  inline str building_name_str(BuildingType building) {
+  inline const char *building_name_str(BuildingType building) {
     switch (building) {
       case BuildingType::LumberMill:
         return "lumber_mill";
@@ -226,8 +226,19 @@ namespace Buildings {
     return {};
   }
 
+
+  // @refactor make this a util, alongside the one in resources.hpp
   inline hstr building_icon_path(BuildingType type) {
-    return hstr{(Buildings::building_name_str(type) + "_icon.png").c_str()};
+    str file = std::string(Buildings::building_name_str(type));
+
+    for (u32 j = 0; j < file.length(); j++) {
+      if (file[j] == ' ')
+        file[j] = '_';
+    }
+
+    file += "_icon.png";
+
+    return hstr{(file).c_str()};
   }
 
 };// namespace Buildings

@@ -33,11 +33,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      // .cornerRadius = { 5, 5, 5, 5 },
     }) {
-
-      // printf( "Name: %s\n", selected_settlement.name.c_str() );
-
       Clay_String cs = Clay_String{
         .length =
           static_cast<int32_t>(strlen(selected_settlement->name.c_str())),
@@ -61,15 +57,6 @@ namespace UI {
 
   inline void buildings_list(list<Settlement::Building> buildings) {
     for (u32 i = 0; i < buildings.size(); i++) {
-      Clay_String sn = Clay_String{
-        .length = static_cast<int32_t>(
-          strlen(Buildings::building_name_str(buildings[i].type).c_str())
-        ),
-
-        .chars = (Buildings::building_name_str(buildings[i].type).c_str()),
-      };
-
-
       CLAY({
         .layout =
           {
@@ -86,8 +73,22 @@ namespace UI {
 
         texture_label(hstr{"arrow.png"}, {13, 13});
 
-        texture_label(
-          Buildings::building_icon_path(buildings[i].type), {32, 32}
+        // texture_label(
+        //   Buildings::building_icon_path(buildings[i].type), {32, 32}
+        // );
+        const char *label = Buildings::building_name_str(buildings[i].type);
+
+        Clay_String cs = Clay_String{
+          .length = static_cast<int32_t>(strlen(label)),
+          .chars = label,
+        };
+
+        texture_w_tooltip(
+          CLAY_STRING("BuildingIcon"),
+          cs,
+          Buildings::building_icon_path(buildings[i].type),
+          {32, 32},
+          i
         );
 
         texture_label(hstr{"arrow.png"}, {13, 13});
