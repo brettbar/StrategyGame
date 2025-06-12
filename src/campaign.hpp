@@ -243,8 +243,6 @@ inline void Campaign::load(cstr file_path) {
     .connect<&Campaign::EvaluteCommands>(this);
 }
 
-// @todo this is broken
-// need to make campaign_ui actually do something with it
 inline opt<Buildings::Building> building_to_build = std::nullopt;
 
 // Runs inside game loop
@@ -288,7 +286,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
     CLAY_STRING("OverviewPanel"),
     CLAY_STRING("OverviewPanel::Content"),
     CLAY_STRING("SettlementContext"),
-    CLAY_STRING("ActorContext")};
+    CLAY_STRING("ActorContext")
+  };
   for (u32 i = 0; i < items; i++) {
     Clay_ElementId id = Clay_GetElementId(foos[i]);
     hovered = hovered || Clay_PointerOver(id);
@@ -397,7 +396,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
     Global::state.camera.zoom = 0.08f;
 
   Global::state.camera.offset = {
-    (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2};
+    (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2
+  };
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame

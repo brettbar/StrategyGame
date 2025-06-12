@@ -84,10 +84,6 @@ int main() {
   u32 physical_w = GetMonitorPhysicalWidth(monitor);
   u32 physical_h = GetMonitorPhysicalHeight(monitor);
 
-  // u32 diagonal = sqrt((physical_w * physical_w) + (physical_h * physical_h));
-
-  // f32 diagonal_in = diagonal / 25.4;
-
   f32 height_dpi = monitor_h / (physical_h / 25.4f);
 
   printf(
@@ -97,8 +93,8 @@ int main() {
 
   // Resize monitor
   SetWindowSize(monitor_w, monitor_h);
-  // UI::set_ui_scale(monitor_w);
-  UI::set_ui_scale(height_dpi);
+  // UI::set_ui_scale(height_dpi);
+  UI::set_ui_scale_by_screen_height(monitor_h);
 
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = Clay_Arena{

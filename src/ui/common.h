@@ -7,26 +7,25 @@
 namespace UI {
   inline float UI_SCALE = 2.0f;
 
-  inline void set_ui_scale(f32 height_dpi) {
-    // f32 base_dpi = 96.0f;
-    f32 base_dpi = 48.0f;
-
-    UI_SCALE = height_dpi / base_dpi;
-
-    if (UI_SCALE < 2.0f)
-      UI_SCALE = 2.0f;
-  }
-
-  // inline void set_ui_scale(f32 screen_diagonal_inches) {
-  //   // @todo find something that works for these
-  //   if (screen_diagonal_inches > 22) {
-  //     UI_SCALE = 4.0f;
-  //   } else if (screen_diagonal_inches > 14) {
+  // inline void set_ui_scale(f32 height_dpi) {
+  //   // f32 base_dpi = 96.0f;
+  //   f32 base_dpi = 48.0f;
+  //
+  //   UI_SCALE = height_dpi / base_dpi;
+  //
+  //   if (UI_SCALE < 2.0f)
   //     UI_SCALE = 2.0f;
-  //   } else {
-  //     UI_SCALE = 1.0f;
-  //   }
   // }
+
+  inline void set_ui_scale_by_screen_height(f32 screen_height) {
+    if (screen_height > 1440) {
+      UI_SCALE = 4.0f;
+    } else if (screen_height > 1080) {
+      UI_SCALE = 2.0f;
+    } else {
+      UI_SCALE = 1.0f;
+    }
+  }
 
 
   const Clay_Color COLOR_TRANSPARENT_BLACK = Clay_Color{0, 0, 0, 200};
