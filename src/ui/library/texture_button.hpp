@@ -51,14 +51,14 @@ namespace UI {
   }
 
   inline void texture_w_tooltip(
-    Clay_ElementId hid,
-    Clay_ElementId tooltip_id,
+    Clay_String cs,
     Clay_String label,
     hstr texture_id,
-    vec2f dimensions
+    vec2f dimensions,
+    u32 i = 0
   ) {
     CLAY({
-      .id = hid,
+      .id = Clay__HashString(cs, i, 0),
       .layout =
         {
           .sizing =
@@ -69,14 +69,13 @@ namespace UI {
         },
       .image = image(texture_id, dimensions),
     }) {
-      if (Clay_PointerOver(hid)) {
+      if (Clay_PointerOver(Clay_GetElementIdWithIndex(cs, i))) {
         CLAY({
-          .id = tooltip_id,
           .layout =
             {
               .sizing =
                 {
-                  .width = CLAY_SIZING_GROW(32 * UI_SCALE),
+                  .width = CLAY_SIZING_GROW(48 * UI_SCALE),
                 },
               .padding = CLAY_PADDING_ALL(uint16_t(4 * UI_SCALE)),
               .childAlignment =

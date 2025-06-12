@@ -85,11 +85,11 @@ namespace UI {
             }
 
             texture_w_tooltip(
-              CLAY_IDI("BuildingIcon", j),
-              CLAY_IDI("BuildingIcon::Tooltip", j),
+              CLAY_STRING("BuildingIcon"),
               building.label,
               hstr{building.path.c_str()},
-              {32, 32}
+              {32, 32},
+              j
             );
           }
         }
