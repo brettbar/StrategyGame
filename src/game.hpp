@@ -270,7 +270,8 @@ class IGame {
     );
 
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) &&
+        IsKeyPressed(KEY_I)) {
       _ui_debug = !_ui_debug;
       Clay_SetDebugModeEnabled(_ui_debug);
     }
@@ -546,7 +547,8 @@ class IGame {
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      Renderer::Get()->draw_map(Map::Manager()->mode);
+      // Renderer::Get()->draw_map(Map::Manager()->mode);
+      // Renderer::Get()->draw_common();
       Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();

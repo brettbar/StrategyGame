@@ -46,7 +46,7 @@ struct Renderer {
     );
   }
 
-  void draw_map(Map::Mode map_mode) {
+  void draw_common() {
     ClearBackground(DARKGRAY);
 
     BeginMode2D(Global::state.camera);
@@ -63,52 +63,48 @@ struct Renderer {
       EndShaderMode();
     }
     EndBlendMode();
+  }
 
-    switch (map_mode) {
-      case Map::Mode::BuildPreview://@todo
+  void draw_build_preview() {
+    Overlay::System::draw_build_preview();
+    Overlay::System::draw_settlement_name();
+  }
 
-        Overlay::System::draw_build_preview();
+  void draw_default() {
+    // Draw TransparentOverlay
 
-        Overlay::System::draw_settlement_name();
-
-        break;
-      case Map::Mode::Default:
-        // Draw TransparentOverlay
-
-        Overlay::System::draw_default();
-        BeginShaderMode(shader);
-        {
-          Overlay::System::draw_borders();
-          Selection::System::Draw(Global::texture_cache, true);
-        }
-        EndShaderMode();
-
-        Overlay::System::draw_settlement_name();
-        break;
-      case Map::Mode::Terrain:
-        // Do nothing
-        break;
-      case Map::Mode::Political:
-        // Draw OpaqueOverlay
-
-        Overlay::System::draw_political();
-        BeginShaderMode(shader);
-        {
-          Overlay::System::draw_borders();
-          Selection::System::Draw(Global::texture_cache, true);
-        }
-        Overlay::System::draw_settlement_name();
-        EndShaderMode();
-        break;
-      case Map::Mode::Resources:
-        // Draw Resources
-        BeginShaderMode(shader);
-        { Resource::System::Draw(Global::state.camera); }
-        EndShaderMode();
-        break;
+    Overlay::System::draw_default();
+    BeginShaderMode(shader);
+    {
+      Overlay::System::draw_borders();
+      Selection::System::Draw(Global::texture_cache, true);
     }
+    EndShaderMode();
 
+    Overlay::System::draw_settlement_name();
+  }
 
+  void draw_political() {
+    // Draw OpaqueOverlay
+
+    Overlay::System::draw_political();
+    BeginShaderMode(shader);
+    {
+      Overlay::System::draw_borders();
+      Selection::System::Draw(Global::texture_cache, true);
+    }
+    Overlay::System::draw_settlement_name();
+    EndShaderMode();
+  }
+
+  void draw_resources() {
+    // Draw Resources
+    BeginShaderMode(shader);
+    { Resource::System::Draw(Global::state.camera); }
+    EndShaderMode();
+  }
+
+  void draw_after(Map::Mode map_mode) {
     BeginBlendMode(BLEND_ALPHA_PREMULTIPLY);
     // BeginBlendMode( BLEND_ALPHA );
     {

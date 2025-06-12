@@ -428,7 +428,29 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::Get()->draw_map(Map::Manager()->mode);
+  // Renderer::Get()->draw_map(Map::Manager()->mode);
+
+  auto rndr = Renderer::Get();
+  rndr->draw_common();
+
+  switch (Map::Manager()->mode) {
+    case Map::Mode::Default:
+      rndr->draw_default();
+      break;
+    case Map::Mode::BuildPreview://@todo
+      rndr->draw_build_preview();
+      break;
+    case Map::Mode::Terrain:
+      break;
+    case Map::Mode::Political:
+      rndr->draw_political();
+      break;
+    case Map::Mode::Resources:
+      rndr->draw_resources();
+      break;
+  }
+
+  rndr->draw_after(Map::Manager()->mode);
 }
 
 // @todo retire this, I think?
