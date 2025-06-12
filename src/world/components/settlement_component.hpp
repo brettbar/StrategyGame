@@ -31,17 +31,19 @@ namespace Settlement {
     Texture2D texture;
     std::map<Resources::Type, u32> resources_quantities = {};
 
-    // Building
+    u32 max_building_slots = 1;
+
     list<Building> buildings = {};
 
     list<Regiment> garrison = {};
 
-    // TOOD might need separate save/load functions for this one
+    // @TODO might need separate save/load functions for this one
     template<class Archive>
     void serialize(Archive &ar) {
       ar(id, name, development, population, buildings);
     }
 
+    // @TODO is this needed?
     template<class Archive>
     void serialize(Archive &ar, Population &pop) {
       ar(pop);

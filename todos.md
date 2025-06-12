@@ -2,5 +2,5 @@
 
 
 - [x] Build mode overlay
-  - [ ] make it actually check requirements to build
-- [ ] fix tooltip buttons
+  - [x] make it actually check requirements to build
+- [x] fix tooltip buttons

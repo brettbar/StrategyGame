@@ -142,6 +142,21 @@ public:
     //   } );
     // }
 
+    static bool has_available_building_slots(Settlement::Component settlement) {
+      return settlement.max_building_slots > settlement.buildings.size();
+    }
+
+    static bool can_build_immediately(Settlement::Component settlement) {
+      // will add additional criteria later
+      return has_available_building_slots(settlement);
+    }
+
+    static bool can_build_with_changes_needed(Settlement::Component settlement
+    ) {
+      // @todo
+      return false;
+    }
+
     static void construct_building(
       entt::entity settlement_e,
       Buildings::Building building
@@ -163,8 +178,7 @@ public:
 
 
       settlement.buildings.push_back(Settlement::Building{
-        .type = building.type, .current_recipe = building.current_recipe
-      });
+        .type = building.type, .current_recipe = building.current_recipe});
     }
 
 

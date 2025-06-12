@@ -65,8 +65,8 @@ struct Renderer {
     EndBlendMode();
   }
 
-  void draw_build_preview() {
-    Overlay::System::draw_build_preview();
+  void draw_build_preview(entt::entity local_player_e) {
+    Overlay::System::draw_build_preview(local_player_e);
     Overlay::System::draw_settlement_name();
   }
 
@@ -305,8 +305,7 @@ struct Renderer {
                 boundingBox.x,
                 boundingBox.y,
                 boundingBox.width,
-                boundingBox.height
-              },
+                boundingBox.height},
               radius,
               8,
               CLAY_COLOR_TO_RAYLIB_COLOR(config->backgroundColor)
@@ -383,8 +382,7 @@ struct Renderer {
             DrawRing(
               Vector2{
                 roundf(boundingBox.x + config->cornerRadius.topLeft),
-                roundf(boundingBox.y + config->cornerRadius.topLeft)
-              },
+                roundf(boundingBox.y + config->cornerRadius.topLeft)},
               roundf(config->cornerRadius.topLeft - config->width.top),
               config->cornerRadius.topLeft,
               180,
@@ -400,8 +398,7 @@ struct Renderer {
                   boundingBox.x + boundingBox.width -
                   config->cornerRadius.topRight
                 ),
-                roundf(boundingBox.y + config->cornerRadius.topRight)
-              },
+                roundf(boundingBox.y + config->cornerRadius.topRight)},
               roundf(config->cornerRadius.topRight - config->width.top),
               config->cornerRadius.topRight,
               270,
@@ -417,8 +414,7 @@ struct Renderer {
                 roundf(
                   boundingBox.y + boundingBox.height -
                   config->cornerRadius.bottomLeft
-                )
-              },
+                )},
               roundf(config->cornerRadius.bottomLeft - config->width.top),
               config->cornerRadius.bottomLeft,
               90,
@@ -437,8 +433,7 @@ struct Renderer {
                 roundf(
                   boundingBox.y + boundingBox.height -
                   config->cornerRadius.bottomRight
-                )
-              },
+                )},
               roundf(config->cornerRadius.bottomRight - config->width.bottom),
               config->cornerRadius.bottomRight,
               0.1,
@@ -469,8 +464,7 @@ struct Renderer {
                   renderCommand->boundingBox.x +
                     renderCommand->boundingBox.width / 2,
                   renderCommand->boundingBox.y +
-                    (renderCommand->boundingBox.height / 2) + 20
-                },
+                    (renderCommand->boundingBox.height / 2) + 20},
                 Raylib_camera,
                 (int) roundf(rootBox.width),
                 (int) roundf(rootBox.height),

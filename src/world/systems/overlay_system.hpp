@@ -11,6 +11,7 @@
 #include "../components/player_component.hpp"
 #include "../components/province_component.hpp"
 #include "../components/settlement_component.hpp"
+#include "settlement_system.hpp"
 
 #include <raylib.h>
 
@@ -118,24 +119,26 @@ namespace Overlay {
       }
     }
 
-    static void draw_build_preview() {
-      auto provinces = Global::world.view<Province::Component>();
+    static void draw_build_preview(entt::entity local_player_e) {
+      auto province_settlements =
+        Global::world.view<Province::Component, Settlement::Component>();
 
-      for (auto entity: provinces) {
-        auto &prov = provinces.get<Province::Component>(entity);
+      for (auto entity: province_settlements) {
+        auto &prov = province_settlements.get<Province::Component>(entity);
+        auto &settlement =
+          province_settlements.get<Settlement::Component>(entity);
 
         Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
-        if (prov.tile->owner != entt::null) {
+        if (prov.tile->owner == local_player_e) {
+
           str color = "red";
 
-
-          bool can_build_immediately = true;
-          bool can_build_with_changes_needed = false;
-
-          if (can_build_immediately) {
+          if (Settlement::System().can_build_immediately(settlement)) {
             color = "green";
-          } else if (can_build_with_changes_needed) {
+          } else if (Settlement::System().can_build_with_changes_needed(
+                       settlement
+                     )) {
             color = "yellow";
           }
 
