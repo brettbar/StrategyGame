@@ -5,17 +5,10 @@
 #include "texture_button.hpp"
 
 namespace UI {
-  inline void resource_icon(Resources::Type type, u32 i) {
-    str resource = Resources::ResourceStr(type);
-
-    Clay_String cs = Clay_String{
-      .isStaticallyAllocated = false,
-      .length = static_cast<int32_t>(strlen(resource.c_str())),
-      .chars = resource.c_str(),
-    };
+  inline void resource_icon(Resources::Type type, Clay_String cs, u32 i) {
 
     CLAY({
-      .id = Clay__HashString(cs, i, Clay__GetParentElementId()),
+      .id = CLAY_SIDI(cs, i),
       .layout =
         {
           .childAlignment =
@@ -29,11 +22,8 @@ namespace UI {
 
       texture_label(resource_icon_path(type), {32, 32});
 
-      auto id = Clay_GetElementIdWithIndex(cs, i);
-
-      if (Clay_PointerOver(id)) {
+      if (Clay_PointerOver(Clay_GetElementIdWithIndex(cs, i))) {
         CLAY({
-          .id = CLAY_IDI_LOCAL("ResourceIcon::Tooltip", i),
           .layout = {.padding = {8, 8}},
           .backgroundColor = COLOR_BLACK,
           .floating =
@@ -47,7 +37,6 @@ namespace UI {
               .attachTo = CLAY_ATTACH_TO_PARENT,
             },
         }) {
-
           text_label(cs, 12);
         }
       }

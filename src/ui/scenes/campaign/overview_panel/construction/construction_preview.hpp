@@ -106,7 +106,14 @@ namespace UI {
 
               texture_label(hstr{"arrow.png"}, {13, 13});
 
-              resource_icon(item.resource, j);
+              const char *resource = Resources::ResourceStr(item.resource);
+
+              Clay_String cs = Clay_String{
+                .length = static_cast<int32_t>(strlen(resource)),
+                .chars = resource,
+              };
+
+              resource_icon(item.resource, cs, j);
             }
 
             if (!selected_recipe.has_value()) {

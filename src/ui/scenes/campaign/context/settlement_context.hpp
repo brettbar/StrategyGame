@@ -97,7 +97,14 @@ namespace UI {
         auto current_recipe = buildings[i].current_recipe;
 
         for (const auto &output: current_recipe.outputs) {
-          resource_icon(output.resource, i);
+          const char *resource = Resources::ResourceStr(output.resource);
+
+          Clay_String cs = Clay_String{
+            .length = static_cast<int32_t>(strlen(resource)),
+            .chars = resource,
+          };
+
+          resource_icon(output.resource, cs, i);
         }
       }
     }

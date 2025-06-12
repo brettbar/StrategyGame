@@ -65,10 +65,7 @@ namespace UI {
   ) {
     CLAY({
       .id = id,
-      .layout =
-        {
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        },
+      .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM},
     }) {
       for (u32 i = 0; i < col.size(); i++) {
 
