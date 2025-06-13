@@ -8,4 +8,9 @@
   - [ ] cancel button or something
 - [x] fix tooltip buttons
 
+
+## Settlement Context
 - [ ] can close settlement context
+- [ ] Display settlement info like development, population
+
+

@@ -81,63 +81,72 @@ namespace UI {
           .childGap = uint16_t(16 * UI_SCALE),
         },
     }) {
+
       CLAY({
         .layout =
           {
-            .childGap = uint16_t(4 * UI_SCALE),
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
           },
-        .clip = {.vertical = true, .childOffset = Clay_GetScrollOffset()},
       }) {
         text_label(CLAY_STRING("Produce:"), 12);
 
-        // for (const Buildings::Recipe &recipe: recipes) {
-        for (u32 i = 0; i < recipes.size(); i++) {
-          auto recipe = recipes[i];
-          CLAY({
-            .layout =
-              {
-                .childGap = uint16_t(8 * UI_SCALE),
-                .childAlignment = {.y = CLAY_ALIGN_Y_CENTER},
-              },
-          }) {
-            for (u32 j = 0; j < recipe.outputs.size(); j++) {
-              Buildings::RecipeItem item = recipe.outputs[j];
+        CLAY({
+          .layout =
+            {
+              .childGap = uint16_t(4 * UI_SCALE),
+              .layoutDirection = CLAY_TOP_TO_BOTTOM,
+            },
+          .clip = {.vertical = true, .childOffset = Clay_GetScrollOffset()},
+        }) {
 
-              texture_label(hstr{"arrow.png"}, {13, 13});
+          // for (const Buildings::Recipe &recipe: recipes) {
+          for (u32 i = 0; i < recipes.size(); i++) {
+            auto recipe = recipes[i];
+            CLAY({
+              .layout =
+                {
+                  .childGap = uint16_t(8 * UI_SCALE),
+                  .childAlignment = {.y = CLAY_ALIGN_Y_CENTER},
+                },
+            }) {
+              for (u32 j = 0; j < recipe.outputs.size(); j++) {
+                Buildings::RecipeItem item = recipe.outputs[j];
 
-              const char *resource = Resources::ResourceStr(item.resource);
+                texture_label(hstr{"arrow.png"}, {13, 13});
+
+                const char *resource = Resources::ResourceStr(item.resource);
+
+                Clay_String cs = Clay_String{
+                  .length = static_cast<int32_t>(strlen(resource)),
+                  .chars = resource,
+                };
+
+                resource_icon(item.resource, cs, j);
+              }
+
+              if (!selected_recipe.has_value()) {
+                selected_recipe = recipe;
+              }
+
+              str building_name = Buildings::building_name_str(building.type);
+              str label = building_name + "::Checkbox";
 
               Clay_String cs = Clay_String{
-                .length = static_cast<int32_t>(strlen(resource)),
-                .chars = resource,
+                .length = static_cast<int32_t>(strlen(label.c_str())),
+                .chars = label.c_str(),
               };
 
-              resource_icon(item.resource, cs, j);
-            }
+              hstr icon = hstr{"checkbox_empty.png"};
 
-            if (!selected_recipe.has_value()) {
-              selected_recipe = recipe;
-            }
+              if (selected_recipe == recipe) {
+                icon = hstr{"checkbox_checked.png"};
+              } else {
+                icon = hstr{"checkbox_empty.png"};
+              }
 
-            str building_name = Buildings::building_name_str(building.type);
-            str label = building_name + "::Checkbox";
-
-            Clay_String cs = Clay_String{
-              .length = static_cast<int32_t>(strlen(label.c_str())),
-              .chars = label.c_str(),
-            };
-
-            hstr icon = hstr{"checkbox_empty.png"};
-
-            if (selected_recipe == recipe) {
-              icon = hstr{"checkbox_checked.png"};
-            } else {
-              icon = hstr{"checkbox_empty.png"};
-            }
-
-            if (texture_button(cs, icon, {15, 15}, i)) {
-              selected_recipe = recipe;
+              if (texture_button(cs, icon, {15, 15}, i)) {
+                selected_recipe = recipe;
+              }
             }
           }
         }

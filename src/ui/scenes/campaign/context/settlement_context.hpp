@@ -34,20 +34,15 @@ namespace UI {
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
     }) {
-      Clay_String cs = Clay_String{
-        .length =
-          static_cast<int32_t>(strlen(selected_settlement->name.c_str())),
-        .chars = selected_settlement->name.c_str(),
-      };
+      auto cs = cstr_to_cs(selected_settlement->name.c_str());
+      text_label(cs, 16);
 
-      CLAY_TEXT(
-        cs,
-        CLAY_TEXT_CONFIG({
-          .textColor = COLOR_WHITE,
-          .fontId = 0,
-          .fontSize = 32,
-        })
-      );
+      auto dev_lvl = selected_settlement->development;
+
+      const char *dev_lvl_str = Settlement::dev_str(dev_lvl);
+      auto dev_cs = cstr_to_cs(dev_lvl_str);
+      text_label(dev_cs, 12);
+
 
       buildings_list(selected_settlement->buildings);
     }
@@ -73,9 +68,6 @@ namespace UI {
 
         texture_label(hstr{"arrow.png"}, {13, 13});
 
-        // texture_label(
-        //   Buildings::building_icon_path(buildings[i].type), {32, 32}
-        // );
         const char *label = Buildings::building_name_str(buildings[i].type);
 
         Clay_String cs = Clay_String{

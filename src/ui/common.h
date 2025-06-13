@@ -70,4 +70,13 @@ namespace UI {
     }
     return false;
   }
+
+  // @todo verify this works
+  // it does in the settlement context at least :shrug:
+  inline Clay_String cstr_to_cs(const char *input) {
+    return Clay_String{
+      .length = static_cast<int32_t>(strlen(input)),
+      .chars = input,
+    };
+  }
 };// namespace UI
