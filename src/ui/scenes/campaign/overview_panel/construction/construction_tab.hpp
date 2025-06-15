@@ -117,27 +117,14 @@ namespace UI {
       show_building_column(CLAY_ID("Construction::LeftCol"), left_col);
       show_building_column(CLAY_ID("Construction::RightCol"), right_col);
     }
-
-
-    // for (u32 i = 0; i < buildings.size(); i++) {
-    //   Buildings::Building building = buildings[i];
-    //
-    //   if (ButtonWasClicked(CLAY_STRING("ConstructionTab::BuildingIcon"), i)) {
-    //     return i;
-    //   }
-    // }
   }
 
 
   inline opt<Buildings::Building> construction_tab() {
 
     if (_constructing) {
-      // Buildings::Building building = buildings[_selected_building];
-
       auto action = construction_preview(_selected.value());
 
-      // _constructing = false;
-      // _selected_building = -1;
       switch (action.type) {
         case UI::Action_ConstructionPreview_t::None:
           break;

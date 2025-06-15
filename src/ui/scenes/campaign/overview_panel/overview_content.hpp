@@ -2,7 +2,6 @@
 
 #include "../../../library/texture_button.hpp"
 #include "construction/construction_tab.hpp"
-#include "overview_tabs.hpp"
 #include "resources_tab.hpp"
 
 
@@ -24,6 +23,7 @@ namespace UI {
     // coming from overview_tabs overall height
     f32 max_height = ((32 * 8) + 64 - 21) * UI_SCALE;
 
+
     CLAY({
       .id = CLAY_ID("OverviewPanel::Content"),
       .layout =
@@ -31,7 +31,6 @@ namespace UI {
           .sizing =
             {
               .width = CLAY_SIZING_FIXED(243 * UI_SCALE),
-              // .height = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_FIXED(max_height),
             },
           .padding = CLAY_PADDING_ALL(uint16_t(8 * UI_SCALE)),
@@ -39,6 +38,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
+      .border = grey_border(),
     }) {
       CLAY({
         .id = CLAY_ID("OverviewPanel::Content::Banner"),
