@@ -71,6 +71,7 @@ namespace UI {
               .width = CLAY_SIZING_FIXED(66 * UI_SCALE),
               .height = CLAY_SIZING_FIT(),
             },
+          .childGap = uint16_t(1 * UI_SCALE),
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_BLACK,

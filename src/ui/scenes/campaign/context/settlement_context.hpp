@@ -27,7 +27,7 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
-          .padding = {16, 16},
+          .padding = CLAY_PADDING_ALL(uint16_t(8 * UI_SCALE)),
           .childGap = 4,
           .childAlignment = {.x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP},
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
@@ -56,7 +56,7 @@ namespace UI {
         .layout =
           {
             .sizing = {.width = CLAY_SIZING_GROW()},
-            .childGap = 4,
+            .childGap = uint16_t(2 * UI_SCALE),
             .childAlignment =
               {
                 .x = CLAY_ALIGN_X_CENTER,

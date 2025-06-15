@@ -19,10 +19,13 @@ namespace UI {
   inline OverviewAction overview_content(Clay_String current_tab) {
     opt<Buildings::Building> building_to_build = std::nullopt;
 
+    OverviewAction action = OverviewAction{
+      .type = OverviewAction_t::None,
+    };
+
     // @todo refactor this shit
     // coming from overview_tabs overall height
-    f32 max_height = ((32 * 8) + 64 - 21) * UI_SCALE;
-
+    f32 max_height = ((1 * 8) + (32 * 8) + 64 - (21 + 1)) * UI_SCALE;
 
     CLAY({
       .id = CLAY_ID("OverviewPanel::Content"),
@@ -66,30 +69,27 @@ namespace UI {
 
         spacer();
 
-        texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15});
+        if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
+          action = OverviewAction{
+            .type = OverviewAction_t::CloseTab,
+          };
+        }
       }
 
       if (std::string(current_tab.chars) == "Construction") {
         building_to_build = UI::construction_tab();
+
+        if (building_to_build.has_value()) {
+          action = OverviewAction{
+            .type = OverviewAction_t::Construction,
+            .building = building_to_build.value(),
+          };
+        }
       } else if (std::string(current_tab.chars) == "Resources") {
         UI::resources_tab();
       }
     }
 
-    if (ButtonWasClicked(CLAY_STRING("Exit"))) {
-      return OverviewAction{
-        .type = OverviewAction_t::CloseTab,
-      };
-    }
-
-
-    if (building_to_build.has_value()) {
-      return OverviewAction{
-        .type = OverviewAction_t::Construction,
-        .building = building_to_build.value(),
-      };
-    }
-
-    return {.type = OverviewAction_t::None};
+    return action;
   }
 }// namespace UI

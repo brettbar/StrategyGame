@@ -102,6 +102,7 @@ namespace UI {
               .width = CLAY_SIZING_GROW(),
               .height = CLAY_SIZING_GROW(),
             },
+          .padding = CLAY_PADDING_ALL(uint16_t(1 * UI_SCALE)),
           .childAlignment =
             {
               .x = CLAY_ALIGN_X_LEFT,
@@ -118,6 +119,7 @@ namespace UI {
               {
                 .width = CLAY_SIZING_GROW(),
               },
+            .childGap = uint16_t(1 * UI_SCALE),
             .childAlignment =
               {
                 .x = CLAY_ALIGN_X_LEFT,
@@ -137,6 +139,7 @@ namespace UI {
                   .width = CLAY_SIZING_GROW(),
                   .height = CLAY_SIZING_GROW(),
                 },
+              .childGap = uint16_t(1 * UI_SCALE),
               .layoutDirection = CLAY_TOP_TO_BOTTOM,
             },
         }) {
