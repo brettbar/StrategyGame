@@ -76,7 +76,7 @@ namespace UI {
         };
 
         texture_w_tooltip(
-          CLAY_STRING("BuildingIcon"),
+          CLAY_STRING("SettlementContext::BuildingIcon"),
           cs,
           Buildings::building_icon_path(buildings[i].type),
           {32, 32},
@@ -98,6 +98,13 @@ namespace UI {
           };
 
           resource_icon(output.resource, cs, i);
+          // texture_label_w_tooltip(
+          //   CLAY_STRING("ResourcesTab::ResourceIcon"),
+          //   cstr_to_cs(resource),
+          //   resource_icon_path(output.resource),
+          //   {32, 32},
+          //   i
+          // );
         }
       }
     }

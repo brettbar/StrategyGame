@@ -52,6 +52,13 @@ namespace UI {
     });
   }
 
+  inline bool ButtonWasClicked(Clay_ElementId id) {
+    bool buttonIsHovered = Clay_PointerOver(id);
+    if (buttonIsHovered && IsMouseButtonPressed(0)) {
+      return true;
+    }
+    return false;
+  }
 
   inline bool ButtonWasClicked(Clay_String id_str, u32 index) {
     auto id = Clay_GetElementIdWithIndex(id_str, index);

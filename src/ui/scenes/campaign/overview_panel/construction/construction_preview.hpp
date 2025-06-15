@@ -21,23 +21,23 @@ namespace UI {
     Buildings::Recipe recipe;
   };
 
-  inline opt<Buildings::Recipe> selected_recipe = std::nullopt;
+  inline opt<Buildings::Recipe> _selected_recipe = std::nullopt;
 
   inline bool construction_preview_top_row(Buildings::Building building) {
     bool hit_back = false;
 
     CLAY({
-      .id = CLAY_ID("Construction::Preview::TopRow"),
+      .id = CLAY_ID("ConstructionPreview::TopRow"),
       .layout = {.childGap = 8},
     }) {
 
       if (texture_button(
-            CLAY_STRING("Construction::Preview::Back"),
+            CLAY_STRING("ConstructionPreview::Back"),
             hstr{"back_button.png"},
             {15, 15}
           )) {
         hit_back = true;
-        selected_recipe = std::nullopt;
+        _selected_recipe = std::nullopt;
       }
 
       CLAY({
@@ -50,8 +50,12 @@ namespace UI {
               },
           },
       }) {
-
-        texture_label(hstr{building.path.c_str()}, {32, 32});
+        texture_w_tooltip(
+          CLAY_STRING("ConstructionPreview::BuildingIcon"),
+          building.label,
+          Buildings::building_icon_path(building.type),
+          {32, 32}
+        );
 
         text_label(building.label, 16);
       }
@@ -65,7 +69,7 @@ namespace UI {
       Buildings::recipes_for_building(building.type);
 
     CLAY({
-      .id = CLAY_ID("Construction::Preview::Desc"),
+      .id = CLAY_ID("ConstructionPreview::Desc"),
     }) {
       text_label(
         CLAY_STRING("Description of a farm. Description of a farm. "
@@ -75,7 +79,7 @@ namespace UI {
     }
 
     CLAY({
-      .id = CLAY_ID("Construction::Preview::MiddleRow"),
+      .id = CLAY_ID("ConstructionPreview::MiddleRow"),
       .layout =
         {
           .childGap = uint16_t(16 * UI_SCALE),
@@ -124,8 +128,8 @@ namespace UI {
                 resource_icon(item.resource, cs, j);
               }
 
-              if (!selected_recipe.has_value()) {
-                selected_recipe = recipe;
+              if (!_selected_recipe.has_value()) {
+                _selected_recipe = recipe;
               }
 
               str building_name = Buildings::building_name_str(building.type);
@@ -138,14 +142,14 @@ namespace UI {
 
               hstr icon = hstr{"checkbox_empty.png"};
 
-              if (selected_recipe == recipe) {
+              if (_selected_recipe == recipe) {
                 icon = hstr{"checkbox_checked.png"};
               } else {
                 icon = hstr{"checkbox_empty.png"};
               }
 
               if (texture_button(cs, icon, {15, 15}, i)) {
-                selected_recipe = recipe;
+                _selected_recipe = recipe;
               }
             }
           }
@@ -163,7 +167,7 @@ namespace UI {
     bool clicked_build = false;
 
     CLAY({
-      .id = CLAY_ID("Construction::Preview::BottomRow"),
+      .id = CLAY_ID("ConstructionPreview::BottomRow"),
       .layout =
         {
           .sizing =
@@ -190,7 +194,7 @@ namespace UI {
     Action_ConstructionPreview action = {Action_ConstructionPreview_t::None};
 
     CLAY({
-      .id = CLAY_ID("Construction::Preview"),
+      .id = CLAY_ID("ConstructionPreview"),
       .layout =
         {
           .sizing =
@@ -204,7 +208,6 @@ namespace UI {
     }) {
 
       if (construction_preview_top_row(building)) {
-        selected_recipe = std::nullopt;
         action = {Action_ConstructionPreview_t::Back};
       }
 
@@ -215,13 +218,13 @@ namespace UI {
       if (construction_preview_bottom_row()) {
         action = {
           .type = Action_ConstructionPreview_t::Build,
-          .recipe = selected_recipe.value()
+          .recipe = _selected_recipe.value()
         };
       }
     }
 
 
-    // if (ButtonWasClicked(CLAY_STRING("Construction::Preview::Back"))) {
+    // if (ButtonWasClicked(CLAY_STRING("ConstructionPreview::Back"))) {
     //   return Action_ConstructionPreview::Back;
     // }
 

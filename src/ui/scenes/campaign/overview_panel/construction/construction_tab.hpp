@@ -11,7 +11,7 @@
 
 namespace UI {
   inline bool _constructing = false;
-  inline i32 _selected_building = -1;
+  inline opt<Buildings::Building> _selected = std::nullopt;
 
   inline Clay_String building_category_str(Buildings::BuildingCategory category
   ) {
@@ -63,12 +63,12 @@ namespace UI {
     Clay_ElementId id,
     list<Buildings::BuildingCategory> col
   ) {
+
     CLAY({
       .id = id,
       .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM},
     }) {
       for (u32 i = 0; i < col.size(); i++) {
-
         text_label(building_category_str(col[i]), 8);
 
         CLAY({
@@ -81,20 +81,23 @@ namespace UI {
               continue;
             }
 
-            texture_w_tooltip(
-              CLAY_STRING("BuildingIcon"),
-              building.label,
-              hstr{building.path.c_str()},
-              {32, 32},
-              j
-            );
+            if (texture_w_tooltip(
+                  CLAY_STRING("ConstructionTab::BuildingIcon"),
+                  building.label,
+                  hstr{building.path.c_str()},
+                  {32, 32},
+                  j
+                )) {
+              printf("Yep got it\n");
+              _selected = building;
+            }
           }
         }
       }
     }
   }
 
-  inline u32 construction_browser() {
+  inline void construction_browser() {
     list<Buildings::BuildingCategory> left_col = {
       Buildings::BuildingCategory::Agricultural,
       Buildings::BuildingCategory::Gathering,
@@ -116,24 +119,22 @@ namespace UI {
     }
 
 
-    for (u32 i = 0; i < buildings.size(); i++) {
-      Buildings::Building building = buildings[i];
-
-      if (ButtonWasClicked(CLAY_STRING("BuildingIcon"), i)) {
-        return i;
-      }
-    }
-
-    return -1;
+    // for (u32 i = 0; i < buildings.size(); i++) {
+    //   Buildings::Building building = buildings[i];
+    //
+    //   if (ButtonWasClicked(CLAY_STRING("ConstructionTab::BuildingIcon"), i)) {
+    //     return i;
+    //   }
+    // }
   }
 
 
   inline opt<Buildings::Building> construction_tab() {
 
     if (_constructing) {
-      Buildings::Building building = buildings[_selected_building];
+      // Buildings::Building building = buildings[_selected_building];
 
-      auto action = construction_preview(building);
+      auto action = construction_preview(_selected.value());
 
       // _constructing = false;
       // _selected_building = -1;
@@ -142,15 +143,16 @@ namespace UI {
           break;
         case UI::Action_ConstructionPreview_t::Back:
           _constructing = false;
+          _selected = std::nullopt;
           break;
         case UI::Action_ConstructionPreview_t::Build:
-          building.current_recipe = action.recipe;
-          return building;
+          _selected.value().current_recipe = action.recipe;
+          return _selected;
       }
     } else {
-      _selected_building = construction_browser();
+      construction_browser();
 
-      if (_selected_building > -1) {
+      if (_selected != std::nullopt) {
         _constructing = true;
       }
     }

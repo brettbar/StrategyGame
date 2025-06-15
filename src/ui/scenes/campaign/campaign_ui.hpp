@@ -117,7 +117,6 @@ namespace UI {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_GROW(),
               },
             .childAlignment =
               {
@@ -249,7 +248,8 @@ namespace UI {
     } else if (building_to_build.has_value()) {
       return Action_Campaign{
         .type = Action_Campaign_t::SelectBuilding,
-        .building = building_to_build.value()};
+        .building = building_to_build.value()
+      };
     }
 
     return Action_Campaign{.type = Action_Campaign_t::None};

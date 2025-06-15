@@ -7,8 +7,9 @@
 namespace UI {
   inline void resource_icon(Resources::Type type, Clay_String cs, u32 i) {
 
+    auto hid = CLAY_SIDI_LOCAL(cs, i);
     CLAY({
-      .id = CLAY_SIDI(cs, i),
+      .id = hid,
       .layout =
         {
           .childAlignment =
@@ -22,7 +23,7 @@ namespace UI {
 
       texture_label(resource_icon_path(type), {32, 32});
 
-      if (Clay_PointerOver(Clay_GetElementIdWithIndex(cs, i))) {
+      if (Clay_PointerOver(hid)) {
         CLAY({
           .layout = {.padding = {8, 8}},
           .backgroundColor = COLOR_BLACK,

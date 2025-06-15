@@ -53,6 +53,7 @@ namespace UI {
         .chars = "0",
       };
 
+      const char *resource = Resources::ResourceStr(resource_t);
 
       CLAY({
         .layout =
@@ -62,7 +63,14 @@ namespace UI {
           },
       }) {
         // 1. Icon
-        texture_label(resource_icon_path(resource_t), {32, 32});
+        // texture_label(resource_icon_path(resource_t), {32, 32});
+        texture_w_tooltip(
+          CLAY_STRING("ResourcesTab::ResourceIcon"),
+          cstr_to_cs(resource),
+          resource_icon_path(resource_t),
+          {32, 32},
+          i
+        );
 
         // 2. Stored
         resource_quantity(amount_cs, dimensions);

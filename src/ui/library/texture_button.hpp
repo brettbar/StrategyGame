@@ -20,8 +20,9 @@ namespace UI {
     vec2f dimensions,
     u32 i = 0
   ) {
+    auto hid = CLAY_SIDI_LOCAL(cs, i);
     CLAY({
-      .id = Clay__HashString(cs, i, 0),
+      .id = hid,
       .layout =
         {
           .sizing =
@@ -33,7 +34,7 @@ namespace UI {
       .image = image(texture_id, dimensions),
     });
 
-    return ButtonWasClicked(cs, i);
+    return ButtonWasClicked(hid);
   }
 
   inline void texture_label(hstr texture_id, vec2f dimensions) {
@@ -50,15 +51,17 @@ namespace UI {
     });
   }
 
-  inline void texture_w_tooltip(
+  inline bool texture_w_tooltip(
     Clay_String cs,
     Clay_String label,
     hstr texture_id,
     vec2f dimensions,
     u32 i = 0
   ) {
+    auto hid = CLAY_SIDI_LOCAL(cs, i);
+
     CLAY({
-      .id = Clay__HashString(cs, i, 0),
+      .id = hid,
       .layout =
         {
           .sizing =
@@ -69,7 +72,7 @@ namespace UI {
         },
       .image = image(texture_id, dimensions),
     }) {
-      if (Clay_PointerOver(Clay_GetElementIdWithIndex(cs, i))) {
+      if (Clay_PointerOver(hid)) {
         CLAY({
           .layout =
             {
@@ -105,7 +108,21 @@ namespace UI {
         }
       }
     }
+
+    return ButtonWasClicked(hid);
   }
+
+  // inline bool texture_button_w_tooltip(
+  //   Clay_String cs,
+  //   Clay_String label,
+  //   hstr texture_id,
+  //   vec2f dimensions,
+  //   u32 i = 0
+  // ) {
+  //   texture_label_w_tooltip(cs, label, texture_id, dimensions);
+  //
+  //   return ButtonWasClicked(cs, i);
+  // }
 
   // @todo this might be broken on windows
   // inline void texture_w_tooltip(

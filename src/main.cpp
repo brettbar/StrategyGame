@@ -27,7 +27,7 @@ void SteamAPIDebugTextHook(int severity, const char *msg) {
 }
 
 void HandleClayErrors(Clay_ErrorData errorData) {
-  printf("%s", errorData.errorText.chars);
+  printf("%s\n", errorData.errorText.chars);
   if (errorData.errorType == CLAY_ERROR_TYPE_ELEMENTS_CAPACITY_EXCEEDED) {
     // reinitializeClay = true;
     Clay_SetMaxElementCount(Clay_GetMaxElementCount() * 2);
