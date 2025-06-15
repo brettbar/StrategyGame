@@ -6,21 +6,21 @@
 
 
 namespace UI {
-  enum class OverviewAction_t {
+  enum class Action_Overview_t {
     None,
     CloseTab,
     Construction,
   };
-  struct OverviewAction {
-    OverviewAction_t type;
+  struct Action_Overview {
+    Action_Overview_t type;
     Buildings::Building building;
   };
 
-  inline OverviewAction overview_content(Clay_String current_tab) {
+  inline Action_Overview overview_content(Clay_String current_tab) {
     opt<Buildings::Building> building_to_build = std::nullopt;
 
-    OverviewAction action = OverviewAction{
-      .type = OverviewAction_t::None,
+    Action_Overview action = Action_Overview{
+      .type = Action_Overview_t::None,
     };
 
     // @todo refactor this shit
@@ -50,7 +50,7 @@ namespace UI {
             .sizing =
               {
                 .width = CLAY_SIZING_GROW(),
-                .height = CLAY_SIZING_FIT(24 * UI_SCALE),
+                .height = CLAY_SIZING_FIT(15, 15 * UI_SCALE),
               },
             .childAlignment =
               {
@@ -70,8 +70,8 @@ namespace UI {
         spacer();
 
         if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
-          action = OverviewAction{
-            .type = OverviewAction_t::CloseTab,
+          action = Action_Overview{
+            .type = Action_Overview_t::CloseTab,
           };
         }
       }
@@ -80,8 +80,8 @@ namespace UI {
         building_to_build = UI::construction_tab();
 
         if (building_to_build.has_value()) {
-          action = OverviewAction{
-            .type = OverviewAction_t::Construction,
+          action = Action_Overview{
+            .type = Action_Overview_t::Construction,
             .building = building_to_build.value(),
           };
         }

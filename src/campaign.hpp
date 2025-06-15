@@ -284,10 +284,11 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
   bool hovered = false;
   const u32 items = 4;
   const Clay_String foos[items] = {
-    CLAY_STRING("OverviewPanel"),
+    CLAY_STRING("OverviewPanel::Tabs"),
     CLAY_STRING("OverviewPanel::Content"),
     CLAY_STRING("SettlementContext"),
-    CLAY_STRING("ActorContext")};
+    CLAY_STRING("ActorContext")
+  };
   for (u32 i = 0; i < items; i++) {
     Clay_ElementId id = Clay_GetElementId(foos[i]);
     hovered = hovered || Clay_PointerOver(id);
@@ -352,7 +353,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
         Settlement::Component settlement_component =
           Global::world.get<Settlement::Component>(sc);
 
-        if (building_to_build.has_value() && Settlement::System().can_build_immediately(settlement_component)) {
+        if (building_to_build.has_value() &&
+            Settlement::System().can_build_immediately(settlement_component)) {
           PostCommand(
             Commands::Command::construct_building(sc, building_to_build.value())
           );
@@ -399,7 +401,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
     Global::state.camera.zoom = 0.08f;
 
   Global::state.camera.offset = {
-    (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2};
+    (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2
+  };
 }
 
 // TODO: look at all of these and see if any belong in UpdateOnFrame

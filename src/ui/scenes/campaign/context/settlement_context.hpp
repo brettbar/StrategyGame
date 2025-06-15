@@ -8,6 +8,7 @@
 namespace UI {
   enum class Action_SettlementContext {
     None,
+    Exit,
     SpawnColonist,
     SpawnArmy,
   };
@@ -17,6 +18,7 @@ namespace UI {
   inline Action_SettlementContext settlement_context(
     Settlement::Component *selected_settlement
   ) {
+    Action_SettlementContext action = Action_SettlementContext::None;
 
     CLAY({
       .id = CLAY_ID("SettlementContext"),
@@ -33,9 +35,17 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
+      .border = grey_border(),
     }) {
-      auto cs = cstr_to_cs(selected_settlement->name.c_str());
-      text_label(cs, 16);
+      CLAY({.id = CLAY_ID("SettlementContext::TopBar")}) {
+        auto cs = cstr_to_cs(selected_settlement->name.c_str());
+        text_label(cs, 16);
+
+
+        if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
+          action = Action_SettlementContext::Exit;
+        }
+      }
 
       auto dev_lvl = selected_settlement->development;
 
@@ -47,7 +57,7 @@ namespace UI {
       buildings_list(selected_settlement->buildings);
     }
 
-    return Action_SettlementContext::None;
+    return action;
   }
 
   inline void buildings_list(list<Settlement::Building> buildings) {

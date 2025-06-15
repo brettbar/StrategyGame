@@ -26,6 +26,8 @@ namespace UI {
     switch (action) {
       case UI::Action_SettlementContext::None:
         break;
+      case UI::Action_SettlementContext::Exit:
+        break;
       case UI::Action_SettlementContext::SpawnColonist:
         return Commands::Command::spawn_colonist(
           player_e, Settlement::System::settlement_position(*prov)
@@ -45,6 +47,7 @@ namespace UI {
 
     return Commands::Command::none();
   }
+
   inline Commands::Command actor_context() {
     auto actor = Selection::System::GetSelectedComponent<Actor::Component>();
     // entt::entity player_e = GetLocalPlayerE();
@@ -103,6 +106,7 @@ namespace UI {
               .height = CLAY_SIZING_GROW(),
             },
           .padding = CLAY_PADDING_ALL(uint16_t(1 * UI_SCALE)),
+          .childGap = uint16_t(1 * UI_SCALE),
           .childAlignment =
             {
               .x = CLAY_ALIGN_X_LEFT,
@@ -146,15 +150,15 @@ namespace UI {
           UI::top_bar(1, 0);
 
           if (std::string(tab.chars) != "") {
-            UI::OverviewAction action = UI::overview_content(tab);
+            UI::Action_Overview action = UI::overview_content(tab);
 
             switch (action.type) {
-              case UI::OverviewAction_t::None:
+              case UI::Action_Overview_t::None:
                 break;
-              case UI::OverviewAction_t::CloseTab:
+              case UI::Action_Overview_t::CloseTab:
                 tab = CLAY_STRING("");
                 break;
-              case UI::OverviewAction_t::Construction:
+              case UI::Action_Overview_t::Construction:
                 building_to_build = action.building;
                 Map::Manager()->mode = Map::Mode::BuildPreview;
                 break;
