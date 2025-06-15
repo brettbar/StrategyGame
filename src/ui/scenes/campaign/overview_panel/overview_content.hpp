@@ -44,7 +44,7 @@ namespace UI {
       .border = grey_border(),
     }) {
       CLAY({
-        .id = CLAY_ID("OverviewPanel::Content::Banner"),
+        .id = CLAY_ID("OverviewPanel::TopBar"),
         .layout =
           {
             .sizing =
@@ -54,7 +54,7 @@ namespace UI {
               },
             .childAlignment =
               {
-                .x = CLAY_ALIGN_X_RIGHT,
+                .x = CLAY_ALIGN_X_LEFT,
                 .y = CLAY_ALIGN_Y_CENTER,
               },
           },

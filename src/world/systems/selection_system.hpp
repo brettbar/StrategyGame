@@ -169,26 +169,18 @@ namespace Selection {
       }
     }
 
-    static void UpdateSelection(Vector2 click_pos, std::string player_id) {
+    static void ClearSelectionAll() {
       view<Actor::Component> actors_view =
         Global::world.view<Actor::Component>();
       view<Province::Component> prov_view =
         Global::world.view<Province::Component>();
 
-
       ClearSelection<Actor::Component>(actors_view);
       ClearSelection<Province::Component>(prov_view);
+    }
 
-      // InterfaceUpdate::Update{
-      //   .id = InterfaceUpdate::ID::SettlementContext,
-      //   .condition = false,
-      // }
-      //   .Send();
-      // InterfaceUpdate::Update{
-      //   .id = InterfaceUpdate::ID::ActorContext,
-      //   .condition = false,
-      // }
-      //   .Send();
+    static void UpdateSelection(Vector2 click_pos, std::string player_id) {
+      ClearSelectionAll();
 
       CheckSelectActors(click_pos, player_id);
       CheckSelectProvince(click_pos, player_id);

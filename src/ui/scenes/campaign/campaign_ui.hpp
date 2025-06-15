@@ -10,7 +10,7 @@
 
 namespace UI {
 
-  inline Commands::Command settlement_context(entt::entity player_e) {
+  inline Commands::Command command_from_settlement_ctx(entt::entity player_e) {
     auto settlement =
       Selection::System::GetSelectedComponent<Settlement::Component>();
     auto prov = Selection::System::GetSelectedComponent<Province::Component>();
@@ -27,6 +27,7 @@ namespace UI {
       case UI::Action_SettlementContext::None:
         break;
       case UI::Action_SettlementContext::Exit:
+        Selection::System::ClearSelectionAll();
         break;
       case UI::Action_SettlementContext::SpawnColonist:
         return Commands::Command::spawn_colonist(
@@ -202,7 +203,7 @@ namespace UI {
         }) {
           if (Selection::System::
                 Selected<Province::Component, Settlement::Component>()) {
-            cmd = settlement_context(player_e);
+            cmd = command_from_settlement_ctx(player_e);
           }
 
           if (Selection::System::Selected<Actor::Component>()) {

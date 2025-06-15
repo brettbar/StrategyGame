@@ -37,10 +37,26 @@ namespace UI {
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
       .border = grey_border(),
     }) {
-      CLAY({.id = CLAY_ID("SettlementContext::TopBar")}) {
+      CLAY({
+        .id = CLAY_ID("SettlementContext::TopBar"),
+        .layout =
+          {
+            .sizing =
+              {
+                .width = CLAY_SIZING_GROW(),
+                .height = CLAY_SIZING_FIT(15, 15 * UI_SCALE),
+              },
+            .childAlignment =
+              {
+                .x = CLAY_ALIGN_X_LEFT,
+                .y = CLAY_ALIGN_Y_CENTER,
+              },
+          },
+      }) {
         auto cs = cstr_to_cs(selected_settlement->name.c_str());
         text_label(cs, 16);
 
+        spacer();
 
         if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
           action = Action_SettlementContext::Exit;
