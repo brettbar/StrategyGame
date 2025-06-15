@@ -9,7 +9,11 @@
       "adjective": "roman",
       "denonym": "romans",
       "settlement_names": [
-        "Rome"
+        "Rome",
+        "Ariminum",
+        "Veii",
+        "Alba Longa",
+        "Ostia"
       ]
     },
     "government": {
@@ -35,7 +39,22 @@
       "adjective": "greek",
       "denonym": "greeks",
       "settlement_names": [
-        "athens"
+        "Athens",
+        "Thebes",
+        "Sparta",
+        "Corinth",
+        "Megara",
+        "Delphi",
+        "Thyrea",
+        "Olympia",
+        "Chalcis",
+        "Samos",
+        "Halicarnassus",
+        "Rhodes",
+        "Methone",
+        "Pylos",
+        "Argos",
+        "Piraeus"
       ]
     },
     "government": {
@@ -61,7 +80,18 @@
       "adjective": "celtic",
       "denonym": "celts",
       "settlement_names": [
-        "lugudunon"
+        "Lugudunon",
+        "Mediolanon",
+        "Bibracte",
+        "Alesia",
+        "Gergovia",
+        "Manching",
+        "Danebury?",
+        "Entremontium",
+        "Windobona",
+        "Lutetia",
+        "Camulodunon",
+        "Durouernon"
       ]
     },
     "government": {
@@ -87,11 +117,19 @@
       "adjective": "punic",
       "denonym": "carthaginians",
       "settlement_names": [
-        "carthage",
-        "utica",
-        "tyre",
-        "byblos",
-        "sidon"
+        "Carthage",
+        "Utica",
+        "Tyre",
+        "Byblos",
+        "Sidon",
+        "Arwad",
+        "Biruta",
+        "Oyat",
+        "Lepqeya",
+        "Agadir",
+        "Malake",
+        "Motye",
+        "Kitiya"
       ]
     },
     "government": {
