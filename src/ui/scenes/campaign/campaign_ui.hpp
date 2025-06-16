@@ -7,77 +7,9 @@
 #include "overview_panel/overview_content.hpp"
 #include "overview_panel/overview_tabs.hpp"
 #include "overview_panel/top_bar.hpp"
+#include <raylib.h>
 
 namespace UI {
-
-  inline Commands::Command command_from_settlement_ctx(entt::entity player_e) {
-    auto settlement =
-      Selection::System::GetSelectedComponent<Settlement::Component>();
-    auto prov = Selection::System::GetSelectedComponent<Province::Component>();
-    // entt::entity player_e = GetLocalPlayerE();
-    auto faction = Global::world.get<Faction::Component>(player_e);
-
-    // if ( !settlement || !prov ) {
-    //   printf( "Got null prov/settlement??\n" );
-    //   return nullptr;
-    // }
-
-    auto action = UI::settlement_context(settlement);
-    switch (action) {
-      case UI::Action_SettlementContext::None:
-        break;
-      case UI::Action_SettlementContext::Exit:
-        Selection::System::ClearSelectionAll();
-        break;
-      case UI::Action_SettlementContext::SpawnColonist:
-        return Commands::Command::spawn_colonist(
-          player_e, Settlement::System::settlement_position(*prov)
-        );
-        break;
-      case UI::Action_SettlementContext::SpawnArmy:
-        return Commands::Command::spawn_army(
-          player_e, Settlement::System::settlement_position(*prov)
-        );
-        break;
-        // case UI::Action_SettlementContext::BuildFarm:
-        //   PostCommand( Commands::Command::construct_building(
-        //     Selection::GetSelectedEntity(), "farm"
-        //   ) );
-        //   break;
-    }
-
-    return Commands::Command::none();
-  }
-
-  inline Commands::Command actor_context() {
-    auto actor = Selection::System::GetSelectedComponent<Actor::Component>();
-    // entt::entity player_e = GetLocalPlayerE();
-
-    // if ( !actor ) {
-    //   printf( "Got null actor??\n" );
-    //   return;
-    // }
-
-    // auto action = UI::ActorContext( actor );
-    auto action = UI::actor_context(actor);
-
-    switch (action) {
-      case UI::Action_ActorContext::None:
-        break;
-      case UI::Action_ActorContext::ClaimProvince: {
-        return Commands::Command::claim_province(
-          Selection::System::GetSelectedEntity()
-        );
-      } break;
-      case UI::Action_ActorContext::SpawnSettlement: {
-        return Commands::Command::build_settlement(
-          Selection::System::GetSelectedEntity()
-        );
-      } break;
-    }
-
-    return Commands::Command::none();
-  }
 
   enum class Action_Campaign_t {
     None,
@@ -91,11 +23,14 @@ namespace UI {
     Buildings::Building building;
   };
 
-  inline Action_Campaign campaign_ui(entt::entity player_e) {
+  inline Commands::Command cmd_from_settlement_ctx(entt::entity);
+  inline Commands::Command cmd_from_actor_ctx();
 
+  inline Action_Campaign campaign_ui(entt::entity player_e) {
     // @todo refactor this shit
     opt<Buildings::Building> building_to_build = std::nullopt;
     Commands::Command cmd = Commands::Command::none();
+    vec2f mouse_pos = GetMousePosition();
 
     CLAY({
       .id = CLAY_ID("Campaign"),
@@ -203,11 +138,11 @@ namespace UI {
         }) {
           if (Selection::System::
                 Selected<Province::Component, Settlement::Component>()) {
-            cmd = command_from_settlement_ctx(player_e);
+            cmd = cmd_from_settlement_ctx(player_e);
           }
 
           if (Selection::System::Selected<Actor::Component>()) {
-            cmd = actor_context();
+            cmd = cmd_from_actor_ctx();
           }
         }
 
@@ -260,6 +195,97 @@ namespace UI {
       };
     }
 
+    // vec2f modal_coords = {120, 120};
+
+
+    vec2f modal_coords = {
+      .x = mouse_pos.x + (8 * UI_SCALE), .y = mouse_pos.y + (4 * UI_SCALE)
+    };
+
+
+    CLAY({
+      .id = CLAY_ID("TEST MODAL"),
+      .backgroundColor = COLOR_BLUE,
+      .floating =
+        {
+          .offset = {.x = modal_coords.x, .y = modal_coords.y},
+          .attachTo = CLAY_ATTACH_TO_PARENT,
+        },
+    }) {
+      text_label(CLAY_STRING("Notification!!"), 12);
+    }
+
     return Action_Campaign{.type = Action_Campaign_t::None};
   }
+
+
+  inline Commands::Command cmd_from_settlement_ctx(entt::entity player_e) {
+    auto settlement =
+      Selection::System::GetSelectedComponent<Settlement::Component>();
+    auto prov = Selection::System::GetSelectedComponent<Province::Component>();
+    // entt::entity player_e = GetLocalPlayerE();
+    auto faction = Global::world.get<Faction::Component>(player_e);
+
+    // if ( !settlement || !prov ) {
+    //   printf( "Got null prov/settlement??\n" );
+    //   return nullptr;
+    // }
+
+    auto action = UI::settlement_context(settlement);
+    switch (action) {
+      case UI::Action_SettlementContext::None:
+        break;
+      case UI::Action_SettlementContext::Exit:
+        Selection::System::ClearSelectionAll();
+        break;
+      case UI::Action_SettlementContext::SpawnColonist:
+        return Commands::Command::spawn_colonist(
+          player_e, Settlement::System::settlement_position(*prov)
+        );
+        break;
+      case UI::Action_SettlementContext::SpawnArmy:
+        return Commands::Command::spawn_army(
+          player_e, Settlement::System::settlement_position(*prov)
+        );
+        break;
+        // case UI::Action_SettlementContext::BuildFarm:
+        //   PostCommand( Commands::Command::construct_building(
+        //     Selection::GetSelectedEntity(), "farm"
+        //   ) );
+        //   break;
+    }
+
+    return Commands::Command::none();
+  }
+
+  inline Commands::Command cmd_from_actor_ctx() {
+    auto actor = Selection::System::GetSelectedComponent<Actor::Component>();
+    // entt::entity player_e = GetLocalPlayerE();
+
+    // if ( !actor ) {
+    //   printf( "Got null actor??\n" );
+    //   return;
+    // }
+
+    // auto action = UI::ActorContext( actor );
+    auto action = UI::actor_context(actor);
+
+    switch (action) {
+      case UI::Action_ActorContext::None:
+        break;
+      case UI::Action_ActorContext::ClaimProvince: {
+        return Commands::Command::claim_province(
+          Selection::System::GetSelectedEntity()
+        );
+      } break;
+      case UI::Action_ActorContext::SpawnSettlement: {
+        return Commands::Command::build_settlement(
+          Selection::System::GetSelectedEntity()
+        );
+      } break;
+    }
+
+    return Commands::Command::none();
+  }
+
 }// namespace UI
