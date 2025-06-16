@@ -35,7 +35,7 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      .border = grey_border(),
+      .border = border(COLOR_GREY),
     }) {
       CLAY({
         .id = CLAY_ID("SettlementContext::TopBar"),

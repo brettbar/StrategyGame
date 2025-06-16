@@ -33,7 +33,7 @@ namespace UI {
           .layoutDirection = CLAY_LEFT_TO_RIGHT,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      .border = grey_border(),
+      .border = border(COLOR_GREY),
     }) {
       settlements_count(num_settlements);
       overview_count(

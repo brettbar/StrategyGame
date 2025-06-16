@@ -40,11 +40,11 @@ namespace UI {
   const Clay_Color COLOR_ORANGE = Clay_Color{225, 138, 50, 255};
   const Clay_Color COLOR_GREY = Clay_Color{137, 137, 137, 255};
 
-  inline Clay_BorderElementConfig grey_border() {
+  inline Clay_BorderElementConfig border(Clay_Color color) {
     uint16_t border_w = 1.0f * UI_SCALE;
 
     return {
-      .color = COLOR_GREY,
+      .color = color,
       .width =
         {
           .left = border_w,
@@ -54,6 +54,7 @@ namespace UI {
         },
     };
   }
+
 
   inline void spacer() {
     CLAY({
