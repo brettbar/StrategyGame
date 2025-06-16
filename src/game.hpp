@@ -54,6 +54,7 @@ class IGame {
       .zoom = 2.0f,
     };
 
+
     // Initialize manager singletons
     // Order matters here
     Faction::Manager::Get();

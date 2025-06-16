@@ -10,6 +10,11 @@
 - [x] implement global tooltip
   - [ ] delay?
 
+- [ ] basic settings menu
+  - [ ] fullscreen
+  - [ ] borderless
+  - [ ] window (resizeable)
+
 
 ## Settlement Context
 - [ ] can close settlement context

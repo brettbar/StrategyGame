@@ -19,6 +19,7 @@ rights reserved.
 #include "assets.hpp"
 #include "game.hpp"
 #include "network/network.hpp"
+#include "settings.hpp"
 
 
 void SteamAPIDebugTextHook(int severity, const char *msg) {
@@ -38,6 +39,38 @@ void HandleClayErrors(Clay_ErrorData errorData) {
       Clay_GetMaxMeasureTextCacheWordCount() * 2
     );
   }
+}
+
+void scale_ui_with_screen_size() {
+  u32 monitor = GetCurrentMonitor();
+  u32 monitor_w = GetMonitorWidth(monitor);
+  u32 monitor_h = GetMonitorHeight(monitor);
+  u32 physical_w = GetMonitorPhysicalWidth(monitor);
+  u32 physical_h = GetMonitorPhysicalHeight(monitor);
+
+  f32 height_dpi = monitor_h / (physical_h / 25.4f);
+
+  printf(
+    "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd %f\n",
+    height_dpi
+  );
+
+  UI::set_ui_scale_by_screen_height(monitor_h);
+}
+void init_clay(vec2i initial_resolution) {
+  u64 clay_required_memory = Clay_MinMemorySize();
+  Clay_Arena clay_memory = Clay_Arena{
+    .capacity = clay_required_memory,
+    .memory = (char *) malloc(clay_required_memory),
+  };
+  Clay_Initialize(
+    clay_memory,
+    Clay_Dimensions{
+      .width = (f32) initial_resolution.x,
+      .height = (f32) initial_resolution.y,
+    },
+    Clay_ErrorHandler{HandleClayErrors, 0}
+  );
 }
 
 /*
@@ -69,48 +102,18 @@ int main() {
     Global::mp_capable = false;
   }
 
+  auto settings = Settings::Manager();
 
   printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
-  SetTargetFPS(200);// Set our game to run at 60 frames-per-second
-  // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-  // SetConfigFlags(FLAG_FULLSCREEN_MODE);
-  SetConfigFlags(FLAG_WINDOW_TOPMOST | FLAG_WINDOW_UNDECORATED);
+  settings.set_window_state(Settings::WindowState::Fullscreen);
 
-  InitWindow(GetScreenWidth(), GetScreenHeight(), "FieldsOfMars");
+  vec2i set_resolution = settings.resolution();
+  InitWindow(set_resolution.x, set_resolution.y, "FieldsOfMars");
 
-  u32 monitor = GetCurrentMonitor();
-  u32 monitor_w = GetMonitorWidth(monitor);
-  u32 monitor_h = GetMonitorHeight(monitor);
+  scale_ui_with_screen_size();
 
-  u32 physical_w = GetMonitorPhysicalWidth(monitor);
-  u32 physical_h = GetMonitorPhysicalHeight(monitor);
-
-  f32 height_dpi = monitor_h / (physical_h / 25.4f);
-
-  printf(
-    "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd %f\n",
-    height_dpi
-  );
-
-  // Resize monitor
-  SetWindowSize(monitor_w, monitor_h);
-  // UI::set_ui_scale(height_dpi);
-  UI::set_ui_scale_by_screen_height(monitor_h);
-
-  u64 clay_required_memory = Clay_MinMemorySize();
-  Clay_Arena clay_memory = Clay_Arena{
-    .capacity = clay_required_memory,
-    .memory = (char *) malloc(clay_required_memory),
-  };
-  Clay_Initialize(
-    clay_memory,
-    Clay_Dimensions{
-      .width = (f32) monitor_w,
-      .height = (f32) monitor_h,
-    },
-    Clay_ErrorHandler{HandleClayErrors, 0}
-  );
+  init_clay(set_resolution);
 
   LoadAssets();
 
