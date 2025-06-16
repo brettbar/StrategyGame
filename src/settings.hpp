@@ -18,10 +18,15 @@ namespace Settings {
     u32 fps_limit;
   };
 
-  struct Manager {
+  struct IManager {
     State _state;
 
-    Manager() {
+    static IManager *Manager() {
+      static IManager instance;
+      return &instance;
+    }
+
+    IManager() {
       _state = State{
         .window_state = WindowState::Fullscreen,
         .resolution = {GetScreenWidth(), GetScreenHeight()},
@@ -30,7 +35,7 @@ namespace Settings {
     }
 
     // @todo we can use this for reading from file or something
-    Manager(State state) {
+    IManager(State state) {
       _state = state;
     }
 
@@ -59,4 +64,8 @@ namespace Settings {
       }
     }
   };
+
+  inline IManager *Manager() {
+    return IManager::Manager();
+  }
 }// namespace Settings

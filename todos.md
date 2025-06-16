@@ -6,9 +6,12 @@
 - [ ]  make building mode escapable
   - [ ] keybind (esc)
   - [ ] cancel button or something
+- [ ] building being built and resource selected not enforced in sync!! A farm is producing ore!
 - [x] fix tooltip buttons
 - [x] implement global tooltip
   - [ ] delay?
+
+
 
 - [ ] basic settings menu
   - [ ] fullscreen

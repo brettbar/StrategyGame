@@ -57,6 +57,7 @@ void scale_ui_with_screen_size() {
 
   UI::set_ui_scale_by_screen_height(monitor_h);
 }
+
 void init_clay(vec2i initial_resolution) {
   u64 clay_required_memory = Clay_MinMemorySize();
   Clay_Arena clay_memory = Clay_Arena{
@@ -102,13 +103,12 @@ int main() {
     Global::mp_capable = false;
   }
 
-  auto settings = Settings::Manager();
 
   printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
-  settings.set_window_state(Settings::WindowState::Fullscreen);
+  Settings::Manager()->set_window_state(Settings::WindowState::Window);
 
-  vec2i set_resolution = settings.resolution();
+  vec2i set_resolution = Settings::Manager()->resolution();
   InitWindow(set_resolution.x, set_resolution.y, "FieldsOfMars");
 
   scale_ui_with_screen_size();
