@@ -38,7 +38,7 @@ namespace UI {
       );
     }
 
-    return ButtonWasClicked(id_str, i);
+    return button_was_clicked(id_str, i);
   }
 
   inline bool text_button_small(
@@ -72,7 +72,7 @@ namespace UI {
       );
     }
 
-    return ButtonWasClicked(id_str, i);
+    return button_was_clicked(id_str, i);
   }
 
 

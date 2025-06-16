@@ -59,19 +59,19 @@ namespace UI {
         .chars = paths[i].c_str()
       };
 
-      if (ButtonWasClicked(cs)) {
+      if (button_was_clicked(cs)) {
         // @todo
         _selected_path = cs.chars;
       }
     }
 
-    if (ButtonWasClicked(CLAY_STRING("LoadGameMenu::Back"))) {
+    if (button_was_clicked(CLAY_STRING("LoadGameMenu::Back"))) {
       pressed_back = true;
       return "";
     }
 
     if (_selected_path != "" &&
-        ButtonWasClicked(CLAY_STRING("LoadGameMenu::Load"))) {
+        button_was_clicked(CLAY_STRING("LoadGameMenu::Load"))) {
       // @todo make actually really get the selected file
       return _selected_path;
     }

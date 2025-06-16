@@ -25,18 +25,11 @@ namespace UI {
 
   inline Commands::Command cmd_from_settlement_ctx(entt::entity);
   inline Commands::Command cmd_from_actor_ctx();
-  inline void tooltip(vec2f, Clay_String);
 
   inline Action_Campaign campaign_ui(entt::entity player_e) {
     // @todo refactor this shit
     opt<Buildings::Building> building_to_build = std::nullopt;
     Commands::Command cmd = Commands::Command::none();
-
-    vec2f mouse_pos = GetMousePosition();
-    vec2f tooltip_coords = {
-      .x = mouse_pos.x + (8 * UI_SCALE), .y = mouse_pos.y + (4 * UI_SCALE)
-    };
-
 
     CLAY({
       .id = CLAY_ID("Campaign"),
@@ -201,28 +194,7 @@ namespace UI {
       };
     }
 
-    tooltip(tooltip_coords, CLAY_STRING("Tooltip!"));
-
     return Action_Campaign{.type = Action_Campaign_t::None};
-  }
-
-  inline void tooltip(vec2f pos, Clay_String label) {
-    CLAY({
-      .id = CLAY_ID("Campaign::Tooltip"),
-      .layout =
-        {
-          .padding = CLAY_PADDING_ALL(uint16_t(4 * UI_SCALE)),
-        },
-      .backgroundColor = COLOR_TRANSPARENT_BLACK,
-      .floating =
-        {
-          .offset = {.x = pos.x, .y = pos.y},
-          .attachTo = CLAY_ATTACH_TO_ROOT,
-        },
-      .border = border(COLOR_WHITE),
-    }) {
-      text_label(label, 12);
-    }
   }
 
   // @todo

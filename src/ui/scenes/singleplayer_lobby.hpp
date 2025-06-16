@@ -48,11 +48,13 @@ namespace UI {
       );
     }
 
-    if (ButtonWasClicked(CLAY_STRING("SinglePlayerLobby::SelectFaction"), 0)) {
+    if (button_was_clicked(
+          CLAY_STRING("SinglePlayerLobby::SelectFaction"), 0
+        )) {
       return Action_SinglePlayerLobby::SelectFaction;
     }
 
-    if (ButtonWasClicked(CLAY_STRING("SinglePlayerLobby::ReturnToMain"), 1)) {
+    if (button_was_clicked(CLAY_STRING("SinglePlayerLobby::ReturnToMain"), 1)) {
       return Action_SinglePlayerLobby::ReturnToMain;
     }
 

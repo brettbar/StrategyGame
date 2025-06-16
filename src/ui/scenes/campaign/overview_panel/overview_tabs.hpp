@@ -101,7 +101,7 @@ namespace UI {
 
 
     for (u32 i = 0; i < num_tabs; i++) {
-      if (ButtonWasClicked(CLAY_STRING("OverviewPanel::tab"), i)) {
+      if (button_was_clicked(CLAY_STRING("OverviewPanel::tab"), i)) {
         // return tab.action;
         _overview_panel_i = i;
         tab = tabs[_overview_panel_i].ref;

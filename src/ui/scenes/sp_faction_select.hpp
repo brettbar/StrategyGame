@@ -80,7 +80,7 @@ namespace UI {
     }
 
     for (u32 i = 0; i < num_factions; i++) {
-      if (ButtonWasClicked(CLAY_STRING("FactionSelect::Button"), i)) {
+      if (button_was_clicked(CLAY_STRING("FactionSelect::Button"), i)) {
         return fm->ids[i];
       }
     }

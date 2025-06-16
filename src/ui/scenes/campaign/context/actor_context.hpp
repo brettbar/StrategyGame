@@ -11,51 +11,49 @@ namespace UI {
     SpawnSettlement,
   };
 
-  inline Action_ActorContext actor_context( Actor::Component *actor ) {
+  inline Action_ActorContext actor_context(Actor::Component *actor) {
 
-    CLAY( {
-      .id = CLAY_ID( "ActorContext" ),
+    CLAY({
+      .id = CLAY_ID("ActorContext"),
       .layout =
         {
           .sizing =
             {
-              .width = CLAY_SIZING_FIT( 256 * UI_SCALE ),
-              .height = CLAY_SIZING_GROW( ),
+              .width = CLAY_SIZING_FIT(256 * UI_SCALE),
+              .height = CLAY_SIZING_GROW(),
             },
-          .padding = { 16, 16 },
-          .childAlignment = { .x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP },
+          .padding = {16, 16},
+          .childAlignment = {.x = CLAY_ALIGN_X_LEFT, .y = CLAY_ALIGN_Y_TOP},
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
       .backgroundColor = COLOR_TRANSPARENT_BLACK,
       // .cornerRadius = { 5 },
-    } ) {
+    }) {
 
       Clay_String cs = Clay_String{
-        .length = static_cast<int32_t>( strlen( actor->data.name.c_str() ) ),
+        .length = static_cast<int32_t>(strlen(actor->data.name.c_str())),
         .chars = actor->data.name.c_str(),
       };
 
       CLAY_TEXT(
         cs,
-        CLAY_TEXT_CONFIG( {
+        CLAY_TEXT_CONFIG({
           .textColor = COLOR_WHITE,
           .fontId = 0,
           .fontSize = 32,
-        } )
+        })
       );
 
-      CLAY( { .layout = { .layoutDirection = CLAY_LEFT_TO_RIGHT } } ) {
-        switch ( actor->data.type ) {
+      CLAY({.layout = {.layoutDirection = CLAY_LEFT_TO_RIGHT}}) {
+        switch (actor->data.type) {
           case Actor::Type::Colonist: {
             text_button_small(
-              CLAY_STRING( "Colonist::ClaimProvince" ),
-              CLAY_STRING( "Claim" ),
-              0
+              CLAY_STRING("Colonist::ClaimProvince"), CLAY_STRING("Claim"), 0
             );
 
             text_button_small(
-              CLAY_STRING( "Colonist::SpawnSettlement" ),
-              CLAY_STRING( "Settlement" ),
+              CLAY_STRING("Colonist::SpawnSettlement"),
+              CLAY_STRING("Settlement"),
               0
             );
           } break;
@@ -64,13 +62,13 @@ namespace UI {
     }
 
 
-    switch ( actor->data.type ) {
+    switch (actor->data.type) {
       case Actor::Type::Colonist: {
-        if ( ButtonWasClicked( CLAY_STRING( "Colonist::ClaimProvince" ) ) ) {
+        if (button_was_clicked(CLAY_STRING("Colonist::ClaimProvince"))) {
           return Action_ActorContext::ClaimProvince;
         }
 
-        if ( ButtonWasClicked( CLAY_STRING( "Colonist::SpawnSettlement" ) ) ) {
+        if (button_was_clicked(CLAY_STRING("Colonist::SpawnSettlement"))) {
           return Action_ActorContext::SpawnSettlement;
         }
       } break;

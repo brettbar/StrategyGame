@@ -7,6 +7,7 @@
   - [ ] keybind (esc)
   - [ ] cancel button or something
 - [x] fix tooltip buttons
+- [ ] Implement global tooltip
 
 
 ## Settlement Context
