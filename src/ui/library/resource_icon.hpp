@@ -7,9 +7,7 @@
 namespace UI {
   inline void resource_icon(Resources::Type type, Clay_String cs, u32 i) {
 
-    auto hid = CLAY_SIDI_LOCAL(cs, i);
     CLAY({
-      .id = hid,
       .layout =
         {
           .childAlignment =
@@ -21,26 +19,33 @@ namespace UI {
       .image = image(hstr{"slot.png"}, {32, 32}),
     }) {
 
-      texture_label(resource_icon_path(type), {32, 32});
+      texture_w_tooltip(
+        CLAY_STRING("ResourceIcon"),
+        cs,
+        Resources::resource_icon_path(type),
+        {32, 32}
+      );
 
-      if (Clay_PointerOver(hid)) {
-        CLAY({
-          .layout = {.padding = {8, 8}},
-          .backgroundColor = COLOR_BLACK,
-          .floating =
-            {
-              .attachPoints =
-                {
-                  .element = CLAY_ATTACH_POINT_LEFT_TOP,
-                  .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
-                },
-              .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-              .attachTo = CLAY_ATTACH_TO_PARENT,
-            },
-        }) {
-          text_label(cs, 12);
-        }
-      }
+      // texture_label(resource_icon_path(type), {32, 32});
+      //
+      // if (Clay_PointerOver(hid)) {
+      //   CLAY({
+      //     .layout = {.padding = {8, 8}},
+      //     .backgroundColor = COLOR_BLACK,
+      //     .floating =
+      //       {
+      //         .attachPoints =
+      //           {
+      //             .element = CLAY_ATTACH_POINT_LEFT_TOP,
+      //             .parent = CLAY_ATTACH_POINT_LEFT_BOTTOM,
+      //           },
+      //         .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
+      //         .attachTo = CLAY_ATTACH_TO_PARENT,
+      //       },
+      //   }) {
+      //     text_label(cs, 12);
+      //   }
+      // }
     }
   }
 }// namespace UI

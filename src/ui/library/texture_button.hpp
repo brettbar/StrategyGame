@@ -101,9 +101,7 @@ namespace UI {
         .y = mouse_pos.y + (4 * UI_SCALE),
       };
 
-      bool hovered = Clay_Hovered();
-
-      if (hovered) {
+      if (Clay_Hovered()) {
         tooltip(tooltip_coords, label);
       }
     }

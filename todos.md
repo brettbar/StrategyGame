@@ -7,7 +7,8 @@
   - [ ] keybind (esc)
   - [ ] cancel button or something
 - [x] fix tooltip buttons
-- [ ] Implement global tooltip
+- [x] implement global tooltip
+  - [ ] delay?
 
 
 ## Settlement Context

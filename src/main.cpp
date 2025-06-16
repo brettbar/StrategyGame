@@ -73,9 +73,11 @@ int main() {
   printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
   SetTargetFPS(200);// Set our game to run at 60 frames-per-second
-  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+  // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+  // SetConfigFlags(FLAG_FULLSCREEN_MODE);
+  SetConfigFlags(FLAG_WINDOW_TOPMOST | FLAG_WINDOW_UNDECORATED);
 
-  InitWindow(1920, 1080, "FieldsOfMars");
+  InitWindow(GetScreenWidth(), GetScreenHeight(), "FieldsOfMars");
 
   u32 monitor = GetCurrentMonitor();
   u32 monitor_w = GetMonitorWidth(monitor);
