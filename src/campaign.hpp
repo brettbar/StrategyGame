@@ -94,6 +94,7 @@ struct Campaign {
 
   private:
   bool _is_singleplayer = true;
+  opt<Buildings::Building> _building_to_build = std::nullopt;
 };
 
 inline entt::entity Campaign::GetLocalPlayerE() {
@@ -244,7 +245,6 @@ inline void Campaign::load(cstr file_path) {
     .connect<&Campaign::EvaluteCommands>(this);
 }
 
-inline opt<Buildings::Building> building_to_build = std::nullopt;
 
 // Runs inside game loop
 inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
@@ -264,7 +264,7 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
       }
       break;
     case UI::Action_Campaign_t::SelectBuilding:
-      building_to_build = action.building;
+      _building_to_build = action.building;
       break;
   }
 
@@ -350,15 +350,19 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
         Selection::System::CheckClickOnSettlement(local_player, click_pos);
 
       if (sc != entt::null) {
+        Province::Component prov_component =
+          Global::world.get<Province::Component>(sc);
         Settlement::Component settlement_component =
           Global::world.get<Settlement::Component>(sc);
 
-        if (building_to_build.has_value() &&
-            Settlement::System().can_build_immediately(settlement_component)) {
-          PostCommand(
-            Commands::Command::construct_building(sc, building_to_build.value())
-          );
-          building_to_build = std::nullopt;
+        if (_building_to_build.has_value() &&
+            Settlement::System::can_build_immediately(
+              prov_component, settlement_component, _building_to_build.value()
+            )) {
+          PostCommand(Commands::Command::construct_building(
+            sc, _building_to_build.value()
+          ));
+          _building_to_build = std::nullopt;
           Map::Manager()->mode = Map::Mode::Default;
         }
       }
@@ -443,7 +447,7 @@ inline void Campaign::Draw() {
       rndr->draw_default();
       break;
     case Map::Mode::BuildPreview://@todo
-      rndr->draw_build_preview(GetLocalPlayerE());
+      rndr->draw_build_preview(GetLocalPlayerE(), _building_to_build.value());
       break;
     case Map::Mode::Terrain:
       break;

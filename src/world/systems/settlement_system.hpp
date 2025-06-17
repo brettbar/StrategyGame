@@ -15,9 +15,7 @@
 
 namespace Settlement {
 
-  class System {
-
-public:
+  struct System {
     static void update_1tps() {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
@@ -146,15 +144,28 @@ public:
       return settlement.max_building_slots > settlement.buildings.size();
     }
 
-    static bool can_build_immediately(Settlement::Component settlement) {
-      // will add additional criteria later
-      return has_available_building_slots(settlement);
+    static bool can_build_immediately(
+      Province::Component prov,
+      Settlement::Component settlement,
+      Buildings::Building building
+    ) {
+      // @todo will add additional criteria later
+      return has_available_building_slots(settlement) &&
+             in_eligible_biome(prov, settlement, building);
     }
 
     static bool can_build_with_changes_needed(Settlement::Component settlement
     ) {
       // @todo
       return false;
+    }
+
+    static bool in_eligible_biome(
+      Province::Component prov,
+      Settlement::Component settlement,
+      Buildings::Building building
+    ) {
+      auto biome = prov.tile->biome;
     }
 
     static void construct_building(
@@ -178,7 +189,8 @@ public:
 
 
       settlement.buildings.push_back(Settlement::Building{
-        .type = building.type, .current_recipe = building.current_recipe});
+        .type = building.type, .current_recipe = building.current_recipe
+      });
     }
 
 

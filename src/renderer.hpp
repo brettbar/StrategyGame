@@ -65,8 +65,11 @@ struct Renderer {
     EndBlendMode();
   }
 
-  void draw_build_preview(entt::entity local_player_e) {
-    Overlay::System::draw_build_preview(local_player_e);
+  void draw_build_preview(
+    entt::entity local_player_e,
+    Buildings::Building building
+  ) {
+    Overlay::System::draw_build_preview(local_player_e, building);
     Overlay::System::draw_settlement_name();
   }
 
@@ -121,7 +124,7 @@ struct Renderer {
             Settlement::System::draw(Global::texture_cache, false);
             break;
           case Map::Mode::Resources:
-            // Settlement::System::draw(Global::texture_cache, false);
+            Settlement::System::draw(Global::texture_cache, false);
             break;
         }
 

@@ -119,27 +119,35 @@ namespace Overlay {
       }
     }
 
-    static void draw_build_preview(entt::entity local_player_e) {
-      auto province_settlements =
-        Global::world.view<Province::Component, Settlement::Component>();
+    static void draw_build_preview(
+      entt::entity local_player_e,
+      Buildings::Building building
+    ) {
+      auto province_settlements = Global::world.view<Province::Component>();
 
       for (auto entity: province_settlements) {
         auto &prov = province_settlements.get<Province::Component>(entity);
-        auto &settlement =
-          province_settlements.get<Settlement::Component>(entity);
+        // auto &settlement =
+        //   province_settlements.get<Settlement::Component>(entity);
 
         Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
         if (prov.tile->owner == local_player_e) {
 
           str color = "red";
+          auto settlement =
+            Global::world.try_get<Settlement::Component>(entity);
 
-          if (Settlement::System().can_build_immediately(settlement)) {
-            color = "green";
-          } else if (Settlement::System().can_build_with_changes_needed(
-                       settlement
-                     )) {
-            color = "yellow";
+          if (settlement != nullptr) {
+            if (Settlement::System::can_build_immediately(
+                  *settlement, building
+                )) {
+              color = "green";
+            } else if (Settlement::System::can_build_with_changes_needed(
+                         *settlement
+                       )) {
+              color = "yellow";
+            }
           }
 
 

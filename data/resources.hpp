@@ -110,61 +110,6 @@ namespace Resources {
   }
 
 
-  // inline std::vector<std::string> natural = {
-  //   "soil",
-  //   "trees",
-  //   "fish",
-  //   "clay",
-  //   "stone",
-  //   "sheep",
-  //   "cattle",
-  //   "silver_vein",
-  //   "gold_vein",
-  //   "iron_vein",
-  //   "tin_vein",
-  //   "copper_vein",
-  //   "gemstones",
-  // };
-
-  // inline std::vector<const char *> resources = {
-  //   "timber",
-  //   "wheat",
-  //   //"olives",
-  //   "fish",
-  //   "clay",
-  //   //"stone",
-  //   //"wool",
-  //   //"flax",
-  //   //"hide",
-  //   "silver ore",
-  //   "gold ore",
-  //   "iron ore",
-  //   "tin ore",
-  //   "copper ore",
-  //   //"gems",
-  //   //////////////////
-  //   // "flour",
-  //   // "bricks",
-  //   // "stone_bricks",
-  //   // "pottery",
-  //   // "cloth",
-  //   // "linen",
-  //   // "leather",
-  //   // "silver",
-  //   "gold ingots",
-  //   "iron ingots",
-  //   "bronze ingots",
-  //   ///////////////////
-  //   "olive oil",
-  //   // "swords",
-  //   // "spears",
-  //   // "shields",
-  //   // "helmets",
-  //   // "armour",
-  //   // "clothing",
-  //   // "jewelry",
-  // };
-
   inline hstr resource_icon_path(Type type) {
     return file_path_str_format(resource_cstr(type), ".png");
   }
