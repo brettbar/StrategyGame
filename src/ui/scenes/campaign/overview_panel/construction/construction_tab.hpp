@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../../shared/common.hpp"
+#include "../../../../../shared/manager.hpp"
 #include "../../../../library/text_label.hpp"
 #include <cstdint>
 #include <optional>
@@ -10,24 +11,16 @@
 #include "construction_preview.hpp"
 
 namespace UI {
-  struct ConstructionTab {
+  struct ConstructionTab : public Singleton<ConstructionTab> {
 private:
     bool _constructing = false;
     opt<Buildings::Building> _selected_building = std::nullopt;
 
+    ConstructionTab() = default;
 
-    ConstructionTab() {}
-    ~ConstructionTab() {}
-    ConstructionTab(ConstructionTab const &) = delete;
-
-    void operator=(const ConstructionTab &) = delete;
+    friend class Singleton<ConstructionTab>;
 
 public:
-    static ConstructionTab *Get() {
-      static ConstructionTab instance;
-      return &instance;
-    }
-
     void exit() {
       _constructing = false;
       _selected_building = std::nullopt;
