@@ -53,7 +53,7 @@ namespace UI {
         .chars = "0",
       };
 
-      const char *resource = Resources::ResourceStr(resource_t);
+      const char *resource = Resources::resource_cstr(resource_t);
 
       CLAY({
         .layout =

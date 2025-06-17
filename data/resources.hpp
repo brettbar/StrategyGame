@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../src/shared/common.hpp"
+#include "../src/shared/utils.hpp"
 #include <vector>
 
 namespace Resources {
@@ -64,18 +65,18 @@ namespace Resources {
   };
 
 
-  inline const char *ResourceStr(Type r) {
+  inline const char *resource_cstr(Type r) {
     switch (r) {
       case Type::Timber:
-        return "timber";
+        return "Timber";
       case Type::Wheat:
-        return "wheat";
+        return "Wheat";
       // case Type::Olives:
       //   return "olives";
       case Type::Fish:
-        return "fish";
+        return "Fish";
       case Type::Clay:
-        return "clay";
+        return "Clay";
       // case Type::Stone:
       //   return "stone";
       // case Type::Wool:
@@ -85,22 +86,22 @@ namespace Resources {
       // case Type::Hide:
       //   return "hide";
       case Type::SilverOre:
-        return "silver ore";
+        return "Silver Ore";
       case Type::GoldOre:
-        return "gold ore";
+        return "Gold Ore";
       case Type::IronOre:
-        return "iron ore";
+        return "Iron Ore";
       case Type::TinOre:
-        return "tin ore";
+        return "Tin Ore";
       case Type::CopperOre:
-        return "copper ore";
+        return "Copper Ore";
 
       case Type::GoldIngots:
-        return "gold ingots";
+        return "Gold Ingots";
       case Type::IronIngots:
-        return "iron ingots";
+        return "Iron Ingots";
       case Type::BronzeIngots:
-        return "bronze ingots";
+        return "Bronze Ingots";
       // case RawMaterial::Gems:
       //   return "gems";
       default:
@@ -165,16 +166,7 @@ namespace Resources {
   // };
 
   inline hstr resource_icon_path(Type type) {
-    str file = std::string(ResourceStr(type));
-
-    for (u32 j = 0; j < file.length(); j++) {
-      if (file[j] == ' ')
-        file[j] = '_';
-    }
-
-    file += ".png";
-
-    return hstr{(file).c_str()};
+    return file_path_str_format(resource_cstr(type), ".png");
   }
 
 };// namespace Resources

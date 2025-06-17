@@ -80,46 +80,46 @@ namespace Buildings {
     Recipe current_recipe;
   };
 
-  inline const char *building_name_str(BuildingType building) {
+  inline const char *building_name_cstr(BuildingType building) {
     switch (building) {
       case BuildingType::LumberMill:
-        return "lumber_mill";
+        return "Lumber Mill";
       case BuildingType::Farm:
-        return "farm";
+        return "Farm";
       case BuildingType::Fisherman:
-        return "fisherman";
+        return "Fisherman";
       case BuildingType::Quarry:
-        return "quarry";
+        return "Quarry";
       case BuildingType::Shepherd:
-        return "shepherd";
+        return "Shepherd";
       case BuildingType::Mine:
-        return "mine";
+        return "Mine";
       case BuildingType::Mill:
-        return "mill";
+        return "Mill";
       case BuildingType::Kiln:
-        return "kiln";
+        return "Kiln";
       case BuildingType::Stonemason:
-        return "stonemason";
+        return "Stonemason";
       case BuildingType::Spinner:
-        return "spinner";
+        return "Spinner";
       case BuildingType::Tanner:
-        return "tanner";
+        return "Tanner";
       case BuildingType::Smithy:
-        return "smithy";
+        return "Smithy";
       case BuildingType::OlivePress:
-        return "olive_press";
+        return "Olive Press";
       case BuildingType::SwordSmith:
-        return "sword_smith";
+        return "Sword Smith";
       case BuildingType::Poleturner:
-        return "poleturner";
+        return "Poleturner";
       case BuildingType::Armourer:
-        return "armourer";
+        return "Armourer";
       case BuildingType::Jeweler:
-        return "jeweler";
+        return "Jeweler";
       case BuildingType::Tailor:
-        return "tailor";
+        return "Tailor";
       default:
-        return "unknown_building";
+        return "Unknown Building";
     }
   }
 
@@ -228,16 +228,9 @@ namespace Buildings {
 
   // @refactor make this a util, alongside the one in resources.hpp
   inline hstr building_icon_path(BuildingType type) {
-    str file = std::string(Buildings::building_name_str(type));
-
-    for (u32 j = 0; j < file.length(); j++) {
-      if (file[j] == ' ')
-        file[j] = '_';
-    }
-
-    file += "_icon.png";
-
-    return hstr{(file).c_str()};
+    return file_path_str_format(
+      Buildings::building_name_cstr(type), "_icon.png"
+    );
   }
 
 };// namespace Buildings

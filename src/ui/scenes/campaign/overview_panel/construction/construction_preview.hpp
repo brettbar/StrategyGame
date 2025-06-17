@@ -119,7 +119,7 @@ namespace UI {
 
                 texture_label(hstr{"arrow.png"}, {13, 13});
 
-                const char *resource = Resources::ResourceStr(item.resource);
+                const char *resource = Resources::resource_cstr(item.resource);
 
                 Clay_String cs = Clay_String{
                   .length = static_cast<int32_t>(strlen(resource)),
@@ -133,7 +133,7 @@ namespace UI {
                 _selected_recipe = 0;
               }
 
-              str building_name = Buildings::building_name_str(building.type);
+              str building_name = Buildings::building_name_cstr(building.type);
               str label = building_name + "::Checkbox";
 
               Clay_String cs = Clay_String{

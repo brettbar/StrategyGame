@@ -263,3 +263,18 @@ inline bool out_of_camera_bounds(Camera2D camera, vec2f position) {
       camera.target.y - (camera.offset.y / camera.zoom) - 32
   );
 }
+
+inline hstr file_path_str_format(const char *input, str postfix) {
+  str file = std::string(input);
+
+  for (u32 j = 0; j < file.length(); j++) {
+    if (file[j] == ' ')
+      file[j] = '_';
+    else
+      file[j] = std::tolower(file[j]);
+  }
+
+  file += postfix;
+
+  return hstr{(file).c_str()};
+}

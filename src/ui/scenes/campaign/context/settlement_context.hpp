@@ -99,7 +99,7 @@ namespace UI {
 
         texture_label(hstr{"arrow.png"}, {13, 13});
 
-        const char *label = Buildings::building_name_str(buildings[i].type);
+        const char *label = Buildings::building_name_cstr(buildings[i].type);
 
         Clay_String cs = Clay_String{
           .length = static_cast<int32_t>(strlen(label)),
@@ -121,7 +121,7 @@ namespace UI {
         auto current_recipe = buildings[i].current_recipe;
 
         for (const auto &output: current_recipe.outputs) {
-          const char *resource = Resources::ResourceStr(output.resource);
+          const char *resource = Resources::resource_cstr(output.resource);
 
           Clay_String cs = Clay_String{
             .length = static_cast<int32_t>(strlen(resource)),
