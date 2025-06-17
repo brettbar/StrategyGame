@@ -1,18 +1,21 @@
 # TODOs
 
 
+## Construction preview
 - [x] Build mode overlay
   - [x] make it actually check requirements to build
 - [ ]  make building mode escapable
   - [ ] keybind (esc)
   - [ ] cancel button or something
 - [ ] building being built and resource selected not enforced in sync!! A farm is producing ore!
+
+## Tooltips
 - [x] fix tooltip buttons
 - [x] implement global tooltip
   - [ ] delay?
 
 
-
+## Settings
 - [ ] basic settings menu
   - [ ] fullscreen
   - [ ] borderless

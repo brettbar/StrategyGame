@@ -70,6 +70,7 @@ namespace UI {
         spacer();
 
         if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
+          UI::ConstructionTab::Get()->exit();
           action = Action_Overview{
             .type = Action_Overview_t::CloseTab,
           };
@@ -77,7 +78,7 @@ namespace UI {
       }
 
       if (std::string(current_tab.chars) == "Construction") {
-        building_to_build = UI::construction_tab();
+        building_to_build = UI::ConstructionTab::Get()->construction_tab();
 
         if (building_to_build.has_value()) {
           action = Action_Overview{

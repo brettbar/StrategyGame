@@ -26,18 +26,6 @@ namespace Settings {
       return &instance;
     }
 
-    IManager() {
-      _state = State{
-        .window_state = WindowState::Fullscreen,
-        .resolution = {GetScreenWidth(), GetScreenHeight()},
-        .fps_limit = 300,
-      };
-    }
-
-    // @todo we can use this for reading from file or something
-    IManager(State state) {
-      _state = state;
-    }
 
     vec2i resolution() {
       return _state.resolution;
@@ -63,6 +51,24 @@ namespace Settings {
         } break;
       }
     }
+
+private:
+    IManager() {
+      _state = State{
+        .window_state = WindowState::Fullscreen,
+        .resolution = {GetScreenWidth(), GetScreenHeight()},
+        .fps_limit = 300,
+      };
+    }
+
+    // @todo we can use this for reading from file or something
+    IManager(State state) {
+      _state = state;
+    }
+    ~IManager() {}
+
+    IManager(IManager const &) = delete;
+    void operator=(const IManager &) = delete;
   };
 
   inline IManager *Manager() {
