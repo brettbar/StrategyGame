@@ -11,14 +11,14 @@
 #include "construction_preview.hpp"
 
 namespace UI {
-  struct ConstructionTab : public Singleton<ConstructionTab> {
+  struct ConstructionTab : public Manager<ConstructionTab> {
 private:
     bool _constructing = false;
     opt<Buildings::Building> _selected_building = std::nullopt;
 
     ConstructionTab() = default;
 
-    friend class Singleton<ConstructionTab>;
+    friend class Manager<ConstructionTab>;
 
 public:
     void exit() {

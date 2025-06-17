@@ -2,10 +2,10 @@
 
 
 template<typename T>
-class Singleton {
+class Manager {
   public:
-  Singleton(const Singleton &) = delete;
-  Singleton &operator=(const Singleton &) = delete;
+  Manager(const Manager &) = delete;
+  Manager &operator=(const Manager &) = delete;
 
   static T *Get() {
     static T instance;
@@ -14,5 +14,5 @@ class Singleton {
 
   protected:
   // Protected constructor to prevent direct instantiation
-  Singleton() = default;
+  Manager() = default;
 };

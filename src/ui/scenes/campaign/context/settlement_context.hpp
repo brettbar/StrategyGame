@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../shared/utils.hpp"
 #include "../../../../world/components/settlement_component.hpp"
 #include "../../../common.h"
 #include "../../../library/resource_icon.hpp"
@@ -64,10 +65,14 @@ namespace UI {
       }
 
       auto dev_lvl = selected_settlement->development;
-
       const char *dev_lvl_str = Settlement::dev_str(dev_lvl);
       auto dev_cs = cstr_to_cs(dev_lvl_str);
       text_label(dev_cs, 12);
+
+      u32 pop = selected_settlement->population.current;
+      const char *pop_txt = u32_to_cstr(pop);
+      auto pop_cs = cstr_to_cs(pop_txt);
+      text_label(pop_cs, 12);
 
 
       buildings_list(selected_settlement->buildings);
@@ -124,13 +129,6 @@ namespace UI {
           };
 
           resource_icon(output.resource, cs, i);
-          // texture_label_w_tooltip(
-          //   CLAY_STRING("ResourcesTab::ResourceIcon"),
-          //   cstr_to_cs(resource),
-          //   resource_icon_path(output.resource),
-          //   {32, 32},
-          //   i
-          // );
         }
       }
     }
