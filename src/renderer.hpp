@@ -151,77 +151,86 @@ struct Renderer {
     // EndShaderMode();
   }
 
+  struct IsVisibleTag {};
+
   void DrawActors(bool debug) {
-    entt::basic_view actors =
-      Global::world.view<Actor::Component, Animated::Component>();
+    auto actors = Global::world.view<Actor::Component, Animated::Component>();
 
     // @todo for sorting this, lets put only the visible ones (ie in bounds)
     // into a temp array first, then sort them, that way the batch is smaller
-    Global::world.sort<Actor::Component>(
-      [](const Actor::Component &lhs, const Actor::Component &rhs) {
-        return rhs.position.y > lhs.position.y;
+
+
+    for (entt::entity entity: actors) {
+      auto [actor_c, anim_c] = actors.get(entity);
+
+      if (out_of_camera_bounds(Global::state.camera, actor_c.position)) {
+        if (Global::world.any_of<IsVisibleTag>(entity)) {
+          Global::world.remove<IsVisibleTag>(entity);
+        }
+
+      } else {
+        if (!Global::world.any_of<IsVisibleTag>(entity)) {
+          Global::world.emplace<IsVisibleTag>(entity);
+        }
+      }
+    }
+
+    auto visible_actors =
+      Global::world.view<Actor::Component, Animated::Component, IsVisibleTag>();
+
+    Global::world.sort<IsVisibleTag>(
+      [&visible_actors](entt::entity lhs, entt::entity rhs) {
+        const auto &actor_lhs = visible_actors.get<Actor::Component>(lhs);
+        const auto &actor_rhs = visible_actors.get<Actor::Component>(rhs);
+        return actor_rhs.position.y > actor_lhs.position.y;
       }
     );
 
-    actors.each([debug,
-                 this](Actor::Component &actor, Animated::Component &anim) {
-      //    DrawTextureV(
-      //        actor.sprite,
-      //        {actor.position.x - 64.0f, actor.position.y - 64.0f},
-      //        WHITE);
-
-      if (out_of_camera_bounds(Global::state.camera, actor.position)) {
-        return;
-      }
+    // Global::world.sort<Actor::Component>(
+    //   [](const Actor::Component &lhs, const Actor::Component &rhs) {
+    //     return rhs.position.y > lhs.position.y;
+    //   }
+    // );
 
 
-      if (actor.selected) {
+    for (auto entity: visible_actors) {
+      auto [actor_c, anim_c] = visible_actors.get(entity);
+
+      if (Global::world.try_get<Selected::Component>(entity)) {
         Texture2D texture =
-          Global::texture_cache[hstr{anim.sprite_id.c_str()}]->texture;
+          Global::texture_cache[hstr{anim_c.sprite_id.c_str()}]->texture;
 
         BeginShaderMode(this->outline_shader);
         {
           DrawTextureRec(
             texture,
-            anim.frameRec,
-            {actor.position.x - 64.0f, actor.position.y - 64.0f},
+            anim_c.frameRec,
+            {actor_c.position.x - 64.0f, actor_c.position.y - 64.0f},
             WHITE
           );
         }
         EndShaderMode();
       } else {
         Texture2D texture =
-          Global::texture_cache[hstr{anim.sprite_id.c_str()}]->texture;
+          Global::texture_cache[hstr{anim_c.sprite_id.c_str()}]->texture;
 
         BeginShaderMode(this->shader);
         {
           DrawTextureRec(
             texture,
-            anim.frameRec,
-            {actor.position.x - 64.0f, actor.position.y - 64.0f},
+            anim_c.frameRec,
+            {actor_c.position.x - 64.0f, actor_c.position.y - 64.0f},
             WHITE
           );
         }
         EndShaderMode();
       }
 
-      // DrawPerfectTexture(
-      //   anim.sprite,
-      //   anim.frameRec,
-      //   { actor.position.x - 64.0f, actor.position.y - 64.0f },
-      //   WHITE );
-
-
-      // DrawTextureRec(
-      //   anim.sprite,
-      //   anim.frameRec,
-      //   { actor.position.x - 64.0f, actor.position.y - 64.0f },
-      //   WHITE );
-
-      if (debug && Vector2Distance(actor.position, actor.destination) > 0.5f) {
-        DrawLineEx(actor.position, actor.destination, 2, MAGENTA);
+      if (debug &&
+          Vector2Distance(actor_c.position, actor_c.destination) > 0.5f) {
+        DrawLineEx(actor_c.position, actor_c.destination, 2, MAGENTA);
       }
-    });
+    }
   }
 
   void Shutdown() {

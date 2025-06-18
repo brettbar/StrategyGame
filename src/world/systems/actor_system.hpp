@@ -106,14 +106,14 @@ public:
       return false;
     }
 
-    static void colonist_build_settlement(entt::entity colonist) {
-      Actor::Component actor = Global::world.get<Actor::Component>(colonist);
-
-      i32 closest_tile = DetermineTileIdFromPosition(actor.position);
-      // 2. if they aren't in a tile, bail
-      if (closest_tile == -1)
-        return;
-    }
+    // static void colonist_build_settlement(entt::entity colonist) {
+    //   Actor::Component actor = Global::world.get<Actor::Component>(colonist);
+    //
+    //   i32 closest_tile = DetermineTileIdFromPosition(actor.position);
+    //   // 2. if they aren't in a tile, bail
+    //   if (closest_tile == -1)
+    //     return;
+    // }
 
     static void colonist_claim_province(entt::entity colonist) {
       Actor::Component actor = Global::world.get<Actor::Component>(colonist);
@@ -174,15 +174,15 @@ private:
     // 1. The colonist is not moving
     // 2. The colonist is in a province owned by their faction
     // 3. The province does not already contain a settlement
-    bool selected_colonist_can_place_settlement() {
-      entt::entity selected_entity = Selection::System::GetSelectedEntity();
-      // 0. if the colonist isnt selected, bail
-      if (selected_entity == entt::null ||
-          !Global::world.all_of<Actor::Component>(selected_entity))
-        return false;
-
-      return colonist_can_place_settlement(selected_entity);
-    }
+    // bool selected_colonist_can_place_settlement() {
+    //   entt::entity selected_entity = Selection::System::GetSelectedEntity();
+    //   // 0. if the colonist isnt selected, bail
+    //   if (selected_entity == entt::null ||
+    //       !Global::world.all_of<Actor::Component>(selected_entity))
+    //     return false;
+    //
+    //   return colonist_can_place_settlement(selected_entity);
+    // }
   };
 
 };// namespace Actor

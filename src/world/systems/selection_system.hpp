@@ -21,7 +21,6 @@ namespace Selection {
     static void ClearSelection(view<T> component_view) {
       for (entt::entity entity: component_view) {
         T &component = Global::world.get<T>(entity);
-        component.selected = false;
         Global::world.remove<Selected::Component>(entity);
       }
     }
@@ -86,7 +85,6 @@ namespace Selection {
           // std::cout << EntityIdToString( entity ) << std::endl;
           // std::cout << EntityIdToString( actor.owner ) << std::endl;
 
-          actor.selected = true;
           selected_entity = entity;
 
           // InterfaceUpdate::Update{
