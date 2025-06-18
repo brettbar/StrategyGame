@@ -21,7 +21,7 @@ namespace Settlement {
         Global::world.view<Province::Component, Settlement::Component>();
 
       for (entt::entity entity: settlements) {
-        auto &settlement = Global::world.get<Settlement::Component>(entity);
+        auto &settlement = settlements.get<Settlement::Component>(entity);
 
         update_settlement(settlement);
         update_resources(settlement);
