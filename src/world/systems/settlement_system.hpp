@@ -165,7 +165,18 @@ namespace Settlement {
       Settlement::Component settlement,
       Buildings::Building building
     ) {
-      auto biome = prov.tile->biome;
+      auto prov_biome = prov.tile->biome;
+
+      auto eligible_biomes =
+        Buildings::eligible_biomes_for_building(building.type);
+
+      for (const auto biome: eligible_biomes) {
+        if (biome == prov_biome) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     static void construct_building(

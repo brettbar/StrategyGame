@@ -140,7 +140,7 @@ namespace Overlay {
 
           if (settlement != nullptr) {
             if (Settlement::System::can_build_immediately(
-                  *settlement, building
+                  prov, *settlement, building
                 )) {
               color = "green";
             } else if (Settlement::System::can_build_with_changes_needed(

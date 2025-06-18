@@ -2,6 +2,7 @@
 
 #include "../../../../../shared/common.hpp"
 #include "../../../../../shared/manager.hpp"
+#include "../../../../../world/managers/map_manager.hpp"
 #include "../../../../library/text_label.hpp"
 #include <cstdint>
 #include <optional>
@@ -22,6 +23,9 @@ private:
 
 public:
     void exit() {
+      if (_constructing)
+        Map::Manager()->mode = Map::Mode::Default;
+
       _constructing = false;
       _selected_building = std::nullopt;
     }
@@ -35,8 +39,7 @@ public:
           case UI::Action_ConstructionPreview_t::None:
             break;
           case UI::Action_ConstructionPreview_t::Back:
-            _constructing = false;
-            _selected_building = std::nullopt;
+            exit();
             break;
           case UI::Action_ConstructionPreview_t::Build:
             _selected_building.value().current_recipe = action.recipe;

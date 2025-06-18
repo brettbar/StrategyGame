@@ -190,9 +190,11 @@ namespace Resource {
 
     static void Draw(Camera2D &camera) {
       // Texture2D tex = Global::texture_cache[hstr{ "lumber.png" }]->texture;
-      for (auto entity: Global::world.view<Province::Component>()) {
 
-        auto &prov = Global::world.get<Province::Component>(entity);
+      auto view = Global::world.view<Province::Component>();
+      for (auto entity: view) {
+
+        auto &prov = view.get<Province::Component>(entity);
 
         if (prov.tile->position.x - TILE_WIDTH >
               camera.target.x + (camera.offset.x / camera.zoom) + 32 ||

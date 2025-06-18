@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../src/shared/common.hpp"
+#include "biomes.hpp"
 #include "clay/clay.h"
 #include "resources.hpp"
 #include <cereal/types/vector.hpp>
@@ -50,6 +51,7 @@ namespace Buildings {
     // Gathering
     LumberMill,// nc
     Farm,
+    Orchard,
     Fisherman,// nc
     Quarry,
     Shepherd,
@@ -220,6 +222,55 @@ namespace Buildings {
         break;
       case BuildingType::Tailor:
         break;
+    }
+
+    return {};
+  }
+
+  // @todo make a function for actually checking the the tile has the required resource
+  inline list<Biome> eligible_biomes_for_building(BuildingType type) {
+
+    auto land_tiles = {
+      Biome::Desert,
+      Biome::Plains,
+      Biome::Hills,
+      Biome::Mountains,
+      Biome::Forest,
+      Biome::Taiga,
+      Biome::Tundra,
+      Biome::Steppe,
+    };
+
+    switch (type) {
+      case BuildingType::LumberMill:
+        return {Biome::Forest, Biome::Taiga};
+      case BuildingType::Farm:
+        return {Biome::Plains};
+      case BuildingType::Orchard:
+        return {Biome::Plains, Biome::Forest, Biome::Hills};
+      case BuildingType::
+        Fisherman:// @todo this isnt really determined by the biome, but rather the proximity to the sea/rivers
+        return {};
+      case BuildingType::Quarry:
+        return {Biome::Hills, Biome::Mountains};
+      case BuildingType::Shepherd:
+        return {Biome::Plains, Biome::Hills};
+      case BuildingType::Mine:
+        return {Biome::Mountains};
+
+      case BuildingType::Mill:
+      case BuildingType::Kiln:
+      case BuildingType::Stonemason:
+      case BuildingType::Spinner:
+      case BuildingType::Tanner:
+      case BuildingType::Smithy:
+      case BuildingType::OlivePress:
+      case BuildingType::SwordSmith:
+      case BuildingType::Poleturner:
+      case BuildingType::Armourer:
+      case BuildingType::Jeweler:
+      case BuildingType::Tailor:
+        return land_tiles;
     }
 
     return {};
