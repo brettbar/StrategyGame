@@ -36,43 +36,6 @@ namespace Settlement {
         auto &province = settlements.get<Province::Component>(entity);
         auto &settlement = settlements.get<Settlement::Component>(entity);
 
-        // str idString = std::to_string(tile.id);
-        // const char *idText = idString.c_str();
-        // if (debug)
-        //   DrawText(idText, tile.position.x + 16.0, tile.position.y + 16.0,
-        //   14
-        //            WHITE);
-
-        // str ownerString = std::to_string(tile.owner);
-        // const char *ownertext = ownerString.c_str();
-        // DrawText(ownertext, tile.position.x + 48.0, tile.position.y + 16.0,
-        // 14,
-        //          BLUE);
-
-        //       str coordString = std::to_string((u32)tile.coord.x) + "," +
-        //                         std::to_string((u32)tile.coord.y);
-        //       const char *coordText = coordString.c_str();
-        ////       if (.debug)
-        //         DrawText(coordText, tile.position.x + 16.0, tile.position.y + 16.0, 14,
-        //                  BLUE);
-
-        // str popString = std::to_string(tile.population);
-        // const char *text = popString.c_str();
-        // if (debug)
-        //   DrawText(text, tile.position.x + 16.0, tile.position.y + 32.0,
-        //   14,
-        //            RED);
-
-        // if ( prov.owner <= -1 || settlement.population.current <= 0 )
-        //   continue;
-
-
-        // // DrawRectangleRec({provPos.x + 50,
-        // //                   provPos.y + 86, 128, 64},
-        // //                  Fade(WHITE, 0.8f));
-        // // DrawSingleBorder(tile);
-
-        // // Draw Settlement
         DrawTextureV(settlement.texture, settlement_position(province), WHITE);
       }
     }
@@ -199,7 +162,7 @@ namespace Settlement {
       // );
 
 
-      settlement.buildings.push_back(Settlement::Building{
+      settlement.buildings.push_back(Buildings::Building{
         .type = building.type, .current_recipe = building.current_recipe
       });
     }
@@ -253,12 +216,12 @@ private:
     }
 
     static void update_resources(Settlement::Component &settlement) {
-      for (Settlement::Building &building: settlement.buildings) {
+      for (Buildings::Building &building: settlement.buildings) {
         auto recipes = Buildings::recipes_for_building(building.type);
         auto current_recipe = building.current_recipe;
 
         for (const auto &recipe_item: current_recipe.outputs) {
-          settlement.resources_quantities[recipe_item.resource] =
+          settlement.resource_quantities[recipe_item.resource] =
             recipe_item.quantity;
         }
       }
@@ -333,7 +296,7 @@ private:
     }
 
 
-    std::vector<Settlement::Building> SelectedSettlementBuildingList() {
+    std::vector<Buildings::Building> SelectedSettlementBuildingList() {
       Settlement::Component *settlement =
         Global::world.try_get<Settlement::Component>(
           Selection::System::GetSelectedEntity()

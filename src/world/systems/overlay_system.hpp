@@ -20,6 +20,8 @@ namespace Overlay {
   struct System {
     static void draw_borders() {
       auto provinces = Global::world.view<Province::Component>();
+      auto player_factions =
+        Global::world.view<Player::Component, Faction::Component>();
 
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
@@ -28,9 +30,9 @@ namespace Overlay {
           continue;
 
         Player::Component player =
-          Global::world.get<Player::Component>(prov.tile->owner);
+          player_factions.get<Player::Component>(prov.tile->owner);
         Faction::Component faction =
-          Global::world.get<Faction::Component>(prov.tile->owner);
+          player_factions.get<Faction::Component>(prov.tile->owner);
 
         auto neighbors = Map::Manager()->get_neighbors(*prov.tile);
 
@@ -64,6 +66,8 @@ namespace Overlay {
 
     static void draw_default() {
       auto provinces = Global::world.view<Province::Component>();
+      auto player_factions =
+        Global::world.view<Player::Component, Faction::Component>();
 
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
@@ -72,9 +76,9 @@ namespace Overlay {
           continue;
 
         Player::Component player =
-          Global::world.get<Player::Component>(prov.tile->owner);
+          player_factions.get<Player::Component>(prov.tile->owner);
         Faction::Component faction =
-          Global::world.get<Faction::Component>(prov.tile->owner);
+          player_factions.get<Faction::Component>(prov.tile->owner);
 
         Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
@@ -93,15 +97,17 @@ namespace Overlay {
 
     static void draw_political() {
       auto provinces = Global::world.view<Province::Component>();
+      auto player_factions =
+        Global::world.view<Player::Component, Faction::Component>();
 
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
 
         if (prov.tile->owner != entt::null) {
           Player::Component player =
-            Global::world.get<Player::Component>(prov.tile->owner);
+            player_factions.get<Player::Component>(prov.tile->owner);
           Faction::Component faction =
-            Global::world.get<Faction::Component>(prov.tile->owner);
+            player_factions.get<Faction::Component>(prov.tile->owner);
 
           Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 

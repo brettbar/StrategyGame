@@ -16,9 +16,16 @@ namespace Resource {
 
       for (const auto &player_e: player_v) {
 
-        Global::world.emplace<Stockpile::Component>(
-          player_e, Stockpile::Component()
-        );
+        auto stockpile_c = Stockpile::Component();
+
+        stockpile_c.resources = {
+          {Resources::Type::Timber, 10},
+          {Resources::Type::Clay, 10},
+          {Resources::Type::Fish, 10},
+          {Resources::Type::Wheat, 10},
+        };
+
+        Global::world.emplace<Stockpile::Component>(player_e, stockpile_c);
       }
     }
 
@@ -29,11 +36,7 @@ namespace Resource {
       auto stockpile_v = Global::world.view<Stockpile::Component>();
 
       for (const auto &settlement_e: settlement_v) {
-        Settlement::Component &settlement =
-          settlement_v.get<Settlement::Component>(settlement_e);
-
-        Province::Component &province =
-          settlement_v.get<Province::Component>(settlement_e);
+        auto [province, settlement] = settlement_v.get(settlement_e);
 
         entt::entity owner_e = province.tile->owner;
 
@@ -47,7 +50,7 @@ namespace Resource {
         for (u32 i = 0; i < (u32) Resources::Type::COUNT; i++) {
           Resources::Type rt = (Resources::Type) i;
 
-          u32 num_in_province = settlement.resources_quantities[rt];
+          u32 num_in_province = settlement.resource_quantities[rt];
 
           stockpile.resources[rt] += num_in_province;
         }
@@ -64,8 +67,7 @@ namespace Resource {
       u32 total = 0;
 
       for (entt::entity stockpile_e: stockpiles) {
-        auto stockpile = stockpiles.get<Stockpile::Component>(stockpile_e);
-        auto player = stockpiles.get<Player::Component>(stockpile_e);
+        auto [stockpile, player] = stockpiles.get(stockpile_e);
 
         if (player.id == player_e) {
           return stockpile.resources;
@@ -160,10 +162,10 @@ namespace Resource {
       Province::Component &prov,
       Settlement::Component &settlement
     ) {
-      if (settlement.resources_quantities.size() == 0)
+      if (settlement.resource_quantities.size() == 0)
         return;
 
-      for (auto resource_pair: settlement.resources_quantities) {
+      for (auto resource_pair: settlement.resource_quantities) {
         Resources::Type resource = resource_pair.first;
 
         DrawCircle(

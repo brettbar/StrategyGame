@@ -2,6 +2,7 @@
 
 #include "shared/common.hpp"
 
+#include "shared/utils.hpp"
 #include "world/managers/map_manager.hpp"
 
 #include "world/components/animated_component.hpp"
@@ -154,6 +155,8 @@ struct Renderer {
   struct IsVisibleTag {};
 
   void DrawActors(bool debug) {
+    BeginShaderMode(this->shader);
+
     auto actors = Global::world.view<Actor::Component, Animated::Component>();
 
     // @todo for sorting this, lets put only the visible ones (ie in bounds)
@@ -214,16 +217,12 @@ struct Renderer {
         Texture2D texture =
           Global::texture_cache[hstr{anim_c.sprite_id.c_str()}]->texture;
 
-        BeginShaderMode(this->shader);
-        {
-          DrawTextureRec(
-            texture,
-            anim_c.frameRec,
-            {actor_c.position.x - 64.0f, actor_c.position.y - 64.0f},
-            WHITE
-          );
-        }
-        EndShaderMode();
+        DrawTextureRec(
+          texture,
+          anim_c.frameRec,
+          {actor_c.position.x - 64.0f, actor_c.position.y - 64.0f},
+          WHITE
+        );
       }
 
       if (debug &&
@@ -231,6 +230,8 @@ struct Renderer {
         DrawLineEx(actor_c.position, actor_c.destination, 2, MAGENTA);
       }
     }
+
+    EndShaderMode();
   }
 
   void Shutdown() {

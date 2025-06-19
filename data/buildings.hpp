@@ -80,6 +80,11 @@ namespace Buildings {
     Clay_String label;
     str path;
     Recipe current_recipe;
+
+    template<class Archive>
+    void serialize(Archive &ar) {
+      ar(type, category, current_recipe);
+    }
   };
 
   inline const char *building_name_cstr(BuildingType building) {

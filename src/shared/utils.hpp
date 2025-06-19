@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 #include "global.hpp"
+#include <iostream>
 #include <memory>
 
 inline i32 DetermineTileIdFromPosition(Vector2);
@@ -20,6 +21,32 @@ inline vec2u coords_from_index(u32 index, u32 w) {
   u32 x = index % w;
   u32 y = index / w;
   return {x, y};
+}
+
+// Global storage for timers
+inline std::unordered_map<std::string, std::chrono::steady_clock::time_point>
+  timers;
+
+inline void startTimer(const std::string &label) {
+  timers[label] = std::chrono::steady_clock::now();
+  std::cout << "Start " << label << "\n";
+}
+
+inline void endTimer(const std::string &label) {
+  auto now = std::chrono::steady_clock::now();
+  auto startIt = timers.find(label);
+
+  if (startIt != timers.end()) {
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                      now - startIt->second
+    )
+                      .count();
+    std::cout << "End " << label << "\n";
+    std::cout << label << " took " << duration << " ms\n";
+    timers.erase(startIt);// Optional: clean up
+  } else {
+    std::cerr << "No timer found for label: " << label << "\n";
+  }
 }
 
 

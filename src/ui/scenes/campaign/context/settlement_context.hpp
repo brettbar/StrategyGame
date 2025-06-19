@@ -14,7 +14,7 @@ namespace UI {
     SpawnArmy,
   };
 
-  inline void buildings_list(list<Settlement::Building>);
+  inline void buildings_list(list<Buildings::Building>);
 
   inline Action_SettlementContext settlement_context(
     Settlement::Component *selected_settlement
@@ -81,7 +81,7 @@ namespace UI {
     return action;
   }
 
-  inline void buildings_list(list<Settlement::Building> buildings) {
+  inline void buildings_list(list<Buildings::Building> buildings) {
     for (u32 i = 0; i < buildings.size(); i++) {
       CLAY({
         .layout =
@@ -128,7 +128,8 @@ namespace UI {
             .chars = resource,
           };
 
-          resource_icon(output.resource, cs, i);
+
+          resource_icon_w_quantity(output.resource, output.quantity, cs, i);
         }
       }
     }
