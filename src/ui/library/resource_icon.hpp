@@ -49,7 +49,8 @@ namespace UI {
         CLAY_STRING("ResourceIcon"),
         cs,
         Resources::resource_icon_path(type),
-        {32, 32}
+        {32, 32},
+        i
       );
 
       CLAY({

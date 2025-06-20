@@ -70,7 +70,6 @@ namespace UI {
         spacer();
 
         if (texture_button(CLAY_STRING("Exit"), hstr{"exit.png"}, {15, 15})) {
-          UI::ConstructionTab::Get()->exit();
           action = Action_Overview{
             .type = Action_Overview_t::CloseTab,
           };

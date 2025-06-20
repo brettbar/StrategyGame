@@ -34,6 +34,8 @@ namespace Resources {
     // Wool,
     // Flax,
     // Hide,
+    Bricks,
+    Stone,
     SilverOre,
     GoldOre,
     IronOre,
@@ -42,8 +44,6 @@ namespace Resources {
     // Gems,
     //////////////////
     // Flour,
-    // Bricks,
-    // StoneBricks,
     // Pottery,
     // Cloth,
     // Linen,
@@ -85,6 +85,10 @@ namespace Resources {
       //   return "flax";
       // case Type::Hide:
       //   return "hide";
+      case Type::Bricks:
+        return "Bricks";
+      case Type::Stone:
+        return "Stone";
       case Type::SilverOre:
         return "Silver Ore";
       case Type::GoldOre:
@@ -96,15 +100,17 @@ namespace Resources {
       case Type::CopperOre:
         return "Copper Ore";
 
+
       case Type::GoldIngots:
         return "Gold Ingots";
       case Type::IronIngots:
         return "Iron Ingots";
       case Type::BronzeIngots:
         return "Bronze Ingots";
-      // case RawMaterial::Gems:
-      //   return "gems";
-      default:
+        // case RawMaterial::Gems:
+        //   return "gems";
+
+      case Type::COUNT:
         return "INVALID";
     }
   }

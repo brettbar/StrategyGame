@@ -49,16 +49,15 @@ namespace Overlay {
 
         for (u32 i = 0; i < neighbors.size(); i++) {
           auto neighbor = neighbors[i];
-          if (!neighbor)
-            continue;
-
-          if (neighbor->owner != prov.tile->owner) {
-            DrawTexture(
-              Global::texture_cache[borders[i]]->texture,
-              prov.tile->position.x,
-              prov.tile->position.y,
-              WHITE
-            );
+          if (neighbor) {
+            if (neighbor->owner != prov.tile->owner) {
+              DrawTexture(
+                Global::texture_cache[borders[i]]->texture,
+                prov.tile->position.x,
+                prov.tile->position.y,
+                WHITE
+              );
+            }
           }
         }
       }

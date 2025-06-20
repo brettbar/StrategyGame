@@ -35,6 +35,7 @@ namespace Buildings {
     }
   };
 
+
   enum class BuildingCategory {
     Agricultural,
     Gathering,
@@ -47,7 +48,7 @@ namespace Buildings {
     Religious
   };
 
-  enum class BuildingType {
+  enum class Type {
     // Gathering
     LumberMill,// nc
     Farm,
@@ -75,7 +76,7 @@ namespace Buildings {
   };
 
   struct Building {
-    BuildingType type;
+    Type type;
     BuildingCategory category;
     Clay_String label;
     str path;
@@ -87,73 +88,87 @@ namespace Buildings {
     }
   };
 
-  inline const char *building_name_cstr(BuildingType building) {
+  struct ConstructionRecipe {
+    u32 id;
+    list<RecipeItem> inputs;
+
+    bool operator==(const Recipe &other) const {
+      return id == other.id;
+    }
+
+    template<class Archive>
+    void serialize(Archive &ar) {
+      ar(id, inputs);
+    }
+  };
+
+  inline const char *building_name_cstr(Type building) {
     switch (building) {
-      case BuildingType::LumberMill:
+      case Type::LumberMill:
         return "Lumber Mill";
-      case BuildingType::Farm:
+      case Type::Farm:
         return "Farm";
-      case BuildingType::Fisherman:
+      case Type::Fisherman:
         return "Fisherman";
-      case BuildingType::Quarry:
+      case Type::Quarry:
         return "Quarry";
-      case BuildingType::Shepherd:
+      case Type::Shepherd:
         return "Shepherd";
-      case BuildingType::Mine:
+      case Type::Mine:
         return "Mine";
-      case BuildingType::Mill:
+      case Type::Mill:
         return "Mill";
-      case BuildingType::Kiln:
+      case Type::Kiln:
         return "Kiln";
-      case BuildingType::Stonemason:
+      case Type::Stonemason:
         return "Stonemason";
-      case BuildingType::Spinner:
+      case Type::Spinner:
         return "Spinner";
-      case BuildingType::Tanner:
+      case Type::Tanner:
         return "Tanner";
-      case BuildingType::Smithy:
+      case Type::Smithy:
         return "Smithy";
-      case BuildingType::OlivePress:
+      case Type::OlivePress:
         return "Olive Press";
-      case BuildingType::SwordSmith:
+      case Type::SwordSmith:
         return "Sword Smith";
-      case BuildingType::Poleturner:
+      case Type::Poleturner:
         return "Poleturner";
-      case BuildingType::Armourer:
+      case Type::Armourer:
         return "Armourer";
-      case BuildingType::Jeweler:
+      case Type::Jeweler:
         return "Jeweler";
-      case BuildingType::Tailor:
+      case Type::Tailor:
         return "Tailor";
       default:
         return "Unknown Building";
     }
   }
 
-  inline map<str, BuildingType> building_lookup = {
-    {"lumber_mill", BuildingType::LumberMill},
-    {"farm", BuildingType::Farm},
-    {"fisherman", BuildingType::Fisherman},
-    {"quarry", BuildingType::Quarry},
-    {"shepherd", BuildingType::Shepherd},
-    {"mine", BuildingType::Mine},
-    {"mill", BuildingType::Mill},
-    {"kiln", BuildingType::Kiln},
-    {"stone_mason", BuildingType::Stonemason},
-    {"spinner", BuildingType::Spinner},
-    {"tanner", BuildingType::Tanner},
-    {"smithy", BuildingType::Smithy},
-    {"olive_press", BuildingType::OlivePress},
-    {"sword_smith", BuildingType::SwordSmith},
-    {"poleturner", BuildingType::Poleturner},
-    {"armourer", BuildingType::Armourer},
-    {"jeweler", BuildingType::Jeweler},
-    {"tailor", BuildingType::Tailor},
+  inline map<str, Type> building_lookup = {
+    {"lumber_mill", Type::LumberMill},
+    {"farm", Type::Farm},
+    {"fisherman", Type::Fisherman},
+    {"quarry", Type::Quarry},
+    {"shepherd", Type::Shepherd},
+    {"mine", Type::Mine},
+    {"mill", Type::Mill},
+    {"kiln", Type::Kiln},
+    {"stone_mason", Type::Stonemason},
+    {"spinner", Type::Spinner},
+    {"tanner", Type::Tanner},
+    {"smithy", Type::Smithy},
+    {"olive_press", Type::OlivePress},
+    {"sword_smith", Type::SwordSmith},
+    {"poleturner", Type::Poleturner},
+    {"armourer", Type::Armourer},
+    {"jeweler", Type::Jeweler},
+    {"tailor", Type::Tailor},
   };
 
-  inline list<Recipe> recipes_for_building(BuildingType building) {
+  inline list<Recipe> recipes_for_building(Type building) {
     switch (building) {
-      case BuildingType::LumberMill:
+      case Type::LumberMill:
         return {
           Recipe{
             .id = 0,
@@ -161,7 +176,7 @@ namespace Buildings {
             .outputs = {RecipeItem{.resource = Resources::Type::Timber}},
           },
         };
-      case BuildingType::Farm:
+      case Type::Farm:
         return {
           Recipe{
             .id = 0,
@@ -169,13 +184,13 @@ namespace Buildings {
             .outputs = {RecipeItem{.resource = Resources::Type::Wheat}},
           },
         };
-      case BuildingType::Fisherman:
+      case Type::Fisherman:
         break;
-      case BuildingType::Quarry:
+      case Type::Quarry:
         break;
-      case BuildingType::Shepherd:
+      case Type::Shepherd:
         break;
-      case BuildingType::Mine:
+      case Type::Mine:
         return {
           Recipe{
             .id = 0,
@@ -203,37 +218,93 @@ namespace Buildings {
             .outputs = {RecipeItem{.resource = Resources::Type::GoldOre}},
           },
         };
-      case BuildingType::Mill:
+      case Type::Mill:
         break;
-      case BuildingType::Kiln:
+      case Type::Kiln:
         break;
-      case BuildingType::Stonemason:
+      case Type::Stonemason:
         break;
-      case BuildingType::Spinner:
+      case Type::Spinner:
         break;
-      case BuildingType::Tanner:
+      case Type::Tanner:
         break;
-      case BuildingType::Smithy:
+      case Type::Smithy:
         break;
-      case BuildingType::OlivePress:
+      case Type::OlivePress:
         break;
-      case BuildingType::SwordSmith:
+      case Type::SwordSmith:
         break;
-      case BuildingType::Poleturner:
+      case Type::Poleturner:
         break;
-      case BuildingType::Armourer:
+      case Type::Armourer:
         break;
-      case BuildingType::Jeweler:
+      case Type::Jeweler:
         break;
-      case BuildingType::Tailor:
+      case Type::Tailor:
         break;
     }
 
     return {};
   }
 
+  inline list<ConstructionRecipe> construction_recipes(Type type) {
+    switch (type) {
+      case Type::LumberMill:
+      case Type::Farm:
+      case Type::Orchard:
+      case Type::Fisherman:
+      case Type::Quarry:
+      case Type::Shepherd:
+      case Type::Mine:
+      case Type::Mill:
+      case Type::Kiln:
+      case Type::Stonemason:
+      case Type::Spinner:
+      case Type::Tanner:
+      case Type::Smithy:
+      case Type::OlivePress:
+      case Type::SwordSmith:
+      case Type::Poleturner:
+      case Type::Armourer:
+      case Type::Jeweler:
+      case Type::Tailor:
+        return {
+          ConstructionRecipe{
+            .id = 0,
+            .inputs =
+              {
+                RecipeItem{
+                  .quantity = 1,
+                  .resource = Resources::Type::Bricks,
+                },
+                RecipeItem{
+                  .quantity = 1,
+                  .resource = Resources::Type::Timber,
+                },
+              },
+          },
+          ConstructionRecipe{
+            .id = 1,
+            .inputs =
+              {
+                RecipeItem{
+                  .quantity = 1,
+                  .resource = Resources::Type::Stone,
+                },
+                RecipeItem{
+                  .quantity = 1,
+                  .resource = Resources::Type::Timber,
+                },
+              },
+          },
+        };
+    };
+
+    return {};
+  }
+
   // @todo make a function for actually checking the the tile has the required resource
-  inline list<Biome> eligible_biomes_for_building(BuildingType type) {
+  inline list<Biome> eligible_biomes_for_building(Type type) {
 
     auto land_tiles = {
       Biome::Desert,
@@ -247,34 +318,34 @@ namespace Buildings {
     };
 
     switch (type) {
-      case BuildingType::LumberMill:
+      case Type::LumberMill:
         return {Biome::Forest, Biome::Taiga};
-      case BuildingType::Farm:
+      case Type::Farm:
         return {Biome::Plains};
-      case BuildingType::Orchard:
+      case Type::Orchard:
         return {Biome::Plains, Biome::Forest, Biome::Hills};
-      case BuildingType::
+      case Type::
         Fisherman:// @todo this isnt really determined by the biome, but rather the proximity to the sea/rivers
         return {};
-      case BuildingType::Quarry:
+      case Type::Quarry:
         return {Biome::Hills, Biome::Mountains};
-      case BuildingType::Shepherd:
+      case Type::Shepherd:
         return {Biome::Plains, Biome::Hills};
-      case BuildingType::Mine:
+      case Type::Mine:
         return {Biome::Mountains};
 
-      case BuildingType::Mill:
-      case BuildingType::Kiln:
-      case BuildingType::Stonemason:
-      case BuildingType::Spinner:
-      case BuildingType::Tanner:
-      case BuildingType::Smithy:
-      case BuildingType::OlivePress:
-      case BuildingType::SwordSmith:
-      case BuildingType::Poleturner:
-      case BuildingType::Armourer:
-      case BuildingType::Jeweler:
-      case BuildingType::Tailor:
+      case Type::Mill:
+      case Type::Kiln:
+      case Type::Stonemason:
+      case Type::Spinner:
+      case Type::Tanner:
+      case Type::Smithy:
+      case Type::OlivePress:
+      case Type::SwordSmith:
+      case Type::Poleturner:
+      case Type::Armourer:
+      case Type::Jeweler:
+      case Type::Tailor:
         return land_tiles;
     }
 
@@ -283,7 +354,7 @@ namespace Buildings {
 
 
   // @refactor make this a util, alongside the one in resources.hpp
-  inline hstr building_icon_path(BuildingType type) {
+  inline hstr building_icon_path(Type type) {
     return file_path_str_format(
       Buildings::building_name_cstr(type), "_icon.png"
     );

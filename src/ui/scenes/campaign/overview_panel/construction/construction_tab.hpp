@@ -18,7 +18,6 @@ private:
     opt<Buildings::Building> _selected_building = std::nullopt;
 
     ConstructionTab() = default;
-
     friend class Manager<ConstructionTab>;
 
 public:
@@ -33,7 +32,9 @@ public:
     opt<Buildings::Building> construction_tab() {
 
       if (_constructing) {
-        auto action = construction_preview(_selected_building.value());
+        auto action = ConstructionPreview::Get()->construction_preview(
+          _selected_building.value()
+        );
 
         switch (action.type) {
           case UI::Action_ConstructionPreview_t::None:
@@ -82,19 +83,19 @@ public:
 
     list<Buildings::Building> buildings = {
       {
-        .type = Buildings::BuildingType::Farm,
+        .type = Buildings::Type::Farm,
         .category = Buildings::BuildingCategory::Agricultural,
         .label = CLAY_STRING("Farm"),
         .path = "farm_icon.png",
       },
       {
-        .type = Buildings::BuildingType::LumberMill,
+        .type = Buildings::Type::LumberMill,
         .category = Buildings::BuildingCategory::Gathering,
         .label = CLAY_STRING("Lumber Mill"),
         .path = "lumber_mill_icon.png",
       },
       {
-        .type = Buildings::BuildingType::Mine,
+        .type = Buildings::Type::Mine,
         .category = Buildings::BuildingCategory::Gathering,
         .label = CLAY_STRING("Mine"),
         .path = "mine_icon.png",
@@ -111,7 +112,7 @@ public:
         .layout = {.layoutDirection = CLAY_TOP_TO_BOTTOM},
       }) {
         for (u32 i = 0; i < col.size(); i++) {
-          text_label(building_category_str(col[i]), 8);
+          text_label(building_category_str(col[i]), 12);
 
           CLAY({
             .layout = {.childGap = uint16_t(3 * UI_SCALE)},

@@ -20,7 +20,8 @@ namespace Resource {
 
         stockpile_c.resources = {
           {Resources::Type::Timber, 10},
-          {Resources::Type::Clay, 10},
+          {Resources::Type::Bricks, 10},
+          {Resources::Type::Stone, 10},
           {Resources::Type::Fish, 10},
           {Resources::Type::Wheat, 10},
         };

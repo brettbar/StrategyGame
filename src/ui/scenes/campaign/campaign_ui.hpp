@@ -92,6 +92,8 @@ namespace UI {
                 break;
               case UI::Action_Overview_t::CloseTab:
                 tab = CLAY_STRING("");
+                UI::ConstructionTab::Get()->exit();
+                UI::ConstructionPreview::Get()->exit();
                 break;
               case UI::Action_Overview_t::Construction:
                 building_to_build = action.building;
