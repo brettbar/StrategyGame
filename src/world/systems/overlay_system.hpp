@@ -17,6 +17,7 @@
 
 namespace Overlay {
 
+  // @todo make sure these dont show out of bounds stuff
   struct System {
     static void draw_borders() {
       auto provinces = Global::world.view<Province::Component>();
@@ -26,15 +27,15 @@ namespace Overlay {
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
 
-        if (prov.tile->owner == entt::null)
+        if (prov.owner == entt::null)
           continue;
 
         Player::Component player =
-          player_factions.get<Player::Component>(prov.tile->owner);
+          player_factions.get<Player::Component>(prov.owner);
         Faction::Component faction =
-          player_factions.get<Faction::Component>(prov.tile->owner);
+          player_factions.get<Faction::Component>(prov.owner);
 
-        auto neighbors = Map::Manager()->get_neighbors(*prov.tile);
+        auto neighbors = Map::Manager()->get_neighboring_owners(prov.tile);
 
         str primary = faction.colors.primary;
 
@@ -48,16 +49,15 @@ namespace Overlay {
         };
 
         for (u32 i = 0; i < neighbors.size(); i++) {
-          auto neighbor = neighbors[i];
-          if (neighbor) {
-            if (neighbor->owner != prov.tile->owner) {
-              DrawTexture(
-                Global::texture_cache[borders[i]]->texture,
-                prov.tile->position.x,
-                prov.tile->position.y,
-                WHITE
-              );
-            }
+          entt::entity neighbor = neighbors[i];
+
+          if (neighbor == entt::null || (neighbor != prov.owner)) {
+            DrawTexture(
+              Global::texture_cache[borders[i]]->texture,
+              prov.tile.position.x,
+              prov.tile.position.y,
+              WHITE
+            );
           }
         }
       }
@@ -71,13 +71,13 @@ namespace Overlay {
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
 
-        if (prov.tile->owner == entt::null)
+        if (prov.owner == entt::null)
           continue;
 
         Player::Component player =
-          player_factions.get<Player::Component>(prov.tile->owner);
+          player_factions.get<Player::Component>(prov.owner);
         Faction::Component faction =
-          player_factions.get<Faction::Component>(prov.tile->owner);
+          player_factions.get<Faction::Component>(prov.owner);
 
         Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
@@ -88,7 +88,7 @@ namespace Overlay {
                                        .c_str()}]
             ->texture,
           frameRec,
-          prov.tile->position,
+          prov.tile.position,
           Fade(color, 0.1)
         );
       }
@@ -102,11 +102,11 @@ namespace Overlay {
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
 
-        if (prov.tile->owner != entt::null) {
+        if (prov.owner != entt::null) {
           Player::Component player =
-            player_factions.get<Player::Component>(prov.tile->owner);
+            player_factions.get<Player::Component>(prov.owner);
           Faction::Component faction =
-            player_factions.get<Faction::Component>(prov.tile->owner);
+            player_factions.get<Faction::Component>(prov.owner);
 
           Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
@@ -117,7 +117,7 @@ namespace Overlay {
                                          .c_str()}]
               ->texture,
             frameRec,
-            prov.tile->position,
+            prov.tile.position,
             Fade(color, 0.5)
           );
         }
@@ -137,7 +137,7 @@ namespace Overlay {
 
         Rectangle frameRec = {0.0, 0.0, TILE_WIDTH, TILE_HEIGHT};
 
-        if (prov.tile->owner == local_player_e) {
+        if (prov.owner == local_player_e) {
 
           str color = "red";
           auto settlement =
@@ -159,14 +159,14 @@ namespace Overlay {
           DrawTextureRec(
             Global::texture_cache[hstr{(color + "_overlay").c_str()}]->texture,
             frameRec,
-            prov.tile->position,
+            prov.tile.position,
             Fade(WHITE, 0.25)
           );
         } else {
           DrawTextureRec(
             Global::texture_cache[hstr{"black_overlay"}]->texture,
             frameRec,
-            prov.tile->position,
+            prov.tile.position,
             Fade(BLACK, 0.5)
           );
         }
@@ -194,8 +194,8 @@ namespace Overlay {
           continue;
 
         Vector2 settlement_pos = {
-          province.tile->position.x + 24,
-          province.tile->position.y + 24,
+          province.tile.position.x + 24,
+          province.tile.position.y + 24,
         };
 
         const vec2f text_dims = MeasureTextEx(

@@ -39,7 +39,7 @@ namespace Resource {
       for (const auto &settlement_e: settlement_v) {
         auto [province, settlement] = settlement_v.get(settlement_e);
 
-        entt::entity owner_e = province.tile->owner;
+        entt::entity owner_e = province.owner;
 
         if (owner_e == entt::null) {
           continue;
@@ -86,7 +86,7 @@ namespace Resource {
     static void SpawnResource(Province::Component &prov) {
       f32 randomFloat = random_u32_inclmax(0, 10);
 
-      switch (prov.tile->biome) {
+      switch (prov.tile.biome) {
         case Biome::Mountains: {
           if (randomFloat > 8) {
             prov.natural_resources.push_back(Resources::Natural::IronVein);
@@ -123,7 +123,7 @@ namespace Resource {
 
       for (auto resource: prov.natural_resources) {
         DrawCircle(
-          prov.tile->position.x + 32, prov.tile->position.y + 32, 16, BLACK
+          prov.tile.position.x + 32, prov.tile.position.y + 32, 16, BLACK
         );
 
         hstr id = {};
@@ -152,8 +152,8 @@ namespace Resource {
 
         DrawTexture(
           Global::texture_cache[id]->texture,
-          prov.tile->position.x + 16,
-          prov.tile->position.y + 16,
+          prov.tile.position.x + 16,
+          prov.tile.position.y + 16,
           WHITE
         );
       }
@@ -170,7 +170,7 @@ namespace Resource {
         Resources::Type resource = resource_pair.first;
 
         DrawCircle(
-          prov.tile->position.x + 32, prov.tile->position.y + 32, 16, BLACK
+          prov.tile.position.x + 32, prov.tile.position.y + 32, 16, BLACK
         );
 
         hstr id = {};
@@ -184,8 +184,8 @@ namespace Resource {
 
         DrawTexture(
           Global::texture_cache[id]->texture,
-          prov.tile->position.x + 16,
-          prov.tile->position.y + 16,
+          prov.tile.position.x + 16,
+          prov.tile.position.y + 16,
           WHITE
         );
       }
@@ -199,13 +199,13 @@ namespace Resource {
 
         auto &prov = view.get<Province::Component>(entity);
 
-        if (prov.tile->position.x - TILE_WIDTH >
+        if (prov.tile.position.x - TILE_WIDTH >
               camera.target.x + (camera.offset.x / camera.zoom) + 32 ||
-            prov.tile->position.x + TILE_WIDTH <
+            prov.tile.position.x + TILE_WIDTH <
               camera.target.x - (camera.offset.x / camera.zoom) - 32 ||
-            prov.tile->position.y - TILE_WIDTH >
+            prov.tile.position.y - TILE_WIDTH >
               camera.target.y + (camera.offset.y / camera.zoom) + 32 ||
-            prov.tile->position.y + TILE_WIDTH <
+            prov.tile.position.y + TILE_WIDTH <
               camera.target.y - (camera.offset.y / camera.zoom) - 32) {
           continue;
         }

@@ -2,6 +2,7 @@
 
 
 ## Performance
+- [ ] switch multi component views to groups where possible
 
 ## Construction preview
 - [x] Build mode overlay

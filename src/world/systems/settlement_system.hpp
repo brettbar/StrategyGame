@@ -42,8 +42,8 @@ namespace Settlement {
 
     static vec2f settlement_position(Province::Component province) {
       return vec2f{
-        province.tile->position.x + 24,
-        province.tile->position.y + 24,
+        province.tile.position.x + 24,
+        province.tile.position.y + 24,
       };
     }
 
@@ -60,7 +60,7 @@ namespace Settlement {
         auto &prov = Global::world.get<Province::Component>(entity);
 
         // TODO pretty sure I am checking this twice, another time in the Actor colonist area
-        if (prov.tile->id == closest_tile && prov.tile->owner == unit.owner) {
+        if (prov.tile.id == closest_tile && prov.owner == unit.owner) {
           if (!Global::world.any_of<Settlement::Component>(entity)) {
             printf("spawning settlement\n");
 
@@ -128,7 +128,7 @@ namespace Settlement {
       Settlement::Component settlement,
       Buildings::Building building
     ) {
-      auto prov_biome = prov.tile->biome;
+      auto prov_biome = prov.tile.biome;
 
       auto eligible_biomes =
         Buildings::eligible_biomes_for_building(building.type);
@@ -174,7 +174,7 @@ namespace Settlement {
 
       for (auto settlement_e: settlements) {
         auto prov = settlements.get<Province::Component>(settlement_e);
-        if (prov.tile->owner == owner) {
+        if (prov.owner == owner) {
           // printf( "AI HAS A SETTLEMENT!!!!!!!!!!!!!!!!!!\n" );
           return true;
         }

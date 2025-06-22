@@ -2,6 +2,7 @@
 
 #include "../../shared/textures.hpp"
 
+#include "../components/actor_component.hpp"
 #include "../managers/map_manager.hpp"
 #include "resource_system.hpp"
 
@@ -55,21 +56,15 @@ namespace Province {
 
     static void Init() {
       for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++) {
-        entt::entity prov_entity = Global::world.create();
 
-        Province::Component prov = {
-          .selected = false,
-          .tile = Map::Manager()->tile_map[i],
-          .resources = {},
-        };
 
-        Resource::System::SpawnResource(prov);
+        // Map::Manager()->tile_map[i].prov_entity = prov_entity;
 
-        Global::world.emplace<Province::Component>(prov_entity, prov);
+        // Resource::System::SpawnResource(prov);
       }
     }
 
-    static void DrawTileTerrain(Tile::Component tile, Texture2D texture) {
+    static void DrawTileTerrain(Province::Tile tile, Texture2D texture) {
       // Texture2D texture =
       //   Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
       // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
@@ -79,7 +74,7 @@ namespace Province {
       // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
       // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
       // DrawTextureRec(hex, frameRec, tile.position, WHITE);
-      // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
+      // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
       DrawTextureRec(texture, frameRec, tile.position, WHITE);
     }
 
@@ -93,11 +88,11 @@ namespace Province {
       for (entt::entity entity: view) {
         auto &prov = view.get<const Province::Component>(entity);
 
-        if (out_of_camera_bounds(camera, prov.tile->position)) {
+        if (out_of_camera_bounds(camera, prov.tile.position)) {
           continue;
         }
 
-        DrawTileTerrain(*prov.tile, texture);
+        DrawTileTerrain(prov.tile, texture);
       }
     }
 
@@ -106,7 +101,7 @@ namespace Province {
 
       for (auto province_e: provinces) {
         auto prov = provinces.get<Province::Component>(province_e);
-        if (prov.tile->owner == owner) {
+        if (prov.owner == owner) {
           return true;
         }
       }
@@ -126,10 +121,11 @@ namespace Province {
       for (auto entity: provinces) {
         auto &prov = provinces.get<Province::Component>(entity);
 
-        if (prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea)
+        if (prov.tile.id != (u32) prov_id || prov.tile.biome == Biome::Sea)
           continue;
 
-        prov.tile->owner = actor.owner;
+        prov.owner = actor.owner;
+        // @todo save
       }
     }
 
@@ -139,7 +135,7 @@ namespace Province {
 
       for (auto prov_e: provinces) {
         auto &prov = provinces.get<Province::Component>(prov_e);
-        if (prov.tile->id == tile_index) {
+        if (prov.tile.id == tile_index) {
           return &prov;
         }
       }
@@ -153,13 +149,14 @@ namespace Province {
         return nullptr;
       }
 
-      auto neighbors = Map::Manager()->get_neighbors(*prov->tile);
+      // auto neighbors = Map::Manager()->get_neighboring_owners(prov->tile);
 
-      for (auto neighbor: neighbors) {
-        if (neighbor->owner == entt::null &&
-            Map::Manager()->biome_inhabitable(neighbor->biome))
-          return std::make_shared<vec2f>(neighbor->position);
-      }
+      // @todo
+      // for (auto neighbor: neighbors) {
+      //   if (neighbor->owner == entt::null &&
+      //       Map::Manager()->biome_inhabitable(neighbor->biome))
+      //     return std::make_shared<vec2f>(neighbor->position);
+      // }
 
       return nullptr;
     }

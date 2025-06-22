@@ -44,8 +44,8 @@ namespace Selection {
         if (isDebug) {
           DrawTexture(
             cache[hstr{"tile_outline"}]->texture,
-            prov.tile->position.x,
-            prov.tile->position.y,
+            prov.tile.position.x,
+            prov.tile.position.y,
             WHITE
           );
         }
@@ -123,11 +123,11 @@ namespace Selection {
 
         auto &prov = prov_view.get<Province::Component>(entity);
 
-        if (tile_pos_id == prov.tile->id) {
+        if (tile_pos_id == prov.tile.id) {
           Global::world.emplace<Selected::Component>(entity, player_id);
 
           std::cout << EntityIdToString(entity) << std::endl;
-          std::cout << EntityIdToString(prov.tile->owner) << std::endl;
+          std::cout << EntityIdToString(prov.owner) << std::endl;
 
           selected_entity = entity;
 
@@ -198,10 +198,10 @@ namespace Selection {
       for (auto &prov_e: prov_view) {
         auto &prov = prov_view.get<Province::Component>(prov_e);
 
-        if (prov.tile->owner != local_player_e)
+        if (prov.owner != local_player_e)
           continue;
 
-        if (tile_pos_id == prov.tile->id) {
+        if (tile_pos_id == prov.tile.id) {
           return prov_e;
         }
       }

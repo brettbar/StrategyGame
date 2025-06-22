@@ -96,8 +96,8 @@ public:
         auto &prov = prov_view.get<Province::Component>(entity);
 
         // 3. if the closest tile is unowned and of a valid biome
-        if (prov.tile->id == closest_tile && prov.tile->owner == entt::null &&
-            Map::Manager()->biome_inhabitable(prov.tile->biome)) {
+        if (prov.tile.id == closest_tile && prov.owner == entt::null &&
+            Map::Manager()->biome_inhabitable(prov.tile.biome)) {
           return true;
         }
       }
@@ -145,7 +145,7 @@ public:
         auto &prov = prov_view.get<Province::Component>(entity);
 
         // !3. if the closest tile is owned by our faction, and the tile doesn't already have a settlement
-        if (prov.tile->id == closest_tile && prov.tile->owner == actor.owner &&
+        if (prov.tile.id == closest_tile && prov.owner == actor.owner &&
             !Global::world.any_of<Settlement::Component>(entity)) {
           return true;
         }

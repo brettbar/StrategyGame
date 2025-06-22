@@ -4,19 +4,16 @@
 
 #pragma once
 
-#include "../../shared/global.hpp"
 #include "../../shared/utils.hpp"
 
-#include "../components/actor_component.hpp"
-#include "../components/sight_component.hpp"
-#include "../components/tile_component.hpp"
+#include "../components/province_component.hpp"
+#include "../systems/resource_system.hpp"
 
-#include <string>
 
 namespace Map {
 
   using NoiseMap = std::array<f32, MAP_WIDTH * MAP_HEIGHT>;
-  using TileMap = std::array<sptr<Tile::Component>, MAP_WIDTH * MAP_HEIGHT>;
+  using TileMap = std::array<entt::entity, MAP_WIDTH * MAP_HEIGHT>;
   enum class Mode {
     Default,
     Terrain,
@@ -46,7 +43,9 @@ public:
       return &instance;
     }
 
-    void Init() {
+    // @todo @leftoff just bake this shit in with provinces
+    // and the ECS. done with this shit
+    void Start() {
       tile_map = {};
 
       NoiseMap elevation_noise =
@@ -77,7 +76,9 @@ public:
         else
           position = {xPos, yPos};
 
-        Tile::Component tile = {
+        entt::entity prov_entity = Global::world.create();
+
+        Province::Tile tile = {
           .id = i,
           .noise = elevation,
           .position = position,
@@ -88,11 +89,33 @@ public:
             },
           .coords = {x, y},
           .biome = biome,
-          .visibility = Tile::Visibility::UNEXPLORED,
+          .visibility = Province::Visibility::UNEXPLORED,
           .texture_i = random_assign_sprite_from_biome(biome),
         };
 
-        tile_map[map_index(x, y)] = std::make_shared<Tile::Component>(tile);
+        Province::Component prov = {
+          .selected = false,
+          .owner = entt::null,
+          .tile = tile,
+          .resources = {},
+        };
+
+        Resource::System::SpawnResource(prov);
+        Global::world.emplace<Province::Component>(prov_entity, prov);
+
+        tile_map[map_index(x, y)] = prov_entity;
+      }
+    }
+
+    void Load() {
+      tile_map = {};
+      auto prov_v = Global::world.group<Province::Component>();
+
+      for (auto const &prov_e: prov_v) {
+        auto prov_c = prov_v.get<Province::Component>(prov_e);
+
+        tile_map[map_index(prov_c.tile.coords.x, prov_c.tile.coords.y)] =
+          prov_e;
       }
     }
 
@@ -112,72 +135,63 @@ public:
       }
     }
 
-    std::array<sptr<Tile::Component>, 6> get_neighbors(Tile::Component tile) {
+    std::array<entt::entity, 6> get_neighboring_owners(Province::Tile tile) {
       u32 x = tile.coords.x;
       u32 y = tile.coords.y;
-      sptr<Tile::Component> ne_tile = nullptr;
-      sptr<Tile::Component> e_tile = nullptr;
-      sptr<Tile::Component> se_tile = nullptr;
-      sptr<Tile::Component> sw_tile = nullptr;
-      sptr<Tile::Component> w_tile = nullptr;
-      sptr<Tile::Component> nw_tile = nullptr;
+
+      entt::entity ne_owner = entt::null;
+      entt::entity e_owner = entt::null;
+      entt::entity se_owner = entt::null;
+      entt::entity sw_owner = entt::null;
+      entt::entity w_owner = entt::null;
+      entt::entity nw_owner = entt::null;
+
+      auto provinces = Global::world.view<Province::Component>();
+
+      i32 ne = map_index(x + 1, y - 1);
+      i32 e = map_index(x + 1, y);
+      i32 se = map_index(x + 1, y + 1);
+      i32 sw = map_index(x, y + 1);
+      i32 w = map_index(x - 1, y);
+      i32 nw = map_index(x, y - 1);
 
       if (y % 2 == 0) {
-        i32 ne = map_index(x, y - 1);
-        i32 e = map_index(x + 1, y);
-        i32 se = map_index(x, y + 1);
-        i32 sw = map_index(x - 1, y + 1);
-        i32 w = map_index(x - 1, y);
-        i32 nw = map_index(x - 1, y - 1);
-
-        if (ne >= 0)
-          ne_tile = tile_map[ne];
-        if (e >= 0)
-          e_tile = tile_map[e];
-        if (se >= 0)
-          se_tile = tile_map[se];
-        if (sw >= 0)
-          sw_tile = tile_map[sw];
-        if (w >= 0)
-          w_tile = tile_map[w];
-        if (nw >= 0)
-          nw_tile = tile_map[nw];
-      } else {
-        i32 ne = map_index(x + 1, y - 1);
-        i32 e = map_index(x + 1, y);
-        i32 se = map_index(x + 1, y + 1);
-        i32 sw = map_index(x, y + 1);
-        i32 w = map_index(x - 1, y);
-        i32 nw = map_index(x, y - 1);
-
-        if (ne >= 0)
-          ne_tile = tile_map[ne];
-        if (e >= 0)
-          e_tile = tile_map[e];
-        if (se >= 0)
-          se_tile = tile_map[se];
-        if (sw >= 0)
-          sw_tile = tile_map[sw];
-        if (w >= 0)
-          w_tile = tile_map[w];
-        if (nw >= 0)
-          nw_tile = tile_map[nw];
+        ne = map_index(x, y - 1);
+        e = map_index(x + 1, y);
+        se = map_index(x, y + 1);
+        sw = map_index(x - 1, y + 1);
+        w = map_index(x - 1, y);
+        nw = map_index(x - 1, y - 1);
       }
 
+      if (ne >= 0)
+        ne_owner = provinces.get<Province::Component>(tile_map[ne]).owner;
+      if (e >= 0)
+        e_owner = provinces.get<Province::Component>(tile_map[e]).owner;
+      if (se >= 0)
+        se_owner = provinces.get<Province::Component>(tile_map[se]).owner;
+      if (sw >= 0)
+        sw_owner = provinces.get<Province::Component>(tile_map[sw]).owner;
+      if (w >= 0)
+        w_owner = provinces.get<Province::Component>(tile_map[w]).owner;
+      if (nw >= 0)
+        nw_owner = provinces.get<Province::Component>(tile_map[nw]).owner;
 
-      return std::array<sptr<Tile::Component>, 6>{
-        ne_tile, e_tile, se_tile, sw_tile, w_tile, nw_tile
+
+      return std::array<entt::entity, 6>{
+        ne_owner, e_owner, se_owner, sw_owner, w_owner, nw_owner
       };
     }
 
-    f32 get_noise(vec2u coords) {
+    f32 get_noise(view<Province::Component> province_v, vec2u coords) {
       u32 i = map_index(coords.x, coords.y);
 
       if (i < 0 || i >= tile_map.size()) {
         return 0.0;
       }
 
-      return tile_map[i]->noise;
+      auto province = province_v.get<Province::Component>(tile_map[i]);
+      return province.tile.noise;
     }
 
 private:
@@ -358,37 +372,37 @@ private:
 
 
     void UpdateFOW() {
-      auto view = Global::world.view<Actor::Component, Sight::Component>();
-
-      for (auto &entity: view) {
-        // Sight::Component sight = view.get<Sight::Component>( entity );
-        Actor::Component actor = view.get<Actor::Component>(entity);
-
-        i32 closestId = DetermineTileIdFromPosition(actor.position);
-        assert(closestId >= 0);
-
-        std::shared_ptr<Tile::Component> closest = tile_map[closestId];
-        u32 x = closest->coords.x;
-        u32 y = closest->coords.y;
-
-        auto neighbors = get_neighbors(*closest);
-
-        if (y % 2 == 1) {
-          neighbors[0] = tile_map[map_index(x + 1, y - 1)];
-          neighbors[2] = tile_map[map_index(x + 1, y + 1)];
-          neighbors[3] = tile_map[map_index(x, y + 1)];
-          neighbors[5] = tile_map[map_index(x, y - 1)];
-        }
-
-        for (auto neighbor: neighbors) {
-          if (neighbor != nullptr) {
-
-            neighbor->visibility = Tile::Visibility::VISIBILE;
-          }
-        }
-
-        closest->visibility = Tile::Visibility::VISIBILE;
-      }
+      // auto view = Global::world.view<Actor::Component, Sight::Component>();
+      //
+      // for (auto &entity: view) {
+      //   // Sight::Component sight = view.get<Sight::Component>( entity );
+      //   Actor::Component actor = view.get<Actor::Component>(entity);
+      //
+      //   i32 closestId = DetermineTileIdFromPosition(actor.position);
+      //   assert(closestId >= 0);
+      //
+      //   std::shared_ptr<Province::Tile> closest = tile_map[closestId];
+      //   u32 x = closest->coords.x;
+      //   u32 y = closest->coords.y;
+      //
+      //   auto neighbors = get_neighbors(*closest);
+      //
+      //   if (y % 2 == 1) {
+      //     neighbors[0] = tile_map[map_index(x + 1, y - 1)];
+      //     neighbors[2] = tile_map[map_index(x + 1, y + 1)];
+      //     neighbors[3] = tile_map[map_index(x, y + 1)];
+      //     neighbors[5] = tile_map[map_index(x, y - 1)];
+      //   }
+      //
+      //   for (auto neighbor: neighbors) {
+      //     if (neighbor != nullptr) {
+      //
+      //       neighbor->visibility = Tile::Visibility::VISIBILE;
+      //     }
+      //   }
+      //
+      //   closest->visibility = Tile::Visibility::VISIBILE;
+      // }
     }
 
     // Inspired from code written by: OneLoneCoder Javidx9

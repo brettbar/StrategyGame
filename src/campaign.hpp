@@ -114,14 +114,13 @@ inline void Campaign::common_start() {
   Global::ClearRegistry();
   Renderer::Get()->Init();
 
-
-  Map::Manager()->Init();
   Settlement::Manager()->on_start();
 }
 
 inline void Campaign::start(str player_faction) {
   common_start();
 
+  Map::Manager()->Start();
   Player::System::create_players_for_sp(player_faction);
   Province::System::Init();
   Resource::System::init();
@@ -169,7 +168,6 @@ inline void Campaign::save(str file_name) {
       .get<Actor::Component>(output)
       .get<Animated::Component>(output)
       .get<Stockpile::Component>(output)
-      .get<Tile::Component>(output)
       .get<Province::Component>(output)
       .get<Settlement::Component>(output)
       .get<AI::Component>(output);
@@ -186,7 +184,6 @@ inline void Campaign::save(str file_name) {
       .get<Actor::Component>(output)
       .get<Animated::Component>(output)
       .get<Stockpile::Component>(output)
-      .get<Tile::Component>(output)
       .get<Province::Component>(output)
       .get<Settlement::Component>(output)
       .get<AI::Component>(output);
@@ -209,7 +206,6 @@ inline void Campaign::load(cstr file_path) {
       .get<Actor::Component>(input)
       .get<Animated::Component>(input)
       .get<Stockpile::Component>(input)
-      .get<Tile::Component>(input)
       .get<Province::Component>(input)
       .get<Settlement::Component>(input)
       .get<AI::Component>(input);
@@ -221,6 +217,7 @@ inline void Campaign::load(cstr file_path) {
 
   // Actor::System::Init();
   // AI::Start();
+  Map::Manager()->Load();
 
   Global::world.view<Settlement::Component>().each(
     [](Settlement::Component &settlement) {
