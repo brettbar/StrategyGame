@@ -183,6 +183,7 @@ public:
       };
     }
 
+
     f32 get_noise(view<Province::Component> province_v, vec2u coords) {
       u32 i = map_index(coords.x, coords.y);
 

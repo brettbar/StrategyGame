@@ -54,15 +54,6 @@ namespace Province {
       }
     }
 
-    static void Init() {
-      for (u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++) {
-
-
-        // Map::Manager()->tile_map[i].prov_entity = prov_entity;
-
-        // Resource::System::SpawnResource(prov);
-      }
-    }
 
     static void DrawTileTerrain(Province::Tile tile, Texture2D texture) {
       // Texture2D texture =
@@ -129,12 +120,14 @@ namespace Province {
       }
     }
 
-    static Province::Component *get_prov_from_vec2f(vec2f tile_pos) {
-      auto provinces = Global::world.view<Province::Component>();
+    static Province::Component *get_prov_from_vec2f(
+      view<Province::Component> province_v,
+      vec2f tile_pos
+    ) {
       u32 tile_index = DetermineTileIdFromPosition(tile_pos);
 
-      for (auto prov_e: provinces) {
-        auto &prov = provinces.get<Province::Component>(prov_e);
+      for (auto prov_e: province_v) {
+        auto &prov = province_v.get<Province::Component>(prov_e);
         if (prov.tile.id == tile_index) {
           return &prov;
         }
@@ -144,16 +137,18 @@ namespace Province {
     }
 
     static sptr<vec2f> get_nearest_inhabitable_province(vec2f entity_pos) {
-      auto prov = get_prov_from_vec2f(entity_pos);
+      auto province_v = Global::world.view<Province::Component>();
+
+      auto prov = get_prov_from_vec2f(province_v, entity_pos);
       if (!prov) {
         return nullptr;
       }
 
-      // auto neighbors = Map::Manager()->get_neighboring_owners(prov->tile);
+      auto neighbors = Map::Manager()->get_neighboring_owners(prov->tile);
 
       // @todo
-      // for (auto neighbor: neighbors) {
-      //   if (neighbor->owner == entt::null &&
+      // for (entt::entity neighbor: neighbors) {
+      //   if (neighbor == entt::null &&
       //       Map::Manager()->biome_inhabitable(neighbor->biome))
       //     return std::make_shared<vec2f>(neighbor->position);
       // }
