@@ -17,6 +17,8 @@ namespace UI {
 
 
   inline Action_ModalMenu modal_menu() {
+    Action_ModalMenu action = Action_ModalMenu::None;
+
     struct Button {
       Clay_String text;
       Action_ModalMenu action;
@@ -69,18 +71,16 @@ namespace UI {
       },
     ) {
       for (u32 i = 0; i < num_buttons; i++) {
-        text_button_lrg(CLAY_STRING("ModalMenu::Button"), buttons[i].text, i);
+        if (text_button_lrg(
+              CLAY_STRING("ModalMenu::Button"), buttons[i].text, i
+            )) {
+          action = buttons[i].action;
+        }
       }
     }
 
-    for (u32 i = 0; i < num_buttons; i++) {
-      Button button = buttons[i];
-      if (button_was_clicked(CLAY_STRING("ModalMenu::Button"), i)) {
-        return button.action;
-      }
-    }
 
-    return Action_ModalMenu::None;
+    return action;
   }
 
 

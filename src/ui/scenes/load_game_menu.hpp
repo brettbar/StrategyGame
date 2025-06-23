@@ -76,29 +76,6 @@ namespace UI {
       }
     }
 
-    // for (u32 i = 0; i < paths.size(); i++) {
-    //   Clay_String cs = Clay_String{
-    //     .length = static_cast<int32_t>(strlen(paths[i].c_str())),
-    //     .chars = paths[i].c_str()
-    //   };
-    //
-    //   if (button_was_clicked(cs)) {
-    //     // @todo
-    //     _selected_path = cs.chars;
-    //   }
-    // }
-
-    // if (button_was_clicked(CLAY_STRING("LoadGameMenu::Back"))) {
-    //   return "";
-    // }
-    //
-    // if (_selected_path != "" &&
-    //     button_was_clicked(CLAY_STRING("LoadGameMenu::Load"))) {
-    //   // @todo make actually really get the selected file
-    //   return _selected_path;
-    // }
-
-
     return action;
   }
 }// namespace UI

@@ -17,6 +17,8 @@ namespace UI {
       Action_SinglePlayerLobby action;
     };
 
+    Action_SinglePlayerLobby action = Action_SinglePlayerLobby::None;
+
     CLAY({
       .id = CLAY_ID("SingleplayerLobby"),
       .layout =
@@ -36,29 +38,25 @@ namespace UI {
           .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
     }) {
-      text_button_lrg(
-        CLAY_STRING("SinglePlayerLobby::SelectFaction"),
-        CLAY_STRING("Select Faction"),
-        0
-      );
-      text_button_lrg(
-        CLAY_STRING("SinglePlayerLobby::ReturnToMain"),
-        CLAY_STRING("Return to Main"),
-        1
-      );
+      if (text_button_lrg(
+            CLAY_STRING("SinglePlayerLobby::SelectFaction"),
+            CLAY_STRING("Select Faction"),
+            0
+          )) {
+        action = Action_SinglePlayerLobby::SelectFaction;
+      }
+
+      if (text_button_lrg(
+            CLAY_STRING("SinglePlayerLobby::ReturnToMain"),
+            CLAY_STRING("Return to Main"),
+            1
+          )) {
+
+        action = Action_SinglePlayerLobby::ReturnToMain;
+      }
     }
 
-    if (button_was_clicked(
-          CLAY_STRING("SinglePlayerLobby::SelectFaction"), 0
-        )) {
-      return Action_SinglePlayerLobby::SelectFaction;
-    }
-
-    if (button_was_clicked(CLAY_STRING("SinglePlayerLobby::ReturnToMain"), 1)) {
-      return Action_SinglePlayerLobby::ReturnToMain;
-    }
-
-    return Action_SinglePlayerLobby::None;
+    return action;
   }
 
 
