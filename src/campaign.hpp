@@ -122,7 +122,6 @@ inline void Campaign::start(str player_faction) {
 
   Map::Manager()->Start();
   Player::System::create_players_for_sp(player_faction);
-  Province::System::Init();
   Resource::System::init();
   Actor::System::Init();
   AI::System::Start();
@@ -142,7 +141,6 @@ inline void Campaign::start_mp() {
     Player::System::ClientStartMultiplayer();
   }
 
-  Province::System::Init();
   Resource::System::init();
   Actor::System::Init();
   AI::System::Start();

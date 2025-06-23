@@ -370,14 +370,16 @@ class IGame {
     Clay_BeginLayout();
     bool pressed_back = false;
 
-    auto file_to_load = UI::load_game_menu(paths, pressed_back);
-
-    if (pressed_back) {
-      _scene = Scene::MainMenu;
-    }
-
-    if (file_to_load != "") {
-      LoadSinglePlayerCampaign(file_to_load.c_str());
+    auto action = UI::load_game_menu(paths);
+    switch (action.type) {
+      case UI::Action_LoadGameMenu_t::None:
+        break;
+      case UI::Action_LoadGameMenu_t::Back:
+        _scene = Scene::MainMenu;
+        break;
+      case UI::Action_LoadGameMenu_t::LoadGame:
+        LoadSinglePlayerCampaign(action.selection.c_str());
+        break;
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();

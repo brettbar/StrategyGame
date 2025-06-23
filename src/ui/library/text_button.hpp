@@ -13,8 +13,10 @@ namespace UI {
     u32 i = 0,
     Clay_Color color = {140, 140, 140, 255}
   ) {
+    auto hid = CLAY_SIDI_LOCAL(id_str, i);
+
     CLAY({
-      .id = (Clay__HashString(id_str, i, 0)),
+      .id = hid,
       .layout =
         {
           .sizing =
@@ -38,7 +40,7 @@ namespace UI {
       );
     }
 
-    return button_was_clicked(id_str, i);
+    return button_was_clicked(hid);
   }
 
   inline bool text_button_small(
@@ -47,8 +49,10 @@ namespace UI {
     u32 i = 0,
     Clay_Color color = {140, 140, 140, 255}
   ) {
+    auto hid = CLAY_SIDI_LOCAL(id_str, i);
+
     CLAY({
-      .id = (Clay__HashString(id_str, i, 0)),
+      .id = hid,
       .layout =
         {
           .sizing =
@@ -72,7 +76,7 @@ namespace UI {
       );
     }
 
-    return button_was_clicked(id_str, i);
+    return button_was_clicked(hid);
   }
 
 

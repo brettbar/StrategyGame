@@ -4,6 +4,7 @@
 #include "../../../../world/components/settlement_component.hpp"
 #include "../../../common.h"
 #include "../../../library/resource_icon.hpp"
+#include "../../../library/text_button.hpp"
 #include "../../../library/texture_button.hpp"
 
 namespace UI {
@@ -56,6 +57,12 @@ namespace UI {
       }) {
         auto cs = cstr_to_cs(selected_settlement->name.c_str());
         text_label(cs, 16);
+
+        CLAY({.id = CLAY_ID("SettlementContext::Tabs")}) {
+          text_button_small(
+            CLAY_STRING("Population"), CLAY_STRING("Population")
+          );
+        }
 
         spacer();
 

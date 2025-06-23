@@ -150,12 +150,12 @@ namespace UI {
         UI::spacer();
 
         CLAY({
-          .id = CLAY_ID("Campaign::RightCol"),
+          .id = CLAY_ID("Campaign::Bottom::RightCol"),
           .layout =
             {
               .sizing =
                 {
-                  .width = CLAY_SIZING_PERCENT(0.33),
+                  .width = CLAY_SIZING_FIT(),
                   .height = CLAY_SIZING_GROW(),
                 },
               .childAlignment =

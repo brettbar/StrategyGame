@@ -5,7 +5,20 @@
 namespace UI {
   inline str _selected_path = "";
 
-  inline str load_game_menu(list<str> &paths, bool &pressed_back) {
+  enum class Action_LoadGameMenu_t {
+    None,
+    Back,
+    LoadGame,
+  };
+
+  struct Action_LoadGameMenu {
+    Action_LoadGameMenu_t type = Action_LoadGameMenu_t::None;
+    str selection = "";
+  };
+
+  inline Action_LoadGameMenu load_game_menu(list<str> &paths) {
+    Action_LoadGameMenu action = Action_LoadGameMenu();
+
     CLAY({
       .id = CLAY_ID("LoadGameMenu"),
       .layout =
@@ -33,7 +46,9 @@ namespace UI {
           .chars = paths[i].c_str()
         };
 
-        text_button_small(cs, cs, 0, COLOR_BLUE);
+        if (text_button_small(cs, cs, 0, COLOR_BLUE)) {
+          _selected_path = cs.chars;
+        }
       }
 
 
@@ -43,40 +58,47 @@ namespace UI {
             .childGap = 4,
           },
       }) {
-        text_button_small(
-          CLAY_STRING("LoadGameMenu::Back"), CLAY_STRING("Back")
-        );
+        if (text_button_small(
+              CLAY_STRING("LoadGameMenu::Back"), CLAY_STRING("Back")
+            )) {
+          action = Action_LoadGameMenu{.type = Action_LoadGameMenu_t::Back};
+        }
 
-        text_button_small(
-          CLAY_STRING("LoadGameMenu::Load"), CLAY_STRING("Load")
-        );
+        if (text_button_small(
+              CLAY_STRING("LoadGameMenu::Load"), CLAY_STRING("Load")
+            ) &&
+            _selected_path != "") {
+          action = Action_LoadGameMenu{
+            .type = Action_LoadGameMenu_t::LoadGame,
+            .selection = _selected_path,
+          };
+        }
       }
     }
 
-    for (u32 i = 0; i < paths.size(); i++) {
-      Clay_String cs = Clay_String{
-        .length = static_cast<int32_t>(strlen(paths[i].c_str())),
-        .chars = paths[i].c_str()
-      };
+    // for (u32 i = 0; i < paths.size(); i++) {
+    //   Clay_String cs = Clay_String{
+    //     .length = static_cast<int32_t>(strlen(paths[i].c_str())),
+    //     .chars = paths[i].c_str()
+    //   };
+    //
+    //   if (button_was_clicked(cs)) {
+    //     // @todo
+    //     _selected_path = cs.chars;
+    //   }
+    // }
 
-      if (button_was_clicked(cs)) {
-        // @todo
-        _selected_path = cs.chars;
-      }
-    }
-
-    if (button_was_clicked(CLAY_STRING("LoadGameMenu::Back"))) {
-      pressed_back = true;
-      return "";
-    }
-
-    if (_selected_path != "" &&
-        button_was_clicked(CLAY_STRING("LoadGameMenu::Load"))) {
-      // @todo make actually really get the selected file
-      return _selected_path;
-    }
+    // if (button_was_clicked(CLAY_STRING("LoadGameMenu::Back"))) {
+    //   return "";
+    // }
+    //
+    // if (_selected_path != "" &&
+    //     button_was_clicked(CLAY_STRING("LoadGameMenu::Load"))) {
+    //   // @todo make actually really get the selected file
+    //   return _selected_path;
+    // }
 
 
-    return "";
+    return action;
   }
 }// namespace UI
