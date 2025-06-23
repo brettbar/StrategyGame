@@ -15,6 +15,8 @@ namespace UI {
     auto fm = Faction::Manager::Get();
     u32 num_factions = fm->num_factions;
 
+    str selected = "";
+
     CLAY({
       .id = CLAY_ID("SPFactionSelect"),
       .layout =
@@ -70,7 +72,11 @@ namespace UI {
                .layoutDirection = CLAY_TOP_TO_BOTTOM,
              }}
         ) {
-          text_button_lrg(CLAY_STRING("FactionSelect::Button"), cs, i, fc);
+          if (text_button_lrg(
+                CLAY_STRING("FactionSelect::Button"), cs, i, fc
+              )) {
+            selected = fm->ids[i];
+          }
 
           texture_label(
             hstr{(actor.sprite_id + "_overview").c_str()}, {128, 128}
@@ -79,12 +85,7 @@ namespace UI {
       }
     }
 
-    for (u32 i = 0; i < num_factions; i++) {
-      if (button_was_clicked(CLAY_STRING("FactionSelect::Button"), i)) {
-        return fm->ids[i];
-      }
-    }
 
-    return "";
+    return selected;
   }
 };// namespace UI
