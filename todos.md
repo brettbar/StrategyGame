@@ -1,5 +1,8 @@
 # TODOs
 
+## Art
+- [ ] Settlement context menus
+
 
 ## Performance
 - [ ] switch multi component views to groups where possible
