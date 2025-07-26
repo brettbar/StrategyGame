@@ -41,7 +41,9 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 }
 
 void scale_ui_with_screen_size() {
-  u32 monitor = GetCurrentMonitor();
+  u32 monitor_count = GetMonitorCount();
+
+  u32 monitor = 0;
   u32 monitor_w = GetMonitorWidth(monitor);
   u32 monitor_h = GetMonitorHeight(monitor);
   u32 physical_w = GetMonitorPhysicalWidth(monitor);
@@ -105,7 +107,7 @@ int main() {
 
   printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
-  Settings::Manager()->set_window_state(Settings::WindowState::Window);
+  Settings::Manager()->set_window_state(Settings::WindowState::Borderless);
 
   vec2i set_resolution = Settings::Manager()->resolution();
   InitWindow(set_resolution.x, set_resolution.y, "FieldsOfMars");

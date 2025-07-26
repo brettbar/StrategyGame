@@ -8,6 +8,8 @@ namespace UI {
   inline float UI_SCALE = 2.0f;
 
   inline void set_ui_scale_by_screen_height(f32 screen_height) {
+    printf("%f\n", screen_height);
+
     if (screen_height > 1440) {
       UI_SCALE = 4.0f;
     } else if (screen_height > 1080) {
