@@ -221,6 +221,7 @@ class IGame {
         _scene = Scene::Campaign;
       } else {
         _scene = Scene::ModalMenu;
+        Global::state.timeScale = 0.0f;
       }
     }
   }
@@ -275,8 +276,7 @@ class IGame {
     clay_update();
 
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) &&
-        IsKeyPressed(KEY_I)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
       _ui_debug = !_ui_debug;
       Clay_SetDebugModeEnabled(_ui_debug);
     }

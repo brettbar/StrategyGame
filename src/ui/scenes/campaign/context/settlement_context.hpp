@@ -59,8 +59,12 @@ namespace UI {
         text_label(cs, 16);
 
         CLAY({.id = CLAY_ID("SettlementContext::Tabs")}) {
-          text_button_small(
+          bool pressed_population = text_button_small(
             CLAY_STRING("Population"), CLAY_STRING("Population")
+          );
+
+          bool pressed_resources = text_button_small(
+            CLAY_STRING("Resources"), CLAY_STRING("Resources")
           );
         }
 

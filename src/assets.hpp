@@ -10,19 +10,19 @@ inline Image InitTileOutline() {
   Image base = GenImageColor(65, 65, ColorAlpha(WHITE, 0.0));
 
   // ne border
-  ImageDrawLineV(&base, {31, 0}, {64, 17}, YELLOW);
+  ImageDrawLineV(&base, {32, 0}, {63, 16}, YELLOW);
 
   // e border
-  ImageDrawLineV(&base, {63, 16}, {63, 48}, YELLOW);
+  ImageDrawLineV(&base, {63, 16}, {63, 47}, YELLOW);
 
   // se border
-  ImageDrawLineV(&base, {32, 63}, {64, 47}, YELLOW);
+  ImageDrawLineV(&base, {32, 63}, {63, 47}, YELLOW);
 
   // sw border
-  ImageDrawLineV(&base, {31, 63}, {0, 48}, YELLOW);
+  ImageDrawLineV(&base, {32, 63}, {0, 47}, YELLOW);
 
   // w border
-  ImageDrawLineV(&base, {0, 16}, {0, 48}, YELLOW);
+  ImageDrawLineV(&base, {0, 16}, {0, 47}, YELLOW);
 
   // nw border
   ImageDrawLineV(&base, {0, 16}, {32, 0}, YELLOW);
@@ -39,28 +39,27 @@ inline void load_borders() {
 
     LoadTexturePointFilter(
       hstr{("ne_border_" + color_str).c_str()},
-      create_border({31, 0}, {64, 17}, color, Global::texture_cache),
+      create_border({32, 0}, {63, 16}, color, Global::texture_cache),
       Global::texture_cache
     );
     LoadTexturePointFilter(
       hstr{("e_border_" + color_str).c_str()},
-      create_border({63, 16}, {63, 48}, color, Global::texture_cache),
-      // LoadImage( ( asset_folder + "/images/overlays-E.png" ).c_str() ),
+      create_border({63, 16}, {63, 47}, color, Global::texture_cache),
       Global::texture_cache
     );
     LoadTexturePointFilter(
       hstr{("se_border_" + color_str).c_str()},
-      create_border({32, 63}, {64, 47}, color, Global::texture_cache),
+      create_border({32, 63}, {63, 47}, color, Global::texture_cache),
       Global::texture_cache
     );
     LoadTexturePointFilter(
       hstr{("sw_border_" + color_str).c_str()},
-      create_border({31, 63}, {0, 48}, color, Global::texture_cache),
+      create_border({32, 63}, {0, 47}, color, Global::texture_cache),
       Global::texture_cache
     );
     LoadTexturePointFilter(
       hstr{("w_border_" + color_str).c_str()},
-      create_border({0, 16}, {0, 48}, color, Global::texture_cache),
+      create_border({0, 16}, {0, 47}, color, Global::texture_cache),
       Global::texture_cache
     );
     LoadTexturePointFilter(

@@ -4,6 +4,7 @@ rights reserved.
 */
 
 
+#include "shared/state.hpp"
 #include "ui/common.h"
 #include <raylib.h>
 #pragma GCC diagnostic push
@@ -107,7 +108,8 @@ int main() {
 
   printf("Starting game as %s.\n", SteamFriends()->GetPersonaName());
 
-  Settings::Manager()->set_window_state(Settings::WindowState::Borderless);
+  Settings::Manager()->set_window_state(Settings::WindowState::Window);
+  Settings::Manager()->limit_fps(300);
 
   vec2i set_resolution = Settings::Manager()->resolution();
   InitWindow(set_resolution.x, set_resolution.y, "FieldsOfMars");

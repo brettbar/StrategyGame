@@ -12,6 +12,7 @@ namespace UI {
   };
 
   inline Action_ActorContext actor_context(Actor::Component *actor) {
+    Action_ActorContext action = Action_ActorContext::None;
 
     CLAY({
       .id = CLAY_ID("ActorContext"),
@@ -47,34 +48,24 @@ namespace UI {
       CLAY({.layout = {.layoutDirection = CLAY_LEFT_TO_RIGHT}}) {
         switch (actor->data.type) {
           case Actor::Type::Colonist: {
-            text_button_small(
-              CLAY_STRING("Colonist::ClaimProvince"), CLAY_STRING("Claim"), 0
-            );
-
-            text_button_small(
-              CLAY_STRING("Colonist::SpawnSettlement"),
-              CLAY_STRING("Settlement"),
-              0
-            );
+            if (text_button_small(
+                  CLAY_STRING("Colonist::ClaimProvince"),
+                  CLAY_STRING("Claim"),
+                  0
+                )) {
+              action = Action_ActorContext::ClaimProvince;
+            } else if (text_button_small(
+                         CLAY_STRING("Colonist::SpawnSettlement"),
+                         CLAY_STRING("Settlement"),
+                         0
+                       )) {
+              action = Action_ActorContext::SpawnSettlement;
+            }
           } break;
         }
       }
     }
 
-
-    switch (actor->data.type) {
-      case Actor::Type::Colonist: {
-        if (button_was_clicked(CLAY_STRING("Colonist::ClaimProvince"))) {
-          return Action_ActorContext::ClaimProvince;
-        }
-
-        if (button_was_clicked(CLAY_STRING("Colonist::SpawnSettlement"))) {
-          return Action_ActorContext::SpawnSettlement;
-        }
-      } break;
-    }
-
-
-    return Action_ActorContext::None;
+    return action;
   }
 };// namespace UI
