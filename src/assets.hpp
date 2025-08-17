@@ -6,6 +6,9 @@
 
 namespace fs = std::filesystem;
 
+// @note these work no problem on windows
+// something is messing them up on macos tho
+// wth is this platform dependent??
 inline Image InitTileOutline() {
   Image base = GenImageColor(65, 65, ColorAlpha(WHITE, 0.0));
 
@@ -30,6 +33,9 @@ inline Image InitTileOutline() {
   return base;
 }
 
+// @note these work no problem on windows
+// something is messing them up on macos tho
+// wth is this platform dependent??
 inline void load_borders() {
   std::string asset_folder = "assets";
 

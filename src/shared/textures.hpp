@@ -97,7 +97,7 @@ inline void create_hex_texture(hstr id, Color color, TextureCache &cache) {
   ClearBackground(BLANK);
 
   DrawTriangle({32, 0}, {32, 32}, {64, 16}, color); // ne
-  DrawTriangle({64, 16}, {32, 3}, {64, 48}, color); // e
+  DrawTriangle({64, 16}, {32, 32}, {64, 48}, color);// e
   DrawTriangle({64, 48}, {32, 32}, {32, 64}, color);// se
   DrawTriangle({32, 64}, {32, 32}, {0, 48}, color); // sw
   DrawTriangle({0, 48}, {32, 32}, {0, 16}, color);  // w

@@ -111,11 +111,17 @@ namespace UI {
   }
 
   inline void resource_list(map<Resources::Type, u32> resources) {
-    for (const auto &[resource, quantity]: resources) {
-      // auto foo = resource.foo
+    for (const auto &[resource_k, quantity_v]: resources) {
+
+      Resources::Type resource_t = resource_k;
+      u32 quantity = quantity_v;
+
+      if (quantity <= 0) {
+        continue;
+      }
 
       CLAY({}) {
-        const char *resource = Resources::resource_cstr(resource);
+        const char *resource = Resources::resource_cstr(resource_t);
 
         Clay_String cs = Clay_String{
           .length = static_cast<int32_t>(strlen(resource)),
@@ -123,7 +129,7 @@ namespace UI {
         };
 
 
-        resource_icon_w_quantity(output.resource, output.quantity, cs, i);
+        resource_icon_w_quantity(resource_t, quantity, cs, (u32) resource_t);
       }
     }
   }
