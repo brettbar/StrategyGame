@@ -16,11 +16,22 @@ namespace UI {
   };
 
   inline void buildings_list(list<Buildings::Building>);
+  inline void resource_list(map<Resources::Type, u32>);
+
+  inline u32 _tab_index = 0;
 
   inline Action_SettlementContext settlement_context(
     Settlement::Component *selected_settlement
   ) {
     Action_SettlementContext action = Action_SettlementContext::None;
+
+
+    const u32 num_tabs = 3;
+    Clay_String tabs[num_tabs] = {
+      CLAY_STRING("Population"),
+      CLAY_STRING("Resources"),
+      CLAY_STRING("Buildings"),
+    };
 
     CLAY({
       .id = CLAY_ID("SettlementContext"),
@@ -59,13 +70,13 @@ namespace UI {
         text_label(cs, 16);
 
         CLAY({.id = CLAY_ID("SettlementContext::Tabs")}) {
-          bool pressed_population = text_button_small(
-            CLAY_STRING("Population"), CLAY_STRING("Population")
-          );
 
-          bool pressed_resources = text_button_small(
-            CLAY_STRING("Resources"), CLAY_STRING("Resources")
-          );
+          for (u32 i = 0; i < num_tabs; i++) {
+            Clay_String tab = tabs[i];
+            if (text_button_small(tab, tab)) {
+              _tab_index = i;
+            }
+          }
         }
 
         spacer();
@@ -75,21 +86,46 @@ namespace UI {
         }
       }
 
-      auto dev_lvl = selected_settlement->development;
-      const char *dev_lvl_str = Settlement::dev_str(dev_lvl);
-      auto dev_cs = cstr_to_cs(dev_lvl_str);
-      text_label(dev_cs, 12);
+      switch (_tab_index) {
+        case 0: {
+          auto dev_lvl = selected_settlement->development;
+          const char *dev_lvl_str = Settlement::dev_str(dev_lvl);
+          auto dev_cs = cstr_to_cs(dev_lvl_str);
+          text_label(dev_cs, 12);
 
-      u32 pop = selected_settlement->population.current;
-      const char *pop_txt = u32_to_cstr(pop);
-      auto pop_cs = cstr_to_cs(pop_txt);
-      text_label(pop_cs, 12);
-
-
-      buildings_list(selected_settlement->buildings);
+          u32 pop = selected_settlement->population.current;
+          const char *pop_txt = u32_to_cstr(pop);
+          auto pop_cs = cstr_to_cs(pop_txt);
+          text_label(pop_cs, 12);
+        } break;
+        case 1: {
+          resource_list(selected_settlement->resource_quantities);
+        } break;
+        case 2: {
+          buildings_list(selected_settlement->buildings);
+        } break;
+      }
     }
 
     return action;
+  }
+
+  inline void resource_list(map<Resources::Type, u32> resources) {
+    for (const auto &[resource, quantity]: resources) {
+      // auto foo = resource.foo
+
+      CLAY({}) {
+        const char *resource = Resources::resource_cstr(resource);
+
+        Clay_String cs = Clay_String{
+          .length = static_cast<int32_t>(strlen(resource)),
+          .chars = resource,
+        };
+
+
+        resource_icon_w_quantity(output.resource, output.quantity, cs, i);
+      }
+    }
   }
 
   inline void buildings_list(list<Buildings::Building> buildings) {
