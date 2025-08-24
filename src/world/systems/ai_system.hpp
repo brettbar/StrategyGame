@@ -150,7 +150,6 @@ namespace AI {
 
           sptr<Node> new_node = std::make_shared<Node>(Node{
             .action = possible_action,
-            .cost = 0,
             .children = {},
           });
 
@@ -247,7 +246,6 @@ namespace AI {
                   .preconditions = goal_conds(ai.current_goal),
                   .effects = {},
                 },
-              .cost = 0,
               .children = {},
             });
 

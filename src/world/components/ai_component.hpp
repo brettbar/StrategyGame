@@ -52,6 +52,8 @@ The ultimate final goal a player will have is to become the most
   struct Action {
     Action_t type;
 
+    f32 cost = 0;
+
     list<Condition> preconditions;
     list<Condition> effects;
 
@@ -75,7 +77,6 @@ The ultimate final goal a player will have is to become the most
 
   struct Node {
     Action action;
-    u32 cost = 0;
     map<Condition, list<sptr<Node>>> children;
 
 
