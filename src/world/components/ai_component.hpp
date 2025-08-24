@@ -56,7 +56,7 @@ The ultimate final goal a player will have is to become the most
     list<Condition> effects;
 
     str as_str() {
-      switch ( type ) {
+      switch (type) {
         case Action_t::AchieveGoal:
           return "AchieveGoal";
         case Action_t::MoveColonistToUnclaimedProvince:
@@ -79,15 +79,15 @@ The ultimate final goal a player will have is to become the most
     map<Condition, list<sptr<Node>>> children;
 
 
-    void print( u32 depth = 0 ) {
-      for ( u32 i = 0; i < depth; ++i ) {
+    void print(u32 depth = 0) {
+      for (u32 i = 0; i < depth; ++i) {
         std::cout << "  ";
       }
       std::cout << "|--" << action.as_str() << '\n';
 
-      for ( const auto &condition: children ) {
-        for ( const auto &child: condition.second ) {
-          child->print( depth + 1 );
+      for (const auto &condition: children) {
+        for (const auto &child: condition.second) {
+          child->print(depth + 1);
         }
       }
     }
@@ -97,8 +97,8 @@ The ultimate final goal a player will have is to become the most
     list<Action> stack;
     u32 cost;
 
-    void push( Action action ) {
-      stack.push_back( action );
+    void push(Action action) {
+      stack.push_back(action);
     }
 
     Action peek() {
@@ -119,13 +119,13 @@ The ultimate final goal a player will have is to become the most
     // bool has_settlement = false;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( current_goal );
+    void serialize(Archive &ar) {
+      ar(current_goal);
     }
   };
 
-  inline Action get_action( Action_t type ) {
-    switch ( type ) {
+  inline Action get_action(Action_t type) {
+    switch (type) {
       case Action_t::AchieveGoal:
         return Action{
           .type = type,
@@ -139,27 +139,27 @@ The ultimate final goal a player will have is to become the most
             {
               Condition::ColonistOnOwnProvince,
             },
-          .effects = { Condition::HasSettlement },
+          .effects = {Condition::HasSettlement},
         };
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
-          .preconditions = { Condition::ColonistOnUnclaimedProvince },
-          .effects = { Condition::HasProvince },
+          .preconditions = {Condition::ColonistOnUnclaimedProvince},
+          .effects = {Condition::HasProvince},
         };
       case Action_t::SpawnColonist:
         return Action{
           .type = type,
           // @todo requirements to make colonist
           .preconditions{},
-          .effects = { Condition::HasColonist },
+          .effects = {Condition::HasColonist},
         };
 
       case Action_t::MoveColonistToUnclaimedProvince:
         return Action{
           .type = type,
-          .preconditions = { Condition::HasColonist },
-          .effects = { Condition::ColonistOnUnclaimedProvince },
+          .preconditions = {Condition::HasColonist},
+          .effects = {Condition::ColonistOnUnclaimedProvince},
         };
       case Action_t::MoveColonistToOwnProvince:
         return Action{
@@ -169,33 +169,33 @@ The ultimate final goal a player will have is to become the most
               Condition::HasColonist,
               Condition::HasProvince,
             },
-          .effects = { Condition::ColonistOnOwnProvince },
+          .effects = {Condition::ColonistOnOwnProvince},
         };
     }
   };
 
-  inline list<Condition> goal_conds( Goal goal ) {
-    switch ( goal ) {
+  inline list<Condition> goal_conds(Goal goal) {
+    switch (goal) {
       case Goal::None:
         return {};
       case Goal::EstablishSettlement:
-        return { Condition::HasSettlement };
+        return {Condition::HasSettlement};
     }
   }
 
 
-  inline list<Action_t> actions_that_satisfy_cond( Condition cond ) {
-    switch ( cond ) {
+  inline list<Action_t> actions_that_satisfy_cond(Condition cond) {
+    switch (cond) {
       case Condition::ColonistOnUnclaimedProvince:
-        return { Action_t::MoveColonistToUnclaimedProvince };
+        return {Action_t::MoveColonistToUnclaimedProvince};
       case Condition::ColonistOnOwnProvince:
-        return { Action_t::MoveColonistToOwnProvince };
+        return {Action_t::MoveColonistToOwnProvince};
       case Condition::HasColonist:
-        return { Action_t::SpawnColonist };
+        return {Action_t::SpawnColonist};
       case Condition::HasProvince:
-        return { Action_t::ClaimProvince };
+        return {Action_t::ClaimProvince};
       case Condition::HasSettlement:
-        return { Action_t::BuildSettlement };
+        return {Action_t::BuildSettlement};
     }
   };
 
