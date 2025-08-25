@@ -27,10 +27,10 @@ The ultimate final goal a player will have is to become the most
 
   enum class Goal {
     // BoostProduction,
-    // ExpandBorders,
     // DevelopSettlements,
     None,
     EstablishSettlement,
+    ExpandBorders,
   };
   enum class Action_t {
     AchieveGoal,
@@ -181,6 +181,19 @@ The ultimate final goal a player will have is to become the most
         return {};
       case Goal::EstablishSettlement:
         return {Condition::HasSettlement};
+      case Goal::ExpandBorders:
+        return {};// @todo
+    }
+  }
+
+  inline f32 default_goal_prio(Goal goal) {
+    switch (goal) {
+      case Goal::None:
+        return 0;
+      case Goal::EstablishSettlement:
+        return 1;
+      case Goal::ExpandBorders:
+        return 0.5;
     }
   }
 

@@ -12,6 +12,7 @@
 #include "movement_system.hpp"
 #include "province_system.hpp"
 #include "settlement_system.hpp"
+#include <cassert>
 
 
 namespace AI {
@@ -222,6 +223,19 @@ namespace AI {
       return false;
     }
 
+    static void determine_goal(
+      entt::entity ai_player,
+      Player::Component &player,
+      AI::Component &ai
+    ) {
+      assert(
+        ai.current_goal == Goal::None
+      );// @temp, eventually be able to change goal on the fly
+
+      if (!Settlement::System::player_has_settlement(ai_player))
+        ai.current_goal = Goal::EstablishSettlement;
+    }
+
     static void execute_goals(
       entt::entity ai_player,
       Player::Component &player,
@@ -230,9 +244,7 @@ namespace AI {
 
       switch (ai.current_goal) {
         case Goal::None:
-          if (!Settlement::System::player_has_settlement(ai_player))
-            ai.current_goal = Goal::EstablishSettlement;
-
+          determine_goal(ai_player, player, ai);
           break;
         case Goal::EstablishSettlement: {
           // printf( "player_1 has NOT finished their goal!\n" );
@@ -271,6 +283,9 @@ namespace AI {
             }
           }
 
+
+        } break;
+        case Goal::ExpandBorders: {
 
         } break;
       }
