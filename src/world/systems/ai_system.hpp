@@ -232,8 +232,9 @@ namespace AI {
         ai.current_goal == Goal::None
       );// @temp, eventually be able to change goal on the fly
 
-      if (!Settlement::System::player_has_settlement(ai_player))
+      if (!Settlement::System::player_has_settlement(ai_player)) {
         ai.current_goal = Goal::EstablishSettlement;
+      }
     }
 
     static void execute_goals(
