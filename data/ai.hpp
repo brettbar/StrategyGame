@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector"
+#include <cstdint>
 #include <string>
 
 namespace AI {
@@ -40,12 +41,25 @@ namespace AI {
     ClaimProvince,
     BuildSettlement,
   };
-  enum class Condition {
+  enum class Condition_t {
     ColonistOnUnclaimedProvince,
     ColonistOnOwnProvince,
     HasColonist,
     HasProvince,
     HasSettlement,
+  };
+
+  struct Condition {
+    Condition_t condition;
+
+    // idk why i need this
+    bool operator<(const Condition &rhs) const noexcept {
+      return this->condition < rhs.condition;
+    }
+
+    // union {
+    //   uint32_t value;
+    // } data;
   };
 
   struct Action {
@@ -74,6 +88,7 @@ namespace AI {
     }
   };
 
+
   inline Action get_action(Action_t type) {
     switch (type) {
       case Action_t::AchieveGoal:
@@ -87,39 +102,60 @@ namespace AI {
           .type = type,
           .preconditions =
             {
-              Condition::ColonistOnOwnProvince,
+              Condition{Condition_t::ColonistOnOwnProvince},
             },
-          .effects = {Condition::HasSettlement},
+          .effects =
+            {
+              Condition{Condition_t::HasSettlement},
+            },
         };
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
-          .preconditions = {Condition::ColonistOnUnclaimedProvince},
-          .effects = {Condition::HasProvince},
+          .preconditions =
+            {
+              Condition{Condition_t::ColonistOnUnclaimedProvince},
+            },
+          .effects =
+            {
+              Condition{Condition_t::HasProvince},
+            },
         };
       case Action_t::SpawnColonist:
         return Action{
           .type = type,
           // @todo requirements to make colonist
           .preconditions{},
-          .effects = {Condition::HasColonist},
+          .effects =
+            {
+              Condition{Condition_t::HasColonist},
+            },
         };
 
       case Action_t::MoveColonistToUnclaimedProvince:
         return Action{
           .type = type,
-          .preconditions = {Condition::HasColonist},
-          .effects = {Condition::ColonistOnUnclaimedProvince},
+          .preconditions =
+            {
+              {Condition_t::HasColonist},
+            },
+          .effects =
+            {
+              {Condition_t::ColonistOnUnclaimedProvince},
+            },
         };
       case Action_t::MoveColonistToOwnProvince:
         return Action{
           .type = type,
           .preconditions =
             {
-              Condition::HasColonist,
-              Condition::HasProvince,
+              {Condition_t::HasColonist},
+              {Condition_t::HasProvince},
             },
-          .effects = {Condition::ColonistOnOwnProvince},
+          .effects =
+            {
+              {Condition_t::ColonistOnOwnProvince},
+            },
         };
     }
   };
@@ -129,7 +165,9 @@ namespace AI {
       case Goal::None:
         return {};
       case Goal::EstablishSettlement:
-        return {Condition::HasSettlement};
+        return {
+          Condition{Condition_t::HasSettlement},
+        };
       case Goal::ExpandBorders:
         return {};// @todo
     }
@@ -147,17 +185,17 @@ namespace AI {
   }
 
 
-  inline std::vector<Action_t> actions_that_satisfy_cond(Condition cond) {
+  inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
     switch (cond) {
-      case Condition::ColonistOnUnclaimedProvince:
+      case Condition_t::ColonistOnUnclaimedProvince:
         return {Action_t::MoveColonistToUnclaimedProvince};
-      case Condition::ColonistOnOwnProvince:
+      case Condition_t::ColonistOnOwnProvince:
         return {Action_t::MoveColonistToOwnProvince};
-      case Condition::HasColonist:
+      case Condition_t::HasColonist:
         return {Action_t::SpawnColonist};
-      case Condition::HasProvince:
+      case Condition_t::HasProvince:
         return {Action_t::ClaimProvince};
-      case Condition::HasSettlement:
+      case Condition_t::HasSettlement:
         return {Action_t::BuildSettlement};
     }
   }

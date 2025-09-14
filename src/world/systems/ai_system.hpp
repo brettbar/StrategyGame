@@ -33,8 +33,8 @@ namespace AI {
     }
 
     static bool condition_met(Condition cond, entt::entity ai_player) {
-      switch (cond) {
-        case Condition::HasColonist: {
+      switch (cond.condition) {
+        case Condition_t::HasColonist: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
             return false;
@@ -42,7 +42,7 @@ namespace AI {
 
         } break;
 
-        case Condition::ColonistOnUnclaimedProvince: {
+        case Condition_t::ColonistOnUnclaimedProvince: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
             return false;
@@ -50,7 +50,7 @@ namespace AI {
           return Actor::System::colonist_can_claim_province(colonist_e);
         } break;
 
-        case Condition::ColonistOnOwnProvince: {
+        case Condition_t::ColonistOnOwnProvince: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
             return false;
@@ -58,9 +58,9 @@ namespace AI {
           return Actor::System::colonist_can_place_settlement(colonist_e);
         } break;
 
-        case Condition::HasProvince:
+        case Condition_t::HasProvince:
           return Province::System::player_has_province(ai_player);
-        case Condition::HasSettlement:
+        case Condition_t::HasSettlement:
           return Settlement::System::player_has_settlement(ai_player);
       }
 
@@ -69,6 +69,8 @@ namespace AI {
 
     static void do_action(Action a, entt::entity ai_player) {
       switch (a.type) {
+        case Action_t::AchieveGoal:
+          break;
         case Action_t::BuildSettlement: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
@@ -146,7 +148,8 @@ namespace AI {
 
       for (auto cond: parent->action.preconditions) {
 
-        for (auto possible_actions_t: actions_that_satisfy_cond(cond)) {
+        for (auto possible_actions_t:
+             actions_that_satisfy_cond(cond.condition)) {
           auto possible_action = get_action(possible_actions_t);
 
           sptr<Node> new_node = std::make_shared<Node>(Node{
