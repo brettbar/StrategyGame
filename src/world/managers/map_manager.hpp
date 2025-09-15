@@ -30,8 +30,11 @@ public:
     f32 mtnsLevel = 0.52;
     f32 hillsLevel = 0.45;
 
-    u32 seed = 132;
     // u32 seed = 132;
+    const u32 MAX = 99999;
+    const u32 MIN = 0;
+    u32 seed = rand() % (MAX + 1 - MIN) + MIN;
+
     u32 octaves = 7;
     f32 scaling_bias = 1.0f;
     // f32 scaling_bias = 1.2f;

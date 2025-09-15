@@ -44,30 +44,30 @@ namespace Player {
         AI::System::Create(ai_player);
       }
 
-      {
-        auto ai_player = Global::world.create();
-        Global::world.emplace<Player::Component>(
-          ai_player, ai_player, "player_2", true
-        );
-        Global::world.emplace<Faction::Component>(
-          ai_player, Faction::Manager::Get()->factions.at("celts")
-        );
-
-        AI::System::Create(ai_player);
-      }
-
-
-      {
-        auto ai_player = Global::world.create();
-        Global::world.emplace<Player::Component>(
-          ai_player, ai_player, "player_3", true
-        );
-        Global::world.emplace<Faction::Component>(
-          ai_player, Faction::Manager::Get()->factions.at("carthaginians")
-        );
-
-        AI::System::Create(ai_player);
-      }
+      // {
+      //   auto ai_player = Global::world.create();
+      //   Global::world.emplace<Player::Component>(
+      //     ai_player, ai_player, "player_2", true
+      //   );
+      //   Global::world.emplace<Faction::Component>(
+      //     ai_player, Faction::Manager::Get()->factions.at("celts")
+      //   );
+      //
+      //   AI::System::Create(ai_player);
+      // }
+      //
+      //
+      // {
+      //   auto ai_player = Global::world.create();
+      //   Global::world.emplace<Player::Component>(
+      //     ai_player, ai_player, "player_3", true
+      //   );
+      //   Global::world.emplace<Faction::Component>(
+      //     ai_player, Faction::Manager::Get()->factions.at("carthaginians")
+      //   );
+      //
+      //   AI::System::Create(ai_player);
+      // }
     }
 
     static void HostStartMultiplayer() {
