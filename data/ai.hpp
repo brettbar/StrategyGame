@@ -46,7 +46,7 @@ namespace AI {
     ColonistOnOwnProvince,
     HasColonist,
     HasProvince,
-    HasSettlement,
+    HasSettlements,
   };
 
   struct Condition {
@@ -57,9 +57,9 @@ namespace AI {
       return this->condition < rhs.condition;
     }
 
-    // union {
-    //   uint32_t value;
-    // } data;
+    union {
+      uint32_t value;
+    } data;
   };
 
   struct Action {
@@ -106,7 +106,7 @@ namespace AI {
             },
           .effects =
             {
-              Condition{Condition_t::HasSettlement},
+              Condition{Condition_t::HasSettlements},
             },
         };
       case Action_t::ClaimProvince:
@@ -166,7 +166,7 @@ namespace AI {
         return {};
       case Goal::EstablishSettlement:
         return {
-          Condition{Condition_t::HasSettlement},
+          Condition{Condition_t::HasSettlements},
         };
       case Goal::ExpandBorders:
         return {};// @todo
@@ -195,7 +195,7 @@ namespace AI {
         return {Action_t::SpawnColonist};
       case Condition_t::HasProvince:
         return {Action_t::ClaimProvince};
-      case Condition_t::HasSettlement:
+      case Condition_t::HasSettlements:
         return {Action_t::BuildSettlement};
     }
   }
