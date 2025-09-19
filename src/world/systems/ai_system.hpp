@@ -70,6 +70,8 @@ namespace AI {
     }
 
     static void do_action(Action a, entt::entity ai_player) {
+
+      std::cout << "Doing Action :: " << a.as_str() << '\n';
       switch (a.type) {
         case Action_t::AchieveGoal:
           break;
@@ -220,7 +222,6 @@ namespace AI {
       Action action = plan.stack.front();
 
       if (action_effects_met(action, ai_player)) {
-        std::cout << "Action " << action.as_str() << '\n';
         plan.stack.erase(plan.stack.begin());
       } else if (action_preconds_met(action, ai_player)) {
         do_action(action, ai_player);
