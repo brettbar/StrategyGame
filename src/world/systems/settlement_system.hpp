@@ -183,7 +183,7 @@ namespace Settlement {
       return false;
     }
 
-    static u32 num_player_settlement(entt::entity owner) {
+    static u32 num_player_settlements(entt::entity owner) {
       auto settlements =
         Global::world.view<Province::Component, Settlement::Component>();
 

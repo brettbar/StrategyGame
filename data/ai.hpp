@@ -58,7 +58,7 @@ namespace AI {
     }
 
     union {
-      uint32_t value;
+      uint32_t value = 1;
     } data;
   };
 
@@ -87,6 +87,32 @@ namespace AI {
       }
     }
   };
+
+  inline std::vector<Condition> goal_conds(Goal goal) {
+    switch (goal) {
+      case Goal::None:
+        return {};
+      case Goal::EstablishSettlement:
+        return {
+          Condition{Condition_t::HasSettlements, 1},
+        };
+      case Goal::ExpandBorders:
+        return {
+          Condition{Condition_t::HasSettlements, 3},
+        };// @todo
+    }
+  }
+
+  inline float default_goal_prio(Goal goal) {
+    switch (goal) {
+      case Goal::None:
+        return 0;
+      case Goal::EstablishSettlement:
+        return 1;
+      case Goal::ExpandBorders:
+        return 0.5;
+    }
+  }
 
 
   inline Action get_action(Action_t type) {
@@ -159,30 +185,6 @@ namespace AI {
         };
     }
   };
-
-  inline std::vector<Condition> goal_conds(Goal goal) {
-    switch (goal) {
-      case Goal::None:
-        return {};
-      case Goal::EstablishSettlement:
-        return {
-          Condition{Condition_t::HasSettlements},
-        };
-      case Goal::ExpandBorders:
-        return {};// @todo
-    }
-  }
-
-  inline float default_goal_prio(Goal goal) {
-    switch (goal) {
-      case Goal::None:
-        return 0;
-      case Goal::EstablishSettlement:
-        return 1;
-      case Goal::ExpandBorders:
-        return 0.5;
-    }
-  }
 
 
   inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {

@@ -60,8 +60,10 @@ namespace AI {
 
         case Condition_t::HasProvince:
           return Province::System::player_has_province(ai_player);
-        case Condition_t::HasSettlements:
-          return Settlement::System::player_has_settlement(ai_player);
+        case Condition_t::HasSettlements: {
+          return Settlement::System::num_player_settlements(ai_player) >=
+                 cond.data.value;
+        } break;
       }
 
       return false;
@@ -236,7 +238,7 @@ namespace AI {
       );// @temp, eventually be able to change goal on the fly
 
       auto num_player_settlements =
-        Settlement::System::num_player_settlement(ai_player);
+        Settlement::System::num_player_settlements(ai_player);
 
       if (num_player_settlements < 1) {
         ai.current_goal = Goal::EstablishSettlement;
