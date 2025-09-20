@@ -6,6 +6,7 @@
 
 namespace AI {
 
+  // Common type for both Goals and Actions
   struct Node {
     Action action;
     map<Condition, list<sptr<Node>>> children;
@@ -57,3 +58,12 @@ namespace AI {
   };
 
 };// namespace AI
+//
+//
+// for each condition of your goal
+//    for i = 0; i < (cond.goal_num - world.current_num); i++
+//      add a seperate plan to the plan array
+//
+//
+// for each plan in plan_array
+//  execute the plan

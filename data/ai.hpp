@@ -132,7 +132,7 @@ namespace AI {
             },
           .effects =
             {
-              Condition{Condition_t::HasSettlements},
+              Condition{Condition_t::HasSettlements, 1},
             },
         };
       case Action_t::ClaimProvince:
