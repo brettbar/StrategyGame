@@ -58,8 +58,8 @@ namespace AI {
           return Actor::System::colonist_can_place_settlement(colonist_e);
         } break;
 
-        case Condition_t::HasProvince:
-          return Province::System::player_has_province(ai_player);
+        case Condition_t::HasUnsettledProvince:
+          return Province::System::player_has_unsettled_province(ai_player);
         case Condition_t::HasSettlements: {
           return Settlement::System::num_player_settlements(ai_player) >=
                  cond.data.value;
@@ -99,7 +99,7 @@ namespace AI {
           );
 
         } break;
-        case Action_t::MoveColonistToOwnProvince: {
+        case Action_t::MoveColonistToUnsettledOwnedProvince: {
           return;
         }
         case Action_t::MoveColonistToUnclaimedProvince: {
@@ -113,13 +113,15 @@ namespace AI {
           if (Movement::System::ActorIsMoving(colonist_e))
             return;
 
-          auto nearest_eligible_tile =
+          sptr<vec2f> nearest_eligible_tile =
             Province::System::get_nearest_inhabitable_province(actor.position);
 
-          if (nearest_eligible_tile)
+          if (nearest_eligible_tile) {
             Commands::Manager()->enqueue(Commands::Command::move(
               ai_player, *nearest_eligible_tile, colonist_e
             ));
+          }
+
 
         } break;
         case Action_t::SpawnColonist: {

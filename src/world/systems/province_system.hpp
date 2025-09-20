@@ -4,7 +4,6 @@
 
 #include "../components/actor_component.hpp"
 #include "../managers/map_manager.hpp"
-#include "resource_system.hpp"
 
 namespace Province {
 
@@ -87,11 +86,13 @@ namespace Province {
       }
     }
 
-    static bool player_has_province(entt::entity owner) {
-      auto provinces = Global::world.view<Province::Component>();
+    static bool player_has_unsettled_province(entt::entity owner) {
+      auto unsettled_provinces =
+        Global::world
+          .view<Province::Component>(entt::exclude<Settlement::Component>);
 
-      for (auto province_e: provinces) {
-        auto prov = provinces.get<Province::Component>(province_e);
+      for (auto province_e: unsettled_provinces) {
+        auto prov = unsettled_provinces.get<Province::Component>(province_e);
         if (prov.owner == owner) {
           return true;
         }
@@ -144,14 +145,36 @@ namespace Province {
         return nullptr;
       }
 
-      auto neighbors = Map::Manager()->get_neighboring_owners(prov->tile);
 
-      // @todo
-      // for (entt::entity neighbor: neighbors) {
-      //   if (neighbor == entt::null &&
-      //       Map::Manager()->biome_inhabitable(neighbor->biome))
-      //     return std::make_shared<vec2f>(neighbor->position);
-      // }
+      auto neighbor_provs =
+        Map::Manager()->get_neighboring_provinces(prov->tile);
+      // auto neighbor_prov_owners =
+      //   Map::Manager()->get_neighboring_owners(prov->tile);
+
+      for (u32 i = 0; i < neighbor_provs.size(); i++) {
+        Province::Component *neighbor_prov = neighbor_provs[i];
+        entt::entity neighbor_owner = neighbor_prov->owner;
+
+
+        if (neighbor_owner == entt::null && neighbor_prov != nullptr) {
+          printf(
+            "tile pos %f %f, biome is %d\n",
+            neighbor_prov->tile.position.x,
+            neighbor_prov->tile.position.y,
+            neighbor_prov->tile.biome
+          );
+
+          if (Map::Manager()->biome_inhabitable(neighbor_prov->tile.biome)) {
+            // printf(
+            //   "tile pos %f %f, biome is %d\n",
+            //   neighbor_prov->tile.position.x,
+            //   neighbor_prov->tile.position.y,
+            //   neighbor_prov->tile.biome
+            // );
+            return std::make_shared<vec2f>(neighbor_prov->tile.position);
+          }
+        }
+      }
 
       return nullptr;
     }

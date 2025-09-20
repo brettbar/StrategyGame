@@ -36,7 +36,7 @@ namespace AI {
   enum class Action_t {
     AchieveGoal,
     MoveColonistToUnclaimedProvince,
-    MoveColonistToOwnProvince,
+    MoveColonistToUnsettledOwnedProvince,
     SpawnColonist,
     ClaimProvince,
     BuildSettlement,
@@ -45,7 +45,7 @@ namespace AI {
     ColonistOnUnclaimedProvince,
     ColonistOnOwnProvince,
     HasColonist,
-    HasProvince,
+    HasUnsettledProvince,
     HasSettlements,
   };
 
@@ -76,7 +76,7 @@ namespace AI {
           return "AchieveGoal";
         case Action_t::MoveColonistToUnclaimedProvince:
           return "MoveColonistToUnclaimedProvince";
-        case Action_t::MoveColonistToOwnProvince:
+        case Action_t::MoveColonistToUnsettledOwnedProvince:
           return "MoveColonistToOwnProvince";
         case Action_t::SpawnColonist:
           return "SpawnColonist";
@@ -144,7 +144,7 @@ namespace AI {
             },
           .effects =
             {
-              Condition{Condition_t::HasProvince},
+              Condition{Condition_t::HasUnsettledProvince},
             },
         };
       case Action_t::SpawnColonist:
@@ -170,13 +170,13 @@ namespace AI {
               {Condition_t::ColonistOnUnclaimedProvince},
             },
         };
-      case Action_t::MoveColonistToOwnProvince:
+      case Action_t::MoveColonistToUnsettledOwnedProvince:
         return Action{
           .type = type,
           .preconditions =
             {
               {Condition_t::HasColonist},
-              {Condition_t::HasProvince},
+              {Condition_t::HasUnsettledProvince},
             },
           .effects =
             {
@@ -192,10 +192,10 @@ namespace AI {
       case Condition_t::ColonistOnUnclaimedProvince:
         return {Action_t::MoveColonistToUnclaimedProvince};
       case Condition_t::ColonistOnOwnProvince:
-        return {Action_t::MoveColonistToOwnProvince};
+        return {Action_t::MoveColonistToUnsettledOwnedProvince};
       case Condition_t::HasColonist:
         return {Action_t::SpawnColonist};
-      case Condition_t::HasProvince:
+      case Condition_t::HasUnsettledProvince:
         return {Action_t::ClaimProvince};
       case Condition_t::HasSettlements:
         return {Action_t::BuildSettlement};

@@ -84,7 +84,7 @@ struct Campaign {
 
   void Draw();
 
-  void EvaluteCommands(const Commands::Command &);
+  void EvaluateCommands(const Commands::Command &);
   // void HandleSpawnRequest( const Commands::Command & );
   void HandleTimeChangeRequest(const Commands::Command &);
 
@@ -129,7 +129,7 @@ inline void Campaign::start(str player_faction) {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>(this);
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
 inline void Campaign::start_mp() {
@@ -148,7 +148,7 @@ inline void Campaign::start_mp() {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>(this);
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
 inline void Campaign::save(str file_name) {
@@ -180,6 +180,7 @@ inline void Campaign::save(str file_name) {
       .get<Player::Component>(output)
       .get<Faction::Component>(output)
       .get<Actor::Component>(output)
+      .get<Sight::Component>(output)
       .get<Animated::Component>(output)
       .get<Stockpile::Component>(output)
       .get<Province::Component>(output)
@@ -202,6 +203,7 @@ inline void Campaign::load(cstr file_path) {
       .get<Player::Component>(input)
       .get<Faction::Component>(input)
       .get<Actor::Component>(input)
+      .get<Sight::Component>(input)
       .get<Animated::Component>(input)
       .get<Stockpile::Component>(input)
       .get<Province::Component>(input)
@@ -237,7 +239,7 @@ inline void Campaign::load(cstr file_path) {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>(this);
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
 
@@ -565,8 +567,10 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
 
 
 // @todo This should be split to explicit Evaluate and Execute steps.
-inline void Campaign::EvaluteCommands(const Commands::Command &cmd) {
+inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
   switch (cmd.type) {
+    case Commands::Type::None:
+      break;
     case Commands::Type::BuildSettlement: {
       Settlement::System::spawn_settlement(cmd.entity);
       return;
@@ -588,6 +592,7 @@ inline void Campaign::EvaluteCommands(const Commands::Command &cmd) {
       return;
     }
     case Commands::Type::Move: {
+      printf("!!!!!!!!!!!!!!!!!!!\n");
       Movement::System::SetDestinations(cmd.entity, cmd.click_pos);
       return;
     }

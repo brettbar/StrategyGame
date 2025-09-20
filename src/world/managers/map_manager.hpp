@@ -129,15 +129,66 @@ public:
         case Biome::Hills:
         case Biome::Plains:
         case Biome::Steppe:
-        case Biome::Taiga:
+        case Biome::Taiga: {
           return true;
+        } break;
         case Biome::Mountains:
         case Biome::Sea:
-        case Biome::Tundra:
+        case Biome::Tundra: {
           return false;
+        } break;
       }
     }
 
+    std::array<Province::Component *, 6> get_neighboring_provinces(
+      Province::Tile tile
+    ) {
+      u32 x = tile.coords.x;
+      u32 y = tile.coords.y;
+
+      Province::Component *ne_prov = nullptr;
+      Province::Component *e_prov = nullptr;
+      Province::Component *se_prov = nullptr;
+      Province::Component *sw_prov = nullptr;
+      Province::Component *w_prov = nullptr;
+      Province::Component *nw_prov = nullptr;
+
+      auto provinces = Global::world.view<Province::Component>();
+
+      i32 ne = map_index(x + 1, y - 1);
+      i32 e = map_index(x + 1, y);
+      i32 se = map_index(x + 1, y + 1);
+      i32 sw = map_index(x, y + 1);
+      i32 w = map_index(x - 1, y);
+      i32 nw = map_index(x, y - 1);
+
+      if (y % 2 == 0) {
+        ne = map_index(x, y - 1);
+        e = map_index(x + 1, y);
+        se = map_index(x, y + 1);
+        sw = map_index(x - 1, y + 1);
+        w = map_index(x - 1, y);
+        nw = map_index(x - 1, y - 1);
+      }
+
+      if (ne >= 0)
+        ne_prov = &provinces.get<Province::Component>(tile_map[ne]);
+      if (e >= 0)
+        e_prov = &provinces.get<Province::Component>(tile_map[e]);
+      if (se >= 0)
+        se_prov = &provinces.get<Province::Component>(tile_map[se]);
+      if (sw >= 0)
+        sw_prov = &provinces.get<Province::Component>(tile_map[sw]);
+      if (w >= 0)
+        w_prov = &provinces.get<Province::Component>(tile_map[w]);
+      if (nw >= 0)
+        nw_prov = &provinces.get<Province::Component>(tile_map[nw]);
+
+
+      return {ne_prov, e_prov, se_prov, sw_prov, w_prov, nw_prov};
+    }
+
+    // @refactor figure out how to get rid of this
     std::array<entt::entity, 6> get_neighboring_owners(Province::Tile tile) {
       u32 x = tile.coords.x;
       u32 y = tile.coords.y;

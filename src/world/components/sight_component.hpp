@@ -10,14 +10,14 @@
 
 namespace Sight {
 
-struct Component {
-  u32 range;
+  struct Component {
+    u32 range;
 
 
-  template<class Archive>
-  void serialize( Archive &ar ) {
-    ar( range );
-  }
-};
+    template<class Archive>
+    void serialize(Archive &ar) {
+      ar(range);
+    }
+  };
 
 }// namespace Sight
