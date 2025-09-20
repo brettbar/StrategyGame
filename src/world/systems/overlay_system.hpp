@@ -54,8 +54,8 @@ namespace Overlay {
           if (neighbor == entt::null || (neighbor != prov.owner)) {
             DrawTexture(
               Global::texture_cache[borders[i]]->texture,
-              prov.tile.position.x,
-              prov.tile.position.y,
+              prov.tile.top_left_corner_position.x,
+              prov.tile.top_left_corner_position.y,
               WHITE
             );
           }
@@ -88,7 +88,7 @@ namespace Overlay {
                                        .c_str()}]
             ->texture,
           frameRec,
-          prov.tile.position,
+          prov.tile.top_left_corner_position,
           Fade(color, 0.1)
         );
       }
@@ -117,7 +117,7 @@ namespace Overlay {
                                          .c_str()}]
               ->texture,
             frameRec,
-            prov.tile.position,
+            prov.tile.top_left_corner_position,
             Fade(color, 0.5)
           );
         }
@@ -159,14 +159,14 @@ namespace Overlay {
           DrawTextureRec(
             Global::texture_cache[hstr{(color + "_overlay").c_str()}]->texture,
             frameRec,
-            prov.tile.position,
+            prov.tile.top_left_corner_position,
             Fade(WHITE, 0.25)
           );
         } else {
           DrawTextureRec(
             Global::texture_cache[hstr{"black_overlay"}]->texture,
             frameRec,
-            prov.tile.position,
+            prov.tile.top_left_corner_position,
             Fade(BLACK, 0.5)
           );
         }
@@ -194,8 +194,8 @@ namespace Overlay {
           continue;
 
         Vector2 settlement_pos = {
-          province.tile.position.x + 24,
-          province.tile.position.y + 24,
+          province.tile.top_left_corner_position.x + 24,
+          province.tile.top_left_corner_position.y + 24,
         };
 
         const vec2f text_dims = MeasureTextEx(

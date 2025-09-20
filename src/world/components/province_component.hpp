@@ -19,8 +19,9 @@ namespace Province {
 
     u32 id;
     f32 noise;
-    Vector2 position;
-    Vector2 center;
+    Vector2 top_left_corner_position;
+    Vector2
+      center;// IMPORTANT, you usually want to send actors to this vec, not position!
     vec2u coords;
     Biome biome;
     Visibility visibility;
@@ -33,8 +34,8 @@ namespace Province {
         prov_entity,
         cereal::make_nvp("tile_id", id),
         noise,
-        position.x,
-        position.y,
+        top_left_corner_position.x,
+        top_left_corner_position.y,
         center.x,
         center.y,
         coords.x,

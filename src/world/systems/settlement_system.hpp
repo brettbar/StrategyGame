@@ -42,8 +42,8 @@ namespace Settlement {
 
     static vec2f settlement_position(Province::Component province) {
       return vec2f{
-        province.tile.position.x + 24,
-        province.tile.position.y + 24,
+        province.tile.top_left_corner_position.x + 24,
+        province.tile.top_left_corner_position.y + 24,
       };
     }
 

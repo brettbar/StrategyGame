@@ -84,7 +84,7 @@ public:
         Province::Tile tile = {
           .id = i,
           .noise = elevation,
-          .position = position,
+          .top_left_corner_position = position,
           .center =
             {
               position.x + (TILE_WIDTH / 2),

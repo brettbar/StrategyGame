@@ -44,8 +44,8 @@ namespace Selection {
         if (isDebug) {
           DrawTexture(
             cache[hstr{"tile_outline"}]->texture,
-            prov.tile.position.x,
-            prov.tile.position.y,
+            prov.tile.top_left_corner_position.x,
+            prov.tile.top_left_corner_position.y,
             WHITE
           );
         }

@@ -65,7 +65,7 @@ namespace Province {
       // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
       // DrawTextureRec(hex, frameRec, tile.position, WHITE);
       // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
-      DrawTextureRec(texture, frameRec, tile.position, WHITE);
+      DrawTextureRec(texture, frameRec, tile.top_left_corner_position, WHITE);
     }
 
     static void Draw(Camera2D &camera) {
@@ -78,7 +78,7 @@ namespace Province {
       for (entt::entity entity: view) {
         auto &prov = view.get<const Province::Component>(entity);
 
-        if (out_of_camera_bounds(camera, prov.tile.position)) {
+        if (out_of_camera_bounds(camera, prov.tile.top_left_corner_position)) {
           continue;
         }
 
@@ -159,18 +159,12 @@ namespace Province {
         if ((neighbor_owner == entt::null) && (neighbor_prov != nullptr)) {
           printf(
             "tile pos %f %f, biome is %d\n",
-            neighbor_prov->tile.position.x,
-            neighbor_prov->tile.position.y,
+            neighbor_prov->tile.top_left_corner_position.x,
+            neighbor_prov->tile.top_left_corner_position.y,
             neighbor_prov->tile.biome
           );
 
           if (Map::Manager()->biome_inhabitable(neighbor_prov->tile.biome)) {
-            // printf(
-            //   "tile pos %f %f, biome is %d\n",
-            //   neighbor_prov->tile.position.x,
-            //   neighbor_prov->tile.position.y,
-            //   neighbor_prov->tile.biome
-            // );
             return std::make_shared<vec2f>(neighbor_prov->tile.center);
           }
         }

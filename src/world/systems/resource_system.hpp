@@ -123,7 +123,10 @@ namespace Resource {
 
       for (auto resource: prov.natural_resources) {
         DrawCircle(
-          prov.tile.position.x + 32, prov.tile.position.y + 32, 16, BLACK
+          prov.tile.top_left_corner_position.x + 32,
+          prov.tile.top_left_corner_position.y + 32,
+          16,
+          BLACK
         );
 
         hstr id = {};
@@ -152,8 +155,8 @@ namespace Resource {
 
         DrawTexture(
           Global::texture_cache[id]->texture,
-          prov.tile.position.x + 16,
-          prov.tile.position.y + 16,
+          prov.tile.top_left_corner_position.x + 16,
+          prov.tile.top_left_corner_position.y + 16,
           WHITE
         );
       }
@@ -170,7 +173,10 @@ namespace Resource {
         Resources::Type resource = resource_pair.first;
 
         DrawCircle(
-          prov.tile.position.x + 32, prov.tile.position.y + 32, 16, BLACK
+          prov.tile.top_left_corner_position.x + 32,
+          prov.tile.top_left_corner_position.y + 32,
+          16,
+          BLACK
         );
 
         hstr id = {};
@@ -184,8 +190,8 @@ namespace Resource {
 
         DrawTexture(
           Global::texture_cache[id]->texture,
-          prov.tile.position.x + 16,
-          prov.tile.position.y + 16,
+          prov.tile.top_left_corner_position.x + 16,
+          prov.tile.top_left_corner_position.y + 16,
           WHITE
         );
       }
@@ -199,13 +205,13 @@ namespace Resource {
 
         auto &prov = view.get<Province::Component>(entity);
 
-        if (prov.tile.position.x - TILE_WIDTH >
+        if (prov.tile.top_left_corner_position.x - TILE_WIDTH >
               camera.target.x + (camera.offset.x / camera.zoom) + 32 ||
-            prov.tile.position.x + TILE_WIDTH <
+            prov.tile.top_left_corner_position.x + TILE_WIDTH <
               camera.target.x - (camera.offset.x / camera.zoom) - 32 ||
-            prov.tile.position.y - TILE_WIDTH >
+            prov.tile.top_left_corner_position.y - TILE_WIDTH >
               camera.target.y + (camera.offset.y / camera.zoom) + 32 ||
-            prov.tile.position.y + TILE_WIDTH <
+            prov.tile.top_left_corner_position.y + TILE_WIDTH <
               camera.target.y - (camera.offset.y / camera.zoom) - 32) {
           continue;
         }
