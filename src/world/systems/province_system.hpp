@@ -156,7 +156,7 @@ namespace Province {
         entt::entity neighbor_owner = neighbor_prov->owner;
 
 
-        if (neighbor_owner == entt::null && neighbor_prov != nullptr) {
+        if ((neighbor_owner == entt::null) && (neighbor_prov != nullptr)) {
           printf(
             "tile pos %f %f, biome is %d\n",
             neighbor_prov->tile.position.x,
@@ -171,7 +171,7 @@ namespace Province {
             //   neighbor_prov->tile.position.y,
             //   neighbor_prov->tile.biome
             // );
-            return std::make_shared<vec2f>(neighbor_prov->tile.position);
+            return std::make_shared<vec2f>(neighbor_prov->tile.center);
           }
         }
       }
