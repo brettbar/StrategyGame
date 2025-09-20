@@ -175,7 +175,6 @@ namespace Settlement {
       for (auto settlement_e: settlements) {
         auto prov = settlements.get<Province::Component>(settlement_e);
         if (prov.owner == owner) {
-          // printf( "AI HAS A SETTLEMENT!!!!!!!!!!!!!!!!!!\n" );
           return true;
         }
       }
@@ -192,12 +191,27 @@ namespace Settlement {
       for (auto settlement_e: settlements) {
         auto prov = settlements.get<Province::Component>(settlement_e);
         if (prov.owner == owner) {
-          // printf( "AI HAS A SETTLEMENT!!!!!!!!!!!!!!!!!!\n" );
           num++;
         }
       }
 
       return num;
+    }
+
+    static vec2f position_of_a_player_settlement(entt::entity owner) {
+
+      auto settlements =
+        Global::world.view<Province::Component, Settlement::Component>();
+
+
+      for (auto settlement_e: settlements) {
+        auto prov = settlements.get<Province::Component>(settlement_e);
+        if (prov.owner == owner) {
+          return settlement_position(prov);
+        }
+      }
+
+      return {};
     }
 
 private:

@@ -122,10 +122,33 @@ namespace AI {
             ));
 
         } break;
-        case Action_t::SpawnColonist:
-          break;
+        case Action_t::SpawnColonist: {
+          vec2f pos =
+            Settlement::System::position_of_a_player_settlement(ai_player);
+
+          Commands::Manager()->enqueue(
+            Commands::Command::spawn_colonist(ai_player, pos)
+          );
+        } break;
       }
     }
+
+    static u32 get_current_cond_num(
+      Condition_t cond,
+      entt::entity ai_player_e
+    ) {
+      switch (cond) {
+        case Condition_t::HasSettlements: {
+          return Settlement::System::num_player_settlements(ai_player_e);
+        } break;
+
+        default:
+          return 0;
+      }
+
+      return 0;
+    }
+
 
     static bool action_effects_met(Action a, entt::entity ai_player) {
       for (auto cond: a.effects) {
@@ -151,28 +174,56 @@ namespace AI {
     static void build_graph(sptr<Node> parent, entt::entity ai_player) {
 
       for (auto cond: parent->action.preconditions) {
+        if (cond.data.value > 1) {
+          u32 goal_num = cond.data.value;
+          u32 curr_num = get_current_cond_num(cond.condition, ai_player);
 
-        for (auto possible_actions_t:
-             actions_that_satisfy_cond(cond.condition)) {
-          auto possible_action = get_action(possible_actions_t);
+          for (u32 i = 0; i < (goal_num - curr_num); i++) {
+            for (auto possible_actions_t:
+                 actions_that_satisfy_cond(cond.condition)) {
+              auto possible_action = get_action(possible_actions_t);
 
-          sptr<Node> new_node = std::make_shared<Node>(Node{
-            .action = possible_action,
-            .children = {},
-          });
+              sptr<Node> new_node = std::make_shared<Node>(Node{
+                .action = possible_action,
+                .children = {},
+              });
 
-          if (parent->children.contains(cond)) {
-            parent->children.at(cond).push_back(new_node);
-          } else {
-            parent->children.emplace(cond, list<sptr<Node>>{new_node});
+              if (parent->children.contains(cond)) {
+                parent->children.at(cond).push_back(new_node);
+              } else {
+                parent->children.emplace(cond, list<sptr<Node>>{new_node});
+              }
+
+              // std::cout << "Parent: " << parent->action.as_str() << '\n';
+              // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
+              // std::cout << std::endl;
+
+              build_graph(new_node, ai_player);
+            };
           }
+        } else {
+          for (auto possible_actions_t:
+               actions_that_satisfy_cond(cond.condition)) {
+            auto possible_action = get_action(possible_actions_t);
 
-          // std::cout << "Parent: " << parent->action.as_str() << '\n';
-          // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
-          // std::cout << std::endl;
+            sptr<Node> new_node = std::make_shared<Node>(Node{
+              .action = possible_action,
+              .children = {},
+            });
 
-          build_graph(new_node, ai_player);
-        };
+            if (parent->children.contains(cond)) {
+              parent->children.at(cond).push_back(new_node);
+            } else {
+              parent->children.emplace(cond, list<sptr<Node>>{new_node});
+            }
+
+            // std::cout << "Parent: " << parent->action.as_str() << '\n';
+            // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
+            // std::cout << std::endl;
+
+            build_graph(new_node, ai_player);
+          };
+        }
       }
     }
 
@@ -258,6 +309,7 @@ namespace AI {
         case Goal::None:
           determine_goal(ai_player, player, ai);
           break;
+        case Goal::ExpandBorders:
         case Goal::EstablishSettlement: {
           // printf( "player_1 has NOT finished their goal!\n" );
 
@@ -297,11 +349,7 @@ namespace AI {
 
 
         } break;
-        case Goal::ExpandBorders: {
-
-        } break;
       }
     }
   };
-
 };// namespace AI
