@@ -48,6 +48,7 @@ namespace AI {
     Goal current_goal;
     Plan current_plan;
     bool executing_plan = false;
+    map<AI::Condition_t, u32> world_state;
     // bool has_colonist = false;
     // bool has_settlement = false;
 

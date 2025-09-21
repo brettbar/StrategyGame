@@ -26,9 +26,11 @@ namespace AI {
       auto ai_players = Global::world.view<Player::Component, AI::Component>();
 
       for (auto player_e: ai_players) {
-        auto ai = ai_players.get<AI::Component>(player_e);
+        Player::Component player_c =
+          ai_players.get<Player::Component>(player_e);
+        AI::Component ai_c = ai_players.get<AI::Component>(player_e);
 
-        ai.current_goal = Goal::EstablishSettlement;
+        determine_goal(player_e, player_c, ai_c);
       }
     }
 
