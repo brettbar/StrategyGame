@@ -50,15 +50,23 @@ namespace AI {
   };
 
   struct Condition {
-    Condition_t condition;
+    Condition_t type;
 
     // idk why i need this
     bool operator<(const Condition &rhs) const noexcept {
-      return this->condition < rhs.condition;
+      return this->type < rhs.type;
     }
 
     union {
       uint32_t value = 1;
+    } data;
+  };
+
+  struct Effect {
+    Condition_t type;
+
+    union {
+      uint32_t value = 0;
     } data;
   };
 

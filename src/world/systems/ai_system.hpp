@@ -33,7 +33,7 @@ namespace AI {
     }
 
     static bool condition_met(Condition cond, entt::entity ai_player) {
-      switch (cond.condition) {
+      switch (cond.type) {
         case Condition_t::HasColonist: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
@@ -178,11 +178,11 @@ namespace AI {
       for (auto cond: parent->action.preconditions) {
         if (cond.data.value > 1) {
           u32 goal_num = cond.data.value;
-          u32 curr_num = get_current_cond_num(cond.condition, ai_player);
+          u32 curr_num = get_current_cond_num(cond.type, ai_player);
 
           for (u32 i = 0; i < (goal_num - curr_num); i++) {
             for (auto possible_actions_t:
-                 actions_that_satisfy_cond(cond.condition)) {
+                 actions_that_satisfy_cond(cond.type)) {
               auto possible_action = get_action(possible_actions_t);
 
               sptr<Node> new_node = std::make_shared<Node>(Node{
@@ -204,8 +204,7 @@ namespace AI {
             };
           }
         } else {
-          for (auto possible_actions_t:
-               actions_that_satisfy_cond(cond.condition)) {
+          for (auto possible_actions_t: actions_that_satisfy_cond(cond.type)) {
             auto possible_action = get_action(possible_actions_t);
 
             sptr<Node> new_node = std::make_shared<Node>(Node{
