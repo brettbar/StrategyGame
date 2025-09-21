@@ -66,7 +66,7 @@ namespace AI {
     Condition_t type;
 
     union {
-      uint32_t value = 0;
+      uint32_t delta = 0;
     } data;
   };
 
