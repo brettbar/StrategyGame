@@ -47,6 +47,12 @@ namespace AI {
     HasColonist,
     HasUnsettledProvince,
     HasSettlements,
+    NUM,
+  };
+
+  using ConditionValue = union {
+    bool boolean;
+    uint32_t number;
   };
 
   struct Condition {
@@ -57,17 +63,13 @@ namespace AI {
       return this->type < rhs.type;
     }
 
-    union {
-      uint32_t value = 1;
-    } data;
+    ConditionValue value;
   };
 
   struct Effect {
     Condition_t type;
 
-    union {
-      uint32_t delta = 0;
-    } data;
+    ConditionValue delta;
   };
 
   struct Action {

@@ -19,8 +19,57 @@ namespace AI {
 
   struct System {
     static void Create(entt::entity player) {
-      Global::world.emplace<AI::Component>(player, Goal::None);
+      AI::Component ai_c = AI::Component(Goal::None, {}, false, {});
+      Global::world.emplace<AI::Component>(player, ai_c);
     }
+
+    void set_world_state(entt::entity ai_player, AI::Component &ai_c) {
+      ai_c.world_state = {};
+      for (u32 i = 0; i < (u32) Condition_t::NUM; i++) {
+        Condition_t cond = (Condition_t) i;
+        ai_c.world_state[cond] = get_real_state_for_cond(ai_player, cond);
+      }
+    }
+
+    ConditionValue get_real_state_for_cond(
+      entt::entity ai_player,
+      Condition_t cond
+    ) {
+      switch (cond) {
+        case Condition_t::HasColonist: {
+          return {
+            Actor::System::get_colonist_of_player(ai_player) != entt::null
+          };
+        } break;
+
+        case Condition_t::ColonistOnUnclaimedProvince: {
+          auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
+          if (colonist_e == entt::null)
+            return {false};
+
+          return {Actor::System::colonist_can_claim_province(colonist_e)};
+        } break;
+
+        case Condition_t::ColonistOnOwnProvince: {
+          auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
+          if (colonist_e == entt::null)
+            return {false};
+
+          return {Actor::System::colonist_can_place_settlement(colonist_e)};
+        } break;
+
+        case Condition_t::HasUnsettledProvince: {
+          return {Province::System::player_has_unsettled_province(ai_player)};
+        } break;
+        case Condition_t::HasSettlements: {
+          return {
+            .number = Settlement::System::num_player_settlements(ai_player)
+          };
+        } break;
+        case AI::Condition_t::NUM:
+          return {};
+      }
+    };
 
     static void Start() {
       auto ai_players = Global::world.view<Player::Component, AI::Component>();
@@ -33,6 +82,34 @@ namespace AI {
         determine_goal(player_e, player_c, ai_c);
       }
     }
+
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
+    ///////////////////////////////
 
     static bool condition_met(Condition cond, entt::entity ai_player) {
       switch (cond.type) {
@@ -66,6 +143,8 @@ namespace AI {
           return Settlement::System::num_player_settlements(ai_player) >=
                  cond.data.value;
         } break;
+        case AI::Condition_t::NUM:
+          break;
       }
 
       return false;
