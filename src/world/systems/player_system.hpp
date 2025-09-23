@@ -164,7 +164,7 @@ namespace Player {
 
         if (Global::state.timeScale <= 0) {
         } else {
-          AI::System::execute_goals(ai_player, player_c, ai_c);
+          AI::System::update(ai_player, player_c, ai_c);
         }
       }
     }

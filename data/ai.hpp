@@ -3,6 +3,7 @@
 #include "vector"
 #include <cstdint>
 #include <string>
+#include <unordered_map>
 
 namespace AI {
   /*
@@ -47,13 +48,33 @@ namespace AI {
     HasColonist,
     HasUnsettledProvince,
     HasSettlements,
-    NUM,
+    LENGTH
+  };
+
+  enum class ConditionValue_t {
+    Boolean,
+    Number,
   };
 
   using ConditionValue = union {
     bool boolean;
     uint32_t number;
   };
+
+  inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
+    switch (cond_t) {
+      case Condition_t::ColonistOnUnclaimedProvince:
+      case Condition_t::ColonistOnOwnProvince:
+      case Condition_t::HasColonist:
+      case Condition_t::HasUnsettledProvince:
+      case Condition_t::LENGTH:
+        return ConditionValue_t::Boolean;
+      case Condition_t::HasSettlements:
+        return ConditionValue_t::Number;
+    }
+  }
+
+  using WorldState = std::unordered_map<Condition_t, ConditionValue>;
 
   struct Condition {
     Condition_t type;
@@ -104,11 +125,11 @@ namespace AI {
         return {};
       case Goal::EstablishSettlement:
         return {
-          Condition{Condition_t::HasSettlements, 1},
+          Condition{Condition_t::HasSettlements, {.number = 1}},
         };
       case Goal::ExpandBorders:
         return {
-          Condition{Condition_t::HasSettlements, 3},
+          Condition{Condition_t::HasSettlements, {.number = 3}},
         };// @todo
     }
   }
@@ -209,6 +230,8 @@ namespace AI {
         return {Action_t::ClaimProvince};
       case Condition_t::HasSettlements:
         return {Action_t::BuildSettlement};
+      case Condition_t::LENGTH:
+        return {};
     }
   }
 
