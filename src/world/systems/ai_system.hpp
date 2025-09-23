@@ -57,13 +57,14 @@ namespace AI {
         case Goal::EstablishSettlement: {
           // printf( "player_1 has NOT finished their goal!\n" );
 
-
           if (!ai_c.executing_plan) {
+            auto desired_state = goal_state(ai_c.current_goal);
+
             sptr<Node> root = std::make_shared<Node>(Node{
               .action =
                 Action{
                   .type = Action_t::AchieveGoal,
-                  .preconditions = goal_conds(ai_c.current_goal),
+                  .preconditions = goal_state(ai_c.current_goal),
                   .effects = {},
                 },
               .children = {},
@@ -75,12 +76,9 @@ namespace AI {
 
             root->print();
 
-
             list<Action> actions = {};
 
-            bool found_plan = find_a_plan(root, actions, ai_player);
-
-            if (found_plan) {
+            if (find_a_plan(root, actions, ai_player)) {
               ai_c.executing_plan = true;
               ai_c.current_plan = Plan{actions, 0};
             }
@@ -128,6 +126,80 @@ namespace AI {
       }
     }
 
+    static WorldState ApplyAction(
+      const WorldState &state,
+      const Action &action
+    ) {
+      WorldState newState = state;
+
+      for (const auto &[effect, value]: action.effects) {
+        switch (op_type_for_cond_t(effect)) {
+          case AI::ConditionOperation::Set:
+            newState[effect] = value;
+            break;
+          case AI::ConditionOperation::Delta:
+            int current = newState[effect].number;
+            newState[effect].number = current + value.number;
+            break;
+        }
+      }
+
+      return newState;
+    }
+
+    static bool find_a_plan(
+      sptr<Node> parent,
+      list<Action> &plan,
+      entt::entity ai_player
+    ) {
+      // In order to find a plan, we are looking for a series of actions until
+      // the final action has all its conditions met
+
+      // this function will return true if at least one valid path exists
+      // otherwise it will return false
+      bool all_conds_met = true;
+
+      for (auto cond: parent->action.preconditions) {
+        if (condition_met(cond, ai_player)) {
+          continue;
+        } else {
+          bool any_valid_action = false;
+
+          for (auto node: parent->children.at(cond)) {
+            if (find_a_plan(node, plan, ai_player)) {
+              any_valid_action = true;
+              break;
+            }
+          }
+
+          if (!any_valid_action) {
+            all_conds_met = false;
+            break;
+          }
+        }
+      }
+
+      if (all_conds_met)
+        plan.push_back(parent->action);
+
+      return all_conds_met;
+    }
+
+    static bool execute_plan(Plan &plan, entt::entity ai_player) {
+      if (plan.stack.size() <= 0) {
+        return true;
+      }
+
+      Action action = plan.stack.front();
+
+      if (action_effects_met(action, ai_player)) {
+        plan.stack.erase(plan.stack.begin());
+      } else if (action_preconds_met(action, ai_player)) {
+        do_action(action, ai_player);
+      }
+      return false;
+    }
+
 
     static WorldState init_world_state(
       entt::entity ai_player,
@@ -149,28 +221,36 @@ namespace AI {
       switch (cond) {
         case Condition_t::HasColonist: {
           return {
-            Actor::System::get_colonist_of_player(ai_player) != entt::null
+            .boolean =
+              Actor::System::get_colonist_of_player(ai_player) != entt::null
           };
         } break;
 
         case Condition_t::ColonistOnUnclaimedProvince: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
-            return {false};
+            return {.boolean = false};
 
-          return {Actor::System::colonist_can_claim_province(colonist_e)};
+          return {
+            .boolean = Actor::System::colonist_can_claim_province(colonist_e)
+          };
         } break;
 
         case Condition_t::ColonistOnOwnProvince: {
           auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
           if (colonist_e == entt::null)
-            return {false};
+            return {.boolean = false};
 
-          return {Actor::System::colonist_can_place_settlement(colonist_e)};
+          return {
+            .boolean = Actor::System::colonist_can_place_settlement(colonist_e)
+          };
         } break;
 
         case Condition_t::HasUnsettledProvince: {
-          return {Province::System::player_has_unsettled_province(ai_player)};
+          return {
+            .boolean =
+              Province::System::player_has_unsettled_province(ai_player)
+          };
         } break;
         case Condition_t::HasSettlements: {
           return {
@@ -346,59 +426,6 @@ namespace AI {
     // }
     //
     //
-    //
-    // static bool find_a_plan(
-    //   sptr<Node> parent,
-    //   list<Action> &plan,
-    //   entt::entity ai_player
-    // ) {
-    //   // In order to find a plan, we are looking for a series of actions until
-    //   // the final action has all its conditions met
-    //
-    //   // this function will return true if at least one valid path exists
-    //   // otherwise it will return false
-    //   bool all_conds_met = true;
-    //
-    //   for (auto cond: parent->action.preconditions) {
-    //     if (condition_met(cond, ai_player)) {
-    //       continue;
-    //     } else {
-    //       bool any_valid_action = false;
-    //
-    //       for (auto node: parent->children.at(cond)) {
-    //         if (find_a_plan(node, plan, ai_player)) {
-    //           any_valid_action = true;
-    //           break;
-    //         }
-    //       }
-    //
-    //       if (!any_valid_action) {
-    //         all_conds_met = false;
-    //         break;
-    //       }
-    //     }
-    //   }
-    //
-    //   if (all_conds_met)
-    //     plan.push_back(parent->action);
-    //
-    //   return all_conds_met;
-    // }
-    //
-    // static bool execute_plan(Plan &plan, entt::entity ai_player) {
-    //   if (plan.stack.size() <= 0) {
-    //     return true;
-    //   }
-    //
-    //   Action action = plan.stack.front();
-    //
-    //   if (action_effects_met(action, ai_player)) {
-    //     plan.stack.erase(plan.stack.begin());
-    //   } else if (action_preconds_met(action, ai_player)) {
-    //     do_action(action, ai_player);
-    //   }
-    //   return false;
-    // }
     //
     //
   };

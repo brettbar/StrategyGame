@@ -61,6 +61,11 @@ namespace AI {
     uint32_t number;
   };
 
+  enum class ConditionOperation {
+    Set,
+    Delta,
+  };
+
   inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
     switch (cond_t) {
       case Condition_t::ColonistOnUnclaimedProvince:
@@ -71,6 +76,19 @@ namespace AI {
         return ConditionValue_t::Boolean;
       case Condition_t::HasSettlements:
         return ConditionValue_t::Number;
+    }
+  }
+
+  inline ConditionOperation op_type_for_cond_t(Condition_t cond_t) {
+    switch (cond_t) {
+      case Condition_t::ColonistOnUnclaimedProvince:
+      case Condition_t::ColonistOnOwnProvince:
+      case Condition_t::HasColonist:
+      case Condition_t::HasUnsettledProvince:
+      case Condition_t::LENGTH:
+        return ConditionOperation::Set;
+      case Condition_t::HasSettlements:
+        return ConditionOperation::Delta;
     }
   }
 
@@ -89,7 +107,6 @@ namespace AI {
 
   struct Effect {
     Condition_t type;
-
     ConditionValue delta;
   };
 
@@ -98,8 +115,8 @@ namespace AI {
 
     float cost = 0;
 
-    std::vector<Condition> preconditions;
-    std::vector<Condition> effects;
+    WorldState preconditions;
+    WorldState effects;
 
     std::string as_str() {
       switch (type) {
@@ -119,17 +136,17 @@ namespace AI {
     }
   };
 
-  inline std::vector<Condition> goal_conds(Goal goal) {
+  inline WorldState goal_state(Goal goal) {
     switch (goal) {
       case Goal::None:
         return {};
       case Goal::EstablishSettlement:
         return {
-          Condition{Condition_t::HasSettlements, {.number = 1}},
+          {Condition_t::HasSettlements, {.number = 1}},
         };
       case Goal::ExpandBorders:
         return {
-          Condition{Condition_t::HasSettlements, {.number = 3}},
+          {Condition_t::HasSettlements, {.number = 3}},
         };// @todo
     }
   }
@@ -159,34 +176,31 @@ namespace AI {
           .type = type,
           .preconditions =
             {
-              Condition{Condition_t::ColonistOnOwnProvince},
+              {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
             },
-          .effects =
-            {
-              Condition{Condition_t::HasSettlements, 1},
-            },
+          .effects = {
+            {Condition_t::HasSettlements, {.number = 1}},
+          },
         };
       case Action_t::ClaimProvince:
         return Action{
           .type = type,
           .preconditions =
             {
-              Condition{Condition_t::ColonistOnUnclaimedProvince},
+              {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
             },
-          .effects =
-            {
-              Condition{Condition_t::HasUnsettledProvince},
-            },
+          .effects = {
+            {Condition_t::HasUnsettledProvince, {.boolean = true}},
+          },
         };
       case Action_t::SpawnColonist:
         return Action{
           .type = type,
           // @todo requirements to make colonist
           .preconditions{},
-          .effects =
-            {
-              Condition{Condition_t::HasColonist},
-            },
+          .effects = {
+            {Condition_t::HasColonist, {.boolean = true}},
+          },
         };
 
       case Action_t::MoveColonistToUnclaimedProvince:
@@ -194,25 +208,23 @@ namespace AI {
           .type = type,
           .preconditions =
             {
-              {Condition_t::HasColonist},
+              {Condition_t::HasColonist, {.boolean = true}},
             },
-          .effects =
-            {
-              {Condition_t::ColonistOnUnclaimedProvince},
-            },
+          .effects = {
+            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+          },
         };
       case Action_t::MoveColonistToUnsettledOwnedProvince:
         return Action{
           .type = type,
           .preconditions =
             {
-              {Condition_t::HasColonist},
-              {Condition_t::HasUnsettledProvince},
+              {Condition_t::HasColonist, {.boolean = true}},
+              {Condition_t::HasUnsettledProvince, {.boolean = true}},
             },
-          .effects =
-            {
-              {Condition_t::ColonistOnOwnProvince},
-            },
+          .effects = {
+            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+          },
         };
     }
   };

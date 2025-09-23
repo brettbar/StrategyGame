@@ -11,7 +11,6 @@ namespace AI {
     Action action;
     map<Condition, list<sptr<Node>>> children;
 
-
     void print(u32 depth = 0) {
       for (u32 i = 0; i < depth; ++i) {
         std::cout << "  ";
