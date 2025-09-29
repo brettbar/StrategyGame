@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 namespace AI {
-  /*
+/*
     The ultimate final goal a player will have is to become the most
     'powerful' in the game. They can do this in the following ways:
 
@@ -27,224 +27,207 @@ namespace AI {
   */
 
 
-  enum class Goal {
-    // BoostProduction,
-    // DevelopSettlements,
-    None,
-    EstablishSettlement,
-    ExpandBorders,
-  };
-  enum class Action_t {
-    AchieveGoal,
-    MoveColonistToUnclaimedProvince,
-    MoveColonistToUnsettledOwnedProvince,
-    SpawnColonist,
-    ClaimProvince,
-    BuildSettlement,
-  };
-  enum class Condition_t {
-    ColonistOnUnclaimedProvince,
-    ColonistOnOwnProvince,
-    HasColonist,
-    HasUnsettledProvince,
-    HasSettlements,
-    LENGTH
-  };
+enum class Goal {
+  // BoostProduction,
+  // DevelopSettlements,
+  None,
+  EstablishSettlement,
+  ExpandBorders,
+};
+enum class Action_t {
+  AchieveGoal,
+  MoveColonistToUnclaimedProvince,
+  MoveColonistToUnsettledOwnedProvince,
+  SpawnColonist,
+  ClaimProvince,
+  BuildSettlement,
+};
+enum class Condition_t {
+  ColonistOnUnclaimedProvince,
+  ColonistOnOwnProvince,
+  HasColonist,
+  HasUnsettledProvince,
+  HasSettlements,
+  COUNT,
+};
 
-  enum class ConditionValue_t {
-    Boolean,
-    Number,
-  };
+enum class ConditionValue_t {
+  Boolean,
+  Number,
+};
 
-  using ConditionValue = union {
-    bool boolean;
-    uint32_t number;
-  };
+using ConditionValue = union {
+  bool boolean;
+  uint32_t number;
+};
 
-  enum class ConditionOperation {
-    Set,
-    Delta,
-  };
+inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
+  switch (cond_t) {
+    case Condition_t::ColonistOnUnclaimedProvince:
+    case Condition_t::ColonistOnOwnProvince:
+    case Condition_t::HasColonist:
+    case Condition_t::HasUnsettledProvince:
+      return ConditionValue_t::Boolean;
+    case Condition_t::HasSettlements:
+      return ConditionValue_t::Number;
+    case Condition_t::COUNT:
+      return ConditionValue_t::Boolean;
+  }
+}
 
-  inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
-    switch (cond_t) {
-      case Condition_t::ColonistOnUnclaimedProvince:
-      case Condition_t::ColonistOnOwnProvince:
-      case Condition_t::HasColonist:
-      case Condition_t::HasUnsettledProvince:
-      case Condition_t::LENGTH:
-        return ConditionValue_t::Boolean;
-      case Condition_t::HasSettlements:
-        return ConditionValue_t::Number;
-    }
+using WorldState = std::unordered_map<Condition_t, ConditionValue>;
+
+struct Condition {
+  Condition_t type;
+
+  // idk why i need this
+  bool operator<(const Condition &rhs) const noexcept {
+    return this->type < rhs.type;
   }
 
-  inline ConditionOperation op_type_for_cond_t(Condition_t cond_t) {
-    switch (cond_t) {
-      case Condition_t::ColonistOnUnclaimedProvince:
-      case Condition_t::ColonistOnOwnProvince:
-      case Condition_t::HasColonist:
-      case Condition_t::HasUnsettledProvince:
-      case Condition_t::LENGTH:
-        return ConditionOperation::Set;
-      case Condition_t::HasSettlements:
-        return ConditionOperation::Delta;
-    }
-  }
+  ConditionValue value;
+};
 
-  using WorldState = std::unordered_map<Condition_t, ConditionValue>;
+struct Effect {
+  Condition_t type;
+  ConditionValue delta;
+};
 
-  struct Condition {
-    Condition_t type;
+struct Action {
+  Action_t type;
 
-    // idk why i need this
-    bool operator<(const Condition &rhs) const noexcept {
-      return this->type < rhs.type;
-    }
+  float cost = 0;
 
-    ConditionValue value;
-  };
+  std::unordered_map<Condition_t, ConditionValue> preconditions;
+  std::unordered_map<Condition_t, ConditionValue> effects;
 
-  struct Effect {
-    Condition_t type;
-    ConditionValue delta;
-  };
-
-  struct Action {
-    Action_t type;
-
-    float cost = 0;
-
-    WorldState preconditions;
-    WorldState effects;
-
-    std::string as_str() {
-      switch (type) {
-        case Action_t::AchieveGoal:
-          return "AchieveGoal";
-        case Action_t::MoveColonistToUnclaimedProvince:
-          return "MoveColonistToUnclaimedProvince";
-        case Action_t::MoveColonistToUnsettledOwnedProvince:
-          return "MoveColonistToOwnProvince";
-        case Action_t::SpawnColonist:
-          return "SpawnColonist";
-        case Action_t::ClaimProvince:
-          return "ClaimProvince";
-        case Action_t::BuildSettlement:
-          return "BuildSettlement";
-      }
-    }
-  };
-
-  inline WorldState goal_state(Goal goal) {
-    switch (goal) {
-      case Goal::None:
-        return {};
-      case Goal::EstablishSettlement:
-        return {
-          {Condition_t::HasSettlements, {.number = 1}},
-        };
-      case Goal::ExpandBorders:
-        return {
-          {Condition_t::HasSettlements, {.number = 3}},
-        };// @todo
-    }
-  }
-
-  inline float default_goal_prio(Goal goal) {
-    switch (goal) {
-      case Goal::None:
-        return 0;
-      case Goal::EstablishSettlement:
-        return 1;
-      case Goal::ExpandBorders:
-        return 0.5;
-    }
-  }
-
-
-  inline Action get_action(Action_t type) {
+  std::string as_str() {
     switch (type) {
       case Action_t::AchieveGoal:
-        return Action{
-          .type = type,
-          .preconditions = {},
-          .effects = {},
-        };
-      case Action_t::BuildSettlement:
-        return Action{
-          .type = type,
-          .preconditions =
-            {
-              {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
-            },
-          .effects = {
-            {Condition_t::HasSettlements, {.number = 1}},
-          },
-        };
-      case Action_t::ClaimProvince:
-        return Action{
-          .type = type,
-          .preconditions =
-            {
-              {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
-            },
-          .effects = {
-            {Condition_t::HasUnsettledProvince, {.boolean = true}},
-          },
-        };
-      case Action_t::SpawnColonist:
-        return Action{
-          .type = type,
-          // @todo requirements to make colonist
-          .preconditions{},
-          .effects = {
-            {Condition_t::HasColonist, {.boolean = true}},
-          },
-        };
-
+        return "AchieveGoal";
       case Action_t::MoveColonistToUnclaimedProvince:
-        return Action{
-          .type = type,
-          .preconditions =
-            {
-              {Condition_t::HasColonist, {.boolean = true}},
-            },
-          .effects = {
-            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
-          },
-        };
+        return "MoveColonistToUnclaimedProvince";
       case Action_t::MoveColonistToUnsettledOwnedProvince:
-        return Action{
-          .type = type,
-          .preconditions =
-            {
-              {Condition_t::HasColonist, {.boolean = true}},
-              {Condition_t::HasUnsettledProvince, {.boolean = true}},
-            },
-          .effects = {
-            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
-          },
-        };
-    }
-  };
-
-
-  inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
-    switch (cond) {
-      case Condition_t::ColonistOnUnclaimedProvince:
-        return {Action_t::MoveColonistToUnclaimedProvince};
-      case Condition_t::ColonistOnOwnProvince:
-        return {Action_t::MoveColonistToUnsettledOwnedProvince};
-      case Condition_t::HasColonist:
-        return {Action_t::SpawnColonist};
-      case Condition_t::HasUnsettledProvince:
-        return {Action_t::ClaimProvince};
-      case Condition_t::HasSettlements:
-        return {Action_t::BuildSettlement};
-      case Condition_t::LENGTH:
-        return {};
+        return "MoveColonistToOwnProvince";
+      case Action_t::SpawnColonist:
+        return "SpawnColonist";
+      case Action_t::ClaimProvince:
+        return "ClaimProvince";
+      case Action_t::BuildSettlement:
+        return "BuildSettlement";
     }
   }
+};
+
+inline WorldState goal_state(Goal goal) {
+  switch (goal) {
+    case Goal::None:
+      return {};
+    case Goal::EstablishSettlement:
+      return {
+        {Condition_t::HasSettlements, {.number = 1}},
+      };
+    case Goal::ExpandBorders:
+      return {
+        {Condition_t::HasSettlements, {.number = 3}},
+      };// @todo
+  }
+}
+
+inline float default_goal_prio(Goal goal) {
+  switch (goal) {
+    case Goal::None:
+      return 0;
+    case Goal::EstablishSettlement:
+      return 1;
+    case Goal::ExpandBorders:
+      return 0.5;
+  }
+}
+
+
+inline Action get_action(Action_t type) {
+  switch (type) {
+    case Action_t::AchieveGoal:
+      return Action{
+        .type = type,
+        .preconditions = {},
+        .effects = {},
+      };
+    case Action_t::BuildSettlement:
+      return Action{
+        .type = type,
+        .preconditions =
+          {
+            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+          },
+        .effects = {
+          {Condition_t::HasSettlements, {.number = 1}},
+        },
+      };
+    case Action_t::ClaimProvince:
+      return Action{
+        .type = type,
+        .preconditions =
+          {
+            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+          },
+        .effects = {
+          {Condition_t::HasUnsettledProvince, {.boolean = true}},
+        },
+      };
+    case Action_t::SpawnColonist:
+      return Action{
+        .type = type,
+        // @todo requirements to make colonist
+        .preconditions{},
+        .effects = {
+          {Condition_t::HasColonist, {.boolean = true}},
+        },
+      };
+
+    case Action_t::MoveColonistToUnclaimedProvince:
+      return Action{
+        .type = type,
+        .preconditions =
+          {
+            {Condition_t::HasColonist, {.boolean = true}},
+          },
+        .effects = {
+          {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+        },
+      };
+    case Action_t::MoveColonistToUnsettledOwnedProvince:
+      return Action{
+        .type = type,
+        .preconditions =
+          {
+            {Condition_t::HasColonist, {.boolean = true}},
+            {Condition_t::HasUnsettledProvince, {.boolean = true}},
+          },
+        .effects = {
+          {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+        },
+      };
+  }
+};
+
+
+inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
+  switch (cond) {
+    case Condition_t::ColonistOnUnclaimedProvince:
+      return {Action_t::MoveColonistToUnclaimedProvince};
+    case Condition_t::ColonistOnOwnProvince:
+      return {Action_t::MoveColonistToUnsettledOwnedProvince};
+    case Condition_t::HasColonist:
+      return {Action_t::SpawnColonist};
+    case Condition_t::HasUnsettledProvince:
+      return {Action_t::ClaimProvince};
+    case Condition_t::HasSettlements:
+      return {Action_t::BuildSettlement};
+    case Condition_t::COUNT:
+      return {};
+  }
+}
 
 }// namespace AI
