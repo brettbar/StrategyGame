@@ -44,20 +44,28 @@ struct System {
 
   static void execute_goals(
     entt::entity ai_player,
-    Player::Component &player,
+    Player::Component &player_c,
     AI::Component &ai_c
   ) {
 
     switch (ai_c.current_goal) {
       case Goal::None:
-        determine_goal(ai_player, player, ai_c);
+        determine_goal(ai_player, player_c, ai_c);
         break;
       case Goal::ExpandBorders:
       case Goal::EstablishSettlement: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         if (!ai_c.executing_plan) {
-          WorldState desired_state = goal_state(ai_c.current_goal);
+          WorldState goal_conds = goal_state(ai_c.current_goal);
+          WorldState state = init_world_state(ai_player, ai_c);
+          WorldState desired_state = state;
+
+          for (const auto &[cond_t, value]: desired_state) {
+            if (goal_conds.contains(cond_t)) {
+              desired_state[cond_t] = goal_conds[cond_t];
+            }
+          }
 
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
@@ -69,10 +77,7 @@ struct System {
             .children = {},
           });
 
-
-          WorldState state = init_world_state(ai_player, ai_c);
           build_graph(root, ai_player);
-
 
           printf("===== START GRAPH =====\n");
           root->print();
@@ -154,62 +159,58 @@ struct System {
         case ConditionValue_t::Boolean: {
           if (curr_val.boolean == desired_val.boolean) {
             continue;
+          } else {
+            bool any_valid_action = false;
+
+            for (sptr<Node> child: parent->children.at(cond_t)) {
+              auto altered_state = apply_action(initial_state, child->action);
+
+              if (find_a_plan(
+                    altered_state, desired_state, plan, child, ai_player
+                  )) {
+                any_valid_action = true;
+                break;
+              }
+            }
+
+            if (!any_valid_action) {
+              all_conds_met = false;
+              break;
+            }
           }
         } break;
         case ConditionValue_t::Number: {
           if (curr_val.number == desired_val.number) {
             continue;
-          }
-        } break;
-      }
+          } else {
+            u32 desired = desired_val.number;
+            u32 current = curr_val.number;
+            u32 discrep = desired - current;
 
+            bool any_valid_action = false;
 
-      if (value_type == ConditionValue_t::Boolean) {
-        bool any_valid_action = false;
+            for (u32 i = 0; i < discrep; i++) {
+              for (sptr<Node> child: parent->children.at(cond_t)) {
+                auto altered_state = apply_action(initial_state, child->action);
 
-        for (sptr<Node> child: parent->children.at(cond_t)) {
-          auto altered_state = apply_action(initial_state, child->action);
+                // Initial::HasSettlements=1
+                // Desired::HasSettlements=3
 
-          if (find_a_plan(
-                altered_state, desired_state, plan, child, ai_player
-              )) {
-            any_valid_action = true;
-            break;
-          }
-        }
+                if (find_a_plan(
+                      altered_state, desired_state, plan, child, ai_player
+                    )) {
+                  any_valid_action = true;
+                  break;
+                }
+              }
 
-        if (!any_valid_action) {
-          all_conds_met = false;
-          break;
-        }
-
-      } else if (value_type == ConditionValue_t::Number) {
-        u32 desired = desired_val.number;
-        u32 current = curr_val.number;
-        u32 discrep = desired - current;
-
-        bool any_valid_action = false;
-
-        for (u32 i = 0; i < discrep; i++) {
-          for (sptr<Node> child: parent->children.at(cond_t)) {
-            auto altered_state = apply_action(initial_state, child->action);
-
-            // Initial::HasSettlements=1
-            // Desired::HasSettlements=3
-
-            if (find_a_plan(
-                  altered_state, desired_state, plan, child, ai_player
-                )) {
-              any_valid_action = true;
-              break;
+              if (!any_valid_action) {
+                all_conds_met = false;
+                break;
+              }
             }
           }
-
-          if (!any_valid_action) {
-            all_conds_met = false;
-            break;
-          }
-        }
+        } break;
       }
     }
 
@@ -233,30 +234,6 @@ struct System {
     //}
     return false;
   }
-
-
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
-  ///////////////////////
 
   static WorldState init_world_state(
     entt::entity ai_player,
@@ -561,4 +538,5 @@ struct System {
   //
   //
 };
+
 };// namespace AI

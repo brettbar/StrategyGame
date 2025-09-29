@@ -22,16 +22,16 @@ if (UNIX)
     add_library(raylib SHARED IMPORTED)
     set_target_properties(
       raylib PROPERTIES
-      IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
-      #IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.dylib"
+      #IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
+      IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.dylib"
       INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
     )
 
     add_library(steam_api SHARED IMPORTED)
     set_target_properties(
       steam_api PROPERTIES
-      IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
-      #IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.dylib"
+      #IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+      IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.dylib"
       INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
     )
 
