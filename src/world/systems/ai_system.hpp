@@ -166,24 +166,33 @@ struct System {
 
       } else if (value_type == ConditionValue_t::Number) {
         int discrep = desired_val.number = curr_val.number;
+        bool any_valid_action = false;
 
         for (u32 i = 0; i < discrep; i++) {
-          for (sptr<Node> node: parent->children.at(cond_t)) {
-            auto altered_state = apply_action(initial_state, node->action);
+          for (sptr<Node> child: parent->children.at(cond_t)) {
+            auto altered_state = apply_action(initial_state, child->action);
 
             // Initial::HasSettlements=1
             // Desired::HasSettlements=3
 
             if (find_a_plan(
-                  altered_state, desired_state, plan, node, ai_player
+                  altered_state, desired_state, plan, child, ai_player
                 )) {
               any_valid_action = true;
               break;
             }
           }
+
+          if (!any_valid_action) {
+            all_conds_met = false;
+            break;
+          }
         }
       }
     }
+
+    if (all_conds_met)
+      plan.push_back(parent->action);
 
     return all_conds_met;
   }
