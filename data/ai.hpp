@@ -2,6 +2,7 @@
 
 #include "vector"
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -136,6 +137,44 @@ namespace AI {
     }
   };
 
+
+  // Common type for both Goals and Actions
+  struct Node {
+    Action action;
+    std::unordered_map<Condition_t, std::vector<std::shared_ptr<Node>>>
+      child_nodes;
+
+    void print(uint32_t depth = 0) {
+      for (uint32_t i = 0; i < depth; ++i) {
+        std::cout << "  ";
+      }
+      std::cout << "|--" << action.as_str() << '\n';
+
+      for (const auto &condition: child_nodes) {
+        for (const auto &child: condition.second) {
+          child->print(depth + 1);
+        }
+      }
+    }
+  };
+
+  struct Plan {
+    std::vector<Action> stack;
+    int32_t cost;
+
+    void push(Action action) {
+      stack.push_back(action);
+    }
+
+    Action peek() {
+      return stack.back();
+    }
+
+    void pop() {
+      stack.pop_back();
+    }
+  };
+
   inline WorldState goal_state(Goal goal) {
     switch (goal) {
       case Goal::None:
@@ -178,9 +217,10 @@ namespace AI {
             {
               {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
             },
-          .effects = {
-            {Condition_t::HasSettlements, {.number = 1}},
-          },
+          .effects =
+            {
+              {Condition_t::HasSettlements, {.number = 1}},
+            },
         };
       case Action_t::ClaimProvince:
         return Action{
@@ -189,18 +229,20 @@ namespace AI {
             {
               {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
             },
-          .effects = {
-            {Condition_t::HasUnsettledProvince, {.boolean = true}},
-          },
+          .effects =
+            {
+              {Condition_t::HasUnsettledProvince, {.boolean = true}},
+            },
         };
       case Action_t::SpawnColonist:
         return Action{
           .type = type,
           // @todo requirements to make colonist
           .preconditions{},
-          .effects = {
-            {Condition_t::HasColonist, {.boolean = true}},
-          },
+          .effects =
+            {
+              {Condition_t::HasColonist, {.boolean = true}},
+            },
         };
 
       case Action_t::MoveColonistToUnclaimedProvince:
@@ -210,9 +252,10 @@ namespace AI {
             {
               {Condition_t::HasColonist, {.boolean = true}},
             },
-          .effects = {
-            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
-          },
+          .effects =
+            {
+              {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+            },
         };
       case Action_t::MoveColonistToUnsettledOwnedProvince:
         return Action{
@@ -222,9 +265,10 @@ namespace AI {
               {Condition_t::HasColonist, {.boolean = true}},
               {Condition_t::HasUnsettledProvince, {.boolean = true}},
             },
-          .effects = {
-            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
-          },
+          .effects =
+            {
+              {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+            },
         };
     }
   };

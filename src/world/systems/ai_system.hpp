@@ -67,18 +67,18 @@ namespace AI {
                   .preconditions = goal_state(ai_c.current_goal),
                   .effects = {},
                 },
-              .children = {},
+              .child_nodes = {},
             });
 
 
             WorldState state = init_world_state(ai_player, ai_c);
-            build_graph(state, root, ai_player);
+            build_graph(root, ai_player);
 
             root->print();
 
             list<Action> actions = {};
 
-            if (find_a_plan(root, actions, ai_player)) {
+            if (find_a_plan(state, root, actions, ai_player)) {
               ai_c.executing_plan = true;
               ai_c.current_plan = Plan{actions, 0};
             }
@@ -96,37 +96,35 @@ namespace AI {
       }
     }
 
-    static void build_graph(
-      WorldState &state,
-      sptr<Node> parent,
-      entt::entity ai_player
-    ) {
+    // the graph should be a tree of all possible actions that can lead to ultimately
+    // acheiving the goal, it shouldnt care about the worldstate
+    static void build_graph(sptr<Node> parent, entt::entity ai_player) {
 
-      for (auto cond: parent->action.preconditions) {
-        for (auto possible_actions_t: actions_that_satisfy_cond(cond.type)) {
+      for (const auto &[cond_t, value]: parent->action.preconditions) {
+        for (auto possible_actions_t: actions_that_satisfy_cond(cond_t)) {
           auto possible_action = get_action(possible_actions_t);
 
           sptr<Node> new_node = std::make_shared<Node>(Node{
             .action = possible_action,
-            .children = {},
+            .child_nodes = {},
           });
 
-          if (parent->children.contains(cond)) {
-            parent->children.at(cond).push_back(new_node);
+          if (parent->child_nodes.contains(cond_t)) {
+            parent->child_nodes.at(cond_t).push_back(new_node);
           } else {
-            parent->children.emplace(cond, list<sptr<Node>>{new_node});
+            parent->child_nodes.emplace(cond_t, list<sptr<Node>>{new_node});
           }
 
           // std::cout << "Parent: " << parent->action.as_str() << '\n';
           // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
           // std::cout << std::endl;
 
-          build_graph(state, new_node, ai_player);
+          build_graph(new_node, ai_player);
         };
       }
     }
 
-    static WorldState ApplyAction(
+    static WorldState apply_action(
       const WorldState &state,
       const Action &action
     ) {
@@ -148,6 +146,7 @@ namespace AI {
     }
 
     static bool find_a_plan(
+      WorldState &state,
       sptr<Node> parent,
       list<Action> &plan,
       entt::entity ai_player
@@ -159,7 +158,8 @@ namespace AI {
       // otherwise it will return false
       bool all_conds_met = true;
 
-      for (auto cond: parent->action.preconditions) {
+      for (const auto &[cond_t, value]: parent->action.preconditions) {
+
         if (condition_met(cond, ai_player)) {
           continue;
         } else {
@@ -281,6 +281,44 @@ namespace AI {
         ai.current_goal = Goal::ExpandBorders;
       }
     }
+
+    // static bool find_a_plan(
+    //   sptr<Node> parent,
+    //   list<Action> &plan,
+    //   entt::entity ai_player
+    // ) {
+    //   // In order to find a plan, we are looking for a series of actions until
+    //   // the final action has all its conditions met
+    //
+    //   // this function will return true if at least one valid path exists
+    //   // otherwise it will return false
+    //   bool all_conds_met = true;
+    //
+    //   for (auto cond: parent->action.preconditions) {
+    //     if (condition_met(cond, ai_player)) {
+    //       continue;
+    //     } else {
+    //       bool any_valid_action = false;
+    //
+    //       for (auto node: parent->children.at(cond)) {
+    //         if (find_a_plan(node, plan, ai_player)) {
+    //           any_valid_action = true;
+    //           break;
+    //         }
+    //       }
+    //
+    //       if (!any_valid_action) {
+    //         all_conds_met = false;
+    //         break;
+    //       }
+    //     }
+    //   }
+    //
+    //   if (all_conds_met)
+    //     plan.push_back(parent->action);
+    //
+    //   return all_conds_met;
+    // }
 
 
     // static bool condition_met(Condition cond, entt::entity ai_player) {
