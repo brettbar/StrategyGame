@@ -3,6 +3,7 @@
 #include "vector"
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -62,6 +63,11 @@ using ConditionValue = union {
   uint32_t number;
 };
 
+enum class ConditionCompare {
+  Equals,
+  GreaterThanOrEqualTo
+};
+
 inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
   switch (cond_t) {
     case Condition_t::ColonistOnUnclaimedProvince:
@@ -76,23 +82,40 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
   }
 }
 
-using WorldState = std::unordered_map<Condition_t, ConditionValue>;
 
 struct Condition {
   Condition_t type;
+  ConditionCompare compare = ConditionCompare::Equals;
+  ConditionValue value;
+
+
+  bool Met(Condition against) {
+
+    switch (value_type_for_cond_t(against.type)) {
+      case AI::ConditionValue_t::Boolean:
+        return value.boolean == against.value.boolean;
+      case AI::ConditionValue_t::Number: {
+        switch (against.compare) {
+          case AI::ConditionCompare::Equals:
+            return value.number == against.value.number;
+          case AI::ConditionCompare::GreaterThanOrEqualTo:
+            // @TODO are these backwards?
+            return value.number >= against.value.number;
+        }
+
+      } break;
+    }
+
+    return false;
+  }
 
   // idk why i need this
   bool operator<(const Condition &rhs) const noexcept {
     return this->type < rhs.type;
   }
-
-  ConditionValue value;
 };
 
-struct Effect {
-  Condition_t type;
-  ConditionValue delta;
-};
+using WorldState = std::unordered_map<Condition_t, Condition>;
 
 struct Action {
   Action_t type;
@@ -120,17 +143,72 @@ struct Action {
   }
 };
 
-inline WorldState goal_state(Goal goal) {
+
+// Common type for both Goals and Actions
+struct Node {
+  Action action;
+  std::unordered_map<Condition_t, std::vector<std::shared_ptr<Node>>> children;
+
+  void print(uint32_t depth = 0) {
+    for (uint32_t i = 0; i < depth; ++i) {
+      std::cout << "  ";
+    }
+    std::cout << "|--" << action.as_str() << '\n';
+
+    for (const auto &condition: children) {
+      for (const auto &child: condition.second) {
+        child->print(depth + 1);
+      }
+    }
+  }
+};
+
+struct Plan {
+  std::vector<Action> stack;
+  uint32_t cost;
+
+  void push(Action action) {
+    stack.push_back(action);
+  }
+
+  Action peek() {
+    return stack.back();
+  }
+
+  void pop() {
+    stack.pop_back();
+  }
+
+  void print() {
+    for (Action action: stack) {
+      printf("%s\n", action.as_str().c_str());
+    }
+  }
+};
+
+inline std::unordered_map<Condition_t, Condition> goal_state(Goal goal) {
   switch (goal) {
     case Goal::None:
       return {};
     case Goal::EstablishSettlement:
-      return {
-        {Condition_t::HasSettlements, {.number = 1}},
-      };
+      return {{
+        Condition_t::HasSettlements,
+        {
+          Condition_t::HasSettlements,
+          ConditionCompare::Equals,
+          {.number = 1},
+        },
+      }};
     case Goal::ExpandBorders:
       return {
-        {Condition_t::HasSettlements, {.number = 3}},
+        {
+          Condition_t::HasSettlements,
+          {
+            Condition_t::HasSettlements,
+            ConditionCompare::Equals,
+            {.number = 3},
+          },
+        },
       };// @todo
   }
 }
@@ -162,10 +240,9 @@ inline Action get_action(Action_t type) {
           {
             {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
           },
-        .effects =
-          {
-            {Condition_t::HasSettlements, {.number = 1}},
-          },
+        .effects = {
+          {Condition_t::HasSettlements, {.number = 1}},
+        },
       };
     case Action_t::ClaimProvince:
       return Action{
@@ -174,20 +251,18 @@ inline Action get_action(Action_t type) {
           {
             {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
           },
-        .effects =
-          {
-            {Condition_t::HasUnsettledProvince, {.boolean = true}},
-          },
+        .effects = {
+          {Condition_t::HasUnsettledProvince, {.boolean = true}},
+        },
       };
     case Action_t::SpawnColonist:
       return Action{
         .type = type,
         // @todo requirements to make colonist
         .preconditions{},
-        .effects =
-          {
-            {Condition_t::HasColonist, {.boolean = true}},
-          },
+        .effects = {
+          {Condition_t::HasColonist, {.boolean = true}},
+        },
       };
 
     case Action_t::MoveColonistToUnclaimedProvince:
@@ -197,10 +272,9 @@ inline Action get_action(Action_t type) {
           {
             {Condition_t::HasColonist, {.boolean = true}},
           },
-        .effects =
-          {
-            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
-          },
+        .effects = {
+          {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+        },
       };
     case Action_t::MoveColonistToUnsettledOwnedProvince:
       return Action{
@@ -210,10 +284,9 @@ inline Action get_action(Action_t type) {
             {Condition_t::HasColonist, {.boolean = true}},
             {Condition_t::HasUnsettledProvince, {.boolean = true}},
           },
-        .effects =
-          {
-            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
-          },
+        .effects = {
+          {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+        },
       };
   }
 };

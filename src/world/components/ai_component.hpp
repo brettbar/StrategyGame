@@ -1,52 +1,9 @@
 #pragma once
 
 #include "../../data/ai.hpp"
-#include "../../shared/common.hpp"
 
 
 namespace AI {
-
-// Common type for both Goals and Actions
-struct Node {
-  Action action;
-  map<Condition_t, list<sptr<Node>>> children;
-
-  void print(u32 depth = 0) {
-    for (u32 i = 0; i < depth; ++i) {
-      std::cout << "  ";
-    }
-    std::cout << "|--" << action.as_str() << '\n';
-
-    for (const auto &condition: children) {
-      for (const auto &child: condition.second) {
-        child->print(depth + 1);
-      }
-    }
-  }
-};
-
-struct Plan {
-  list<Action> stack;
-  u32 cost;
-
-  void push(Action action) {
-    stack.push_back(action);
-  }
-
-  Action peek() {
-    return stack.back();
-  }
-
-  void pop() {
-    stack.pop_back();
-  }
-
-  void print() {
-    for (Action action: stack) {
-      printf("%s\n", action.as_str().c_str());
-    }
-  }
-};
 
 struct Component {
   Goal current_goal;

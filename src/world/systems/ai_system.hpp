@@ -3,13 +3,10 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 
-#include "../components/actor_component.hpp"
 #include "../components/ai_component.hpp"
 #include "../components/player_component.hpp"
 
 #include "actor_system.hpp"
-#include "commands_system.hpp"
-#include "movement_system.hpp"
 #include "province_system.hpp"
 #include "settlement_system.hpp"
 #include <cassert>
@@ -57,21 +54,15 @@ struct System {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         if (!ai_c.executing_plan) {
-          WorldState goal_conds = goal_state(ai_c.current_goal);
+          std::unordered_map<Condition_t, Condition> goal_conds =
+            goal_state(ai_c.current_goal);
           WorldState state = init_world_state(ai_player, ai_c);
-          WorldState desired_state = state;
-
-          for (const auto &[cond_t, value]: desired_state) {
-            if (goal_conds.contains(cond_t)) {
-              desired_state[cond_t] = goal_conds[cond_t];
-            }
-          }
 
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
               Action{
                 .type = Action_t::AchieveGoal,
-                .preconditions = desired_state,
+                .preconditions = goal_conds,
                 .effects = {},
               },
             .children = {},
@@ -85,7 +76,7 @@ struct System {
 
           list<Action> actions = {};
 
-          if (find_a_plan(state, desired_state, actions, root, ai_player)) {
+          if (find_a_plan(state, goal_conds, actions, root, ai_player)) {
             ai_c.executing_plan = true;
             ai_c.current_plan = Plan{actions, 0};
 
@@ -133,8 +124,8 @@ struct System {
   }
 
   static bool find_a_plan(
-    WorldState &initial_state,
-    WorldState desired_state,
+    WorldState &current_state,
+    WorldState goal_conds,
     list<Action> &plan,
     sptr<Node> parent,
     entt::entity ai_player
@@ -148,69 +139,60 @@ struct System {
     // We have a graph of potential actions that could be taken
     // First lets just see if the parent's effects are already met
     for (const auto &[cond_t, value]: parent->action.preconditions) {
-      ConditionValue curr_val =
-        initial_state[cond_t];// Initial::HasSettlements=0
-      ConditionValue desired_val =
-        desired_state[cond_t];// Desired::HasSettlements=3
+      Condition curr_val = current_state[cond_t];
+      Condition desired_val = goal_conds[cond_t];
       ConditionValue_t value_type = value_type_for_cond_t(cond_t);
 
       // Check if the conditions are already met
-      switch (value_type) {
-        case ConditionValue_t::Boolean: {
-          if (curr_val.boolean == desired_val.boolean) {
-            continue;
-          } else {
-            bool any_valid_action = false;
+      if (curr_val.Met(desired_val)) {
+        continue;
+      } else {
+        bool any_valid_action = false;
+
+        switch (value_type) {
+          case ConditionValue_t::Boolean: {
 
             for (sptr<Node> child: parent->children.at(cond_t)) {
-              auto altered_state = apply_action(initial_state, child->action);
+              apply_action(current_state, child->action);
 
               if (find_a_plan(
-                    altered_state, desired_state, plan, child, ai_player
+                    current_state, goal_conds, plan, child, ai_player
                   )) {
                 any_valid_action = true;
                 break;
               }
             }
+          } break;
+          case ConditionValue_t::Number: {
+            u32 desired = desired_val.value.number;
+            u32 current = curr_val.value.number;
 
-            if (!any_valid_action) {
-              all_conds_met = false;
-              break;
-            }
-          }
-        } break;
-        case ConditionValue_t::Number: {
-          if (curr_val.number == desired_val.number) {
-            continue;
-          } else {
-            u32 desired = desired_val.number;
-            u32 current = curr_val.number;
             u32 discrep = desired - current;
 
             bool any_valid_action = false;
 
             for (u32 i = 0; i < discrep; i++) {
               for (sptr<Node> child: parent->children.at(cond_t)) {
-                auto altered_state = apply_action(initial_state, child->action);
+                apply_action(current_state, child->action);
 
                 // Initial::HasSettlements=1
                 // Desired::HasSettlements=3
 
                 if (find_a_plan(
-                      altered_state, desired_state, plan, child, ai_player
+                      current_state, goal_conds, plan, child, ai_player
                     )) {
                   any_valid_action = true;
                   break;
                 }
               }
-
-              if (!any_valid_action) {
-                all_conds_met = false;
-                break;
-              }
             }
-          }
-        } break;
+          } break;
+        }
+
+        if (!any_valid_action) {
+          all_conds_met = false;
+          break;
+        }
       }
     }
 
@@ -242,28 +224,29 @@ struct System {
     WorldState world_state = {};
     for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
       Condition_t cond = (Condition_t) i;
-      world_state[cond] = get_real_state_for_cond(ai_player, cond);
+      world_state[cond] = Condition{
+        .type = cond,
+        .compare = ConditionCompare::Equals,
+        .value = get_real_state_for_cond(ai_player, cond)
+      };
     }
 
     return world_state;
   }
 
-  static WorldState apply_action(WorldState &state, Action &action) {
-    WorldState newState = state;
+  static void apply_action(WorldState &state, Action &action) {
 
     for (const auto &[effect, value]: action.effects) {
       switch (value_type_for_cond_t(effect)) {
         case AI::ConditionValue_t::Boolean:
-          newState[effect] = value;
+          state[effect].value.boolean = value.boolean;
           break;
         case AI::ConditionValue_t::Number:
-          int current = newState[effect].number;
-          newState[effect].number = current + value.number;
+          int current = state[effect].value.number;
+          state[effect].value.number = current + value.number;
           break;
       }
     }
-
-    return newState;
   }
 
 
@@ -349,7 +332,6 @@ struct System {
   //   bool all_conds_met = true;
 
   //   for (const auto &[cont_t, value]: parent->action.preconditions) {
-  //     auto delta = value.number;
 
   //     if (condition_met(cond, ai_player)) {
   //       continue;
