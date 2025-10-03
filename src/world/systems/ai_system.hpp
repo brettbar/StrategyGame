@@ -54,8 +54,7 @@ struct System {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         if (!ai_c.executing_plan) {
-          std::unordered_map<Condition_t, Condition> goal_conds =
-            goal_state(ai_c.current_goal);
+          list<Condition> goal_conds = goal_state(ai_c.current_goal);
           WorldState state = init_world_state(ai_player, ai_c);
 
           sptr<Node> root = std::make_shared<Node>(Node{
@@ -99,8 +98,8 @@ struct System {
   }
 
   static void build_graph(sptr<Node> parent, entt::entity ai_player) {
-    for (const auto &[cond_t, value]: parent->action.preconditions) {
-      for (auto possible_actions_t: actions_that_satisfy_cond(cond_t)) {
+    for (Condition condition: parent->action.preconditions) {
+      for (auto possible_actions_t: actions_that_satisfy_cond(condition.type)) {
         auto possible_action = get_action(possible_actions_t);
 
         sptr<Node> new_node = std::make_shared<Node>(Node{
@@ -108,10 +107,10 @@ struct System {
           .children = {},
         });
 
-        if (parent->children.contains(cond_t)) {
-          parent->children.at(cond_t).push_back(new_node);
+        if (parent->children.contains(condition.type)) {
+          parent->children.at(condition.type).push_back(new_node);
         } else {
-          parent->children.emplace(cond_t, list<sptr<Node>>{new_node});
+          parent->children.emplace(condition.type, list<sptr<Node>>{new_node});
         }
 
         // std::cout << "Parent: " << parent->action.as_str() << '\n';
@@ -125,81 +124,46 @@ struct System {
 
   static bool find_a_plan(
     WorldState &current_state,
-    WorldState goal_conds,
+    list<Condition> goal_conds,
     list<Action> &plan,
     sptr<Node> parent,
     entt::entity ai_player
   ) {
-
-    bool all_conds_met = true;
-
-    // I want to find a plan for ExpandBorders
-    // This means I need HasSettlements=3
-
-    // We have a graph of potential actions that could be taken
-    // First lets just see if the parent's effects are already met
-    for (const auto &[cond_t, value]: parent->action.preconditions) {
-      Condition curr_val = current_state[cond_t];
-      Condition desired_val = goal_conds[cond_t];
-      ConditionValue_t value_type = value_type_for_cond_t(cond_t);
-
-      // Check if the conditions are already met
-      if (curr_val.Met(desired_val)) {
+    bool all_action_conds_met = true;
+    for (Condition condition: parent->action.preconditions) {
+      // If the precondition is met, no need to recurse further
+      if (condition_met(current_state, condition)) {
         continue;
-      } else {
-        bool any_valid_action = false;
+      }
 
-        switch (value_type) {
-          case ConditionValue_t::Boolean: {
+      list<sptr<Node>> children_that_satisfy_cond =
+        parent->children[condition.type];
 
-            for (sptr<Node> child: parent->children.at(cond_t)) {
-              apply_action(current_state, child->action);
+      bool any_valid_action = false;
 
-              if (find_a_plan(
-                    current_state, goal_conds, plan, child, ai_player
-                  )) {
-                any_valid_action = true;
-                break;
-              }
-            }
-          } break;
-          case ConditionValue_t::Number: {
-            u32 desired = desired_val.value.number;
-            u32 current = curr_val.value.number;
-
-            u32 discrep = desired - current;
-
-            bool any_valid_action = false;
-
-            for (u32 i = 0; i < discrep; i++) {
-              for (sptr<Node> child: parent->children.at(cond_t)) {
-                apply_action(current_state, child->action);
-
-                // Initial::HasSettlements=1
-                // Desired::HasSettlements=3
-
-                if (find_a_plan(
-                      current_state, goal_conds, plan, child, ai_player
-                    )) {
-                  any_valid_action = true;
-                  break;
-                }
-              }
-            }
-          } break;
-        }
-
-        if (!any_valid_action) {
-          all_conds_met = false;
+      // Only one of these needs to work
+      for (sptr<Node> child: children_that_satisfy_cond) {
+        if (find_a_plan(current_state, goal_conds, plan, parent, ai_player)) {
+          any_valid_action = true;
           break;
         }
       }
+
+      if (!any_valid_action) {
+        all_action_conds_met = false;
+      }
     }
 
-    if (all_conds_met)
+    if (all_action_conds_met)
       plan.push_back(parent->action);
 
-    return all_conds_met;
+    return all_action_conds_met;
+  }
+
+  static bool condition_met(WorldState current_state, Condition &cond) {
+    Condition current = current_state[cond.type];
+
+    return cond.Met(current);
   }
 
   static bool execute_plan(Plan &plan, entt::entity ai_player) {

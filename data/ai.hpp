@@ -115,6 +115,11 @@ struct Condition {
   }
 };
 
+struct Effect {
+  Condition_t type;
+  ConditionValue value;
+};
+
 using WorldState = std::unordered_map<Condition_t, Condition>;
 
 struct Action {
@@ -122,8 +127,8 @@ struct Action {
 
   float cost = 0;
 
-  std::unordered_map<Condition_t, ConditionValue> preconditions;
-  std::unordered_map<Condition_t, ConditionValue> effects;
+  std::vector<Condition> preconditions;
+  std::vector<Effect> effects;
 
   std::string as_str() {
     switch (type) {
@@ -186,28 +191,24 @@ struct Plan {
   }
 };
 
-inline std::unordered_map<Condition_t, Condition> goal_state(Goal goal) {
+inline std::vector<Condition> goal_state(Goal goal) {
   switch (goal) {
     case Goal::None:
       return {};
     case Goal::EstablishSettlement:
-      return {{
-        Condition_t::HasSettlements,
+      return {
         {
           Condition_t::HasSettlements,
           ConditionCompare::Equals,
           {.number = 1},
         },
-      }};
+      };
     case Goal::ExpandBorders:
       return {
         {
           Condition_t::HasSettlements,
-          {
-            Condition_t::HasSettlements,
-            ConditionCompare::Equals,
-            {.number = 3},
-          },
+          ConditionCompare::Equals,
+          {.number = 3},
         },
       };// @todo
   }
@@ -238,7 +239,11 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+            {
+              Condition_t::ColonistOnOwnProvince,
+              ConditionCompare::Equals,
+              {.boolean = true},
+            },
           },
         .effects = {
           {Condition_t::HasSettlements, {.number = 1}},
@@ -249,7 +254,11 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+            {
+              Condition_t::ColonistOnUnclaimedProvince,
+              ConditionCompare::Equals,
+              {.boolean = true},
+            },
           },
         .effects = {
           {Condition_t::HasUnsettledProvince, {.boolean = true}},
@@ -270,7 +279,11 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {Condition_t::HasColonist, {.boolean = true}},
+            {
+              Condition_t::HasColonist,
+              ConditionCompare::Equals,
+              {.boolean = true},
+            },
           },
         .effects = {
           {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
@@ -281,8 +294,16 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {Condition_t::HasColonist, {.boolean = true}},
-            {Condition_t::HasUnsettledProvince, {.boolean = true}},
+            {
+              Condition_t::HasColonist,
+              ConditionCompare::Equals,
+              {.boolean = true},
+            },
+            {
+              Condition_t::HasUnsettledProvince,
+              ConditionCompare::Equals,
+              {.boolean = true},
+            },
           },
         .effects = {
           {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
