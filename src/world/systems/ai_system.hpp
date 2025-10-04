@@ -7,6 +7,7 @@
 #include "../components/player_component.hpp"
 
 #include "actor_system.hpp"
+#include "commands_system.hpp"
 #include "province_system.hpp"
 #include "settlement_system.hpp"
 #include <cassert>
@@ -31,6 +32,23 @@ struct System {
     }
   }
 
+  static WorldState current_world_state(
+    entt::entity ai_player,
+    AI::Component &ai_c
+  ) {
+    WorldState world_state = {};
+    for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
+      Condition_t cond = (Condition_t) i;
+      world_state[cond] = {
+        .type = cond,
+        .compare = ConditionCompare::Equals,
+        .value = get_real_state_for_cond(ai_player, cond),
+      };
+    }
+
+    return world_state;
+  }
+
   static void update(
     entt::entity ai_player,
     Player::Component &player_c,
@@ -53,9 +71,9 @@ struct System {
       case Goal::EstablishSettlement: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
+        WorldState state = current_world_state(ai_player, ai_c);
         if (!ai_c.executing_plan) {
           list<Condition> goal_conds = goal_state(ai_c.current_goal);
-          WorldState state = init_world_state(ai_player, ai_c);
 
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
@@ -84,7 +102,7 @@ struct System {
             printf("===== END PLAN =====\n");
           }
         } else {
-          if (execute_plan(ai_c.current_plan, ai_player)) {
+          if (execute_plan(state, ai_c.current_plan, ai_player)) {
             printf("player_1 has finished their goal!\n");
             ai_c.executing_plan = false;
             ai_c.current_plan = Plan{{}, 0};
@@ -131,6 +149,8 @@ struct System {
   ) {
     bool all_action_conds_met = true;
     for (Condition condition: parent->action.preconditions) {
+      printf("Analyzing Precondition %s\n", condition.as_str().c_str());
+
       // If the precondition is met, no need to recurse further
       if (condition_met(current_state, condition)) {
         continue;
@@ -143,14 +163,18 @@ struct System {
 
       // Only one of these needs to work
       for (sptr<Node> child: children_that_satisfy_cond) {
-        if (find_a_plan(current_state, goal_conds, plan, parent, ai_player)) {
+        // TODO probably need to modify the current_state here for accumatlive actions
+        if (find_a_plan(current_state, goal_conds, plan, child, ai_player)) {
           any_valid_action = true;
           break;
         }
       }
 
+      // If for this precondition we have found no valid actions
+      // The whole of this action is not possible
       if (!any_valid_action) {
         all_action_conds_met = false;
+        break;
       }
     }
 
@@ -166,37 +190,25 @@ struct System {
     return cond.Met(current);
   }
 
-  static bool execute_plan(Plan &plan, entt::entity ai_player) {
-    //if (plan.stack.size() <= 0) {
-    //  return true;
-    //}
+  static bool execute_plan(
+    WorldState &state,
+    Plan &plan,
+    entt::entity ai_player
+  ) {
+    if (plan.stack.size() <= 0) {
+      return true;
+    }
 
-    //Action action = plan.stack.front();
+    Action action = plan.stack.front();
 
-    //if (action_effects_met(action, ai_player)) {
-    //  plan.stack.erase(plan.stack.begin());
-    //} else if (action_preconds_met(action, ai_player)) {
-    //  do_action(action, ai_player);
-    //}
+    if (action_effects_met(state, action)) {
+      plan.stack.erase(plan.stack.begin());
+    } else if (action_preconds_met(state, action)) {
+      do_action(action, ai_player);
+    }
     return false;
   }
 
-  static WorldState init_world_state(
-    entt::entity ai_player,
-    AI::Component &ai_c
-  ) {
-    WorldState world_state = {};
-    for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
-      Condition_t cond = (Condition_t) i;
-      world_state[cond] = Condition{
-        .type = cond,
-        .compare = ConditionCompare::Equals,
-        .value = get_real_state_for_cond(ai_player, cond)
-      };
-    }
-
-    return world_state;
-  }
 
   static void apply_action(WorldState &state, Action &action) {
 
@@ -213,6 +225,121 @@ struct System {
     }
   }
 
+
+  static void determine_goal(
+    entt::entity ai_player,
+    Player::Component &player,
+    AI::Component &ai
+  ) {
+    assert(
+      ai.current_goal == Goal::None
+    );// @temp, eventually be able to change goal on the fly
+
+    auto num_player_settlements =
+      Settlement::System::num_player_settlements(ai_player);
+
+    if (num_player_settlements < 1) {
+      ai.current_goal = Goal::EstablishSettlement;
+    } else if (num_player_settlements < 3) {
+      ai.current_goal = Goal::ExpandBorders;
+    }
+  }
+
+  static bool action_effects_met(WorldState &state, Action a) {
+    for (Effect effect: a.effects) {
+      Condition equivalent = Condition{
+        .type = effect.type,
+        .compare = ConditionCompare::Equals,
+        .value = effect.value
+      };
+
+      // TODO this is probably wrong
+      if (!condition_met(state, equivalent)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  static bool action_preconds_met(WorldState &state, Action a) {
+    for (Condition cond: a.preconditions) {
+      if (!condition_met(state, cond)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  static void do_action(Action a, entt::entity ai_player) {
+
+    std::cout << "Doing Action :: " << a.as_str() << '\n';
+    switch (a.type) {
+      case Action_t::AchieveGoal:
+        break;
+      case Action_t::BuildSettlement: {
+        auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
+        if (colonist_e == entt::null)
+          return;
+
+        // @todo this is missing a step that is found in campaigns PostCommand
+        Commands::Manager()->enqueue(
+          Commands::Command::build_settlement(colonist_e)
+        );
+
+      } break;
+      case Action_t::ClaimProvince: {
+        auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
+        if (colonist_e == entt::null)
+          return;
+
+        Actor::Component actor =
+          Global::world.get<Actor::Component>(colonist_e);
+
+        Commands::Manager()->enqueue(
+          Commands::Command::claim_province(colonist_e)
+        );
+
+      } break;
+      case Action_t::MoveColonistToUnsettledOwnedProvince: {
+        return;
+      }
+      case Action_t::MoveColonistToUnclaimedProvince: {
+        auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
+        if (colonist_e == entt::null)
+          return;
+
+        Actor::Component actor =
+          Global::world.get<Actor::Component>(colonist_e);
+
+        if (Movement::System::ActorIsMoving(colonist_e))
+          return;
+
+        sptr<vec2f> nearest_eligible_tile =
+          Province::System::get_nearest_inhabitable_province(actor.position);
+
+        if (nearest_eligible_tile) {
+          Commands::Manager()->enqueue(
+            Commands::Command::move(
+              ai_player, *nearest_eligible_tile, colonist_e
+            )
+          );
+        }
+
+
+      } break;
+      case Action_t::SpawnColonist: {
+        vec2f pos =
+          Settlement::System::position_of_a_player_settlement(ai_player);
+
+        Commands::Manager()->enqueue(
+          Commands::Command::spawn_colonist(ai_player, pos)
+        );
+      } break;
+    }
+  }
 
   static ConditionValue get_real_state_for_cond(
     entt::entity ai_player,
@@ -260,26 +387,6 @@ struct System {
         return {};
     }
   };
-
-
-  static void determine_goal(
-    entt::entity ai_player,
-    Player::Component &player,
-    AI::Component &ai
-  ) {
-    assert(
-      ai.current_goal == Goal::None
-    );// @temp, eventually be able to change goal on the fly
-
-    auto num_player_settlements =
-      Settlement::System::num_player_settlements(ai_player);
-
-    if (num_player_settlements < 1) {
-      ai.current_goal = Goal::EstablishSettlement;
-    } else if (num_player_settlements < 3) {
-      ai.current_goal = Goal::ExpandBorders;
-    }
-  }
 
 
   // static bool find_a_plan(
@@ -377,71 +484,7 @@ struct System {
   //   return false;
   // }
   //
-  // static void do_action(Action a, entt::entity ai_player) {
-  //
-  //   std::cout << "Doing Action :: " << a.as_str() << '\n';
-  //   switch (a.type) {
-  //     case Action_t::AchieveGoal:
-  //       break;
-  //     case Action_t::BuildSettlement: {
-  //       auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
-  //       if (colonist_e == entt::null)
-  //         return;
-  //
-  //       // @todo this is missing a step that is found in campaigns PostCommand
-  //       Commands::Manager()->enqueue(
-  //         Commands::Command::build_settlement(colonist_e)
-  //       );
-  //
-  //     } break;
-  //     case Action_t::ClaimProvince: {
-  //       auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
-  //       if (colonist_e == entt::null)
-  //         return;
-  //
-  //       Actor::Component actor =
-  //         Global::world.get<Actor::Component>(colonist_e);
-  //
-  //       Commands::Manager()->enqueue(
-  //         Commands::Command::claim_province(colonist_e)
-  //       );
-  //
-  //     } break;
-  //     case Action_t::MoveColonistToUnsettledOwnedProvince: {
-  //       return;
-  //     }
-  //     case Action_t::MoveColonistToUnclaimedProvince: {
-  //       auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
-  //       if (colonist_e == entt::null)
-  //         return;
-  //
-  //       Actor::Component actor =
-  //         Global::world.get<Actor::Component>(colonist_e);
-  //
-  //       if (Movement::System::ActorIsMoving(colonist_e))
-  //         return;
-  //
-  //       sptr<vec2f> nearest_eligible_tile =
-  //         Province::System::get_nearest_inhabitable_province(actor.position);
-  //
-  //       if (nearest_eligible_tile) {
-  //         Commands::Manager()->enqueue(Commands::Command::move(
-  //           ai_player, *nearest_eligible_tile, colonist_e
-  //         ));
-  //       }
-  //
-  //
-  //     } break;
-  //     case Action_t::SpawnColonist: {
-  //       vec2f pos =
-  //         Settlement::System::position_of_a_player_settlement(ai_player);
-  //
-  //       Commands::Manager()->enqueue(
-  //         Commands::Command::spawn_colonist(ai_player, pos)
-  //       );
-  //     } break;
-  //   }
-  // }
+
   //
   // static u32 get_current_cond_num(
   //   Condition_t cond,
@@ -460,25 +503,6 @@ struct System {
   // }
   //
   //
-  // static bool action_effects_met(Action a, entt::entity ai_player) {
-  //   for (auto cond: a.effects) {
-  //     if (!condition_met(cond, ai_player)) {
-  //       return false;
-  //     }
-  //   }
-  //
-  //   return true;
-  // }
-  //
-  // static bool action_preconds_met(Action a, entt::entity ai_player) {
-  //   for (auto cond: a.preconditions) {
-  //     if (!condition_met(cond, ai_player)) {
-  //       return false;
-  //     }
-  //   }
-  //
-  //   return true;
-  // }
   //
   //
   //

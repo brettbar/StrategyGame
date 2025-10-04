@@ -95,7 +95,7 @@ struct Condition {
       case AI::ConditionValue_t::Boolean:
         return value.boolean == against.value.boolean;
       case AI::ConditionValue_t::Number: {
-        switch (against.compare) {
+        switch (compare) {
           case AI::ConditionCompare::Equals:
             return value.number == against.value.number;
           case AI::ConditionCompare::GreaterThanOrEqualTo:
@@ -107,6 +107,23 @@ struct Condition {
     }
 
     return false;
+  }
+
+  std::string as_str() {
+    switch (type) {
+      case Condition_t::ColonistOnUnclaimedProvince:
+        return "ColonistOnUnclaimedProvince";
+      case Condition_t::ColonistOnOwnProvince:
+        return "ColonistOnOwnProvince";
+      case Condition_t::HasColonist:
+        return "HasColonist";
+      case Condition_t::HasUnsettledProvince:
+        return "HasUnsettledProvince";
+      case Condition_t::HasSettlements:
+        return "HasSettlements";
+      case Condition_t::COUNT:
+        return "";
+    }
   }
 
   // idk why i need this
