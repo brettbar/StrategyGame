@@ -82,6 +82,10 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
   }
 }
 
+struct State {
+  Condition_t type;
+  ConditionValue value;
+};
 
 struct Condition {
   Condition_t type;
@@ -89,21 +93,31 @@ struct Condition {
   ConditionValue value;
 
 
-  bool Met(Condition against) {
+  bool operator>=(const Condition &other) const {
+    switch (value_type_for_cond_t(type)) {
+      case ConditionValue_t::Boolean:
+        return false;
+      case ConditionValue_t::Number:
+        return value.number >= other.value.number;
+    }
+  }
 
-    switch (value_type_for_cond_t(against.type)) {
-      case AI::ConditionValue_t::Boolean:
-        return value.boolean == against.value.boolean;
-      case AI::ConditionValue_t::Number: {
-        switch (compare) {
-          case AI::ConditionCompare::Equals:
-            return value.number == against.value.number;
-          case AI::ConditionCompare::GreaterThanOrEqualTo:
-            // @TODO are these backwards?
-            return value.number >= against.value.number;
-        }
+  bool operator==(const Condition &other) const {
+    switch (value_type_for_cond_t(type)) {
+      case ConditionValue_t::Boolean:
+        return value.boolean == other.value.boolean;
+      case ConditionValue_t::Number:
+        return value.number == other.value.number;
+    }
+  }
 
-      } break;
+
+  bool equals(const Condition &against) {
+    switch (compare) {
+      case AI::ConditionCompare::Equals:
+        return *this == against;
+      case AI::ConditionCompare::GreaterThanOrEqualTo:
+        return *this >= against;
     }
 
     return false;
@@ -132,12 +146,9 @@ struct Condition {
   }
 };
 
-struct Effect {
-  Condition_t type;
-  ConditionValue value;
-};
 
-using WorldState = std::unordered_map<Condition_t, Condition>;
+using WorldState = std::unordered_map<Condition_t, State>;
+using WorldConditions = std::unordered_map<Condition_t, Condition>;
 
 struct Action {
   Action_t type;

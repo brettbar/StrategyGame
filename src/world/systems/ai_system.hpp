@@ -32,6 +32,28 @@ struct System {
     }
   }
 
+  static void determine_goal(
+    entt::entity ai_player,
+    Player::Component &player,
+    AI::Component &ai
+  ) {
+    assert(
+      ai.current_goal == Goal::None
+    );// @temp, eventually be able to change goal on the fly
+
+    auto num_player_settlements =
+      Settlement::System::num_player_settlements(ai_player);
+
+    if (num_player_settlements < 1) {
+      ai.current_goal = Goal::EstablishSettlement;
+      printf("Starting goal Goal::EstablishSettlement\n");
+    } else if (num_player_settlements < 3) {
+      ai.current_goal = Goal::ExpandBorders;
+      printf("Starting goal Goal::ExpandBorders\n");
+    }
+  }
+
+
   static WorldState current_world_state(
     entt::entity ai_player,
     AI::Component &ai_c
@@ -72,8 +94,8 @@ struct System {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         WorldState state = current_world_state(ai_player, ai_c);
+        list<Condition> goal_conds = goal_state(ai_c.current_goal);
         if (!ai_c.executing_plan) {
-          list<Condition> goal_conds = goal_state(ai_c.current_goal);
 
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
@@ -102,7 +124,7 @@ struct System {
             printf("===== END PLAN =====\n");
           }
         } else {
-          if (execute_plan(state, ai_c.current_plan, ai_player)) {
+          if (execute_plan(state, goal_conds, ai_c.current_plan, ai_player)) {
             printf("player_1 has finished their goal!\n");
             ai_c.executing_plan = false;
             ai_c.current_plan = Plan{{}, 0};
@@ -130,10 +152,6 @@ struct System {
         } else {
           parent->children.emplace(condition.type, list<sptr<Node>>{new_node});
         }
-
-        // std::cout << "Parent: " << parent->action.as_str() << '\n';
-        // std::cout << "Graph node: " << new_node->action.as_str() << '\n';
-        // std::cout << std::endl;
 
         build_graph(new_node, ai_player);
       };
@@ -164,6 +182,8 @@ struct System {
       // Only one of these needs to work
       for (sptr<Node> child: children_that_satisfy_cond) {
         // TODO probably need to modify the current_state here for accumatlive actions
+        apply_action(current_state, child->action);
+
         if (find_a_plan(current_state, goal_conds, plan, child, ai_player)) {
           any_valid_action = true;
           break;
@@ -186,12 +206,12 @@ struct System {
 
   static bool condition_met(WorldState current_state, Condition &cond) {
     Condition current = current_state[cond.type];
-
-    return cond.Met(current);
+    return cond.equals(current);
   }
 
   static bool execute_plan(
     WorldState &state,
+    list<Condition> goal_conds,
     Plan &plan,
     entt::entity ai_player
   ) {
@@ -201,12 +221,46 @@ struct System {
 
     Action action = plan.stack.front();
 
-    if (action_effects_met(state, action)) {
+
+    if (action_effects_met(state, goal_conds, action)) {
       plan.stack.erase(plan.stack.begin());
     } else if (action_preconds_met(state, action)) {
       do_action(action, ai_player);
     }
+
     return false;
+  }
+
+  static bool action_effects_met(
+    WorldState state,
+    list<Condition> goal_conds,
+    Action action
+  ) {
+    for (auto effect: action.effects) {
+      for (auto goal_cond: goal_conds) {
+        if (effect.type != goal_cond.type) {
+          continue;
+        }
+
+        Condition current = state[effect.type];
+
+        if (!current.equals(goal_cond)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  static bool action_preconds_met(WorldState &state, Action a) {
+    for (Condition cond: a.preconditions) {
+      if (!condition_met(state, cond)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
 
@@ -223,53 +277,6 @@ struct System {
           break;
       }
     }
-  }
-
-
-  static void determine_goal(
-    entt::entity ai_player,
-    Player::Component &player,
-    AI::Component &ai
-  ) {
-    assert(
-      ai.current_goal == Goal::None
-    );// @temp, eventually be able to change goal on the fly
-
-    auto num_player_settlements =
-      Settlement::System::num_player_settlements(ai_player);
-
-    if (num_player_settlements < 1) {
-      ai.current_goal = Goal::EstablishSettlement;
-    } else if (num_player_settlements < 3) {
-      ai.current_goal = Goal::ExpandBorders;
-    }
-  }
-
-  static bool action_effects_met(WorldState &state, Action a) {
-    for (Effect effect: a.effects) {
-      Condition equivalent = Condition{
-        .type = effect.type,
-        .compare = ConditionCompare::Equals,
-        .value = effect.value
-      };
-
-      // TODO this is probably wrong
-      if (!condition_met(state, equivalent)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  static bool action_preconds_met(WorldState &state, Action a) {
-    for (Condition cond: a.preconditions) {
-      if (!condition_met(state, cond)) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
 
