@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../data/ai.hpp"
+#include "../../shared/common.hpp"
 
 
 namespace AI {
@@ -8,6 +9,7 @@ namespace AI {
 struct Component {
   Goal current_goal;
   Plan current_plan;
+  sptr<Action> current_action = nullptr;
   bool executing_plan = false;
   // map<AI::Condition_t, ConditionValue> world_state;
   // bool has_colonist = false;

@@ -63,7 +63,6 @@ struct System {
       Condition_t cond = (Condition_t) i;
       world_state[cond] = {
         .type = cond,
-        .compare = ConditionCompare::Equals,
         .value = get_real_state_for_cond(ai_player, cond),
       };
     }
@@ -124,11 +123,14 @@ struct System {
             printf("===== END PLAN =====\n");
           }
         } else {
-          if (execute_plan(state, goal_conds, ai_c.current_plan, ai_player)) {
+          if (execute_plan(
+                state, goal_conds, ai_c.current_plan, ai_player, ai_c
+              )) {
             printf("player_1 has finished their goal!\n");
             ai_c.executing_plan = false;
-            ai_c.current_plan = Plan{{}, 0};
             ai_c.current_goal = Goal::None;
+            ai_c.current_plan = Plan{{}, 0};
+            ai_c.current_action = nullptr;
           }
         }
 
@@ -205,27 +207,37 @@ struct System {
   }
 
   static bool condition_met(WorldState current_state, Condition &cond) {
-    Condition current = current_state[cond.type];
+    State current = current_state[cond.type];
     return cond.equals(current);
   }
 
   static bool execute_plan(
-    WorldState &state,
+    WorldState state,
     list<Condition> goal_conds,
     Plan &plan,
-    entt::entity ai_player
+    entt::entity ai_player,
+    AI::Component &ai_c
   ) {
     if (plan.stack.size() <= 0) {
       return true;
     }
 
-    Action action = plan.stack.front();
+    bool new_action = false;
 
+    if (ai_c.current_action == nullptr) {
+      ai_c.current_action = std::make_shared<Action>(plan.stack.front());
 
-    if (action_effects_met(state, goal_conds, action)) {
+      new_action = true;
+    }
+
+    if (action_effects_met(state, goal_conds, *ai_c.current_action)) {
       plan.stack.erase(plan.stack.begin());
-    } else if (action_preconds_met(state, action)) {
-      do_action(action, ai_player);
+      ai_c.current_action = nullptr;
+    } else if (action_preconds_met(state, *ai_c.current_action)) {
+      if (new_action) {
+        printf("Executing Action %s\n", ai_c.current_action->as_str().c_str());
+        do_action(*ai_c.current_action, ai_player);
+      }
     }
 
     return false;
@@ -236,18 +248,11 @@ struct System {
     list<Condition> goal_conds,
     Action action
   ) {
-    for (auto effect: action.effects) {
-      for (auto goal_cond: goal_conds) {
-        if (effect.type != goal_cond.type) {
-          continue;
-        }
+    // For an actions effects to be met, we basically need to see
+    // if
 
-        Condition current = state[effect.type];
-
-        if (!current.equals(goal_cond)) {
-          return false;
-        }
-      }
+    for (State effect: action.effects) {
+      if (!condition_met(state, effect)) {}
     }
 
     return true;
@@ -328,11 +333,9 @@ struct System {
           Province::System::get_nearest_inhabitable_province(actor.position);
 
         if (nearest_eligible_tile) {
-          Commands::Manager()->enqueue(
-            Commands::Command::move(
-              ai_player, *nearest_eligible_tile, colonist_e
-            )
-          );
+          Commands::Manager()->enqueue(Commands::Command::move(
+            ai_player, *nearest_eligible_tile, colonist_e
+          ));
         }
 
 

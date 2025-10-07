@@ -93,7 +93,7 @@ struct Condition {
   ConditionValue value;
 
 
-  bool operator>=(const Condition &other) const {
+  bool operator>=(const State &other) const {
     switch (value_type_for_cond_t(type)) {
       case ConditionValue_t::Boolean:
         return false;
@@ -102,7 +102,7 @@ struct Condition {
     }
   }
 
-  bool operator==(const Condition &other) const {
+  bool operator==(const State &other) const {
     switch (value_type_for_cond_t(type)) {
       case ConditionValue_t::Boolean:
         return value.boolean == other.value.boolean;
@@ -112,7 +112,7 @@ struct Condition {
   }
 
 
-  bool equals(const Condition &against) {
+  bool equals(const State &against) {
     switch (compare) {
       case AI::ConditionCompare::Equals:
         return *this == against;
@@ -156,7 +156,7 @@ struct Action {
   float cost = 0;
 
   std::vector<Condition> preconditions;
-  std::vector<Effect> effects;
+  std::vector<State> effects;
 
   std::string as_str() {
     switch (type) {
@@ -273,9 +273,10 @@ inline Action get_action(Action_t type) {
               {.boolean = true},
             },
           },
-        .effects = {
-          {Condition_t::HasSettlements, {.number = 1}},
-        },
+        .effects =
+          {
+            {Condition_t::HasSettlements, {.number = 1}},
+          },
       };
     case Action_t::ClaimProvince:
       return Action{
@@ -288,18 +289,20 @@ inline Action get_action(Action_t type) {
               {.boolean = true},
             },
           },
-        .effects = {
-          {Condition_t::HasUnsettledProvince, {.boolean = true}},
-        },
+        .effects =
+          {
+            {Condition_t::HasUnsettledProvince, {.boolean = true}},
+          },
       };
     case Action_t::SpawnColonist:
       return Action{
         .type = type,
         // @todo requirements to make colonist
         .preconditions{},
-        .effects = {
-          {Condition_t::HasColonist, {.boolean = true}},
-        },
+        .effects =
+          {
+            {Condition_t::HasColonist, {.boolean = true}},
+          },
       };
 
     case Action_t::MoveColonistToUnclaimedProvince:
@@ -313,9 +316,10 @@ inline Action get_action(Action_t type) {
               {.boolean = true},
             },
           },
-        .effects = {
-          {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
-        },
+        .effects =
+          {
+            {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+          },
       };
     case Action_t::MoveColonistToUnsettledOwnedProvince:
       return Action{
@@ -333,9 +337,10 @@ inline Action get_action(Action_t type) {
               {.boolean = true},
             },
           },
-        .effects = {
-          {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
-        },
+        .effects =
+          {
+            {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+          },
       };
   }
 };
