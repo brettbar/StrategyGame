@@ -41,16 +41,10 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
   }
 }
 
-struct State {
-  Condition_t type;
-  ConditionValue value;
-};
-
 struct Condition {
   Condition_t type;
   ConditionCompare compare = ConditionCompare::Equals;
   ConditionValue value;
-
 
 
   bool operator==(const ConditionValue &other) const {
@@ -102,4 +96,22 @@ struct Condition {
     return this->type < rhs.type;
   }
 };
+
+
+enum class EffectOperator {
+  Set,
+  Increase,
+  Decrease,
+};
+
+struct Effect {
+  Condition_t type;
+  EffectOperator op;
+  ConditionValue value;
+
+  ConditionValue before = {};
+  ConditionValue after = {};
+};
+
+
 }// namespace AI

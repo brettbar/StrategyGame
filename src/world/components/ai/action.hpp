@@ -19,7 +19,7 @@ struct Action {
   float cost = 0;
 
   list<Condition> preconditions;
-  list<State> effects;
+  list<Effect> effects;
 
   str as_str() {
     switch (type) {
@@ -59,7 +59,11 @@ inline Action get_action(Action_t type) {
             },
           },
         .effects = {
-          {Condition_t::HasSettlements, {.number = 1}},
+          Effect{
+            Condition_t::HasSettlements,
+            EffectOperator::Increase,
+            {.number = 1},
+          },
         },
       };
     case Action_t::ClaimProvince:
@@ -74,7 +78,11 @@ inline Action get_action(Action_t type) {
             },
           },
         .effects = {
-          {Condition_t::HasUnsettledProvince, {.boolean = true}},
+          Effect{
+            Condition_t::HasUnsettledProvince,
+            EffectOperator::Set,
+            {.boolean = true},
+          },
         },
       };
     case Action_t::SpawnColonist:
@@ -83,7 +91,11 @@ inline Action get_action(Action_t type) {
         // @todo requirements to make colonist
         .preconditions{},
         .effects = {
-          {Condition_t::HasColonist, {.boolean = true}},
+          Effect{
+            Condition_t::HasColonist,
+            EffectOperator::Set,
+            {.boolean = true},
+          },
         },
       };
 
@@ -99,7 +111,11 @@ inline Action get_action(Action_t type) {
             },
           },
         .effects = {
-          {Condition_t::ColonistOnUnclaimedProvince, {.boolean = true}},
+          Effect{
+            Condition_t::ColonistOnUnclaimedProvince,
+            EffectOperator::Set,
+            {.boolean = true},
+          },
         },
       };
     case Action_t::MoveColonistToUnsettledOwnedProvince:
@@ -119,7 +135,11 @@ inline Action get_action(Action_t type) {
             },
           },
         .effects = {
-          {Condition_t::ColonistOnOwnProvince, {.boolean = true}},
+          Effect{
+            Condition_t::ColonistOnOwnProvince,
+            EffectOperator::Set,
+            {.boolean = true},
+          },
         },
       };
   }

@@ -125,15 +125,15 @@ struct System {
             printf("===== END PLAN =====\n");
           }
         } else {
-          //if (execute_plan(
-          //      state, goal_conds, ai_c.current_plan, ai_player, ai_c
-          //    )) {
-          //  printf("player_1 has finished their goal!\n");
-          //  ai_c.executing_plan = false;
-          //  ai_c.current_goal = Goal_t::None;
-          //  ai_c.current_plan = Plan{{}, 0};
-          //  ai_c.current_action = nullptr;
-          //}
+          if (execute_plan(
+                state, goal_conds, ai_c.current_plan, ai_player, ai_c
+              )) {
+            printf("player_1 has finished their goal!\n");
+            ai_c.executing_plan = false;
+            ai_c.current_goal = Goal_t::None;
+            ai_c.current_plan = Plan{{}, 0};
+            ai_c.current_action = nullptr;
+          }
         }
 
 
@@ -208,10 +208,6 @@ struct System {
     return all_action_conds_met;
   }
 
-  static bool condition_met(WorldState current_state, Condition &cond) {
-    ConditionValue current = current_state[cond.type];
-    return cond.is_satisfied_by(current);
-  }
 
   static bool execute_plan(
     WorldState state,
@@ -232,7 +228,7 @@ struct System {
       new_action = true;
     }
 
-    if (action_effects_met(state, goal_conds, *ai_c.current_action)) {
+    if (all_action_effects_met(state, *ai_c.current_action)) {
       plan.stack.erase(plan.stack.begin());
       ai_c.current_action = nullptr;
     } else if (action_preconds_met(state, *ai_c.current_action)) {
@@ -245,16 +241,31 @@ struct System {
     return false;
   }
 
-  static bool action_effects_met(
-    WorldState state,
-    list<Condition> goal_conds,
-    Action action
-  ) {
-    // For an actions effects to be met, we basically need to see
-    // if
+  static bool condition_met(WorldState current_state, Condition &cond) {
+    ConditionValue current = current_state[cond.type];
+    bool met = cond.is_satisfied_by(current);
+    return met;
+  }
 
-    for (State effect: action.effects) {
-      //if (!condition_met(state, effect)) {}
+  static bool all_action_effects_met(WorldState state, Action action) {
+    for (Effect effect: action.effects) {
+      ConditionValue expected_before = effect.before;
+      ConditionValue expected_after = effect.after;
+
+      ConditionValue current = state[effect.type];
+
+      switch (value_type_for_cond_t(effect.type)) {
+        case AI::ConditionValue_t::Boolean:
+          return expected_after.boolean == current.boolean;
+        case AI::ConditionValue_t::Number:
+          // @TODO this is almost certainly wrong(or at least just incomplete)
+          // Like what if we wanted to go from 4 to 3, then this should be decrementing
+          // So we need to take into account what the effect op was.
+          // if it was increasing, then maybe this suffices
+          // if it was supposed to be decreasing, then maybe <= or something?
+          // if set, maybe ==
+          return expected_after.number >= current.number;
+      }
     }
 
     return true;
@@ -273,16 +284,21 @@ struct System {
 
   static void apply_action(WorldState &state, Action &action) {
 
-    for (const auto &[effect, value]: action.effects) {
-      switch (value_type_for_cond_t(effect)) {
+    for (Effect &effect: action.effects) {
+      effect.before = state[effect.type];
+
+      switch (value_type_for_cond_t(effect.type)) {
+          // @todo  actually use the op
         case AI::ConditionValue_t::Boolean:
-          state[effect].boolean = value.boolean;
+          state[effect.type].boolean = effect.value.boolean;
           break;
         case AI::ConditionValue_t::Number:
-          int current = state[effect].number;
-          state[effect].number = current + value.number;
+          int current = state[effect.type].number;
+          state[effect.type].number = current + effect.value.number;
           break;
       }
+
+      effect.after = state[effect.type];
     }
   }
 
