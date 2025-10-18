@@ -3,7 +3,7 @@
 #include "../../shared/common.hpp"
 #include "../../shared/global.hpp"
 
-#include "../components/ai_component.hpp"
+#include "../components/ai/ai_component.hpp"
 #include "../components/player_component.hpp"
 
 #include "actor_system.hpp"
@@ -15,9 +15,11 @@
 
 namespace AI {
 
+using WorldState = map<Condition_t, ConditionValue>;
+
 struct System {
   static void Create(entt::entity player) {
-    AI::Component ai_c = AI::Component(Goal::None);
+    AI::Component ai_c = AI::Component(Goal_t::None);
     Global::world.emplace<AI::Component>(player, ai_c);
   }
 
@@ -38,17 +40,17 @@ struct System {
     AI::Component &ai
   ) {
     assert(
-      ai.current_goal == Goal::None
+      ai.current_goal == Goal_t::None
     );// @temp, eventually be able to change goal on the fly
 
     auto num_player_settlements =
       Settlement::System::num_player_settlements(ai_player);
 
     if (num_player_settlements < 1) {
-      ai.current_goal = Goal::EstablishSettlement;
+      ai.current_goal = Goal_t::EstablishSettlement;
       printf("Starting goal Goal::EstablishSettlement\n");
     } else if (num_player_settlements < 3) {
-      ai.current_goal = Goal::ExpandBorders;
+      ai.current_goal = Goal_t::ExpandBorders;
       printf("Starting goal Goal::ExpandBorders\n");
     }
   }
@@ -61,9 +63,8 @@ struct System {
     WorldState world_state = {};
     for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
       Condition_t cond = (Condition_t) i;
-      world_state[cond] = {
-        .type = cond,
-        .value = get_real_state_for_cond(ai_player, cond),
+      world_state[cond] = ConditionValue{
+        get_real_state_for_cond(ai_player, cond),
       };
     }
 
@@ -85,17 +86,18 @@ struct System {
   ) {
 
     switch (ai_c.current_goal) {
-      case Goal::None:
+      case Goal_t::None:
         determine_goal(ai_player, player_c, ai_c);
         break;
-      case Goal::ExpandBorders:
-      case Goal::EstablishSettlement: {
+      case Goal_t::ExpandBorders:
+      case Goal_t::EstablishSettlement: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         WorldState state = current_world_state(ai_player, ai_c);
-        list<Condition> goal_conds = goal_state(ai_c.current_goal);
-        if (!ai_c.executing_plan) {
+        Goal current_goal = goal(ai_c.current_goal);
+        list<Condition> goal_conds = current_goal.conditions;
 
+        if (!ai_c.executing_plan) {
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
               Action{
@@ -123,15 +125,15 @@ struct System {
             printf("===== END PLAN =====\n");
           }
         } else {
-          if (execute_plan(
-                state, goal_conds, ai_c.current_plan, ai_player, ai_c
-              )) {
-            printf("player_1 has finished their goal!\n");
-            ai_c.executing_plan = false;
-            ai_c.current_goal = Goal::None;
-            ai_c.current_plan = Plan{{}, 0};
-            ai_c.current_action = nullptr;
-          }
+          //if (execute_plan(
+          //      state, goal_conds, ai_c.current_plan, ai_player, ai_c
+          //    )) {
+          //  printf("player_1 has finished their goal!\n");
+          //  ai_c.executing_plan = false;
+          //  ai_c.current_goal = Goal_t::None;
+          //  ai_c.current_plan = Plan{{}, 0};
+          //  ai_c.current_action = nullptr;
+          //}
         }
 
 
@@ -207,8 +209,8 @@ struct System {
   }
 
   static bool condition_met(WorldState current_state, Condition &cond) {
-    State current = current_state[cond.type];
-    return cond.equals(current);
+    ConditionValue current = current_state[cond.type];
+    return cond.is_satisfied_by(current);
   }
 
   static bool execute_plan(
@@ -252,7 +254,7 @@ struct System {
     // if
 
     for (State effect: action.effects) {
-      if (!condition_met(state, effect)) {}
+      //if (!condition_met(state, effect)) {}
     }
 
     return true;
@@ -274,11 +276,11 @@ struct System {
     for (const auto &[effect, value]: action.effects) {
       switch (value_type_for_cond_t(effect)) {
         case AI::ConditionValue_t::Boolean:
-          state[effect].value.boolean = value.boolean;
+          state[effect].boolean = value.boolean;
           break;
         case AI::ConditionValue_t::Number:
-          int current = state[effect].value.number;
-          state[effect].value.number = current + value.number;
+          int current = state[effect].number;
+          state[effect].number = current + value.number;
           break;
       }
     }
@@ -333,9 +335,11 @@ struct System {
           Province::System::get_nearest_inhabitable_province(actor.position);
 
         if (nearest_eligible_tile) {
-          Commands::Manager()->enqueue(Commands::Command::move(
-            ai_player, *nearest_eligible_tile, colonist_e
-          ));
+          Commands::Manager()->enqueue(
+            Commands::Command::move(
+              ai_player, *nearest_eligible_tile, colonist_e
+            )
+          );
         }
 
 

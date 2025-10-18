@@ -2,8 +2,6 @@
 
 // TODO see which of these includes can be removed
 #include <entt/entt.hpp>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -11,7 +9,6 @@
 #include <raymath.h>
 #include <string>
 #include <vector>
-
 
 
 #define LEN(arr) sizeof(arr) / sizeof(arr[0])

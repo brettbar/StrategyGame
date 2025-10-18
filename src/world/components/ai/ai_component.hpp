@@ -1,13 +1,15 @@
 #pragma once
 
-#include "../../data/ai.hpp"
-#include "../../shared/common.hpp"
+#include "../../../shared/common.hpp"
+
+#include "goal.hpp"
+#include "plan.hpp"
 
 
 namespace AI {
 
 struct Component {
-  Goal current_goal;
+  Goal_t current_goal;
   Plan current_plan;
   sptr<Action> current_action = nullptr;
   bool executing_plan = false;
