@@ -248,15 +248,18 @@ struct System {
   }
 
   static bool all_action_effects_met(WorldState state, Action action) {
+    bool all_met = true;
+
     for (Effect effect: action.effects) {
-      ConditionValue expected_before = effect.before;
+      //ConditionValue expected_before = effect.before;
       ConditionValue expected_after = effect.after;
 
       ConditionValue current = state[effect.type];
 
       switch (value_type_for_cond_t(effect.type)) {
         case AI::ConditionValue_t::Boolean:
-          return expected_after.boolean == current.boolean;
+          all_met = all_met && (expected_after.boolean == current.boolean);
+          break;
         case AI::ConditionValue_t::Number:
           // @TODO this is almost certainly wrong(or at least just incomplete)
           // Like what if we wanted to go from 4 to 3, then this should be decrementing
@@ -264,11 +267,12 @@ struct System {
           // if it was increasing, then maybe this suffices
           // if it was supposed to be decreasing, then maybe <= or something?
           // if set, maybe ==
-          return expected_after.number >= current.number;
+          all_met = all_met && (current.number >= expected_after.number);
+          break;
       }
     }
 
-    return true;
+    return all_met;
   }
 
   static bool action_preconds_met(WorldState &state, Action a) {
