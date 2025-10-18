@@ -49,7 +49,7 @@ struct System {
     if (num_player_settlements < 1) {
       ai.current_goal = Goal_t::EstablishSettlement;
       printf("Starting goal Goal::EstablishSettlement\n");
-    } else if (num_player_settlements < 3) {
+    } else if (num_player_settlements < 4) {
       ai.current_goal = Goal_t::ExpandBorders;
       printf("Starting goal Goal::ExpandBorders\n");
     }
