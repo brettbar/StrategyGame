@@ -79,7 +79,7 @@ inline Goal goal(Goal_t goal) {
           Condition{
             Condition_t::HasSettlements,
             ConditionCompare::GreaterThanOrEqualTo,
-            {.number = 4},
+            {.number = 3},
           },
         }
       };

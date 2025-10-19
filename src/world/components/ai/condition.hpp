@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../data/resources.hpp"
 #include "../../../shared/common.hpp"
 
 namespace AI {
@@ -9,6 +10,7 @@ enum class Condition_t {
   HasColonist,
   HasUnsettledProvince,
   HasSettlements,
+  HasResources,
   COUNT,
 };
 
@@ -20,6 +22,15 @@ enum class ConditionValue_t {
 using ConditionValue = union {
   bool boolean;
   u32 number;
+};
+
+enum class ConditionQuantityType {
+  None,
+  Resource
+};
+
+using ConditionQuantity = union {
+  Resources::Type resource;
 };
 
 enum class ConditionCompare {
@@ -35,9 +46,19 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
     case Condition_t::HasUnsettledProvince:
       return ConditionValue_t::Boolean;
     case Condition_t::HasSettlements:
+    case Condition_t::HasResources:
       return ConditionValue_t::Number;
     case Condition_t::COUNT:
       return ConditionValue_t::Boolean;
+  }
+}
+
+inline ConditionQuantityType quantity_type(Condition_t cond_t) {
+  switch (cond_t) {
+    case Condition_t::HasResources:
+      return ConditionQuantityType::Resource;
+    default:
+      return ConditionQuantityType::None;
   }
 }
 
@@ -45,6 +66,9 @@ struct Condition {
   Condition_t type;
   ConditionCompare compare = ConditionCompare::Equals;
   ConditionValue value;
+
+  ConditionQuantityType quantity_type = ConditionQuantityType::None;
+  ConditionQuantity quantity;
 
 
   bool operator==(const ConditionValue &other) const {
@@ -86,6 +110,8 @@ struct Condition {
         return "HasUnsettledProvince";
       case Condition_t::HasSettlements:
         return "HasSettlements";
+      case Condition_t::HasResources:
+        return "HasResources";
       case Condition_t::COUNT:
         return "";
     }

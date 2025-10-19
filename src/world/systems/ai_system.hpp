@@ -9,6 +9,7 @@
 #include "actor_system.hpp"
 #include "commands_system.hpp"
 #include "province_system.hpp"
+#include "resource_system.hpp"
 #include "settlement_system.hpp"
 #include <cassert>
 
@@ -46,10 +47,6 @@ struct System {
       ai.current_goal == Goal_t::None
     );// @temp, eventually be able to change goal on the fly
 
-    auto num_player_settlements =
-      Settlement::System::num_player_settlements(ai_player);
-
-
     auto goals = {
       goal(Goal_t::EstablishSettlement),
       goal(Goal_t::ExpandBorders),
@@ -60,14 +57,6 @@ struct System {
         ai.current_goal = goal.type;
       }
     }
-
-    // if (num_player_settlements < 1) {
-    //   ai.current_goal = Goal_t::EstablishSettlement;
-    //   printf("Starting goal Goal::EstablishSettlement\n");
-    // } else if (num_player_settlements < 4) {
-    //   ai.current_goal = Goal_t::ExpandBorders;
-    //   printf("Starting goal Goal::ExpandBorders\n");
-    // }
   }
 
   static bool all_goal_conds_met(WorldState state, Goal goal) {
@@ -88,10 +77,24 @@ struct System {
   ) {
     WorldState world_state = {};
     for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
-      Condition_t cond = (Condition_t) i;
-      world_state[cond] = ConditionValue{
-        get_real_state_for_cond(ai_player, cond),
-      };
+      Condition_t cond_t = (Condition_t) i;
+
+      ConditionQuantityType quant_type = quantity_type(cond_t);
+
+      switch (quant_type) {
+        case ConditionQuantityType::None:
+          world_state[cond_t] = ConditionValue{
+            get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
+          };
+          break;
+        case AI::ConditionQuantityType::Resource:
+          world_state[cond_t] = ConditionValue{
+            get_real_state_for_cond(
+              ai_player, Condition{.type = cond_t, .quantity_type = quant_type}
+            ),
+          };
+          break;
+      }
     }
 
     return world_state;
@@ -403,9 +406,9 @@ struct System {
 
   static ConditionValue get_real_state_for_cond(
     entt::entity ai_player,
-    Condition_t cond
+    Condition cond
   ) {
-    switch (cond) {
+    switch (cond.type) {
       case Condition_t::HasColonist: {
         return {
           .boolean =
@@ -443,6 +446,17 @@ struct System {
           .number = Settlement::System::num_player_settlements(ai_player)
         };
       } break;
+      case Condition_t::HasResources: {
+        assert(cond.quantity_type == ConditionQuantityType::Resource);
+
+        auto ai_player_resources =
+          Resource::System::get_resources_for_player(ai_player);
+
+        auto quantity = ai_player_resources[cond.quantity.resource];
+
+        return {.number = quantity};
+      } break;
+
       case AI::Condition_t::COUNT:
         return {};
     }

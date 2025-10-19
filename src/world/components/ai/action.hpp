@@ -158,6 +158,8 @@ inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
       return {Action_t::ClaimProvince};
     case Condition_t::HasSettlements:
       return {Action_t::BuildSettlement};
+    case Condition_t::HasResources:
+      return {};
     case Condition_t::COUNT:
       return {};
   }
