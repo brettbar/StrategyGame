@@ -30,11 +30,14 @@ struct System {
       Player::Component player_c = ai_players.get<Player::Component>(player_e);
       AI::Component ai_c = ai_players.get<AI::Component>(player_e);
 
-      determine_goal(player_e, player_c, ai_c);
+      WorldState state = current_world_state(player_e, ai_c);
+
+      determine_goal(state, player_e, player_c, ai_c);
     }
   }
 
   static void determine_goal(
+    WorldState state,
     entt::entity ai_player,
     Player::Component &player,
     AI::Component &ai
@@ -46,13 +49,36 @@ struct System {
     auto num_player_settlements =
       Settlement::System::num_player_settlements(ai_player);
 
-    if (num_player_settlements < 1) {
-      ai.current_goal = Goal_t::EstablishSettlement;
-      printf("Starting goal Goal::EstablishSettlement\n");
-    } else if (num_player_settlements < 4) {
-      ai.current_goal = Goal_t::ExpandBorders;
-      printf("Starting goal Goal::ExpandBorders\n");
+
+    auto goals = {
+      goal(Goal_t::EstablishSettlement),
+      goal(Goal_t::ExpandBorders),
+    };
+
+    for (const auto &goal: goals) {
+      if (!all_goal_conds_met(state, goal)) {
+        ai.current_goal = goal.type;
+      }
     }
+
+    // if (num_player_settlements < 1) {
+    //   ai.current_goal = Goal_t::EstablishSettlement;
+    //   printf("Starting goal Goal::EstablishSettlement\n");
+    // } else if (num_player_settlements < 4) {
+    //   ai.current_goal = Goal_t::ExpandBorders;
+    //   printf("Starting goal Goal::ExpandBorders\n");
+    // }
+  }
+
+  static bool all_goal_conds_met(WorldState state, Goal goal) {
+    for (Condition cond: goal.conditions) {
+      ConditionValue current = state[cond.type];
+      if (!cond.is_satisfied_by(current)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
 
@@ -84,16 +110,16 @@ struct System {
     Player::Component &player_c,
     AI::Component &ai_c
   ) {
+    WorldState state = current_world_state(ai_player, ai_c);
 
     switch (ai_c.current_goal) {
       case Goal_t::None:
-        determine_goal(ai_player, player_c, ai_c);
+        determine_goal(state, ai_player, player_c, ai_c);
         break;
       case Goal_t::ExpandBorders:
       case Goal_t::EstablishSettlement: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
-        WorldState state = current_world_state(ai_player, ai_c);
         Goal current_goal = goal(ai_c.current_goal);
         list<Condition> goal_conds = current_goal.conditions;
 
