@@ -52,12 +52,7 @@ void scale_ui_with_screen_size() {
 
   f32 height_dpi = monitor_h / (physical_h / 25.4f);
 
-  printf(
-    "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDd %f\n",
-    height_dpi
-  );
-
-  UI::set_ui_scale_by_screen_height(monitor_h);
+  UI::set_ui_scale_by_screen_height(monitor_h, height_dpi);
 }
 
 void init_clay(vec2i initial_resolution) {
