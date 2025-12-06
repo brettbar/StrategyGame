@@ -55,14 +55,14 @@ inline Action get_action(Action_t type) {
             {
               Condition_t::ColonistOnOwnProvince,
               ConditionCompare::Equals,
-              {.boolean = true},
+              true,
             },
           },
         .effects = {
           Effect{
             Condition_t::HasSettlements,
             EffectOperator::Increase,
-            {.number = 1},
+            (u32) 1,
           },
         },
       };
@@ -74,14 +74,14 @@ inline Action get_action(Action_t type) {
             {
               Condition_t::ColonistOnUnclaimedProvince,
               ConditionCompare::Equals,
-              {.boolean = true},
+              true,
             },
           },
         .effects = {
           Effect{
             Condition_t::HasUnsettledProvince,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };
@@ -94,7 +94,7 @@ inline Action get_action(Action_t type) {
           Effect{
             Condition_t::HasColonist,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };
@@ -107,14 +107,14 @@ inline Action get_action(Action_t type) {
             {
               Condition_t::HasColonist,
               ConditionCompare::Equals,
-              {.boolean = true},
+              true,
             },
           },
         .effects = {
           Effect{
             Condition_t::ColonistOnUnclaimedProvince,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };
@@ -126,19 +126,19 @@ inline Action get_action(Action_t type) {
             {
               Condition_t::HasColonist,
               ConditionCompare::Equals,
-              {.boolean = true},
+              true,
             },
             {
               Condition_t::HasUnsettledProvince,
               ConditionCompare::Equals,
-              {.boolean = true},
+              true,
             },
           },
         .effects = {
           Effect{
             Condition_t::ColonistOnOwnProvince,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };

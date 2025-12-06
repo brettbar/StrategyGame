@@ -79,22 +79,27 @@ struct System {
     for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
       Condition_t cond_t = (Condition_t) i;
 
-      ConditionQuantityType quant_type = quantity_type(cond_t);
 
-      switch (quant_type) {
-        case ConditionQuantityType::None:
-          world_state[cond_t] = ConditionValue{
-            get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
-          };
-          break;
-        case AI::ConditionQuantityType::Resource:
-          world_state[cond_t] = ConditionValue{
-            get_real_state_for_cond(
-              ai_player, Condition{.type = cond_t, .quantity_type = quant_type}
-            ),
-          };
-          break;
-      }
+      world_state[cond_t] = ConditionValue{
+        get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
+      };
+
+      // ConditionQuantityType quant_type = quantity_type(cond_t);
+      //
+      // switch (quant_type) {
+      //   case ConditionQuantityType::None:
+      //     world_state[cond_t] = ConditionValue{
+      //       get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
+      //     };
+      //     break;
+      //   case AI::ConditionQuantityType::Resource:
+      //     world_state[cond_t] = ConditionValue{
+      //       get_real_state_for_cond(
+      //         ai_player, Condition{.type = cond_t, .quantity_type = quant_type}
+      //       ),
+      //     };
+      //     break;
+      // }
     }
 
     return world_state;
@@ -287,7 +292,8 @@ struct System {
 
       switch (value_type_for_cond_t(effect.type)) {
         case AI::ConditionValue_t::Boolean:
-          all_met = all_met && (expected_after.boolean == current.boolean);
+          all_met = all_met &&
+                    (std::get<bool>(expected_after) == std::get<bool>(current));
           break;
         case AI::ConditionValue_t::Number:
           // @TODO this is almost certainly wrong(or at least just incomplete)
@@ -296,7 +302,10 @@ struct System {
           // if it was increasing, then maybe this suffices
           // if it was supposed to be decreasing, then maybe <= or something?
           // if set, maybe ==
-          all_met = all_met && (current.number >= expected_after.number);
+          all_met = all_met &&
+                    (std::get<u32>(current) >= std::get<u32>(expected_after));
+          break;
+        case AI::ConditionValue_t::Resources:
           break;
       }
     }
@@ -323,12 +332,15 @@ struct System {
       switch (value_type_for_cond_t(effect.type)) {
           // @todo  actually use the op
         case AI::ConditionValue_t::Boolean:
-          state[effect.type].boolean = effect.value.boolean;
+          std::get<bool>(state[effect.type]) = std::get<bool>(effect.value);
           break;
-        case AI::ConditionValue_t::Number:
-          int current = state[effect.type].number;
-          state[effect.type].number = current + effect.value.number;
-          break;
+        case AI::ConditionValue_t::Number: {
+          u32 current = std::get<u32>(state[effect.type]);
+          state[effect.type] = current + std::get<u32>(effect.value);
+        } break;
+        case AI::ConditionValue_t::Resources: {
+          // @todo
+        } break;
       }
 
       effect.after = state[effect.type];
@@ -410,51 +422,40 @@ struct System {
   ) {
     switch (cond.type) {
       case Condition_t::HasColonist: {
-        return {
-          .boolean =
-            Actor::System::get_colonist_of_player(ai_player) != entt::null
-        };
+        return Actor::System::get_colonist_of_player(ai_player) != entt::null;
       } break;
 
       case Condition_t::ColonistOnUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
-          return {.boolean = false};
+          return false;
 
-        return {
-          .boolean = Actor::System::colonist_can_claim_province(colonist_e)
-        };
+        return Actor::System::colonist_can_claim_province(colonist_e);
       } break;
 
       case Condition_t::ColonistOnOwnProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
-          return {.boolean = false};
+          return false;
 
-        return {
-          .boolean = Actor::System::colonist_can_place_settlement(colonist_e)
-        };
+        return Actor::System::colonist_can_place_settlement(colonist_e);
       } break;
 
       case Condition_t::HasUnsettledProvince: {
-        return {
-          .boolean = Province::System::player_has_unsettled_province(ai_player)
-        };
+        return Province::System::player_has_unsettled_province(ai_player);
       } break;
       case Condition_t::HasSettlements: {
-        return {
-          .number = Settlement::System::num_player_settlements(ai_player)
-        };
+        return Settlement::System::num_player_settlements(ai_player);
       } break;
       case Condition_t::HasResources: {
-        assert(cond.quantity_type == ConditionQuantityType::Resource);
+        // auto ai_player_resources =
+        //   Resource::System::get_resources_for_player(ai_player);
+        //
+        // auto cond_resources = std::get<map<Resources::Type, u32>>(cond.value);
+        //
+        // auto quantity = ai_player_resources[];
 
-        auto ai_player_resources =
-          Resource::System::get_resources_for_player(ai_player);
-
-        auto quantity = ai_player_resources[cond.quantity.resource];
-
-        return {.number = quantity};
+        return (u32) 0;
       } break;
 
       case AI::Condition_t::COUNT:

@@ -2,6 +2,7 @@
 
 #include "../../../../data/resources.hpp"
 #include "../../../shared/common.hpp"
+#include <variant>
 
 namespace AI {
 enum class Condition_t {
@@ -17,21 +18,16 @@ enum class Condition_t {
 enum class ConditionValue_t {
   Boolean,
   Number,
+  Resources,
 };
 
-using ConditionValue = union {
-  bool boolean;
-  u32 number;
-};
+// using ConditionValue = union {
+//   bool boolean;
+//   u32 number;
+//   map<Resources::Type, u32> resources;
+// };
 
-enum class ConditionQuantityType {
-  None,
-  Resource
-};
-
-using ConditionQuantity = union {
-  Resources::Type resource;
-};
+using ConditionValue = std::variant<bool, u32, map<Resources::Type, u32>>;
 
 enum class ConditionCompare {
   Equals,
@@ -53,30 +49,20 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
   }
 }
 
-inline ConditionQuantityType quantity_type(Condition_t cond_t) {
-  switch (cond_t) {
-    case Condition_t::HasResources:
-      return ConditionQuantityType::Resource;
-    default:
-      return ConditionQuantityType::None;
-  }
-}
-
 struct Condition {
   Condition_t type;
   ConditionCompare compare = ConditionCompare::Equals;
   ConditionValue value;
 
-  ConditionQuantityType quantity_type = ConditionQuantityType::None;
-  ConditionQuantity quantity;
-
-
   bool operator==(const ConditionValue &other) const {
     switch (value_type_for_cond_t(type)) {
       case ConditionValue_t::Boolean:
-        return value.boolean == other.boolean;
+        return std::get<bool>(value) == std::get<bool>(other);
       case ConditionValue_t::Number:
-        return value.number == other.number;
+        return std::get<u32>(value) == std::get<u32>(other);
+      case ConditionValue_t::Resources:
+        return std::get<map<Resources::Type, u32>>(value) ==
+               std::get<map<Resources::Type, u32>>(other);
     }
   }
 
@@ -90,7 +76,11 @@ struct Condition {
           case ConditionValue_t::Boolean:
             return false;
           case ConditionValue_t::Number:
-            return against.number >= value.number;
+            return std::get<u32>(against) >= std::get<u32>(value);
+          case ConditionValue_t::Resources:
+            // @verify does this actually work?
+            return std::get<map<Resources::Type, u32>>(against) >=
+                   std::get<map<Resources::Type, u32>>(value);
         }
       }
     }
