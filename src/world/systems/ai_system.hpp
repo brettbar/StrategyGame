@@ -450,24 +450,6 @@ struct System {
       case Condition_t::HasResources: {
         map<Resources::Type, u32> current_resources =
           Resource::System::get_resources_for_player(ai_player);
-
-        // map<Resources::Type, u32> resources_needed =
-        //   std::get<map<Resources::Type, u32>>(cond.value);
-        //
-        // for (const auto &[key, val]: resources_needed) {
-        //   Resources::Type resource_needed = key;
-        //   u32 amount_needed = val;
-        //
-        //   u32 amount_currently_have = current_resources[resource_needed];
-        //
-        //   if (amount_currently_have < amount_needed) {
-        //     return false;
-        //   }
-        // }
-
-
-        // auto quantity = ai_player_resources[];
-
         return current_resources;
       } break;
 

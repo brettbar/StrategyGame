@@ -42,8 +42,9 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
     case Condition_t::HasUnsettledProvince:
       return ConditionValue_t::Boolean;
     case Condition_t::HasSettlements:
-    case Condition_t::HasResources:
       return ConditionValue_t::Number;
+    case Condition_t::HasResources:
+      return ConditionValue_t::Resources;
     case Condition_t::COUNT:
       return ConditionValue_t::Boolean;
   }
@@ -61,6 +62,8 @@ struct Condition {
       case ConditionValue_t::Number:
         return std::get<u32>(value) == std::get<u32>(other);
       case ConditionValue_t::Resources:
+        // @todo wont work
+        // we need to change it so its just saying does all of one equal that of the other, not a strict check I think
         return std::get<map<Resources::Type, u32>>(value) ==
                std::get<map<Resources::Type, u32>>(other);
     }
@@ -77,10 +80,27 @@ struct Condition {
             return false;
           case ConditionValue_t::Number:
             return std::get<u32>(against) >= std::get<u32>(value);
-          case ConditionValue_t::Resources:
-            // @verify does this actually work?
-            return std::get<map<Resources::Type, u32>>(against) >=
-                   std::get<map<Resources::Type, u32>>(value);
+          case ConditionValue_t::Resources: {
+            map<Resources::Type, u32> resources_needed =
+              std::get<map<Resources::Type, u32>>(value);
+
+            map<Resources::Type, u32> comparing_against =
+              std::get<map<Resources::Type, u32>>(against);
+
+
+            for (const auto &[key, val]: resources_needed) {
+              Resources::Type resource_needed = key;
+              u32 amount_needed = val;
+
+              u32 amount_currently_have = comparing_against[resource_needed];
+
+              if (amount_currently_have < amount_needed) {
+                return false;
+              }
+            }
+
+            return true;
+          } break;
         }
       }
     }

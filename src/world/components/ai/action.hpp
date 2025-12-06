@@ -57,6 +57,13 @@ inline Action get_action(Action_t type) {
               ConditionCompare::Equals,
               true,
             },
+            {
+              Condition_t::HasResources,
+              ConditionCompare::GreaterThanOrEqualTo,
+              map<Resources::Type, u32>{
+                {Resources::Type::Bricks, 10},
+              },
+            },
           },
         .effects = {
           Effect{
