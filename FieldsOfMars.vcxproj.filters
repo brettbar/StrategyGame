@@ -33,6 +33,9 @@
     <ClInclude Include="src\world\systems\abstract.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\clay\clay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

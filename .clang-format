@@ -45,7 +45,7 @@ IndentPPDirectives: None
 IndentWidth: 2
 KeepEmptyLinesAtTheStartOfBlocks: true
 MaxEmptyLinesToKeep: 2
-NamespaceIndentation: All
+NamespaceIndentation: None
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PointerAlignment: Right
@@ -64,9 +64,9 @@ SpacesBeforeTrailingComments: 0
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
-SpacesInParens: Custom
-SpacesInParensOptions:
-   Other: true 
+# SpacesInParens: Custom
+# SpacesInParensOptions:
+#    Other: true 
 
 SpacesInSquareBrackets: false
 TabWidth: 2

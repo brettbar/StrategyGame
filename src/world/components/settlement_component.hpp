@@ -11,30 +11,30 @@
 #include <cereal/types/vector.hpp>
 
 namespace Settlement {
-
-
   struct Component {
     u32 id;
     std::string name;
     Development development;
     Population population;
     Texture2D texture;
-    std::map<Resources::Type, u32> resources = {};
+    map<Resources::Type, u32> resource_quantities = {};
 
-    // Building
-    std::vector<Buildings::Building> buildings = {};
+    u32 max_building_slots = 1;
 
-    std::vector<Regiment> garrison = {};
+    list<Buildings::Building> buildings = {};
 
-    // TOOD might need separate save/load functions for this one
+    list<Regiment> garrison = {};
+
+    // @TODO might need separate save/load functions for this one
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( id, name, development, population, buildings );
+    void serialize(Archive &ar) {
+      ar(id, name, development, population, buildings);
     }
 
+    // @TODO is this needed?
     template<class Archive>
-    void serialize( Archive &ar, Population &pop ) {
-      ar( pop );
+    void serialize(Archive &ar, Population &pop) {
+      ar(pop);
     }
   };
 

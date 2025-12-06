@@ -11,30 +11,33 @@
 #include <raylib.h>
 
 namespace UI {
-  inline str faction_settlement_screen() {
+  inline str faction_selection_screen() {
     auto fm = Faction::Manager::Get();
     u32 num_factions = fm->num_factions;
 
-    CLAY(
-      CLAY_ID( "SPFactionSelect" ),
-      CLAY_RECTANGLE( { .color = { 0, 0, 0, 255 } } ),
-      CLAY_LAYOUT( {
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          },
-        .padding = { 16, 16 },
-        .childGap = 8,
-        .childAlignment =
-          {
-            .x = CLAY_ALIGN_X_CENTER,
-            .y = CLAY_ALIGN_Y_CENTER,
-          },
-        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-      } )
-    ) {
-      for ( u32 i = 0; i < num_factions; i++ ) {
+    str selected = "";
+
+    CLAY({
+      .id = CLAY_ID("SPFactionSelect"),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .padding = {16, 16},
+          .childGap = 8,
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
+            },
+          .layoutDirection = CLAY_LEFT_TO_RIGHT,
+        },
+      .backgroundColor = COLOR_BLACK,
+    }) {
+      for (u32 i = 0; i < num_factions; i++) {
         // Clay_String poop = CLAY_STRING( "romans" );
         const char *faction = fm->ids[i].c_str();
 
@@ -42,8 +45,8 @@ namespace UI {
           Actor::Type::ArmyTierI, faction
         );
 
-        Clay_String cs = (Clay_String) {
-          .length = strlen( faction ),
+        Clay_String cs = Clay_String{
+          .length = static_cast<int32_t>(strlen(faction)),
           .chars = faction,
         };
 
@@ -56,31 +59,33 @@ namespace UI {
         };
 
 
-        CLAY( CLAY_LAYOUT( {
-          .padding = { 16, 16 },
-          .childGap = 8,
-          .childAlignment =
-            {
-              .x = CLAY_ALIGN_X_CENTER,
-              .y = CLAY_ALIGN_Y_CENTER,
-            },
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        } ) ) {
-          text_button_lrg( CLAY_STRING( "FactionSelect::Button" ), cs, i, fc );
+        CLAY(
+          {.layout =
+             {
+               .padding = {16, 16},
+               .childGap = 8,
+               .childAlignment =
+                 {
+                   .x = CLAY_ALIGN_X_CENTER,
+                   .y = CLAY_ALIGN_Y_CENTER,
+                 },
+               .layoutDirection = CLAY_TOP_TO_BOTTOM,
+             }}
+        ) {
+          if (text_button_lrg(
+                CLAY_STRING("FactionSelect::Button"), cs, i, fc
+              )) {
+            selected = fm->ids[i];
+          }
 
           texture_label(
-            hstr{ ( actor.sprite_id + "_overview" ).c_str() }, { 128, 128 }
+            hstr{(actor.sprite_id + "_overview").c_str()}, {128, 128}
           );
         }
       }
     }
 
-    for ( u32 i = 0; i < num_factions; i++ ) {
-      if ( ButtonWasClicked( CLAY_STRING( "FactionSelect::Button" ), i ) ) {
-        return fm->ids[i];
-      }
-    }
 
-    return "";
+    return selected;
   }
 };// namespace UI

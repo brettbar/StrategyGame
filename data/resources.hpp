@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../src/shared/common.hpp"
+#include "../src/shared/utils.hpp"
 #include <vector>
 
 namespace Resources {
@@ -32,6 +34,8 @@ namespace Resources {
     // Wool,
     // Flax,
     // Hide,
+    Bricks,
+    Stone,
     SilverOre,
     GoldOre,
     IronOre,
@@ -40,8 +44,6 @@ namespace Resources {
     // Gems,
     //////////////////
     // Flour,
-    // Bricks,
-    // StoneBricks,
     // Pottery,
     // Cloth,
     // Linen,
@@ -63,18 +65,18 @@ namespace Resources {
   };
 
 
-  inline const char *ResourceStr( Type r ) {
-    switch ( r ) {
+  inline const char *resource_cstr(Type r) {
+    switch (r) {
       case Type::Timber:
-        return "timber";
+        return "Timber";
       case Type::Wheat:
-        return "wheat";
+        return "Wheat";
       // case Type::Olives:
       //   return "olives";
       case Type::Fish:
-        return "fish";
+        return "Fish";
       case Type::Clay:
-        return "clay";
+        return "Clay";
       // case Type::Stone:
       //   return "stone";
       // case Type::Wool:
@@ -83,76 +85,39 @@ namespace Resources {
       //   return "flax";
       // case Type::Hide:
       //   return "hide";
+      case Type::Bricks:
+        return "Bricks";
+      case Type::Stone:
+        return "Stone";
       case Type::SilverOre:
-        return "silver ore";
+        return "Silver Ore";
       case Type::GoldOre:
-        return "gold ore";
+        return "Gold Ore";
       case Type::IronOre:
-        return "iron ore";
+        return "Iron Ore";
       case Type::TinOre:
-        return "tin ore";
+        return "Tin Ore";
       case Type::CopperOre:
-        return "copper ore";
-      // case RawMaterial::Gems:
-      //   return "gems";
-      default:
+        return "Copper Ore";
+
+
+      case Type::GoldIngots:
+        return "Gold Ingots";
+      case Type::IronIngots:
+        return "Iron Ingots";
+      case Type::BronzeIngots:
+        return "Bronze Ingots";
+        // case RawMaterial::Gems:
+        //   return "gems";
+
+      case Type::COUNT:
         return "INVALID";
     }
   }
 
 
-  // inline std::vector<std::string> natural = {
-  //   "soil",
-  //   "trees",
-  //   "fish",
-  //   "clay",
-  //   "stone",
-  //   "sheep",
-  //   "cattle",
-  //   "silver_vein",
-  //   "gold_vein",
-  //   "iron_vein",
-  //   "tin_vein",
-  //   "copper_vein",
-  //   "gemstones",
-  // };
+  inline hstr resource_icon_path(Type type) {
+    return file_path_str_format(resource_cstr(type), ".png");
+  }
 
-  inline std::vector<const char *> resources = {
-    "timber",
-    "wheat",
-    //"olives",
-    "fish",
-    "clay",
-    //"stone",
-    //"wool",
-    //"flax",
-    //"hide",
-    "silver ore",
-    "gold ore",
-    "iron ore",
-    "tin ore",
-    "copper ore",
-    //"gems",
-    //////////////////
-    // "flour",
-    // "bricks",
-    // "stone_bricks",
-    // "pottery",
-    // "cloth",
-    // "linen",
-    // "leather",
-    // "silver",
-    "gold ingots",
-    "iron ingots",
-    "bronze ingots",
-    ///////////////////
-    "olive oil",
-    // "swords",
-    // "spears",
-    // "shields",
-    // "helmets",
-    // "armour",
-    // "clothing",
-    // "jewelry",
-  };
 };// namespace Resources

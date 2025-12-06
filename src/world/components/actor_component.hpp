@@ -23,16 +23,16 @@ namespace Actor {
   };
 
   inline map<str, Type> type_lookup = {
-    { "colonist", Type::Colonist },
-    { "diplomat", Type::Diplomat },
-    { "explorer", Type::Explorer },
-    { "merchant", Type::Merchant },
-    { "army_tier_i", Type::ArmyTierI },
-    { "special", Type::Special },
+    {"colonist", Type::Colonist},
+    {"diplomat", Type::Diplomat},
+    {"explorer", Type::Explorer},
+    {"merchant", Type::Merchant},
+    {"army_tier_i", Type::ArmyTierI},
+    {"special", Type::Special},
   };
 
-  inline str type_as_str( Type type ) {
-    switch ( type ) {
+  inline str type_as_str(Type type) {
+    switch (type) {
       case Type::Colonist:
         return "colonist";
       case Type::Diplomat:
@@ -61,8 +61,14 @@ namespace Actor {
     str sprite_id; //  hstr{"romans_plebeian"}
 
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( type, CEREAL_NVP(actor_id), name, CEREAL_NVP(faction_id), CEREAL_NVP(sprite_id) );
+    void serialize(Archive &ar) {
+      ar(
+        type,
+        CEREAL_NVP(actor_id),
+        name,
+        CEREAL_NVP(faction_id),
+        CEREAL_NVP(sprite_id)
+      );
     }
   };
 
@@ -72,13 +78,20 @@ namespace Actor {
     vec2f position;
     vec2f destination;
     f32 speed;
-    bool selected = false;
+    // bool selected = false;
     bool moving = false;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( CEREAL_NVP(owner), position.x, position.y, destination.x, destination.y, speed );
-      data.serialize( ar );
+    void serialize(Archive &ar) {
+      ar(
+        CEREAL_NVP(owner),
+        position.x,
+        position.y,
+        destination.x,
+        destination.y,
+        speed
+      );
+      data.serialize(ar);
     }
   };
 

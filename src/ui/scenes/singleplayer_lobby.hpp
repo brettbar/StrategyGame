@@ -17,52 +17,46 @@ namespace UI {
       Action_SinglePlayerLobby action;
     };
 
-    CLAY(
-      CLAY_ID( "SingleplayerLobby" ),
-      CLAY_RECTANGLE( {
-        .color = { 43, 41, 51, 255 },
-      } ),
-      CLAY_LAYOUT( {
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        .sizing =
-          {
-            .width = CLAY_SIZING_GROW(),
-            .height = CLAY_SIZING_GROW(),
-          },
-        .padding = { 16, 16 },
-        .childGap = 8,
-        .childAlignment =
-          {
-            .y = CLAY_ALIGN_Y_CENTER,
-            .x = CLAY_ALIGN_X_CENTER,
-          },
-      } )
-    ) {
-      text_button_lrg(
-        CLAY_STRING( "SinglePlayerLobby::SelectFaction" ),
-        CLAY_STRING( "Select Faction" ),
-        0
-      );
-      text_button_lrg(
-        CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ),
-        CLAY_STRING( "Return to Main" ),
-        1
-      );
+    Action_SinglePlayerLobby action = Action_SinglePlayerLobby::None;
+
+    CLAY({
+      .id = CLAY_ID("SingleplayerLobby"),
+      .layout =
+        {
+          .sizing =
+            {
+              .width = CLAY_SIZING_GROW(),
+              .height = CLAY_SIZING_GROW(),
+            },
+          .padding = {16, 16},
+          .childGap = 8,
+          .childAlignment =
+            {
+              .x = CLAY_ALIGN_X_CENTER,
+              .y = CLAY_ALIGN_Y_CENTER,
+            },
+          .layoutDirection = CLAY_TOP_TO_BOTTOM,
+        },
+    }) {
+      if (text_button_lrg(
+            CLAY_STRING("SinglePlayerLobby::SelectFaction"),
+            CLAY_STRING("Select Faction"),
+            0
+          )) {
+        action = Action_SinglePlayerLobby::SelectFaction;
+      }
+
+      if (text_button_lrg(
+            CLAY_STRING("SinglePlayerLobby::ReturnToMain"),
+            CLAY_STRING("Return to Main"),
+            1
+          )) {
+
+        action = Action_SinglePlayerLobby::ReturnToMain;
+      }
     }
 
-    if ( ButtonWasClicked(
-           CLAY_STRING( "SinglePlayerLobby::SelectFaction" ), 0
-         ) ) {
-      return Action_SinglePlayerLobby::SelectFaction;
-    }
-
-    if ( ButtonWasClicked(
-           CLAY_STRING( "SinglePlayerLobby::ReturnToMain" ), 1
-         ) ) {
-      return Action_SinglePlayerLobby::ReturnToMain;
-    }
-
-    return Action_SinglePlayerLobby::None;
+    return action;
   }
 
 

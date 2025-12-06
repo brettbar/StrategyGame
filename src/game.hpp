@@ -1,12 +1,5 @@
 #pragma once
 
-#include "interface/irongui/forge.hpp"
-#include "interface/pages/editor.hpp"
-#include "interface/pages/faction_select_menu.hpp"
-#include "interface/pages/lobby_browser.hpp"
-#include "interface/pages/modal_menu_ui.hpp"
-#include "interface/pages/multiplayer_lobby.hpp"
-#include "interface/pages/save_games.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 
@@ -14,18 +7,17 @@
 #include "network/network.hpp"
 #include "shared/common.hpp"
 
-#include "renderer/renderer.hpp"
-
-
 #include "campaign.hpp"
 #include "shared/global.hpp"
 #include <raylib.h>
 
-#define CLAY_IMPLEMENTATION
-#define CLAY_EXTEND_CONFIG_IMAGE hstr texture_id;
-#include "clay/clay.h"
+#include "shared/utils.hpp"
 
+
+#include "ui/common.h"
+#include "ui/scenes/load_game_menu.hpp"
 #include "ui/scenes/main_menu.hpp"
+#include "ui/scenes/modal_menu.hpp"
 #include "ui/scenes/singleplayer_lobby.hpp"
 #include "ui/scenes/sp_faction_select.hpp"
 
@@ -54,20 +46,21 @@ class IGame {
     // RegisterEventListeners();
 
     Global::state.camera = Camera2D{
-      .offset = { (f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2 },
+      .offset = {(f32) GetScreenWidth() / 2, (f32) GetScreenHeight() / 2},
       .target =
-        { ( Global::state.mapWidth * 64.0f ) / 2,
-          ( Global::state.mapHeight * 64.0f ) / 2 },
+        {(Global::state.mapWidth * 64.0f) / 2,
+         (Global::state.mapHeight * 64.0f) / 2},
       .rotation = 0,
       .zoom = 2.0f,
     };
+
 
     // Initialize manager singletons
     // Order matters here
     Faction::Manager::Get();
     Actor::Manager::Get();
 
-    while ( !WindowShouldClose() && ShouldRun() ) {
+    while (!WindowShouldClose() && ShouldRun()) {
       SteamAPI_RunCallbacks();
 
       // 1. Update Time
@@ -78,8 +71,8 @@ class IGame {
       // 5. Run all Updates
       {
         // Update 60 times a second
-        while ( _lag >= _MS_PER_UPDATE ) {
-          if ( _campaign )
+        while (_lag >= _MS_PER_UPDATE) {
+          if (_campaign)
             _campaign->Update60TPS();
           _lag -= _MS_PER_UPDATE;
         }
@@ -100,8 +93,8 @@ class IGame {
         // Update once per second but modified by timeScale
         // TODO? Do we want to fold this timescale business into campaign itself
         // Since we dont care about timescale in other program_modes
-        while ( _oncelag >= _ONCE_A_SECOND * ( 1 / Global::state.timeScale ) ) {
-          if ( _campaign )
+        while (_oncelag >= _ONCE_A_SECOND * (1 / Global::state.timeScale)) {
+          if (_campaign)
             _campaign->Update1TPS();
           _oncelag = 0.0f;
         }
@@ -146,18 +139,18 @@ class IGame {
 
                         Begin: Singleplayer
   =============================================================*/
-  void StartSingleplayerCampaign( str player_faction ) {
+  void StartSingleplayerCampaign(str player_faction) {
     _scene = Scene::Campaign;
 
-    _campaign = new struct Campaign( true );
-    _campaign->start( player_faction );
+    _campaign = new struct Campaign(true);
+    _campaign->start(player_faction);
   }
 
-  void LoadSinglePlayerCampaign( cstr file_path ) {
+  void LoadSinglePlayerCampaign(cstr file_path) {
     _scene = Scene::Campaign;
 
-    _campaign = new struct Campaign( true, "output.dat" );
-    _campaign->load( file_path );
+    _campaign = new struct Campaign(true, "output.dat");
+    _campaign->load(file_path);
   }
   /*=============================================================
                         End: Singleplayer
@@ -175,20 +168,20 @@ class IGame {
 
   // @todo maybe can consolidate these
   void HostStartMultiplayerCampaign() {
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
 
     _scene = Scene::Campaign;
-    _campaign = new struct Campaign( false );
+    _campaign = new struct Campaign(false);
     _campaign->start_mp();
     // _campaign->start( Network::Host()->GetHostFaction() );
   }
   void ClientStartMultiplayerCampaign() {
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
 
     _scene = Scene::Campaign;
-    _campaign = new struct Campaign( false );
+    _campaign = new struct Campaign(false);
     _campaign->start_mp();
     // _campaign->start( Network::Client()->GetClientFaction() );
   }
@@ -223,13 +216,32 @@ class IGame {
   }
 
   void CheckMenuToggle() {
-    if ( IsKeyPressed( KEY_CAPS_LOCK ) || IsKeyPressed( KEY_ESCAPE ) ) {
-      if ( _scene == Scene::ModalMenu ) {
+    if (IsKeyPressed(KEY_CAPS_LOCK) || IsKeyPressed(KEY_ESCAPE)) {
+      if (_scene == Scene::ModalMenu) {
         _scene = Scene::Campaign;
       } else {
         _scene = Scene::ModalMenu;
+        Global::state.timeScale = 0.0f;
       }
     }
+  }
+
+  void clay_update() {
+    Vector2 mouse_pos = GetMousePosition();
+    Vector2 scroll_delta = GetMouseWheelMoveV();
+
+    Clay_SetLayoutDimensions(Clay_Dimensions{
+      .width = (f32) GetScreenWidth(),
+      .height = (f32) GetScreenHeight(),
+    });
+
+    Clay_SetPointerState(
+      Clay_Vector2{mouse_pos.x, mouse_pos.y}, IsMouseButtonDown(0)
+    );
+
+    Clay_UpdateScrollContainers(
+      true, Clay_Vector2{scroll_delta.x, scroll_delta.y}, GetFrameTime()
+    );
   }
 
   void ExitToMainMenu() {
@@ -238,56 +250,39 @@ class IGame {
   }
 
   void UpdateOnFrame() {
-    if ( Network::is_host ) {
+    if (Network::is_host) {
       auto msg = Network::Host()->ProcessNextMsg();
-      switch ( msg.message_id ) {
+      switch (msg.message_id) {
         case Network::MessageID::Command: {
-          _campaign->ConvertCommandRequest( msg.body.dump() );
+          _campaign->ConvertCommandRequest(msg.body.dump());
         } break;
       }
 
       // auto msg = Network::Host()->CheckForMessages();
     } else {
       auto msg = Network::Client()->CheckForMessages();
-      switch ( msg.message_id ) {
+      switch (msg.message_id) {
         case Network::MessageID::None: {
         } break;
         case Network::MessageID::HostStartedCampaign: {
           ClientStartMultiplayerCampaign();
         } break;
         case Network::MessageID::Command: {
-          _campaign->ConvertCommandRequest( msg.body.dump() );
+          _campaign->ConvertCommandRequest(msg.body.dump());
         } break;
       }
     }
 
-    Iron::Forge()->over_any_elem = false;
-
-    Clay_SetLayoutDimensions( (Clay_Dimensions) {
-      .width = (f32) GetScreenWidth(),
-      .height = (f32) GetScreenHeight(),
-    } );
-
-    Vector2 mouse_pos = GetMousePosition();
-    Vector2 scroll_delta = GetMouseWheelMoveV();
-
-    Clay_SetPointerState(
-      Clay_Vector2{ mouse_pos.x, mouse_pos.y }, IsMouseButtonDown( 0 )
-    );
-
-    Clay_UpdateScrollContainers(
-      true, (Clay_Vector2) { scroll_delta.x, scroll_delta.y }, GetFrameTime()
-    );
+    clay_update();
 
 
-    if ( IsKeyDown( KEY_LEFT_CONTROL ) && IsKeyDown( KEY_LEFT_SHIFT ) &&
-         IsKeyPressed( KEY_I ) ) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
       _ui_debug = !_ui_debug;
-      Clay_SetDebugModeEnabled( _ui_debug );
+      Clay_SetDebugModeEnabled(_ui_debug);
     }
 
 
-    switch ( _scene ) {
+    switch (_scene) {
       case Scene::MainMenu:
         Scene_MainMenu();
         break;
@@ -317,11 +312,6 @@ class IGame {
         Scene_Campaign();
         break;
     }
-
-    if ( !Iron::Forge()->over_any_elem ) {
-      Iron::Forge()->context.hot = -1;
-      Iron::Forge()->context.active = -1;
-    }
   }
 
 
@@ -330,9 +320,9 @@ class IGame {
     Clay_BeginLayout();
     auto action = UI::main_menu();
 
-    switch ( action ) {
+    switch (action) {
       case UI::Action_MainMenu::StartGame:
-        printf( "Hit Start Game in game.hpp\n" );
+        printf("Hit Start Game in game.hpp\n");
         _scene = Scene::SinglePlayerLobby;
         break;
       case UI::Action_MainMenu::LoadGame:
@@ -358,29 +348,46 @@ class IGame {
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
+      ClearBackground(BLACK);
 
-      Clay_Raylib_Render( render_cmds );
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
 
   void Scene_LoadGames() {
+    list<str> paths = {};
+
+    // @todo probably make this absolute like paradox games do, in documents for example
+    str path = "./saves";
+    for (const auto &entry: fs::directory_iterator(path)) {
+      if (entry.path().extension() == ".dat") {
+        paths.push_back(entry.path().string());
+      }
+    }
+
+
+    Clay_BeginLayout();
     bool pressed_back = false;
-    auto file_to_load = UI::load_game_menu( pressed_back );
 
-    if ( pressed_back ) {
-      _scene = Scene::MainMenu;
+    auto action = UI::load_game_menu(paths);
+    switch (action.type) {
+      case UI::Action_LoadGameMenu_t::None:
+        break;
+      case UI::Action_LoadGameMenu_t::Back:
+        _scene = Scene::MainMenu;
+        break;
+      case UI::Action_LoadGameMenu_t::LoadGame:
+        LoadSinglePlayerCampaign(action.selection.c_str());
+        break;
     }
 
-    if ( file_to_load != "" ) {
-      LoadSinglePlayerCampaign( file_to_load.c_str() );
-    }
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
+      ClearBackground(BLACK);
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -389,7 +396,7 @@ class IGame {
     Clay_BeginLayout();
     auto action = UI::singleplayer_lobby();
 
-    switch ( action ) {
+    switch (action) {
       case UI::Action_SinglePlayerLobby::SelectFaction:
         _scene = Scene::SPFactionSelect;
         break;
@@ -403,137 +410,140 @@ class IGame {
 
     BeginDrawing();
     {
-      ClearBackground( BLACK );
-      Clay_Raylib_Render( render_cmds );
+      ClearBackground(BLACK);
+      Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
 
   void Scene_MultiplayerLobby() {
-    switch ( UI::MultiPlayerLobby() ) {
-      case UI::Action_MultiplayerLobby::None:
-        break;
-      case UI::Action_MultiplayerLobby::HitBack:
-        _scene = Scene::MainMenu;
-        break;
-      case UI::Action_MultiplayerLobby::PickFaction: {
-        _scene = Scene::MPFactionSelect;
-      } break;
-      case UI::Action_MultiplayerLobby::ToggleReady:
-        if ( Network::is_host ) {
-          Network::Host()->ToggleReady();
-        } else {
-          Network::Client()->ToggleReady();
-        }
-        break;
-      case UI::Action_MultiplayerLobby::HostStartedGame: {
-        Network::Host()->StartHostedCampaign();
-        HostStartMultiplayerCampaign();
-      } break;
-    }
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // switch ( UI::MultiPlayerLobby() ) {
+    //   case UI::Action_MultiplayerLobby::None:
+    //     break;
+    //   case UI::Action_MultiplayerLobby::HitBack:
+    //     _scene = Scene::MainMenu;
+    //     break;
+    //   case UI::Action_MultiplayerLobby::PickFaction: {
+    //     _scene = Scene::MPFactionSelect;
+    //   } break;
+    //   case UI::Action_MultiplayerLobby::ToggleReady:
+    //     if ( Network::is_host ) {
+    //       Network::Host()->ToggleReady();
+    //     } else {
+    //       Network::Client()->ToggleReady();
+    //     }
+    //     break;
+    //   case UI::Action_MultiplayerLobby::HostStartedGame: {
+    //     Network::Host()->StartHostedCampaign();
+    //     HostStartMultiplayerCampaign();
+    //   } break;
+    // }
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_LobbyBrowser() {
-    CSteamID choice = UI::LobbyBrowser();
-    // dont know if this works
-
-    if ( choice.IsValid() ) {
-      std::cout << "1." << '\n';
-      if ( Network::Client()->AttemptJoinLobby( choice ) ) {
-        _scene = Scene::MultiPlayerLobby;
-        std::cout << "2." << '\n';
-      }
-    }
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // CSteamID choice = UI::LobbyBrowser();
+    // // dont know if this works
+    //
+    // if ( choice.IsValid() ) {
+    //   std::cout << "1." << '\n';
+    //   if ( Network::Client()->AttemptJoinLobby( choice ) ) {
+    //     _scene = Scene::MultiPlayerLobby;
+    //     std::cout << "2." << '\n';
+    //   }
+    // }
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing
   }
 
 
   void Scene_SPFactionSelect() {
-    // auto selection = UI::DrawFactionSelectScreen();
     Clay_BeginLayout();
-    auto selection = UI::faction_settlement_screen();
+    auto selection = UI::faction_selection_screen();
 
     // @volatile
     // TODO make this a faction enum
-    if ( selection != "" ) {
-      StartSingleplayerCampaign( selection );
+    if (selection != "") {
+      StartSingleplayerCampaign(selection);
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      ClearBackground( BLACK );
-      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      ClearBackground(BLACK);
+
+      // Clay_Raylib_Render( render_cmds, Global::fonts.data() );
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
+
       // Iron::Forge()->DrawAll();
     }
     EndDrawing();
   }
 
   void Scene_MPFactionSelect() {
-    auto selection = UI::DrawFactionSelectScreen();
-
-    if ( selection != "" ) {
-      if ( Network::is_host ) {
-        Network::Host()->SetHostFaction( selection );
-        Network::Host()->SendMessageToAllActiveClients( Network::Message{
-          Network::MessageID::PlayerFactionSelect,
-          nlohmann::json{
-            { "player_id", "player_0" },
-            { "faction", selection },
-          },
-        } );
-      } else {
-        auto player_id = Network::Client()->_local_player_id;
-        Network::Client()->SendMessageToHost( Network::Message{
-          Network::MessageID::PlayerFactionSelect,
-          nlohmann::json{
-            { "player_id", player_id },
-            { "faction", selection },
-          },
-        } );
-      }
-
-      _scene = Scene::MultiPlayerLobby;
-    }
-
-
-    BeginDrawing();
-    {
-      ClearBackground( BLACK );
-      Iron::Forge()->DrawAll();
-    }
-    EndDrawing();
+    // auto selection = UI::DrawFactionSelectScreen();
+    //
+    // if ( selection != "" ) {
+    //   if ( Network::is_host ) {
+    //     Network::Host()->SetHostFaction( selection );
+    //     Network::Host()->SendMessageToAllActiveClients( Network::Message{
+    //       Network::MessageID::PlayerFactionSelect,
+    //       nlohmann::json{
+    //         { "player_id", "player_0" },
+    //         { "faction", selection },
+    //       },
+    //     } );
+    //   } else {
+    //     auto player_id = Network::Client()->_local_player_id;
+    //     Network::Client()->SendMessageToHost( Network::Message{
+    //       Network::MessageID::PlayerFactionSelect,
+    //       nlohmann::json{
+    //         { "player_id", player_id },
+    //         { "faction", selection },
+    //       },
+    //     } );
+    //   }
+    //
+    //   _scene = Scene::MultiPlayerLobby;
+    // }
+    //
+    //
+    // BeginDrawing();
+    // {
+    //   ClearBackground( BLACK );
+    //   Iron::Forge()->DrawAll();
+    // }
+    // EndDrawing();
   }
 
   void Scene_ModalMenu() {
+    Clay_BeginLayout();
     CheckMenuToggle();
 
-    switch ( UI::DrawModalMenu() ) {
+    switch (UI::modal_menu()) {
       case UI::Action_ModalMenu::None:
         break;
       case UI::Action_ModalMenu::SaveGame:
         // @todo get actual user input for file name
-        _campaign->save( "output" );
+        _campaign->save("output");
         break;
       case UI::Action_ModalMenu::LoadGame:
         // LoadSinglePlayerCampaign();
         break;
       case UI::Action_ModalMenu::Settings:
         break;
-      case UI::Action_ModalMenu::ExitToMainMenu:
+      case UI::Action_ModalMenu::ExitMainMenu:
         ExitToMainMenu();
         break;
       case UI::Action_ModalMenu::ExitGame:
@@ -541,13 +551,12 @@ class IGame {
         return;
     }
 
+    Clay_RenderCommandArray render_cmds = Clay_EndLayout();
     BeginDrawing();
     {
-      Renderer::draw_map( Map::Manager()->mode );
-      DrawRectangle(
-        0, 0, GetScreenWidth(), GetScreenHeight(), Fade( BLACK, 0.33f )
-      );
-      Iron::Forge()->DrawAll();
+      // Renderer::Get()->draw_map(Map::Manager()->mode);
+      // Renderer::Get()->draw_common();
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
     }
     EndDrawing();
   }
@@ -557,30 +566,30 @@ class IGame {
 
     CheckMenuToggle();
 
-    _campaign->UpdateOnFrame( _dt, _lag, _oncelag );
+    _campaign->UpdateOnFrame(_dt, _lag, _oncelag);
 
-    if ( IsKeyPressed( KEY_GRAVE ) ) {
-      if ( _scene == Scene::Editor ) {
+    if (IsKeyPressed(KEY_GRAVE)) {
+      if (_scene == Scene::Editor) {
         _scene = Scene::Campaign;
       } else {
         _scene = Scene::Editor;
       }
     }
 
-    if ( _scene == Scene::Editor ) {
+    if (_scene == Scene::Editor) {
 
-      auto editor_action = UI::panel();
-
-      switch ( editor_action ) {
-        case UI::EditorAction::None:
-          break;
-        case UI::EditorAction::GenerateMap:
-          // MapSystem::Init();
-          if ( _campaign )
-            //@todo actualyl pass in the faction
-            _campaign->start( "romans" );
-          break;
-      }
+      // auto editor_action = UI::panel();
+      //
+      // switch ( editor_action ) {
+      //   case UI::EditorAction::None:
+      //     break;
+      //   case UI::EditorAction::GenerateMap:
+      //     // MapSystem::Init();
+      //     if ( _campaign )
+      //       //@todo actualyl pass in the faction
+      //       _campaign->start( "romans" );
+      //     break;
+      // }
     }
 
     Clay_RenderCommandArray render_cmds = Clay_EndLayout();
@@ -589,7 +598,8 @@ class IGame {
     BeginDrawing();
     {
       _campaign->Draw();
-      Renderer::Custom_Clay_Raylib_Render( render_cmds );
+      Renderer::Custom_Clay_Raylib_Render(render_cmds, Global::fonts.data());
+      DrawFPS(GetScreenWidth() - 128, 128);
       // Iron::Forge()->DrawAll();
       // Iron::Forge()->DrawDebug();
     }
@@ -602,7 +612,7 @@ class IGame {
     // else
     //   Network::Client()->Delete();
 
-    if ( _campaign )
+    if (_campaign)
       delete _campaign;
   }
   /*=============================================================

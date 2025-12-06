@@ -2,135 +2,177 @@
 
 #include "../../shared/textures.hpp"
 
+#include "../components/actor_component.hpp"
 #include "../managers/map_manager.hpp"
-#include "resource_system.hpp"
 
-namespace ProvinceSystem {
+namespace Province {
 
-  inline void SetProvinceOwner( u32 owner );
+  struct System {
+    static void SetProvinceOwner(u32 owner);
 
-  inline void Init() {
-    for ( u32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++ ) {
-      entt::entity prov_entity = Global::world.create();
+    static rect GetTileTextureRect(u32 texture_i) {
+      f32 offset = 2.0f;
 
-      Province::Component prov = {
-        .selected = false,
-        .tile = Map::Manager()->tile_map[i],
-        .resources = {},
-      };
+      f32 atlas_slot_w = TILE_WIDTH + (offset * 2);
+      f32 atlas_slot_h = TILE_HEIGHT + (offset * 2);
 
-      ResourceSystem::SpawnResource( prov );
-
-
-      // switch ( prov.tile->biome )
-      // {
-      //   case Biome::Plains:
-      //   {
-      //     prov.resources.push_back( Resources::Natural::Trees );
-      //   }
-      //   break;
-      // }
-
-      Global::world.emplace<Province::Component>( prov_entity, prov );
-    }
-  }
-
-  inline void DrawTileTerrain( Tile::Component tile ) {
-    Texture2D texture =
-      Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
-
-    Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
-
-    // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
-    // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
-    // DrawTextureRec(hex, frameRec, tile.position, WHITE);
-    // DrawTextureRec( water_tile, frameRec, tile->position, WHITE );
-    DrawTextureRec( texture, frameRec, tile.position, WHITE );
-  }
-
-  inline void Draw( Camera2D &camera ) {
-    // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
-    for ( auto entity: Global::world.view<Province::Component>() ) {
-
-      auto &prov = Global::world.get<Province::Component>( entity );
-
-      if ( prov.tile->position.x - TILE_WIDTH >
-             camera.target.x + ( camera.offset.x / camera.zoom ) + 32 ||
-           prov.tile->position.x + TILE_WIDTH <
-             camera.target.x - ( camera.offset.x / camera.zoom ) - 32 ||
-           prov.tile->position.y - TILE_WIDTH >
-             camera.target.y + ( camera.offset.y / camera.zoom ) + 32 ||
-           prov.tile->position.y + TILE_WIDTH <
-             camera.target.y - ( camera.offset.y / camera.zoom ) - 32 ) {
-        continue;
+      // plains
+      if (texture_i >= 0 && texture_i <= 13) {
+        return {
+          offset + (atlas_slot_w) *texture_i, offset, TILE_WIDTH, TILE_HEIGHT
+        };
       }
-
-      DrawTileTerrain( *prov.tile );
-    }
-  }
-
-  inline bool player_has_province( entt::entity owner ) {
-    auto provinces = Global::world.view<Province::Component>();
-
-    for ( auto province_e: provinces ) {
-      auto prov = provinces.get<Province::Component>( province_e );
-      if ( prov.tile->owner == owner ) {
-        return true;
+      // mtns
+      else if (texture_i == 14) {
+        return {offset, offset + atlas_slot_h, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // forrest
+      else if (texture_i == 15) {
+        return {offset, offset + atlas_slot_h * 2, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // sea
+      else if (texture_i == 16) {
+        return {offset, offset + atlas_slot_h * 3, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // hills
+      else if (texture_i == 17) {
+        return {offset, offset + atlas_slot_h * 4, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // desert
+      else if (texture_i == 18) {
+        return {offset, offset + atlas_slot_h * 5, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // tundra
+      else if (texture_i == 19) {
+        return {offset, offset + atlas_slot_h * 6, TILE_WIDTH, TILE_HEIGHT};
+      }
+      // invalid
+      else {
+        // placeholder empty
+        return {2048.0f, 2048.0f, TILE_WIDTH, TILE_HEIGHT};
       }
     }
 
-    return false;
-  }
 
+    static void DrawTileTerrain(Province::Tile tile, Texture2D texture) {
+      // Texture2D texture =
+      //   Global::texture_cache[hstr{ tile.texture_key.c_str() }]->texture;
+      // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+      // Rectangle frameRec = { 0.0f, 0.0f, TILE_WIDTH, TILE_HEIGHT };
+      Rectangle frameRec = GetTileTextureRect(tile.texture_i);
 
-  inline void colonist_claim_province( entt::entity colonist_e ) {
-    Actor::Component &actor = Global::world.get<Actor::Component>( colonist_e );
-
-    i32 prov_id = DetermineTileIdFromPosition( actor.position );
-    assert( prov_id >= 0 );
-
-    auto provinces = Global::world.view<Province::Component>();
-
-    for ( auto entity: provinces ) {
-      auto &prov = provinces.get<Province::Component>( entity );
-
-      if ( prov.tile->id != (u32) prov_id || prov.tile->biome == Biome::Sea )
-        continue;
-
-      prov.tile->owner = actor.owner;
+      // Texture2D snow_tile = cache[hstr{ "snow_tile" }]->texture;
+      // DrawTextureRec(hex, {frameRec.x + 520.0f, frameRec.y, frameRec.width, frameRec.height}, tile.position, WHITE);
+      // DrawTextureRec(hex, frameRec, tile.position, WHITE);
+      // DrawTextureRec( water_tile, frameRec, tile.position, WHITE );
+      DrawTextureRec(texture, frameRec, tile.top_left_corner_position, WHITE);
     }
-  }
 
-  inline static Province::Component *get_prov_from_vec2f( vec2f tile_pos ) {
-    auto provinces = Global::world.view<Province::Component>();
-    u32 tile_index = DetermineTileIdFromPosition( tile_pos );
+    static void Draw(Camera2D &camera) {
+      // Texture2D tex = Global::texture_cache[hstr{ "timber.png" }]->texture;
 
-    for ( auto prov_e: provinces ) {
-      auto &prov = provinces.get<Province::Component>( prov_e );
-      if ( prov.tile->id == tile_index ) {
-        return &prov;
+      auto view = Global::world.view<Province::Component>();
+      Texture2D texture = Global::texture_cache[hstr{"terrain.png"}]->texture;
+
+      // Draw backwards to make sure out-of-hex overlaps work
+      for (entt::entity entity: view) {
+        auto &prov = view.get<const Province::Component>(entity);
+
+        if (out_of_camera_bounds(camera, prov.tile.top_left_corner_position)) {
+          continue;
+        }
+
+        DrawTileTerrain(prov.tile, texture);
       }
     }
 
-    return nullptr;
-  }
+    static bool player_has_unsettled_province(entt::entity owner) {
+      auto unsettled_provinces =
+        Global::world
+          .view<Province::Component>(entt::exclude<Settlement::Component>);
 
-  inline static sptr<vec2f> get_nearest_inhabitable_province( vec2f entity_pos
-  ) {
-    auto prov = get_prov_from_vec2f( entity_pos );
-    if ( !prov ) {
+      for (auto province_e: unsettled_provinces) {
+        auto prov = unsettled_provinces.get<Province::Component>(province_e);
+        if (prov.owner == owner) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+
+    static void colonist_claim_province(entt::entity colonist_e) {
+      Actor::Component &actor = Global::world.get<Actor::Component>(colonist_e);
+
+      i32 prov_id = DetermineTileIdFromPosition(actor.position);
+      assert(prov_id >= 0);
+
+      auto provinces = Global::world.view<Province::Component>();
+
+      for (auto entity: provinces) {
+        auto &prov = provinces.get<Province::Component>(entity);
+
+        if (prov.tile.id != (u32) prov_id || prov.tile.biome == Biome::Sea)
+          continue;
+
+        prov.owner = actor.owner;
+        // @todo save
+      }
+    }
+
+    static Province::Component *get_prov_from_vec2f(
+      view<Province::Component> province_v,
+      vec2f tile_pos
+    ) {
+      u32 tile_index = DetermineTileIdFromPosition(tile_pos);
+
+      for (auto prov_e: province_v) {
+        auto &prov = province_v.get<Province::Component>(prov_e);
+        if (prov.tile.id == tile_index) {
+          return &prov;
+        }
+      }
+
       return nullptr;
     }
 
-    auto neighbors = Map::Manager()->get_neighbors( *prov->tile );
+    static sptr<vec2f> get_nearest_inhabitable_province(vec2f entity_pos) {
+      auto province_v = Global::world.view<Province::Component>();
 
-    for ( auto neighbor: neighbors ) {
-      if ( neighbor->owner == entt::null &&
-           Map::Manager()->biome_inhabitable( neighbor->biome ) )
-        return std::make_shared<vec2f>( neighbor->position );
+      auto prov = get_prov_from_vec2f(province_v, entity_pos);
+      if (!prov) {
+        return nullptr;
+      }
+
+
+      auto neighbor_provs =
+        Map::Manager()->get_neighboring_provinces(prov->tile);
+      // auto neighbor_prov_owners =
+      //   Map::Manager()->get_neighboring_owners(prov->tile);
+
+      for (u32 i = 0; i < neighbor_provs.size(); i++) {
+        Province::Component *neighbor_prov = neighbor_provs[i];
+        entt::entity neighbor_owner = neighbor_prov->owner;
+
+
+        if ((neighbor_owner == entt::null) && (neighbor_prov != nullptr)) {
+          printf(
+            "tile pos %f %f, biome is %d\n",
+            neighbor_prov->tile.top_left_corner_position.x,
+            neighbor_prov->tile.top_left_corner_position.y,
+            neighbor_prov->tile.biome
+          );
+
+          if (Map::Manager()->biome_inhabitable(neighbor_prov->tile.biome)) {
+            return std::make_shared<vec2f>(neighbor_prov->tile.center);
+          }
+        }
+      }
+
+      return nullptr;
     }
+  };
 
-    return nullptr;
-  }
 
-};// namespace ProvinceSystem
+};// namespace Province

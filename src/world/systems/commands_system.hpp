@@ -1,10 +1,12 @@
 #pragma once
 
+#include "../../../data/buildings.hpp"
 #include "../../shared/common.hpp"
 
 namespace Commands {
 
   enum class Type {
+    None,
     Move,
     TimeChange,
     SpawnColonist,
@@ -23,9 +25,15 @@ namespace Commands {
     entt::entity player_e;
     str msg;
     Vector2 click_pos;
+    Buildings::Building building;
 
     entt::entity entity;
 
+    static Command none() {
+      auto cmd = Command();
+      cmd.type = Type::None;
+      return cmd;
+    }
 
     static Command move(
       entt::entity player,
@@ -41,21 +49,21 @@ namespace Commands {
     }
 
 
-    static Command build_settlement( entt::entity entity ) {
+    static Command build_settlement(entt::entity entity) {
       auto cmd = Command();
       cmd.type = Type::BuildSettlement;
       cmd.entity = entity;
       return cmd;
     }
 
-    static Command claim_province( entt::entity entity ) {
+    static Command claim_province(entt::entity entity) {
       auto cmd = Command();
       cmd.type = Type::ClaimProvince;
       cmd.entity = entity;
       return cmd;
     }
 
-    static Command spawn_colonist( entt::entity player, vec2f click_pos ) {
+    static Command spawn_colonist(entt::entity player, vec2f click_pos) {
       auto cmd = Command();
       cmd.type = Type::SpawnColonist;
       cmd.player_e = player;
@@ -63,7 +71,7 @@ namespace Commands {
       return cmd;
     }
 
-    static Command spawn_army( entt::entity player, vec2f click_pos ) {
+    static Command spawn_army(entt::entity player, vec2f click_pos) {
       auto cmd = Command();
       cmd.type = Type::SpawnArmy;
       cmd.player_e = player;
@@ -71,7 +79,7 @@ namespace Commands {
       return cmd;
     }
 
-    static Command time_change( entt::entity player, str msg ) {
+    static Command time_change(entt::entity player, str msg) {
       auto cmd = Command();
       cmd.type = Type::TimeChange;
       cmd.player_e = player;
@@ -81,12 +89,12 @@ namespace Commands {
 
     static Command construct_building(
       entt::entity settlement_e,
-      str building
+      Buildings::Building building
     ) {
       auto cmd = Command();
       cmd.type = Type::ConstructBuilding;
       cmd.entity = settlement_e;
-      cmd.msg = building;
+      cmd.building = building;
       return cmd;
     }
 
@@ -106,8 +114,8 @@ public:
       queue.update();
     }
 
-    void enqueue( const Command &cmd ) {
-      queue.enqueue( cmd );
+    void enqueue(const Command &cmd) {
+      queue.enqueue(cmd);
     }
 
     static System *Singleton() {
@@ -119,8 +127,8 @@ private:
     System() {}
     ~System() {}
 
-    System( System const & ) = delete;
-    void operator=( const System & ) = delete;
+    System(System const &) = delete;
+    void operator=(const System &) = delete;
   };
 
   inline System *Manager() {

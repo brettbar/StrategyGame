@@ -17,6 +17,29 @@ namespace Settlement {
     Citadel,
   };
 
+  inline const char *dev_str(Development d) {
+    switch (d) {
+      case Development::Uninhabited:
+        return "Uninhabited";
+      case Development::Village:
+        return "Village";
+      case Development::Town:
+        return "Town";
+      case Development::City:
+        return "City";
+      case Development::Metropolis:
+        return "Metropolis";
+      case Development::Fort:
+        return "Fort";
+      case Development::Fortress:
+        return "Fortress";
+      case Development::Citadel:
+        return "Citadel";
+      default:
+        return "Invalid";
+    }
+  };
+
   struct Population {
     u32 current;
 
@@ -56,21 +79,8 @@ namespace Settlement {
     f32 carryingCapacity;
 
     template<class Archive>
-    void serialize( Archive &ar ) {
-      ar( current, birthRate, deathRate, growthRate, carryingCapacity );
+    void serialize(Archive &ar) {
+      ar(current, birthRate, deathRate, growthRate, carryingCapacity);
     }
   };
-
-  inline std::map<Development, std::string> dev_names = {
-    { Development::Uninhabited, "Uninhabited" },
-    { Development::Village, "Village" },
-    { Development::Town, "Town" },
-    { Development::City, "City" },
-    { Development::Metropolis, "Metropolis" },
-    { Development::Fort, "Fort" },
-    { Development::Fortress, "Fortress" },
-    { Development::Citadel, "Citadel" },
-  };
-
-
 };// namespace Settlement

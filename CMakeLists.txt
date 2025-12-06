@@ -8,8 +8,14 @@ set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include)
 set(SOURCE_FILES 
   src/main.cpp
   src/shared/common.hpp
-  src/renderer/renderer.hpp
+  src/renderer.hpp
   )
+
+if(UNIX AND NOT APPLE)
+  set(LINUX TRUE)
+endif()
+
+
 
 if (UNIX)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -20,20 +26,37 @@ if (UNIX)
     add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
     add_library(raylib SHARED IMPORTED)
-    set_target_properties(
-      raylib PROPERTIES
-      #IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
-      IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.dylib"
-      INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
-    )
 
-    add_library(steam_api SHARED IMPORTED)
-    set_target_properties(
-      steam_api PROPERTIES
-      #IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
-      IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.dylib"
-      INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
-    )
+    if (LINUX)
+      set_target_properties(
+        raylib PROPERTIES
+        IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.so"
+        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
+      )
+
+      add_library(steam_api SHARED IMPORTED)
+      set_target_properties(
+        steam_api PROPERTIES
+        IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
+      )
+    endif()
+
+    if (APPLE)
+      set_target_properties(
+        raylib PROPERTIES
+        IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/libraylib.dylib"
+        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
+      )
+
+      add_library(steam_api SHARED IMPORTED)
+      set_target_properties(
+        steam_api PROPERTIES
+        IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.dylib"
+        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
+      )
+    endif()
+
 
   # For compiler errors/warnings
   # target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
@@ -52,43 +75,39 @@ if (UNIX)
 endif(UNIX)
 
 
-# if (WIN32)
+#if (WIN32)
 #  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-
-#  project(game LANGUAGES CXX)
-
-
+#
+#  project(game)
+#
 #  add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-
+#
 #  add_library(raylib STATIC IMPORTED)
 #  set_target_properties(
 #        raylib PROPERTIES
-#        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libraylib.a"
-#        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/include/raylib"
+#        IMPORTED_LOCATION "${INCLUDE_DIRS}/raylib/lib/raylib.lib"
+#        INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/raylib"
 #  )
-#  add_library(steam_api SHARED IMPORTED)
+#  add_library(steam_api STATIC IMPORTED)
 #  set_target_properties(
 #          steam_api PROPERTIES
-#          IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/libsteam_api.so"
+#          IMPORTED_LOCATION "${INCLUDE_DIRS}/steam/lib/steam_api.lib"
 #          INTERFACE_INCLUDE_DIRECTORIES "${INCLUDE_DIRS}/steam"
 #  )
-
-#  find_package(nlohmann_json 3.11.2 REQUIRED)
-
+#
+#
 #  target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-#  target_link_libraries(
-#    ${PROJECT_NAME}
-#    PRIVATE
-#    nlohmann_json::nlohmann_json
-#    raylib
-#    steam_api
-#    opengl32
-#    gdi32
-#    winmm
-#    -static
-#    )
+#  target_link_libraries(${PROJECT_NAME} PRIVATE raylib steam_api)
 #  target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-
-# endif(WIN32)
+#
+#  configure_file("steam_appid.txt" "steam_appid.txt")
+#
+#  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
+#  "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${CMAKE_CURRENT_BINARY_DIR}/assets")
+#
+#  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
+#  "${CMAKE_CURRENT_SOURCE_DIR}/data" "${CMAKE_CURRENT_BINARY_DIR}/data")
+#
+#endif(WIN32)
 
 

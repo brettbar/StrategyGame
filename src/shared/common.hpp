@@ -2,8 +2,6 @@
 
 // TODO see which of these includes can be removed
 #include <entt/entt.hpp>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -13,7 +11,7 @@
 #include <vector>
 
 
-#define LEN( arr ) sizeof( arr ) / sizeof( arr[0] )
+#define LEN(arr) sizeof(arr) / sizeof(arr[0])
 
 using ECS = entt::registry;
 using u32 = unsigned int;
@@ -45,11 +43,11 @@ struct urect {
   u32 w;
 
   u32 width() {
-    return ( z - x ) + 1;
+    return (z - x) + 1;
   }
 
   u32 height() {
-    return ( w - y ) + 1;
+    return (w - y) + 1;
   }
 
   vec2u center() {
@@ -87,13 +85,13 @@ const u32 MAP_HEIGHT = 128;
 
 
 inline std::map<std::string, Color> color_map = {
-  { "red", RED },
-  { "gold", GOLD },
-  { "cyan", BLUE },
-  { "green", GREEN },
-  { "white", WHITE },
-  { "purple", PURPLE },
-  { "orange", ORANGE },
-  { "pink", PINK },
-  { "grey", GRAY },
+  {"red", RED},
+  {"gold", GOLD},
+  {"cyan", BLUE},
+  {"green", GREEN},
+  {"white", WHITE},
+  {"purple", PURPLE},
+  {"orange", ORANGE},
+  {"pink", PINK},
+  {"grey", GRAY},
 };

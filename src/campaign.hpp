@@ -14,8 +14,6 @@
 #pragma once
 
 
-#include "interface/pages/campaign/map_mode_menu.hpp"
-#include "interface/pages/campaign/overview_panel.hpp"
 #include "network/client.hpp"
 #include "network/host.hpp"
 #include "network/network.hpp"
@@ -25,18 +23,14 @@
 #include "shared/common.hpp"
 
 
+// #include "ui/common.h"
 #include "ui/common.h"
-#include "ui/scenes/campaign/context/actor_context.hpp"
-#include "ui/scenes/campaign/context/settlement_context.hpp"
-#include "ui/scenes/campaign/minimap.hpp"
-#include "ui/scenes/campaign/overview_panel/overview_content.hpp"
-#include "ui/scenes/campaign/overview_panel/overview_panel.hpp"
-#include "ui/scenes/campaign/time_panel.hpp"
-#include "world/managers/map_manager.hpp"
-#include "world/managers/settlement_manager.hpp"
+#include "ui/scenes/campaign/campaign_ui.hpp"
 
 #include "world/components/player_component.hpp"
-
+#include "world/components/settlement_component.hpp"
+#include "world/managers/map_manager.hpp"
+#include "world/managers/settlement_manager.hpp"
 #include "world/systems/ai_system.hpp"
 #include "world/systems/animation_system.hpp"
 #include "world/systems/commands_system.hpp"
@@ -47,11 +41,9 @@
 #include "world/systems/selection_system.hpp"
 #include "world/systems/settlement_system.hpp"
 
-#include "renderer/renderer.hpp"
+#include "renderer.hpp"
 
-#include "interface/irongui/forge.hpp"
-
-#include "interface/pages/campaign/settlement_context/settlement_context.hpp"
+#include <optional>
 #include <raylib.h>
 
 // If you ever get strange compile time errors from cereal
@@ -62,14 +54,14 @@
 #include <cereal/types/unordered_map.hpp>
 
 struct Campaign {
-  Campaign( bool is_singleplayer ) {
+  Campaign(bool is_singleplayer) {
     _is_singleplayer = is_singleplayer;
 
     // Start();
   }
 
   // @todo delete this stuff
-  Campaign( bool is_singleplayer, const char * ) {
+  Campaign(bool is_singleplayer, const char *) {
     _is_singleplayer = is_singleplayer;
 
     // TODO make take in file path
@@ -81,27 +73,28 @@ struct Campaign {
   entt::entity GetLocalPlayerE();
 
   void common_start();
-  void start( str );
-  void save( str );
+  void start(str);
+  void save(str);
   void start_mp();
-  void load( cstr );
-  void UpdateOnFrame( f32 &, f32 &, f32 & );
+  void load(cstr);
+  void UpdateOnFrame(f32 &, f32 &, f32 &);
   void Update60TPS();
   void Update1TPS();
-  void PostCommand( Commands::Command );
+  void PostCommand(Commands::Command);
 
   void Draw();
 
-  void EvaluteCommands( const Commands::Command & );
+  void EvaluateCommands(const Commands::Command &);
   // void HandleSpawnRequest( const Commands::Command & );
-  void HandleTimeChangeRequest( const Commands::Command & );
+  void HandleTimeChangeRequest(const Commands::Command &);
 
   // void ForwardEvent( const InterfaceEvent::Data & );
-  void ConvertCommandRequest( str );
+  void ConvertCommandRequest(str);
 
 
   private:
   bool _is_singleplayer = true;
+  opt<Buildings::Building> _building_to_build = std::nullopt;
 };
 
 inline entt::entity Campaign::GetLocalPlayerE() {
@@ -109,7 +102,7 @@ inline entt::entity Campaign::GetLocalPlayerE() {
 }
 
 inline str Campaign::GetLocalPlayerID() {
-  if ( _is_singleplayer || Network::is_host ) {
+  if (_is_singleplayer || Network::is_host) {
     return "player_0";
   } else {
     return Network::Client()->_local_player_id;
@@ -119,107 +112,103 @@ inline str Campaign::GetLocalPlayerID() {
 
 inline void Campaign::common_start() {
   Global::ClearRegistry();
-  Renderer::Init();
+  Renderer::Get()->Init();
 
-
-  Map::Manager()->Init();
   Settlement::Manager()->on_start();
 }
 
-inline void Campaign::start( str player_faction ) {
+inline void Campaign::start(str player_faction) {
   common_start();
 
-  PlayerSystem::create_players_for_sp( player_faction );
-  ProvinceSystem::Init();
-  ResourceSystem::init();
+  Map::Manager()->Start();
+  Player::System::create_players_for_sp(player_faction);
+  Resource::System::init();
   Actor::System::Init();
-  AI::Start();
+  AI::System::Start();
 
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>( this );
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
 inline void Campaign::start_mp() {
   common_start();
 
-  if ( Network::is_host ) {
-    PlayerSystem::HostStartMultiplayer();
+  if (Network::is_host) {
+    Player::System::HostStartMultiplayer();
   } else {
-    PlayerSystem::ClientStartMultiplayer();
+    Player::System::ClientStartMultiplayer();
   }
 
-  ProvinceSystem::Init();
-  ResourceSystem::init();
+  Resource::System::init();
   Actor::System::Init();
-  AI::Start();
+  AI::System::Start();
 
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>( this );
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
-inline void Campaign::save( str file_name ) {
-  printf( "Saving to output\n" );
+inline void Campaign::save(str file_name) {
+  printf("Saving to output\n");
 
 
   // I think only needed for human readability??
-  std::ofstream jfile( "./saves/" + file_name + ".json" );
+  std::ofstream jfile("./saves/" + file_name + ".json");
   {
-    cereal::JSONOutputArchive output{ jfile };
+    cereal::JSONOutputArchive output{jfile};
 
-    entt::snapshot{ Global::world }
-      .get<Player::Component>( output )
-      .get<Faction::Component>( output )
-      .get<Actor::Component>( output )
-      .get<Animated::Component>( output )
-      .get<Stockpile::Component>( output )
-      .get<Tile::Component>( output )
-      .get<Province::Component>( output )
-      .get<Settlement::Component>( output )
-      .get<AI::Component>( output );
+    entt::snapshot{Global::world}
+      .get<Player::Component>(output)
+      .get<Faction::Component>(output)
+      .get<Actor::Component>(output)
+      .get<Animated::Component>(output)
+      .get<Stockpile::Component>(output)
+      .get<Province::Component>(output)
+      .get<Settlement::Component>(output)
+      .get<AI::Component>(output);
   }
   jfile.close();
 
-  std::ofstream file( "./saves/" + file_name + ".dat", std::ios::binary );
+  std::ofstream file("./saves/" + file_name + ".dat", std::ios::binary);
   {
-    cereal::BinaryOutputArchive output{ file };
+    cereal::BinaryOutputArchive output{file};
 
-    entt::snapshot{ Global::world }
-      .get<Player::Component>( output )
-      .get<Faction::Component>( output )
-      .get<Actor::Component>( output )
-      .get<Animated::Component>( output )
-      .get<Stockpile::Component>( output )
-      .get<Tile::Component>( output )
-      .get<Province::Component>( output )
-      .get<Settlement::Component>( output )
-      .get<AI::Component>( output );
+    entt::snapshot{Global::world}
+      .get<Player::Component>(output)
+      .get<Faction::Component>(output)
+      .get<Actor::Component>(output)
+      .get<Sight::Component>(output)
+      .get<Animated::Component>(output)
+      .get<Stockpile::Component>(output)
+      .get<Province::Component>(output)
+      .get<Settlement::Component>(output)
+      .get<AI::Component>(output);
   }
   file.close();
 }
 
-inline void Campaign::load( cstr file_path ) {
+inline void Campaign::load(cstr file_path) {
   common_start();
 
-  printf( "Loading from file: %s \n", file_path );
+  printf("Loading from file: %s \n", file_path);
 
-  std::ifstream file( file_path, std::ios::binary );
+  std::ifstream file(file_path, std::ios::binary);
   {
-    cereal::BinaryInputArchive input{ file };
+    cereal::BinaryInputArchive input{file};
 
-    entt::snapshot_loader{ Global::world }
-      .get<Player::Component>( input )
-      .get<Faction::Component>( input )
-      .get<Actor::Component>( input )
-      .get<Animated::Component>( input )
-      .get<Stockpile::Component>( input )
-      .get<Tile::Component>( input )
-      .get<Province::Component>( input )
-      .get<Settlement::Component>( input )
-      .get<AI::Component>( input );
+    entt::snapshot_loader{Global::world}
+      .get<Player::Component>(input)
+      .get<Faction::Component>(input)
+      .get<Actor::Component>(input)
+      .get<Sight::Component>(input)
+      .get<Animated::Component>(input)
+      .get<Stockpile::Component>(input)
+      .get<Province::Component>(input)
+      .get<Settlement::Component>(input)
+      .get<AI::Component>(input);
     // Sight::Component
 
     // printf( "%u\n", (int) Global::world.size() );
@@ -228,20 +217,21 @@ inline void Campaign::load( cstr file_path ) {
 
   // Actor::System::Init();
   // AI::Start();
+  Map::Manager()->Load();
 
   Global::world.view<Settlement::Component>().each(
-    []( Settlement::Component &settlement ) {
+    [](Settlement::Component &settlement) {
       settlement.texture =
-        LoadTextureFromImage( Settlement::Manager()->building_map.at( "roman_m1"
-        ) );
+        LoadTextureFromImage(Settlement::Manager()->building_map.at("roman_m1")
+        );
     }
   );
   Global::world.view<Player::Component>().each(
-    []( entt::entity et, Player::Component &player ) {
-      printf( "Player %s\n", player.player_id.c_str() );
-      if ( player.player_id == "player_0" && player.is_human ) {
-        printf( "Assigning!!!!!!!!!!!!!!!!!!!!!!$$$$$$$$$$$$$$$$$$$$$$$\n" );
-        Global::world.emplace<Player::LocalTag>( et );
+    [](entt::entity et, Player::Component &player) {
+      printf("Player %s\n", player.player_id.c_str());
+      if (player.player_id == "player_0" && player.is_human) {
+        printf("Assigning!!!!!!!!!!!!!!!!!!!!!!$$$$$$$$$$$$$$$$$$$$$$$\n");
+        Global::world.emplace<Player::LocalTag>(et);
       }
     }
   );
@@ -249,171 +239,39 @@ inline void Campaign::load( cstr file_path ) {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluteCommands>( this );
+    .connect<&Campaign::EvaluateCommands>(this);
 }
 
+
 // Runs inside game loop
-inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
+inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
   f32 cameraSpeed = 500.0f;
 
   bool show_content = false;
-
-  CLAY(
-    CLAY_ID( "Campaign" ),
-    CLAY_LAYOUT( {
-      .sizing =
-        {
-          .width = CLAY_SIZING_GROW(),
-          .height = CLAY_SIZING_GROW(),
-        },
-      .childAlignment =
-        {
-          .x = CLAY_ALIGN_X_LEFT,
-          .y = CLAY_ALIGN_Y_TOP,
-        },
-      .layoutDirection = CLAY_LEFT_TO_RIGHT,
-    } )
-  ) {
-
-    CLAY(
-      CLAY_ID( "Campaign::LeftCol" ),
-      CLAY_LAYOUT( {
-        .sizing = { .height = CLAY_SIZING_GROW() },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } )
-    ) {
-      auto tab = UI::overview_panel();
-
-      CLAY(
-        // CLAY_RECTANGLE( { .color = UI::COLOR_ORANGE, .cornerRadius = { 5 } } ),
-        CLAY_LAYOUT( {
-          .sizing =
-            {
-              .height = CLAY_SIZING_GROW(),
-            },
-          .layoutDirection = CLAY_TOP_TO_BOTTOM,
-        } )
-      ) {
-
-        if ( std::string( tab.chars ) != "" ) {
-          UI::OverviewAction action = UI::overview_content( tab );
-
-          switch ( action.type ) {
-            case UI::OverviewAction_t::None:
-              break;
-            case UI::OverviewAction_t::Construction:
-              Map::Manager()->mode = Map::Mode::BuildPreview;
-              break;
-          }
-        }
+  Clay_String tab = CLAY_STRING("");
 
 
-        UI::spacer();
-
-        if ( Selection::Selected<Province::Component, Settlement::Component>(
-             ) ) {
-          auto settlement =
-            Selection::GetSelectedComponent<Settlement::Component>();
-          auto prov = Selection::GetSelectedComponent<Province::Component>();
-          entt::entity player_e = GetLocalPlayerE();
-          auto faction = Global::world.get<Faction::Component>( player_e );
-
-          if ( !settlement || !prov ) {
-            printf( "Got null prov/settlement??\n" );
-            return;
-          }
-
-          auto action = UI::settlement_context( settlement );
-          switch ( action ) {
-            case UI::Action_SettlementContext::SpawnColonist:
-              PostCommand( Commands::Command::spawn_colonist(
-                player_e, Settlement::System::settlement_position( *prov )
-              ) );
-              break;
-            case UI::Action_SettlementContext::SpawnArmy:
-              PostCommand( Commands::Command::spawn_army(
-                player_e, Settlement::System::settlement_position( *prov )
-              ) );
-              break;
-            case UI::Action_SettlementContext::BuildFarm:
-              PostCommand( Commands::Command::construct_building(
-                Selection::GetSelectedEntity(), "farm"
-              ) );
-              break;
-            case UI::Action_SettlementContext::None:
-              break;
-          }
-        }
-
-        if ( Selection::Selected<Actor::Component>() ) {
-          auto actor = Selection::GetSelectedComponent<Actor::Component>();
-          // entt::entity player_e = GetLocalPlayerE();
-
-          if ( !actor ) {
-            printf( "Got null actor??\n" );
-            return;
-          }
-
-          // auto action = UI::ActorContext( actor );
-          auto action = UI::actor_context( actor );
-
-          switch ( action ) {
-            case UI::Action_ActorContext::ClaimProvince: {
-              PostCommand( Commands::Command::claim_province(
-                Selection::GetSelectedEntity()
-              ) );
-            } break;
-            case UI::Action_ActorContext::SpawnSettlement: {
-              PostCommand( Commands::Command::build_settlement(
-                Selection::GetSelectedEntity()
-              ) );
-            } break;
-            case UI::Action_ActorContext::None:
-              break;
-          }
-        }
+  auto action = UI::campaign_ui(GetLocalPlayerE());
+  switch (action.type) {
+    case UI::Action_Campaign_t::None:
+      break;
+    case UI::Action_Campaign_t::Command:
+      if (action.cmd.type != Commands::Type::None) {
+        PostCommand(action.cmd);
       }
-    }
-
-    UI::spacer();
-
-    CLAY(
-      CLAY_ID( "Campaign::RightCol" ),
-      CLAY_LAYOUT( {
-        .sizing = { .height = CLAY_SIZING_GROW() },
-        .childAlignment = { .x = CLAY_ALIGN_X_RIGHT },
-        .layoutDirection = CLAY_TOP_TO_BOTTOM,
-      } )
-    ) {
-      UI::time_panel( Global::state.timeScale );
-
-      UI::spacer();
-      switch ( UI::minimap() ) {
-        case UI::Action_Minimap::Default:
-          Map::Manager()->mode = Map::Mode::Default;
-          break;
-        case UI::Action_Minimap::Terrain:
-          Map::Manager()->mode = Map::Mode::Terrain;
-          break;
-        case UI::Action_Minimap::Political:
-          Map::Manager()->mode = Map::Mode::Political;
-          break;
-        case UI::Action_Minimap::Resources:
-          Map::Manager()->mode = Map::Mode::Resources;
-          break;
-        default:
-          break;
-      }
-    }
+      break;
+    case UI::Action_Campaign_t::SelectBuilding:
+      _building_to_build = action.building;
+      break;
   }
 
   Vector2 click_pos =
-    GetScreenToWorld2D( GetMousePosition(), Global::state.camera );
+    GetScreenToWorld2D(GetMousePosition(), Global::state.camera);
 
   auto player_e =
     Global::world.view<Player::Component, Player::LocalTag>().front();
 
-  if ( player_e == entt::null ) {
+  if (player_e == entt::null) {
     std::cout << "ERROR"
               << " no local player was found" << '\n';
     return;
@@ -423,91 +281,102 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   bool hovered = false;
   const u32 items = 4;
   const Clay_String foos[items] = {
-    CLAY_STRING( "OverviewPanel" ),
-    CLAY_STRING( "OverviewPanel::Content" ),
-    CLAY_STRING( "SettlementContext" ),
-    CLAY_STRING( "ActorContext" )
+    CLAY_STRING("OverviewPanel::Tabs"),
+    CLAY_STRING("OverviewPanel::Content"),
+    CLAY_STRING("SettlementContext"),
+    CLAY_STRING("ActorContext")
   };
-  for ( u32 i = 0; i < items; i++ ) {
-    Clay_ElementId id = Clay_GetElementId( foos[i] );
-    hovered = hovered || Clay_PointerOver( id );
+  for (u32 i = 0; i < items; i++) {
+    Clay_ElementId id = Clay_GetElementId(foos[i]);
+    hovered = hovered || Clay_PointerOver(id);
   }
 
-  if ( IsKeyPressed( KEY_SPACE ) ) {
-    PostCommand(
-      Commands::Command::time_change( player_e, "Player request Pause" )
+  if (IsKeyPressed(KEY_SPACE)) {
+    PostCommand(Commands::Command::time_change(player_e, "Player request Pause")
     );
   }
 
-  if ( IsKeyPressed( KEY_MINUS ) ) {
+  if (IsKeyPressed(KEY_MINUS)) {
     PostCommand(
-      Commands::Command::time_change( player_e, "Player request Slower" )
+      Commands::Command::time_change(player_e, "Player request Slower")
     );
   }
 
-  if ( IsKeyPressed( KEY_EQUAL ) ) {
+  if (IsKeyPressed(KEY_EQUAL)) {
     PostCommand(
-      Commands::Command::time_change( player_e, "Player request Faster" )
+      Commands::Command::time_change(player_e, "Player request Faster")
     );
   }
 
-  if ( IsKeyPressed( KEY_V ) ) {
-    PostCommand( Commands::Command::spawn_colonist( player_e, click_pos ) );
+  if (IsKeyPressed(KEY_V)) {
+    PostCommand(Commands::Command::spawn_colonist(player_e, click_pos));
   }
 
-  if ( IsKeyPressed( KEY_P ) ) {
+  if (IsKeyPressed(KEY_P)) {
     Map::Manager()->mode = Map::Mode::Political;
   }
 
-  if ( IsKeyPressed( KEY_T ) ) {
+  if (IsKeyPressed(KEY_T)) {
     Map::Manager()->mode = Map::Mode::Terrain;
   }
 
-  if ( IsKeyDown( KEY_D ) )
+  if (IsKeyDown(KEY_D))
     Global::state.camera.target.x +=
       dt * cameraSpeed / Global::state.camera.zoom;
-  if ( IsKeyDown( KEY_A ) )
+  if (IsKeyDown(KEY_A))
     Global::state.camera.target.x -=
       dt * cameraSpeed / Global::state.camera.zoom;
-  if ( IsKeyDown( KEY_W ) )
+  if (IsKeyDown(KEY_W))
     Global::state.camera.target.y -=
       dt * cameraSpeed / Global::state.camera.zoom;
-  if ( IsKeyDown( KEY_S ) )
+  if (IsKeyDown(KEY_S))
     Global::state.camera.target.y +=
       dt * cameraSpeed / Global::state.camera.zoom;
 
-  if ( hovered ) {
+  if (hovered) {
     return;
   }
 
-  if ( IsMouseButtonPressed( 0 ) ) {
-    if ( Map::Manager()->mode == Map::Mode::BuildPreview ) {
+  if (IsMouseButtonPressed(0)) {
+    if (Map::Manager()->mode == Map::Mode::BuildPreview) {
       // if we click on a valid province, post a build command
 
       entt::entity local_player = GetLocalPlayerE();
 
-      auto sc = Selection::CheckClickOnSettlement( local_player, click_pos );
+      auto sc =
+        Selection::System::CheckClickOnSettlement(local_player, click_pos);
 
-      if ( sc != entt::null ) {
-        printf( "%d\n", sc );
-        PostCommand( Commands::Command::construct_building( sc, "farm" ) );
+      if (sc != entt::null) {
+        Province::Component prov_component =
+          Global::world.get<Province::Component>(sc);
+        Settlement::Component settlement_component =
+          Global::world.get<Settlement::Component>(sc);
 
-        Map::Manager()->mode = Map::Mode::Default;
+        if (_building_to_build.has_value() &&
+            Settlement::System::can_build_immediately(
+              prov_component, settlement_component, _building_to_build.value()
+            )) {
+          PostCommand(Commands::Command::construct_building(
+            sc, _building_to_build.value()
+          ));
+          _building_to_build = std::nullopt;
+          Map::Manager()->mode = Map::Mode::Default;
+        }
       }
     } else {
-      Selection::UpdateSelection( click_pos, GetLocalPlayerID() );
+      Selection::System::UpdateSelection(click_pos, GetLocalPlayerID());
     }
   }
 
-  if ( IsMouseButtonPressed( 1 ) ) {
+  if (IsMouseButtonPressed(1)) {
     auto selected_e =
       Global::world
         .view<Actor::Component, Animated::Component, Selected::Component>()
         .front();
 
-    if ( selected_e != entt::null ) {
-      std::cout << "Moving entity: " << EntityIdToString( selected_e ) << '\n';
-      PostCommand( Commands::Command::move( player_e, click_pos, selected_e ) );
+    if (selected_e != entt::null) {
+      std::cout << "Moving entity: " << EntityIdToString(selected_e) << '\n';
+      PostCommand(Commands::Command::move(player_e, click_pos, selected_e));
     }
   }
 
@@ -519,17 +388,17 @@ inline void Campaign::UpdateOnFrame( f32 &dt, f32 &lag, f32 &oncelag ) {
   // camera.offset = target;
 
 
-  if ( IsKeyDown( KEY_Z ) )
+  if (IsKeyDown(KEY_Z))
     Global::state.camera.zoom -= 0.05f;
-  if ( IsKeyDown( KEY_X ) )
+  if (IsKeyDown(KEY_X))
     Global::state.camera.zoom += 0.05f;
 
   f32 mouseWheelDelta = GetMouseWheelMove();
 
-  Global::state.camera.zoom += ( mouseWheelDelta * 0.2f );
-  if ( Global::state.camera.zoom > 8.0f )
+  Global::state.camera.zoom += (mouseWheelDelta * 0.2f);
+  if (Global::state.camera.zoom > 8.0f)
     Global::state.camera.zoom = 8.0f;
-  else if ( Global::state.camera.zoom < 0.08f )
+  else if (Global::state.camera.zoom < 0.08f)
     Global::state.camera.zoom = 0.08f;
 
   Global::state.camera.offset = {
@@ -543,20 +412,20 @@ inline void Campaign::Update60TPS() {
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
-  MovementSystem::Update( animated_actors, Global::state.timeScale );
-  AnimationSystem::Update( animated_actors, Global::state.timeScale );
+  Movement::System::Update(animated_actors, Global::state.timeScale);
+  Animation::System::Update(animated_actors, Global::state.timeScale);
   Commands::Manager()->poll();
-  PlayerSystem::Update( players );
+  Player::System::Update(players);
   //  Terrain::UpdateFOW(reg);
 }
 
 inline void Campaign::Update1TPS() {
   Settlement::System::update_1tps();
-  ResourceSystem::update_1tps();
+  Resource::System::update_1tps();
 
   Global::state.day++;
 
-  if ( Global::state.month < 12 )
+  if (Global::state.month < 12)
     Global::state.month++;
   else {
     Global::state.year++;
@@ -565,12 +434,34 @@ inline void Campaign::Update1TPS() {
 }
 
 inline void Campaign::Draw() {
-  Renderer::draw_map( Map::Manager()->mode );
+  // Renderer::Get()->draw_map(Map::Manager()->mode);
+
+  auto rndr = Renderer::Get();
+  rndr->draw_common();
+
+  switch (Map::Manager()->mode) {
+    case Map::Mode::Default:
+      rndr->draw_default();
+      break;
+    case Map::Mode::BuildPreview://@todo
+      rndr->draw_build_preview(GetLocalPlayerE(), _building_to_build.value());
+      break;
+    case Map::Mode::Terrain:
+      break;
+    case Map::Mode::Political:
+      rndr->draw_political();
+      break;
+    case Map::Mode::Resources:
+      rndr->draw_resources();
+      break;
+  }
+
+  rndr->draw_after(Map::Manager()->mode);
 }
 
 // @todo retire this, I think?
-inline void Campaign::ConvertCommandRequest( str cmd ) {
-  nlohmann::json body = nlohmann::json::parse( cmd );
+inline void Campaign::ConvertCommandRequest(str cmd) {
+  nlohmann::json body = nlohmann::json::parse(cmd);
 
   std::cout << "BODY" << body << '\n';
   // std::cout << "body " << body.dump() << '\n';
@@ -584,40 +475,38 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
   // or even just the tile coord or something
   f32 cmd_click_pos_x = body["cmd_pos.x"];
   f32 cmd_click_pos_y = body["cmd_pos.y"];
-  vec2f click_pos = vec2f{ cmd_click_pos_x, cmd_click_pos_y };
+  vec2f click_pos = vec2f{cmd_click_pos_x, cmd_click_pos_y};
   entt::entity entity = body["entity"];
 
 
   // this switch is only necessary so that we dont incorrectly access
   // missing keys from the json for commands that dont need certain values
   // certainly protobufs or something would be better than json!
-  switch ( cmd_type ) {
+  switch (cmd_type) {
     case Commands::Type::Move: {
       Commands::Manager()->enqueue(
-        Commands::Command::move( cmd_player_e, click_pos, entity )
+        Commands::Command::move(cmd_player_e, click_pos, entity)
       );
     } break;
     case Commands::Type::TimeChange: {
       Commands::Manager()->enqueue(
-        Commands::Command::time_change( cmd_player_e, cmd_msg )
+        Commands::Command::time_change(cmd_player_e, cmd_msg)
       );
     } break;
     case Commands::Type::ClaimProvince: {
-      Commands::Manager()->enqueue( Commands::Command::claim_province( entity )
-      );
+      Commands::Manager()->enqueue(Commands::Command::claim_province(entity));
     } break;
     case Commands::Type::BuildSettlement: {
-      Commands::Manager()->enqueue( Commands::Command::build_settlement( entity
-      ) );
+      Commands::Manager()->enqueue(Commands::Command::build_settlement(entity));
     } break;
     case Commands::Type::SpawnArmy: {
       Commands::Manager()->enqueue(
-        Commands::Command::spawn_army( cmd_player_e, click_pos )
+        Commands::Command::spawn_army(cmd_player_e, click_pos)
       );
     } break;
     case Commands::Type::SpawnColonist: {
       Commands::Manager()->enqueue(
-        Commands::Command::spawn_colonist( cmd_player_e, click_pos )
+        Commands::Command::spawn_colonist(cmd_player_e, click_pos)
       );
     } break;
   }
@@ -647,92 +536,94 @@ inline void Campaign::ConvertCommandRequest( str cmd ) {
 }
 
 
-inline void Campaign::PostCommand( Commands::Command cmd ) {
-  if ( _is_singleplayer ) {
-    Commands::Manager()->enqueue( cmd );
+inline void Campaign::PostCommand(Commands::Command cmd) {
+  if (_is_singleplayer) {
+    Commands::Manager()->enqueue(cmd);
   } else {
     auto body = nlohmann::json{
-      { "cmd_player", GetLocalPlayerID() },
-      { "cmd_player_e", cmd.player_e },
-      { "cmd_type", cmd.type },
-      { "cmd_msg", cmd.msg },
-      { "cmd_pos.x", cmd.click_pos.x },
-      { "cmd_pos.y", cmd.click_pos.y },
-      { "entity", cmd.entity },
+      {"cmd_player", GetLocalPlayerID()},
+      {"cmd_player_e", cmd.player_e},
+      {"cmd_type", cmd.type},
+      {"cmd_msg", cmd.msg},
+      {"cmd_pos.x", cmd.click_pos.x},
+      {"cmd_pos.y", cmd.click_pos.y},
+      {"entity", cmd.entity},
     };
 
-    if ( Network::is_host ) {
-      Network::Host()->SendMessageToAllActiveClients( Network::Message{
+    if (Network::is_host) {
+      Network::Host()->SendMessageToAllActiveClients(Network::Message{
         Network::MessageID::Command,
         body,
-      } );
-      Commands::Manager()->enqueue( cmd );
+      });
+      Commands::Manager()->enqueue(cmd);
     } else {
-      Network::Client()->SendMessageToHost( Network::Message{
+      Network::Client()->SendMessageToHost(Network::Message{
         Network::MessageID::Command,
         body,
-      } );
+      });
     }
   }
 }
 
 
 // @todo This should be split to explicit Evaluate and Execute steps.
-inline void Campaign::EvaluteCommands( const Commands::Command &cmd ) {
-  switch ( cmd.type ) {
+inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
+  switch (cmd.type) {
+    case Commands::Type::None:
+      break;
     case Commands::Type::BuildSettlement: {
-      Settlement::System::spawn_settlement( cmd.entity );
+      Settlement::System::spawn_settlement(cmd.entity);
       return;
     }
     case Commands::Type::ClaimProvince: {
-      ProvinceSystem::colonist_claim_province( cmd.entity );
+      Province::System::colonist_claim_province(cmd.entity);
       return;
     }
     case Commands::Type::TimeChange: {
-      HandleTimeChangeRequest( cmd );
+      HandleTimeChangeRequest(cmd);
       return;
     }
     case Commands::Type::SpawnColonist: {
-      Actor::System::spawn_colonist( cmd.player_e, cmd.click_pos );
+      Actor::System::spawn_colonist(cmd.player_e, cmd.click_pos);
       return;
     }
     case Commands::Type::SpawnArmy: {
-      Actor::System::spawn_army( cmd.player_e, cmd.click_pos );
+      Actor::System::spawn_army(cmd.player_e, cmd.click_pos);
       return;
     }
     case Commands::Type::Move: {
-      MovementSystem::SetDestinations( cmd.entity, cmd.click_pos );
+      printf("!!!!!!!!!!!!!!!!!!!\n");
+      Movement::System::SetDestinations(cmd.entity, cmd.click_pos);
       return;
     }
     case Commands::Type::ConstructBuilding: {
-      Settlement::System::construct_building( cmd.entity, cmd.msg );
+      Settlement::System::construct_building(cmd.entity, cmd.building);
       return;
     };
   }
 }
 
 
-inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
-  if ( cmd.msg == "Player request Pause" ) {
+inline void Campaign::HandleTimeChangeRequest(const Commands::Command &cmd) {
+  if (cmd.msg == "Player request Pause") {
     std::cout << cmd.msg << std::endl;
 
-    if ( Global::state.timeScale > 0.0f ) {
+    if (Global::state.timeScale > 0.0f) {
       Global::state.prevTimeScale = Global::state.timeScale;
       Global::state.timeScale = 0.0f;
-    } else if ( Global::state.timeScale == 0.0f ) {
+    } else if (Global::state.timeScale == 0.0f) {
       Global::state.timeScale = Global::state.prevTimeScale;
     }
 
     return;
   }
 
-  if ( cmd.msg == "Player request Slower" ) {
+  if (cmd.msg == "Player request Slower") {
     Global::state.timeScale -= 0.5f;
-    if ( Global::state.timeScale < 0.0f )
+    if (Global::state.timeScale < 0.0f)
       Global::state.timeScale = 0.0f;
 
-    if ( Global::state.timeScale == 0.0f &&
-         Global::state.prevTimeScale > 0.5f ) {
+    if (Global::state.timeScale == 0.0f && Global::state.prevTimeScale > 0.5f) {
       Global::state.prevTimeScale -= 0.5f;
       Global::state.timeScale = Global::state.prevTimeScale;
     }
@@ -740,9 +631,9 @@ inline void Campaign::HandleTimeChangeRequest( const Commands::Command &cmd ) {
     return;
   }
 
-  if ( cmd.msg == "Player request Faster" ) {
+  if (cmd.msg == "Player request Faster") {
     Global::state.timeScale += 0.5f;
-    if ( Global::state.timeScale > 1.5f )
+    if (Global::state.timeScale > 1.5f)
       Global::state.timeScale = 1.5f;
 
     return;
