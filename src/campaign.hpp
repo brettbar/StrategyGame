@@ -221,9 +221,9 @@ inline void Campaign::load(cstr file_path) {
 
   Global::world.view<Settlement::Component>().each(
     [](Settlement::Component &settlement) {
-      settlement.texture =
-        LoadTextureFromImage(Settlement::Manager()->building_map.at("roman_m1")
-        );
+      settlement.texture = LoadTextureFromImage(
+        Settlement::Manager()->building_map.at("roman_m1")
+      );
     }
   );
   Global::world.view<Player::Component>().each(
@@ -292,7 +292,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
   }
 
   if (IsKeyPressed(KEY_SPACE)) {
-    PostCommand(Commands::Command::time_change(player_e, "Player request Pause")
+    PostCommand(
+      Commands::Command::time_change(player_e, "Player request Pause")
     );
   }
 
@@ -356,9 +357,11 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
             Settlement::System::can_build_immediately(
               prov_component, settlement_component, _building_to_build.value()
             )) {
-          PostCommand(Commands::Command::construct_building(
-            sc, _building_to_build.value()
-          ));
+          PostCommand(
+            Commands::Command::construct_building(
+              sc, _building_to_build.value()
+            )
+          );
           _building_to_build = std::nullopt;
           Map::Manager()->mode = Map::Mode::Default;
         }
@@ -551,16 +554,20 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
     };
 
     if (Network::is_host) {
-      Network::Host()->SendMessageToAllActiveClients(Network::Message{
-        Network::MessageID::Command,
-        body,
-      });
+      Network::Host()->SendMessageToAllActiveClients(
+        Network::Message{
+          Network::MessageID::Command,
+          body,
+        }
+      );
       Commands::Manager()->enqueue(cmd);
     } else {
-      Network::Client()->SendMessageToHost(Network::Message{
-        Network::MessageID::Command,
-        body,
-      });
+      Network::Client()->SendMessageToHost(
+        Network::Message{
+          Network::MessageID::Command,
+          body,
+        }
+      );
     }
   }
 }
@@ -572,7 +579,7 @@ inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
     case Commands::Type::None:
       break;
     case Commands::Type::BuildSettlement: {
-      Settlement::System::spawn_settlement(cmd.entity);
+      Settlement::System::build_settlement(cmd.entity);
       return;
     }
     case Commands::Type::ClaimProvince: {
