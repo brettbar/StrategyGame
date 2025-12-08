@@ -84,7 +84,9 @@ struct Campaign {
 
   void Draw();
 
-  void EvaluateCommands(const Commands::Command &);
+  void evaluate_commands(const Commands::Command &);
+  void execute_commands();
+  void execute_command(const Commands::Command &);
   // void HandleSpawnRequest( const Commands::Command & );
   void HandleTimeChangeRequest(const Commands::Command &);
 
@@ -129,7 +131,7 @@ inline void Campaign::start(str player_faction) {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+    .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::start_mp() {
@@ -148,7 +150,7 @@ inline void Campaign::start_mp() {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+    .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::save(str file_name) {
@@ -239,7 +241,7 @@ inline void Campaign::load(cstr file_path) {
   Commands::Manager()->init();
   Commands::Manager()
     ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+    .connect<&Campaign::evaluate_commands>(this);
 }
 
 
@@ -573,8 +575,11 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
 }
 
 
-// @todo This should be split to explicit Evaluate and Execute steps.
-inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
+inline void Campaign::evaluate_commands(const Commands::Command &cmd) {}
+
+inline void Campaign::execute_commands() {}
+
+inline void Campaign::execute_command(const Commands::Command &cmd) {
   switch (cmd.type) {
     case Commands::Type::None:
       break;
@@ -599,7 +604,6 @@ inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
       return;
     }
     case Commands::Type::Move: {
-      printf("!!!!!!!!!!!!!!!!!!!\n");
       Movement::System::SetDestinations(cmd.entity, cmd.click_pos);
       return;
     }
