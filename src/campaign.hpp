@@ -575,7 +575,10 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
 }
 
 
-inline void Campaign::evaluate_commands(const Commands::Command &cmd) {}
+inline void Campaign::evaluate_commands(const Commands::Command &cmd) {
+  // @temp
+  execute_command(cmd);
+}
 
 inline void Campaign::execute_commands() {}
 
