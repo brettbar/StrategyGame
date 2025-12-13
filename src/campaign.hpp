@@ -77,7 +77,7 @@ struct Campaign {
   void save(str);
   void start_mp();
   void load(cstr);
-  void UpdateOnFrame(f32 &, f32 &, f32 &);
+  void update_on_frame(f32 &, f32 &, f32 &);
   void Update60TPS();
   void Update1TPS();
   void PostCommand(Commands::Command);
@@ -246,7 +246,7 @@ inline void Campaign::load(cstr file_path) {
 
 
 // Runs inside game loop
-inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
+inline void Campaign::update_on_frame(f32 &dt, f32 &lag, f32 &oncelag) {
   f32 cameraSpeed = 500.0f;
 
   bool show_content = false;

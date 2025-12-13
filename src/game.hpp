@@ -230,10 +230,12 @@ class IGame {
     Vector2 mouse_pos = GetMousePosition();
     Vector2 scroll_delta = GetMouseWheelMoveV();
 
-    Clay_SetLayoutDimensions(Clay_Dimensions{
-      .width = (f32) GetScreenWidth(),
-      .height = (f32) GetScreenHeight(),
-    });
+    Clay_SetLayoutDimensions(
+      Clay_Dimensions{
+        .width = (f32) GetScreenWidth(),
+        .height = (f32) GetScreenHeight(),
+      }
+    );
 
     Clay_SetPointerState(
       Clay_Vector2{mouse_pos.x, mouse_pos.y}, IsMouseButtonDown(0)
@@ -276,7 +278,8 @@ class IGame {
     clay_update();
 
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_I)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT) &&
+        IsKeyPressed(KEY_I)) {
       _ui_debug = !_ui_debug;
       Clay_SetDebugModeEnabled(_ui_debug);
     }
@@ -566,7 +569,7 @@ class IGame {
 
     CheckMenuToggle();
 
-    _campaign->UpdateOnFrame(_dt, _lag, _oncelag);
+    _campaign->update_on_frame(_dt, _lag, _oncelag);
 
     if (IsKeyPressed(KEY_GRAVE)) {
       if (_scene == Scene::Editor) {
