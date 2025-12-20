@@ -89,7 +89,7 @@ struct System {
             Global::world.get<Stockpile::Component>(unit.owner);
 
           // @todo actually check what resources we used to build the settlement
-          stockpile.resources[Resources::Type::Bricks] -= 10;
+          stockpile.resources[Resources::Type::Timber] -= 5;
 
           Global::world.destroy(colonist_e);
           return;

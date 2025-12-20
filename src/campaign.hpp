@@ -84,7 +84,7 @@ struct Campaign {
 
   void Draw();
 
-  void evaluate_commands(const Commands::Command &);
+  void evaluate_commands();
   void execute_commands();
   void execute_command(const Commands::Command &);
   // void HandleSpawnRequest( const Commands::Command & );
@@ -129,9 +129,9 @@ inline void Campaign::start(str player_faction) {
   AI::System::Start();
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::evaluate_commands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::start_mp() {
@@ -148,9 +148,9 @@ inline void Campaign::start_mp() {
   AI::System::Start();
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::evaluate_commands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::save(str file_name) {
@@ -239,9 +239,9 @@ inline void Campaign::load(cstr file_path) {
   );
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::evaluate_commands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 
@@ -417,9 +417,12 @@ inline void Campaign::Update60TPS() {
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
+  // Commands::Manager()->poll();
+  evaluate_commands();
+  execute_commands();
+
   Movement::System::Update(animated_actors, Global::state.timeScale);
   Animation::System::Update(animated_actors, Global::state.timeScale);
-  Commands::Manager()->poll();
   Player::System::Update(players);
   //  Terrain::UpdateFOW(reg);
 }
@@ -575,12 +578,22 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
 }
 
 
-inline void Campaign::evaluate_commands(const Commands::Command &cmd) {
-  // @temp
-  execute_command(cmd);
+inline void Campaign::evaluate_commands() {
+  for (auto &cmd: Commands::Manager()->queue) {
+    cmd.can_execute = true;
+  }
 }
 
-inline void Campaign::execute_commands() {}
+inline void Campaign::execute_commands() {
+  while (!Commands::Manager()->is_empty()) {
+    auto cmd_opt = Commands::Manager()->pop();
+    if (cmd_opt.has_value()) {
+      if (cmd_opt->can_execute) {
+        execute_command(cmd_opt.value());
+      }
+    }
+  }
+}
 
 inline void Campaign::execute_command(const Commands::Command &cmd) {
   switch (cmd.type) {

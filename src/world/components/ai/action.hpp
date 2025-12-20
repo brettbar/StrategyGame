@@ -61,7 +61,7 @@ inline Action get_action(Action_t type) {
               Condition_t::HasResources,
               ConditionCompare::GreaterThanOrEqualTo,
               map<Resources::Type, u32>{
-                {Resources::Type::Bricks, 10},
+                {Resources::Type::Timber, 5},
               },
             },
           },
