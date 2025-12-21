@@ -4,7 +4,7 @@
 #include "condition.hpp"
 
 namespace AI {
-enum class Action_t {
+enum class ActionType {
   AchieveGoal,
   MoveColonistToUnclaimedProvince,
   MoveColonistToUnsettledOwnedProvince,
@@ -15,7 +15,7 @@ enum class Action_t {
 };
 
 struct Action {
-  Action_t type;
+  ActionType type;
 
   float cost = 0;
 
@@ -24,33 +24,33 @@ struct Action {
 
   str as_str() {
     switch (type) {
-      case Action_t::AchieveGoal:
+      case ActionType::AchieveGoal:
         return "AchieveGoal";
-      case Action_t::MoveColonistToUnclaimedProvince:
+      case ActionType::MoveColonistToUnclaimedProvince:
         return "MoveColonistToUnclaimedProvince";
-      case Action_t::MoveColonistToUnsettledOwnedProvince:
+      case ActionType::MoveColonistToUnsettledOwnedProvince:
         return "MoveColonistToOwnProvince";
-      case Action_t::SpawnColonist:
+      case ActionType::SpawnColonist:
         return "SpawnColonist";
-      case Action_t::ClaimProvince:
+      case ActionType::ClaimProvince:
         return "ClaimProvince";
-      case Action_t::BuildSettlement:
+      case ActionType::BuildSettlement:
         return "BuildSettlement";
-      case Action_t::BuildBuilding:
+      case ActionType::BuildBuilding:
         return "BuildBuilding";
     }
   }
 };
 
-inline Action get_action(Action_t type) {
+inline Action get_action(ActionType type) {
   switch (type) {
-    case Action_t::AchieveGoal:
+    case ActionType::AchieveGoal:
       return Action{
         .type = type,
         .preconditions = {},
         .effects = {},
       };
-    case Action_t::BuildSettlement:
+    case ActionType::BuildSettlement:
       return Action{
         .type = type,
         .preconditions =
@@ -72,17 +72,21 @@ inline Action get_action(Action_t type) {
           },
         },
       };
-    case AI::Action_t::BuildBuilding:
+    case AI::ActionType::BuildBuilding:
       return Action {
         .type = type,
         .preconditions = {
-          {ConditionType::HasSettlements, true},
+          {
+            ConditionType::HasSettlements, 
+            ConditionCompare::GreaterThanOrEqualTo, 
+            (u32) 1,
+          },
         },
         .effects = {
           
         },
       };
-    case Action_t::ClaimProvince:
+    case ActionType::ClaimProvince:
       return Action{
         .type = type,
         .preconditions =
@@ -97,7 +101,7 @@ inline Action get_action(Action_t type) {
           },
         },
       };
-    case Action_t::SpawnColonist:
+    case ActionType::SpawnColonist:
       return Action{
         .type = type,
         // @todo requirements to make colonist
@@ -111,7 +115,7 @@ inline Action get_action(Action_t type) {
         },
       };
 
-    case Action_t::MoveColonistToUnclaimedProvince:
+    case ActionType::MoveColonistToUnclaimedProvince:
       return Action{
         .type = type,
         .preconditions =
@@ -126,7 +130,7 @@ inline Action get_action(Action_t type) {
           },
         },
       };
-    case Action_t::MoveColonistToUnsettledOwnedProvince:
+    case ActionType::MoveColonistToUnsettledOwnedProvince:
       return Action{
         .type = type,
         .preconditions =
@@ -146,18 +150,18 @@ inline Action get_action(Action_t type) {
 };
 
 
-inline std::vector<Action_t> actions_that_satisfy_cond(ConditionType cond) {
+inline std::vector<ActionType> actions_that_satisfy_cond(ConditionType cond) {
   switch (cond) {
     case ConditionType::ColonistOnUnclaimedProvince:
-      return {Action_t::MoveColonistToUnclaimedProvince};
+      return {ActionType::MoveColonistToUnclaimedProvince};
     case ConditionType::ColonistOnOwnProvince:
-      return {Action_t::MoveColonistToUnsettledOwnedProvince};
+      return {ActionType::MoveColonistToUnsettledOwnedProvince};
     case ConditionType::HasColonist:
-      return {Action_t::SpawnColonist};
+      return {ActionType::SpawnColonist};
     case ConditionType::HasUnsettledProvince:
-      return {Action_t::ClaimProvince};
+      return {ActionType::ClaimProvince};
     case ConditionType::HasSettlements:
-      return {Action_t::BuildSettlement};
+      return {ActionType::BuildSettlement};
     case ConditionType::HasResources:
       return {};
     case ConditionType::COUNT:

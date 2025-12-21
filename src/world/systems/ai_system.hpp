@@ -135,7 +135,7 @@ struct System {
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
               Action{
-                .type = Action_t::AchieveGoal,
+                .type = ActionType::AchieveGoal,
                 .preconditions = goal_conds,
                 .effects = {},
               },
@@ -291,11 +291,11 @@ struct System {
       ConditionValue current = state[effect.type];
 
       switch (value_type_for_cond_t(effect.type)) {
-        case AI::ConditionValue_t::Boolean:
+        case AI::ConditionValueType::Boolean:
           all_met = all_met &&
                     (std::get<bool>(expected_after) == std::get<bool>(current));
           break;
-        case AI::ConditionValue_t::Number:
+        case AI::ConditionValueType::Number:
           // @TODO this is almost certainly wrong(or at least just incomplete)
           // Like what if we wanted to go from 4 to 3, then this should be decrementing
           // So we need to take into account what the effect op was.
@@ -305,7 +305,7 @@ struct System {
           all_met = all_met &&
                     (std::get<u32>(current) >= std::get<u32>(expected_after));
           break;
-        case AI::ConditionValue_t::Resources:
+        case AI::ConditionValueType::Resources:
           break;
       }
     }
@@ -331,14 +331,14 @@ struct System {
 
       switch (value_type_for_cond_t(effect.type)) {
           // @todo  actually use the op
-        case AI::ConditionValue_t::Boolean:
+        case AI::ConditionValueType::Boolean:
           std::get<bool>(state[effect.type]) = std::get<bool>(effect.value);
           break;
-        case AI::ConditionValue_t::Number: {
+        case AI::ConditionValueType::Number: {
           u32 current = std::get<u32>(state[effect.type]);
           state[effect.type] = current + std::get<u32>(effect.value);
         } break;
-        case AI::ConditionValue_t::Resources: {
+        case AI::ConditionValueType::Resources: {
           // @todo
         } break;
       }
@@ -352,9 +352,9 @@ struct System {
 
     std::cout << "Doing Action :: " << a.as_str() << '\n';
     switch (a.type) {
-      case Action_t::AchieveGoal:
+      case ActionType::AchieveGoal:
         break;
-      case Action_t::BuildSettlement: {
+      case ActionType::BuildSettlement: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -365,7 +365,7 @@ struct System {
         );
 
       } break;
-      case Action_t::ClaimProvince: {
+      case ActionType::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -378,10 +378,10 @@ struct System {
         );
 
       } break;
-      case Action_t::MoveColonistToUnsettledOwnedProvince: {
+      case ActionType::MoveColonistToUnsettledOwnedProvince: {
         return;
       }
-      case Action_t::MoveColonistToUnclaimedProvince: {
+      case ActionType::MoveColonistToUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -405,7 +405,7 @@ struct System {
 
 
       } break;
-      case Action_t::SpawnColonist: {
+      case ActionType::SpawnColonist: {
         vec2f pos =
           Settlement::System::position_of_a_player_settlement(ai_player);
 

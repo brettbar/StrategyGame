@@ -15,17 +15,11 @@ enum class ConditionType {
   COUNT,
 };
 
-enum class ConditionValue_t {
+enum class ConditionValueType {
   Boolean,
   Number,
   Resources,
 };
-
-// using ConditionValue = union {
-//   bool boolean;
-//   u32 number;
-//   map<Resources::Type, u32> resources;
-// };
 
 using ConditionValue = std::variant<bool, u32, map<Resources::Type, u32>>;
 
@@ -34,19 +28,19 @@ enum class ConditionCompare {
   GreaterThanOrEqualTo
 };
 
-inline ConditionValue_t value_type_for_cond_t(ConditionType cond_t) {
+inline ConditionValueType value_type_for_cond_t(ConditionType cond_t) {
   switch (cond_t) {
     case ConditionType::ColonistOnUnclaimedProvince:
     case ConditionType::ColonistOnOwnProvince:
     case ConditionType::HasColonist:
     case ConditionType::HasUnsettledProvince:
-      return ConditionValue_t::Boolean;
+      return ConditionValueType::Boolean;
     case ConditionType::HasSettlements:
-      return ConditionValue_t::Number;
+      return ConditionValueType::Number;
     case ConditionType::HasResources:
-      return ConditionValue_t::Resources;
+      return ConditionValueType::Resources;
     case ConditionType::COUNT:
-      return ConditionValue_t::Boolean;
+      return ConditionValueType::Boolean;
   }
 }
 
@@ -65,11 +59,11 @@ struct Condition {
 
   bool operator==(const ConditionValue &other) const {
     switch (value_type_for_cond_t(type)) {
-      case ConditionValue_t::Boolean:
+      case ConditionValueType::Boolean:
         return std::get<bool>(value) == std::get<bool>(other);
-      case ConditionValue_t::Number:
+      case ConditionValueType::Number:
         return std::get<u32>(value) == std::get<u32>(other);
-      case ConditionValue_t::Resources:
+      case ConditionValueType::Resources:
         // @todo wont work
         // we need to change it so its just saying does all of one equal that of the other, not a strict check I think
         return std::get<map<Resources::Type, u32>>(value) ==
@@ -84,11 +78,11 @@ struct Condition {
         return *this == against;
       case AI::ConditionCompare::GreaterThanOrEqualTo: {
         switch (value_type_for_cond_t(type)) {
-          case ConditionValue_t::Boolean:
+          case ConditionValueType::Boolean:
             return false;
-          case ConditionValue_t::Number:
+          case ConditionValueType::Number:
             return std::get<u32>(against) >= std::get<u32>(value);
-          case ConditionValue_t::Resources: {
+          case ConditionValueType::Resources: {
             map<Resources::Type, u32> resources_needed =
               std::get<map<Resources::Type, u32>>(value);
 
