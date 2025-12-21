@@ -103,9 +103,9 @@ struct Renderer {
 
   void draw_resources() {
     // Draw Resources
-    BeginShaderMode(shader);
+    //BeginShaderMode(shader);
     { Resource::System::Draw(Global::state.camera); }
-    EndShaderMode();
+    //EndShaderMode();
   }
 
   void draw_after(Map::Mode map_mode) {
@@ -125,7 +125,7 @@ struct Renderer {
             Settlement::System::draw(Global::texture_cache, false);
             break;
           case Map::Mode::Resources:
-            Settlement::System::draw(Global::texture_cache, false);
+            // Settlement::System::draw(Global::texture_cache, false);
             break;
         }
 
@@ -353,8 +353,8 @@ struct Renderer {
           // Right border
           if (config->width.right > 0) {
             DrawRectangle(
-              (int
-              ) roundf(boundingBox.x + boundingBox.width - config->width.right),
+              (int)
+                roundf(boundingBox.x + boundingBox.width - config->width.right),
               (int) roundf(boundingBox.y + config->cornerRadius.topRight),
               (int) config->width.right,
               (int) roundf(
