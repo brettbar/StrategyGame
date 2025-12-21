@@ -7,6 +7,7 @@
 #include "../components/province_component.hpp"
 #include "../components/settlement_component.hpp"
 #include "../components/stockpile_component.hpp"
+#include <raylib.h>
 
 namespace Resource {
 
@@ -191,6 +192,19 @@ struct System {
         Global::texture_cache[id]->texture,
         prov.tile.top_left_corner_position.x + 16,
         prov.tile.top_left_corner_position.y + 16,
+        WHITE
+      );
+
+      cstr quant = u32_to_cstr(quantity);
+      DrawTextEx(
+        Global::font_cache[hstr{"font_romulus"}]->font,
+        quant,
+        {
+          prov.tile.top_left_corner_position.x + 36,
+          prov.tile.top_left_corner_position.y + 36,
+        },
+        8,
+        2,
         WHITE
       );
     }
