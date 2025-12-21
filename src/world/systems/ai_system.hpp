@@ -81,7 +81,7 @@ struct System {
 
 
       world_state[cond_t] = ConditionValue{
-        get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
+        get_real_state_for_cond(ai_player, Condition(cond_t)),
       };
 
       // ConditionQuantityType quant_type = quantity_type(cond_t);

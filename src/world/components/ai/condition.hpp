@@ -53,7 +53,15 @@ inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
 struct Condition {
   Condition_t type;
   ConditionCompare compare = ConditionCompare::Equals;
-  ConditionValue value;
+  ConditionValue value = {};
+
+  Condition(Condition_t cond_t) : type(cond_t), value({}) {}
+
+  Condition(Condition_t cond_t, ConditionCompare comp, ConditionValue cond_v)
+      : type(cond_t), compare(comp), value(cond_v) {}
+
+  Condition(Condition_t cond_t, ConditionValue cond_v)
+      : type(cond_t), value(cond_v) {}
 
   bool operator==(const ConditionValue &other) const {
     switch (value_type_for_cond_t(type)) {

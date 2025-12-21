@@ -11,6 +11,7 @@ enum class Action_t {
   SpawnColonist,
   ClaimProvince,
   BuildSettlement,
+  BuildBuilding,
 };
 
 struct Action {
@@ -35,6 +36,8 @@ struct Action {
         return "ClaimProvince";
       case Action_t::BuildSettlement:
         return "BuildSettlement";
+      case Action_t::BuildBuilding:
+        return "BuildBuilding";
     }
   }
 };
@@ -52,11 +55,7 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::ColonistOnOwnProvince,
-              ConditionCompare::Equals,
-              true,
-            },
+            Condition(Condition_t::ColonistOnOwnProvince, true),
             {
               Condition_t::HasResources,
               ConditionCompare::GreaterThanOrEqualTo,
@@ -71,6 +70,16 @@ inline Action get_action(Action_t type) {
             EffectOperator::Increase,
             (u32) 1,
           },
+        },
+      };
+    case AI::Action_t::BuildBuilding:
+      return Action {
+        .type = type,
+        .preconditions = {
+          Condition(Condition_t::HasSettlements, true),
+        },
+        .effects = {
+          
         },
       };
     case Action_t::ClaimProvince:
