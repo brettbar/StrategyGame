@@ -64,7 +64,7 @@ inline Goal goal(Goal_t goal) {
         .prio = 1,
         .conditions = {
           Condition{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             ConditionCompare::GreaterThanOrEqualTo,
             (u32) 1,
           },
@@ -77,7 +77,7 @@ inline Goal goal(Goal_t goal) {
         .prio = 0.5,
         .conditions = {
           Condition{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             ConditionCompare::GreaterThanOrEqualTo,
             (u32) 3,
           },

@@ -16,7 +16,7 @@
 
 namespace AI {
 
-using WorldState = map<Condition_t, ConditionValue>;
+using WorldState = map<ConditionType, ConditionValue>;
 
 struct System {
   static void Create(entt::entity player) {
@@ -76,8 +76,8 @@ struct System {
     AI::Component &ai_c
   ) {
     WorldState world_state = {};
-    for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
-      Condition_t cond_t = (Condition_t) i;
+    for (u32 i = 0; i < (u32) ConditionType::COUNT; i++) {
+      ConditionType cond_t = (ConditionType) i;
 
 
       world_state[cond_t] = ConditionValue{
@@ -421,11 +421,11 @@ struct System {
     Condition cond
   ) {
     switch (cond.type) {
-      case Condition_t::HasColonist: {
+      case ConditionType::HasColonist: {
         return Actor::System::get_colonist_of_player(ai_player) != entt::null;
       } break;
 
-      case Condition_t::ColonistOnUnclaimedProvince: {
+      case ConditionType::ColonistOnUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return false;
@@ -433,7 +433,7 @@ struct System {
         return Actor::System::colonist_can_claim_province(colonist_e);
       } break;
 
-      case Condition_t::ColonistOnOwnProvince: {
+      case ConditionType::ColonistOnOwnProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return false;
@@ -441,19 +441,19 @@ struct System {
         return Actor::System::colonist_can_place_settlement(colonist_e);
       } break;
 
-      case Condition_t::HasUnsettledProvince: {
+      case ConditionType::HasUnsettledProvince: {
         return Province::System::player_has_unsettled_province(ai_player);
       } break;
-      case Condition_t::HasSettlements: {
+      case ConditionType::HasSettlements: {
         return Settlement::System::num_player_settlements(ai_player);
       } break;
-      case Condition_t::HasResources: {
+      case ConditionType::HasResources: {
         map<Resources::Type, u32> current_resources =
           Resource::System::get_resources_for_player(ai_player);
         return current_resources;
       } break;
 
-      case AI::Condition_t::COUNT:
+      case AI::ConditionType::COUNT:
         return {};
     }
   };

@@ -5,7 +5,7 @@
 #include <variant>
 
 namespace AI {
-enum class Condition_t {
+enum class ConditionType {
   ColonistOnUnclaimedProvince,
   ColonistOnOwnProvince,
   HasColonist,
@@ -34,33 +34,33 @@ enum class ConditionCompare {
   GreaterThanOrEqualTo
 };
 
-inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
+inline ConditionValue_t value_type_for_cond_t(ConditionType cond_t) {
   switch (cond_t) {
-    case Condition_t::ColonistOnUnclaimedProvince:
-    case Condition_t::ColonistOnOwnProvince:
-    case Condition_t::HasColonist:
-    case Condition_t::HasUnsettledProvince:
+    case ConditionType::ColonistOnUnclaimedProvince:
+    case ConditionType::ColonistOnOwnProvince:
+    case ConditionType::HasColonist:
+    case ConditionType::HasUnsettledProvince:
       return ConditionValue_t::Boolean;
-    case Condition_t::HasSettlements:
+    case ConditionType::HasSettlements:
       return ConditionValue_t::Number;
-    case Condition_t::HasResources:
+    case ConditionType::HasResources:
       return ConditionValue_t::Resources;
-    case Condition_t::COUNT:
+    case ConditionType::COUNT:
       return ConditionValue_t::Boolean;
   }
 }
 
 struct Condition {
-  Condition_t type;
+  ConditionType type;
   ConditionCompare compare = ConditionCompare::Equals;
   ConditionValue value = {};
 
-  Condition(Condition_t cond_t) : type(cond_t), value({}) {}
+  Condition(ConditionType cond_t) : type(cond_t), value({}) {}
 
-  Condition(Condition_t cond_t, ConditionCompare comp, ConditionValue cond_v)
+  Condition(ConditionType cond_t, ConditionCompare comp, ConditionValue cond_v)
       : type(cond_t), compare(comp), value(cond_v) {}
 
-  Condition(Condition_t cond_t, ConditionValue cond_v)
+  Condition(ConditionType cond_t, ConditionValue cond_v)
       : type(cond_t), value(cond_v) {}
 
   bool operator==(const ConditionValue &other) const {
@@ -118,19 +118,19 @@ struct Condition {
 
   std::string as_str() {
     switch (type) {
-      case Condition_t::ColonistOnUnclaimedProvince:
+      case ConditionType::ColonistOnUnclaimedProvince:
         return "ColonistOnUnclaimedProvince";
-      case Condition_t::ColonistOnOwnProvince:
+      case ConditionType::ColonistOnOwnProvince:
         return "ColonistOnOwnProvince";
-      case Condition_t::HasColonist:
+      case ConditionType::HasColonist:
         return "HasColonist";
-      case Condition_t::HasUnsettledProvince:
+      case ConditionType::HasUnsettledProvince:
         return "HasUnsettledProvince";
-      case Condition_t::HasSettlements:
+      case ConditionType::HasSettlements:
         return "HasSettlements";
-      case Condition_t::HasResources:
+      case ConditionType::HasResources:
         return "HasResources";
-      case Condition_t::COUNT:
+      case ConditionType::COUNT:
         return "";
     }
   }
@@ -149,7 +149,7 @@ enum class EffectOperator {
 };
 
 struct Effect {
-  Condition_t type;
+  ConditionType type;
   EffectOperator op;
   ConditionValue value;
 

@@ -55,9 +55,9 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            Condition(Condition_t::ColonistOnOwnProvince, true),
+            {ConditionType::ColonistOnOwnProvince, true},
             {
-              Condition_t::HasResources,
+              ConditionType::HasResources,
               ConditionCompare::GreaterThanOrEqualTo,
               map<Resources::Type, u32>{
                 {Resources::Type::Timber, 5},
@@ -66,7 +66,7 @@ inline Action get_action(Action_t type) {
           },
         .effects = {
           Effect{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             EffectOperator::Increase,
             (u32) 1,
           },
@@ -76,7 +76,7 @@ inline Action get_action(Action_t type) {
       return Action {
         .type = type,
         .preconditions = {
-          Condition(Condition_t::HasSettlements, true),
+          {ConditionType::HasSettlements, true},
         },
         .effects = {
           
@@ -87,15 +87,11 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::ColonistOnUnclaimedProvince,
-              ConditionCompare::Equals,
-              true,
-            },
+            {ConditionType::ColonistOnUnclaimedProvince, true},
           },
         .effects = {
           Effect{
-            Condition_t::HasUnsettledProvince,
+            ConditionType::HasUnsettledProvince,
             EffectOperator::Set,
             true,
           },
@@ -108,7 +104,7 @@ inline Action get_action(Action_t type) {
         .preconditions{},
         .effects = {
           Effect{
-            Condition_t::HasColonist,
+            ConditionType::HasColonist,
             EffectOperator::Set,
             true,
           },
@@ -120,15 +116,11 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::HasColonist,
-              ConditionCompare::Equals,
-              true,
-            },
+            {ConditionType::HasColonist, true},
           },
         .effects = {
           Effect{
-            Condition_t::ColonistOnUnclaimedProvince,
+            ConditionType::ColonistOnUnclaimedProvince,
             EffectOperator::Set,
             true,
           },
@@ -139,20 +131,12 @@ inline Action get_action(Action_t type) {
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::HasColonist,
-              ConditionCompare::Equals,
-              true,
-            },
-            {
-              Condition_t::HasUnsettledProvince,
-              ConditionCompare::Equals,
-              true,
-            },
+            {ConditionType::HasColonist, true},
+            {ConditionType::HasUnsettledProvince, true},
           },
         .effects = {
           Effect{
-            Condition_t::ColonistOnOwnProvince,
+            ConditionType::ColonistOnOwnProvince,
             EffectOperator::Set,
             true,
           },
@@ -162,21 +146,21 @@ inline Action get_action(Action_t type) {
 };
 
 
-inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
+inline std::vector<Action_t> actions_that_satisfy_cond(ConditionType cond) {
   switch (cond) {
-    case Condition_t::ColonistOnUnclaimedProvince:
+    case ConditionType::ColonistOnUnclaimedProvince:
       return {Action_t::MoveColonistToUnclaimedProvince};
-    case Condition_t::ColonistOnOwnProvince:
+    case ConditionType::ColonistOnOwnProvince:
       return {Action_t::MoveColonistToUnsettledOwnedProvince};
-    case Condition_t::HasColonist:
+    case ConditionType::HasColonist:
       return {Action_t::SpawnColonist};
-    case Condition_t::HasUnsettledProvince:
+    case ConditionType::HasUnsettledProvince:
       return {Action_t::ClaimProvince};
-    case Condition_t::HasSettlements:
+    case ConditionType::HasSettlements:
       return {Action_t::BuildSettlement};
-    case Condition_t::HasResources:
+    case ConditionType::HasResources:
       return {};
-    case Condition_t::COUNT:
+    case ConditionType::COUNT:
       return {};
   }
 }
