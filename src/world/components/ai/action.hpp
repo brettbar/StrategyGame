@@ -121,7 +121,16 @@ inline Action get_action(ActionType type) {
     case ActionType::SpawnArmy:
       return Action{
         .type = type,
-        .preconditions = {},// @todo requirements to make army
+        .preconditions =
+          {
+            {
+              ConditionType::HasResources,
+              ConditionCompare::GreaterThanOrEqualTo,
+              map<Resources::Type, u32>{
+                {Resources::Type::Fish, 10},
+              },
+            },
+          },// @todo requirements to make army
         .effects = {
           Effect{
             ConditionType::HasArmies,
