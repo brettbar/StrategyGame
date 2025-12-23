@@ -9,7 +9,7 @@
 namespace AI {
 
 struct Component {
-  Goal_t current_goal;
+  GoalType current_goal;
   Plan current_plan;
   sptr<Action> current_action = nullptr;
   bool executing_plan = false;

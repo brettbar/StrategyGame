@@ -9,6 +9,7 @@ enum class ActionType {
   MoveColonistToUnclaimedProvince,
   MoveColonistToUnsettledOwnedProvince,
   SpawnColonist,
+  SpawnArmy,
   ClaimProvince,
   BuildSettlement,
   BuildBuilding,
@@ -32,6 +33,8 @@ struct Action {
         return "MoveColonistToOwnProvince";
       case ActionType::SpawnColonist:
         return "SpawnColonist";
+      case ActionType::SpawnArmy:
+        return "SpawnArmy";
       case ActionType::ClaimProvince:
         return "ClaimProvince";
       case ActionType::BuildSettlement:
@@ -115,6 +118,19 @@ inline Action get_action(ActionType type) {
         },
       };
 
+    case ActionType::SpawnArmy:
+      return Action{
+        .type = type,
+        .preconditions = {},// @todo requirements to make army
+        .effects = {
+          Effect{
+            ConditionType::HasArmies,
+            EffectOperator::Increase,
+            (u32) 1,
+          },
+        },
+      };
+
     case ActionType::MoveColonistToUnclaimedProvince:
       return Action{
         .type = type,
@@ -158,12 +174,14 @@ inline std::vector<ActionType> actions_that_satisfy_cond(ConditionType cond) {
       return {ActionType::MoveColonistToUnsettledOwnedProvince};
     case ConditionType::HasColonist:
       return {ActionType::SpawnColonist};
+    case ConditionType::HasArmies:
+      return {ActionType::SpawnArmy};
     case ConditionType::HasUnsettledProvince:
       return {ActionType::ClaimProvince};
     case ConditionType::HasSettlements:
       return {ActionType::BuildSettlement};
     case ConditionType::HasResources:
-      return {};
+      return {};// @todo
     case ConditionType::COUNT:
       return {};
   }

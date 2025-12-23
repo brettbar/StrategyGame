@@ -12,6 +12,7 @@ enum class ConditionType {
   HasUnsettledProvince,
   HasSettlements,
   HasResources,
+  HasArmies,
   COUNT,
 };
 
@@ -36,6 +37,7 @@ inline ConditionValueType value_type_for_cond_t(ConditionType cond_t) {
     case ConditionType::HasUnsettledProvince:
       return ConditionValueType::Boolean;
     case ConditionType::HasSettlements:
+    case ConditionType::HasArmies:
       return ConditionValueType::Number;
     case ConditionType::HasResources:
       return ConditionValueType::Resources;
@@ -124,6 +126,8 @@ struct Condition {
         return "HasSettlements";
       case ConditionType::HasResources:
         return "HasResources";
+      case ConditionType::HasArmies:
+        return "HasArmies";
       case ConditionType::COUNT:
         return "";
     }

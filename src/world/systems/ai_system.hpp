@@ -20,7 +20,7 @@ using WorldState = map<ConditionType, ConditionValue>;
 
 struct System {
   static void Create(entt::entity player) {
-    AI::Component ai_c = AI::Component(Goal_t::None);
+    AI::Component ai_c = AI::Component(GoalType::None);
     Global::world.emplace<AI::Component>(player, ai_c);
   }
 
@@ -44,12 +44,14 @@ struct System {
     AI::Component &ai
   ) {
     assert(
-      ai.current_goal == Goal_t::None
+      ai.current_goal == GoalType::None
     );// @temp, eventually be able to change goal on the fly
 
+    // This is reverse
     auto goals = {
-      goal(Goal_t::EstablishSettlement),
-      goal(Goal_t::ExpandBorders),
+      goal(GoalType::ExpandBorders),
+      goal(GoalType::BuildArmy),
+      goal(GoalType::EstablishSettlement),
     };
 
     for (const auto &goal: goals) {
@@ -121,11 +123,10 @@ struct System {
     WorldState state = current_world_state(ai_player, ai_c);
 
     switch (ai_c.current_goal) {
-      case Goal_t::None:
+      case GoalType::None:
         determine_goal(state, ai_player, player_c, ai_c);
         break;
-      case Goal_t::ExpandBorders:
-      case Goal_t::EstablishSettlement: {
+      default: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         Goal current_goal = goal(ai_c.current_goal);
@@ -143,6 +144,8 @@ struct System {
           });
 
           build_graph(root, ai_player);
+
+          printf("Executing plan for goal %d\n", current_goal.type);
 
           printf("===== START GRAPH =====\n");
           root->print();
@@ -164,7 +167,7 @@ struct System {
               )) {
             printf("player_1 has finished their goal!\n");
             ai_c.executing_plan = false;
-            ai_c.current_goal = Goal_t::None;
+            ai_c.current_goal = GoalType::None;
             ai_c.current_plan = Plan{{}, 0};
             ai_c.current_action = nullptr;
           }
@@ -413,6 +416,15 @@ struct System {
           Commands::Command::spawn_colonist(ai_player, pos)
         );
       } break;
+
+      case ActionType::SpawnArmy: {
+        vec2f pos =
+          Settlement::System::position_of_a_player_settlement(ai_player);
+
+        Commands::Manager()->enqueue(
+          Commands::Command::spawn_army(ai_player, pos)
+        );
+      } break;
     }
   }
 
@@ -453,6 +465,9 @@ struct System {
         return current_resources;
       } break;
 
+      case ConditionType::HasArmies: {
+        return Actor::System::get_army_count(ai_player);
+      } break;
       case AI::ConditionType::COUNT:
         return {};
     }
