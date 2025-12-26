@@ -127,7 +127,7 @@ inline Action get_action(ActionType type) {
               ConditionType::HasResources,
               ConditionCompare::GreaterThanOrEqualTo,
               map<Resources::Type, u32>{
-                {Resources::Type::Fish, 10},
+                {Resources::Type::Seabass, 10},
               },
             },
           },// @todo requirements to make army

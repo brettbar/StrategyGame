@@ -23,7 +23,7 @@ struct System {
         {Resources::Type::Timber, 10},
         {Resources::Type::Bricks, 10},
         {Resources::Type::Stone, 10},
-        {Resources::Type::Fish, 10},
+        {Resources::Type::Seabass, 10},
         {Resources::Type::Wheat, 10},
       };
 
