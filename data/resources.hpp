@@ -44,6 +44,7 @@ enum class Type {
   Flour,
   Bread,
   OliveOil,
+  Wine,
   Seabass,
   Mackerel,
   RedMullet,
@@ -112,6 +113,8 @@ inline const char *resource_cstr(Type r) {
       return "Bread";
     case Type::OliveOil:
       return "Olive Oil";
+    case Type::Wine:
+      return "Wine";
     case Type::Seabass:
       return "Seabass";
     case Type::Mackerel:
