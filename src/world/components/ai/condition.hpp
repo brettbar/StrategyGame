@@ -155,5 +155,17 @@ struct Effect {
   ConditionValue after = {};
 };
 
+inline list<Condition> has_food(u32 quantity) {
+  return {
+    {
+      ConditionType::HasResources,
+      ConditionCompare::GreaterThanOrEqualTo,
+      map<Resources::Type, u32>{
+        {Resources::Type::Seabass, 10},
+      },
+    },
+  };
+}
+
 
 }// namespace AI

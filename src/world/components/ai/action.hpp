@@ -123,13 +123,7 @@ inline Action get_action(ActionType type) {
         .type = type,
         .preconditions =
           {
-            {
-              ConditionType::HasResources,
-              ConditionCompare::GreaterThanOrEqualTo,
-              map<Resources::Type, u32>{
-                {Resources::Type::Seabass, 10},
-              },
-            },
+            has_food(10),
           },// @todo requirements to make army
         .effects = {
           Effect{
