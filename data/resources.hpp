@@ -7,6 +7,7 @@
 #include "../src/shared/utils.hpp"
 
 namespace Resources {
+
 enum class Natural {
   Soil,// not sure about this one
   Trees,
@@ -69,6 +70,21 @@ enum class Type {
   COUNT,
 };
 
+inline list<Resources::Type> food_resources = {
+  Type::Olives,
+  Type::Bread,
+  Type::OliveOil,
+  Type::Wine,
+  Type::Seabass,
+  Type::Mackerel,
+  Type::RedMullet,
+  Type::Puls,
+};
+
+// @todo use
+struct Component {
+  Type type;
+};
 
 inline const char *resource_cstr(Type r) {
   switch (r) {

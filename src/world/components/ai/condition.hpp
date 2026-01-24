@@ -156,15 +156,17 @@ struct Effect {
 };
 
 inline list<Condition> has_food(u32 quantity) {
-  return {
-    {
+  list<Condition> food_conditions = {};
+
+  for (const auto resource: Resources::food_resources) {
+    food_conditions.push_back({
       ConditionType::HasResources,
       ConditionCompare::GreaterThanOrEqualTo,
-      map<Resources::Type, u32>{
-        {Resources::Type::Seabass, 10},
-      },
-    },
-  };
+      map<Resources::Type, u32>{{resource, quantity}},
+    });
+  }
+
+  return food_conditions;
 }
 
 
