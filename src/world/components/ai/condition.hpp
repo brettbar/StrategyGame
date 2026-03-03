@@ -2,81 +2,74 @@
 
 #include "../../../../data/resources.hpp"
 #include "../../../shared/common.hpp"
+#include <variant>
 
 namespace AI {
-enum class Condition_t {
+enum class ConditionType {
   ColonistOnUnclaimedProvince,
   ColonistOnOwnProvince,
   HasColonist,
   HasUnsettledProvince,
   HasSettlements,
   HasResources,
+  HasArmies,
   COUNT,
 };
 
-enum class ConditionValue_t {
+enum class ConditionValueType {
   Boolean,
   Number,
+  Resources,
 };
 
-using ConditionValue = union {
-  bool boolean;
-  u32 number;
-};
-
-enum class ConditionQuantityType {
-  None,
-  Resource
-};
-
-using ConditionQuantity = union {
-  Resources::Type resource;
-};
+using ConditionValue = std::variant<bool, u32, map<Resources::Type, u32>>;
 
 enum class ConditionCompare {
   Equals,
   GreaterThanOrEqualTo
 };
 
-inline ConditionValue_t value_type_for_cond_t(Condition_t cond_t) {
+inline ConditionValueType value_type_for_cond_t(ConditionType cond_t) {
   switch (cond_t) {
-    case Condition_t::ColonistOnUnclaimedProvince:
-    case Condition_t::ColonistOnOwnProvince:
-    case Condition_t::HasColonist:
-    case Condition_t::HasUnsettledProvince:
-      return ConditionValue_t::Boolean;
-    case Condition_t::HasSettlements:
-    case Condition_t::HasResources:
-      return ConditionValue_t::Number;
-    case Condition_t::COUNT:
-      return ConditionValue_t::Boolean;
-  }
-}
-
-inline ConditionQuantityType quantity_type(Condition_t cond_t) {
-  switch (cond_t) {
-    case Condition_t::HasResources:
-      return ConditionQuantityType::Resource;
-    default:
-      return ConditionQuantityType::None;
+    case ConditionType::ColonistOnUnclaimedProvince:
+    case ConditionType::ColonistOnOwnProvince:
+    case ConditionType::HasColonist:
+    case ConditionType::HasUnsettledProvince:
+      return ConditionValueType::Boolean;
+    case ConditionType::HasSettlements:
+    case ConditionType::HasArmies:
+      return ConditionValueType::Number;
+    case ConditionType::HasResources:
+      return ConditionValueType::Resources;
+    case ConditionType::COUNT:
+      return ConditionValueType::Boolean;
   }
 }
 
 struct Condition {
-  Condition_t type;
+  ConditionType type;
   ConditionCompare compare = ConditionCompare::Equals;
-  ConditionValue value;
+  ConditionValue value = {};
 
-  ConditionQuantityType quantity_type = ConditionQuantityType::None;
-  ConditionQuantity quantity;
+  Condition(ConditionType cond_t) : type(cond_t), value({}) {}
 
+  Condition(ConditionType cond_t, ConditionCompare comp, ConditionValue cond_v)
+      : type(cond_t), compare(comp), value(cond_v) {}
+
+  Condition(ConditionType cond_t, ConditionValue cond_v)
+      : type(cond_t), value(cond_v) {}
 
   bool operator==(const ConditionValue &other) const {
     switch (value_type_for_cond_t(type)) {
-      case ConditionValue_t::Boolean:
-        return value.boolean == other.boolean;
-      case ConditionValue_t::Number:
-        return value.number == other.number;
+      case ConditionValueType::Boolean:
+        return std::get<bool>(value) == std::get<bool>(other);
+      case ConditionValueType::Number:
+        return std::get<u32>(value) == std::get<u32>(other);
+      case ConditionValueType::Resources:
+        // @todo wont work
+        // we need to change it so its just saying does all of one equal that of the other, not a strict check I think
+        return std::get<map<Resources::Type, u32>>(value) ==
+               std::get<map<Resources::Type, u32>>(other);
     }
   }
 
@@ -87,10 +80,31 @@ struct Condition {
         return *this == against;
       case AI::ConditionCompare::GreaterThanOrEqualTo: {
         switch (value_type_for_cond_t(type)) {
-          case ConditionValue_t::Boolean:
+          case ConditionValueType::Boolean:
             return false;
-          case ConditionValue_t::Number:
-            return against.number >= value.number;
+          case ConditionValueType::Number:
+            return std::get<u32>(against) >= std::get<u32>(value);
+          case ConditionValueType::Resources: {
+            map<Resources::Type, u32> resources_needed =
+              std::get<map<Resources::Type, u32>>(value);
+
+            map<Resources::Type, u32> comparing_against =
+              std::get<map<Resources::Type, u32>>(against);
+
+
+            for (const auto &[key, val]: resources_needed) {
+              Resources::Type resource_needed = key;
+              u32 amount_needed = val;
+
+              u32 amount_currently_have = comparing_against[resource_needed];
+
+              if (amount_currently_have < amount_needed) {
+                return false;
+              }
+            }
+
+            return true;
+          } break;
         }
       }
     }
@@ -100,19 +114,21 @@ struct Condition {
 
   std::string as_str() {
     switch (type) {
-      case Condition_t::ColonistOnUnclaimedProvince:
+      case ConditionType::ColonistOnUnclaimedProvince:
         return "ColonistOnUnclaimedProvince";
-      case Condition_t::ColonistOnOwnProvince:
+      case ConditionType::ColonistOnOwnProvince:
         return "ColonistOnOwnProvince";
-      case Condition_t::HasColonist:
+      case ConditionType::HasColonist:
         return "HasColonist";
-      case Condition_t::HasUnsettledProvince:
+      case ConditionType::HasUnsettledProvince:
         return "HasUnsettledProvince";
-      case Condition_t::HasSettlements:
+      case ConditionType::HasSettlements:
         return "HasSettlements";
-      case Condition_t::HasResources:
+      case ConditionType::HasResources:
         return "HasResources";
-      case Condition_t::COUNT:
+      case ConditionType::HasArmies:
+        return "HasArmies";
+      case ConditionType::COUNT:
         return "";
     }
   }
@@ -131,13 +147,27 @@ enum class EffectOperator {
 };
 
 struct Effect {
-  Condition_t type;
+  ConditionType type;
   EffectOperator op;
   ConditionValue value;
 
   ConditionValue before = {};
   ConditionValue after = {};
 };
+
+inline list<Condition> has_food(u32 quantity) {
+  list<Condition> food_conditions = {};
+
+  for (const auto resource: Resources::food_resources) {
+    food_conditions.push_back({
+      ConditionType::HasResources,
+      ConditionCompare::GreaterThanOrEqualTo,
+      map<Resources::Type, u32>{{resource, quantity}},
+    });
+  }
+
+  return food_conditions;
+}
 
 
 }// namespace AI

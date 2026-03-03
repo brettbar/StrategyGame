@@ -9,7 +9,7 @@ namespace AI {
 // Common type for both Goals and Actions
 struct Node {
   Action action;
-  map<Condition_t, std::vector<std::shared_ptr<Node>>> children;
+  map<ConditionType, std::vector<std::shared_ptr<Node>>> children;
 
   void print(uint32_t depth = 0) {
     for (uint32_t i = 0; i < depth; ++i) {

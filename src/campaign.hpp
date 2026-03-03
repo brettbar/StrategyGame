@@ -77,14 +77,16 @@ struct Campaign {
   void save(str);
   void start_mp();
   void load(cstr);
-  void UpdateOnFrame(f32 &, f32 &, f32 &);
+  void update_on_frame(f32 &, f32 &, f32 &);
   void Update60TPS();
   void Update1TPS();
   void PostCommand(Commands::Command);
 
   void Draw();
 
-  void EvaluateCommands(const Commands::Command &);
+  void evaluate_commands();
+  void execute_commands();
+  void execute_command(const Commands::Command &);
   // void HandleSpawnRequest( const Commands::Command & );
   void HandleTimeChangeRequest(const Commands::Command &);
 
@@ -127,9 +129,9 @@ inline void Campaign::start(str player_faction) {
   AI::System::Start();
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::start_mp() {
@@ -146,9 +148,9 @@ inline void Campaign::start_mp() {
   AI::System::Start();
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 inline void Campaign::save(str file_name) {
@@ -221,9 +223,9 @@ inline void Campaign::load(cstr file_path) {
 
   Global::world.view<Settlement::Component>().each(
     [](Settlement::Component &settlement) {
-      settlement.texture =
-        LoadTextureFromImage(Settlement::Manager()->building_map.at("roman_m1")
-        );
+      settlement.texture = LoadTextureFromImage(
+        Settlement::Manager()->building_map.at("roman_m1")
+      );
     }
   );
   Global::world.view<Player::Component>().each(
@@ -237,14 +239,14 @@ inline void Campaign::load(cstr file_path) {
   );
 
   Commands::Manager()->init();
-  Commands::Manager()
-    ->queue.sink<Commands::Command>()
-    .connect<&Campaign::EvaluateCommands>(this);
+  // Commands::Manager()
+  //   ->queue.sink<Commands::Command>()
+  //   .connect<&Campaign::evaluate_commands>(this);
 }
 
 
 // Runs inside game loop
-inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
+inline void Campaign::update_on_frame(f32 &dt, f32 &lag, f32 &oncelag) {
   f32 cameraSpeed = 500.0f;
 
   bool show_content = false;
@@ -292,7 +294,8 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
   }
 
   if (IsKeyPressed(KEY_SPACE)) {
-    PostCommand(Commands::Command::time_change(player_e, "Player request Pause")
+    PostCommand(
+      Commands::Command::time_change(player_e, "Player request Pause")
     );
   }
 
@@ -356,9 +359,11 @@ inline void Campaign::UpdateOnFrame(f32 &dt, f32 &lag, f32 &oncelag) {
             Settlement::System::can_build_immediately(
               prov_component, settlement_component, _building_to_build.value()
             )) {
-          PostCommand(Commands::Command::construct_building(
-            sc, _building_to_build.value()
-          ));
+          PostCommand(
+            Commands::Command::construct_building(
+              sc, _building_to_build.value()
+            )
+          );
           _building_to_build = std::nullopt;
           Map::Manager()->mode = Map::Mode::Default;
         }
@@ -412,9 +417,12 @@ inline void Campaign::Update60TPS() {
     Global::world.view<Actor::Component, Animated::Component>();
   auto players = Global::world.view<Player::Component>();
 
+  // Commands::Manager()->poll();
+  evaluate_commands();
+  execute_commands();
+
   Movement::System::Update(animated_actors, Global::state.timeScale);
   Animation::System::Update(animated_actors, Global::state.timeScale);
-  Commands::Manager()->poll();
   Player::System::Update(players);
   //  Terrain::UpdateFOW(reg);
 }
@@ -551,28 +559,48 @@ inline void Campaign::PostCommand(Commands::Command cmd) {
     };
 
     if (Network::is_host) {
-      Network::Host()->SendMessageToAllActiveClients(Network::Message{
-        Network::MessageID::Command,
-        body,
-      });
+      Network::Host()->SendMessageToAllActiveClients(
+        Network::Message{
+          Network::MessageID::Command,
+          body,
+        }
+      );
       Commands::Manager()->enqueue(cmd);
     } else {
-      Network::Client()->SendMessageToHost(Network::Message{
-        Network::MessageID::Command,
-        body,
-      });
+      Network::Client()->SendMessageToHost(
+        Network::Message{
+          Network::MessageID::Command,
+          body,
+        }
+      );
     }
   }
 }
 
 
-// @todo This should be split to explicit Evaluate and Execute steps.
-inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
+inline void Campaign::evaluate_commands() {
+  for (auto &cmd: Commands::Manager()->queue) {
+    cmd.can_execute = true;
+  }
+}
+
+inline void Campaign::execute_commands() {
+  while (!Commands::Manager()->is_empty()) {
+    auto cmd_opt = Commands::Manager()->pop();
+    if (cmd_opt.has_value()) {
+      if (cmd_opt->can_execute) {
+        execute_command(cmd_opt.value());
+      }
+    }
+  }
+}
+
+inline void Campaign::execute_command(const Commands::Command &cmd) {
   switch (cmd.type) {
     case Commands::Type::None:
       break;
     case Commands::Type::BuildSettlement: {
-      Settlement::System::spawn_settlement(cmd.entity);
+      Settlement::System::build_settlement(cmd.entity);
       return;
     }
     case Commands::Type::ClaimProvince: {
@@ -592,7 +620,6 @@ inline void Campaign::EvaluateCommands(const Commands::Command &cmd) {
       return;
     }
     case Commands::Type::Move: {
-      printf("!!!!!!!!!!!!!!!!!!!\n");
       Movement::System::SetDestinations(cmd.entity, cmd.click_pos);
       return;
     }

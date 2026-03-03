@@ -25,11 +25,12 @@ namespace AI {
     Can increase by player wide or tall
   */
 
-enum class Goal_t {
+enum class GoalType {
   // BoostProduction,
   // DevelopSettlements,
   None,
   EstablishSettlement,
+  BuildArmy,
   ExpandBorders,
 };
 
@@ -41,45 +42,71 @@ enum class GoalLayer {
 };
 
 struct Goal {
-  Goal_t type;
+  GoalType type;
   GoalLayer layer;
   f32 prio;
 
   list<Condition> conditions;
+
+  std::string as_str() {
+    switch (type) {
+      case GoalType::None:
+        return "None";
+      case GoalType::EstablishSettlement:
+        return "EstablishSettlement";
+      case GoalType::BuildArmy:
+        return "BuildArmy";
+      case GoalType::ExpandBorders:
+        return "ExpandBorders";
+    }
+  }
 };
 
-inline Goal goal(Goal_t goal) {
+inline Goal goal(GoalType goal) {
   switch (goal) {
-    case Goal_t::None:
+    case GoalType::None:
       return Goal{
-        .type = Goal_t::None,
+        .type = GoalType::None,
         .layer = GoalLayer::Tactical,
         .prio = 0,
         .conditions = {},
       };
-    case Goal_t::EstablishSettlement:
+    case GoalType::EstablishSettlement:
       return Goal{
-        .type = Goal_t::EstablishSettlement,
+        .type = GoalType::EstablishSettlement,
         .layer = GoalLayer::Tactical,
         .prio = 1,
         .conditions = {
           Condition{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             ConditionCompare::GreaterThanOrEqualTo,
-            {.number = 1},
+            (u32) 1,
           },
         }
       };
-    case Goal_t::ExpandBorders:
+    case GoalType::BuildArmy:
       return Goal{
-        .type = Goal_t::ExpandBorders,
+        .type = GoalType::BuildArmy,
+        .layer = GoalLayer::Tactical,
+        .prio = 0.75,
+        .conditions = {
+          Condition{
+            ConditionType::HasArmies,
+            ConditionCompare::GreaterThanOrEqualTo,
+            (u32) 1,
+          },
+        }
+      };
+    case GoalType::ExpandBorders:
+      return Goal{
+        .type = GoalType::ExpandBorders,
         .layer = GoalLayer::Tactical,// @todo
         .prio = 0.5,
         .conditions = {
           Condition{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             ConditionCompare::GreaterThanOrEqualTo,
-            {.number = 3},
+            (u32) 3,
           },
         }
       };

@@ -16,11 +16,11 @@
 
 namespace AI {
 
-using WorldState = map<Condition_t, ConditionValue>;
+using WorldState = map<ConditionType, ConditionValue>;
 
 struct System {
   static void Create(entt::entity player) {
-    AI::Component ai_c = AI::Component(Goal_t::None);
+    AI::Component ai_c = AI::Component(GoalType::None);
     Global::world.emplace<AI::Component>(player, ai_c);
   }
 
@@ -44,12 +44,14 @@ struct System {
     AI::Component &ai
   ) {
     assert(
-      ai.current_goal == Goal_t::None
+      ai.current_goal == GoalType::None
     );// @temp, eventually be able to change goal on the fly
 
+    // This is reverse
     auto goals = {
-      goal(Goal_t::EstablishSettlement),
-      goal(Goal_t::ExpandBorders),
+      goal(GoalType::ExpandBorders),
+      goal(GoalType::BuildArmy),
+      goal(GoalType::EstablishSettlement),
     };
 
     for (const auto &goal: goals) {
@@ -76,25 +78,30 @@ struct System {
     AI::Component &ai_c
   ) {
     WorldState world_state = {};
-    for (u32 i = 0; i < (u32) Condition_t::COUNT; i++) {
-      Condition_t cond_t = (Condition_t) i;
+    for (u32 i = 0; i < (u32) ConditionType::COUNT; i++) {
+      ConditionType cond_t = (ConditionType) i;
 
-      ConditionQuantityType quant_type = quantity_type(cond_t);
 
-      switch (quant_type) {
-        case ConditionQuantityType::None:
-          world_state[cond_t] = ConditionValue{
-            get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
-          };
-          break;
-        case AI::ConditionQuantityType::Resource:
-          world_state[cond_t] = ConditionValue{
-            get_real_state_for_cond(
-              ai_player, Condition{.type = cond_t, .quantity_type = quant_type}
-            ),
-          };
-          break;
-      }
+      world_state[cond_t] = ConditionValue{
+        get_real_state_for_cond(ai_player, Condition(cond_t)),
+      };
+
+      // ConditionQuantityType quant_type = quantity_type(cond_t);
+      //
+      // switch (quant_type) {
+      //   case ConditionQuantityType::None:
+      //     world_state[cond_t] = ConditionValue{
+      //       get_real_state_for_cond(ai_player, Condition{.type = cond_t}),
+      //     };
+      //     break;
+      //   case AI::ConditionQuantityType::Resource:
+      //     world_state[cond_t] = ConditionValue{
+      //       get_real_state_for_cond(
+      //         ai_player, Condition{.type = cond_t, .quantity_type = quant_type}
+      //       ),
+      //     };
+      //     break;
+      // }
     }
 
     return world_state;
@@ -116,11 +123,10 @@ struct System {
     WorldState state = current_world_state(ai_player, ai_c);
 
     switch (ai_c.current_goal) {
-      case Goal_t::None:
+      case GoalType::None:
         determine_goal(state, ai_player, player_c, ai_c);
         break;
-      case Goal_t::ExpandBorders:
-      case Goal_t::EstablishSettlement: {
+      default: {
         // printf( "player_1 has NOT finished their goal!\n" );
 
         Goal current_goal = goal(ai_c.current_goal);
@@ -130,7 +136,7 @@ struct System {
           sptr<Node> root = std::make_shared<Node>(Node{
             .action =
               Action{
-                .type = Action_t::AchieveGoal,
+                .type = ActionType::AchieveGoal,
                 .preconditions = goal_conds,
                 .effects = {},
               },
@@ -138,6 +144,8 @@ struct System {
           });
 
           build_graph(root, ai_player);
+
+          printf("Executing plan for goal %d\n", current_goal.type);
 
           printf("===== START GRAPH =====\n");
           root->print();
@@ -159,7 +167,7 @@ struct System {
               )) {
             printf("player_1 has finished their goal!\n");
             ai_c.executing_plan = false;
-            ai_c.current_goal = Goal_t::None;
+            ai_c.current_goal = GoalType::None;
             ai_c.current_plan = Plan{{}, 0};
             ai_c.current_action = nullptr;
           }
@@ -286,17 +294,21 @@ struct System {
       ConditionValue current = state[effect.type];
 
       switch (value_type_for_cond_t(effect.type)) {
-        case AI::ConditionValue_t::Boolean:
-          all_met = all_met && (expected_after.boolean == current.boolean);
+        case AI::ConditionValueType::Boolean:
+          all_met = all_met &&
+                    (std::get<bool>(expected_after) == std::get<bool>(current));
           break;
-        case AI::ConditionValue_t::Number:
+        case AI::ConditionValueType::Number:
           // @TODO this is almost certainly wrong(or at least just incomplete)
           // Like what if we wanted to go from 4 to 3, then this should be decrementing
           // So we need to take into account what the effect op was.
           // if it was increasing, then maybe this suffices
           // if it was supposed to be decreasing, then maybe <= or something?
           // if set, maybe ==
-          all_met = all_met && (current.number >= expected_after.number);
+          all_met = all_met &&
+                    (std::get<u32>(current) >= std::get<u32>(expected_after));
+          break;
+        case AI::ConditionValueType::Resources:
           break;
       }
     }
@@ -322,13 +334,16 @@ struct System {
 
       switch (value_type_for_cond_t(effect.type)) {
           // @todo  actually use the op
-        case AI::ConditionValue_t::Boolean:
-          state[effect.type].boolean = effect.value.boolean;
+        case AI::ConditionValueType::Boolean:
+          std::get<bool>(state[effect.type]) = std::get<bool>(effect.value);
           break;
-        case AI::ConditionValue_t::Number:
-          int current = state[effect.type].number;
-          state[effect.type].number = current + effect.value.number;
-          break;
+        case AI::ConditionValueType::Number: {
+          u32 current = std::get<u32>(state[effect.type]);
+          state[effect.type] = current + std::get<u32>(effect.value);
+        } break;
+        case AI::ConditionValueType::Resources: {
+          // @todo
+        } break;
       }
 
       effect.after = state[effect.type];
@@ -340,9 +355,9 @@ struct System {
 
     std::cout << "Doing Action :: " << a.as_str() << '\n';
     switch (a.type) {
-      case Action_t::AchieveGoal:
+      case ActionType::AchieveGoal:
         break;
-      case Action_t::BuildSettlement: {
+      case ActionType::BuildSettlement: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -353,7 +368,7 @@ struct System {
         );
 
       } break;
-      case Action_t::ClaimProvince: {
+      case ActionType::ClaimProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -366,10 +381,10 @@ struct System {
         );
 
       } break;
-      case Action_t::MoveColonistToUnsettledOwnedProvince: {
+      case ActionType::MoveColonistToUnsettledOwnedProvince: {
         return;
       }
-      case Action_t::MoveColonistToUnclaimedProvince: {
+      case ActionType::MoveColonistToUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
           return;
@@ -393,12 +408,21 @@ struct System {
 
 
       } break;
-      case Action_t::SpawnColonist: {
+      case ActionType::SpawnColonist: {
         vec2f pos =
           Settlement::System::position_of_a_player_settlement(ai_player);
 
         Commands::Manager()->enqueue(
           Commands::Command::spawn_colonist(ai_player, pos)
+        );
+      } break;
+
+      case ActionType::SpawnArmy: {
+        vec2f pos =
+          Settlement::System::position_of_a_player_settlement(ai_player);
+
+        Commands::Manager()->enqueue(
+          Commands::Command::spawn_army(ai_player, pos)
         );
       } break;
     }
@@ -409,55 +433,42 @@ struct System {
     Condition cond
   ) {
     switch (cond.type) {
-      case Condition_t::HasColonist: {
-        return {
-          .boolean =
-            Actor::System::get_colonist_of_player(ai_player) != entt::null
-        };
+      case ConditionType::HasColonist: {
+        return Actor::System::get_colonist_of_player(ai_player) != entt::null;
       } break;
 
-      case Condition_t::ColonistOnUnclaimedProvince: {
+      case ConditionType::ColonistOnUnclaimedProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
-          return {.boolean = false};
+          return false;
 
-        return {
-          .boolean = Actor::System::colonist_can_claim_province(colonist_e)
-        };
+        return Actor::System::colonist_can_claim_province(colonist_e);
       } break;
 
-      case Condition_t::ColonistOnOwnProvince: {
+      case ConditionType::ColonistOnOwnProvince: {
         auto colonist_e = Actor::System::get_colonist_of_player(ai_player);
         if (colonist_e == entt::null)
-          return {.boolean = false};
+          return false;
 
-        return {
-          .boolean = Actor::System::colonist_can_place_settlement(colonist_e)
-        };
+        return Actor::System::colonist_can_place_settlement(colonist_e);
       } break;
 
-      case Condition_t::HasUnsettledProvince: {
-        return {
-          .boolean = Province::System::player_has_unsettled_province(ai_player)
-        };
+      case ConditionType::HasUnsettledProvince: {
+        return Province::System::player_has_unsettled_province(ai_player);
       } break;
-      case Condition_t::HasSettlements: {
-        return {
-          .number = Settlement::System::num_player_settlements(ai_player)
-        };
+      case ConditionType::HasSettlements: {
+        return Settlement::System::num_player_settlements(ai_player);
       } break;
-      case Condition_t::HasResources: {
-        assert(cond.quantity_type == ConditionQuantityType::Resource);
-
-        auto ai_player_resources =
+      case ConditionType::HasResources: {
+        map<Resources::Type, u32> current_resources =
           Resource::System::get_resources_for_player(ai_player);
-
-        auto quantity = ai_player_resources[cond.quantity.resource];
-
-        return {.number = quantity};
+        return current_resources;
       } break;
 
-      case AI::Condition_t::COUNT:
+      case ConditionType::HasArmies: {
+        return Actor::System::get_army_count(ai_player);
+      } break;
+      case AI::ConditionType::COUNT:
         return {};
     }
   };

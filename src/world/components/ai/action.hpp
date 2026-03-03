@@ -4,17 +4,19 @@
 #include "condition.hpp"
 
 namespace AI {
-enum class Action_t {
+enum class ActionType {
   AchieveGoal,
   MoveColonistToUnclaimedProvince,
   MoveColonistToUnsettledOwnedProvince,
   SpawnColonist,
+  SpawnArmy,
   ClaimProvince,
   BuildSettlement,
+  BuildBuilding,
 };
 
 struct Action {
-  Action_t type;
+  ActionType type;
 
   float cost = 0;
 
@@ -23,122 +25,143 @@ struct Action {
 
   str as_str() {
     switch (type) {
-      case Action_t::AchieveGoal:
+      case ActionType::AchieveGoal:
         return "AchieveGoal";
-      case Action_t::MoveColonistToUnclaimedProvince:
+      case ActionType::MoveColonistToUnclaimedProvince:
         return "MoveColonistToUnclaimedProvince";
-      case Action_t::MoveColonistToUnsettledOwnedProvince:
+      case ActionType::MoveColonistToUnsettledOwnedProvince:
         return "MoveColonistToOwnProvince";
-      case Action_t::SpawnColonist:
+      case ActionType::SpawnColonist:
         return "SpawnColonist";
-      case Action_t::ClaimProvince:
+      case ActionType::SpawnArmy:
+        return "SpawnArmy";
+      case ActionType::ClaimProvince:
         return "ClaimProvince";
-      case Action_t::BuildSettlement:
+      case ActionType::BuildSettlement:
         return "BuildSettlement";
+      case ActionType::BuildBuilding:
+        return "BuildBuilding";
     }
   }
 };
 
-inline Action get_action(Action_t type) {
+inline Action get_action(ActionType type) {
   switch (type) {
-    case Action_t::AchieveGoal:
+    case ActionType::AchieveGoal:
       return Action{
         .type = type,
         .preconditions = {},
         .effects = {},
       };
-    case Action_t::BuildSettlement:
+    case ActionType::BuildSettlement:
       return Action{
         .type = type,
         .preconditions =
           {
+            {ConditionType::ColonistOnOwnProvince, true},
             {
-              Condition_t::ColonistOnOwnProvince,
-              ConditionCompare::Equals,
-              {.boolean = true},
+              ConditionType::HasResources,
+              ConditionCompare::GreaterThanOrEqualTo,
+              map<Resources::Type, u32>{
+                {Resources::Type::Timber, 5},
+              },
             },
           },
         .effects = {
           Effect{
-            Condition_t::HasSettlements,
+            ConditionType::HasSettlements,
             EffectOperator::Increase,
-            {.number = 1},
+            (u32) 1,
           },
         },
       };
-    case Action_t::ClaimProvince:
+    case AI::ActionType::BuildBuilding:
+      return Action {
+        .type = type,
+        .preconditions = {
+          {
+            ConditionType::HasSettlements, 
+            ConditionCompare::GreaterThanOrEqualTo, 
+            (u32) 1,
+          },
+        },
+        .effects = {
+          
+        },
+      };
+    case ActionType::ClaimProvince:
       return Action{
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::ColonistOnUnclaimedProvince,
-              ConditionCompare::Equals,
-              {.boolean = true},
-            },
+            {ConditionType::ColonistOnUnclaimedProvince, true},
           },
         .effects = {
           Effect{
-            Condition_t::HasUnsettledProvince,
+            ConditionType::HasUnsettledProvince,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };
-    case Action_t::SpawnColonist:
+    case ActionType::SpawnColonist:
       return Action{
         .type = type,
         // @todo requirements to make colonist
         .preconditions{},
         .effects = {
           Effect{
-            Condition_t::HasColonist,
+            ConditionType::HasColonist,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
           },
         },
       };
 
-    case Action_t::MoveColonistToUnclaimedProvince:
+    case ActionType::SpawnArmy:
       return Action{
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::HasColonist,
-              ConditionCompare::Equals,
-              {.boolean = true},
-            },
-          },
+            has_food(10),
+          },// @todo requirements to make army
         .effects = {
           Effect{
-            Condition_t::ColonistOnUnclaimedProvince,
-            EffectOperator::Set,
-            {.boolean = true},
+            ConditionType::HasArmies,
+            EffectOperator::Increase,
+            (u32) 1,
           },
         },
       };
-    case Action_t::MoveColonistToUnsettledOwnedProvince:
+
+    case ActionType::MoveColonistToUnclaimedProvince:
       return Action{
         .type = type,
         .preconditions =
           {
-            {
-              Condition_t::HasColonist,
-              ConditionCompare::Equals,
-              {.boolean = true},
-            },
-            {
-              Condition_t::HasUnsettledProvince,
-              ConditionCompare::Equals,
-              {.boolean = true},
-            },
+            {ConditionType::HasColonist, true},
           },
         .effects = {
           Effect{
-            Condition_t::ColonistOnOwnProvince,
+            ConditionType::ColonistOnUnclaimedProvince,
             EffectOperator::Set,
-            {.boolean = true},
+            true,
+          },
+        },
+      };
+    case ActionType::MoveColonistToUnsettledOwnedProvince:
+      return Action{
+        .type = type,
+        .preconditions =
+          {
+            {ConditionType::HasColonist, true},
+            {ConditionType::HasUnsettledProvince, true},
+          },
+        .effects = {
+          Effect{
+            ConditionType::ColonistOnOwnProvince,
+            EffectOperator::Set,
+            true,
           },
         },
       };
@@ -146,21 +169,23 @@ inline Action get_action(Action_t type) {
 };
 
 
-inline std::vector<Action_t> actions_that_satisfy_cond(Condition_t cond) {
+inline std::vector<ActionType> actions_that_satisfy_cond(ConditionType cond) {
   switch (cond) {
-    case Condition_t::ColonistOnUnclaimedProvince:
-      return {Action_t::MoveColonistToUnclaimedProvince};
-    case Condition_t::ColonistOnOwnProvince:
-      return {Action_t::MoveColonistToUnsettledOwnedProvince};
-    case Condition_t::HasColonist:
-      return {Action_t::SpawnColonist};
-    case Condition_t::HasUnsettledProvince:
-      return {Action_t::ClaimProvince};
-    case Condition_t::HasSettlements:
-      return {Action_t::BuildSettlement};
-    case Condition_t::HasResources:
-      return {};
-    case Condition_t::COUNT:
+    case ConditionType::ColonistOnUnclaimedProvince:
+      return {ActionType::MoveColonistToUnclaimedProvince};
+    case ConditionType::ColonistOnOwnProvince:
+      return {ActionType::MoveColonistToUnsettledOwnedProvince};
+    case ConditionType::HasColonist:
+      return {ActionType::SpawnColonist};
+    case ConditionType::HasArmies:
+      return {ActionType::SpawnArmy};
+    case ConditionType::HasUnsettledProvince:
+      return {ActionType::ClaimProvince};
+    case ConditionType::HasSettlements:
+      return {ActionType::BuildSettlement};
+    case ConditionType::HasResources:
+      return {};// @todo
+    case ConditionType::COUNT:
       return {};
   }
 }
